@@ -74,7 +74,7 @@ public class SlottableTest {
 			wearSlot.Position = Vector2.zero;
 			sgWear.Slots.Add(wearSlot);
 			
-
+			
 		BowMock defBow = new BowMock();
 		defBow.ItemID = 1;
 		BowInstanceMock defBowA = new BowInstanceMock();
