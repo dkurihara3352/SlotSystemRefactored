@@ -15,6 +15,39 @@ namespace SlotSystem{
 			}
 	/*	SGM classes
 	*/
+		/*	transaction
+		*/
+			public interface SlotSystemTransaction{
+				void Indicate();
+				void Execute();
+			}
+			public class RevertTransaction: SlotSystemTransaction{
+				Slottable slottable;
+				public RevertTransaction(Slottable sb){
+					this.slottable = sb;
+				}
+				public void Indicate(){
+					//implement revert indication here
+				}
+				public void Execute(){
+					//implement reverting here
+				}
+			}
+		/*	commands
+		*/
+			public interface SGMCommand{
+				void Execute(SlotGroupManager sgm);
+			}
+			public class UpdateTransactionCommand: SGMCommand{
+				public void Execute(SlotGroupManager sgm){
+					if(sgm.PickedSB != null){
+						if(sgm.PickedSB == sgm.SelectedSB){
+							SlotSystemTransaction revertTs = new RevertTransaction(sgm.PickedSB);
+							sgm.SetTransaction(revertTs);
+						}
+					}
+				}
+			}
 		/*	process
 		*/
 			public interface SGMProcess{
@@ -385,10 +418,7 @@ namespace SlotSystem{
 					slottable.PickedUpAndSelectedProcess.Start();
 					slottable.SGM.SetState(SlotGroupManager.ProbingState);
 					slottable.SGM.SetPickedSB(slottable);
-					/*
-						==> this consequently sets both SelectedSB and SelectedSG
-						and indicate
-					*/
+
 					
 				}
 				public void ExitState(Slottable slottable){

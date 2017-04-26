@@ -10,6 +10,30 @@ namespace SlotSystem{
 			get{return m_UTLog;}
 			set{m_UTLog = value;}
 		}
+		/*	transaction
+		*/
+			SlotSystemTransaction m_transaction;
+			public SlotSystemTransaction Transaction{
+				get{return m_transaction;}
+			}
+			public void SetTransaction(SlotSystemTransaction ts){
+				if(ts != null){
+					if(m_transaction != ts){
+						m_transaction = ts;
+						m_transaction.Indicate();
+					}
+				}
+			}
+		/*	command
+		*/
+			SGMCommand m_updateTransactionCommand;
+			public SGMCommand UpdateTransactionCommand{
+				get{return m_updateTransactionCommand;}
+			}
+			public void SetUpdateTransacitonCommand(SGMCommand command){
+				m_updateTransactionCommand = command;
+			}
+
 		/*	process
 		*/
 			AbsSGMProcess m_probingStateProcess;
@@ -78,21 +102,21 @@ namespace SlotSystem{
 			Slottable m_selectedSB;
 			public Slottable SelectedSB{
 				get{return m_selectedSB;}
-				set{
-					if(m_selectedSB != value){
-						m_selectedSB = value;
-						// UpdateTransaction();
-					}
+			}
+			public void SetSelectedSB(Slottable sb){
+				if(sb != m_selectedSB){
+					UpdateTransaction();
+					m_selectedSB = sb;
 				}
 			}
 			SlotGroup m_selectedSG;
 			public SlotGroup SelectedSG{
 				get{return m_selectedSG;}
-				set{
-					if(m_selectedSG != value){
-						m_selectedSG = value;
-						// UpdateTransaction();
-					}
+			}
+			public void SetSelectedSG(SlotGroup sg){
+				if(sg != m_selectedSG){
+					m_selectedSG = sg;
+					UpdateTransaction();
 				}
 			}
 			Slottable m_pickedSB;
@@ -166,12 +190,12 @@ namespace SlotSystem{
 				if(sb != null){
 					if(SelectedSB != null && SelectedSB != sb)
 						SelectedSB.OnDehoveredMock(eventData);
-					m_selectedSB = sb;
+					SetSelectedSB(sb);
 					m_selectedSB.OnHoveredMock(eventData);
 				}else{
 					if(SelectedSB != null){
 						SelectedSB.OnDehoveredMock(eventData);
-						m_selectedSB = null;
+						SetSelectedSB(null);
 					}
 				}
 			}
@@ -181,15 +205,20 @@ namespace SlotSystem{
 				if(sg != null){
 					if(SelectedSG != null && SelectedSG != sg)
 						SelectedSG.OnDehoveredMock(eventData);
-					m_selectedSG = sg;
+					SetSelectedSG(sg);
 					m_selectedSG.OnHoveredMock(eventData);
 				}else{
 					if(SelectedSG != null){
 						SelectedSG.OnDehoveredMock(eventData);
-						m_selectedSG = null;
+						SetSelectedSG(null);
 					}
 				}
 			}
+		}
+		
+		public void UpdateTransaction(){
+		
+			m_updateTransactionCommand.Execute(this);
 		}
 
 	}
