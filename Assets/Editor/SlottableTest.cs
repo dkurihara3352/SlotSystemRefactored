@@ -75,6 +75,10 @@ public class SlottableTest {
 			sgWear.Slots.Add(wearSlot);
 
 			//added comment in master
+			//added comment in master
+			//added comment in master
+			//added comment in master
+
 			
 			
 		BowMock defBow = new BowMock();
