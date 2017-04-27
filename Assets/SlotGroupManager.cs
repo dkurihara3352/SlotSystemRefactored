@@ -27,15 +27,26 @@ namespace SlotSystem{
 		/*	command
 		*/
 			SGMCommand m_updateTransactionCommand;
-			public SGMCommand UpdateTransactionCommand{
-				get{return m_updateTransactionCommand;}
-			}
-			public void SetUpdateTransactionCommand(SGMCommand command){
-				m_updateTransactionCommand = command;
-			}
-			public void UpdateTransaction(){
-				m_updateTransactionCommand.Execute(this);
-			}
+				public SGMCommand UpdateTransactionCommand{
+					get{return m_updateTransactionCommand;}
+				}
+				public void SetUpdateTransactionCommand(SGMCommand command){
+					m_updateTransactionCommand = command;
+				}
+				public void UpdateTransaction(){
+					m_updateTransactionCommand.Execute(this);
+				}
+			SGMCommand m_postPickFilterCommand;
+				public SGMCommand PostPickFilterCommand{
+					get{return m_postPickFilterCommand;}
+				}
+				public void SetPostPickFilterCommand(SGMCommand comm){
+					m_postPickFilterCommand = comm;
+				}
+				public void PostPickFilter(){
+					if(m_postPickFilterCommand != null)
+					m_postPickFilterCommand.Execute(this);
+				}
 		/*	process
 		*/
 			AbsSGMProcess m_probingStateProcess;
@@ -192,12 +203,12 @@ namespace SlotSystem{
 				if(sb != null){
 					if(SelectedSB != null && SelectedSB != sb)
 						SelectedSB.OnDehoveredMock(eventData);
-					SetSelectedSB(sb);
-					m_selectedSB.OnHoveredMock(eventData);
+					// SetSelectedSB(sb);
+					sb.OnHoveredMock(eventData);
 				}else{
 					if(SelectedSB != null){
 						SelectedSB.OnDehoveredMock(eventData);
-						SetSelectedSB(null);
+						// SetSelectedSB(null);
 					}
 				}
 			}
@@ -207,19 +218,16 @@ namespace SlotSystem{
 				if(sg != null){
 					if(SelectedSG != null && SelectedSG != sg)
 						SelectedSG.OnDehoveredMock(eventData);
-					SetSelectedSG(sg);
-					m_selectedSG.OnHoveredMock(eventData);
+					// SetSelectedSG(sg);
+					sg.OnHoveredMock(eventData);
 				}else{
 					if(SelectedSG != null){
 						SelectedSG.OnDehoveredMock(eventData);
-						SetSelectedSG(null);
+						// SetSelectedSG(null);
 					}
 				}
 			}
 		}
-		// public void PostPickFilter(){
-		// 	m_postPickFilter.Execute(this);
-		// }
 
 	}
 

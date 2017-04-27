@@ -122,14 +122,24 @@ namespace SlotSystem{
 				}
 			}
 
-			static SlottableState m_equippedState;
-			public static SlottableState EquippedState{
+			static SlottableState m_equippedAndDeselectedState;
+			public static SlottableState EquippedAndDeselectedState{
 				get{
-					if(Slottable.m_equippedState != null)
-						return Slottable.m_equippedState;
+					if(Slottable.m_equippedAndDeselectedState != null)
+						return Slottable.m_equippedAndDeselectedState;
 					else
-						Slottable.m_equippedState = new EquippedState();
-						return Slottable.m_equippedState;
+						Slottable.m_equippedAndDeselectedState = new EquippedAndDeselectedState();
+						return Slottable.m_equippedAndDeselectedState;
+				}
+			}
+			static SlottableState m_equippedAndSelectedState;
+			public static SlottableState EquippedAndSelectedState{
+				get{
+					if(Slottable.m_equippedAndSelectedState != null)
+						return Slottable.m_equippedAndSelectedState;
+					else
+						Slottable.m_equippedAndSelectedState = new EquippedAndSelectedState();
+						return Slottable.m_equippedAndSelectedState;
 				}
 			}
 			static SlottableState m_selectedState;

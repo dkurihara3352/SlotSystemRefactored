@@ -187,15 +187,15 @@ public class SGMTest {
 	}	
 	public void CheckSGStatesUpdated(){
 		
-		Assert.That(sgpAll.CurrentState, Is.EqualTo(SlotGroup.FocusedState));
+		Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.FocusedState));
 		
-		Assert.That(sgpBow.CurrentState, Is.EqualTo(SlotGroup.DefocusedState));
+		Assert.That(sgpBow.CurState, Is.EqualTo(SlotGroup.DefocusedState));
 		
-		Assert.That(sgpWear.CurrentState, Is.EqualTo(SlotGroup.DefocusedState));
+		Assert.That(sgpWear.CurState, Is.EqualTo(SlotGroup.DefocusedState));
 		
-		Assert.That(sgBow.CurrentState, Is.EqualTo(SlotGroup.FocusedState));
+		Assert.That(sgBow.CurState, Is.EqualTo(SlotGroup.FocusedState));
 		
-		Assert.That(sgWear.CurrentState, Is.EqualTo(SlotGroup.FocusedState));
+		Assert.That(sgWear.CurState, Is.EqualTo(SlotGroup.FocusedState));
 	}
 	public void CheckSGMIsAssigned(){
 		Assert.That(sgpAll.SGM, Is.Not.Null);
@@ -210,35 +210,35 @@ public class SGMTest {
 		foreach(Slot slot in sgpAll.Slots){
 			InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)slot.Sb.Item;
 			if(invInst.IsEquipped)
-				AssertSBState(slot.Sb, Slottable.EquippedState);
+				AssertSBState(slot.Sb, Slottable.EquippedAndDeselectedState);
 			else
 				AssertSBState(slot.Sb, Slottable.DeactivatedState);
 		}
 		foreach(Slot slot in sgpBow.Slots){
 			InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)slot.Sb.Item;
 			if(invInst.IsEquipped)
-				AssertSBState(slot.Sb, Slottable.EquippedState);
+				AssertSBState(slot.Sb, Slottable.EquippedAndDeselectedState);
 			else
 				AssertSBState(slot.Sb, Slottable.DeactivatedState);
 		}
 		foreach(Slot slot in sgpWear.Slots){
 			InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)slot.Sb.Item;
 			if(invInst.IsEquipped)
-				AssertSBState(slot.Sb, Slottable.EquippedState);
+				AssertSBState(slot.Sb, Slottable.EquippedAndDeselectedState);
 			else
 				AssertSBState(slot.Sb, Slottable.DeactivatedState);
 		}
 		foreach(Slot slot in sgBow.Slots){
 			InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)slot.Sb.Item;
 			if(invInst.IsEquipped)
-				AssertSBState(slot.Sb, Slottable.EquippedState);
+				AssertSBState(slot.Sb, Slottable.EquippedAndDeselectedState);
 			else
 				AssertSBState(slot.Sb, Slottable.DeactivatedState);
 		}
 		foreach(Slot slot in sgWear.Slots){
 			InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)slot.Sb.Item;
 			if(invInst.IsEquipped)
-				AssertSBState(slot.Sb, Slottable.EquippedState);
+				AssertSBState(slot.Sb, Slottable.EquippedAndDeselectedState);
 			else
 				AssertSBState(slot.Sb, Slottable.DeactivatedState);
 		}
@@ -633,7 +633,7 @@ public class SGMTest {
 	/* Assert Methods
 	*/
 		public void AssertSGState<T>(SlotGroup sg) where T: SlotGroupState{
-			Assert.That(sg.CurrentState.GetType(), Is.EqualTo(typeof(T)));
+			Assert.That(sg.CurState.GetType(), Is.EqualTo(typeof(T)));
 		}
 		public void AssertLog(MonoBehaviour logger, string str){
 			if(logger is SlotGroupManager){
@@ -665,13 +665,13 @@ public class SGMTest {
 		public void AssertSlottableStateAfterFocused(SlotGroup sg){
 			foreach(Slot slot in sg.Slots){
 			if(slot.Sb != null){
-				if(sg.CurrentState == SlotGroup.DefocusedState){
+				if(sg.CurState == SlotGroup.DefocusedState){
 					Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-				}else if(sg.CurrentState == SlotGroup.FocusedState){
+				}else if(sg.CurState == SlotGroup.FocusedState){
 
 					InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
 					if(invItem.IsEquipped)
-						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedState));
+						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 					else{
 						if(invItem.Item is BowMock)
 							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.FocusedState));
@@ -688,7 +688,7 @@ public class SGMTest {
 			}
 		}
 		public void AssertSGState(SlotGroup sg, SlotGroupState sgState){
-			Assert.That(sg.CurrentState, Is.EqualTo(sgState));
+			Assert.That(sg.CurState, Is.EqualTo(sgState));
 		}
 		public void AssertSBState(Slottable sb, SlottableState sbState){
 			Assert.That(sb.CurState, Is.EqualTo(sbState));
@@ -699,7 +699,7 @@ public class SGMTest {
 				if(slot.Sb != null){
 					InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
 					if(invItem.IsEquipped)
-						AssertSBState(slot.Sb, Slottable.EquippedState);
+						AssertSBState(slot.Sb, Slottable.EquippedAndDeselectedState);
 					else if(!(sg.Filter is SGPartsFilter) && invItem is PartsInstanceMock)
 						AssertSBState(slot.Sb, Slottable.DefocusedState);
 					else

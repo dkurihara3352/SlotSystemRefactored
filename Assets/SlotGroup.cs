@@ -20,8 +20,15 @@ namespace SlotSystem{
 			void Update () {
 				
 			}
-		/* static fields
+		/*	states
 		*/
+			SlotGroupState m_curState;
+			public SlotGroupState CurState{
+				get{
+					if(m_curState == null)
+						m_curState = DeactivatedState;
+					return m_curState;}
+			}
 			private static SlotGroupState m_deactivatedState;
 			public static SlotGroupState DeactivatedState{
 				get{
@@ -46,16 +53,18 @@ namespace SlotSystem{
 					return m_focusedState;
 				}
 			}
+			private static SlotGroupState m_selectedState;
+			public static SlotGroupState SelectedState{
+				get{
+					if(m_selectedState == null)
+						m_selectedState = new SGSelectedState();
+					return m_selectedState;
+				}
+			}
 
 		/*	public fields
 		*/
-			SlotGroupState m_currentState;
-			public SlotGroupState CurrentState{
-				get{
-					if(m_currentState == null)
-						m_currentState = DeactivatedState;
-					return m_currentState;}
-			}
+			
 			AxisScrollerMock m_scroller;
 			public AxisScrollerMock Scroller{
 				get{return m_scroller;}
@@ -102,6 +111,8 @@ namespace SlotSystem{
 				get{return m_sgm;}
 				set{m_sgm = value;}
 			}
+		/*	state
+		*/
 
 		/* commands
 		*/	SlotGroupCommand m_wakeUpCommand = new SGWakeupCommand();
@@ -145,7 +156,10 @@ namespace SlotSystem{
 				set{m_defocusCommand = value;}
 			}
 		public void SetState(SlotGroupState state){
-			m_currentState = state;
+			if(m_curState != state){
+				m_curState = state;
+				UpdateSbState();
+			}
 		}
 		public void WakeUp(){
 			m_wakeUpCommand.Execute(this);
@@ -194,10 +208,10 @@ namespace SlotSystem{
 			return null;
 		}
 		public void OnHoveredMock(PointerEventDataMock eventData){
-			CurrentState.OnHoveredMock(this, eventData);
+			CurState.OnHoveredMock(this, eventData);
 		}
 		public void OnDehoveredMock(PointerEventDataMock eventData){
-			CurrentState.OnDehoveredMock(this, eventData);
+			CurState.OnDehoveredMock(this, eventData);
 		}
 		
 	}

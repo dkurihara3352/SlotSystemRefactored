@@ -32,6 +32,8 @@ public class SlottableTest {
 		sgm = sgmGO.AddComponent<SlotGroupManager>();
 		SGMCommand updateTSCommand = new UpdateTransactionCommand();
 		sgm.SetUpdateTransactionCommand(updateTSCommand);
+		SGMCommand postPickFilterCommand = new PostPickFilterCommand();
+		sgm.SetPostPickFilterCommand(postPickFilterCommand);
 		/*	sgpAll
 		*/
 			sgpAllGO = new GameObject("PoolSlotGroup");
@@ -151,19 +153,19 @@ public class SlottableTest {
 		/*	Assertions
 		*/
 			Assert.That(sgm.SlotGroups.Count, Is.EqualTo(3));
-			Assert.That(sgpAll.CurrentState, Is.EqualTo(SlotGroup.FocusedState));
-			Assert.That(sgBow.CurrentState, Is.EqualTo(SlotGroup.FocusedState));
-			Assert.That(sgWear.CurrentState, Is.EqualTo(SlotGroup.FocusedState));
+			Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.FocusedState));
+			Assert.That(sgBow.CurState, Is.EqualTo(SlotGroup.FocusedState));
+			Assert.That(sgWear.CurState, Is.EqualTo(SlotGroup.FocusedState));
 
 			Assert.That(sgBow.Slots.Count, Is.EqualTo(1));
-				Assert.That(sgBow.GetSlottable(defBowA).CurState, Is.EqualTo(Slottable.EquippedState));
+				Assert.That(sgBow.GetSlottable(defBowA).CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 			Assert.That(sgWear.Slots.Count, Is.EqualTo(1));
-				Assert.That(sgWear.GetSlottable(defWearA).CurState, Is.EqualTo(Slottable.EquippedState));
+				Assert.That(sgWear.GetSlottable(defWearA).CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 			Assert.That(sgpAll.Slots.Count, Is.EqualTo(9));
-				Assert.That(sgpAll.GetSlottable(defBowA).CurState, Is.EqualTo(Slottable.EquippedState));
+				Assert.That(sgpAll.GetSlottable(defBowA).CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 				Assert.That(sgpAll.GetSlottable(defBowB).CurState, Is.EqualTo(Slottable.FocusedState));
 				Assert.That(sgpAll.GetSlottable(crfBowA).CurState, Is.EqualTo(Slottable.FocusedState));
-				Assert.That(sgpAll.GetSlottable(defWearA).CurState, Is.EqualTo(Slottable.EquippedState));
+				Assert.That(sgpAll.GetSlottable(defWearA).CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 				Assert.That(sgpAll.GetSlottable(defWearB).CurState, Is.EqualTo(Slottable.FocusedState));
 				Assert.That(sgpAll.GetSlottable(crfWearA).CurState, Is.EqualTo(Slottable.FocusedState));
 				Assert.That(sgpAll.GetSlottable(defPartsA).CurState, Is.EqualTo(Slottable.DefocusedState));
@@ -179,35 +181,41 @@ public class SlottableTest {
 		sb.SetState(Slottable.SelectedState);
 		AssertState(sb, Slottable.SelectedState);
 	}
+	public void PickUpAndValidate(Slottable sb){
+
+		sb.OnPointerDownMock(eventDataMock);
+			
+			AssertState(sb, Slottable.WaitForPickUpState);
+			Assert.That(sb.WaitAndPickUpProcess.IsRunning, Is.True);
+			Assert.That(sb.WaitAndPickUpProcess.IsExpired, Is.False);
+		
+		sb.WaitAndPickUpProcess.Expire();
+		
+			AssertAction(sb, "WaitAndPickUpProcess done");
+			Assert.That(sb.WaitAndPickUpProcess.IsRunning, Is.False);
+			Assert.That(sb.WaitAndPickUpProcess.IsExpired, Is.True);
+		
+			AssertState(sb, Slottable.PickedUpAndSelectedState);
+			Assert.That(sb.PickedUpAndSelectedProcess.IsRunning, Is.True);
+			Assert.That(sb.PickedUpAndSelectedProcess.IsExpired, Is.False);
+
+		sb.SGM.SimSBHover(sb, eventDataMock);
+		sb.SGM.SimSGHover(sb.SGM.GetSlotGroup(sb), eventDataMock);
+			
+			Assert.That(sb.SGM.CurState, Is.EqualTo(SlotGroupManager.ProbingState));
+			Assert.That(sb.SGM.ProbingStateProcess.IsRunning, Is.True);
+			Assert.That(sb.SGM.ProbingStateProcess.IsExpired, Is.False);
+	}
 	[Test]
 	public void TestPickedUpAndSelectedState(){
 		/* pick up
 		*/
-			/*	setup
-			*/	
-						
-				// sb.SetState(Slottable.FocusedState);
-				defBowBSB.OnPointerDownMock(eventDataMock);
-				AssertState(defBowBSB, Slottable.WaitForPickUpState);
-				
-				defBowBSB.WaitAndPickUpProcess.Expire();
-				
-				AssertAction(defBowBSB, "WaitAndPickUpProcess done");
-				Assert.That(defBowBSB.WaitAndPickUpProcess.IsRunning, Is.False);
-				Assert.That(defBowBSB.WaitAndPickUpProcess.IsExpired, Is.True);
-				
-				AssertState(defBowBSB, Slottable.PickedUpAndSelectedState);
-				
-				defBowBSB.SGM.SimSBHover(defBowBSB, eventDataMock);
-				defBowBSB.SGM.SimSGHover(defBowBSB.SGM.GetSlotGroup(defBowBSB), eventDataMock);
+			PickUpAndValidate(defBowBSB);
 		/* enter
 		*/
-			Assert.That(defBowBSB.PickedUpAndSelectedProcess.IsRunning, Is.True);
-			Assert.That(defBowBSB.PickedUpAndSelectedProcess.IsExpired, Is.False);
 			
-			Assert.That(defBowBSB.SGM.CurState, Is.EqualTo(SlotGroupManager.ProbingState));
-			Assert.That(defBowBSB.SGM.ProbingStateProcess.IsRunning, Is.True);
-			Assert.That(defBowBSB.SGM.ProbingStateProcess.IsExpired, Is.False);
+			
+			
 			//SGM fields set properly
 				Assert.That(defBowBSB.SGM.SelectedSB, Is.EqualTo(defBowBSB));
 				Assert.That(defBowBSB.SGM.SelectedSG, Is.EqualTo(defBowBSB.SGM.GetSlotGroup(defBowBSB)));
@@ -220,12 +228,35 @@ public class SlottableTest {
 		/*	post pick filtering
 			after this is done then test hovering on defocused entities to validate SGM does not update its Selected fields
 		*/
-			// Assert.That(sgWear.CurrentState, Is.EqualTo(SlotGroup.DefocusedState));
-			// foreach(Slot slot in sgWear.Slots){
-			// 	if(slot.Sb != null){
-			// 		Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-			// 	}
-			// }
+			Assert.That(defBowBSB.SGM.PickedSB.Item, Is.TypeOf(typeof(BowInstanceMock)));
+			Assert.That(sgWear.Filter, Is.TypeOf(typeof(SGWearFilter)));
+			Assert.That(sgWear.CurState, Is.EqualTo(SlotGroup.DefocusedState));
+			foreach(Slot slot in sgWear.Slots){
+				if(slot.Sb != null){
+					Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
+				}
+			}
+			Assert.That(sgBow.CurState, Is.EqualTo(SlotGroup.FocusedState));
+			foreach(Slot slot in sgBow.Slots){
+				if(slot.Sb != null){
+					Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
+				}
+			}
+			Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.SelectedState));
+			foreach(Slot slot in sgpAll.Slots){
+				if(slot.Sb != null){
+					if(slot.Sb.Item is PartsInstanceMock)
+						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
+					else if(object.ReferenceEquals(slot.Sb.Item, sgBow.Slots[0].Sb.Item))
+						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
+					else if(object.ReferenceEquals(slot.Sb.Item, sgWear.Slots[0].Sb.Item))
+						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
+					else if(slot.Sb == sgm.PickedSB)
+						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
+					else
+						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.FocusedState));
+				}
+			}
 		/*	checkTransaction
 		*/
 		/*	hover and dehover
@@ -768,20 +799,23 @@ public class SlottableTest {
 			
 		// }
 
-	public void AssertState<T>() where T: SlottableState{
-		Assert.That(sb.CurState.GetType(), Is.EqualTo(typeof(T)));
-	}
-	public void AssertState(Slottable sb, SlottableState sbState){
-		Assert.That(sb.CurState, Is.EqualTo(sbState));
-	}
-	public void AssertAction(Slottable sb, string str){
-		Assert.That(sb.UTLog, Is.EqualTo(str));
-	}
-	public void AssertCanceled(){
-		Assert.That(sb.UTLog, Is.EqualTo("Canceled"));
-		sb.UTLog = "";
-	}
-	public void AssertPickQuantity(int quant){
-		Assert.That(sb.PickedAmount, Is.EqualTo(quant));
-	}
+	
+	/*	Assertions
+	*/
+		public void AssertState<T>() where T: SlottableState{
+			Assert.That(sb.CurState.GetType(), Is.EqualTo(typeof(T)));
+		}
+		public void AssertState(Slottable sb, SlottableState sbState){
+			Assert.That(sb.CurState, Is.EqualTo(sbState));
+		}
+		public void AssertAction(Slottable sb, string str){
+			Assert.That(sb.UTLog, Is.EqualTo(str));
+		}
+		public void AssertCanceled(){
+			Assert.That(sb.UTLog, Is.EqualTo("Canceled"));
+			sb.UTLog = "";
+		}
+		public void AssertPickQuantity(int quant){
+			Assert.That(sb.PickedAmount, Is.EqualTo(quant));
+		}
 }

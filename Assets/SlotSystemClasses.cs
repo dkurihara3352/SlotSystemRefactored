@@ -48,6 +48,41 @@ namespace SlotSystem{
 					}
 				}
 			}
+			public class PostPickFilterCommand: SGMCommand{
+				public void Execute(SlotGroupManager sgm){
+					if(sgm.PickedSB != null){
+						if(sgm.PickedSB.Item is BowInstanceMock){
+							foreach(SlotGroup sg in sgm.SlotGroups){
+								if(sg.CurState != SlotGroup.SelectedState){
+									if(sg.CurState == SlotGroup.FocusedState){
+										if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGBowFilter))
+											sg.SetState(SlotGroup.DefocusedState);
+									}
+								}
+							}
+						}else if(sgm.PickedSB.Item is WearInstanceMock){
+							foreach(SlotGroup sg in sgm.SlotGroups){
+								if(sg.CurState != SlotGroup.SelectedState){
+									if(sg.CurState == SlotGroup.FocusedState){
+										if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGWearFilter))
+											sg.SetState(SlotGroup.DefocusedState);
+									}
+								}
+							}
+						}else if(sgm.PickedSB.Item is PartsInstanceMock){
+							foreach(SlotGroup sg in sgm.SlotGroups){
+								if(sg.CurState != SlotGroup.SelectedState){
+									if(sg.CurState == SlotGroup.FocusedState){
+										if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGPartsFilter))
+											sg.SetState(SlotGroup.DefocusedState);
+									}
+								}
+							}
+
+						}
+					}
+				}
+			}
 		/*	process
 		*/
 			public interface SGMProcess{
@@ -337,14 +372,17 @@ namespace SlotSystem{
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
 				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
-					if(eventDataMock.pointerDrag != null){
-						Slottable draggedSb = eventDataMock.pointerDrag.GetComponent<Slottable>();
-						if(draggedSb != null){
-							if(draggedSb.CurState == Slottable.PickedUpAndSelectedState){
-								sb.SetState(Slottable.SelectedState);
-							}
-						}
-					}
+					sb.SGM.SetSelectedSB(sb);
+					sb.SetState(Slottable.SelectedState);
+					// if(eventDataMock.pointerDrag != null){
+					// 	Slottable draggedSb = eventDataMock.pointerDrag.GetComponent<Slottable>();
+					// 	if(draggedSb != null){
+					// 		if(draggedSb.CurState == Slottable.PickedUpAndSelectedState){
+					// 			sb.SetState(Slottable.SelectedState);
+					// 			sb.SGM.SetSelectedSB(sb);
+					// 		}
+					// 	}
+					// }
 				}
 				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
@@ -418,7 +456,7 @@ namespace SlotSystem{
 					slottable.PickedUpAndSelectedProcess.Start();
 					slottable.SGM.SetState(SlotGroupManager.ProbingState);
 					slottable.SGM.SetPickedSB(slottable);
-					// slottable.SGM.PostPickFilter();
+					slottable.SGM.PostPickFilter();
 					
 				}
 				public void ExitState(Slottable slottable){
@@ -439,13 +477,20 @@ namespace SlotSystem{
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					// slottable.ExecuteTransaction();
 				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					sb.SGM.SetPickedSB(sb);
+					sb.SGM.SetSelectedSB(sb);
+				}
 				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
 					// if(sb.SGM.SelectedSB == sb){
 					// 	sb.SGM.SelectedSB = null;
 					// }
 					//=> handled in SGM side
+					if(sb.SGM.SelectedSB == sb){
+						sb.SGM.SetSelectedSB(null);
+					}
 					sb.SetState(Slottable.PickedUpAndDeselectedState);
+
 					
 				}
 			}
@@ -456,7 +501,10 @@ namespace SlotSystem{
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					sb.SetState(Slottable.PickedUpAndSelectedState);
+					sb.SGM.SetSelectedSB(sb);
+				}
 				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class WaitForNextTouchWhilePUState: SlottableState{
@@ -495,15 +543,34 @@ namespace SlotSystem{
 				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
-			public class EquippedState: SlottableState{
+			public class EquippedAndDeselectedState: SlottableState{
 				public void EnterState(Slottable slottable){}
 				public void ExitState(Slottable slottable){}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					sb.SGM.SetSelectedSB(sb);
+					sb.SetState(Slottable.EquippedAndSelectedState);
+				}
 				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+			}
+			public class EquippedAndSelectedState: SlottableState{
+				public void EnterState(Slottable slottable){}
+				public void ExitState(Slottable slottable){}
+				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				}
+				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					if(sb.SGM.SelectedSB == sb)
+						sb.SGM.SetSelectedSB(sb);
+					sb.SetState(Slottable.EquippedAndDeselectedState);
+				}
+
 			}
 			public class SBSelectedState: SlottableState{
 				public void EnterState(Slottable sb){}
@@ -513,7 +580,11 @@ namespace SlotSystem{
 				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					if(sb.SGM.SelectedSB == sb)
+						sb.SGM.SetSelectedSB(null);
+					sb.SetState(Slottable.FocusedState);
+				}
 			}
 		/*	commands
 		*/
@@ -672,8 +743,22 @@ namespace SlotSystem{
 				public void EnterState(SlotGroup sg){}
 				public void ExitState(SlotGroup sg){}
 				public void OnHoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+					sg.SGM.SetSelectedSG(sg);
+					sg.SetState(SlotGroup.SelectedState);
 				}
 				public void OnDehoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				}
+			}
+			public class SGSelectedState: SlotGroupState{
+				public void EnterState(SlotGroup sg){}
+				public void ExitState(SlotGroup sg){}
+				public void OnHoveredMock(SlotGroup sg, PointerEventDataMock eventData){}
+				public void OnDehoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+					if(sg.SGM.SelectedSG == sg){
+						sg.SGM.SetSelectedSG(sg);
+						sg.SetState(SlotGroup.FocusedState);
+					}
+					
 				}
 			}
 		/*	commands
@@ -695,18 +780,18 @@ namespace SlotSystem{
 			}
 			public class SGUpdateSbStateCommand: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
-					if(sg.CurrentState == SlotGroup.DefocusedState){
+					if(sg.CurState == SlotGroup.DefocusedState){
 					foreach(Slot slot in sg.Slots){
 						if(slot.Sb != null){
 							slot.Sb.SetState(Slottable.DefocusedState);
 						}
 					}
-				}else if(sg.CurrentState == SlotGroup.FocusedState){
+				}else if(sg.CurState == SlotGroup.FocusedState){
 					foreach(Slot slot in sg.Slots){
 						if(slot.Sb != null){
 							InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
 							if(invItem.IsEquipped)
-								slot.Sb.SetState(Slottable.EquippedState);
+								slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
 							else{
 								if(!(sg.Filter is SGPartsFilter) && (invItem is PartsInstanceMock))
 									slot.Sb.SetState(Slottable.DefocusedState);
