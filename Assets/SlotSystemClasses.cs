@@ -51,6 +51,7 @@ namespace SlotSystem{
 			public class PostPickFilterCommand: SGMCommand{
 				public void Execute(SlotGroupManager sgm){
 					if(sgm.PickedSB != null){
+						
 						if(sgm.PickedSB.Item is BowInstanceMock){
 							foreach(SlotGroup sg in sgm.SlotGroups){
 								if(sg.CurState != SlotGroup.SelectedState){
@@ -77,6 +78,12 @@ namespace SlotSystem{
 											sg.SetState(SlotGroup.DefocusedState);
 									}
 								}
+							}
+						}
+						foreach(SlotGroup sg in sgm.SlotGroups){
+							if(sg.CurState == SlotGroup.FocusedState || sg.CurState == SlotGroup.SelectedState){
+								if(sg.Filter is SGNullFilter)
+									sg.UpdateSbState();
 							}
 
 						}
@@ -455,7 +462,7 @@ namespace SlotSystem{
 				public void EnterState(Slottable slottable){
 					slottable.PickedUpAndSelectedProcess.Start();
 					slottable.SGM.SetState(SlotGroupManager.ProbingState);
-					slottable.SGM.SetPickedSB(slottable);
+					InitializeSGMFields(slottable);
 					slottable.SGM.PostPickFilter();
 					
 				}
@@ -491,6 +498,17 @@ namespace SlotSystem{
 					}
 					sb.SetState(Slottable.PickedUpAndDeselectedState);
 
+					
+				}
+				void InitializeSGMFields(Slottable slottable){
+					slottable.SGM.SetSelectedSB(null);
+					slottable.SGM.SetSelectedSG(null);
+					slottable.SGM.SetPickedSB(slottable);//picked needs to be set prior to the other two in order to update transaction properly
+					slottable.SGM.SetSelectedSB(slottable);
+					SlotGroup sg = slottable.SGM.GetSlotGroup(slottable);
+					slottable.SGM.SetSelectedSG(sg);
+					sg.SetState(SlotGroup.SelectedState);
+					// slottable.SGM.SetSelectedSG(slottable.SGM.GetSlotGroup(slottable));
 					
 				}
 			}
@@ -546,7 +564,14 @@ namespace SlotSystem{
 			public class EquippedAndDeselectedState: SlottableState{
 				public void EnterState(Slottable slottable){}
 				public void ExitState(Slottable slottable){}
-				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					if(!slottable.SGM.GetSlotGroup(slottable).IsPool){
+						if(slottable.Delayed)
+							slottable.SetState(Slottable.WaitForPickUpState);
+						else
+							slottable.SetState(Slottable.PickedUpAndSelectedState);
+					}
+				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
@@ -569,6 +594,19 @@ namespace SlotSystem{
 					if(sb.SGM.SelectedSB == sb)
 						sb.SGM.SetSelectedSB(sb);
 					sb.SetState(Slottable.EquippedAndDeselectedState);
+				}
+
+			}
+			public class EquippedAndDefocusedState: SlottableState{
+				public void EnterState(Slottable slottable){}
+				public void ExitState(Slottable slottable){}
+				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				}
+				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
 				}
 
 			}
@@ -780,27 +818,73 @@ namespace SlotSystem{
 			}
 			public class SGUpdateSbStateCommand: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
+					SlotGroupManager sgm = sg.SGM;
 					if(sg.CurState == SlotGroup.DefocusedState){
-					foreach(Slot slot in sg.Slots){
-						if(slot.Sb != null){
-							slot.Sb.SetState(Slottable.DefocusedState);
-						}
-					}
-				}else if(sg.CurState == SlotGroup.FocusedState){
-					foreach(Slot slot in sg.Slots){
-						if(slot.Sb != null){
-							InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
-							if(invItem.IsEquipped)
-								slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-							else{
-								if(!(sg.Filter is SGPartsFilter) && (invItem is PartsInstanceMock))
+						foreach(Slot slot in sg.Slots){
+							if(slot.Sb != null){
+								InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
+								if(invItem.IsEquipped){
+									slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+								}else
 									slot.Sb.SetState(Slottable.DefocusedState);
-								else
-									slot.Sb.SetState(Slottable.FocusedState);
+							}
+						}
+					}else if(sg.CurState == SlotGroup.FocusedState){
+						foreach(Slot slot in sg.Slots){
+							if(slot.Sb != null){
+								if(slot.Sb != sgm.PickedSB){
+
+									InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
+									if(invItem.IsEquipped){
+										if(sgm.PickedSB == null)
+											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+										else if(slot.Sb.Item is BowInstanceMock){
+											if(sgm.PickedSB.Item is BowInstanceMock){
+												if(object.ReferenceEquals(sgm.PickedSB.Item, slot.Sb.Item))
+													slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+												else
+													slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+											}
+											else
+												slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+										}else if(slot.Sb.Item is WearInstanceMock){
+											if(sgm.PickedSB.Item is WearInstanceMock)
+												if(object.ReferenceEquals(sgm.PickedSB.Item, slot.Sb.Item))
+													slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+												else
+													slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+											else
+												slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+										}else
+											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									}
+									else{
+										if(!(sg.Filter is SGPartsFilter) && (invItem is PartsInstanceMock))
+											slot.Sb.SetState(Slottable.DefocusedState);
+										else{
+											if(sgm.PickedSB == null)
+												slot.Sb.SetState(Slottable.FocusedState);
+											else{
+												if(invItem is BowInstanceMock){
+													if(sgm.PickedSB.Item is BowInstanceMock)
+														slot.Sb.SetState(Slottable.FocusedState);
+													else
+														slot.Sb.SetState(Slottable.DefocusedState);
+												}else if(invItem is WearInstanceMock){
+													if(sgm.PickedSB.Item is WearInstanceMock)
+														slot.Sb.SetState(Slottable.FocusedState);
+													else
+														slot.Sb.SetState(Slottable.DefocusedState);
+												}else{
+													slot.Sb.SetState(Slottable.DefocusedState);
+												}
+											}
+										}
+									}
+								}
 							}
 						}
 					}
-				}
 				}
 			}
 			public class SGInitItemsCommand: SlotGroupCommand{

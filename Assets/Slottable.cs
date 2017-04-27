@@ -142,6 +142,17 @@ namespace SlotSystem{
 						return Slottable.m_equippedAndSelectedState;
 				}
 			}
+			static SlottableState m_equippedAndDefocusedState;
+			public static SlottableState EquippedAndDefocusedState{
+				get{
+					if(Slottable.m_equippedAndDefocusedState != null)
+						return Slottable.m_equippedAndDefocusedState;
+					else
+						Slottable.m_equippedAndDefocusedState = new EquippedAndDefocusedState();
+						return Slottable.m_equippedAndDefocusedState;
+				}
+			}
+
 			static SlottableState m_selectedState;
 			public static SlottableState SelectedState{
 				get{

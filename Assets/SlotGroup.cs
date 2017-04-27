@@ -111,6 +111,15 @@ namespace SlotSystem{
 				get{return m_sgm;}
 				set{m_sgm = value;}
 			}
+
+			public bool IsPool{
+				get{
+					bool flag = true;
+					flag &= IsExpandable;
+					flag &= IsShrinkable;
+					return flag;
+				}
+			}
 		/*	state
 		*/
 
