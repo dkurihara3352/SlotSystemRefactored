@@ -418,7 +418,7 @@ namespace SlotSystem{
 					slottable.PickedUpAndSelectedProcess.Start();
 					slottable.SGM.SetState(SlotGroupManager.ProbingState);
 					slottable.SGM.SetPickedSB(slottable);
-
+					// slottable.SGM.PostPickFilter();
 					
 				}
 				public void ExitState(Slottable slottable){

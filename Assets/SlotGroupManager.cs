@@ -16,10 +16,10 @@ namespace SlotSystem{
 			public SlotSystemTransaction Transaction{
 				get{return m_transaction;}
 			}
-			public void SetTransaction(SlotSystemTransaction ts){
-				if(ts != null){
-					if(m_transaction != ts){
-						m_transaction = ts;
+			public void SetTransaction(SlotSystemTransaction transaction){
+				if(m_transaction != transaction){
+					m_transaction = transaction;
+					if(m_transaction != null){
 						m_transaction.Indicate();
 					}
 				}
@@ -30,10 +30,12 @@ namespace SlotSystem{
 			public SGMCommand UpdateTransactionCommand{
 				get{return m_updateTransactionCommand;}
 			}
-			public void SetUpdateTransacitonCommand(SGMCommand command){
+			public void SetUpdateTransactionCommand(SGMCommand command){
 				m_updateTransactionCommand = command;
 			}
-
+			public void UpdateTransaction(){
+				m_updateTransactionCommand.Execute(this);
+			}
 		/*	process
 		*/
 			AbsSGMProcess m_probingStateProcess;
@@ -104,9 +106,9 @@ namespace SlotSystem{
 				get{return m_selectedSB;}
 			}
 			public void SetSelectedSB(Slottable sb){
-				if(sb != m_selectedSB){
-					UpdateTransaction();
+				if(m_selectedSB != sb){
 					m_selectedSB = sb;
+					UpdateTransaction();
 				}
 			}
 			SlotGroup m_selectedSG;
@@ -114,7 +116,7 @@ namespace SlotSystem{
 				get{return m_selectedSG;}
 			}
 			public void SetSelectedSG(SlotGroup sg){
-				if(sg != m_selectedSG){
+				if(m_selectedSG != sg){
 					m_selectedSG = sg;
 					UpdateTransaction();
 				}
@@ -215,11 +217,9 @@ namespace SlotSystem{
 				}
 			}
 		}
-		
-		public void UpdateTransaction(){
-		
-			m_updateTransactionCommand.Execute(this);
-		}
+		// public void PostPickFilter(){
+		// 	m_postPickFilter.Execute(this);
+		// }
 
 	}
 

@@ -31,7 +31,7 @@ public class SlottableTest {
 		sgmGO = new GameObject("SlotGroupManager");
 		sgm = sgmGO.AddComponent<SlotGroupManager>();
 		SGMCommand updateTSCommand = new UpdateTransactionCommand();
-		sgm.SetUpdateTransacitonCommand(updateTSCommand);
+		sgm.SetUpdateTransactionCommand(updateTSCommand);
 		/*	sgpAll
 		*/
 			sgpAllGO = new GameObject("PoolSlotGroup");
@@ -209,17 +209,23 @@ public class SlottableTest {
 			Assert.That(defBowBSB.SGM.ProbingStateProcess.IsRunning, Is.True);
 			Assert.That(defBowBSB.SGM.ProbingStateProcess.IsExpired, Is.False);
 			//SGM fields set properly
-			Assert.That(defBowBSB.SGM.SelectedSB, Is.EqualTo(defBowBSB));
-			Assert.That(defBowBSB.SGM.SelectedSG, Is.EqualTo(defBowBSB.SGM.GetSlotGroup(defBowBSB)));
-			Assert.That(defBowBSB.SGM.PickedSB, Is.EqualTo(defBowBSB));
+				Assert.That(defBowBSB.SGM.SelectedSB, Is.EqualTo(defBowBSB));
+				Assert.That(defBowBSB.SGM.SelectedSG, Is.EqualTo(defBowBSB.SGM.GetSlotGroup(defBowBSB)));
+				Assert.That(defBowBSB.SGM.PickedSB, Is.EqualTo(defBowBSB));
 			//transaction
-			Assert.That(defBowBSB.SGM.UpdateTransactionCommand.GetType(), Is.EqualTo(typeof(UpdateTransactionCommand)));
-			
-			Assert.That(defBowBSB.SGM.Transaction.GetType(), Is.EqualTo(typeof(RevertTransaction)));
+				Assert.That(defBowBSB.SGM.UpdateTransactionCommand.GetType(), Is.EqualTo(typeof(UpdateTransactionCommand)));
+				
+				Assert.That(defBowBSB.SGM.Transaction.GetType(), Is.EqualTo(typeof(RevertTransaction)));
 			
 		/*	post pick filtering
 			after this is done then test hovering on defocused entities to validate SGM does not update its Selected fields
 		*/
+			// Assert.That(sgWear.CurrentState, Is.EqualTo(SlotGroup.DefocusedState));
+			// foreach(Slot slot in sgWear.Slots){
+			// 	if(slot.Sb != null){
+			// 		Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
+			// 	}
+			// }
 		/*	checkTransaction
 		*/
 		/*	hover and dehover
