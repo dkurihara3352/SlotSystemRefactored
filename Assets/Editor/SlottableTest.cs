@@ -216,6 +216,7 @@ public class SlottableTest {
 			Assert.That(defBowBSB.SGM.UpdateTransactionCommand.GetType(), Is.EqualTo(typeof(UpdateTransactionCommand)));
 			
 			Assert.That(defBowBSB.SGM.Transaction.GetType(), Is.EqualTo(typeof(RevertTransaction)));
+			
 		/*	post pick filtering
 			after this is done then test hovering on defocused entities to validate SGM does not update its Selected fields
 		*/
