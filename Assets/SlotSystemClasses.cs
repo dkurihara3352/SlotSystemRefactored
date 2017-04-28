@@ -31,6 +31,7 @@ namespace SlotSystem{
 				}
 				public void Execute(){
 					//implement reverting here
+					slottable.SetState(Slottable.RevertingState);
 				}
 			}
 		/*	commands
@@ -87,6 +88,17 @@ namespace SlotSystem{
 							}
 
 						}
+					}
+				}
+			}
+			public class PrePickFilterCommand: SGMCommand{
+				public void Execute(SlotGroupManager sgm){
+					foreach(SlotGroup sg in sgm.SlotGroups){
+						if(sg.CurState == SlotGroup.DefocusedState || !sg.IsPool)
+							sg.SetState(SlotGroup.FocusedState);
+						else if(sg.CurState == SlotGroup.SelectedState)
+							sg.SetState(SlotGroup.FocusedState);
+						sg.UpdateSbState();
 					}
 				}
 			}
@@ -297,6 +309,24 @@ namespace SlotSystem{
 					SB.UTLog = "PickedUpAndSelectedProcess done";
 				}
 			}
+			public class RevertingStateProcess: AbsSBProcess{
+				public RevertingStateProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					/*	destroy dragged icon
+						complete translation
+
+						make defocused non pool SGs focused
+						make selectedSG focused
+						then updateSBstates
+					*/
+					base.Expire();
+					SB.SGM.ClearFields();
+					SB.SGM.PrePickFilter();
+				}
+			}
 			
 		/*	states
 		*/
@@ -403,7 +433,7 @@ namespace SlotSystem{
 				}
 				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
-					sb.OnTap();
+					sb.Tap();
 					sb.SetState(Slottable.DefocusedState);
 					
 				}
@@ -469,20 +499,17 @@ namespace SlotSystem{
 				public void ExitState(Slottable slottable){
 					if(slottable.PickedUpAndSelectedProcess.IsRunning)
 						slottable.PickedUpAndSelectedProcess.Stop();
-					/*	canbe to one of..
-							PickedUpAndDeselected when dehovered
-					*/
 
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					// slottable.ExecuteTransaction();
+					slottable.ExecuteTransaction();
 				}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					// slottable.ExecuteTransaction();
+					slottable.ExecuteTransaction();
 				}
 				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.SGM.SetPickedSB(sb);
@@ -624,6 +651,25 @@ namespace SlotSystem{
 					sb.SetState(Slottable.FocusedState);
 				}
 			}
+			public class SBRevertingState: SlottableState{
+				public void EnterState(Slottable sb){
+					sb.RevertingStateProcess.Start();
+				}
+				public void ExitState(Slottable sb){
+					if(sb.RevertingStateProcess.IsRunning)
+						sb.RevertingStateProcess.Expire();
+				}
+				/*	undefined events
+				*/
+					public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					
+				}
+			}
 		/*	commands
 		*/
 			public interface SlottableCommand{
@@ -632,6 +678,11 @@ namespace SlotSystem{
 			public class DefInstantDeactivateCommand: SlottableCommand{
 				public void Execute(Slottable sb){
 					sb.UTLog = "InstantDeactivate executed";
+				}
+			}
+			public class SBTapCommand: SlottableCommand{
+				public void Execute(Slottable sb){
+
 				}
 			}
 		public interface SlottableItem: IEquatable<SlottableItem>, IComparable<SlottableItem>, IComparable{

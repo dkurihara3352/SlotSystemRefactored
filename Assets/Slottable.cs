@@ -163,12 +163,26 @@ namespace SlotSystem{
 						return Slottable.m_selectedState;
 				}
 			}
+			static SlottableState m_revertingState;
+			public static SlottableState RevertingState{
+				get{
+					if(Slottable.m_revertingState != null)
+						return Slottable.m_revertingState;
+					else
+						Slottable.m_revertingState = new SBRevertingState();
+						return Slottable.m_revertingState;
+				}
+			}
 		/* commands
 		*/
 			static SlottableCommand m_instantDeactivateCommand = new DefInstantDeactivateCommand();
-			public static SlottableCommand InstantDeactivateCommand{
-				get{return m_instantDeactivateCommand;}
-			}
+				public static SlottableCommand InstantDeactivateCommand{
+					get{return m_instantDeactivateCommand;}
+				}
+			static SlottableCommand m_tapCommand = new SBTapCommand();
+				static public SlottableCommand TapCommand{
+					get{return m_tapCommand;}
+				}
 		/* public fields
 		*/
 			
@@ -283,6 +297,34 @@ namespace SlotSystem{
 				public IEnumeratorMock PickedUpAndSelectedCoroutine(){
 					return null;
 				}
+			SBProcess m_revertingStateProcess;
+				public SBProcess RevertingStateProcess{
+					get{return m_revertingStateProcess;}
+					set{m_revertingStateProcess = value;}
+				}
+				public IEnumeratorMock RevertingStateCoroutine(){
+					return null;
+				}
+		/*	Event methods
+		*/
+			public void OnPointerDownMock(PointerEventDataMock eventDataMock){
+				m_curState.OnPointerDownMock(this, eventDataMock);
+			}
+			public void OnPointerUpMock(PointerEventDataMock eventDataMock){
+				m_curState.OnPointerUpMock(this, eventDataMock);
+			}
+			public void OnHoveredMock(PointerEventDataMock eventDataMock){
+				m_curState.OnHoveredMock(this, eventDataMock);
+			}
+			public void OnDehoveredMock(PointerEventDataMock eventDataMock){
+				m_curState.OnDehoveredMock(this, eventDataMock);
+			}
+			public void OnDeselectedMock(PointerEventDataMock eventDataMock){
+				CurState.OnDeselectedMock(this, eventDataMock);
+			}
+			public void OnEndDragMock(PointerEventDataMock eventDataMock){
+				m_curState.OnEndDragMock(this, eventDataMock);
+			}
 		string m_UTLog = "";
 		public string UTLog{
 			get{return m_UTLog;}
@@ -298,15 +340,14 @@ namespace SlotSystem{
 			this.WaitAndSetBackToDefocusedStateProcess = new WaitAndSetBackToDefocusedStateProcess(this, WaitAndSetBackToDefocusedStateCoroutine);
 			this.WaitAndPickUpProcess = new WaitAndPickUpProcess(this, WaitAndPickUpCoroutine);
 			this.PickedUpAndSelectedProcess = new PickedUpAndSelectedProcess(this, PickedUpAndSelectedCoroutine);
+			this.RevertingStateProcess = new RevertingStateProcess(this, RevertingStateCoroutine);
 		}
 		public void Initialize(SlotGroup sg){
 			InitializeProcesses();
 			m_curState = Slottable.DeactivatedState;
-			// SetState(Slottable.DeactivatedState);
 			m_prevState = Slottable.DeactivatedState;
 			this.m_sgm = sg.SGM;
 		}
-
 		public void SetState(SlottableState state){
 			if(this.m_curState != state){
 				this.m_prevState = this.m_curState;
@@ -316,50 +357,14 @@ namespace SlotSystem{
 			}
 		}
 
-		public void Defocus(){
-			
-		}
-
-		public void OnPointerDownMock(PointerEventDataMock eventDataMock){
-			m_curState.OnPointerDownMock(this, eventDataMock);
-		}
-		public void WaitAndPickupMock(){
-			m_isPickupTimerOn = true;
-		}
+		
 		public void WaitAndTapMock(){
 			m_isTapTimerOn = true;
 		}
 		public void WaitAndRevertMock(){
 			m_isRevertTimerOn = true;
 		}
-		public void OnPointerUpMock(PointerEventDataMock eventDataMock){
-			m_curState.OnPointerUpMock(this, eventDataMock);
-		}
-		public void OnHoveredMock(PointerEventDataMock eventDataMock){
-			m_curState.OnHoveredMock(this, eventDataMock);
-		}
-		public void OnDehoveredMock(PointerEventDataMock eventDataMock){
-			m_curState.OnDehoveredMock(this, eventDataMock);
-		}
 		
-		public void ExpirePickupTimer(){
-			if(m_isPickupTimerOn){
-				m_isPickupTimerOn = false;
-				PickUp();
-			}
-		}
-		public void ExpireTapTimer(){
-			if(m_isTapTimerOn){
-				m_isTapTimerOn = false;
-				OnTap();
-			}
-		}
-		public void ExpireRevertTimer(){
-			if(m_isRevertTimerOn){
-				m_isRevertTimerOn = false;
-				Revert();
-			}
-		}
 		public void Cancel(){
 			m_UTLog = "Canceled";
 			ResetTimers();
@@ -368,17 +373,11 @@ namespace SlotSystem{
 		public void FilteredInMock(){
 			SetState(Slottable.FocusedState);
 		}
-		public void OnDeselectedMock(PointerEventDataMock eventDataMock){
-			CurState.OnDeselectedMock(this, eventDataMock);
-		}
-		public void FingerMoveOverThreshMock(PointerEventDataMock eventDataMock){
-			OnEndDragMock(eventDataMock);
-		}
-		public void OnEndDragMock(PointerEventDataMock eventDataMock){
-			m_curState.OnEndDragMock(this, eventDataMock);
-		}
+		
+		
 
-		public void OnTap(){
+		public void Tap(){
+			m_tapCommand.Execute(this);
 			m_UTLog = "tapped";
 			// ResetTimers();
 			// FilteredInMock();
@@ -403,7 +402,6 @@ namespace SlotSystem{
 				m_UTLog = "Incremented";
 			}
 		}
-
 		public void ResetTimers(){
 			m_isPickupTimerOn = false;
 			m_isRevertTimerOn = false;
@@ -419,6 +417,9 @@ namespace SlotSystem{
 			m_UTLog = "InstantGrayin called";
 		}
 		public void Deactivate(){}
+		public void ExecuteTransaction(){
+			SGM.Transaction.Execute();
+		}
 	}
 
 }

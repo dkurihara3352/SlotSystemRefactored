@@ -47,6 +47,17 @@ namespace SlotSystem{
 					if(m_postPickFilterCommand != null)
 					m_postPickFilterCommand.Execute(this);
 				}
+			SGMCommand m_prePickFilterCommand;
+				public SGMCommand PrePickFilterCommand{
+					get{return m_prePickFilterCommand;}
+				}
+				public void SetPrePickFilterCommand(SGMCommand comm){
+					m_prePickFilterCommand = comm;
+				}
+				public void PrePickFilter(){
+					if(m_prePickFilterCommand != null)
+					m_prePickFilterCommand.Execute(this);
+				}
 		/*	process
 		*/
 			AbsSGMProcess m_probingStateProcess;
@@ -90,17 +101,7 @@ namespace SlotSystem{
 			public static SGMState ProbingState{
 				get{return m_probingState;}
 			}
-		/*	not used
-		*/
-			// Use this for initialization
-			void Start () {
-				
-			}
-			
-			// Update is called once per frame
-			void Update () {
-				
-			}
+		
 		/*	public field
 		*/
 			List<SlotGroup> m_slotGroups;
@@ -227,6 +228,11 @@ namespace SlotSystem{
 					}
 				}
 			}
+		}
+		public void ClearFields(){
+			m_selectedSB = null;
+			m_selectedSG = null;
+			m_pickedSB = null;
 		}
 
 	}
