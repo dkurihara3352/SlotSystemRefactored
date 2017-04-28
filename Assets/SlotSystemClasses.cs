@@ -309,6 +309,16 @@ namespace SlotSystem{
 					SB.UTLog = "PickedUpAndSelectedProcess done";
 				}
 			}
+			public class PickedUpAndDeselectedProcess: AbsSBProcess{
+				public PickedUpAndDeselectedProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+					SB.UTLog = "PickedUpAndDeselectedProcess done";
+				}
+			}
 			public class RevertingStateProcess: AbsSBProcess{
 				public RevertingStateProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 					this.SB = sb;
@@ -325,6 +335,16 @@ namespace SlotSystem{
 					base.Expire();
 					SB.SGM.ClearFields();
 					SB.SGM.PrePickFilter();
+				}
+			}
+			public class WaitForNextTouchWhilePUProcess: AbsSBProcess{
+				public WaitForNextTouchWhilePUProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+					SB.SGM.Transaction.Execute();
 				}
 			}
 			
@@ -347,14 +367,16 @@ namespace SlotSystem{
 				}
 				public void ExitState(Slottable sb){
 				}
-				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){
-					
-				}
-				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				/*	undef
+				*/
+					public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){
+						
+					}
+					public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class DefocusedState: SlottableState{
 				public void EnterState(Slottable slottable){
@@ -371,14 +393,18 @@ namespace SlotSystem{
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.SetState(Slottable.WaitForPointerUpState);
 				}
-				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				/*	undef
+				*/
+					public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+				/*	ignore
+				*/
+					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class FocusedState: SlottableState{
 				public void EnterState(Slottable slottable){
@@ -402,26 +428,21 @@ namespace SlotSystem{
 					else
 						slottable.SetState(Slottable.PickedUpAndSelectedState);
 				}
-				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
+				
 				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.SGM.SetSelectedSB(sb);
 					sb.SetState(Slottable.SelectedState);
-					// if(eventDataMock.pointerDrag != null){
-					// 	Slottable draggedSb = eventDataMock.pointerDrag.GetComponent<Slottable>();
-					// 	if(draggedSb != null){
-					// 		if(draggedSb.CurState == Slottable.PickedUpAndSelectedState){
-					// 			sb.SetState(Slottable.SelectedState);
-					// 			sb.SGM.SetSelectedSB(sb);
-					// 		}
-					// 	}
-					// }
+					
 				}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				/*	undef
+				*/
+					public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class WaitForPointerUpState: SlottableState{
 				public void EnterState(Slottable sb){
@@ -431,7 +452,7 @@ namespace SlotSystem{
 					if(sb.WaitAndSetBackToDefocusedStateProcess.IsRunning)
 						sb.WaitAndSetBackToDefocusedStateProcess.Stop();
 				}
-				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.Tap();
 					sb.SetState(Slottable.DefocusedState);
@@ -441,19 +462,20 @@ namespace SlotSystem{
 				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.SetState(Slottable.DefocusedState);
 				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				/*	undef
+				*/
+					public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class WaitForPickUpState: SlottableState{
 				public void EnterState(Slottable slottable){
-					// slottable.WaitAndPickupMock();
+					
 					slottable.WaitAndPickUpProcess.Start();
 				}
 				public void ExitState(Slottable slottable){
 					if(slottable.WaitAndPickUpProcess.IsRunning)
 						slottable.WaitAndPickUpProcess.Stop();
-				}
-				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.SetState(Slottable.WaitForNextTouchState);
@@ -463,16 +485,22 @@ namespace SlotSystem{
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.SetState(Slottable.FocusedState);
 				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
-					sb.SetState(Slottable.FocusedState);
-				}
+				/*	undef
+				*/
+					public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+						
+					}
 			}
 			public class WaitForNextTouchState: SlottableState{
 				public void EnterState(Slottable slottable){
-					slottable.WaitAndTapMock();
+					// slottable.WaitForNextTouchProcess.Start();
 				}
 				public void ExitState(Slottable slottable){
+					// if(slottable.WaitForNextTouchProcess.IsRunning)
+					// 	slottable.WaitForNextTouchProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.IsTapTimerOn = false;
@@ -489,6 +517,9 @@ namespace SlotSystem{
 				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class PickedUpAndSelectedState: SlottableState{
+				/*	Execute transaction needs revision
+					it should turn the state of sb not straight into RevertingState, but need to operate an alogorithm to decide whether it should turn sb state instead to WaitForNextTouch state before jumping into the conclusion
+				*/
 				public void EnterState(Slottable slottable){
 					slottable.PickedUpAndSelectedProcess.Start();
 					slottable.SGM.SetState(SlotGroupManager.ProbingState);
@@ -504,7 +535,10 @@ namespace SlotSystem{
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					slottable.ExecuteTransaction();
+					if(slottable.Item.IsStackable)
+						slottable.SetState(Slottable.WaitForNextTouchWhilePUState);
+					else
+						slottable.ExecuteTransaction();
 				}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
@@ -540,8 +574,14 @@ namespace SlotSystem{
 				}
 			}
 			public class PickedUpAndDeselectedState: SlottableState{
-				public void EnterState(Slottable sb){}
-				public void ExitState(Slottable sb){}
+				public void EnterState(Slottable sb){
+					sb.PickedUpAndDeselectedProcess.Start();
+				}
+				public void ExitState(Slottable sb){
+
+					if(sb.PickedUpAndDeselectedProcess.IsRunning)
+						sb.PickedUpAndDeselectedProcess.Stop();
+				}
 				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
@@ -554,9 +594,11 @@ namespace SlotSystem{
 			}
 			public class WaitForNextTouchWhilePUState: SlottableState{
 				public void EnterState(Slottable slottable){
-					slottable.WaitAndRevertMock();
+					slottable.WaitForNextTouchWhilePUProcess.Start();
 				}
-				public void ExitState(Slottable Slottable){
+				public void ExitState(Slottable slottable){
+					if(slottable.WaitForNextTouchWhilePUProcess.IsRunning)
+						slottable.WaitForNextTouchWhilePUProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.Increment();
@@ -729,11 +771,23 @@ namespace SlotSystem{
 				return m_item.ItemID.GetHashCode() + 31;
 			}
 			public static bool operator ==(InventoryItemInstanceMock a, InventoryItemInstanceMock b){
+				if(object.ReferenceEquals(a, null)){
+					return object.ReferenceEquals(b, null);
+				}
+				if(object.ReferenceEquals(b, null)){
+					return object.ReferenceEquals(a, null);
+				}
 				bool flag = a.Item.ItemID == b.Item.ItemID;
 				flag &= a.IsStackable && b.IsStackable;
 				return flag;
 			}
 			public static bool operator != (InventoryItemInstanceMock a, InventoryItemInstanceMock b){
+				if(object.ReferenceEquals(a, null)){
+					return !object.ReferenceEquals(b, null);
+				}
+				if(object.ReferenceEquals(b, null)){
+					return !object.ReferenceEquals(a, null);
+				}
 				return !(a == b);
 			}
 			int IComparable.CompareTo(object other){
@@ -926,6 +980,11 @@ namespace SlotSystem{
 														slot.Sb.SetState(Slottable.FocusedState);
 													else
 														slot.Sb.SetState(Slottable.DefocusedState);
+												}else if(invItem is PartsInstanceMock){
+													if(sgm.PickedSB.Item is PartsInstanceMock)
+														slot.Sb.SetState(Slottable.FocusedState);
+													else
+														slot.Sb.SetState(Slottable.DefocusedState);
 												}else{
 													slot.Sb.SetState(Slottable.DefocusedState);
 												}
@@ -1084,16 +1143,62 @@ namespace SlotSystem{
 				get{return m_items;}
 			}
 			public void Add(SlottableItem item){
+				// m_items.Add(item);
+				foreach(SlottableItem it in m_items){
+					InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)it;
+					InventoryItemInstanceMock addedInst = (InventoryItemInstanceMock)item;
+					if(invInst == addedInst){
+						invInst.Quantity += addedInst.Quantity;
+						return;
+					}
+				}
 				m_items.Add(item);
 			}
 		}
 		public class EquipmentSetInventory: Inventory{
-			List<SlottableItem> m_items = new List<SlottableItem>();
+			BowInstanceMock m_equippedBow;
+			WearInstanceMock m_equippedWear;
+			List<CarriedGearInstanceMock> m_equippedCGears = new List<CarriedGearInstanceMock>();
+			int m_equippableCGearsCount;
+			public int EquippableCGearsCount{
+				get{return m_equippableCGearsCount;}
+			}
+			public void SetEquippableCGearsCount(int num){
+				m_equippableCGearsCount = num;
+			}
+			
 			public List<SlottableItem> Items{
-				get{return m_items;}
+				get{
+					List<SlottableItem> result = new List<SlottableItem>();
+					if(m_equippedBow != null)
+						result.Add(m_equippedBow);
+					if(m_equippedWear != null)
+						result.Add(m_equippedWear);
+					if(m_equippedCGears.Count != 0){
+						foreach(CarriedGearInstanceMock inst in m_equippedCGears){
+							result.Add((SlottableItem)inst);
+						}
+					}
+					return result;
+				}
 			}
 			public void Add(SlottableItem item){
-				m_items.Add(item);
+				if(item != null){
+					if(item is BowInstanceMock){
+						BowInstanceMock bowInst = (BowInstanceMock)item;
+						m_equippedBow = bowInst;
+					}	
+					else if(item is WearInstanceMock){
+						WearInstanceMock wearInst = (WearInstanceMock)item;
+						m_equippedWear = wearInst;
+					}
+					else if(item is CarriedGearInstanceMock){
+						if(m_equippedCGears.Count < m_equippableCGearsCount)
+							m_equippedCGears.Add((CarriedGearInstanceMock)item);
+						else
+							throw new InvalidOperationException("trying to add a CarriedGear exceeding the maximum allowed count");
+					}
+				}
 			}
 		}
 		public class BowMock: InventoryItemMock{
@@ -1104,6 +1209,29 @@ namespace SlotSystem{
 		}
 		public class WearMock: InventoryItemMock{
 			public WearMock(){
+				IsStackable = false;
+			}
+		}
+		public abstract class CarriedGearMock: InventoryItemMock{
+
+		}
+		public class ShieldMock: CarriedGearMock{
+			public ShieldMock(){
+				IsStackable = false;
+			}
+		}
+		public class MeleeWeaponMock: CarriedGearMock{
+			public MeleeWeaponMock(){
+				IsStackable = false;
+			}
+		}
+		public class QuiverMock: CarriedGearMock{
+			public QuiverMock(){
+				IsStackable = false;
+			}
+		}
+		public class PackMock: CarriedGearMock{
+			public PackMock(){
 				IsStackable = false;
 			}
 		}
@@ -1119,6 +1247,29 @@ namespace SlotSystem{
 		}
 		public class WearInstanceMock: InventoryItemInstanceMock{
 			public WearInstanceMock(){
+				this.Quantity = 1;
+			}
+		}
+		public class CarriedGearInstanceMock: InventoryItemInstanceMock{
+			
+		}
+		public class ShieldInstanceMock: CarriedGearInstanceMock{
+			public ShieldInstanceMock(){
+				this.Quantity = 1;
+			}
+		}
+		public class MeleeWeaponInstanceMock: CarriedGearInstanceMock{
+			public MeleeWeaponInstanceMock(){
+				this.Quantity = 1;
+			}
+		}
+		public class QuiverInstanceMock: CarriedGearInstanceMock{
+			public QuiverInstanceMock(){
+				this.Quantity = 1;
+			}
+		}
+		public class PackInstanceMock: CarriedGearInstanceMock{
+			public PackInstanceMock(){
 				this.Quantity = 1;
 			}
 		}

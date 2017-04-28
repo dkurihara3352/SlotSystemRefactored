@@ -210,7 +210,10 @@ namespace SlotSystem{
 			foreach(Slot slot in this.Slots){
 				if(slot.Sb != null){
 					InventoryItemInstanceMock invItemInst = (InventoryItemInstanceMock)slot.Sb.Item;
-					if(object.ReferenceEquals(itemInst, invItemInst))
+					if(itemInst.IsStackable){
+						if(invItemInst == itemInst)
+							return slot.Sb;
+					}else if(object.ReferenceEquals(itemInst, invItemInst))
 						return slot.Sb;
 				}
 			}
@@ -222,6 +225,7 @@ namespace SlotSystem{
 		public void OnDehoveredMock(PointerEventDataMock eventData){
 			CurState.OnDehoveredMock(this, eventData);
 		}
+		
 		
 	}
 }

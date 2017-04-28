@@ -17,17 +17,21 @@ public class SlottableTest {
 	SlotGroup sgBow;
 	GameObject sgWearGO;
 	SlotGroup sgWear;
+	GameObject sgpPartsGO;
+	SlotGroup sgpParts;
 	Slottable defBowBSB_p;
 	Slottable defBowASB_p;
 	Slottable crfBowASB_p;
 	Slottable defWearBSB_p;
 	Slottable defWearASB_p;
 	Slottable crfWearASB_p;
-	Slottable defPartsASB_p;
-	Slottable defPartsBSB_p;
-	Slottable crfPartsASB_p;
+	Slottable defPartsSB_p;
+	Slottable crfPartsSB_p;
 	Slottable defBowASB_e;
 	Slottable defWearASB_e;
+	Slottable defPartsSB_p2;
+	Slottable crfPartsSB_p2;
+
 
 	[SetUp]
 	public void Setup(){
@@ -90,6 +94,19 @@ public class SlottableTest {
 			wearSlot.Position = Vector2.zero;
 			sgWear.Slots.Add(wearSlot);
 
+		/*	sgpParts
+		*/	
+			sgpPartsGO = new GameObject("PartsSlotGroupPool");
+			sgpParts = sgpPartsGO.AddComponent<SlotGroup>();
+			sgm.SetSG(sgpParts);
+			sgpParts.Filter = new SGPartsFilter();
+			sgpParts.Sorter = new SGItemIndexSorter();
+			sgpParts.UpdateEquipStatusCommand = new UpdateEquipStatusForPoolCommmand();
+			sgpParts.SetInventory(inventory);
+			sgpParts.IsShrinkable = true;
+			sgpParts.IsExpandable = true;
+
+			
 			
 		/*	bows
 		*/
@@ -129,25 +146,34 @@ public class SlottableTest {
 		*/
 			PartsMock defParts = new PartsMock();
 			defParts.ItemID = 601;
+			defParts.IsStackable = true;
 			PartsMock crfParts = new PartsMock();
 			crfParts.ItemID = 602;
+			crfParts.IsStackable = true;
 			
 			PartsInstanceMock defPartsA = new PartsInstanceMock();
 			defPartsA.Item = defParts;
+			defPartsA.Quantity = 10;
 			sgpAll.Inventory.Add(defPartsA);
 			PartsInstanceMock defPartsB = new PartsInstanceMock();
 			defPartsB.Item = defParts;
+			defPartsB.Quantity = 5;
 			sgpAll.Inventory.Add(defPartsB);
 			PartsInstanceMock crfPartsA = new PartsInstanceMock();
 			crfPartsA.Item = crfParts;
+			crfPartsA.Quantity = 3;
 			sgpAll.Inventory.Add(crfPartsA);
+
+			Assert.That(defPartsA, Is.EqualTo(defPartsB));
+			Assert.That(object.ReferenceEquals(defPartsA, defPartsB), Is.False);
 
 		sgm.InitiallyFocusedSG = sgpAll;
 		
 				Assert.That(sgm.CurState, Is.EqualTo(SlotGroupManager.DeactivatedState));
 				Assert.That(sgm.PrevState, Is.EqualTo(SlotGroupManager.DeactivatedState));
-				Assert.That(sgm.SlotGroups.Count, Is.EqualTo(3));
+				Assert.That(sgm.SlotGroups.Count, Is.EqualTo(4));
 		sgm.Initialize();
+		
 		defBowASB_p = sgpAll.GetSlottable(defBowA);		
 		sbGO = defBowASB_p.gameObject;
 			Assert.That(defBowASB_p.SGM.CurState, Is.EqualTo(SlotGroupManager.DefocusedState));
@@ -163,16 +189,17 @@ public class SlottableTest {
 
 		/*	Assertions
 		*/
-			Assert.That(sgm.SlotGroups.Count, Is.EqualTo(3));
+			Assert.That(sgm.SlotGroups.Count, Is.EqualTo(4));
 			Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.FocusedState));
 			Assert.That(sgBow.CurState, Is.EqualTo(SlotGroup.FocusedState));
 			Assert.That(sgWear.CurState, Is.EqualTo(SlotGroup.FocusedState));
+			Assert.That(sgpParts.CurState, Is.EqualTo(SlotGroup.FocusedState));
 
 			Assert.That(sgBow.Slots.Count, Is.EqualTo(1));
 				Assert.That(sgBow.GetSlottable(defBowA).CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 			Assert.That(sgWear.Slots.Count, Is.EqualTo(1));
 				Assert.That(sgWear.GetSlottable(defWearA).CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
-			Assert.That(sgpAll.Slots.Count, Is.EqualTo(9));
+			Assert.That(sgpAll.Slots.Count, Is.EqualTo(8));
 				Assert.That(sgpAll.GetSlottable(defBowA).CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 				Assert.That(sgpAll.GetSlottable(defBowB).CurState, Is.EqualTo(Slottable.FocusedState));
 				Assert.That(sgpAll.GetSlottable(crfBowA).CurState, Is.EqualTo(Slottable.FocusedState));
@@ -182,6 +209,10 @@ public class SlottableTest {
 				Assert.That(sgpAll.GetSlottable(defPartsA).CurState, Is.EqualTo(Slottable.DefocusedState));
 				Assert.That(sgpAll.GetSlottable(defPartsB).CurState, Is.EqualTo(Slottable.DefocusedState));
 				Assert.That(sgpAll.GetSlottable(crfPartsA).CurState, Is.EqualTo(Slottable.DefocusedState));
+			Assert.That(sgpParts.Slots.Count, Is.EqualTo(2));
+				Assert.That(sgpParts.GetSlottable(defPartsA).CurState, Is.EqualTo(Slottable.FocusedState));
+				Assert.That(sgpParts.GetSlottable(defPartsB).CurState, Is.EqualTo(Slottable.FocusedState));
+				Assert.That(sgpParts.GetSlottable(crfPartsA).CurState, Is.EqualTo(Slottable.FocusedState));
 		/*
 		*/
 			defBowBSB_p = sgpAll.GetSlottable(defBowB);
@@ -189,9 +220,8 @@ public class SlottableTest {
 			defWearASB_p = sgpAll.GetSlottable(defWearA);
 			defWearBSB_p = sgpAll.GetSlottable(defWearB);
 			crfWearASB_p = sgpAll.GetSlottable(crfWearA);
-			defPartsASB_p = sgpAll.GetSlottable(defPartsA);
-			defPartsBSB_p = sgpAll.GetSlottable(defPartsB);
-			crfPartsASB_p = sgpAll.GetSlottable(crfPartsA);
+			defPartsSB_p = sgpAll.GetSlottable(defPartsA);
+			crfPartsSB_p = sgpAll.GetSlottable(crfPartsA);
 			defBowASB_e = sgBow.GetSlottable(defBowA);
 			defWearASB_e = sgWear.GetSlottable(defWearA);
 	}
@@ -201,6 +231,17 @@ public class SlottableTest {
 		defBowASB_p.SetState(Slottable.SelectedState);
 		AssertState(defBowASB_p, Slottable.SelectedState);
 	}
+	[Test]
+	public void Test(){		
+		// TestWaitForPickUpState(defBowBSB_p);
+		TestPickedUpAndSelectedState(defBowBSB_p);
+		
+	}
+	public void ValidateNonPickable(Slottable sb){
+		sb.OnPointerDownMock(eventDataMock);
+		Assert.That(sb.CurState, Is.Not.EqualTo(Slottable.WaitForPickUpState));
+	}
+	
 	public void ValidatePickup(Slottable sb){
 
 		sb.OnPointerDownMock(eventDataMock);
@@ -229,27 +270,7 @@ public class SlottableTest {
 				Assert.That(sb.SGM.PickedSB, Is.EqualTo(sb));
 			//transaction
 				Assert.That(sb.SGM.UpdateTransactionCommand.GetType(), Is.EqualTo(typeof(UpdateTransactionCommand)));
-				
 				Assert.That(sb.SGM.Transaction.GetType(), Is.EqualTo(typeof(RevertTransaction)));
-	}
-	public void ValidateNonPickable(Slottable sb){
-		sb.OnPointerDownMock(eventDataMock);
-		Assert.That(sb.CurState, Is.Not.EqualTo(Slottable.WaitForPickUpState));
-	}
-	[Test]
-	public void Test(){
-		ValidatePickUpAndSelectedState(defBowBSB_p);
-		// ValidatePickUpAndSelectedState(crfBowASB_p);
-		// ValidatePickUpAndSelectedState(defWearBSB_p);
-		// ValidatePickUpAndSelectedState(crfWearASB_p);
-		// ValidatePickUpAndSelectedState(defBowASB_e);
-		// ValidatePickUpAndSelectedState(defWearASB_e);
-		
-		// ValidateNonPickable(defBowASB_p);
-		// ValidateNonPickable(defWearASB_p);
-		// ValidateNonPickable(defPartsASB_p);
-		// ValidateNonPickable(defPartsBSB_p);
-		// ValidateNonPickable(crfPartsASB_p);
 	}
 	public void ValidatePostpickFilter(Slottable pickedSB){
 		/*	Revise the post pick filter so that picking up the Equipped bow in the equipBowSG does not results anything other than bows to not get focused in the pool all sg
@@ -326,7 +347,7 @@ public class SlottableTest {
 
 		}
 	}
-	public void ValidatePickUpAndSelectedState(Slottable sb){
+	public void TestPickedUpAndSelectedState(Slottable sb){
 		
 		ValidatePickup(sb);
 		ValidatePostpickFilter(sb);
@@ -355,20 +376,37 @@ public class SlottableTest {
 			sb.OnPointerUpMock(eventDataMock);
 			Assert.That(sb.PickedUpAndSelectedProcess.IsRunning, Is.False);
 			Assert.That(sb.PickedUpAndSelectedProcess.IsExpired, Is.True);
-			Assert.That(sb.CurState, Is.EqualTo(Slottable.RevertingState));
-			Assert.That(sb.RevertingStateProcess.IsRunning, Is.True);
-			Assert.That(sb.RevertingStateProcess.IsExpired, Is.False);
+			if(sb.Item.IsStackable){
+
+				Assert.That(sb.CurState, Is.EqualTo(Slottable.WaitForNextTouchWhilePUState));
+				Assert.That(sb.WaitForNextTouchWhilePUProcess.IsRunning, Is.True);
+				Assert.That(sb.WaitForNextTouchWhilePUProcess.IsExpired, Is.False);
+				/*	try expiring 
+				*/
+			}else{
+
+				Assert.That(sb.CurState, Is.EqualTo(Slottable.RevertingState));
+				Assert.That(sb.RevertingStateProcess.IsRunning, Is.True);
+				Assert.That(sb.RevertingStateProcess.IsExpired, Is.False);
+			}
+
 
 		/*	trying expring the revert state process(although it's a bit out of scope)
 		*/
 
-		sb.RevertingStateProcess.Expire();
-			Assert.That(sb.RevertingStateProcess.IsRunning, Is.False);
-			Assert.That(sb.RevertingStateProcess.IsExpired, Is.True);
-			AssertPrePickFiltered();
+		// sb.RevertingStateProcess.Expire();
+		// 	Assert.That(sb.RevertingStateProcess.IsRunning, Is.False);
+		// 	Assert.That(sb.RevertingStateProcess.IsExpired, Is.True);
+		// 	AssertPrePickFiltered();
 		
 		/*	OnDehovered
 		*/
+			// sgm.SimSBHover(null, eventDataMock);
+			// 	Assert.That(sb.CurState, Is.EqualTo(Slottable.PickedUpAndDeselectedState));
+			// 	Assert.That(sb.PickedUpAndSelectedProcess.IsRunning, Is.False);
+			// 	Assert.That(sb.PickedUpAndSelectedProcess.IsExpired, Is.True);
+			// 	Assert.That(sb.PickedUpAndDeselectedProcess.IsRunning, Is.True);
+			// 	Assert.That(sb.PickedUpAndDeselectedProcess.IsExpired, Is.False);
 		
 
 	}
@@ -383,63 +421,60 @@ public class SlottableTest {
 		Assert.That(defWearASB_p.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 		Assert.That(defWearBSB_p.CurState, Is.EqualTo(Slottable.FocusedState));
 		Assert.That(crfWearASB_p.CurState, Is.EqualTo(Slottable.FocusedState));
-		Assert.That(defPartsASB_p.CurState, Is.EqualTo(Slottable.DefocusedState));
-		Assert.That(defPartsBSB_p.CurState, Is.EqualTo(Slottable.DefocusedState));
-		Assert.That(crfPartsASB_p.CurState, Is.EqualTo(Slottable.DefocusedState));
+		Assert.That(defPartsSB_p.CurState, Is.EqualTo(Slottable.DefocusedState));
+		Assert.That(crfPartsSB_p.CurState, Is.EqualTo(Slottable.DefocusedState));
 
 		Assert.That(defBowASB_e.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 		Assert.That(defWearASB_e.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
 	}
-	public void TestWaitForPickUpState(){
+	public void TestWaitForPickUpState(Slottable sb){
 		/*	entering
 		*/
-		defBowASB_p.OnPointerDownMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.WaitForPickUpState);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsRunning, Is.True);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsExpired, Is.False);
+		sb.OnPointerDownMock(eventDataMock);
+		AssertState(sb, Slottable.WaitForPickUpState);
+		Assert.That(sb.WaitAndPickUpProcess.IsRunning, Is.True);
+		Assert.That(sb.WaitAndPickUpProcess.IsExpired, Is.False);
 		/*	expire
 		*/
-		defBowASB_p.WaitAndPickUpProcess.Expire();
-		AssertAction(defBowASB_p,"WaitAndPickUpProcess done");
-		AssertState(defBowASB_p, Slottable.PickedUpAndSelectedState);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsRunning, Is.False);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsExpired, Is.True);
+		sb.WaitAndPickUpProcess.Expire();
+		AssertAction(sb,"WaitAndPickUpProcess done");
+		AssertState(sb, Slottable.PickedUpAndSelectedState);
+		Assert.That(sb.WaitAndPickUpProcess.IsRunning, Is.False);
+		Assert.That(sb.WaitAndPickUpProcess.IsExpired, Is.True);
 		/* abort, pointer up
 		*/
-		defBowASB_p.SetState(Slottable.FocusedState);
-		AssertState(defBowASB_p, Slottable.FocusedState);
-		defBowASB_p.OnPointerDownMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.WaitForPickUpState);
+		sb.SetState(Slottable.FocusedState);
+		AssertState(sb, Slottable.FocusedState);
+		sb.OnPointerDownMock(eventDataMock);
+		AssertState(sb, Slottable.WaitForPickUpState);
 		
-		defBowASB_p.OnPointerUpMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.WaitForNextTouchState);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsRunning, Is.False);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsExpired, Is.False);
+		sb.OnPointerUpMock(eventDataMock);
+		AssertState(sb, Slottable.WaitForNextTouchState);
+		Assert.That(sb.WaitAndPickUpProcess.IsRunning, Is.False);
+		Assert.That(sb.WaitAndPickUpProcess.IsExpired, Is.False);
 		/*	OnEndDrag
 		*/
-		defBowASB_p.SetState(Slottable.FocusedState);
-		AssertState(defBowASB_p, Slottable.FocusedState);
-		defBowASB_p.OnPointerDownMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.WaitForPickUpState);
+		sb.SetState(Slottable.FocusedState);
+		AssertState(sb, Slottable.FocusedState);
+		sb.OnPointerDownMock(eventDataMock);
+		AssertState(sb, Slottable.WaitForPickUpState);
 
-		defBowASB_p.OnEndDragMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.FocusedState);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsRunning, Is.False);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsExpired, Is.False);
-		/*	OnPointerExit
-		*/
-		defBowASB_p.SetState(Slottable.FocusedState);
-		AssertState(defBowASB_p, Slottable.FocusedState);
-		defBowASB_p.OnPointerDownMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.WaitForPickUpState);
+		sb.OnEndDragMock(eventDataMock);
+		AssertState(sb, Slottable.FocusedState);
+		Assert.That(sb.WaitAndPickUpProcess.IsRunning, Is.False);
+		Assert.That(sb.WaitAndPickUpProcess.IsExpired, Is.False);
+		// /*	OnPointerExit
+		// */
+		// defBowASB_p.SetState(Slottable.FocusedState);
+		// AssertState(defBowASB_p, Slottable.FocusedState);
+		// defBowASB_p.OnPointerDownMock(eventDataMock);
+		// AssertState(defBowASB_p, Slottable.WaitForPickUpState);
 
-		defBowASB_p.OnDehoveredMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.FocusedState);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsRunning, Is.False);
-		Assert.That(defBowASB_p.WaitAndPickUpProcess.IsExpired, Is.False);
+		// defBowASB_p.OnDehoveredMock(eventDataMock);
+		// AssertState(defBowASB_p, Slottable.FocusedState);
+		// Assert.That(defBowASB_p.WaitAndPickUpProcess.IsRunning, Is.False);
+		// Assert.That(defBowASB_p.WaitAndPickUpProcess.IsExpired, Is.False);
 		
-
-
 	}
 	public void TestWaitForPointerUpState(){
 		defBowASB_p.SetState(Slottable.DefocusedState);
@@ -475,7 +510,7 @@ public class SlottableTest {
 		
 	}
 	
-	public void TestFocusedState(){
+	public void TestFocusedState(Slottable sb){
 		
 		// sb.SetState(Slottable.MovingState);
 		// sb.SetState(Slottable.WaitForNextTouchState);
@@ -486,68 +521,68 @@ public class SlottableTest {
 		*/
 		/*	enter
 		*/
-			AssertState(defBowASB_p, Slottable.FocusedState);
-			AssertAction(defBowASB_p,"InstantGrayin called");
-			defBowASB_p.SetState(Slottable.DefocusedState);
-			defBowASB_p.SetState(Slottable.FocusedState);
-			Assert.That(defBowASB_p.GradualGrayinProcess.IsRunning, Is.True);
-			Assert.That(defBowASB_p.GradualGrayinProcess.IsExpired, Is.False);
+			AssertState(sb, Slottable.FocusedState);
+			AssertAction(sb,"InstantGrayin called");
+			sb.SetState(Slottable.DefocusedState);
+			sb.SetState(Slottable.FocusedState);
+			Assert.That(sb.GradualGrayinProcess.IsRunning, Is.True);
+			Assert.That(sb.GradualGrayinProcess.IsExpired, Is.False);
 			/*	expire
 			*/
-			defBowASB_p.GradualGrayinProcess.Expire();
-			AssertAction(defBowASB_p,"GradualGrayinProcess done");
-			Assert.That(defBowASB_p.GradualGrayinProcess.IsRunning, Is.False);
-			Assert.That(defBowASB_p.GradualGrayinProcess.IsExpired, Is.True);
+			sb.GradualGrayinProcess.Expire();
+			AssertAction(sb,"GradualGrayinProcess done");
+			Assert.That(sb.GradualGrayinProcess.IsRunning, Is.False);
+			Assert.That(sb.GradualGrayinProcess.IsExpired, Is.True);
 
-			defBowASB_p.SetState(Slottable.DefocusedState);
-			defBowASB_p.SetState(Slottable.FocusedState);
+			sb.SetState(Slottable.DefocusedState);
+			sb.SetState(Slottable.FocusedState);
 			/*	abort
 			*/
-			defBowASB_p.SetState(Slottable.SelectedState);
-			Assert.That(defBowASB_p.GradualGrayinProcess.IsRunning, Is.False);
-			Assert.That(defBowASB_p.GradualGrayinProcess.IsExpired, Is.False);
+			sb.SetState(Slottable.SelectedState);
+			Assert.That(sb.GradualGrayinProcess.IsRunning, Is.False);
+			Assert.That(sb.GradualGrayinProcess.IsExpired, Is.False);
 		
 		/*	Dehighlighting
 		*/
 			/* enter
 			*/
-			defBowASB_p.SetState(Slottable.FocusedState);
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsRunning, Is.True);
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsExpired, Is.False);
+			sb.SetState(Slottable.FocusedState);
+			Assert.That(sb.GradualDehighlightProcess.IsRunning, Is.True);
+			Assert.That(sb.GradualDehighlightProcess.IsExpired, Is.False);
 			/*	expire
 			*/
-			defBowASB_p.GradualDehighlightProcess.Expire();
-			AssertAction(defBowASB_p,"GradualDehighlightProcess done");
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsRunning, Is.False);
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsExpired, Is.True);
-			defBowASB_p.SetState(Slottable.SelectedState);
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsRunning, Is.False);
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsExpired, Is.True);
+			sb.GradualDehighlightProcess.Expire();
+			AssertAction(sb,"GradualDehighlightProcess done");
+			Assert.That(sb.GradualDehighlightProcess.IsRunning, Is.False);
+			Assert.That(sb.GradualDehighlightProcess.IsExpired, Is.True);
+			sb.SetState(Slottable.SelectedState);
+			Assert.That(sb.GradualDehighlightProcess.IsRunning, Is.False);
+			Assert.That(sb.GradualDehighlightProcess.IsExpired, Is.True);
 			/*	abort
 			*/
-			defBowASB_p.SetState(Slottable.FocusedState);
-			defBowASB_p.SetState(Slottable.SelectedState);
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsRunning, Is.False);
-			Assert.That(defBowASB_p.GradualDehighlightProcess.IsExpired, Is.False);
+			sb.SetState(Slottable.FocusedState);
+			sb.SetState(Slottable.SelectedState);
+			Assert.That(sb.GradualDehighlightProcess.IsRunning, Is.False);
+			Assert.That(sb.GradualDehighlightProcess.IsExpired, Is.False);
 		
 		/*Pointer enter
 		*/
-		defBowASB_p.SetState(Slottable.FocusedState);
-		defBowASB_p.GradualDehighlightProcess.Expire();
+		sb.SetState(Slottable.FocusedState);
+		sb.GradualDehighlightProcess.Expire();
 		
 		
 		// anotherSb.SetState(Slottable.PickedUpAndSelectedState);
 		// eventDataMock.pointerDrag = anotherGO;
-		defBowASB_p.OnHoveredMock(eventDataMock);
+		sb.OnHoveredMock(eventDataMock);
 
-		AssertState(defBowASB_p, Slottable.SelectedState);
+		AssertState(sb, Slottable.SelectedState);
 		/*	pointer down
 		*/
-		defBowASB_p.SetState(Slottable.FocusedState);
-		defBowASB_p.GradualDehighlightProcess.Expire();
-		AssertState(defBowASB_p, Slottable.FocusedState);
-		defBowASB_p.OnPointerDownMock(eventDataMock);
-		AssertState(defBowASB_p, Slottable.WaitForPickUpState);
+		sb.SetState(Slottable.FocusedState);
+		sb.GradualDehighlightProcess.Expire();
+		AssertState(sb, Slottable.FocusedState);
+		sb.OnPointerDownMock(eventDataMock);
+		AssertState(sb, Slottable.WaitForPickUpState);
 
 
 	}

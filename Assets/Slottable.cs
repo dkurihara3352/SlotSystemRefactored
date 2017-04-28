@@ -297,12 +297,28 @@ namespace SlotSystem{
 				public IEnumeratorMock PickedUpAndSelectedCoroutine(){
 					return null;
 				}
+			SBProcess m_pickedUpAndDeselectedProcess;
+				public SBProcess PickedUpAndDeselectedProcess{
+					get{return m_pickedUpAndDeselectedProcess;}
+					set{m_pickedUpAndDeselectedProcess = value;}
+				}
+				public IEnumeratorMock PickedUpAndDeselectedCoroutine(){
+					return null;
+				}
 			SBProcess m_revertingStateProcess;
 				public SBProcess RevertingStateProcess{
 					get{return m_revertingStateProcess;}
 					set{m_revertingStateProcess = value;}
 				}
 				public IEnumeratorMock RevertingStateCoroutine(){
+					return null;
+				}
+			SBProcess m_waitForNextTouchWhilePUProcess;
+				public SBProcess WaitForNextTouchWhilePUProcess{
+					get{return m_waitForNextTouchWhilePUProcess;}
+					set{m_waitForNextTouchWhilePUProcess = value;}
+				}
+				public IEnumeratorMock WaitForNextTouchWhilePUCoroutine(){
 					return null;
 				}
 		/*	Event methods
@@ -340,7 +356,10 @@ namespace SlotSystem{
 			this.WaitAndSetBackToDefocusedStateProcess = new WaitAndSetBackToDefocusedStateProcess(this, WaitAndSetBackToDefocusedStateCoroutine);
 			this.WaitAndPickUpProcess = new WaitAndPickUpProcess(this, WaitAndPickUpCoroutine);
 			this.PickedUpAndSelectedProcess = new PickedUpAndSelectedProcess(this, PickedUpAndSelectedCoroutine);
+			this.PickedUpAndDeselectedProcess = new PickedUpAndDeselectedProcess(this, PickedUpAndSelectedCoroutine);
 			this.RevertingStateProcess = new RevertingStateProcess(this, RevertingStateCoroutine);
+			this.WaitForNextTouchWhilePUProcess = new WaitForNextTouchWhilePUProcess(this, WaitForNextTouchWhilePUCoroutine);
+			
 		}
 		public void Initialize(SlotGroup sg){
 			InitializeProcesses();
