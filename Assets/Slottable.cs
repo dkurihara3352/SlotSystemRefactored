@@ -281,12 +281,12 @@ namespace SlotSystem{
 				public IEnumeratorMock WaitAndSetBackToDefocusedStateCoroutine(){
 					return null;
 				}
-			SBProcess m_waitAndPickUpProcess;
-				public SBProcess WaitAndPickUpProcess{
-					get{return m_waitAndPickUpProcess;}
-					set{m_waitAndPickUpProcess = value;}
+			SBProcess m_waitForPickUpProcess;
+				public SBProcess WaitForPickUpProcess{
+					get{return m_waitForPickUpProcess;}
+					set{m_waitForPickUpProcess = value;}
 				}
-				public IEnumeratorMock WaitAndPickUpCoroutine(){
+				public IEnumeratorMock WaitForPickUpCoroutine(){
 					return null;
 				}
 			SBProcess m_pickedUpAndSelectedProcess;
@@ -319,6 +319,14 @@ namespace SlotSystem{
 					set{m_waitForNextTouchWhilePUProcess = value;}
 				}
 				public IEnumeratorMock WaitForNextTouchWhilePUCoroutine(){
+					return null;
+				}
+			SBProcess m_waitForNextTouchProcess;
+				public SBProcess WaitForNextTouchProcess{
+					get{return m_waitForNextTouchProcess;}
+					set{m_waitForNextTouchProcess = value;}
+				}
+				public IEnumeratorMock WaitForNextTouchCoroutine(){
 					return null;
 				}
 		/*	Event methods
@@ -354,12 +362,12 @@ namespace SlotSystem{
 			this.GradualGrayinProcess = new GradualGrayinProcess(this, GradualHighlightCoroutine);
 			this.GradualDehighlightProcess = new GradualDehighlightProcess(this, GradualDehighlightCoroutine);
 			this.WaitAndSetBackToDefocusedStateProcess = new WaitAndSetBackToDefocusedStateProcess(this, WaitAndSetBackToDefocusedStateCoroutine);
-			this.WaitAndPickUpProcess = new WaitAndPickUpProcess(this, WaitAndPickUpCoroutine);
+			this.WaitForPickUpProcess = new WaitAndPickUpProcess(this, WaitForPickUpCoroutine);
 			this.PickedUpAndSelectedProcess = new PickedUpAndSelectedProcess(this, PickedUpAndSelectedCoroutine);
 			this.PickedUpAndDeselectedProcess = new PickedUpAndDeselectedProcess(this, PickedUpAndSelectedCoroutine);
 			this.RevertingStateProcess = new RevertingStateProcess(this, RevertingStateCoroutine);
 			this.WaitForNextTouchWhilePUProcess = new WaitForNextTouchWhilePUProcess(this, WaitForNextTouchWhilePUCoroutine);
-			
+			this.WaitForNextTouchProcess = new WaitForNextTouchProcess(this, WaitForNextTouchCoroutine);
 		}
 		public void Initialize(SlotGroup sg){
 			InitializeProcesses();
@@ -393,13 +401,12 @@ namespace SlotSystem{
 			SetState(Slottable.FocusedState);
 		}
 		
-		
+		public bool Tapped = false;
 
 		public void Tap(){
 			m_tapCommand.Execute(this);
 			m_UTLog = "tapped";
-			// ResetTimers();
-			// FilteredInMock();
+			Tapped = true;
 		}
 		public void PickUp(){
 			SetState(Slottable.PickedUpAndSelectedState);

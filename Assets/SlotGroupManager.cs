@@ -234,7 +234,20 @@ namespace SlotSystem{
 			m_selectedSG = null;
 			m_pickedSB = null;
 		}
-
+		public BowInstanceMock GetEquippedBow(){
+			foreach(SlotGroup sg in SlotGroups){
+				if(!sg.IsPool && sg.Filter.GetType() == typeof(SGBowFilter))
+					return (BowInstanceMock)sg.Slots[0].Sb.Item;
+			}
+			return null;
+		}
+		public WearInstanceMock GetEquippedWear(){
+			foreach(SlotGroup sg in SlotGroups){
+				if(!sg.IsPool && sg.Filter.GetType() == typeof(SGWearFilter))
+					return (WearInstanceMock)sg.Slots[0].Sb.Item;
+			}
+			return null;
+		}
 	}
 
 }

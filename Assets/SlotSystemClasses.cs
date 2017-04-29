@@ -347,6 +347,17 @@ namespace SlotSystem{
 					SB.SGM.Transaction.Execute();
 				}
 			}
+			public class WaitForNextTouchProcess: AbsSBProcess{
+				public WaitForNextTouchProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+					SB.Tap();
+					SB.SetState(Slottable.FocusedState);
+				}
+			}
 			
 		/*	states
 		*/
@@ -423,10 +434,9 @@ namespace SlotSystem{
 						slottable.GradualDehighlightProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					if(slottable.Delayed)
-						slottable.SetState(Slottable.WaitForPickUpState);
-					else
-						slottable.SetState(Slottable.PickedUpAndSelectedState);
+					
+					slottable.SetState(Slottable.WaitForPickUpState);
+
 				}
 				
 				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
@@ -471,14 +481,19 @@ namespace SlotSystem{
 			public class WaitForPickUpState: SlottableState{
 				public void EnterState(Slottable slottable){
 					
-					slottable.WaitAndPickUpProcess.Start();
+					slottable.WaitForPickUpProcess.Start();
 				}
 				public void ExitState(Slottable slottable){
-					if(slottable.WaitAndPickUpProcess.IsRunning)
-						slottable.WaitAndPickUpProcess.Stop();
+					if(slottable.WaitForPickUpProcess.IsRunning)
+						slottable.WaitForPickUpProcess.Stop();
 				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					slottable.SetState(Slottable.WaitForNextTouchState);
+					if(slottable.Item.IsStackable)
+						slottable.SetState(Slottable.WaitForNextTouchState);
+					else{
+						slottable.Tap();
+						slottable.SetState(Slottable.FocusedState);
+					}
 				}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
@@ -496,25 +511,28 @@ namespace SlotSystem{
 			}
 			public class WaitForNextTouchState: SlottableState{
 				public void EnterState(Slottable slottable){
-					// slottable.WaitForNextTouchProcess.Start();
+					slottable.WaitForNextTouchProcess.Start();
 				}
 				public void ExitState(Slottable slottable){
-					// if(slottable.WaitForNextTouchProcess.IsRunning)
-					// 	slottable.WaitForNextTouchProcess.Stop();
+					if(slottable.WaitForNextTouchProcess.IsRunning)
+						slottable.WaitForNextTouchProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					slottable.IsTapTimerOn = false;
+					
 					slottable.PickUp();
 				}
-				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					slottable.Cancel();
+					
+					slottable.SetState(Slottable.FocusedState);
 				}
-				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				/*	undef
+				*/
+					public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					}
+					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class PickedUpAndSelectedState: SlottableState{
 				/*	Execute transaction needs revision
@@ -990,6 +1008,27 @@ namespace SlotSystem{
 												}
 											}
 										}
+									}
+								}
+							}
+						}
+					}else if(sg.CurState == SlotGroup.SelectedState){
+						//pickedSB != null;
+						foreach(Slot slot in sg.Slots){
+							if(slot.Sb != null){
+								if(sgm.PickedSB != slot.Sb){
+									BowInstanceMock equippedBow = sgm.GetEquippedBow();
+									WearInstanceMock equippedWear = sgm.GetEquippedWear();
+									if(sg.AutoSort){
+										if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
+											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+										else
+											slot.Sb.SetState(Slottable.DefocusedState);
+									}else{
+										if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
+											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+										else
+											slot.Sb.SetState(Slottable.FocusedState);
 									}
 								}
 							}

@@ -120,11 +120,12 @@ namespace SlotSystem{
 					return flag;
 				}
 			}
+			public bool AutoSort = true;
 		/*	state
 		*/
-
 		/* commands
-		*/	SlotGroupCommand m_wakeUpCommand = new SGWakeupCommand();
+		*/	
+			SlotGroupCommand m_wakeUpCommand = new SGWakeupCommand();
 			public SlotGroupCommand WakeUpCommand{
 				get{return m_wakeUpCommand;}
 				set{m_wakeUpCommand = value;}
