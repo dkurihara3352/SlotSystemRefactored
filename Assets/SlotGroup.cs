@@ -220,13 +220,21 @@ namespace SlotSystem{
 			}
 			return null;
 		}
-		public void OnHoveredMock(PointerEventDataMock eventData){
-			CurState.OnHoveredMock(this, eventData);
+		public void OnHoverEnterMock(PointerEventDataMock eventData){
+			CurState.OnHoverEnterMock(this, eventData);
 		}
-		public void OnDehoveredMock(PointerEventDataMock eventData){
-			CurState.OnDehoveredMock(this, eventData);
+		public void OnHoverExitMock(PointerEventDataMock eventData){
+			CurState.OnHoverExitMock(this, eventData);
 		}
-		
-		
+		public bool HasItem(InventoryItemInstanceMock invInst){
+			bool result = false;
+			foreach(Slot slot in this.Slots){
+				if(slot.Sb != null){
+					if((InventoryItemInstanceMock)slot.Sb.Item == invInst)
+						return true;
+				}
+			}
+			return result;
+		}
 	}
 }

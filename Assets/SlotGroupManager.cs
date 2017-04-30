@@ -202,13 +202,14 @@ namespace SlotSystem{
 		public void SimSBHover(Slottable sb, PointerEventDataMock eventData){
 			if(CurState == SlotGroupManager.m_probingState){
 				if(sb != null){
-					if(SelectedSB != null && SelectedSB != sb)
-						SelectedSB.OnDehoveredMock(eventData);
-					// SetSelectedSB(sb);
-					sb.OnHoveredMock(eventData);
+					if(SelectedSB != null && SelectedSB != sb){
+						SelectedSB.OnHoverExitMock(eventData);
+						// SetSelectedSB(sb);
+						sb.OnHoverEnterMock(eventData);
+					}
 				}else{
 					if(SelectedSB != null){
-						SelectedSB.OnDehoveredMock(eventData);
+						SelectedSB.OnHoverExitMock(eventData);
 						// SetSelectedSB(null);
 					}
 				}
@@ -217,13 +218,14 @@ namespace SlotSystem{
 		public void SimSGHover(SlotGroup sg, PointerEventDataMock eventData){
 			if(CurState == SlotGroupManager.m_probingState){
 				if(sg != null){
-					if(SelectedSG != null && SelectedSG != sg)
-						SelectedSG.OnDehoveredMock(eventData);
-					// SetSelectedSG(sg);
-					sg.OnHoveredMock(eventData);
+					if(SelectedSG != null && SelectedSG != sg){
+						SelectedSG.OnHoverExitMock(eventData);
+						// SetSelectedSG(sg);
+						sg.OnHoverEnterMock(eventData);
+					}
 				}else{
 					if(SelectedSG != null){
-						SelectedSG.OnDehoveredMock(eventData);
+						SelectedSG.OnHoverExitMock(eventData);
 						// SetSelectedSG(null);
 					}
 				}
@@ -247,6 +249,12 @@ namespace SlotSystem{
 					return (WearInstanceMock)sg.Slots[0].Sb.Item;
 			}
 			return null;
+		}
+		public void CompleteTransactionMock(){
+			this.SetTransaction(null);
+			this.SetState(SlotGroupManager.FocusedState);
+			this.ClearFields();
+			PrePickFilter();
 		}
 	}
 

@@ -22,16 +22,76 @@ namespace SlotSystem{
 				void Execute();
 			}
 			public class RevertTransaction: SlotSystemTransaction{
-				Slottable slottable;
+				Slottable pickedSB;
+				SlotGroupManager sgm;
 				public RevertTransaction(Slottable sb){
-					this.slottable = sb;
+					this.pickedSB = sb;
+					this.sgm = sb.SGM;
 				}
 				public void Indicate(){
 					//implement revert indication here
 				}
 				public void Execute(){
 					//implement reverting here
-					slottable.SetState(Slottable.RevertingState);
+
+					// pickedSB.SetState(Slottable.RevertingState);
+					// sgm.SetState(SlotGroupManager.FocusedState);
+					// sgm.SetPickedSB(null);
+					// sgm.SetSelectedSB(null);
+					// sgm.SelectedSG.SetState(SlotGroup.FocusedState);
+					// sgm.PrePickFilter();
+					sgm.CompleteTransactionMock();
+				}
+			}
+			public class ReorderTransaction: SlotSystemTransaction{
+				Slottable pickedSB;
+				Slottable selectedSB;
+				public ReorderTransaction(Slottable picked, Slottable selected){
+					this.pickedSB = picked;
+					this.selectedSB = selected;
+				}
+				public void Indicate(){}
+				public void Execute(){
+					// pickedSB.SetState(Slottable.ReorderingState);
+					pickedSB.SGM.CompleteTransactionMock();
+				}
+			}
+			public class StackTransaction: SlotSystemTransaction{
+				Slottable pickedSB;
+				Slottable selectedSB;
+				public StackTransaction(Slottable picked, Slottable selected){
+					this.pickedSB = picked;
+					this.selectedSB = selected;
+				}
+				public void Indicate(){}
+				public void Execute(){
+					pickedSB.SGM.CompleteTransactionMock();
+				}
+			}
+			public class SwapTransaction: SlotSystemTransaction{
+				Slottable pickedSB;
+				Slottable selectedSB;
+				public SwapTransaction(Slottable picked, Slottable selected){
+					this.pickedSB = picked;
+					this.selectedSB = selected;
+				}
+				public void Indicate(){}
+				public void Execute(){
+
+					pickedSB.SGM.CompleteTransactionMock();
+				}
+			}
+			public class FillTransaction: SlotSystemTransaction{
+				Slottable pickedSB;
+				SlotGroup selectedSG;
+				public FillTransaction(Slottable picked, SlotGroup selSG){
+					this.pickedSB = picked;
+					this.selectedSG = selSG;
+				}
+				public void Indicate(){}
+				public void Execute(){
+
+					pickedSB.SGM.CompleteTransactionMock();
 				}
 			}
 		/*	commands
@@ -40,11 +100,50 @@ namespace SlotSystem{
 				void Execute(SlotGroupManager sgm);
 			}
 			public class UpdateTransactionCommand: SGMCommand{
+				
 				public void Execute(SlotGroupManager sgm){
-					if(sgm.PickedSB != null){
-						if(sgm.PickedSB == sgm.SelectedSB){
-							SlotSystemTransaction revertTs = new RevertTransaction(sgm.PickedSB);
-							sgm.SetTransaction(revertTs);
+					Slottable pickedSB = sgm.PickedSB;
+					Slottable selectedSB = sgm.SelectedSB;
+					SlotGroup selectedSG = sgm.SelectedSG;
+					SlotGroup origSG = sgm.GetSlotGroup(pickedSB);
+					if(pickedSB != null){
+						if(selectedSB == null){
+							if(selectedSG == null || selectedSG == origSG){
+								SlotSystemTransaction revertTs = new RevertTransaction(pickedSB);
+								sgm.SetTransaction(revertTs);
+							}else{
+								/*	selectedSG != null && != origSG
+									there's at least one vacant slot OR there's a sb of a same stackable item
+								*/
+								if(selectedSG.HasItem((InventoryItemInstanceMock)pickedSB.Item)){
+									StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
+									sgm.SetTransaction(stackTs);
+								}else{
+									FillTransaction fillTs = new FillTransaction(pickedSB, selectedSG);
+									sgm.SetTransaction(fillTs);
+								}
+							}
+
+						}else{
+							if(pickedSB == selectedSB){
+								SlotSystemTransaction revertTs = new RevertTransaction(pickedSB);
+								sgm.SetTransaction(revertTs);
+							}else{
+								if(sgm.GetSlotGroup(selectedSB) == sgm.GetSlotGroup(pickedSB)){
+									if(!sgm.GetSlotGroup(pickedSB).AutoSort){
+										SlotSystemTransaction reorderTs = new ReorderTransaction(pickedSB, selectedSB);
+										sgm.SetTransaction(reorderTs);
+									}
+								}else{
+									if(pickedSB.Item == selectedSB.Item){
+										StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
+										sgm.SetTransaction(stackTs);
+									}else{
+										SwapTransaction swapTs = new SwapTransaction(pickedSB, selectedSB);
+										sgm.SetTransaction(swapTs);
+									}
+								}
+							}
 						}
 					}
 				}
@@ -334,6 +433,8 @@ namespace SlotSystem{
 					*/
 					base.Expire();
 					SB.SGM.ClearFields();
+					SB.SGM.SetState(SlotGroupManager.FocusedState);
+					SB.SGM.SetTransaction(null);
 					SB.SGM.PrePickFilter();
 				}
 			}
@@ -368,8 +469,8 @@ namespace SlotSystem{
 				void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock);
 				void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock);
 				void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
-				void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock);
-				void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock);
+				void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock);
+				void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock);
 			}
 			
 			public class DeactivatedState: SlottableState{
@@ -386,8 +487,8 @@ namespace SlotSystem{
 					public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
 					public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 					public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class DefocusedState: SlottableState{
 				public void EnterState(Slottable slottable){
@@ -414,8 +515,8 @@ namespace SlotSystem{
 					}
 				/*	ignore
 				*/
-					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class FocusedState: SlottableState{
 				public void EnterState(Slottable slottable){
@@ -439,7 +540,7 @@ namespace SlotSystem{
 
 				}
 				
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.SGM.SetSelectedSB(sb);
 					sb.SetState(Slottable.SelectedState);
 					
@@ -452,7 +553,7 @@ namespace SlotSystem{
 					}
 					public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					}
-					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class WaitForPointerUpState: SlottableState{
 				public void EnterState(Slottable sb){
@@ -475,8 +576,8 @@ namespace SlotSystem{
 				/*	undef
 				*/
 					public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class WaitForPickUpState: SlottableState{
 				public void EnterState(Slottable slottable){
@@ -504,8 +605,8 @@ namespace SlotSystem{
 				*/
 					public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					}
-					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 						
 					}
 			}
@@ -531,8 +632,8 @@ namespace SlotSystem{
 					}
 					public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					}
-					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class PickedUpAndSelectedState: SlottableState{
 				/*	Execute transaction needs revision
@@ -563,11 +664,11 @@ namespace SlotSystem{
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.ExecuteTransaction();
 				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.SGM.SetPickedSB(sb);
 					sb.SGM.SetSelectedSB(sb);
 				}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					// if(sb.SGM.SelectedSB == sb){
 					// 	sb.SGM.SelectedSB = null;
 					// }
@@ -604,11 +705,11 @@ namespace SlotSystem{
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.SetState(Slottable.PickedUpAndSelectedState);
 					sb.SGM.SetSelectedSB(sb);
 				}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class WaitForNextTouchWhilePUState: SlottableState{
 				public void EnterState(Slottable slottable){
@@ -629,8 +730,8 @@ namespace SlotSystem{
 				}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class MovingState: SlottableState{
 				public void EnterState(Slottable slottable){
@@ -645,8 +746,8 @@ namespace SlotSystem{
 				}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class EquippedAndDeselectedState: SlottableState{
 				public void EnterState(Slottable slottable){}
@@ -662,11 +763,11 @@ namespace SlotSystem{
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.SGM.SetSelectedSB(sb);
 					sb.SetState(Slottable.EquippedAndSelectedState);
 				}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 			}
 			public class EquippedAndSelectedState: SlottableState{
 				public void EnterState(Slottable slottable){}
@@ -675,9 +776,9 @@ namespace SlotSystem{
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
 				}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					if(sb.SGM.SelectedSB == sb)
 						sb.SGM.SetSelectedSB(sb);
 					sb.SetState(Slottable.EquippedAndDeselectedState);
@@ -691,9 +792,9 @@ namespace SlotSystem{
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
 				}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 				}
 
 			}
@@ -704,8 +805,8 @@ namespace SlotSystem{
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					if(sb.SGM.SelectedSB == sb)
 						sb.SGM.SetSelectedSB(null);
 					sb.SetState(Slottable.FocusedState);
@@ -725,8 +826,8 @@ namespace SlotSystem{
 					public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
 					public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 					public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnHoveredMock(Slottable sb, PointerEventDataMock eventDataMock){}
-					public void OnDehoveredMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					
 				}
 			}
@@ -879,42 +980,42 @@ namespace SlotSystem{
 			public interface SlotGroupState{
 				void EnterState(SlotGroup sg);
 				void ExitState(SlotGroup sg);
-				void OnHoveredMock(SlotGroup sg, PointerEventDataMock eventData);
-				void OnDehoveredMock(SlotGroup sg, PointerEventDataMock eventData);
+				void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData);
+				void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData);
 			}
 			public class SGDeactivatedState : SlotGroupState{
 				public void EnterState(SlotGroup sg){
 				}
 				public void ExitState(SlotGroup sg){
 				}
-				public void OnHoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
 				}
-				public void OnDehoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
 				}
 			}
 			public class SGDefocusedState: SlotGroupState{
 				public void EnterState(SlotGroup sg){}
 				public void ExitState(SlotGroup sg){}
-				public void OnHoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
 				}
-				public void OnDehoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
 				}
 			}
 			public class SGFocusedState: SlotGroupState{
 				public void EnterState(SlotGroup sg){}
 				public void ExitState(SlotGroup sg){}
-				public void OnHoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
 					sg.SGM.SetSelectedSG(sg);
 					sg.SetState(SlotGroup.SelectedState);
 				}
-				public void OnDehoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
 				}
 			}
 			public class SGSelectedState: SlotGroupState{
 				public void EnterState(SlotGroup sg){}
 				public void ExitState(SlotGroup sg){}
-				public void OnHoveredMock(SlotGroup sg, PointerEventDataMock eventData){}
-				public void OnDehoveredMock(SlotGroup sg, PointerEventDataMock eventData){
+				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
+				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
 					if(sg.SGM.SelectedSG == sg){
 						sg.SGM.SetSelectedSG(sg);
 						sg.SetState(SlotGroup.FocusedState);

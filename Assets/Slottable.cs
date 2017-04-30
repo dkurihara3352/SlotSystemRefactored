@@ -337,11 +337,11 @@ namespace SlotSystem{
 			public void OnPointerUpMock(PointerEventDataMock eventDataMock){
 				m_curState.OnPointerUpMock(this, eventDataMock);
 			}
-			public void OnHoveredMock(PointerEventDataMock eventDataMock){
-				m_curState.OnHoveredMock(this, eventDataMock);
+			public void OnHoverEnterMock(PointerEventDataMock eventDataMock){
+				m_curState.OnHoverEnterMock(this, eventDataMock);
 			}
-			public void OnDehoveredMock(PointerEventDataMock eventDataMock){
-				m_curState.OnDehoveredMock(this, eventDataMock);
+			public void OnHoverExitMock(PointerEventDataMock eventDataMock){
+				m_curState.OnHoverExitMock(this, eventDataMock);
 			}
 			public void OnDeselectedMock(PointerEventDataMock eventDataMock){
 				CurState.OnDeselectedMock(this, eventDataMock);
