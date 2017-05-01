@@ -349,6 +349,12 @@ namespace SlotSystem{
 			public void OnEndDragMock(PointerEventDataMock eventDataMock){
 				m_curState.OnEndDragMock(this, eventDataMock);
 			}
+			public void Focus(){
+				m_curState.Focus(this);
+			}
+			public void Defocus(){
+				m_curState.Defocus(this);
+			}
 		string m_UTLog = "";
 		public string UTLog{
 			get{return m_UTLog;}
@@ -446,6 +452,7 @@ namespace SlotSystem{
 		public void ExecuteTransaction(){
 			SGM.Transaction.Execute();
 		}
+		
 	}
 
 }

@@ -3,23 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class SlotGroup : MonoBehaviour {
+	public class SlotGroup : MonoBehaviour, SlotSystemElement {
 		string m_UTLog = "";
 		public string UTLog{
 			get{return m_UTLog;}
 			set{m_UTLog = value;}
 		}
-		/* 	not used
-		*/
-			// Use this for initialization
-			void Start () {
-				
-			}
-			
-			// Update is called once per frame
-			void Update () {
-				
-			}
+	
 		/*	states
 		*/
 			SlotGroupState m_curState;
@@ -70,21 +60,16 @@ namespace SlotSystem{
 				get{return m_scroller;}
 				set{m_scroller = value;}
 			}
-			SGFilter m_filter;
-			public SGFilter Filter{
-				get{return m_filter;}
-				set{m_filter = value;}
-			}
-			SGSorter m_sorter;
-			public SGSorter Sorter{
-				get{return m_sorter;}
-				set{m_sorter = value;}
-			}
+			
+		
 			
 			Inventory m_inventory;
-			public Inventory Inventory{
-				get{return m_inventory;}
-			}
+				public Inventory Inventory{
+					get{return m_inventory;}
+				}
+				public void SetInventory(Inventory inv){
+					m_inventory = inv;
+				}
 			bool m_isShrinkable;
 			public bool IsShrinkable{
 				get{return m_isShrinkable;}
@@ -101,11 +86,13 @@ namespace SlotSystem{
 				set{m_slots = value;}
 			}
 			
-			List<SlottableItem> m_itemInstances;
-			public List<SlottableItem> ItemInstances{
-				get{return m_itemInstances;}
-			}
-
+			List<SlottableItem> m_filteredItems;
+				public List<SlottableItem> FilteredItems{
+					get{return m_filteredItems;}
+				}
+				public void SetFilteredItems(List<SlottableItem> filteredItems){
+					m_filteredItems = filteredItems;
+				}
 			SlotGroupManager m_sgm;
 			public SlotGroupManager SGM{
 				get{return m_sgm;}
@@ -126,87 +113,112 @@ namespace SlotSystem{
 		/* commands
 		*/	
 			SlotGroupCommand m_wakeUpCommand = new SGWakeupCommand();
-			public SlotGroupCommand WakeUpCommand{
-				get{return m_wakeUpCommand;}
-				set{m_wakeUpCommand = value;}
-			}
+				public SlotGroupCommand WakeUpCommand{
+					get{return m_wakeUpCommand;}
+					set{m_wakeUpCommand = value;}
+				}
+				public void WakeUp(){
+					m_wakeUpCommand.Execute(this);
+				}
 			SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
-			public SlotGroupCommand InitItemsCommand{
-				get{return m_initItemsCommand;}
-				set{m_initItemsCommand = value;}
-			}
+				public SlotGroupCommand InitItemsCommand{
+					get{return m_initItemsCommand;}
+					set{m_initItemsCommand = value;}
+				}
+				public void InitializeItems(){
+					m_initItemsCommand.Execute(this);
+				}
 			SlotGroupCommand m_createSlotsCommand = new ConcCreateSlotsCommand();
-			public SlotGroupCommand CreateSlotsCommand{
-				get{return m_createSlotsCommand;}
-				set{m_createSlotsCommand = value;}
-			}
+				public SlotGroupCommand CreateSlotsCommand{
+					get{return m_createSlotsCommand;}
+					set{m_createSlotsCommand = value;}
+				}
+				public void CreateSlots(){
+					m_createSlotsCommand.Execute(this);
+				}
 			SlotGroupCommand m_createSbsCommand = new ConcCreateSbsCommand();
-			public SlotGroupCommand CreateSbsCommand{
-				get{return m_createSbsCommand;}
-				
-			}
+				public SlotGroupCommand CreateSbsCommand{
+					get{return m_createSbsCommand;}
+					
+				}
+				public void CreateSlottables(){
+					m_createSbsCommand.Execute(this);
+				}
 			SlotGroupCommand m_updateEquipStatusCommand;
-			public SlotGroupCommand UpdateEquipStatusCommand{
-				get{return m_updateEquipStatusCommand;}
-				set{m_updateEquipStatusCommand = value;}
+				public SlotGroupCommand UpdateEquipStatusCommand{
+					get{return m_updateEquipStatusCommand;}
+					set{m_updateEquipStatusCommand = value;}
+				}
+				public void UpdateEquipStatus(){
+					m_updateEquipStatusCommand.Execute(this);
+				}
+			SlotGroupCommand m_focusCommand = new SGFocusCommandV2();
+				public SlotGroupCommand FocusCommand{
+					get{return m_focusCommand;}
+					set{m_focusCommand = value;}
+				}
+				public void Focus(){
+					m_focusCommand.Execute(this);
+				}
+			SlotGroupCommand m_updateSbStateCommand = new UpdateSbStateCommandV2();
+				public SlotGroupCommand UpdateSbStateCommand{
+					get{return m_updateSbStateCommand;}
+					set{m_updateSbStateCommand = value;}
+				}
+				public void UpdateSbState(){
+					m_updateSbStateCommand.Execute(this);
+				}
+			SlotGroupCommand m_defocusCommand = new SGDefocusCommandV2();
+				public SlotGroupCommand DefocusCommand{
+					get{return m_defocusCommand;}
+					set{m_defocusCommand = value;}
+				}
+				public void Defocus(){
+					m_defocusCommand.Execute(this);
+				}
+			SlotGroupCommand m_prePickFilterCommand;
+				public SlotGroupCommand PrePickFilterCommand{
+					get{return m_prePickFilterCommand;}
+				}
+				public void SetPrePickFilterCommand(SlotGroupCommand comm){
+					m_prePickFilterCommand = comm;
+				}
+				public void PrePickFilter(){
+					m_prePickFilterCommand.Execute(this);
+				}
+			SGSorter m_sorter;
+				public SGSorter Sorter{
+					get{return m_sorter;}
+					set{m_sorter = value;}
+				}
+				public void SortItems(){
+					m_sorter.Execute(this);
+				}
+			SGFilter m_filter;
+				public SGFilter Filter{
+					get{return m_filter;}
+					set{m_filter = value;}
+				}
+				public void FilterItems(){
+					m_filter.Execute(this);
+				}
+		/*	events
+		*/
+			public void OnHoverEnterMock(PointerEventDataMock eventData){
+				CurState.OnHoverEnterMock(this, eventData);
 			}
-			SlotGroupCommand m_focusCommand = new SGFocusCommand();
-			public SlotGroupCommand FocusCommand{
-				get{return m_focusCommand;}
-				set{m_focusCommand = value;}
+			public void OnHoverExitMock(PointerEventDataMock eventData){
+				CurState.OnHoverExitMock(this, eventData);
 			}
-			SlotGroupCommand m_updateSbStateCommand = new SGUpdateSbStateCommand();
-			public SlotGroupCommand UpdateSbStateCommand{
-				get{return m_updateSbStateCommand;}
-				set{m_updateSbStateCommand = value;}
-			}
-			SlotGroupCommand m_defocusCommand = new SGDefocusCommand();
-			public SlotGroupCommand DefocusCommand{
-				get{return m_defocusCommand;}
-				set{m_defocusCommand = value;}
-			}
+		public void Activate(){
+			InitializeItems();
+		}
 		public void SetState(SlotGroupState state){
 			if(m_curState != state){
 				m_curState = state;
 				UpdateSbState();
 			}
-		}
-		public void WakeUp(){
-			m_wakeUpCommand.Execute(this);
-		}
-		public void SetInventory(Inventory inv){
-			m_inventory = inv;
-		}
-		public void InitializeItems(){
-			m_initItemsCommand.Execute(this);
-		}
-		public void SetItems(List<SlottableItem> filteredItems){
-			m_itemInstances = filteredItems;
-		}
-		public void FilterItems(){
-			m_filter.Execute(this);
-		}
-		public void SortItems(){
-			m_sorter.Execute(this);
-		}
-		public void CreateSlots(){
-			m_createSlotsCommand.Execute(this);
-		}
-		public void CreateSlottables(){
-			m_createSbsCommand.Execute(this);
-		}
-		public void UpdateEquipStatus(){
-			m_updateEquipStatusCommand.Execute(this);
-		}
-		public void Focus(){
-			m_focusCommand.Execute(this);
-		}
-		public void UpdateSbState(){
-			m_updateSbStateCommand.Execute(this);
-		}
-		public void Defocus(){
-			m_defocusCommand.Execute(this);
-		}
+		}	
 		public Slottable GetSlottable(InventoryItemInstanceMock itemInst){
 			foreach(Slot slot in this.Slots){
 				if(slot.Sb != null){
@@ -220,12 +232,7 @@ namespace SlotSystem{
 			}
 			return null;
 		}
-		public void OnHoverEnterMock(PointerEventDataMock eventData){
-			CurState.OnHoverEnterMock(this, eventData);
-		}
-		public void OnHoverExitMock(PointerEventDataMock eventData){
-			CurState.OnHoverExitMock(this, eventData);
-		}
+		
 		public bool HasItem(InventoryItemInstanceMock invInst){
 			bool result = false;
 			foreach(Slot slot in this.Slots){
@@ -235,6 +242,24 @@ namespace SlotSystem{
 				}
 			}
 			return result;
+		}
+		public SlotGroup GetSlotGroup(Slottable sb){
+			return null;
+		}
+		public bool ContainsElement(SlotSystemElement element){
+			return false;
+		}
+		public void FocusSBs(){
+			foreach(Slot slot in Slots){
+				if(slot.Sb != null)
+					slot.Sb.Focus();
+			}
+		}
+		public void DefocusSBs(){
+			foreach(Slot slot in Slots){
+				if(slot.Sb != null)
+					slot.Sb.Defocus();
+			}
 		}
 	}
 }

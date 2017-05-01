@@ -5,11 +5,7 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SlotGroupManager : MonoBehaviour {
-		string m_UTLog = "";
-		public string UTLog{
-			get{return m_UTLog;}
-			set{m_UTLog = value;}
-		}
+		
 		/*	transaction
 		*/
 			SlotSystemTransaction m_transaction;
@@ -58,14 +54,23 @@ namespace SlotSystem{
 					if(m_prePickFilterCommand != null)
 					m_prePickFilterCommand.Execute(this);
 				}
+			public void SetupCommands(){
+				m_updateTransactionCommand = new UpdateTransactionCommand();
+				m_postPickFilterCommand = new PostPickFilterCommand();
+				m_prePickFilterCommand = new PrePickFilterCommand();			
+			}
 		/*	process
 		*/
+		
 			AbsSGMProcess m_probingStateProcess;
 			public AbsSGMProcess ProbingStateProcess{
 				get{return m_probingStateProcess;}
 			}
 			IEnumeratorMock ProbingStateCoroutine(){
 				return null;
+			}
+			public void SetupProcesses(){
+				m_probingStateProcess = new SGMProbingStateProcess(this, ProbingStateCoroutine);
 			}
 		/*	states
 		*/
@@ -114,29 +119,41 @@ namespace SlotSystem{
 				set{m_initiallyFocusedSG = value;}
 			}
 			Slottable m_selectedSB;
-			public Slottable SelectedSB{
-				get{return m_selectedSB;}
-			}
-			public void SetSelectedSB(Slottable sb){
-				if(m_selectedSB != sb){
-					m_selectedSB = sb;
-					UpdateTransaction();
+				public Slottable SelectedSB{
+					get{return m_selectedSB;}
 				}
-			}
+				public void SetSelectedSB(Slottable sb){
+					if(m_selectedSB != sb){
+						m_selectedSB = sb;
+						UpdateTransaction();
+					}
+				}
 			SlotGroup m_selectedSG;
-			public SlotGroup SelectedSG{
-				get{return m_selectedSG;}
-			}
-			public void SetSelectedSG(SlotGroup sg){
-				if(m_selectedSG != sg){
-					m_selectedSG = sg;
-					UpdateTransaction();
+				public SlotGroup SelectedSG{
+					get{return m_selectedSG;}
 				}
-			}
+				public void SetSelectedSG(SlotGroup sg){
+					if(m_selectedSG != sg){
+						m_selectedSG = sg;
+						UpdateTransaction();
+					}
+				}
 			Slottable m_pickedSB;
-			public Slottable PickedSB{
-				get{return m_pickedSB;}
-			}
+				public Slottable PickedSB{
+					get{return m_pickedSB;}
+				}
+				public void SetPickedSB(Slottable sb){
+					this.m_pickedSB = sb;
+				}
+			InventoryManagerPage m_rootPage;
+				public InventoryManagerPage RootPage{
+					get{return m_rootPage;}
+				}
+				public void SetRootPage(InventoryManagerPage rootPage){
+					m_rootPage = rootPage;
+					m_rootPage.SGM = this;
+				}
+			
 		
 		public void SetSG(SlotGroup sg){
 			if(m_slotGroups == null)
@@ -145,7 +162,11 @@ namespace SlotSystem{
 			sg.SGM = this;
 		}
 		public void Initialize(){
-			this.SetState(SlotGroupManager.DefocusedState);
+			
+			// InitializeItems();
+			// InitializeProcesses();
+			SetState(SlotGroupManager.DefocusedState);
+			m_rootPage.Activate();
 		}
 		public void Focus(){
 			this.SetState(SlotGroupManager.FocusedState);
@@ -175,19 +196,10 @@ namespace SlotSystem{
 		}
 
 		public SlotGroup GetSlotGroup(Slottable sb){
-			foreach(SlotGroup sg in this.SlotGroups){
-				foreach(Slot slot in sg.Slots){
-					if(slot.Sb != null){
-						if(slot.Sb == sb)
-							return sg;
-					}
-				}
-			}
-			return null;
+			return this.RootPage.GetSlotGroup(sb);
+			
 		}
-		public void SetPickedSB(Slottable sb){
-			this.m_pickedSB = sb;
-		}
+		
 		public void SetState(SGMState sgmState){
 			if(CurState != sgmState){
 				m_prevState = CurState;
@@ -196,9 +208,7 @@ namespace SlotSystem{
 				CurState.EnterState(this);
 			}
 		}
-		public void InitializeProcesses(){
-			m_probingStateProcess = new SGMProbingStateProcess(this, ProbingStateCoroutine);
-		}
+		
 		public void SimSBHover(Slottable sb, PointerEventDataMock eventData){
 			if(CurState == SlotGroupManager.m_probingState){
 				if(sb != null){
