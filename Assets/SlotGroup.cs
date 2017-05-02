@@ -108,8 +108,7 @@ namespace SlotSystem{
 				}
 			}
 			public bool AutoSort = true;
-		/*	state
-		*/
+		
 		/* commands
 		*/	
 			SlotGroupCommand m_wakeUpCommand = new SGWakeupCommand();
@@ -212,6 +211,14 @@ namespace SlotSystem{
 			}
 		public void Activate(){
 			InitializeItems();
+		}
+		public void Deactivate(){
+			SetState(SlotGroup.DeactivatedState);
+			foreach(Slot slot in Slots){
+				if(slot.Sb != null){
+					slot.Sb.SetState(Slottable.DeactivatedState);
+				}
+			}
 		}
 		public void SetState(SlotGroupState state){
 			if(m_curState != state){

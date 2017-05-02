@@ -288,7 +288,7 @@ namespace SlotSystem{
 					// for(int i =0; i<sgm.SlotGroups.Count; i++){
 					// sgm.SlotGroups[i].WakeUp();
 					// }
-					sgm.RootPage.Focus();		
+					sgm.RootPage.Focus();
 				}
 				public void ExitState(SlotGroupManager sgm){}
 
@@ -736,8 +736,17 @@ namespace SlotSystem{
 				public override void Expire(){
 					base.Expire();
 					SB.UTLog = "GradualGrayoutProcess done";
+				}	
+			}
+			public class EquipGradualGrayoutProcess: AbsSBProcess{
+				public EquipGradualGrayoutProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					SB = sb;
+					CoroutineMock = coroutineMock;
 				}
-				
+				public override void Expire(){
+					base.Expire();
+					SB.UTLog = "EquipGradualGrayoutProcess done";
+				}	
 			}
 			public class GradualGrayinProcess: AbsSBProcess{
 				public GradualGrayinProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
@@ -747,6 +756,16 @@ namespace SlotSystem{
 				public override void Expire(){
 					base.Expire();
 					SB.UTLog = "GradualGrayinProcess done";
+				}
+			}
+			public class EquipGradualGrayinProcess: AbsSBProcess{
+				public EquipGradualGrayinProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+					SB.UTLog = "EquipGradualGrayinProcess done";
 				}
 			}
 			public class GradualDehighlightProcess: AbsSBProcess{
@@ -759,25 +778,34 @@ namespace SlotSystem{
 					SB.UTLog = "GradualDehighlightProcess done";
 				}
 			}
-			public class WaitAndSetBackToDefocusedStateProcess: AbsSBProcess{
-				public WaitAndSetBackToDefocusedStateProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+			public class EquipGradualDehighlightProcess: AbsSBProcess{
+				public EquipGradualDehighlightProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+					SB.UTLog = "EquipGradualDehighlightProcess done";
+				}
+			}
+			public class WaitForPointerUpProcess: AbsSBProcess{
+				public WaitForPointerUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 					this.SB = sb;
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Expire(){
 					base.Expire();
 					SB.SetState(Slottable.DefocusedState);
-					SB.UTLog = "WaitAndSetBackToDefocusedStateProcess done";
+					SB.UTLog = "WaitForPointerUpProcess done";
 				}
 			}
-			public class WaitAndPickUpProcess: AbsSBProcess{
-				public WaitAndPickUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+			public class WaitForPickUpProcess: AbsSBProcess{
+				public WaitForPickUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 					this.SB = sb;
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Expire(){
 					base.Expire();
-					SB.UTLog = "WaitAndPickUpProcess done";
 					SB.SetState(Slottable.PickedUpAndSelectedState);
 				}
 			}
@@ -860,7 +888,8 @@ namespace SlotSystem{
 			
 			public class DeactivatedState: SlottableState{
 				public void EnterState(Slottable sb){
-					sb.Deactivate();
+					// sb.Deactivate();
+					sb.SetAndRun(null);
 				}
 				public void ExitState(Slottable sb){
 				}
@@ -893,15 +922,19 @@ namespace SlotSystem{
 			}
 			public class DefocusedState: SlottableState{
 				public void EnterState(Slottable slottable){
-					if(slottable.PrevState == Slottable.DeactivatedState){
+
+					if(slottable.PrevState == Slottable.FocusedState || slottable.PrevState == Slottable.EquippedAndDeselectedState){
+
+						SBProcess gradGOProcess = new GradualGrayoutProcess(slottable, slottable.GradualGrayoutCoroutine);
+						slottable.SetAndRun(gradGOProcess);
+
+					}else{
+
 						slottable.InstantGrayout();
-					}else if(slottable.PrevState == Slottable.FocusedState){
-						slottable.GradualGrayoutProcess.Start();
+						slottable.SetAndRun(null);
 					}
 				}
 				public void ExitState(Slottable slottable){
-					if(slottable.GradualGrayoutProcess.IsRunning)
-						slottable.GradualGrayoutProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.SetState(Slottable.WaitForPointerUpState);
@@ -935,23 +968,23 @@ namespace SlotSystem{
 			}
 			public class FocusedState: SlottableState{
 				public void EnterState(Slottable slottable){
-					if(slottable.PrevState == Slottable.DeactivatedState || slottable.PrevState == Slottable.MovingState || slottable.PrevState == Slottable.WaitForNextTouchState){
-						slottable.InstantGrayin();
-					}else if(slottable.PrevState == Slottable.DefocusedState){
-						slottable.GradualGrayinProcess.Start();
-					}else if(slottable.PrevState == Slottable.SelectedState){
-						slottable.GradualDehighlightProcess.Start();
-					}
+					
+					if(slottable.PrevState == Slottable.DefocusedState || slottable.PrevState == Slottable.EquippedAndDefocusedState){
 
-					if(slottable.PrevState == Slottable.DefocusedState){
-						slottable.GradualGrayinProcess.Start();
+						SBProcess gradGIProcess = new GradualGrayinProcess(slottable, slottable.GradualGrayinCoroutine);
+						slottable.SetAndRun(gradGIProcess);
+
+					}else if(slottable.PrevState == Slottable.SelectedState || slottable.PrevState == Slottable.EquippedAndSelectedState){
+
+						SBProcess gradDhProcess = new GradualDehighlightProcess(slottable, slottable.GradualDehighlightCoroutine);
+						slottable.SetAndRun(gradDhProcess);
+
+					}else{
+						slottable.InstantGrayin();
+						slottable.SetAndRun(null);
 					}
 				}
 				public void ExitState(Slottable slottable){
-					if(slottable.GradualGrayinProcess.IsRunning)
-						slottable.GradualGrayinProcess.Stop();
-					if(slottable.GradualDehighlightProcess.IsRunning)
-						slottable.GradualDehighlightProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					
@@ -990,21 +1023,27 @@ namespace SlotSystem{
 			}
 			public class WaitForPointerUpState: SlottableState{
 				public void EnterState(Slottable sb){
-					sb.WaitAndSetBackToDefocusedStateProcess.Start();
+					
+					SBProcess wfPtuProcess = new WaitForPointerUpProcess(sb, sb.WaitForPointerUpCoroutine);
+					sb.SetAndRun(wfPtuProcess);
 				}
 				public void ExitState(Slottable sb){
-					if(sb.WaitAndSetBackToDefocusedStateProcess.IsRunning)
-						sb.WaitAndSetBackToDefocusedStateProcess.Stop();
 				}
 				
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
 					sb.Tap();
-					sb.SetState(Slottable.DefocusedState);
+					if(sb.IsEquipped)
+						sb.SetState(Slottable.EquippedAndDefocusedState);
+					else
+						sb.SetState(Slottable.DefocusedState);
 					
 				}
 				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){
-					sb.SetState(Slottable.DefocusedState);
+					if(sb.IsEquipped)
+						sb.SetState(Slottable.EquippedAndDefocusedState);
+					else
+						sb.SetState(Slottable.DefocusedState);
 				}
 				/*	undef
 				*/
@@ -1020,12 +1059,11 @@ namespace SlotSystem{
 			}
 			public class WaitForPickUpState: SlottableState{
 				public void EnterState(Slottable slottable){
-					
-					slottable.WaitForPickUpProcess.Start();
+
+					SBProcess wfpuProcess = new WaitForPickUpProcess(slottable, slottable.WaitForPickUpCoroutine);
+					slottable.SetAndRun(wfpuProcess);
 				}
 				public void ExitState(Slottable slottable){
-					if(slottable.WaitForPickUpProcess.IsRunning)
-						slottable.WaitForPickUpProcess.Stop();
 				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					if(slottable.Item.IsStackable)
@@ -1060,11 +1098,10 @@ namespace SlotSystem{
 			}
 			public class WaitForNextTouchState: SlottableState{
 				public void EnterState(Slottable slottable){
-					slottable.WaitForNextTouchProcess.Start();
+					SBProcess wfntProcess = new WaitForNextTouchProcess(slottable, slottable.WaitForNextTouchCoroutine);
+					slottable.SetAndRun(wfntProcess);
 				}
 				public void ExitState(Slottable slottable){
-					if(slottable.WaitForNextTouchProcess.IsRunning)
-						slottable.WaitForNextTouchProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					
@@ -1094,16 +1131,16 @@ namespace SlotSystem{
 					it should turn the state of sb not straight into RevertingState, but need to operate an alogorithm to decide whether it should turn sb state instead to WaitForNextTouch state before jumping into the conclusion
 				*/
 				public void EnterState(Slottable slottable){
-					slottable.PickedUpAndSelectedProcess.Start();
+					
+					SBProcess puaSelProcess = new PickedUpAndSelectedProcess(slottable, slottable.PickedUpAndSelectedCoroutine);
+					slottable.SetAndRun(puaSelProcess);
+
 					slottable.SGM.SetState(SlotGroupManager.ProbingState);
 					InitializeSGMFields(slottable);
 					slottable.SGM.PostPickFilter();
 					
 				}
 				public void ExitState(Slottable slottable){
-					if(slottable.PickedUpAndSelectedProcess.IsRunning)
-						slottable.PickedUpAndSelectedProcess.Stop();
-
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
@@ -1154,12 +1191,11 @@ namespace SlotSystem{
 			}
 			public class PickedUpAndDeselectedState: SlottableState{
 				public void EnterState(Slottable sb){
-					sb.PickedUpAndDeselectedProcess.Start();
+					
+					SBProcess puaDesProcess = new PickedUpAndDeselectedProcess(sb, sb.PickedUpAndDeselectedCoroutine);
+					sb.SetAndRun(puaDesProcess);
 				}
 				public void ExitState(Slottable sb){
-
-					if(sb.PickedUpAndDeselectedProcess.IsRunning)
-						sb.PickedUpAndDeselectedProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
@@ -1182,11 +1218,11 @@ namespace SlotSystem{
 			}
 			public class WaitForNextTouchWhilePUState: SlottableState{
 				public void EnterState(Slottable slottable){
-					slottable.WaitForNextTouchWhilePUProcess.Start();
+					
+					SBProcess wfntwpuProcess = new WaitForNextTouchWhilePUProcess(slottable, slottable.WaitForNextTouchWhilePUCoroutine);
+					slottable.SetAndRun(wfntwpuProcess);
 				}
 				public void ExitState(Slottable slottable){
-					if(slottable.WaitForNextTouchWhilePUProcess.IsRunning)
-						slottable.WaitForNextTouchWhilePUProcess.Stop();
 				}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					slottable.Increment();
@@ -1231,7 +1267,22 @@ namespace SlotSystem{
 				}
 			}
 			public class EquippedAndDeselectedState: SlottableState{
-				public void EnterState(Slottable slottable){}
+				public void EnterState(Slottable slottable){
+					if(slottable.PrevState == Slottable.DefocusedState || slottable.PrevState == Slottable.EquippedAndDefocusedState){
+
+						SBProcess gradGIProcess = new EquipGradualGrayinProcess(slottable, slottable.EquipGradualGrayinCoroutine);
+						slottable.SetAndRun(gradGIProcess);
+
+					}else if(slottable.PrevState == Slottable.SelectedState || slottable.PrevState == Slottable.EquippedAndSelectedState){
+
+						SBProcess gradDhProcess = new EquipGradualDehighlightProcess(slottable, slottable.EquipGradualDehighlightCoroutine);
+						slottable.SetAndRun(gradDhProcess);
+
+					}else{
+						slottable.InstantEquipGrayin();
+						slottable.SetAndRun(null);
+					}
+				}
 				public void ExitState(Slottable slottable){}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
 					if(slottable.Delayed)
@@ -1286,9 +1337,22 @@ namespace SlotSystem{
 				}
 			}
 			public class EquippedAndDefocusedState: SlottableState{
-				public void EnterState(Slottable slottable){}
+				public void EnterState(Slottable slottable){
+					if(slottable.PrevState == Slottable.FocusedState || slottable.PrevState == Slottable.EquippedAndDeselectedState){
+
+						SBProcess gradGOProcess = new EquipGradualGrayoutProcess(slottable, slottable.EquipGradualGrayoutCoroutine);
+						slottable.SetAndRun(gradGOProcess);
+
+					}else{
+
+						slottable.InstantEquipGrayout();
+						slottable.SetAndRun(null);
+					}
+				}
 				public void ExitState(Slottable slottable){}
-				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
+					slottable.SetState(Slottable.WaitForPointerUpState);
+				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){}
@@ -1334,11 +1398,11 @@ namespace SlotSystem{
 			}
 			public class SBRevertingState: SlottableState{
 				public void EnterState(Slottable sb){
-					sb.RevertingStateProcess.Start();
+					
+					SBProcess revertProcess = new RevertingStateProcess(sb, sb.RevertingStateCoroutine);
+					sb.SetAndRun(revertProcess);
 				}
 				public void ExitState(Slottable sb){
-					if(sb.RevertingStateProcess.IsRunning)
-						sb.RevertingStateProcess.Expire();
 				}
 				/*	undefined events
 				*/
@@ -1682,6 +1746,7 @@ namespace SlotSystem{
 			*/
 				public interface SlotSystemElement{
 					void Activate();
+					void Deactivate();
 					void Focus();
 					void Defocus();
 					SlotGroupManager SGM{get; set;}
@@ -1703,6 +1768,11 @@ namespace SlotSystem{
 					public virtual void Activate(){
 						foreach(SlotSystemElement ele in Elements){
 							ele.Activate();
+						}
+					}
+					public virtual void Deactivate(){
+						foreach(SlotSystemElement ele in Elements){
+							ele.Deactivate();
 						}
 					}
 					public virtual void Focus(){
@@ -1748,7 +1818,13 @@ namespace SlotSystem{
 				}
 				public class InventoryManagerPage: AbsSlotSysElement{
 					SlotGroupBundle m_poolBundle;
+					public SlotGroupBundle PoolBundle{
+						get{return m_poolBundle;}
+					}
 					SlotGroupBundle m_equipBundle;
+					public SlotGroupBundle EquipBundle{
+						get{return m_equipBundle;}
+					}
 					public InventoryManagerPage(SlotGroupBundle poolBundle, SlotGroupBundle equipBundle){
 						this.m_poolBundle = poolBundle;
 						this.m_equipBundle = equipBundle;
@@ -1760,6 +1836,9 @@ namespace SlotSystem{
 							pageElements.Add(m_equipBundle);
 							return pageElements;
 						}
+					}
+					public override void Focus(){
+						base.Focus();
 					}
 				}	
 				public class EquipmentSet: AbsSlotSysElement{

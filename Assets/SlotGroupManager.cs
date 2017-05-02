@@ -168,6 +168,7 @@ namespace SlotSystem{
 			// SetState(SlotGroupManager.DefocusedState);
 			m_rootPage.Activate();
 		}
+		
 		public void Focus(){
 			this.SetState(SlotGroupManager.FocusedState);
 		}
@@ -268,6 +269,10 @@ namespace SlotSystem{
 			this.SetState(SlotGroupManager.FocusedState);
 			this.ClearFields();
 			PrePickFilter();
+		}
+		public void Deactivate(){
+			SetState(SlotGroupManager.DeactivatedState);
+			m_rootPage.Deactivate();
 		}
 	}
 

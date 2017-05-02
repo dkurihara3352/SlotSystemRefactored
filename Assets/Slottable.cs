@@ -255,82 +255,60 @@ namespace SlotSystem{
 			
 		/*	processes
 		*/
-			SBProcess m_gradualGrayoutProcess;
-				public SBProcess GradualGrayoutProcess{
-					get{return m_gradualGrayoutProcess;}
-					set{m_gradualGrayoutProcess = value;}
-				}
+			SBProcess m_curProcess;
+			public SBProcess CurProcess{
+				get{return m_curProcess;}
+			}
+			public void SetAndRun(SBProcess process){
+				if(m_curProcess != null)
+					m_curProcess.Stop();
+				m_curProcess = process;
+				if(m_curProcess != null)
+					m_curProcess.Start();
+			}
+			/*	coroutines
+			*/
 				public IEnumeratorMock GradualGrayoutCoroutine(){
 					return null;
 				}
-			SBProcess m_gradualHighlightProcess;
-				public SBProcess GradualGrayinProcess{
-					get{return m_gradualHighlightProcess;}
-					set{m_gradualHighlightProcess = value;}
+				public IEnumeratorMock EquipGradualGrayoutCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock GradualGrayinCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock EquipGradualGrayinCoroutine(){
+					return null;
 				}
 				public IEnumeratorMock GradualHighlightCoroutine(){
 					return null;
 				}
-			SBProcess m_gradualDehighlightProcess;
-				public SBProcess GradualDehighlightProcess{
-					get{return m_gradualDehighlightProcess;}
-					set{m_gradualDehighlightProcess = value;}
+				public IEnumeratorMock EquipGradualHighlightCoroutine(){
+					return null;
 				}
 				public IEnumeratorMock GradualDehighlightCoroutine(){
 					return null;
 				}
-			SBProcess m_waitAndSetBackToDefocusedStateProcess;
-				public SBProcess WaitAndSetBackToDefocusedStateProcess{
-					get{return m_waitAndSetBackToDefocusedStateProcess;}
-					set{m_waitAndSetBackToDefocusedStateProcess = value;}
-				}
-				public IEnumeratorMock WaitAndSetBackToDefocusedStateCoroutine(){
+				public IEnumeratorMock EquipGradualDehighlightCoroutine(){
 					return null;
 				}
-			SBProcess m_waitForPickUpProcess;
-				public SBProcess WaitForPickUpProcess{
-					get{return m_waitForPickUpProcess;}
-					set{m_waitForPickUpProcess = value;}
+				public IEnumeratorMock WaitForPointerUpCoroutine(){
+					return null;
 				}
 				public IEnumeratorMock WaitForPickUpCoroutine(){
 					return null;
 				}
-			SBProcess m_pickedUpAndSelectedProcess;
-				public SBProcess PickedUpAndSelectedProcess{
-					get{return m_pickedUpAndSelectedProcess;}
-					set{m_pickedUpAndSelectedProcess = value;}
-				}
 				public IEnumeratorMock PickedUpAndSelectedCoroutine(){
 					return null;
-				}
-			SBProcess m_pickedUpAndDeselectedProcess;
-				public SBProcess PickedUpAndDeselectedProcess{
-					get{return m_pickedUpAndDeselectedProcess;}
-					set{m_pickedUpAndDeselectedProcess = value;}
 				}
 				public IEnumeratorMock PickedUpAndDeselectedCoroutine(){
 					return null;
 				}
-			SBProcess m_revertingStateProcess;
-				public SBProcess RevertingStateProcess{
-					get{return m_revertingStateProcess;}
-					set{m_revertingStateProcess = value;}
-				}
 				public IEnumeratorMock RevertingStateCoroutine(){
 					return null;
 				}
-			SBProcess m_waitForNextTouchWhilePUProcess;
-				public SBProcess WaitForNextTouchWhilePUProcess{
-					get{return m_waitForNextTouchWhilePUProcess;}
-					set{m_waitForNextTouchWhilePUProcess = value;}
-				}
 				public IEnumeratorMock WaitForNextTouchWhilePUCoroutine(){
 					return null;
-				}
-			SBProcess m_waitForNextTouchProcess;
-				public SBProcess WaitForNextTouchProcess{
-					get{return m_waitForNextTouchProcess;}
-					set{m_waitForNextTouchProcess = value;}
 				}
 				public IEnumeratorMock WaitForNextTouchCoroutine(){
 					return null;
@@ -369,20 +347,8 @@ namespace SlotSystem{
 		public void ClearLog(){
 			m_UTLog = "";
 		}
-		public void InitializeProcesses(){	
-			this.GradualGrayoutProcess = new GradualGrayoutProcess(this, GradualGrayoutCoroutine);
-			this.GradualGrayinProcess = new GradualGrayinProcess(this, GradualHighlightCoroutine);
-			this.GradualDehighlightProcess = new GradualDehighlightProcess(this, GradualDehighlightCoroutine);
-			this.WaitAndSetBackToDefocusedStateProcess = new WaitAndSetBackToDefocusedStateProcess(this, WaitAndSetBackToDefocusedStateCoroutine);
-			this.WaitForPickUpProcess = new WaitAndPickUpProcess(this, WaitForPickUpCoroutine);
-			this.PickedUpAndSelectedProcess = new PickedUpAndSelectedProcess(this, PickedUpAndSelectedCoroutine);
-			this.PickedUpAndDeselectedProcess = new PickedUpAndDeselectedProcess(this, PickedUpAndSelectedCoroutine);
-			this.RevertingStateProcess = new RevertingStateProcess(this, RevertingStateCoroutine);
-			this.WaitForNextTouchWhilePUProcess = new WaitForNextTouchWhilePUProcess(this, WaitForNextTouchWhilePUCoroutine);
-			this.WaitForNextTouchProcess = new WaitForNextTouchProcess(this, WaitForNextTouchCoroutine);
-		}
+
 		public void Initialize(SlotGroup sg){
-			InitializeProcesses();
 			m_curState = Slottable.DeactivatedState;
 			m_prevState = Slottable.DeactivatedState;
 			this.m_sgm = sg.SGM;
@@ -417,7 +383,6 @@ namespace SlotSystem{
 
 		public void Tap(){
 			m_tapCommand.Execute(this);
-			m_UTLog = "tapped";
 			Tapped = true;
 		}
 		public void PickUp(){
@@ -449,12 +414,21 @@ namespace SlotSystem{
 			m_instantDeactivateCommand.Execute(this);
 		}
 		public void InstantGrayout(){
-			m_UTLog = "InstantGrayout called";
+			IsInstGOCalled = true;
 		}
-		public bool IsInstGICalled = false;
+			public bool IsInstGOCalled = false;
+		public void InstantEquipGrayout(){
+			IsInstGOCalled = true;
+		}
+			public bool IsInstEqGOCalled = false;
 		public void InstantGrayin(){
 			IsInstGICalled = true;
 		}
+			public bool IsInstGICalled = false;
+		public void InstantEquipGrayin(){
+			IsInstEqGICalled = true;
+		}
+			public bool IsInstEqGICalled = false;
 		public void Deactivate(){}
 		public void ExecuteTransaction(){
 			SGM.Transaction.Execute();
