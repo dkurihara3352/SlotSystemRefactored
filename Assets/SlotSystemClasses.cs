@@ -279,6 +279,7 @@ namespace SlotSystem{
 				public void EnterState(SlotGroupManager sgm){
 					// sgm.InitializeItems();
 					// sgm.InitializeProcesses();
+					sgm.RootPage.Defocus();
 				}
 				public void ExitState(SlotGroupManager sgm){}
 			}
@@ -916,7 +917,7 @@ namespace SlotSystem{
 					}
 				}
 				public void Defocus(Slottable sb){
-					if(!((InventoryItemInstanceMock)sb.Item).IsEquipped)
+					if(((InventoryItemInstanceMock)sb.Item).IsEquipped)
 						sb.SetState(Slottable.EquippedAndDefocusedState);
 				}
 				/*	undef
@@ -940,6 +941,10 @@ namespace SlotSystem{
 						slottable.GradualGrayinProcess.Start();
 					}else if(slottable.PrevState == Slottable.SelectedState){
 						slottable.GradualDehighlightProcess.Start();
+					}
+
+					if(slottable.PrevState == Slottable.DefocusedState){
+						slottable.GradualGrayinProcess.Start();
 					}
 				}
 				public void ExitState(Slottable slottable){
@@ -1027,7 +1032,10 @@ namespace SlotSystem{
 						slottable.SetState(Slottable.WaitForNextTouchState);
 					else{
 						slottable.Tap();
-						slottable.SetState(Slottable.FocusedState);
+						if(slottable.IsEquipped)
+							slottable.SetState(Slottable.EquippedAndDeselectedState);
+						else
+							slottable.SetState(Slottable.FocusedState);
 					}
 				}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
@@ -1226,12 +1234,12 @@ namespace SlotSystem{
 				public void EnterState(Slottable slottable){}
 				public void ExitState(Slottable slottable){}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					if(!slottable.SGM.GetSlotGroup(slottable).IsPool){
-						if(slottable.Delayed)
-							slottable.SetState(Slottable.WaitForPickUpState);
-						else
-							slottable.SetState(Slottable.PickedUpAndSelectedState);
-					}
+					if(slottable.Delayed)
+						slottable.SetState(Slottable.WaitForPickUpState);
+					else
+						slottable.SetState(Slottable.PickedUpAndSelectedState);
+					// if(!slottable.SGM.GetSlotGroup(slottable).IsPool){
+					// }
 				}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}

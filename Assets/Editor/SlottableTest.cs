@@ -2,7 +2,7 @@
 using UnityEditor;
 using NUnit.Framework;
 using SlotSystem;
-
+using System.Collections.Generic;
 public class SlottableTest {
 
 
@@ -34,8 +34,7 @@ public class SlottableTest {
 
 
 	[SetUp]
-	public void Setup(){
-	
+	public void Setup(){	
 		/*	SGM
 		*/
 			sgmGO = new GameObject("SlotGroupManager");
@@ -170,7 +169,6 @@ public class SlottableTest {
 		poolBundle.SetFocusedBundleElement(sgpAll);
 		InventoryManagerPage invManPage = new InventoryManagerPage(poolBundle, equipBundle);
 	
-	
 		sgm.SetRootPage(invManPage);	
 			/*	Assert Setup
 				Preinitialized validation
@@ -233,7 +231,7 @@ public class SlottableTest {
 			defPartsSB_p2 = sgpParts.GetSlottable(defPartsA);
 			crfPartsSB_p2 = sgpParts.GetSlottable(crfPartsA);
 
-			Assert.That(sgm.CurState, Is.EqualTo(SlotGroupManager.DefocusedState));
+			Assert.That(sgm.CurState, Is.EqualTo(SlotGroupManager.DeactivatedState));
 			/*	sgpAll
 			*/
 			Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.DeactivatedState));
@@ -292,24 +290,11 @@ public class SlottableTest {
 			/*	when the widget gets focus
 			*/
 			AssertSGMFocused();
-
-
-		// Assert.That(sgm.CurState, Is.EqualTo(SlotGroupManager.FocusedState));
-		// Assert.That(sgm.PrevState, Is.EqualTo(SlotGroupManager.DefocusedState));
-
-		// /**/
-			// defBowASB_p = sgpAll.GetSlottable(defBowA);	
-			// defBowBSB_p = sgpAll.GetSlottable(defBowB);
-			// crfBowASB_p = sgpAll.GetSlottable(crfBowA);
-			// defWearASB_p = sgpAll.GetSlottable(defWearA);
-			// defWearBSB_p = sgpAll.GetSlottable(defWearB);
-			// crfWearASB_p = sgpAll.GetSlottable(crfWearA);
-			// defPartsSB_p = sgpAll.GetSlottable(defPartsA);
-			// crfPartsSB_p = sgpAll.GetSlottable(crfPartsA);
-			// defBowASB_e = sgBow.GetSlottable(defBowA);
-			// defWearASB_e = sgWear.GetSlottable(defWearA);
-			// defPartsSB_p2 = sgpParts.GetSlottable(defPartsA);
-			// crfPartsSB_p2 = sgpParts.GetSlottable(crfPartsA);
+			AssertInstGICalled();
+		sgm.Defocus();
+			AssertSGMDefocus();
+		sgm.Focus();
+			AssertSGMFocused();
 	}
 	public void AssertSGMFocused(){
 		AE(sgm.CurState, SlotGroupManager.FocusedState);
@@ -331,16 +316,115 @@ public class SlottableTest {
 		AE(sgWear.CurState, SlotGroup.FocusedState);
 			ASSB(defWearASB_e, Slottable.EquippedAndDeselectedState);
 	}
-	/*try this again after everything else*/
-	public void TestSBSelectedState(){
-		Assert.That(Slottable.SelectedState.GetType(), Is.EqualTo(typeof(SBSelectedState)));
-		defBowASB_p.SetState(Slottable.SelectedState);
-		AssertState(defBowASB_p, Slottable.SelectedState);
+	public void CheckInstantGrayinCalled(Slottable sb){
+		AB(sb.IsInstGICalled, true);
+		sb.IsInstGICalled = false;
 	}
+	public void AssertInstGICalled(){
+		foreach(Slottable sb in SlottableList()){
+			if(sb.CurState == Slottable.FocusedState){
+				AE(sb.PrevState, Slottable.DeactivatedState);
+				CheckInstantGrayinCalled(sb);
+
+			}
+		}
+	}
+	public void AssertSGMDefocus(){
+		AE(sgm.CurState, SlotGroupManager.DefocusedState);
+
+		AE(sgpAll.CurState, SlotGroup.DefocusedState);
+			ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
+			ASSB(defBowBSB_p, Slottable.DefocusedState);
+			ASSB(crfBowASB_p, Slottable.DefocusedState);
+			ASSB(defWearASB_p, Slottable.EquippedAndDefocusedState);
+			ASSB(defWearBSB_p, Slottable.DefocusedState);
+			ASSB(crfWearASB_p, Slottable.DefocusedState);
+
+			AB(((InventoryItemInstanceMock)defPartsSB_p.Item).IsEquipped, false);
+			AE(sgm.GetSlotGroup(defPartsSB_p), sgpAll);
+
+			ASSB(defPartsSB_p, Slottable.DefocusedState);
+			ASSB(crfPartsSB_p, Slottable.DefocusedState);
+		AE(sgpParts.CurState, SlotGroup.DefocusedState);
+			ASSB(defPartsSB_p2, Slottable.DefocusedState);
+			ASSB(crfPartsSB_p2, Slottable.DefocusedState);
+		AE(sgBow.CurState, SlotGroup.DefocusedState);
+			ASSB(defBowASB_e, Slottable.EquippedAndDefocusedState);
+		AE(sgWear.CurState, SlotGroup.DefocusedState);
+			ASSB(defWearASB_e, Slottable.EquippedAndDefocusedState);
+
+	}
+	
 	[Test]
 	public void Test(){		
-		// TestAllSbHoverOnAllSB();
+	
+		TestOnPointerDownOnAllSB();
+	
 	}
+	public void TestAllSBsDelayed(){
+		foreach(Slottable sb in SlottableList()){
+			AB(sb.Delayed, true);
+		}
+	}
+	List<Slottable> SlottableList(){
+		List<Slottable> sbList = new List<Slottable>();
+		sbList.Add(defBowASB_p);
+		sbList.Add(defBowBSB_p);
+		sbList.Add(crfBowASB_p);
+		sbList.Add(defWearASB_p);
+		sbList.Add(defWearBSB_p);
+		sbList.Add(crfWearASB_p);
+		sbList.Add(defPartsSB_p);
+		sbList.Add(crfPartsSB_p);
+		sbList.Add(defBowASB_e);
+		sbList.Add(defWearASB_e);
+		sbList.Add(defPartsSB_p2);
+		sbList.Add(crfPartsSB_p2);
+
+		return sbList;
+	}
+	public void TestOnPointerDownOnAllSB(){
+		foreach(Slottable sb in SlottableList()){
+			TestOnPointerDown(sb);
+		}
+	}
+		public void TestOnPointerDown(Slottable sb){
+			if(sb.CurState == Slottable.DeactivatedState){
+				sb.OnPointerDownMock(eventData);
+				ASSB(sb, Slottable.DeactivatedState);
+
+			}
+			else if(sb.CurState == Slottable.DefocusedState || sb.CurState == Slottable.EquippedAndDefocusedState){
+				sb.OnPointerDownMock(eventData);
+				ASSB(sb, Slottable.WaitForPointerUpState);
+				sb.OnPointerUpMock(eventData);
+				if(sb.IsEquipped)
+					ASSB(sb, Slottable.EquippedAndDefocusedState);
+				else
+					ASSB(sb, Slottable.DefocusedState);
+			}
+			else if(sb.CurState == Slottable.FocusedState || sb.CurState == Slottable.EquippedAndDeselectedState){
+				sb.OnPointerDownMock(eventData);
+				ASSB(sb, Slottable.WaitForPickUpState);
+				sb.OnPointerUpMock(eventData);
+				if(sb.Item.IsStackable){
+					ASSB(sb, Slottable.WaitForNextTouchState);
+					sb.WaitForNextTouchProcess.Expire();
+					if(sb.IsEquipped)
+						ASSB(sb, Slottable.EquippedAndDeselectedState);
+					else
+						ASSB(sb, Slottable.FocusedState);
+
+				}else{
+					if(sb.IsEquipped)
+						ASSB(sb, Slottable.EquippedAndDeselectedState);
+					else	
+						ASSB(sb, Slottable.FocusedState);
+				}
+			}
+			else
+				throw new System.InvalidOperationException("shouldn't be performed OnPointerDown while in " + sb.CurState.GetType().ToString() + " state");
+		}
 	public void TestAllSbHoverOnAllSB(){
 		// TestHoverOnAllSB(defBowASB_p);
 		// TestHoverOnAllSB(defBowBSB_p);

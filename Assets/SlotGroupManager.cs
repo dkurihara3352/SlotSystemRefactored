@@ -165,11 +165,14 @@ namespace SlotSystem{
 			
 			// InitializeItems();
 			// InitializeProcesses();
-			SetState(SlotGroupManager.DefocusedState);
+			// SetState(SlotGroupManager.DefocusedState);
 			m_rootPage.Activate();
 		}
 		public void Focus(){
 			this.SetState(SlotGroupManager.FocusedState);
+		}
+		public void Defocus(){
+			this.SetState(SlotGroupManager.DefocusedState);
 		}
 		public void InitializeItems(){
 			foreach(SlotGroup sg in SlotGroups){

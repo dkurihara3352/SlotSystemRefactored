@@ -184,8 +184,7 @@ namespace SlotSystem{
 					get{return m_tapCommand;}
 				}
 		/* public fields
-		*/
-			
+		*/			
 			SlottableState m_curState;
 			public SlottableState CurState{
 				get{return m_curState;}
@@ -245,6 +244,13 @@ namespace SlotSystem{
 			public SlotGroupManager SGM{
 				get{return m_sgm;}
 				set{m_sgm = value;}
+			}
+			bool m_isEquipped;
+			public bool IsEquipped{
+				get{
+					InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)m_item;
+					return invInst.IsEquipped;
+				}
 			}
 			
 		/*	processes
@@ -445,8 +451,9 @@ namespace SlotSystem{
 		public void InstantGrayout(){
 			m_UTLog = "InstantGrayout called";
 		}
+		public bool IsInstGICalled = false;
 		public void InstantGrayin(){
-			m_UTLog = "InstantGrayin called";
+			IsInstGICalled = true;
 		}
 		public void Deactivate(){}
 		public void ExecuteTransaction(){
