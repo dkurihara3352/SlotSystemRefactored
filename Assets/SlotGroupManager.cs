@@ -22,6 +22,11 @@ namespace SlotSystem{
 			}
 		/*	command
 		*/
+			public void SetupCommands(){
+				m_updateTransactionCommand = new UpdateTransactionCommand();
+				m_postPickFilterCommand = new PostPickFilterV2Command();
+				// m_prePickFilterCommand = new PrePickFilterCommand();			
+			}
 			SGMCommand m_updateTransactionCommand;
 				public SGMCommand UpdateTransactionCommand{
 					get{return m_updateTransactionCommand;}
@@ -43,35 +48,46 @@ namespace SlotSystem{
 					if(m_postPickFilterCommand != null)
 					m_postPickFilterCommand.Execute(this);
 				}
-			SGMCommand m_prePickFilterCommand;
-				public SGMCommand PrePickFilterCommand{
-					get{return m_prePickFilterCommand;}
-				}
-				public void SetPrePickFilterCommand(SGMCommand comm){
-					m_prePickFilterCommand = comm;
-				}
-				public void PrePickFilter(){
-					if(m_prePickFilterCommand != null)
-					m_prePickFilterCommand.Execute(this);
-				}
-			public void SetupCommands(){
-				m_updateTransactionCommand = new UpdateTransactionCommand();
-				m_postPickFilterCommand = new PostPickFilterCommand();
-				m_prePickFilterCommand = new PrePickFilterCommand();			
-			}
+			// SGMCommand m_prePickFilterCommand;
+			// 	public SGMCommand PrePickFilterCommand{
+			// 		get{return m_prePickFilterCommand;}
+			// 	}
+			// 	public void SetPrePickFilterCommand(SGMCommand comm){
+			// 		m_prePickFilterCommand = comm;
+			// 	}
+			// 	public void PrePickFilter(){
+			// 		if(m_prePickFilterCommand != null)
+			// 		m_prePickFilterCommand.Execute(this);
+			// 	}
+			
 		/*	process
 		*/
-		
-			AbsSGMProcess m_probingStateProcess;
-			public AbsSGMProcess ProbingStateProcess{
-				get{return m_probingStateProcess;}
+			SGMProcess m_curProcess;
+			public SGMProcess CurProcess{
+				get{return m_curProcess;}
 			}
-			IEnumeratorMock ProbingStateCoroutine(){
-				return null;
+			public void SetAndRun(SGMProcess process){	
+				if(m_curProcess != null)
+					m_curProcess.Stop();
+				m_curProcess = process;
+				if(m_curProcess != null)
+					m_curProcess.Start();
 			}
-			public void SetupProcesses(){
-				m_probingStateProcess = new SGMProbingStateProcess(this, ProbingStateCoroutine);
-			}
+			/*	coroutines
+			*/
+				public IEnumeratorMock ProbingStateCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock RevertStateCoroutine(){
+					bool done = true;
+					done &= m_SBADoneTransaction;
+					done &= m_SBBDoneTransaction;
+					done &= m_SGADoneTransaction;
+					done &= m_SGBDoneTransaction;
+					if(done)
+						this.CurProcess.Expire();
+					return null;
+				}
 		/*	states
 		*/
 			SGMState m_curState;
@@ -105,6 +121,10 @@ namespace SlotSystem{
 			static SGMState m_probingState = new SGMProbingState();
 			public static SGMState ProbingState{
 				get{return m_probingState;}
+			}
+			static SGMState m_performingTransactionState = new SGMPerformingTransactionState();
+			public static SGMState PerformingTransactionState{
+				get{return m_performingTransactionState;}
 			}
 		
 		/*	public field
@@ -155,6 +175,80 @@ namespace SlotSystem{
 				}
 			
 		
+			
+			/*	Transaction misc
+			*/
+				Slottable m_SBA;
+					public Slottable SBA{
+						get{return m_SBA;}
+					}
+					public void SetSBA(Slottable sb){
+						m_SBA = sb;
+						if(sb == null)
+							m_SBADoneTransaction = true;
+						else
+							m_SBADoneTransaction = false;
+					}
+				Slottable m_SBB;
+					public Slottable SBB{
+						get{return m_SBB;}
+					}
+					public void SetSBB(Slottable sb){
+						m_SBB = sb;
+						if(sb == null)
+							m_SBBDoneTransaction = true;
+						else
+							m_SBBDoneTransaction = false;
+					}
+				Slottable m_SGA;
+					public Slottable SGA{
+						get{return m_SGA;}
+					}
+					public void SetSGA(Slottable sb){
+						m_SGA = sb;
+						if(sb == null)
+							m_SGADoneTransaction = true;
+						else
+							m_SGADoneTransaction = false;
+					}
+				Slottable m_SGB;
+					public Slottable SGB{
+						get{return m_SGB;}
+					}
+					public void SetSGB(Slottable sb){
+						m_SGB = sb;
+						if(sb == null)
+							m_SGBDoneTransaction = true;
+						else
+							m_SGBDoneTransaction = false;
+					}
+				public void CompleteTransaction(Slottable sb){
+					if(sb == SBA) m_SBADoneTransaction = true;
+					else if(sb == SBB) m_SBBDoneTransaction = true;
+					IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
+				}
+				public void CompleteTransaction(SlotGroup sg){
+					if(sg == SGA) m_SGADoneTransaction = true;
+					else if(sg == SGB) m_SGBDoneTransaction = true;
+					IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
+				}
+				bool m_SBADoneTransaction = true;
+					public bool SBADoneTransaction{
+						get{return m_SBADoneTransaction;}
+					}
+				bool m_SBBDoneTransaction = true;
+					public bool SBBDoneTransaction{
+						get{return m_SBBDoneTransaction;}
+					}
+				bool m_SGADoneTransaction = true;
+					public bool SGADoneTransaction{
+						get{return m_SGADoneTransaction;}
+					}
+				bool m_SGBDoneTransaction = true;
+				public bool SGBDoneTransaction{
+					get{return m_SGBDoneTransaction;}
+				}
+			/**/
 		public void SetSG(SlotGroup sg){
 			if(m_slotGroups == null)
 				m_slotGroups = new List<SlotGroup>();
@@ -247,8 +341,14 @@ namespace SlotSystem{
 		}
 		public void ClearFields(){
 			m_selectedSB = null;
+			if(m_selectedSG != null)
+				m_selectedSG.SetState(SlotGroup.FocusedState);
 			m_selectedSG = null;
 			m_pickedSB = null;
+			SetSBA(null);
+			SetSBB(null);
+			SetSGA(null);
+			SetSGB(null);
 		}
 		public BowInstanceMock GetEquippedBow(){
 			foreach(SlotGroup sg in SlotGroups){
@@ -264,11 +364,11 @@ namespace SlotSystem{
 			}
 			return null;
 		}
-		public void CompleteTransactionMock(){
+		public void CompleteAllTransactionMock(){
 			this.SetTransaction(null);
 			this.SetState(SlotGroupManager.FocusedState);
 			this.ClearFields();
-			PrePickFilter();
+			Focus();
 		}
 		public void Deactivate(){
 			SetState(SlotGroupManager.DeactivatedState);

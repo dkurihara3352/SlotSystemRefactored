@@ -175,16 +175,16 @@ namespace SlotSystem{
 				public void Defocus(){
 					m_defocusCommand.Execute(this);
 				}
-			SlotGroupCommand m_prePickFilterCommand;
-				public SlotGroupCommand PrePickFilterCommand{
-					get{return m_prePickFilterCommand;}
-				}
-				public void SetPrePickFilterCommand(SlotGroupCommand comm){
-					m_prePickFilterCommand = comm;
-				}
-				public void PrePickFilter(){
-					m_prePickFilterCommand.Execute(this);
-				}
+			// SlotGroupCommand m_prePickFilterCommand;
+			// 	public SlotGroupCommand PrePickFilterCommand{
+			// 		get{return m_prePickFilterCommand;}
+			// 	}
+			// 	public void SetPrePickFilterCommand(SlotGroupCommand comm){
+			// 		m_prePickFilterCommand = comm;
+			// 	}
+			// 	public void PrePickFilter(){
+			// 		m_prePickFilterCommand.Execute(this);
+			// 	}
 			SGSorter m_sorter;
 				public SGSorter Sorter{
 					get{return m_sorter;}
@@ -267,6 +267,26 @@ namespace SlotSystem{
 				if(slot.Sb != null)
 					slot.Sb.Defocus();
 			}
+		}
+		public bool AcceptsFilter(Slottable pickedSB){
+			if(this.Filter is SGNullFilter) return true;
+			else{
+				if(pickedSB.Item is BowInstanceMock)
+					return this.Filter is SGBowFilter;
+				else if(pickedSB.Item is WearInstanceMock)
+					return this.Filter is SGWearFilter;
+				else if(pickedSB.Item is CarriedGearInstanceMock)
+					return this.Filter is SGCarriedGearFilter;
+				else// if(pickedSB.Item is PartsInstanceMock)
+					return this.Filter is SGPartsFilter;
+			}
+		}
+		public Slot GetSlot(Slottable sb){
+			foreach(Slot slot in this.Slots){
+				if(slot.Sb != null && slot.Sb == sb)
+					return slot;
+			}
+			return null;
 		}
 	}
 }
