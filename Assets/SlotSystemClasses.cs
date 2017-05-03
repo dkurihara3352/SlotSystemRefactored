@@ -885,7 +885,8 @@ namespace SlotSystem{
 				}
 				public override void Expire(){
 					base.Expire();
-					SB.SetState(Slottable.PickedUpAndSelectedState);
+					SB.PickUp();
+					// SB.SetState(Slottable.PickedUpAndSelectedState);
 				}
 			}
 			public class PickedUpAndSelectedProcess: AbsSBProcess{
@@ -1155,7 +1156,10 @@ namespace SlotSystem{
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					slottable.SetState(Slottable.FocusedState);
+					if(slottable.IsEquipped)
+						slottable.SetState(Slottable.EquippedAndDeselectedState);
+					else
+						slottable.SetState(Slottable.FocusedState);
 				}
 				/*	undef
 				*/
@@ -1307,7 +1311,7 @@ namespace SlotSystem{
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
 				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
-					// slottable.Revert();
+					slottable.ExecuteTransaction();
 				}
 				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
 				}
