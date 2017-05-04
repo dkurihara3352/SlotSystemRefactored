@@ -642,29 +642,9 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public class SGFocusCommand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					if(sg.Scroller != null)
-						sg.SGM.ChangeFocus(sg);//-> and update all SBs states
-					else{
-						sg.SetState(SlotGroup.FocusedState);
-						sg.UpdateSbState();
-					}
-				}
-			}
 			public class SGFocusCommandV2: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
 					sg.CurState.Focus(sg);
-				}
-			}
-			public class SGDefocusCommand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					if(sg.Scroller != null){
-						return;
-					}else{
-						sg.SetState(SlotGroup.DefocusedState);
-						sg.UpdateSbState();
-					}
 				}
 			}
 			public class SGDefocusCommandV2: SlotGroupCommand{
@@ -859,8 +839,26 @@ namespace SlotSystem{
 					base.Expire();
 				}
 			}
+			public class GradualHighlightProcess: AbsSBProcess{
+				public GradualHighlightProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+				}
+			}
 			public class EquipGradualDehighlightProcess: AbsSBProcess{
 				public EquipGradualDehighlightProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					this.SB = sb;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+				}
+			}
+			public class EquipGradualHighlightProcess: AbsSBProcess{
+				public EquipGradualHighlightProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 					this.SB = sb;
 					this.CoroutineMock = coroutineMock;
 				}
@@ -1272,8 +1270,10 @@ namespace SlotSystem{
 			public class PickedUpAndDeselectedState: SlottableState{
 				public void EnterState(Slottable sb){
 					
-					SBProcess puaDesProcess = new PickedUpAndDeselectedProcess(sb, sb.PickedUpAndDeselectedCoroutine);
-					sb.SetAndRun(puaDesProcess);
+					// SBProcess puaDesProcess = new PickedUpAndDeselectedProcess(sb, sb.PickedUpAndDeselectedCoroutine);
+					// sb.SetAndRun(puaDesProcess);
+					GradualDehighlightProcess gradDeHiProcess = new GradualDehighlightProcess(sb, sb.GradualDehighlightCoroutine);
+					sb.SetAndRun(gradDeHiProcess);
 				}
 				public void ExitState(Slottable sb){
 				}
@@ -1398,7 +1398,12 @@ namespace SlotSystem{
 				}
 			}
 			public class EquippedAndSelectedState: SlottableState{
-				public void EnterState(Slottable slottable){}
+				public void EnterState(Slottable slottable){
+					if(slottable.PrevState == Slottable.EquippedAndDeselectedState){
+						EquipGradualHighlightProcess gradHiProcess = new EquipGradualHighlightProcess(slottable, slottable.EquipGradualHighlightCoroutine);
+						slottable.SetAndRun(gradHiProcess);
+					}
+				}
 				public void ExitState(Slottable slottable){}
 				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){}
@@ -1459,7 +1464,12 @@ namespace SlotSystem{
 
 			}
 			public class SBSelectedState: SlottableState{
-				public void EnterState(Slottable sb){}
+				public void EnterState(Slottable sb){
+					if(sb.PrevState == Slottable.FocusedState){
+						GradualHighlightProcess gradHiProcess = new GradualHighlightProcess(sb, sb.GradualHighlightCoroutine);
+						sb.SetAndRun(gradHiProcess);
+					}
+				}
 				public void ExitState(Slottable sb){}
 				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
@@ -1946,17 +1956,22 @@ namespace SlotSystem{
 					}
 					SlotSystemElement m_focusedElement;
 						public void SetFocusedBundleElement(SlotSystemElement element){
-							if(m_focusedElement != element){
-								if(element == null){
-									// if(m_focusedElement != null) => always true
-									m_focusedElement.Defocus();
-									m_focusedElement = null;
-								}else{
-									if(m_focusedElement != null)
-										m_focusedElement.Defocus();
-									m_focusedElement = element;
-								}
-							}
+							// if(m_focusedElement != element){
+							// 	if(element == null){
+							// 		// if(m_focusedElement != null) => always true
+							// 		m_focusedElement.Defocus();
+							// 		m_focusedElement = null;
+							// 	}else{
+							// 		if(m_focusedElement != null)
+							// 			m_focusedElement.Defocus();
+							// 		m_focusedElement = element;
+							// 	}
+							// }
+							if(ContainsElement(element))
+								m_focusedElement = element;
+							else
+								throw new InvalidOperationException("trying to set focsed element that is not one of its members");
+							// Focus();
 						}
 						public SlotSystemElement GetFocusedBundleElement(){
 							return m_focusedElement;

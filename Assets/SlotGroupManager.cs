@@ -264,9 +264,15 @@ namespace SlotSystem{
 		}
 		
 		public void Focus(){
-			this.SetState(SlotGroupManager.FocusedState);
+			if(CurState == SlotGroupManager.FocusedState){
+				RootPage.Focus();
+			}else
+				this.SetState(SlotGroupManager.FocusedState);
 		}
 		public void Defocus(){
+			if(CurState == SlotGroupManager.DefocusedState){
+				RootPage.Defocus();
+			}
 			this.SetState(SlotGroupManager.DefocusedState);
 		}
 		public void InitializeItems(){
@@ -275,23 +281,23 @@ namespace SlotSystem{
 			}
 		}
 		
-		public void ChangeFocus(SlotGroup sg){
-			//first spot the scroller siblings
-			List<SlotGroup> scrollerSiblings = new List<SlotGroup>();
-			foreach(SlotGroup slotG in m_slotGroups){
-				if(slotG.Scroller != null){
-					if(slotG.Scroller == sg.Scroller)
-						scrollerSiblings.Add(slotG);
-				}
-			}
-			foreach(SlotGroup slotG in scrollerSiblings){
-				if(slotG != sg)
-					slotG.SetState(SlotGroup.DefocusedState);
-				else
-					slotG.SetState(SlotGroup.FocusedState);
-				slotG.UpdateSbState();
-			}
-		}
+		// public void ChangeFocus(SlotGroup sg){
+		// 	//first spot the scroller siblings
+		// 	List<SlotGroup> scrollerSiblings = new List<SlotGroup>();
+		// 	foreach(SlotGroup slotG in m_slotGroups){
+		// 		if(slotG.Scroller != null){
+		// 			if(slotG.Scroller == sg.Scroller)
+		// 				scrollerSiblings.Add(slotG);
+		// 		}
+		// 	}
+		// 	foreach(SlotGroup slotG in scrollerSiblings){
+		// 		if(slotG != sg)
+		// 			slotG.SetState(SlotGroup.DefocusedState);
+		// 		else
+		// 			slotG.SetState(SlotGroup.FocusedState);
+		// 		slotG.UpdateSbState();
+		// 	}
+		// }
 
 		public SlotGroup GetSlotGroup(Slottable sb){
 			return this.RootPage.GetSlotGroup(sb);
@@ -310,15 +316,14 @@ namespace SlotSystem{
 		public void SimSBHover(Slottable sb, PointerEventDataMock eventData){
 			if(CurState == SlotGroupManager.m_probingState){
 				if(sb != null){
-					if(SelectedSB != null && SelectedSB != sb){
-						SelectedSB.OnHoverExitMock(eventData);
-						// SetSelectedSB(sb);
+					if(SelectedSB != sb){
+						if(SelectedSB != null)
+							SelectedSB.OnHoverExitMock(eventData);
 						sb.OnHoverEnterMock(eventData);
 					}
 				}else{
 					if(SelectedSB != null){
 						SelectedSB.OnHoverExitMock(eventData);
-						// SetSelectedSB(null);
 					}
 				}
 			}
@@ -373,6 +378,10 @@ namespace SlotSystem{
 		public void Deactivate(){
 			SetState(SlotGroupManager.DeactivatedState);
 			m_rootPage.Deactivate();
+		}
+		public void SetFocusedPoolSG(SlotGroup sg){
+			RootPage.PoolBundle.SetFocusedBundleElement(sg);
+			Focus();
 		}
 	}
 

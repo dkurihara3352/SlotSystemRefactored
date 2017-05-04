@@ -258,8 +258,15 @@ namespace SlotSystem{
 		}
 		public void FocusSBs(){
 			foreach(Slot slot in Slots){
-				if(slot.Sb != null)
+				if(slot.Sb != null){
+					if(SGM.RootPage.PoolBundle.ContainsElement(this)){
+						if(slot.Sb.IsEquipped){
+							slot.Sb.Defocus();
+							continue;
+						}
+					}
 					slot.Sb.Focus();
+				}
 			}
 		}
 		public void DefocusSBs(){

@@ -297,35 +297,254 @@ public class SlottableTest {
 			AssertSGMFocused();
 	}
 	[Test]
-	public void Test(){		
-	
+	public void Test(){	
 		TestOnPointerDownOnAllSB();
+		TestPickupAndRevertAll();
+		// TestSimHover(defBowBSB_p, defWearBSB_p, sgm.GetSlotGroup(defBowBSB_p));
+		SlotGroup origSG = sgm.GetSlotGroup(defBowBSB_p);
+		// bool picked;
+		// bool selectionChanged;
+		// SlotSystemTransaction transaction;
+		AB(origSG.AutoSort, true);
+		origSG.AutoSort = false;
+		// TestSimHover(defBowBSB_p, defWearBSB_p, origSG, out picked, out selectionChanged, out transaction);
+		// AB(picked, true);
+		// AB(selectionChanged, true);
+		// AE(transaction.GetType(), typeof(ReorderTransaction));
+		TestSimHoverOnAllSB(defBowBSB_p);
 
+		
+		origSG.AutoSort = true;
+		TestSimHoverOnAllSB(defBowBSB_p);
+		
 	}
+	public void TestSimHoverOnAllSB(Slottable pickedSB){
+		foreach(Slottable sb in SlottableList()){
+			SlotGroup destSG = sgm.GetSlotGroup(sb);
+			bool picked;
+			bool selectionChanged;
+			SlotSystemTransaction transaction;
+			TestSimHover(pickedSB, sb, destSG, out picked, out selectionChanged, out transaction);
+		}
+	}
+	public void TestSimHover(Slottable pickedSB, Slottable hoveredSB, SlotGroup hoveredSG, out bool picked, out bool selectionChanged, out SlotSystemTransaction transaction){
+		SlotGroup origSG = sgm.GetSlotGroup(pickedSB);
+		
+		// AB(origSG.AutoSort, true);
+		// origSG.AutoSort = false;
+		if(pickedSB.CurState == Slottable.FocusedState || pickedSB.CurState == Slottable.EquippedAndDeselectedState){
+
+			PickUp(pickedSB, out picked);
+			ASSB(pickedSB, Slottable.PickedUpAndSelectedState);
+			AssertPostPickFilter(pickedSB);
+			
+			if(hoveredSB != null){
+				SlotGroup destSG = sgm.GetSlotGroup(hoveredSB);
+				
+				if(hoveredSB == pickedSB){
+					
+					selectionChanged = false;
+					sgm.SimSBHover(hoveredSB, eventData);
+					ASSB(hoveredSB, Slottable.PickedUpAndSelectedState);
+					AE(hoveredSB.CurProcess.GetType(), typeof(PickedUpAndSelectedProcess));
+					AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+					transaction = sgm.Transaction;
+
+				}else{
+					if(origSG == destSG){
+						// if(hoveredSB == null){
+
+						// }else{
+
+						// }
+						if(hoveredSB.CurState == Slottable.FocusedState){
+							selectionChanged = true;
+							sgm.SimSBHover(hoveredSB, eventData);
+							ASSB(hoveredSB, Slottable.SelectedState);
+							AE(hoveredSB.CurProcess.GetType(), typeof(GradualHighlightProcess));
+							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+							AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+
+							AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
+							transaction = sgm.Transaction;
+
+							sgm.SimSBHover(pickedSB, eventData);
+
+						}else if(hoveredSB.CurState == Slottable.EquippedAndDeselectedState){
+							selectionChanged = true;
+							sgm.SimSBHover(hoveredSB, eventData);
+							ASSB(hoveredSB, Slottable.EquippedAndSelectedState);
+							AE(hoveredSB.CurProcess.GetType(), typeof(EquipGradualHighlightProcess));
+							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+							AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+
+							AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
+							transaction = sgm.Transaction;
+
+							sgm.SimSBHover(pickedSB, eventData);
+
+						}else{
+							selectionChanged = false;
+							SlottableState preState = hoveredSB.CurState;
+							sgm.SimSBHover(hoveredSB, eventData);
+							ASSB(hoveredSB, preState);
+							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+							AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+
+							AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+							transaction = sgm.Transaction;
+
+							sgm.SimSBHover(pickedSB, eventData);
+						}
+
+					}else{//	different sgs
+						/*	fill, swap, stack, revert
+						*/
+					}
+				}
+
+			}else{//	hoveredSB == null
+
+			}
+			bool reverted;
+			Revert(pickedSB, out reverted);
+			AB(reverted, true);
+			AssertSGMFocused();
+			
+		}else{//	pickedSB is not in a state to be picked up
+			picked = false;
+			selectionChanged = false;
+			transaction = null;
+
+			if(pickedSB.CurState == Slottable.DefocusedState || pickedSB.CurState == Slottable.EquippedAndDefocusedState){
+				pickedSB.OnPointerDownMock(eventData);
+				ASSB(pickedSB, Slottable.WaitForPointerUpState);
+				pickedSB.OnPointerUpMock(eventData);
+				if(pickedSB.IsEquipped)
+					ASSB(pickedSB, Slottable.EquippedAndDefocusedState);
+				else
+					ASSB(pickedSB, Slottable.DefocusedState);
+			}else{
+				/*	not testable
+				*/
+				SlottableState preState = pickedSB.CurState;
+				pickedSB.OnPointerDownMock(eventData);
+				ASSB(pickedSB, preState);
+			}
+			AssertSGMFocused();
+		}
+	}
+	/*	hovering
+	*/
+		public void TestPickupAndRevertAll(){
+			int hoveredCount = 0;
+			TestHoverAll(ref hoveredCount);
+			AE(hoveredCount, 6);
+
+			hoveredCount = 0;
+			sgm.SetFocusedPoolSG(sgpParts);
+			TestHoverAll(ref hoveredCount);
+			AE(hoveredCount, 4);
+
+			AB(HoverTestPassed(defBowASB_p), false);
+			AB(HoverTestPassed(defBowBSB_p), false);
+			AB(HoverTestPassed(crfBowASB_p), false);
+			AB(HoverTestPassed(defWearASB_p), false);
+			AB(HoverTestPassed(defWearBSB_p), false);
+			AB(HoverTestPassed(crfWearASB_p), false);
+			AB(HoverTestPassed(defPartsSB_p), false);
+			AB(HoverTestPassed(crfPartsSB_p), false);
+			AB(HoverTestPassed(defBowASB_e), true);
+			AB(HoverTestPassed(defWearASB_e), true);
+			AB(HoverTestPassed(defPartsSB_p2), true);
+			AB(HoverTestPassed(crfPartsSB_p2), true);
+			
+			hoveredCount = 0;
+			sgm.SetFocusedPoolSG(sgpAll);
+			TestHoverAll(ref hoveredCount);
+			AE(hoveredCount, 6);
+			
+			AB(HoverTestPassed(defBowASB_p), false);
+			AB(HoverTestPassed(defBowBSB_p), true);
+			AB(HoverTestPassed(crfBowASB_p), true);
+			AB(HoverTestPassed(defWearASB_p), false);
+			AB(HoverTestPassed(defWearBSB_p), true);
+			AB(HoverTestPassed(crfWearASB_p), true);
+			AB(HoverTestPassed(defPartsSB_p), false);
+			AB(HoverTestPassed(crfPartsSB_p), false);
+			AB(HoverTestPassed(defBowASB_e), true);
+			AB(HoverTestPassed(defWearASB_e), true);
+			AB(HoverTestPassed(defPartsSB_p2), false);
+			AB(HoverTestPassed(crfPartsSB_p2), false);
+		}
+		public bool HoverTestPassed(Slottable sb){
+			bool result = false;
+			TestHoverSequence(sb, out result);
+			return result;
+		}
+		public void TestHoverAll(ref int count){
+			
+			foreach(Slottable sb in SlottableList()){
+				bool hovered = false;
+				TestHoverSequence(sb, out hovered);
+				if(hovered)
+					count ++;
+			}
+
+		}
+		public void TestHoverSequence(Slottable sb, out bool hovered){
+			bool pickedUp = false;
+			bool reverted = false;
+			PickUp(sb, out pickedUp);
+			TestHover(sb, ref pickedUp);
+			Revert(sb, out reverted);
+			hovered = pickedUp && reverted;
+		}
+		public void TestHover(Slottable sb, ref bool picked){
+			if(picked){
+				ASSB(sb, Slottable.PickedUpAndSelectedState);
+				
+				// sb.OnEndDragMock(eventData);
+				
+				ASSB(sb, Slottable.PickedUpAndSelectedState);
+			}
+		}
+		public void PickUp(Slottable sb, out bool pickedUp){	
+			AssertSGMFocused();
+			if(sb.CurState == Slottable.FocusedState || sb.CurState == Slottable.EquippedAndDeselectedState){
+				
+				sb.OnPointerDownMock(eventData);
+				ASSB(sb, Slottable.WaitForPickUpState);
+				sb.CurProcess.Expire();
+				pickedUp = true;
+				ASSB(sb, Slottable.PickedUpAndSelectedState);
+				AssertPostPickFilter(sb);
+			}else{
+				pickedUp = false;
+			}
+		}
+		public void Revert(Slottable sb, out bool reverted){
+			if(sb.CurState == Slottable.PickedUpAndSelectedState){
+				sb.OnPointerUpMock(eventData);
+				if(sb.Item.IsStackable){
+					ASSB(sb, Slottable.WaitForNextTouchWhilePUState);
+					sb.CurProcess.Expire();
+				}
+					AssertReverting(sb);
+				sb.CurProcess.Expire();
+				
+				reverted = true;
+			}else{
+				reverted = false;
+			}
+			AssertSGMFocused();
+		}
 	public void TestOnPointerDownOnAllSB(){
 		foreach(Slottable sb in SlottableList()){
 			TestOnPointerDownSequence(sb);
 		}
 	}
-		public void TestOnPointerDownSequence(Slottable sb){
-			sgm.RootPage.PoolBundle.SetFocusedBundleElement(sgpParts);
-			TestDeactivatedState(sb);
-			TestWaitForPointerUpState(sb);
-			TestFocusedState(sb);
-			TestEqDeselectedState(sb);
-			TestWaitForPickUpState(sb);
-			TestPickedUpAndSelectedState(sb);
-			TestWaitForNextTouchWhilePUState(sb);
-
-			sgm.RootPage.PoolBundle.SetFocusedBundleElement(sgpAll);
-			TestDeactivatedState(sb);
-			TestWaitForPointerUpState(sb);
-			TestFocusedState(sb);
-			TestEqDeselectedState(sb);
-			TestWaitForPickUpState(sb);
-			TestPickedUpAndSelectedState(sb);
-			TestWaitForNextTouchWhilePUState(sb);
-		}
+		
 	/*	supportives
 	*/
 		List<Slottable> SlottableList(){
@@ -445,10 +664,12 @@ public class SlottableTest {
 			AE(sgm.CurState, SlotGroupManager.FocusedState);
 			if(sgm.RootPage.PoolBundle.GetFocusedBundleElement() == (SlotSystemElement)sgpAll){
 				AE(sgpAll.CurState, SlotGroup.FocusedState);
-					ASSB(defBowASB_p, Slottable.EquippedAndDeselectedState);
+					AB(defBowASB_p.IsEquipped, true);
+					ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
 					ASSB(defBowBSB_p, Slottable.FocusedState);
 					ASSB(crfBowASB_p, Slottable.FocusedState);
-					ASSB(defWearASB_p, Slottable.EquippedAndDeselectedState);
+					AB(defWearASB_p.IsEquipped, true);
+					ASSB(defWearASB_p, Slottable.EquippedAndDefocusedState);
 					ASSB(defWearBSB_p, Slottable.FocusedState);
 					ASSB(crfWearASB_p, Slottable.FocusedState);
 					ASSB(defPartsSB_p, Slottable.DefocusedState);
@@ -457,10 +678,13 @@ public class SlottableTest {
 					ASSB(defPartsSB_p2, Slottable.DefocusedState);
 					ASSB(crfPartsSB_p2, Slottable.DefocusedState);
 			}else{
+				AE(sgm.RootPage.PoolBundle.GetFocusedBundleElement(), sgpParts);
 				AE(sgpAll.CurState, SlotGroup.DefocusedState);
+					AB(defBowASB_p.IsEquipped, true);
 					ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
 					ASSB(defBowBSB_p, Slottable.DefocusedState);
 					ASSB(crfBowASB_p, Slottable.DefocusedState);
+					AB(defWearASB_p.IsEquipped, true);
 					ASSB(defWearASB_p, Slottable.EquippedAndDefocusedState);
 					ASSB(defWearBSB_p, Slottable.DefocusedState);
 					ASSB(crfWearASB_p, Slottable.DefocusedState);
@@ -471,8 +695,10 @@ public class SlottableTest {
 					ASSB(crfPartsSB_p2, Slottable.FocusedState);
 			}
 			AE(sgBow.CurState, SlotGroup.FocusedState);
+				AB(defBowASB_e.IsEquipped, true);
 				ASSB(defBowASB_e, Slottable.EquippedAndDeselectedState);
 			AE(sgWear.CurState, SlotGroup.FocusedState);
+				AB(defWearASB_e.IsEquipped, true);
 				ASSB(defWearASB_e, Slottable.EquippedAndDeselectedState);
 		}
 		public void AssertSGMDefocus(){
@@ -507,6 +733,33 @@ public class SlottableTest {
 		}
 	/*	states test
 	*/
+		public void TestOnPointerDownSequence(Slottable sb){
+			sgm.RootPage.PoolBundle.SetFocusedBundleElement(sgpParts);
+			sgm.Focus();
+			AssertSGMFocused();
+			TestDeactivatedState(sb);
+			TestWaitForPointerUpState(sb);
+			TestFocusedState(sb);
+			TestEqDeselectedState(sb);
+			TestWaitForPickUpState(sb);
+			TestPickedUpAndSelectedState(sb);
+			TestWaitForNextTouchWhilePUState(sb);
+			TestDefocusedStates(sb);
+			TestWaitForNextTouchState(sb);
+
+			sgm.RootPage.PoolBundle.SetFocusedBundleElement(sgpAll);		
+			sgm.Focus();
+			AssertSGMFocused();
+			TestDeactivatedState(sb);
+			TestWaitForPointerUpState(sb);
+			TestFocusedState(sb);
+			TestEqDeselectedState(sb);
+			TestWaitForPickUpState(sb);
+			TestPickedUpAndSelectedState(sb);
+			TestWaitForNextTouchWhilePUState(sb);
+			TestDefocusedStates(sb);
+			TestWaitForNextTouchState(sb);
+		}
 		public void TestDeactivatedState(Slottable sb){
 			
 			sgm.Deactivate();
@@ -816,12 +1069,78 @@ public class SlottableTest {
 				}
 			}
 		}
-		public void TestDefocusedState(Slottable sb){
-
-		}
-		public void TestEquippedAndDefocusedState(Slottable sb){
+		public void TestDefocusedStates(Slottable sb){
+			sgm.Defocus();
+			if(sb.IsEquipped)
+				ASSB(sb, Slottable.EquippedAndDefocusedState);
+			else
+				ASSB(sb, Slottable.DefocusedState);
 			
+			sb.OnPointerDownMock(eventData);
+				ASSB(sb, Slottable.WaitForPointerUpState);
+			sb.OnPointerUpMock(eventData);
+				AssertSGMDefocus();
+				AE(sb.Tapped, true);
+				sb.Tapped = false;
+			
+			sgm.Focus();
 		}
+		public void TestWaitForNextTouchState(Slottable sb){
+			if(sb.CurState == Slottable.FocusedState || sb.CurState == Slottable.EquippedAndDeselectedState){
+
+				sb.OnPointerDownMock(eventData);
+				sb.OnPointerUpMock(eventData);
+
+				if(sb.Item.IsStackable){
+					ASSB(sb, Slottable.WaitForNextTouchState);
+					/*	1.0 Expire
+					*/
+					sb.CurProcess.Expire();
+						// if(sb.IsEquipped)
+						// 	ASSB(sb, Slottable.MovingState);
+						// else
+							ASSB(sb, Slottable.FocusedState);
+						AB(sb.Tapped, true);
+						sb.Tapped = false;
+					/*	1.1 OnPointerDown
+					*/
+					sb.OnPointerDownMock(eventData);
+					sb.OnPointerUpMock(eventData);
+					
+					sb.OnPointerDownMock(eventData);
+						ASSB(sb, Slottable.PickedUpAndSelectedState);
+						AE(sb.PickedAmount, 1);
+						AE(sb.CurProcess.GetType(), typeof(PickedUpAndSelectedProcess));
+						AB(sb.CurProcess.IsRunning, true);
+						AB(sb.CurProcess.IsExpired, false);
+						AssertPostPickFilter(sb);
+					
+					sb.OnPointerUpMock(eventData);
+						ASSB(sb, Slottable.WaitForNextTouchWhilePUState);
+					sb.CurProcess.Expire();
+						ASSB(sb, Slottable.MovingState);
+					sb.CurProcess.Expire();
+					/*	1.2 OnDeselected
+					*/
+					sb.OnPointerDownMock(eventData);
+					sb.OnPointerUpMock(eventData);
+					
+					sb.OnDeselectedMock(eventData);
+						AssertTransactionFieldsAreCleared(sb);
+						if(sb == defBowASB_p || sb == defBowASB_e || sb == defWearASB_p || sb == defWearASB_e)
+							AB(sb.IsEquipped, true);
+						// if(sb.IsEquipped)
+						// 	ASSB(sb, Slottable.MovingState);
+						// else
+							ASSB(sb, Slottable.FocusedState);
+				}else{//	non stackable
+					AB(sb.Tapped, true);
+					sb.Tapped = false;
+				}
+			}
+			AssertSGMFocused();
+		}
+		
 	/*
 	*/
 	public void TestSimSBHover(Slottable pickedSb, Slottable hoveredSb){
