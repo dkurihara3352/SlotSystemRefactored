@@ -223,7 +223,7 @@ namespace SlotSystem{
 		public void SetState(SlotGroupState state){
 			if(m_curState != state){
 				m_curState = state;
-				UpdateSbState();
+				// UpdateSbState();
 			}
 		}	
 		public Slottable GetSlottable(InventoryItemInstanceMock itemInst){

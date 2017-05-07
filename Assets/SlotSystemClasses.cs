@@ -138,7 +138,7 @@ namespace SlotSystem{
 								}
 							}
 
-						}else{
+						}else{// selectedSB != null
 							if(pickedSB == selectedSB){
 								SlotSystemTransaction revertTs = new RevertTransaction(pickedSB);
 								sgm.SetTransaction(revertTs);
@@ -156,6 +156,96 @@ namespace SlotSystem{
 										SwapTransaction swapTs = new SwapTransaction(pickedSB, selectedSB);
 										sgm.SetTransaction(swapTs);
 									}
+								}
+							}
+						}
+					}
+				}
+			}
+			public class PostPickFilterV3Command: SGMCommand{
+				public void Execute(SlotGroupManager sgm){
+					Slottable pickedSb = sgm.PickedSB;
+					SlotGroup origSG = sgm.SelectedSG;
+					SlotSystemBundle poolBundle = sgm.RootPage.PoolBundle;
+					SlotSystemBundle equipBundle = sgm.RootPage.EquipBundle;
+
+					if(poolBundle.ContainsElement(origSG)){// in the pool
+						foreach(Slot slot in origSG.Slots){
+							if(slot.Sb != null && slot.Sb != pickedSb){
+								if(origSG.AutoSort){
+									if(slot.Sb.IsEquipped)
+										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									else
+										slot.Sb.SetState(Slottable.DefocusedState);
+								}else{
+									if(slot.Sb.IsEquipped)
+										slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+									else
+										slot.Sb.SetState(Slottable.FocusedState);
+								}
+							}
+						}
+						EquipmentSet focusedEquipmentSet = (EquipmentSet)equipBundle.GetFocusedBundleElement();
+						foreach(SlotSystemElement ele in focusedEquipmentSet.Elements){
+							SlotGroup sg = (SlotGroup)ele;
+							if(sg.AcceptsFilter(pickedSb)){
+								sg.SetState(SlotGroup.FocusedState);
+								foreach(Slot slot in sg.Slots){
+									if(slot.Sb != null){
+										if(slot.Sb.IsEquipped){
+											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+										}else{
+											slot.Sb.SetState(Slottable.FocusedState);
+										}
+									}
+								}
+							}else{// sg filtered out
+								sg.SetState(SlotGroup.DefocusedState);
+								foreach(Slot slot in sg.Slots){
+									if(slot.Sb != null){
+										if(slot.Sb.IsEquipped)
+											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+										else
+											slot.Sb.SetState(Slottable.DefocusedState);
+									}
+								}
+							}
+						}
+					}else{// if pickedSB.IsEquipped
+						foreach(SlotSystemElement ele in equipBundle.Elements){
+							EquipmentSet equipSet = (EquipmentSet)ele;
+							if(equipSet.ContainsElement(origSG)){
+								foreach(SlotSystemElement nestedEle in equipSet.Elements){
+									SlotGroup sg = (SlotGroup)nestedEle;
+									if(sg != origSG){
+										if(sg.AcceptsFilter(pickedSb)){
+											sg.SetState(SlotGroup.FocusedState);
+											sg.Slots[0].Sb.SetState(Slottable.EquippedAndDeselectedState);
+										}else{
+											sg.SetState(SlotGroup.DefocusedState);
+											sg.Slots[0].Sb.SetState(Slottable.EquippedAndDefocusedState);
+										}
+									}
+								}
+							}
+						}
+						SlotGroup focusedPoolSG = sgm.GetFocusedPoolSG();
+						foreach(Slot slot in focusedPoolSG.Slots){
+							if(slot.Sb != null){
+								if(SlotSystem.Utility.HaveCommonItemFamily(slot.Sb, pickedSb)){
+									if(object.ReferenceEquals(slot.Sb.Item, pickedSb.Item))
+										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									else{
+										if(slot.Sb.IsEquipped)
+											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+										else
+											slot.Sb.SetState(Slottable.FocusedState);
+									}
+								}else{	// different item family
+									if(slot.Sb.IsEquipped)
+										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									else
+										slot.Sb.SetState(Slottable.DefocusedState);
 								}
 							}
 						}
@@ -196,8 +286,8 @@ namespace SlotSystem{
 						}
 						foreach(SlotGroup sg in sgm.SlotGroups){
 							if(sg.CurState == SlotGroup.FocusedState || sg.CurState == SlotGroup.SelectedState){
-								if(sg.Filter is SGNullFilter)
-									sg.UpdateSbState();
+								// if(sg.Filter is SGNullFilter)
+									// sg.UpdateSbState();
 							}
 
 						}
@@ -248,24 +338,7 @@ namespace SlotSystem{
 					}
 				}
 			}
-			// public class PrePickFilterCommand: SGMCommand{
-			// 	public void Execute(SlotGroupManager sgm){
-			// 		foreach(SlotGroup sg in sgm.SlotGroups){
-			// 			if(sg.CurState == SlotGroup.DefocusedState || !sg.IsPool)
-			// 				sg.SetState(SlotGroup.FocusedState);
-			// 			else if(sg.CurState == SlotGroup.SelectedState)
-			// 				sg.SetState(SlotGroup.FocusedState);
-			// 			sg.UpdateSbState();
-			// 		}
-			// 	}
-			// }
-			// public class PrePickFilterCommandV2: SGMCommand{
-			// 	public void Execute(SlotGroupManager sgm){
-			// 		foreach(SlotGroup sg in sgm.SlotGroups){
-			// 			sg.PrePickFilter();
-			// 		}
-			// 	}
-			// }
+			
 		/*	process
 		*/
 			public interface SGMProcess{
@@ -437,14 +510,15 @@ namespace SlotSystem{
 					sg.SetState(SlotGroup.SelectedState);
 				}
 				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+					
 				}
 				public void Focus(SlotGroup sg){
-					// sg.UpdateSbState();
+					
 					sg.FocusSBs();
 				}
 				public void Defocus(SlotGroup sg){
 					sg.SetState(SlotGroup.DefocusedState);
-					// sg.UpdateSbState();
+					
 					sg.DefocusSBs();
 				}
 			}
@@ -454,9 +528,9 @@ namespace SlotSystem{
 				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
 				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
 					if(sg.SGM.SelectedSG == sg){
-						sg.SGM.SetSelectedSG(sg);
-						sg.SetState(SlotGroup.FocusedState);
-					}	
+						sg.SGM.SetSelectedSG(null);
+					}
+					sg.SetState(SlotGroup.FocusedState);
 				}
 				public void Focus(SlotGroup sg){
 					// sg.UpdateSbState();
@@ -482,7 +556,7 @@ namespace SlotSystem{
 						if(sg == sg.SGM.InitiallyFocusedSG)
 							sg.Focus();
 					}
-					sg.UpdateSbState();
+					// sg.UpdateSbState();
 				}
 			}
 			public class UpdateSbStateCommand: SlotGroupCommand{
@@ -1212,10 +1286,12 @@ namespace SlotSystem{
 					
 					SBProcess puaSelProcess = new PickedUpAndSelectedProcess(slottable, slottable.PickedUpAndSelectedCoroutine);
 					slottable.SetAndRun(puaSelProcess);
+					if(slottable.SGM.CurState != SlotGroupManager.ProbingState){
 
-					slottable.SGM.SetState(SlotGroupManager.ProbingState);
-					InitializeSGMFields(slottable);
-					slottable.SGM.PostPickFilter();
+						slottable.SGM.SetState(SlotGroupManager.ProbingState);
+						InitializeSGMFields(slottable);
+						slottable.SGM.PostPickFilter();
+					}
 					
 				}
 				public void ExitState(Slottable slottable){
@@ -1413,7 +1489,7 @@ namespace SlotSystem{
 				}
 				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					if(sb.SGM.SelectedSB == sb)
-						sb.SGM.SetSelectedSB(sb);
+						sb.SGM.SetSelectedSB(null);
 					sb.SetState(Slottable.EquippedAndDeselectedState);
 				}
 				public void Focus(Slottable sb){
@@ -1992,4 +2068,21 @@ namespace SlotSystem{
 				}
 				
 				
+	/*	utility
+	*/	
+		public static class Utility{
+			public static bool HaveCommonItemFamily(Slottable sb, Slottable other){
+				if(sb.Item is BowInstanceMock)
+					return (other.Item is BowInstanceMock);
+				else if(sb.Item is WearInstanceMock)
+					return (other.Item is WearInstanceMock);
+				else if(sb.Item is CarriedGearInstanceMock)
+					return (other.Item is CarriedGearInstanceMock);
+				else if(sb.Item is PartsInstanceMock)
+					return (other.Item is PartsInstanceMock);
+				else
+					return false;
+			}
+
+		}
 }

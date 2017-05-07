@@ -24,7 +24,7 @@ namespace SlotSystem{
 		*/
 			public void SetupCommands(){
 				m_updateTransactionCommand = new UpdateTransactionCommand();
-				m_postPickFilterCommand = new PostPickFilterV2Command();
+				m_postPickFilterCommand = new PostPickFilterV3Command();
 				// m_prePickFilterCommand = new PrePickFilterCommand();			
 			}
 			SGMCommand m_updateTransactionCommand;
@@ -331,15 +331,14 @@ namespace SlotSystem{
 		public void SimSGHover(SlotGroup sg, PointerEventDataMock eventData){
 			if(CurState == SlotGroupManager.m_probingState){
 				if(sg != null){
-					if(SelectedSG != null && SelectedSG != sg){
-						SelectedSG.OnHoverExitMock(eventData);
-						// SetSelectedSG(sg);
+					if(SelectedSG != sg){
+						if(SelectedSG != null)
+							SelectedSG.OnHoverExitMock(eventData);
 						sg.OnHoverEnterMock(eventData);
 					}
 				}else{
 					if(SelectedSG != null){
 						SelectedSG.OnHoverExitMock(eventData);
-						// SetSelectedSG(null);
 					}
 				}
 			}
@@ -383,6 +382,10 @@ namespace SlotSystem{
 			RootPage.PoolBundle.SetFocusedBundleElement(sg);
 			Focus();
 		}
+		public SlotGroup GetFocusedPoolSG(){
+			SlotSystemElement focusedEle = RootPage.PoolBundle.GetFocusedBundleElement();
+			return (SlotGroup)focusedEle;
+		} 
 	}
 
 }
