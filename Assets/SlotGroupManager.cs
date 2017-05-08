@@ -368,6 +368,20 @@ namespace SlotSystem{
 			}
 			return null;
 		}
+		public List<CarriedGearInstanceMock> GetEquippedCarriedGears(){
+			List<CarriedGearInstanceMock> result = new List<CarriedGearInstanceMock>();
+			EquipmentSet equipSet = (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
+			foreach(SlotSystemElement ele in equipSet.Elements){
+				SlotGroup sg = (SlotGroup)ele;
+				if(sg.Filter is SGCarriedGearFilter){
+					foreach(Slot slot in sg.Slots){
+						if(slot.Sb != null)
+							result.Add((CarriedGearInstanceMock)slot.Sb.Item);
+					}
+				}
+			}
+			return result;
+		}
 		public void CompleteAllTransactionMock(){
 			this.SetTransaction(null);
 			this.SetState(SlotGroupManager.FocusedState);

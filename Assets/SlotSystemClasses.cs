@@ -108,6 +108,20 @@ namespace SlotSystem{
 				}
 				public void OnComplete(){}
 			}
+			public class UnequipTransaction: SlotSystemTransaction{
+				Slottable pickedSB;
+				SlotGroup selectedSG;
+				public UnequipTransaction(Slottable picked, SlotGroup selSG){
+					this.pickedSB = picked;
+					this.selectedSG = selSG;
+				}
+				public void Indicate(){}
+				public void Execute(){
+
+					pickedSB.SGM.CompleteAllTransactionMock();
+				}
+				public void OnComplete(){}
+			}
 		/*	commands
 		*/
 			public interface SGMCommand{
@@ -148,10 +162,15 @@ namespace SlotSystem{
 										SlotSystemTransaction reorderTs = new ReorderTransaction(pickedSB, selectedSB);
 										sgm.SetTransaction(reorderTs);
 									}
-								}else{
+								}else{// different SGs
 									if(pickedSB.Item == selectedSB.Item){
-										StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
-										sgm.SetTransaction(stackTs);
+										if(pickedSB.IsEquipped){
+											UnequipTransaction unequipTs = new UnequipTransaction(pickedSB, sgm.GetSlotGroup(selectedSB));
+											sgm.SetTransaction(unequipTs);
+										}else{
+											StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
+											sgm.SetTransaction(stackTs);
+										}
 									}else{
 										SwapTransaction swapTs = new SwapTransaction(pickedSB, selectedSB);
 										sgm.SetTransaction(swapTs);
@@ -212,6 +231,7 @@ namespace SlotSystem{
 							}
 						}
 					}else{// if pickedSB.IsEquipped
+						
 						foreach(SlotSystemElement ele in equipBundle.Elements){
 							EquipmentSet equipSet = (EquipmentSet)ele;
 							if(equipSet.ContainsElement(origSG)){
@@ -220,10 +240,27 @@ namespace SlotSystem{
 									if(sg != origSG){
 										if(sg.AcceptsFilter(pickedSb)){
 											sg.SetState(SlotGroup.FocusedState);
-											sg.Slots[0].Sb.SetState(Slottable.EquippedAndDeselectedState);
+											foreach(Slot slot in sg.Slots){
+												if(slot.Sb != null)
+													slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+											}
 										}else{
 											sg.SetState(SlotGroup.DefocusedState);
-											sg.Slots[0].Sb.SetState(Slottable.EquippedAndDefocusedState);
+											foreach(Slot slot in sg.Slots){
+												if(slot.Sb != null)
+													slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+											}
+										}
+									}else{// sg == origSG, the state is Selected
+										foreach(Slot slot in sg.Slots){
+											if(slot.Sb != null){
+												if(slot.Sb != pickedSb){
+													if(!sg.AutoSort)
+														slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+													else
+														slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+												}
+											}
 										}
 									}
 								}
@@ -233,11 +270,15 @@ namespace SlotSystem{
 						foreach(Slot slot in focusedPoolSG.Slots){
 							if(slot.Sb != null){
 								if(SlotSystem.Utility.HaveCommonItemFamily(slot.Sb, pickedSb)){
-									if(object.ReferenceEquals(slot.Sb.Item, pickedSb.Item))
-										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									if(object.ReferenceEquals(slot.Sb.Item, pickedSb.Item)){
+										if(origSG.IsShrinkable)// unequip
+											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+										else
+											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									}
 									else{
 										if(slot.Sb.IsEquipped)
-											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+											slot.Sb.SetState(/*Slottable.EquippedAndDeselectedState*/Slottable.EquippedAndDefocusedState);
 										else
 											slot.Sb.SetState(Slottable.FocusedState);
 									}
@@ -726,24 +767,7 @@ namespace SlotSystem{
 					sg.CurState.Defocus(sg);
 				}
 			}
-			// public class PoolPrePickFilter: SlotGroupCommand{
-			// 	public void Execute(SlotGroup sg){
-			// 		// if(sg.SGM.FocusedPoolSG == sg)
-			// 		// 	sg.SetState(SlotGroup.FocusedState);
-			// 		// else
-			// 		// 	sg.SetState(SlotGroup.DefocusedState);
-			// 		// sg.UpdateSbState();
-			// 	}
-			// }
-			// public class EquipSGPrePickFilter: SlotGroupCommand{
-			// 	public void Execute(SlotGroup sg){
-			// 		// if(sg.SGM.FocusedEquipmentSetContains(sg))
-			// 		// 	sg.SetState(SlotGroup.FocusedState);
-			// 		// else
-			// 		// 	sg.SetState(SlotGroup.DefocusedState);
-			// 		// sg.UpdateSbState();
-			// 	}
-			// }
+			
 		/*	filters
 		*/
 			public interface SGFilter{
@@ -1614,133 +1638,135 @@ namespace SlotSystem{
 		
 	/*	Other Classes
 		*/
-			public interface SlottableItem: IEquatable<SlottableItem>, IComparable<SlottableItem>, IComparable{
+			/*	Inventory Item
+			*/
+				public interface SlottableItem: IEquatable<SlottableItem>, IComparable<SlottableItem>, IComparable{
 
-				int Quantity{get;}
-				bool IsStackable{get;}
-			}
-			public class InventoryItemInstanceMock: SlottableItem{
-				InventoryItemMock m_item;
-				public InventoryItemMock Item{
-					get{return m_item;}
-					set{m_item = value;}
+					int Quantity{get;}
+					bool IsStackable{get;}
 				}
-				int m_quantity;
-				public int Quantity{
-					get{return m_quantity;}
-					set{m_quantity = value;}
-				}
-				bool m_isStackable;
-				public bool IsStackable{
-					get{
-						return m_item.IsStackable;
+				public class InventoryItemInstanceMock: SlottableItem{
+					InventoryItemMock m_item;
+					public InventoryItemMock Item{
+						get{return m_item;}
+						set{m_item = value;}
+					}
+					int m_quantity;
+					public int Quantity{
+						get{return m_quantity;}
+						set{m_quantity = value;}
+					}
+					bool m_isStackable;
+					public bool IsStackable{
+						get{
+							return m_item.IsStackable;
+						}
+					}
+					bool m_isEquipped = false;
+					public bool IsEquipped{
+						get{return m_isEquipped;}
+						set{m_isEquipped = value;}
+					}
+					public override bool Equals(object other){
+						if(!(other is InventoryItemInstanceMock))
+							return false;
+						return Equals((SlottableItem)other);
+					}
+					public bool Equals(SlottableItem other){
+						if(!(other is InventoryItemInstanceMock))
+							return false;
+						InventoryItemInstanceMock otherInst = (InventoryItemInstanceMock)other;
+						bool flag = m_item.Equals(otherInst.Item);
+						flag &= m_item.IsStackable && otherInst.Item.IsStackable;
+						return flag;		
+					}
+					public override int GetHashCode(){
+						return m_item.ItemID.GetHashCode() + 31;
+					}
+					public static bool operator ==(InventoryItemInstanceMock a, InventoryItemInstanceMock b){
+						if(object.ReferenceEquals(a, null)){
+							return object.ReferenceEquals(b, null);
+						}
+						if(object.ReferenceEquals(b, null)){
+							return object.ReferenceEquals(a, null);
+						}
+						bool flag = a.Item.ItemID == b.Item.ItemID;
+						flag &= a.IsStackable && b.IsStackable;
+						return flag;
+					}
+					public static bool operator != (InventoryItemInstanceMock a, InventoryItemInstanceMock b){
+						if(object.ReferenceEquals(a, null)){
+							return !object.ReferenceEquals(b, null);
+						}
+						if(object.ReferenceEquals(b, null)){
+							return !object.ReferenceEquals(a, null);
+						}
+						return !(a == b);
+					}
+					int IComparable.CompareTo(object other){
+						if(!(other is SlottableItem))
+							throw new InvalidOperationException("System.Object.CompareTo: not a SlottableItem");
+						return CompareTo((SlottableItem)other);
+					}
+					public int CompareTo(SlottableItem other){
+						if(!(other is InventoryItemInstanceMock))
+							throw new InvalidOperationException("System.Object.CompareTo: not an InventoryItemInstance");
+						InventoryItemInstanceMock otherInst = (InventoryItemInstanceMock)other;
+						return m_item.ItemID.CompareTo(otherInst.Item.ItemID);
 					}
 				}
-				bool m_isEquipped = false;
-				public bool IsEquipped{
-					get{return m_isEquipped;}
-					set{m_isEquipped = value;}
-				}
-				public override bool Equals(object other){
-					if(!(other is InventoryItemInstanceMock))
-						return false;
-					return Equals((SlottableItem)other);
-				}
-				public bool Equals(SlottableItem other){
-					if(!(other is InventoryItemInstanceMock))
-						return false;
-					InventoryItemInstanceMock otherInst = (InventoryItemInstanceMock)other;
-					bool flag = m_item.Equals(otherInst.Item);
-					flag &= m_item.IsStackable && otherInst.Item.IsStackable;
-					return flag;		
-				}
-				public override int GetHashCode(){
-					return m_item.ItemID.GetHashCode() + 31;
-				}
-				public static bool operator ==(InventoryItemInstanceMock a, InventoryItemInstanceMock b){
-					if(object.ReferenceEquals(a, null)){
-						return object.ReferenceEquals(b, null);
-					}
-					if(object.ReferenceEquals(b, null)){
-						return object.ReferenceEquals(a, null);
-					}
-					bool flag = a.Item.ItemID == b.Item.ItemID;
-					flag &= a.IsStackable && b.IsStackable;
-					return flag;
-				}
-				public static bool operator != (InventoryItemInstanceMock a, InventoryItemInstanceMock b){
-					if(object.ReferenceEquals(a, null)){
-						return !object.ReferenceEquals(b, null);
-					}
-					if(object.ReferenceEquals(b, null)){
-						return !object.ReferenceEquals(a, null);
-					}
-					return !(a == b);
-				}
-				int IComparable.CompareTo(object other){
-					if(!(other is SlottableItem))
-						throw new InvalidOperationException("System.Object.CompareTo: not a SlottableItem");
-					return CompareTo((SlottableItem)other);
-				}
-				public int CompareTo(SlottableItem other){
-					if(!(other is InventoryItemInstanceMock))
-						throw new InvalidOperationException("System.Object.CompareTo: not an InventoryItemInstance");
-					InventoryItemInstanceMock otherInst = (InventoryItemInstanceMock)other;
-					return m_item.ItemID.CompareTo(otherInst.Item.ItemID);
-				}
-			}
-			public class InventoryItemMock: IEquatable<InventoryItemMock>, IComparable, IComparable<InventoryItemMock>{
-				
-				bool m_isStackable;
-				public bool IsStackable{
-					get{return m_isStackable;}
-					set{m_isStackable = value;}
-				}
-
-				int m_itemId;
-				public int ItemID{
-					get{return m_itemId;}
-					set{m_itemId = value;}
-				}
-
-				public override bool Equals(object other){
-					if(!(other is InventoryItemMock)) return false;
-					else
-						return Equals((InventoryItemMock)other);
-				}
-				public bool Equals(InventoryItemMock other){
-					return m_itemId == other.ItemID;
-				}
-
-				public override int GetHashCode(){
-					return 31 + m_itemId.GetHashCode();
-				}
-
-				public static bool operator == (InventoryItemMock a, InventoryItemMock b){
-					return a.ItemID == b.ItemID;
-				}
-
-				public static bool operator != (InventoryItemMock a, InventoryItemMock b){
-					return a.ItemID != b.ItemID;
-				}
-				int IComparable.CompareTo(object other){
-					if(!(other is InventoryItemMock))
-						throw new InvalidOperationException("Compare To: not a InventoryItemMock");
-					return CompareTo((InventoryItemMock)other);
-				}
-				public int CompareTo(InventoryItemMock other){
-					if(!(other is InventoryItemMock))
-						throw new InvalidOperationException("Compare To: not a InventoryItemMock");
+				public class InventoryItemMock: IEquatable<InventoryItemMock>, IComparable, IComparable<InventoryItemMock>{
 					
-					return this.m_itemId.CompareTo(other.ItemID);
+					bool m_isStackable;
+					public bool IsStackable{
+						get{return m_isStackable;}
+						set{m_isStackable = value;}
+					}
+
+					int m_itemId;
+					public int ItemID{
+						get{return m_itemId;}
+						set{m_itemId = value;}
+					}
+
+					public override bool Equals(object other){
+						if(!(other is InventoryItemMock)) return false;
+						else
+							return Equals((InventoryItemMock)other);
+					}
+					public bool Equals(InventoryItemMock other){
+						return m_itemId == other.ItemID;
+					}
+
+					public override int GetHashCode(){
+						return 31 + m_itemId.GetHashCode();
+					}
+
+					public static bool operator == (InventoryItemMock a, InventoryItemMock b){
+						return a.ItemID == b.ItemID;
+					}
+
+					public static bool operator != (InventoryItemMock a, InventoryItemMock b){
+						return a.ItemID != b.ItemID;
+					}
+					int IComparable.CompareTo(object other){
+						if(!(other is InventoryItemMock))
+							throw new InvalidOperationException("Compare To: not a InventoryItemMock");
+						return CompareTo((InventoryItemMock)other);
+					}
+					public int CompareTo(InventoryItemMock other){
+						if(!(other is InventoryItemMock))
+							throw new InvalidOperationException("Compare To: not a InventoryItemMock");
+						
+						return this.m_itemId.CompareTo(other.ItemID);
+					}
+					public static bool operator > (InventoryItemMock a, InventoryItemMock b){
+						return a.CompareTo(b) > 0;
+					}
+					public static bool operator < (InventoryItemMock a, InventoryItemMock b){
+						return a.CompareTo(b) < 0;
+					}
 				}
-				public static bool operator > (InventoryItemMock a, InventoryItemMock b){
-					return a.CompareTo(b) > 0;
-				}
-				public static bool operator < (InventoryItemMock a, InventoryItemMock b){
-					return a.CompareTo(b) < 0;
-				}
-			}
 			/*	Inventories
 			*/
 				public interface Inventory{
@@ -2011,16 +2037,19 @@ namespace SlotSystem{
 				public class EquipmentSet: AbsSlotSysElement{
 					SlotGroup m_bowSG;
 					SlotGroup m_wearSG;
+					SlotGroup m_cGearsSG;
 					List<SlotSystemElement> m_pageElements;
-					public EquipmentSet(SlotGroup bowSG, SlotGroup wearSG){
+					public EquipmentSet(SlotGroup bowSG, SlotGroup wearSG, SlotGroup cGearsSG){
 						m_bowSG = bowSG;
 						m_wearSG = wearSG;
+						m_cGearsSG = cGearsSG;
 					}
 					public override List<SlotSystemElement> Elements{
 						get{
 							m_pageElements = new List<SlotSystemElement>();
 							m_pageElements.Add(m_bowSG);
 							m_pageElements.Add(m_wearSG);
+							m_pageElements.Add(m_cGearsSG);
 							return m_pageElements;
 						}
 					}
