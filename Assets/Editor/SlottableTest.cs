@@ -6,33 +6,36 @@ using System.Collections.Generic;
 public class SlottableTest {
 
 
-	// GameObject sbGO;
+	
+	/*	fields
+	*/
+		PointerEventDataMock eventData = new PointerEventDataMock();
+		GameObject sgmGO;
+		SlotGroupManager sgm;
+		GameObject sgpAllGO;
+		SlotGroup sgpAll;
+		GameObject sgBowGO;
+		SlotGroup sgBow;
+		GameObject sgWearGO;
+		SlotGroup sgWear;
+		GameObject sgpPartsGO;
+		SlotGroup sgpParts;
+		Slottable defBowBSB_p;
+		Slottable defBowASB_p;
+		Slottable crfBowASB_p;
+		Slottable defWearBSB_p;
+		Slottable defWearASB_p;
+		Slottable crfWearASB_p;
+		Slottable defPartsSB_p;
+		Slottable crfPartsSB_p;
+		Slottable defBowASB_e;
+		Slottable defWearASB_e;
+		Slottable defPartsSB_p2;
+		Slottable crfPartsSB_p2;
 
-	PointerEventDataMock eventData = new PointerEventDataMock();
-	GameObject sgmGO;
-	SlotGroupManager sgm;
-	GameObject sgpAllGO;
-	SlotGroup sgpAll;
-	GameObject sgBowGO;
-	SlotGroup sgBow;
-	GameObject sgWearGO;
-	SlotGroup sgWear;
-	GameObject sgpPartsGO;
-	SlotGroup sgpParts;
-	Slottable defBowBSB_p;
-	Slottable defBowASB_p;
-	Slottable crfBowASB_p;
-	Slottable defWearBSB_p;
-	Slottable defWearASB_p;
-	Slottable crfWearASB_p;
-	Slottable defPartsSB_p;
-	Slottable crfPartsSB_p;
-	Slottable defBowASB_e;
-	Slottable defWearASB_e;
-	Slottable defPartsSB_p2;
-	Slottable crfPartsSB_p2;
 
-
+	/*
+	*/
 	[SetUp]
 	public void Setup(){	
 		/*	SGM
@@ -296,10 +299,11 @@ public class SlottableTest {
 		sgm.Focus();
 			AssertSGMFocused();
 	}
-	bool picked;
-	Slottable selectedSB;
-	SlotGroup selectedSG;
-	SlotSystemTransaction transaction;
+	[Test]
+	public void Test(){
+		TestHover();
+	}
+	
 	
 	public void TestPostPickFilter(){
 		AB(sgpAll.AutoSort, true);
@@ -373,625 +377,707 @@ public class SlottableTest {
 
 	}
 	
-	[Test]
-	public void Test(){	
-		// TestOnPointerDownOnAllSB();
-		// TestPickupAndRevertAll();
-		// TestSimHover(defBowBSB_p, defWearBSB_p, sgm.GetSlotGroup(defBowBSB_p));
-		SlotGroup origSG = sgm.GetSlotGroup(defBowBSB_p);
-		Slottable targetSB;
-
-		// /*	test reorder
-			// */
-			// AB(origSG.AutoSort, true);
-			// origSG.AutoSort = false;
-
-			// TestSimHover(defBowBSB_p, defWearBSB_p, origSG, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
-			// 	AB(picked, true);
-			// 	AB(selectedSBChanged, true);
-			// 	AB(selectedSGChanged, false);
-			// 	AE(transaction.GetType(), typeof(ReorderTransaction));
-			
-			// TestSimHover(defBowBSB_p, crfBowASB_p, origSG, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
-			// 	AB(picked, true);
-			// 	AB(selectedSBChanged, true);
-			// 	AB(selectedSGChanged, false);
-			// 	AE(transaction.GetType(), typeof(ReorderTransaction));
-		// /*	test swap
-			// */
-			// TestSimHover(defBowBSB_p, defBowASB_e, sgBow, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
-			// 	AB(picked, true);
-			// 	AB(selectedSBChanged, true);
-			// 	AB(selectedSGChanged, true);
-			// 	AE(transaction.GetType(), typeof(SwapTransaction));
-			
-			// TestSimHover(defWearBSB_p, defWearASB_e, sgWear, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
-			// 	AB(picked, true);
-			// 	AB(selectedSBChanged, true);
-			// 	AB(selectedSGChanged, true);
-			// 	AE(transaction.GetType(), typeof(SwapTransaction));
-		/**/
-
-
-		
-		AB(origSG.AutoSort, true);
-		origSG.AutoSort = false;
-		// TestSimHoverOnAllSB();
-		// TestSimHoverOnAllSB(defBowASB_p);
-		// TestSimHoverOnAllSB(defBowBSB_p);
-		// TestSimHoverOnAllSB(crfBowASB_p);
-		// TestSimHoverOnAllSB(defWearASB_p);
-		// TestSimHoverOnAllSB(defWearBSB_p);
-		// TestSimHoverOnAllSB(crfWearASB_p);
-		// TestSimHoverOnAllSB(defBowASB_e);
-		// TestSimHoverOnAllSB(defWearASB_e);
-		// TestSimHoverOnAllSB(defBowASB_p);
-		
-			
-		// TestHoverDefBowASBE();
-		// TestHoverDefBowASBP();
-		// TestHoverDefBowBSBP();
-			
-	}
-	/*	spot tests hover
+	/*	Test hover
 	*/
-		public void TestHoverDefBowASBE(){
-			SlotGroup origSG = sgBow;
-			/*	defBowASB_e
-			*/
-				/*	AutoSort false
-				*/
-					Slottable targetSB = defBowASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defBowBSB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, defBowBSB_p);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(SwapTransaction));
-
-					targetSB = crfBowASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, crfBowASB_p);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(SwapTransaction));
-
-					targetSB = defWearASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defWearBSB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = crfWearASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-
-					targetSB = defPartsSB_p2;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, null);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = crfPartsSB_p2;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, null);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defBowASB_e;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, defBowASB_e);
-						AE(selectedSG, sgBow);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defWearASB_e;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, null);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					sgm.SetFocusedPoolSG(sgpParts);
-					
-						targetSB = defPartsSB_p2;
-						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-							AB(picked, true);
-							AE(selectedSB, null);
-							AE(selectedSG, sgpParts);
-							AE(transaction.GetType(), typeof(RevertTransaction));
-						
-						targetSB = crfPartsSB_p2;
-						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-							AB(picked, true);
-							AE(selectedSB, null);
-							AE(selectedSG, sgpParts);
-							AE(transaction.GetType(), typeof(RevertTransaction));
-				/*	AutoSort true
-				*/
-					sgm.SetFocusedPoolSG(sgpAll);
-					origSG.AutoSort = true;
-					targetSB = defBowASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defBowBSB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, defBowBSB_p);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(SwapTransaction));
-
-					targetSB = crfBowASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, crfBowASB_p);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(SwapTransaction));
-
-					targetSB = defWearASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defWearBSB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = crfWearASB_p;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, sgpAll);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-
-					targetSB = defPartsSB_p2;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, null);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = crfPartsSB_p2;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, null);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defBowASB_e;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, defBowASB_e);
-						AE(selectedSG, sgBow);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					targetSB = defWearASB_e;
-					TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-						AB(picked, true);
-						AE(selectedSB, null);
-						AE(selectedSG, null);
-						AE(transaction.GetType(), typeof(RevertTransaction));
-					
-					sgm.SetFocusedPoolSG(sgpParts);
-					
-						targetSB = defPartsSB_p2;
-						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-							AB(picked, true);
-							AE(selectedSB, null);
-							AE(selectedSG, sgpParts);
-							AE(transaction.GetType(), typeof(RevertTransaction));
-						
-						targetSB = crfPartsSB_p2;
-						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-							AB(picked, true);
-							AE(selectedSB, null);
-							AE(selectedSG, sgpParts);
-							AE(transaction.GetType(), typeof(RevertTransaction));
-		}
-		public void TestHoverDefBowASBP(){
-			Slottable targetSB;
-			targetSB = defBowASB_p;
-					TestSimHover(defBowASB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-					AssertSimHover<RevertTransaction>(false, null, null, true);
-				targetSB = defBowBSB_p;
-					TestSimHover(defBowASB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-					AssertSimHover<RevertTransaction>(false, null, null, true);
-				targetSB = defBowASB_e;
-					TestSimHover(defBowASB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-					AssertSimHover<RevertTransaction>(false, null, null, true);
-		}
-		public void TestHoverDefBowBSBP(){
-			sgpAll.AutoSort = true;
-			sgm.SetFocusedPoolSG(sgpAll);
-			AssertSGMFocused();
-
-			Slottable targetSB;
-			targetSB = defBowASB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
-			targetSB = defBowBSB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, defBowBSB_p, sgpAll, false);
-			targetSB = crfBowASB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
-			targetSB = defBowASB_e;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<SwapTransaction>(true, defBowASB_e, sgBow, false);
-			targetSB = defWearASB_e;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, null, null, false);
-
-			sgpAll.AutoSort = false;
-
-			targetSB = defBowASB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<ReorderTransaction>(true, defBowASB_p, sgpAll, false);
-			targetSB = crfBowASB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<ReorderTransaction>(true, crfBowASB_p, sgpAll, false);
-			targetSB = defBowBSB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, defBowBSB_p, sgpAll, false);
-			targetSB = defWearASB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<ReorderTransaction>(true, defWearASB_p, sgpAll, false);
-			targetSB = defWearBSB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<ReorderTransaction>(true, defWearBSB_p, sgpAll, false);
-			targetSB = crfWearASB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<ReorderTransaction>(true, crfWearASB_p, sgpAll, false);
-			targetSB = defPartsSB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<ReorderTransaction>(true, defPartsSB_p, sgpAll, false);
-			targetSB = crfPartsSB_p;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<ReorderTransaction>(true, crfPartsSB_p, sgpAll, false);
-			targetSB = defBowASB_e;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<SwapTransaction>(true, defBowASB_e, sgBow, false);
-			targetSB = defWearASB_e;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, null, null, false);
-			targetSB = defPartsSB_p2;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, null, null, false);
-			targetSB = crfPartsSB_p2;
-				TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
-				AssertSimHover<RevertTransaction>(true, null, null, false);
-
-		}
-	public void AssertSimHover<T>(bool picked, Slottable sb, SlotGroup sg, bool TSNull){
-		if(picked) AB(picked, true); else AB(picked, false);
-		if(sb != null) AE(selectedSB, sb); else AB(selectedSB == null, true);
-		if(sg != null) AE(selectedSG, sg); else AB(selectedSG == null, true);
-		if(!TSNull) AE(transaction.GetType(), typeof(T)); else AB(transaction == null, true);
-	}
-	public void TestSimHoverOnAllSB(Slottable pickedSB){
-		// foreach(Slottable pickedSB in SlottableList()){
-			// Slottable pickedSB = crfBowASB_p;
-			foreach(Slottable hoveredSB in SlottableList()){
-				SlotGroup destSG = sgm.GetSlotGroup(hoveredSB);
-				bool picked;
-				Slottable selectedSB;
-				SlotGroup selectedSG;
-				SlotSystemTransaction transaction;
-				TestSimHover(pickedSB, hoveredSB, destSG, out picked, out selectedSB, out selectedSG, out transaction);
-			}
-		// }
-	}
-	public void TestSimHover(Slottable pickedSB, Slottable hoveredSB, SlotGroup hoveredSG, out bool picked, out Slottable selectedSB, out SlotGroup selectedSG, out SlotSystemTransaction transaction){
-		SlotGroup origSG = sgm.GetSlotGroup(pickedSB);// == SelectedSG
-		
-		if(pickedSB.CurState == Slottable.FocusedState || pickedSB.CurState == Slottable.EquippedAndDeselectedState){
-
-			PickUp(pickedSB, out picked);//picked = true;
-			ASSB(pickedSB, Slottable.PickedUpAndSelectedState);
-			AssertPostPickFilter(pickedSB);
+		bool picked;
+		Slottable selectedSB;
+		SlotGroup selectedSG;
+		SlotSystemTransaction transaction;
+		public void TestHover(){	
 			
-			if(hoveredSB != null){
-				SlotGroup destSG = sgm.GetSlotGroup(hoveredSB);
+			SlotGroup origSG = sgm.GetSlotGroup(defBowBSB_p);
+			Slottable targetSB;
+
+			// /*	test reorder
+				// */
+				// AB(origSG.AutoSort, true);
+				// origSG.AutoSort = false;
+
+				// TestSimHover(defBowBSB_p, defWearBSB_p, origSG, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
+				// 	AB(picked, true);
+				// 	AB(selectedSBChanged, true);
+				// 	AB(selectedSGChanged, false);
+				// 	AE(transaction.GetType(), typeof(ReorderTransaction));
 				
-				if(hoveredSB == pickedSB){
-					
-					selectedSB = pickedSB;
-					selectedSG = origSG;
-					sgm.SimSBHover(hoveredSB, eventData);
-					ASSB(hoveredSB, Slottable.PickedUpAndSelectedState);
-					AE(hoveredSB.CurProcess.GetType(), typeof(PickedUpAndSelectedProcess));
-					AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
-					transaction = sgm.Transaction;
+				// TestSimHover(defBowBSB_p, crfBowASB_p, origSG, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
+				// 	AB(picked, true);
+				// 	AB(selectedSBChanged, true);
+				// 	AB(selectedSGChanged, false);
+				// 	AE(transaction.GetType(), typeof(ReorderTransaction));
+			// /*	test swap
+				// */
+				// TestSimHover(defBowBSB_p, defBowASB_e, sgBow, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
+				// 	AB(picked, true);
+				// 	AB(selectedSBChanged, true);
+				// 	AB(selectedSGChanged, true);
+				// 	AE(transaction.GetType(), typeof(SwapTransaction));
+				
+				// TestSimHover(defWearBSB_p, defWearASB_e, sgWear, out picked, out selectedSBChanged, out selectedSGChanged, out transaction);
+				// 	AB(picked, true);
+				// 	AB(selectedSBChanged, true);
+				// 	AB(selectedSGChanged, true);
+				// 	AE(transaction.GetType(), typeof(SwapTransaction));
+			/**/
 
-				}else{//	hover is not null nor same as pickedSb
-					if(origSG == destSG){
-						selectedSG = origSG;
-						// ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
-						if(hoveredSB.CurState == Slottable.FocusedState){
-							selectedSB = hoveredSB;
-							sgm.SimSBHover(hoveredSB, eventData);
-							sgm.SimSGHover(hoveredSG, eventData);
-							ASSB(hoveredSB, Slottable.SelectedState);
-							AE(hoveredSB.CurProcess.GetType(), typeof(GradualHighlightProcess));
-							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
-							AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+			AB(origSG.AutoSort, true);
+			origSG.AutoSort = false;
 
-							AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
-							transaction = sgm.Transaction;
+			TestSimHoverOnAllSB();
+			// TestSimHoverOnAllSB(defBowASB_p);
+			// TestSimHoverOnAllSB(defBowBSB_p);
+			// TestSimHoverOnAllSB(crfBowASB_p);
+			// TestSimHoverOnAllSB(defWearASB_p);
+			// TestSimHoverOnAllSB(defWearBSB_p);
+			// TestSimHoverOnAllSB(crfWearASB_p);
+			// TestSimHoverOnAllSB(defBowASB_e);
+			// TestSimHoverOnAllSB(defWearASB_e);
+			// TestSimHoverOnAllSB(defBowASB_p);
+			
+				
+			// TestHoverDefBowASBE();
+			// TestHoverDefBowASBP();
+			// TestHoverDefBowBSBP();
+			// TestHoverDefWearASBE();
+			//TestHoverPartsInSGPParts();
+				
+		}
+		/*	spot tests hover
+		*/
+			public void TestHoverDefBowASBE(){
+				SlotGroup origSG = sgBow;
+				/*	defBowASB_e
+				*/
+					/*	AutoSort false
+					*/
+						Slottable targetSB = defBowASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defBowBSB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, defBowBSB_p);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(SwapTransaction));
 
-							sgm.SimSBHover(pickedSB, eventData);
+						targetSB = crfBowASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, crfBowASB_p);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(SwapTransaction));
 
-						}else if(hoveredSB.CurState == Slottable.EquippedAndDeselectedState){
-							selectedSB = hoveredSB;
-							sgm.SimSBHover(hoveredSB, eventData);
-							sgm.SimSGHover(hoveredSG, eventData);
-							ASSB(hoveredSB, Slottable.EquippedAndSelectedState);
-							AE(hoveredSB.CurProcess.GetType(), typeof(EquipGradualHighlightProcess));
-							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
-							AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+						targetSB = defWearASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defWearBSB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = crfWearASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
 
-							AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
-							transaction = sgm.Transaction;
-
-							sgm.SimSBHover(pickedSB, eventData);
-
-						}else{
-							selectedSB = null;
-							SlottableState preState = hoveredSB.CurState;
-							sgm.SimSBHover(hoveredSB, eventData);
-							sgm.SimSGHover(hoveredSG, eventData);
-							ASSB(hoveredSB, preState);
-							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
-							AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
-
-							AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
-							transaction = sgm.Transaction;
-
-							sgm.SimSBHover(pickedSB, eventData);
-						}		
-					}else{
-						/*	destSG != null, != origSG
-							selectedSG == null || == destSG || != origSG
-							hoveredSB != null, != pickdSB
-							fill, swap, stack
-							not revert
-						*/
-						AE(sgm.SelectedSB, pickedSB);
-						AE(sgm.SelectedSG, origSG);
-						// ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
-						if(hoveredSB.CurState == Slottable.FocusedState || hoveredSB.CurState == Slottable.EquippedAndDeselectedState || hoveredSB.CurState == Slottable.PickedUpAndDeselectedState){
-							sgm.SimSBHover(hoveredSB, eventData);
-								AE(sgm.SelectedSB, hoveredSB);
-								selectedSB = hoveredSB;
-								if(hoveredSB.CurState != Slottable.PickedUpAndSelectedState){
-									if(hoveredSB.IsEquipped)
-										ASSB(hoveredSB, Slottable.EquippedAndSelectedState);
-									else
-										ASSB(hoveredSB, Slottable.SelectedState);
-								}else
-									ASSB(hoveredSB, Slottable.PickedUpAndSelectedState);
+						targetSB = defPartsSB_p2;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, null);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = crfPartsSB_p2;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, null);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defBowASB_e;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, defBowASB_e);
+							AE(selectedSG, sgBow);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defWearASB_e;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, null);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						sgm.SetFocusedPoolSG(sgpParts);
+						
+							targetSB = defPartsSB_p2;
+							TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+								AB(picked, true);
+								AE(selectedSB, null);
+								AE(selectedSG, sgpParts);
+								AE(transaction.GetType(), typeof(RevertTransaction));
 							
-							if(hoveredSB.Item.IsStackable)
-								AE(sgm.Transaction.GetType(), typeof(StackTransaction));
-							else
-								AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
-							transaction = sgm.Transaction;
-						}else{// hoveredSB not in a state to be hovered
-							SlottableState preState = hoveredSB.CurState;
-							selectedSB = null;
-							sgm.SimSBHover(hoveredSB, eventData);
-								AE(sgm.SelectedSB, null);
-								ASSB(hoveredSB, preState);
+							targetSB = crfPartsSB_p2;
+							TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+								AB(picked, true);
+								AE(selectedSB, null);
+								AE(selectedSG, sgpParts);
+								AE(transaction.GetType(), typeof(RevertTransaction));
+					/*	AutoSort true
+					*/
+						sgm.SetFocusedPoolSG(sgpAll);
+						origSG.AutoSort = true;
+						targetSB = defBowASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defBowBSB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, defBowBSB_p);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(SwapTransaction));
+
+						targetSB = crfBowASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, crfBowASB_p);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(SwapTransaction));
+
+						targetSB = defWearASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defWearBSB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = crfWearASB_p;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, sgpAll);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+
+						targetSB = defPartsSB_p2;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, null);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = crfPartsSB_p2;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, null);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defBowASB_e;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, defBowASB_e);
+							AE(selectedSG, sgBow);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						targetSB = defWearASB_e;
+						TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+							AB(picked, true);
+							AE(selectedSB, null);
+							AE(selectedSG, null);
+							AE(transaction.GetType(), typeof(RevertTransaction));
+						
+						sgm.SetFocusedPoolSG(sgpParts);
+						
+							targetSB = defPartsSB_p2;
+							TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+								AB(picked, true);
+								AE(selectedSB, null);
+								AE(selectedSG, sgpParts);
+								AE(transaction.GetType(), typeof(RevertTransaction));
 							
-							AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
-							transaction = sgm.Transaction;
-						}
+							targetSB = crfPartsSB_p2;
+							TestSimHover(defBowASB_e, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+								AB(picked, true);
+								AE(selectedSB, null);
+								AE(selectedSG, sgpParts);
+								AE(transaction.GetType(), typeof(RevertTransaction));
+			}
+			public void TestHoverDefBowASBP(){
+				Slottable targetSB;
+				targetSB = defBowASB_p;
+						TestSimHover(defBowASB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+						AssertSimHover<RevertTransaction>(false, null, null, true);
+					targetSB = defBowBSB_p;
+						TestSimHover(defBowASB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+						AssertSimHover<RevertTransaction>(false, null, null, true);
+					targetSB = defBowASB_e;
+						TestSimHover(defBowASB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+						AssertSimHover<RevertTransaction>(false, null, null, true);
+			}
+			public void TestHoverDefBowBSBP(){
+				sgpAll.AutoSort = true;
+				sgm.SetFocusedPoolSG(sgpAll);
+				AssertSGMFocused();
+
+				Slottable targetSB;
+				targetSB = defBowASB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				targetSB = defBowBSB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, defBowBSB_p, sgpAll, false);
+				targetSB = crfBowASB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				targetSB = defBowASB_e;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<SwapTransaction>(true, defBowASB_e, sgBow, false);
+				targetSB = defWearASB_e;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+
+				sgpAll.AutoSort = false;
+
+				targetSB = defBowASB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, defBowASB_p, sgpAll, false);
+				targetSB = crfBowASB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, crfBowASB_p, sgpAll, false);
+				targetSB = defBowBSB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, defBowBSB_p, sgpAll, false);
+				targetSB = defWearASB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, defWearASB_p, sgpAll, false);
+				targetSB = defWearBSB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, defWearBSB_p, sgpAll, false);
+				targetSB = crfWearASB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, crfWearASB_p, sgpAll, false);
+				targetSB = defPartsSB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, defPartsSB_p, sgpAll, false);
+				targetSB = crfPartsSB_p;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, crfPartsSB_p, sgpAll, false);
+				targetSB = defBowASB_e;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<SwapTransaction>(true, defBowASB_e, sgBow, false);
+				targetSB = defWearASB_e;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+				targetSB = defPartsSB_p2;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+				targetSB = crfPartsSB_p2;
+					TestSimHover(defBowBSB_p, targetSB, sgm.GetSlotGroup(targetSB), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+
+			}
+			public void TestHoverDefWearASBE(){
+				sgm.SetFocusedPoolSG(sgpAll);
+				AssertSGMFocused();
+				Slottable target;
+
+				target = defBowASB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				target = defBowBSB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				target = crfBowASB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				target = defWearASB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				target = defWearBSB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<SwapTransaction>(true, defWearBSB_p, sgpAll, false);
+				target = crfWearASB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<SwapTransaction>(true, crfWearASB_p, sgpAll, false);
+				target = defPartsSB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				target = crfPartsSB_p;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpAll, false);
+				
+				target = defBowASB_e;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+				target = defWearASB_e;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, defWearASB_e, sgWear, false);
+				target = defPartsSB_p2;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+				
+				sgm.SetFocusedPoolSG(sgpParts);
+				target = defPartsSB_p2;
+					TestSimHover(defWearASB_e, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpParts, false);
+				sgm.SetFocusedPoolSG(sgpAll);
 
 
-						ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
-						/*	selected, eqSelected, pickSele, 
-						*/
-						if(hoveredSG.CurState == SlotGroup.FocusedState){
-							selectedSG = hoveredSG;
-							sgm.SimSGHover(hoveredSG, eventData);
-								AE(sgm.SelectedSG, hoveredSG);
-								ASSG(hoveredSG, SlotGroup.SelectedState);
-						}else{
-							selectedSG = null;
-							SlotGroupState preState = hoveredSG.CurState;
-							sgm.SimSGHover(hoveredSG, eventData);
-								AE(sgm.SelectedSG, null);
-								ASSG(hoveredSG, preState);
-						}
+			}
+			public void TestHoverPartsInSGPParts(){
+				sgm.SetFocusedPoolSG(sgpParts);
+				AssertSGMFocused();
+				Slottable target;
 
-						sgm.SimSBHover(pickedSB, eventData);
-						sgm.SimSGHover(origSG, eventData);
-					}
+				target = defPartsSB_p2;
+					TestSimHover(defPartsSB_p2, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, target, sgpParts, false);
+				target = crfPartsSB_p2;
+					TestSimHover(defPartsSB_p2, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, sgpParts, false);
+				
+				sgpParts.AutoSort = false;
+				target = defPartsSB_p2;
+					TestSimHover(defPartsSB_p2, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, target, sgpParts, false);
+				target = crfPartsSB_p2;
+					TestSimHover(defPartsSB_p2, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<ReorderTransaction>(true, target, sgpParts, false);
+				sgpParts.AutoSort = true;
+				
+				target = defPartsSB_p;
+					TestSimHover(defPartsSB_p2, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+				target = defBowASB_e;
+					TestSimHover(defPartsSB_p2, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+				target = defWearASB_e;
+					TestSimHover(defPartsSB_p2, target, sgm.GetSlotGroup(target), out picked, out selectedSB, out selectedSG, out transaction);
+					AssertSimHover<RevertTransaction>(true, null, null, false);
+			}
+		public void AssertSimHover<T>(bool picked, Slottable sb, SlotGroup sg, bool TSNull){
+			if(picked) AB(picked, true); else AB(picked, false);
+			if(sb != null) AE(selectedSB, sb); else AB(selectedSB == null, true);
+			if(sg != null) AE(selectedSG, sg); else AB(selectedSG == null, true);
+			if(!TSNull) AE(transaction.GetType(), typeof(T)); else AB(transaction == null, true);
+		}
+		public void TestSimHoverOnAllSB(){
+			foreach(Slottable sb in SlottableList()){
+				foreach(Slottable hoveredSB in SlottableList()){
+					SlotGroup destSG = sgm.GetSlotGroup(hoveredSB);
+					bool picked;
+					Slottable selectedSB;
+					SlotGroup selectedSG;
+					SlotSystemTransaction transaction;
+					TestSimHover(sb, hoveredSB, destSG, out picked, out selectedSB, out selectedSG, out transaction);
 				}
 			}
-			else{//	hoveredSB == null
-				selectedSB = null;
-				transaction = new RevertTransaction(pickedSB);
-				if(hoveredSG == null){
-					selectedSG = null;
-					/*	revert
-					*/
-				}else{
-					selectedSG = hoveredSG;
-					if(hoveredSG == origSG){// same sg, no selectable sb under cursor
-						
+		}
+		public void TestSimHover(Slottable pickedSB, Slottable hoveredSB, SlotGroup hoveredSG, out bool picked, out Slottable selectedSB, out SlotGroup selectedSG, out SlotSystemTransaction transaction){
+			SlotGroup origSG = sgm.GetSlotGroup(pickedSB);// == SelectedSG
+			
+			if(pickedSB.CurState == Slottable.FocusedState || pickedSB.CurState == Slottable.EquippedAndDeselectedState){
 
+				PickUp(pickedSB, out picked);//picked = true;
+				ASSB(pickedSB, Slottable.PickedUpAndSelectedState);
+				AssertPostPickFilter(pickedSB);
+				
+				if(hoveredSB != null){
+					SlotGroup destSG = sgm.GetSlotGroup(hoveredSB);
+					
+					if(hoveredSB == pickedSB){
+						
+						selectedSB = pickedSB;
+						selectedSG = origSG;
+						sgm.SimSBHover(hoveredSB, eventData);
+						ASSB(hoveredSB, Slottable.PickedUpAndSelectedState);
+						AE(hoveredSB.CurProcess.GetType(), typeof(PickedUpAndSelectedProcess));
+						AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+						transaction = sgm.Transaction;
+
+					}else{//	hover is not null nor same as pickedSb
+						if(origSG == destSG){
+							selectedSG = origSG;
+							// ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
+							if(hoveredSB.CurState == Slottable.FocusedState){
+								selectedSB = hoveredSB;
+								sgm.SimSBHover(hoveredSB, eventData);
+								sgm.SimSGHover(hoveredSG, eventData);
+								ASSB(hoveredSB, Slottable.SelectedState);
+								AE(hoveredSB.CurProcess.GetType(), typeof(GradualHighlightProcess));
+								ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+								AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+
+								AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
+								transaction = sgm.Transaction;
+
+								sgm.SimSBHover(pickedSB, eventData);
+
+							}else if(hoveredSB.CurState == Slottable.EquippedAndDeselectedState){
+								selectedSB = hoveredSB;
+								sgm.SimSBHover(hoveredSB, eventData);
+								sgm.SimSGHover(hoveredSG, eventData);
+								ASSB(hoveredSB, Slottable.EquippedAndSelectedState);
+								AE(hoveredSB.CurProcess.GetType(), typeof(EquipGradualHighlightProcess));
+								ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+								AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+
+								AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
+								transaction = sgm.Transaction;
+
+								sgm.SimSBHover(pickedSB, eventData);
+
+							}else{
+								selectedSB = null;
+								SlottableState preState = hoveredSB.CurState;
+								sgm.SimSBHover(hoveredSB, eventData);
+								sgm.SimSGHover(hoveredSG, eventData);
+								ASSB(hoveredSB, preState);
+								ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+								AE(pickedSB.CurProcess.GetType(), typeof(GradualDehighlightProcess));
+
+								AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+								transaction = sgm.Transaction;
+
+								sgm.SimSBHover(pickedSB, eventData);
+							}		
+						}else{
+							/*	destSG != null, != origSG
+								selectedSG == null || == destSG || != origSG
+								hoveredSB != null, != pickdSB
+								fill, swap, stack
+								not revert
+							*/
+							AE(sgm.SelectedSB, pickedSB);
+							AE(sgm.SelectedSG, origSG);
+							// ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
+							if(hoveredSB.CurState == Slottable.FocusedState || hoveredSB.CurState == Slottable.EquippedAndDeselectedState || hoveredSB.CurState == Slottable.PickedUpAndDeselectedState){
+								sgm.SimSBHover(hoveredSB, eventData);
+									AE(sgm.SelectedSB, hoveredSB);
+									selectedSB = hoveredSB;
+									if(hoveredSB.CurState != Slottable.PickedUpAndSelectedState){
+										if(hoveredSB.IsEquipped)
+											ASSB(hoveredSB, Slottable.EquippedAndSelectedState);
+										else
+											ASSB(hoveredSB, Slottable.SelectedState);
+									}else
+										ASSB(hoveredSB, Slottable.PickedUpAndSelectedState);
+								
+								if(hoveredSB.Item.IsStackable)
+									AE(sgm.Transaction.GetType(), typeof(StackTransaction));
+								else
+									AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+								transaction = sgm.Transaction;
+							}else{// hoveredSB not in a state to be hovered
+								SlottableState preState = hoveredSB.CurState;
+								selectedSB = null;
+								sgm.SimSBHover(hoveredSB, eventData);
+									AE(sgm.SelectedSB, null);
+									ASSB(hoveredSB, preState);
+								
+								AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+								transaction = sgm.Transaction;
+							}
+
+
+							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+							/*	selected, eqSelected, pickSele, 
+							*/
+							if(hoveredSG.CurState == SlotGroup.FocusedState){
+								selectedSG = hoveredSG;
+								sgm.SimSGHover(hoveredSG, eventData);
+									AE(sgm.SelectedSG, hoveredSG);
+									ASSG(hoveredSG, SlotGroup.SelectedState);
+							}else{
+								selectedSG = null;
+								SlotGroupState preState = hoveredSG.CurState;
+								sgm.SimSGHover(hoveredSG, eventData);
+									AE(sgm.SelectedSG, null);
+									ASSG(hoveredSG, preState);
+							}
+
+							sgm.SimSBHover(pickedSB, eventData);
+							sgm.SimSGHover(origSG, eventData);
+						}
+					}
+				}
+				else{//	hoveredSB == null
+					selectedSB = null;
+					transaction = new RevertTransaction(pickedSB);
+					if(hoveredSG == null){
+						selectedSG = null;
 						/*	revert
 						*/
-					}else{//	hoveredSG not null nor the same as orig
+					}else{
+						selectedSG = hoveredSG;
+						if(hoveredSG == origSG){// same sg, no selectable sb under cursor
+							
 
-						
+							/*	revert
+							*/
+						}else{//	hoveredSG not null nor the same as orig
+
+							
+						}
 					}
+					sgm.SimSBHover(pickedSB, eventData);
+					sgm.SimSGHover(origSG, eventData);
 				}
-				sgm.SimSBHover(pickedSB, eventData);
-				sgm.SimSGHover(origSG, eventData);
-			}
-			bool reverted;
-			Revert(pickedSB, out reverted);
-			AB(reverted, true);
-			AssertSGMFocused();
-			
-		}else{//	pickedSB is not in a state to be picked up
-			picked = false;
-			selectedSB = null;
-			selectedSG = null;
-			transaction = null;
-
-			if(pickedSB.CurState == Slottable.DefocusedState || pickedSB.CurState == Slottable.EquippedAndDefocusedState){
-				pickedSB.OnPointerDownMock(eventData);
-				ASSB(pickedSB, Slottable.WaitForPointerUpState);
-				pickedSB.OnPointerUpMock(eventData);
-				if(pickedSB.IsEquipped)
-					ASSB(pickedSB, Slottable.EquippedAndDefocusedState);
-				else
-					ASSB(pickedSB, Slottable.DefocusedState);
-			}else{
-				/*	not testable
-				*/
-				SlottableState preState = pickedSB.CurState;
-				pickedSB.OnPointerDownMock(eventData);
-				ASSB(pickedSB, preState);
-			}
-			AssertSGMFocused();
-		}
-	}
-	/*	hovering
-	*/
-		public void TestPickupAndRevertAll(){
-			int hoveredCount = 0;
-			TestHoverAll(ref hoveredCount);
-			AE(hoveredCount, 6);
-
-			hoveredCount = 0;
-			sgm.SetFocusedPoolSG(sgpParts);
-			TestHoverAll(ref hoveredCount);
-			AE(hoveredCount, 4);
-
-			AB(HoverTestPassed(defBowASB_p), false);
-			AB(HoverTestPassed(defBowBSB_p), false);
-			AB(HoverTestPassed(crfBowASB_p), false);
-			AB(HoverTestPassed(defWearASB_p), false);
-			AB(HoverTestPassed(defWearBSB_p), false);
-			AB(HoverTestPassed(crfWearASB_p), false);
-			AB(HoverTestPassed(defPartsSB_p), false);
-			AB(HoverTestPassed(crfPartsSB_p), false);
-			AB(HoverTestPassed(defBowASB_e), true);
-			AB(HoverTestPassed(defWearASB_e), true);
-			AB(HoverTestPassed(defPartsSB_p2), true);
-			AB(HoverTestPassed(crfPartsSB_p2), true);
-			
-			hoveredCount = 0;
-			sgm.SetFocusedPoolSG(sgpAll);
-			TestHoverAll(ref hoveredCount);
-			AE(hoveredCount, 6);
-			
-			AB(HoverTestPassed(defBowASB_p), false);
-			AB(HoverTestPassed(defBowBSB_p), true);
-			AB(HoverTestPassed(crfBowASB_p), true);
-			AB(HoverTestPassed(defWearASB_p), false);
-			AB(HoverTestPassed(defWearBSB_p), true);
-			AB(HoverTestPassed(crfWearASB_p), true);
-			AB(HoverTestPassed(defPartsSB_p), false);
-			AB(HoverTestPassed(crfPartsSB_p), false);
-			AB(HoverTestPassed(defBowASB_e), true);
-			AB(HoverTestPassed(defWearASB_e), true);
-			AB(HoverTestPassed(defPartsSB_p2), false);
-			AB(HoverTestPassed(crfPartsSB_p2), false);
-		}
-		public bool HoverTestPassed(Slottable sb){
-			bool result = false;
-			TestHoverSequence(sb, out result);
-			return result;
-		}
-		public void TestHoverAll(ref int count){
-			
-			foreach(Slottable sb in SlottableList()){
-				bool hovered = false;
-				TestHoverSequence(sb, out hovered);
-				if(hovered)
-					count ++;
-			}
-
-		}
-		public void TestHoverSequence(Slottable sb, out bool hovered){
-			bool pickedUp = false;
-			bool reverted = false;
-			PickUp(sb, out pickedUp);
-			// TestHover(sb, ref pickedUp);
-			Revert(sb, out reverted);
-			hovered = pickedUp && reverted;
-		}
-		// public void TestHover(Slottable sb, ref bool picked){
-			// 	if(picked){
-			// 		ASSB(sb, Slottable.PickedUpAndSelectedState);
-					
-			// 		// sb.OnEndDragMock(eventData);
-					
-			// 		ASSB(sb, Slottable.PickedUpAndSelectedState);
-			// 	}
-			// }
-		public void PickUp(Slottable sb, out bool pickedUp){	
-			AssertSGMFocused();
-			if(sb.CurState == Slottable.FocusedState || sb.CurState == Slottable.EquippedAndDeselectedState){
+				bool reverted;
+				Revert(pickedSB, out reverted);
+				AB(reverted, true);
+				AssertSGMFocused();
 				
-				sb.OnPointerDownMock(eventData);
-				ASSB(sb, Slottable.WaitForPickUpState);
-				sb.CurProcess.Expire();
-				pickedUp = true;
-				ASSB(sb, Slottable.PickedUpAndSelectedState);
-				AssertPostPickFilter(sb);
-			}else{
-				pickedUp = false;
-			}
-		}
-		public void Revert(Slottable sb, out bool reverted){
-			if(sb.CurState == Slottable.PickedUpAndSelectedState){
-				sb.OnPointerUpMock(eventData);
-				if(sb.Item.IsStackable){
-					ASSB(sb, Slottable.WaitForNextTouchWhilePUState);
-					sb.CurProcess.Expire();
+			}else{//	pickedSB is not in a state to be picked up
+				picked = false;
+				selectedSB = null;
+				selectedSG = null;
+				transaction = null;
+
+				if(pickedSB.CurState == Slottable.DefocusedState || pickedSB.CurState == Slottable.EquippedAndDefocusedState){
+					pickedSB.OnPointerDownMock(eventData);
+					ASSB(pickedSB, Slottable.WaitForPointerUpState);
+					pickedSB.OnPointerUpMock(eventData);
+					if(pickedSB.IsEquipped)
+						ASSB(pickedSB, Slottable.EquippedAndDefocusedState);
+					else
+						ASSB(pickedSB, Slottable.DefocusedState);
+				}else{
+					/*	not testable
+					*/
+					SlottableState preState = pickedSB.CurState;
+					pickedSB.OnPointerDownMock(eventData);
+					ASSB(pickedSB, preState);
 				}
-					AssertReverting(sb);
-				sb.CurProcess.Expire();
-				reverted = true;
-			}else{
-				reverted = false;
+				AssertSGMFocused();
 			}
-			AssertSGMFocused();
 		}
+		/*	hovering
+		*/
+			public void TestPickupAndRevertAll(){
+				int hoveredCount = 0;
+				TestHoverAll(ref hoveredCount);
+				AE(hoveredCount, 6);
+
+				hoveredCount = 0;
+				sgm.SetFocusedPoolSG(sgpParts);
+				TestHoverAll(ref hoveredCount);
+				AE(hoveredCount, 4);
+
+				AB(HoverTestPassed(defBowASB_p), false);
+				AB(HoverTestPassed(defBowBSB_p), false);
+				AB(HoverTestPassed(crfBowASB_p), false);
+				AB(HoverTestPassed(defWearASB_p), false);
+				AB(HoverTestPassed(defWearBSB_p), false);
+				AB(HoverTestPassed(crfWearASB_p), false);
+				AB(HoverTestPassed(defPartsSB_p), false);
+				AB(HoverTestPassed(crfPartsSB_p), false);
+				AB(HoverTestPassed(defBowASB_e), true);
+				AB(HoverTestPassed(defWearASB_e), true);
+				AB(HoverTestPassed(defPartsSB_p2), true);
+				AB(HoverTestPassed(crfPartsSB_p2), true);
+				
+				hoveredCount = 0;
+				sgm.SetFocusedPoolSG(sgpAll);
+				TestHoverAll(ref hoveredCount);
+				AE(hoveredCount, 6);
+				
+				AB(HoverTestPassed(defBowASB_p), false);
+				AB(HoverTestPassed(defBowBSB_p), true);
+				AB(HoverTestPassed(crfBowASB_p), true);
+				AB(HoverTestPassed(defWearASB_p), false);
+				AB(HoverTestPassed(defWearBSB_p), true);
+				AB(HoverTestPassed(crfWearASB_p), true);
+				AB(HoverTestPassed(defPartsSB_p), false);
+				AB(HoverTestPassed(crfPartsSB_p), false);
+				AB(HoverTestPassed(defBowASB_e), true);
+				AB(HoverTestPassed(defWearASB_e), true);
+				AB(HoverTestPassed(defPartsSB_p2), false);
+				AB(HoverTestPassed(crfPartsSB_p2), false);
+			}
+			public bool HoverTestPassed(Slottable sb){
+				bool result = false;
+				TestHoverSequence(sb, out result);
+				return result;
+			}
+			public void TestHoverAll(ref int count){
+				
+				foreach(Slottable sb in SlottableList()){
+					bool hovered = false;
+					TestHoverSequence(sb, out hovered);
+					if(hovered)
+						count ++;
+				}
+
+			}
+			public void TestHoverSequence(Slottable sb, out bool hovered){
+				bool pickedUp = false;
+				bool reverted = false;
+				PickUp(sb, out pickedUp);
+				// TestHover(sb, ref pickedUp);
+				Revert(sb, out reverted);
+				hovered = pickedUp && reverted;
+			}
+			// public void TestHover(Slottable sb, ref bool picked){
+				// 	if(picked){
+				// 		ASSB(sb, Slottable.PickedUpAndSelectedState);
+						
+				// 		// sb.OnEndDragMock(eventData);
+						
+				// 		ASSB(sb, Slottable.PickedUpAndSelectedState);
+				// 	}
+				// }
+			public void PickUp(Slottable sb, out bool pickedUp){	
+				AssertSGMFocused();
+				if(sb.CurState == Slottable.FocusedState || sb.CurState == Slottable.EquippedAndDeselectedState){
+					
+					sb.OnPointerDownMock(eventData);
+					ASSB(sb, Slottable.WaitForPickUpState);
+					sb.CurProcess.Expire();
+					pickedUp = true;
+					ASSB(sb, Slottable.PickedUpAndSelectedState);
+					AssertPostPickFilter(sb);
+				}else{
+					pickedUp = false;
+				}
+			}
+			public void Revert(Slottable sb, out bool reverted){
+				if(sb.CurState == Slottable.PickedUpAndSelectedState){
+					sb.OnPointerUpMock(eventData);
+					if(sb.Item.IsStackable){
+						ASSB(sb, Slottable.WaitForNextTouchWhilePUState);
+						sb.CurProcess.Expire();
+					}
+						AssertReverting(sb);
+					sb.CurProcess.Expire();
+					reverted = true;
+				}else{
+					reverted = false;
+				}
+				AssertSGMFocused();
+			}
 	public void TestOnPointerDownOnAllSB(){
 		foreach(Slottable sb in SlottableList()){
 			TestOnPointerDownSequence(sb);
@@ -1596,277 +1682,6 @@ public class SlottableTest {
 		
 	/*
 	*/
-	public void TestSimSBHover(Slottable pickedSb, Slottable hoveredSb){
-		if(pickedSb != null && pickedSb.CurState == Slottable.PickedUpAndSelectedState){
-
-			SlotGroup targetSG = sgm.GetSlotGroup(hoveredSb);
-			SlotGroup origSG = sgm.GetSlotGroup(pickedSb);
-			SlotGroup selectedSG = pickedSb.SGM.SelectedSG;
-			sgm.SimSBHover(hoveredSb, eventData);
-			if(hoveredSb == null){
-					Assert.That(pickedSb.CurState, Is.EqualTo(Slottable.PickedUpAndDeselectedState));
-				if(selectedSG == null || selectedSG == origSG){
-					Assert.That(sgm.Transaction, Is.TypeOf(typeof(RevertTransaction)));
-				}else{
-					if(selectedSG.HasItem((InventoryItemInstanceMock)pickedSb.Item)){
-						Assert.That(sgm.Transaction, Is.TypeOf(typeof(StackTransaction)));
-					}else{
-						Assert.That(sgm.Transaction, Is.TypeOf(typeof(FillTransaction)));
-					}
-				}
-			}else{
-				if(targetSG.AutoSort && targetSG == origSG){
-					if(hoveredSb == pickedSb){
-						Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-						Assert.That(sgm.SelectedSB, Is.EqualTo(hoveredSb));
-						Assert.That(sgm.SelectedSB, Is.EqualTo(sgm.PickedSB));
-						Assert.That(pickedSb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-					}else{
-						Assert.That(pickedSb.CurState, Is.EqualTo(Slottable.PickedUpAndDeselectedState));
-						if(object.ReferenceEquals(hoveredSb.Item, sgm.GetEquippedBow()) || object.ReferenceEquals(hoveredSb.Item, sgm.GetEquippedWear())){
-						
-							Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-						} 
-						else
-							Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.DefocusedState));
-
-						Assert.That(sgm.SelectedSB, Is.EqualTo(null));
-					}
-
-					Assert.That(sgm.Transaction, Is.TypeOf(typeof(RevertTransaction)));
-				}else{//hoveredSb != null && (!AutoSort OR differentSG)
-					if(pickedSb == hoveredSb){
-						Assert.That(sgm.SelectedSB, Is.EqualTo(hoveredSb));
-						Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-					}else{
-						if((pickedSb.Item is BowInstanceMock && hoveredSb.Item is BowInstanceMock)|| (pickedSb.Item is WearInstanceMock && hoveredSb.Item is WearInstanceMock) || (pickedSb.Item is PartsInstanceMock && hoveredSb.Item is PartsInstanceMock)){
-							if(object.ReferenceEquals(sgm.GetEquippedBow(), hoveredSb.Item)||(object.ReferenceEquals(sgm.GetEquippedWear(), hoveredSb.Item))){
-								Assert.That(sgm.SelectedSB, Is.EqualTo(hoveredSb));
-								Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.EquippedAndSelectedState));
-								Assert.That(pickedSb.CurState, Is.EqualTo(Slottable.PickedUpAndDeselectedState));
-							}else{//hoveredSb not equipped
-								Assert.That(sgm.SelectedSB, Is.EqualTo(hoveredSb));
-								Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.SelectedState));
-								Assert.That(pickedSb.CurState, Is.EqualTo(Slottable.PickedUpAndDeselectedState));
-							}
-						}else{//different item family
-							Assert.That(sgm.SelectedSB, Is.EqualTo(null));
-							Assert.That(pickedSb.CurState, Is.EqualTo(Slottable.PickedUpAndDeselectedState));
-
-							if(object.ReferenceEquals(hoveredSb.Item, sgm.GetEquippedBow())|| object.ReferenceEquals(hoveredSb.Item, sgm.GetEquippedWear())){
-							
-								Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-							
-							}else{//hoveredSb not equipped
-							
-								Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.DefocusedState));
-							}
-						}
-					}
-					
-					// Assert.That(sgm.SelectedSB, Is.EqualTo(hoveredSb));
-					// if(object.ReferenceEquals(hoveredSb.Item, sgm.GetEquippedBow()) || object.ReferenceEquals(hoveredSb.Item, sgm.GetEquippedWear()))
-					// 	Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.EquippedAndSelectedState));
-					// else
-					// 	Assert.That(hoveredSb.CurState, Is.EqualTo(Slottable.SelectedState));
-
-					// Assert.That(sgm.PickedSB, Is.EqualTo(pickedSb));
-					// Assert.That(pickedSb.CurState, Is.EqualTo(Slottable.PickedUpAndDeselectedState));
-					// Assert.That(pickedSb.PickedUpAndSelectedProcess.IsRunning, Is.False);
-					// Assert.That(pickedSb.PickedUpAndSelectedProcess.IsExpired, Is.False);
-					if(targetSG == origSG){
-						Assert.That(sgm.Transaction, Is.TypeOf(typeof(ReorderTransaction)));
-					}else{
-						if(hoveredSb.Item == pickedSb.Item)
-							Assert.That(sgm.Transaction, Is.TypeOf(typeof(StackTransaction)));
-						else{
-							if(sgm.SelectedSB != null)
-								Assert.That(sgm.Transaction, Is.TypeOf(typeof(SwapTransaction)));
-							else
-								Assert.That(sgm.Transaction, Is.TypeOf(typeof(RevertTransaction)));
-						}
-					}
-
-				}
-			}
-		}
-	}
-	public void ValidatePostpickFilter(Slottable pickedSB){
-		if(pickedSB != null && pickedSB.CurState == Slottable.PickedUpAndSelectedState){
-
-			SlotGroup origSG = sgm.GetSlotGroup(pickedSB);
-			
-			if(origSG.Filter is SGNullFilter){
-				foreach(SlotGroup sg in sgm.SlotGroups){
-					if(sg == origSG){
-						Assert.That(sg.CurState, Is.EqualTo(SlotGroup.SelectedState));
-						foreach(Slot slot in sg.Slots){
-							if(slot.Sb != null){
-								if(pickedSB == slot.Sb)
-									Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-								else{
-									BowInstanceMock equippedBow = (BowInstanceMock)sgBow.Slots[0].Sb.Item;
-									WearInstanceMock equippedWear = (WearInstanceMock)sgWear.Slots[0].Sb.Item;
-									if(sg.AutoSort){
-										if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
-
-											Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-										else
-											Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-									}else{
-										if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
-											
-											Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDeselectedState));
-										else
-											Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.FocusedState));
-
-									}		
-								}
-							}
-						}
-					}else{// if SG under examination is not the origSG
-						if(sg.IsPool){
-							Assert.That(sg.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-							
-						}else{
-							if(sgm.PickedSB.Item is BowInstanceMock){
-								if(sg.Filter is SGBowFilter)
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.FocusedState));
-								else
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-							}else if(sgm.PickedSB.Item is WearInstanceMock){
-								if(sg.Filter is SGWearFilter)
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.FocusedState));
-								else
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-							}else if(sgm.PickedSB.Item is PartsInstanceMock){
-								if(sg.Filter is SGPartsFilter)
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.FocusedState));
-								else
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-							}
-						}
-					}
-				}
-			}else if(origSG.Filter is SGBowFilter && !origSG.IsPool){
-				
-				Assert.That(origSG, Is.EqualTo(sgBow));
-
-				Assert.That(pickedSB.Item, Is.TypeOf(typeof(BowInstanceMock)));
-				Assert.That(sgBow.CurState, Is.EqualTo(SlotGroup.SelectedState));
-				/*	Validate sgBow
-				*/
-					Assert.That(sgBow.Slots.Count, Is.EqualTo(1));
-					Assert.That(sgBow.Slots[0].Sb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-				/*	Validate sgWear
-				*/
-					Assert.That(sgWear.Slots.Count, Is.EqualTo(1));
-					Assert.That(sgWear.Slots[0].Sb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-				/*	Validate sgpAll
-				*/
-					Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.FocusedState));
-					foreach(Slot slot in sgpAll.Slots){
-						if(slot.Sb != null){
-							if(slot.Sb.Item is PartsInstanceMock)
-								Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-							else if(object.ReferenceEquals(slot.Sb.Item, sgBow.Slots[0].Sb.Item))
-								Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-							else if(object.ReferenceEquals(slot.Sb.Item, sgWear.Slots[0].Sb.Item))
-								Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-							else if(slot.Sb == sgm.PickedSB)
-								Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-							else if(slot.Sb.Item is BowInstanceMock)
-								Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.FocusedState));
-							else 
-								Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-						}
-					}
-				/*	Validate sgpParts
-				*/
-					Assert.That(sgpParts.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-					foreach(Slot slot in sgpParts.Slots){
-						if(slot.Sb != null){
-							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-						}
-					}
-				
-			}else if(origSG.Filter is SGWearFilter){
-				Assert.That(pickedSB.Item, Is.TypeOf(typeof(WearInstanceMock)));
-				Assert.That(sgBow.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-				foreach(Slot slot in sgBow.Slots){
-					if(slot.Sb != null){
-						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-					}
-				}
-				Assert.That(sgWear.CurState, Is.EqualTo(SlotGroup.SelectedState));
-				foreach(Slot slot in sgWear.Slots){
-					if(slot.Sb != null){
-						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-					}
-				}
-				Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.FocusedState));
-				foreach(Slot slot in sgpAll.Slots){
-					if(slot.Sb != null){
-						if(slot.Sb.Item is PartsInstanceMock)
-							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-						else if(object.ReferenceEquals(slot.Sb.Item, sgBow.Slots[0].Sb.Item))
-							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));
-						else if(object.ReferenceEquals(slot.Sb.Item, sgWear.Slots[0].Sb.Item))
-							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.EquippedAndDefocusedState));//needs to be defocused?
-						else if(slot.Sb == sgm.PickedSB)//	never happens
-							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-						else if(slot.Sb.Item is WearInstanceMock)
-							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.FocusedState));
-						else 
-							Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-
-					}
-				}
-				Assert.That(sgpParts.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-				foreach(Slot slot in sgpParts.Slots){
-					if(slot.Sb != null){
-						Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-					}
-				}
-				
-			}else if(origSG.Filter is SGPartsFilter){
-				foreach(SlotGroup sg in sgm.SlotGroups){
-					if(sg == origSG){
-						foreach(Slot slot in sg.Slots){
-							if(slot.Sb != null){
-								if(slot.Sb == pickedSB){
-									Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.PickedUpAndSelectedState));
-								}else{
-									if(sg.AutoSort)
-										Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DefocusedState));
-									else
-										Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.FocusedState));
-								}
-							}
-						}
-					}else{// the sg under inspection is not the orig sg
-						if(origSG.IsPool){
-							if(sg.IsPool){//multiple pool sgs cannot be focused at the same time
-								Assert.That(sg.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-							}else{// sg not pool
-								if(sg.Filter is SGPartsFilter){
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.FocusedState));
-								}else
-									Assert.That(sg.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-							}
-						}else{// orig not pool
-							if(sg.Filter is SGNullFilter || sg.Filter is SGPartsFilter){
-								Assert.That(sg.CurState, Is.EqualTo(SlotGroup.FocusedState));
-							}else{
-								Assert.That(sg.CurState, Is.EqualTo(SlotGroup.DefocusedState));
-							
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 	/*	Assertions
 	*/
 		public void AssertState<T>() where T: SlottableState{
