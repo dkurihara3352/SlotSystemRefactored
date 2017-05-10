@@ -387,7 +387,6 @@ public class SlottableTest {
 		sgm.Focus();
 			AssertSGMFocused();
 	}
-	[Test]
 	public void TestSGProcesses(){
 		sgm.Defocus();
 		sgm.Focus();
@@ -621,6 +620,7 @@ public class SlottableTest {
 			
 			sgm.Focus();
 	}
+	[Test]
 	public void Test(){
 		
 		// TestHover();
@@ -641,11 +641,12 @@ public class SlottableTest {
 
 				AE(sgpAll.CurState, SlotGroup.FocusedState);
 				AB(sgpAll.CurProcess == null, false);
-				AE(sgpAll.PrevState, SlotGroup.SelectedState);
+				// AE(sgpAll.PrevState, SlotGroup.SelectedState);
+				AE(sgpAll.PrevState, SlotGroup.FocusedState);
 				AE(sgpAll.CurProcess.GetType(), typeof(SGDehighlightProcess));
 				AB(sgpAll.CurProcess.IsRunning, true);
 				AE(sgCGears.CurState, SlotGroup.FocusedState);
-				AE(sgCGears.PrevState, SlotGroup.SelectedState);
+				AE(sgCGears.PrevState, SlotGroup.FocusedState);
 				AE(sgCGears.CurProcess.GetType(), typeof(SGDehighlightProcess));
 			PickUp(defQuiverA_p, out picked);
 				AssertPostPickFilter(defQuiverA_p);
