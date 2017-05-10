@@ -9,13 +9,21 @@ namespace SlotSystem{
 		/* States
 		*/	
 			public void SetState(SlottableState state){
-				if(this.m_curState != state){
 					this.m_prevState = this.m_curState;
 					this.m_curState = state;
+				if(this.m_curState != this.m_prevState){
 					this.m_prevState.ExitState(this);
 					this.m_curState.EnterState(this);
 				}
-			}	
+			}
+			SlottableState m_curState;
+				public SlottableState CurState{
+					get{return m_curState;}
+				}
+			SlottableState m_prevState;
+				public SlottableState PrevState{
+					get{return m_prevState;}
+				}
 			static SlottableState m_deactivatedState;
 				public static SlottableState DeactivatedState{
 					get{
@@ -187,20 +195,18 @@ namespace SlotSystem{
 				public static SlottableCommand InstantDeactivateCommand{
 					get{return m_instantDeactivateCommand;}
 				}
+				public void InstantDeactivate(){
+					m_instantDeactivateCommand.Execute(this);
+				}
 			static SlottableCommand m_tapCommand = new SBTapCommand();
 				static public SlottableCommand TapCommand{
 					get{return m_tapCommand;}
 				}
+				public void Tap(){
+					m_tapCommand.Execute(this);
+				}
 		/* public fields
-		*/			
-			SlottableState m_curState;
-				public SlottableState CurState{
-					get{return m_curState;}
-				}
-			SlottableState m_prevState;
-				public SlottableState PrevState{
-					get{return m_prevState;}
-				}
+		*/	
 			bool m_delayed = true;
 				public bool Delayed{
 					get{return m_delayed;}
@@ -254,29 +260,35 @@ namespace SlotSystem{
 					m_curProcess.Start();
 			}
 			/*	coroutines
-			*/
-				public IEnumeratorMock GradualGrayoutCoroutine(){
+			*/		
+				public IEnumeratorMock GreyoutCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock EquipGradualGrayoutCoroutine(){
+				public IEnumeratorMock UnequipAndGreyoutCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock GradualGrayinCoroutine(){
+				public IEnumeratorMock EquipAndGreyoutCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock EquipGradualGrayinCoroutine(){
+				public IEnumeratorMock GreyinCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock GradualHighlightCoroutine(){
+				public IEnumeratorMock UnequipAndGreyinCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock EquipGradualHighlightCoroutine(){
+				public IEnumeratorMock EquipAndGreyinCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock GradualDehighlightCoroutine(){
+				public IEnumeratorMock HighlightCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock EquipGradualDehighlightCoroutine(){
+				public IEnumeratorMock DehighlightCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock UnequipAndDehighlightCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock EquipAndDehighlightCoroutine(){
 					return null;
 				}
 				public IEnumeratorMock WaitForPointerUpCoroutine(){
@@ -291,9 +303,6 @@ namespace SlotSystem{
 				public IEnumeratorMock PickedUpAndDeselectedCoroutine(){
 					return null;
 				}
-				// public IEnumeratorMock RevertingStateCoroutine(){
-				// 	return null;
-				// }
 				public IEnumeratorMock MoveCoroutine(){
 					return null;
 				}
@@ -303,6 +312,49 @@ namespace SlotSystem{
 				public IEnumeratorMock WaitForNextTouchCoroutine(){
 					return null;
 				}
+				public IEnumeratorMock UnequipCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock EquipCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock UnpickCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock PickUpCoroutine(){
+					return null;
+				}
+				// public IEnumeratorMock InstantGreyoutCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock EquipGreyoutCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock InstantEquipGreyoutCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock InstantGreyinCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock EquipGreyinCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock InstantEquipGreyinCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock EquipHighlightCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock EquipDehighlightCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock UnpickGreyinCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock UnpickGreyoutCoroutine(){
+					// 	return null;
+					// }
+				
 		/*	Event methods
 		*/
 			public void OnPointerDownMock(PointerEventDataMock eventDataMock){
@@ -336,42 +388,22 @@ namespace SlotSystem{
 			m_prevState = Slottable.DeactivatedState;
 			this.m_sgm = sg.SGM;
 		}
-		
-
-		public void Tap(){
-			m_tapCommand.Execute(this);
-			Tapped = true;
-		}
-			public bool Tapped = false;
 		public void PickUp(){
 			SetState(Slottable.PickedUpAndSelectedState);
 			m_pickedAmount = 1;
 		}
-
 		public void Increment(){
 			if(m_item.IsStackable && m_item.Quantity > m_pickedAmount){
 				m_pickedAmount ++;
 			}
 		}
-		public void InstantDeactivate(){
-			m_instantDeactivateCommand.Execute(this);
-		}
-		public void InstantGrayout(){
-			IsInstGOCalled = true;
-		}
-			public bool IsInstGOCalled = false;
-		public void InstantEquipGrayout(){
-			IsInstGOCalled = true;
-		}
-			public bool IsInstEqGOCalled = false;
-		public void InstantGrayin(){
-			IsInstGICalled = true;
-		}
-			public bool IsInstGICalled = false;
-		public void InstantEquipGrayin(){
-			IsInstEqGICalled = true;
-		}
-			public bool IsInstEqGICalled = false;
+		
+		public void InstantGreyout(){}
+		public void InstantEquipAndGreyout(){}
+		public void InstantGreyin(){}
+		public void InstantEquipAndGreyin(){}
+		public void InstantEquip(){}
+		public void InstantUnequip(){}
 		public void Deactivate(){}
 		public void ExecuteTransaction(){
 			SGM.Transaction.Execute();

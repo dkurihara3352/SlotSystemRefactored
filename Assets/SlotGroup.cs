@@ -12,12 +12,28 @@ namespace SlotSystem{
 	
 		/*	states
 		*/
+			public void SetState(SlotGroupState state){
+				m_prevState = m_curState;
+				m_curState = state;
+				if(m_curState != m_prevState){
+					m_prevState.ExitState(this);
+					m_curState.EnterState(this);
+				}	
+			}	
 			SlotGroupState m_curState;
 			public SlotGroupState CurState{
 				get{
 					if(m_curState == null)
-						m_curState = DeactivatedState;
+						m_curState = SlotGroup.DeactivatedState;
 					return m_curState;}
+			}
+			SlotGroupState m_prevState;
+			public SlotGroupState PrevState{
+				get{
+					if(m_prevState == null)
+						m_prevState = SlotGroup.DeactivatedState;
+					return m_prevState;
+				}
 			}
 			private static SlotGroupState m_deactivatedState;
 			public static SlotGroupState DeactivatedState{
@@ -54,15 +70,11 @@ namespace SlotSystem{
 
 		/*	public fields
 		*/
-			
 			AxisScrollerMock m_scroller;
 			public AxisScrollerMock Scroller{
 				get{return m_scroller;}
 				set{m_scroller = value;}
 			}
-			
-		
-			
 			Inventory m_inventory;
 				public Inventory Inventory{
 					get{return m_inventory;}
@@ -84,8 +96,7 @@ namespace SlotSystem{
 			public List<Slot> Slots{
 				get{return m_slots;}
 				set{m_slots = value;}
-			}
-			
+			}			
 			List<SlottableItem> m_filteredItems;
 				public List<SlottableItem> FilteredItems{
 					get{return m_filteredItems;}
@@ -98,7 +109,6 @@ namespace SlotSystem{
 				get{return m_sgm;}
 				set{m_sgm = value;}
 			}
-
 			public bool IsPool{
 				get{
 					bool flag = true;
@@ -110,7 +120,7 @@ namespace SlotSystem{
 			public bool AutoSort = true;
 		
 		/* commands
-		*/	
+		*/
 			SlotGroupCommand m_wakeUpCommand = new SGWakeupCommand();
 				public SlotGroupCommand WakeUpCommand{
 					get{return m_wakeUpCommand;}
@@ -209,6 +219,40 @@ namespace SlotSystem{
 			public void OnHoverExitMock(PointerEventDataMock eventData){
 				CurState.OnHoverExitMock(this, eventData);
 			}
+		/*	process
+		*/
+			SGProcess m_curProcess;
+			public SGProcess CurProcess{
+				get{return m_curProcess;}
+			}
+			public void SetAndRun(SGProcess process){
+				if(m_curProcess != null)
+					m_curProcess.Stop();
+				m_curProcess = process;
+				if(m_curProcess != null)
+					m_curProcess.Start();
+			}
+		/*	coroutines
+		*/
+			public IEnumeratorMock GreyoutCoroutine(){
+				return null;
+			}
+			public IEnumeratorMock DehighlightCoroutine(){
+				return null;
+			}
+			public IEnumeratorMock HighlightCoroutine(){
+				return null;
+			}
+			public IEnumeratorMock GreyinCoroutine(){
+				return null;
+			}
+			public IEnumeratorMock InstantGreyoutCoroutine(){
+				return null;
+			}
+			public IEnumeratorMock InstantGreyinCoroutine(){
+				return null;
+			}
+
 		public void Activate(){
 			InitializeItems();
 		}
@@ -220,12 +264,7 @@ namespace SlotSystem{
 				}
 			}
 		}
-		public void SetState(SlotGroupState state){
-			if(m_curState != state){
-				m_curState = state;
-				// UpdateSbState();
-			}
-		}	
+		
 		public Slottable GetSlottable(InventoryItemInstanceMock itemInst){
 			foreach(Slot slot in this.Slots){
 				if(slot.Sb != null){
@@ -294,6 +333,22 @@ namespace SlotSystem{
 					return slot;
 			}
 			return null;
+		}
+		public Slot GetNextEmptySlot(){
+			if(IsExpandable){
+				Slot newSlot = new Slot();
+				Slots.Add(newSlot);
+				return newSlot;
+			}else{
+				foreach(Slot slot in Slots){
+					if(slot.Sb == null)
+						return slot;
+				}
+			}
+			return null;
+		}
+		public void TransactionUpdate(Slottable added, Slottable removed){
+
 		}
 	}
 }

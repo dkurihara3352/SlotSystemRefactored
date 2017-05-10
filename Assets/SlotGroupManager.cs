@@ -78,12 +78,22 @@ namespace SlotSystem{
 				public IEnumeratorMock ProbingStateCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock RevertStateCoroutine(){
+				public IEnumeratorMock WaitForRevertDone(){
 					bool done = true;
-					done &= m_SBADoneTransaction;
-					done &= m_SBBDoneTransaction;
-					done &= m_SGADoneTransaction;
-					done &= m_SGBDoneTransaction;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
+					if(done)
+						this.CurProcess.Expire();
+					return null;
+				}
+				public IEnumeratorMock WaitForFillDone(){
+					bool done = true;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
 					if(done)
 						this.CurProcess.Expire();
 					return null;
@@ -146,6 +156,11 @@ namespace SlotSystem{
 					if(m_selectedSB != sb){
 						m_selectedSB = sb;
 						UpdateTransaction();
+						if(sb != null){
+							m_selectedSBDoneTransaction = false;
+						}else{
+							m_selectedSBDoneTransaction = true;
+						}
 					}
 				}
 			SlotGroup m_selectedSG;
@@ -156,6 +171,11 @@ namespace SlotSystem{
 					if(m_selectedSG != sg){
 						m_selectedSG = sg;
 						UpdateTransaction();
+						if(sg != null){
+							m_selectedSGDoneTransaction = false;
+						}else{
+							m_selectedSGDoneTransaction = true;
+						}
 					}
 				}
 			Slottable m_pickedSB;
@@ -164,6 +184,14 @@ namespace SlotSystem{
 				}
 				public void SetPickedSB(Slottable sb){
 					this.m_pickedSB = sb;
+					if(sb != null){
+						m_pickedSBDoneTransaction = false;
+						m_origSGDoneTransaction = false;
+					}else{
+						m_pickedSBDoneTransaction = true;
+						m_origSGDoneTransaction = true;
+					}
+
 				}
 			InventoryManagerPage m_rootPage;
 				public InventoryManagerPage RootPage{
@@ -172,83 +200,51 @@ namespace SlotSystem{
 				public void SetRootPage(InventoryManagerPage rootPage){
 					m_rootPage = rootPage;
 					m_rootPage.SGM = this;
+				}		
+		/*	Transaction misc
+		*/
+			public void CompleteTransactionOnSB(Slottable sb){
+				if(sb == PickedSB) m_pickedSBDoneTransaction = true;
+				else if(sb == SelectedSB) m_selectedSBDoneTransaction = true;
+				IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
+			}
+			public void CompleteTransactionOnSG(SlotGroup sg){
+				if(sg == GetSlotGroup(PickedSB)) m_origSGDoneTransaction = true;
+				else if(sg == SelectedSG) m_selectedSGDoneTransaction = true;
+				IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
+			}
+			public void CompleteAllTransaction(){
+				Transaction.OnComplete();
+			}
+			bool m_pickedSBDoneTransaction = true;
+				public bool PickedSBDoneTransaction{
+					get{return m_pickedSBDoneTransaction;}
 				}
-			
-		
-			
-			/*	Transaction misc
-			*/
-				Slottable m_SBA;
-					public Slottable SBA{
-						get{return m_SBA;}
-					}
-					public void SetSBA(Slottable sb){
-						m_SBA = sb;
-						if(sb == null)
-							m_SBADoneTransaction = true;
-						else
-							m_SBADoneTransaction = false;
-					}
-				Slottable m_SBB;
-					public Slottable SBB{
-						get{return m_SBB;}
-					}
-					public void SetSBB(Slottable sb){
-						m_SBB = sb;
-						if(sb == null)
-							m_SBBDoneTransaction = true;
-						else
-							m_SBBDoneTransaction = false;
-					}
-				Slottable m_SGA;
-					public Slottable SGA{
-						get{return m_SGA;}
-					}
-					public void SetSGA(Slottable sb){
-						m_SGA = sb;
-						if(sb == null)
-							m_SGADoneTransaction = true;
-						else
-							m_SGADoneTransaction = false;
-					}
-				Slottable m_SGB;
-					public Slottable SGB{
-						get{return m_SGB;}
-					}
-					public void SetSGB(Slottable sb){
-						m_SGB = sb;
-						if(sb == null)
-							m_SGBDoneTransaction = true;
-						else
-							m_SGBDoneTransaction = false;
-					}
-				public void CompleteTransaction(Slottable sb){
-					if(sb == SBA) m_SBADoneTransaction = true;
-					else if(sb == SBB) m_SBBDoneTransaction = true;
-					IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
+			public void SetPickedSBDoneTransaction(bool done){
+				m_pickedSBDoneTransaction = done;
+			}
+			bool m_selectedSBDoneTransaction = true;
+				public bool SelectedSBDoneTransaction{
+					get{return m_selectedSBDoneTransaction;}
 				}
-				public void CompleteTransaction(SlotGroup sg){
-					if(sg == SGA) m_SGADoneTransaction = true;
-					else if(sg == SGB) m_SGBDoneTransaction = true;
-					IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
+			public void SetSelectedSBDoneTransaction(bool done){
+				m_selectedSBDoneTransaction = done;
+			}
+			bool m_origSGDoneTransaction = true;
+				public bool OrigSGDoneTransaction{
+					get{return m_origSGDoneTransaction;}
 				}
-				bool m_SBADoneTransaction = true;
-					public bool SBADoneTransaction{
-						get{return m_SBADoneTransaction;}
-					}
-				bool m_SBBDoneTransaction = true;
-					public bool SBBDoneTransaction{
-						get{return m_SBBDoneTransaction;}
-					}
-				bool m_SGADoneTransaction = true;
-					public bool SGADoneTransaction{
-						get{return m_SGADoneTransaction;}
-					}
-				bool m_SGBDoneTransaction = true;
-				public bool SGBDoneTransaction{
-					get{return m_SGBDoneTransaction;}
-				}
-			/**/
+			public void SetOrigSGDoneTransaction(bool done){
+				m_origSGDoneTransaction = done;
+			}
+			bool m_selectedSGDoneTransaction = true;
+			public bool SelectedSGDoneTransaction{
+				get{return m_selectedSGDoneTransaction;}
+			}
+			public void SetSelectedSGDoneTransaction(bool done){
+				m_selectedSGDoneTransaction = done;
+			}
+		/**/
 		public void SetSG(SlotGroup sg){
 			if(m_slotGroups == null)
 				m_slotGroups = new List<SlotGroup>();
@@ -256,10 +252,6 @@ namespace SlotSystem{
 			sg.SGM = this;
 		}
 		public void Initialize(){
-			
-			// InitializeItems();
-			// InitializeProcesses();
-			// SetState(SlotGroupManager.DefocusedState);
 			m_rootPage.Activate();
 		}
 		
@@ -280,30 +272,9 @@ namespace SlotSystem{
 				sg.InitializeItems();
 			}
 		}
-		
-		// public void ChangeFocus(SlotGroup sg){
-		// 	//first spot the scroller siblings
-		// 	List<SlotGroup> scrollerSiblings = new List<SlotGroup>();
-		// 	foreach(SlotGroup slotG in m_slotGroups){
-		// 		if(slotG.Scroller != null){
-		// 			if(slotG.Scroller == sg.Scroller)
-		// 				scrollerSiblings.Add(slotG);
-		// 		}
-		// 	}
-		// 	foreach(SlotGroup slotG in scrollerSiblings){
-		// 		if(slotG != sg)
-		// 			slotG.SetState(SlotGroup.DefocusedState);
-		// 		else
-		// 			slotG.SetState(SlotGroup.FocusedState);
-		// 		slotG.UpdateSbState();
-		// 	}
-		// }
-
 		public SlotGroup GetSlotGroup(Slottable sb){
-			return this.RootPage.GetSlotGroup(sb);
-			
+			return this.RootPage.GetSlotGroup(sb);	
 		}
-		
 		public void SetState(SGMState sgmState){
 			if(CurState != sgmState){
 				m_prevState = CurState;
@@ -349,10 +320,11 @@ namespace SlotSystem{
 				m_selectedSG.SetState(SlotGroup.FocusedState);
 			m_selectedSG = null;
 			m_pickedSB = null;
-			SetSBA(null);
-			SetSBB(null);
-			SetSGA(null);
-			SetSGB(null);
+			
+			m_pickedSBDoneTransaction = true;
+			m_selectedSBDoneTransaction = true;
+			m_origSGDoneTransaction = true;
+			m_selectedSGDoneTransaction = true;
 		}
 		public BowInstanceMock GetEquippedBow(){
 			foreach(SlotGroup sg in SlotGroups){
@@ -382,7 +354,7 @@ namespace SlotSystem{
 			}
 			return result;
 		}
-		public void CompleteAllTransactionMock(){
+		public void ClearAndReset(){
 			this.SetTransaction(null);
 			this.SetState(SlotGroupManager.FocusedState);
 			this.ClearFields();
