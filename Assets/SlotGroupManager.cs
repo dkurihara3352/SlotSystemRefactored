@@ -48,18 +48,10 @@ namespace SlotSystem{
 					if(m_postPickFilterCommand != null)
 					m_postPickFilterCommand.Execute(this);
 				}
-			// SGMCommand m_prePickFilterCommand;
-			// 	public SGMCommand PrePickFilterCommand{
-			// 		get{return m_prePickFilterCommand;}
-			// 	}
-			// 	public void SetPrePickFilterCommand(SGMCommand comm){
-			// 		m_prePickFilterCommand = comm;
-			// 	}
-			// 	public void PrePickFilter(){
-			// 		if(m_prePickFilterCommand != null)
-			// 		m_prePickFilterCommand.Execute(this);
-			// 	}
 			
+			
+			
+				
 		/*	process
 		*/
 			SGMProcess m_curProcess;
@@ -89,6 +81,27 @@ namespace SlotSystem{
 					return null;
 				}
 				public IEnumeratorMock WaitForFillDone(){
+					bool done = true;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
+					if(done)
+						this.CurProcess.Expire();
+					return null;
+				}
+				public IEnumeratorMock WaitForFillEquipDone(){
+					bool done = true;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
+					if(done)
+						this.CurProcess.Expire();
+					return null;
+				}
+				
+				public IEnumeratorMock WaitForUnequipDone(){
 					bool done = true;
 					done &= m_pickedSBDoneTransaction;
 					done &= m_selectedSBDoneTransaction;
@@ -156,11 +169,11 @@ namespace SlotSystem{
 					if(m_selectedSB != sb){
 						m_selectedSB = sb;
 						UpdateTransaction();
-						if(sb != null){
-							m_selectedSBDoneTransaction = false;
-						}else{
-							m_selectedSBDoneTransaction = true;
-						}
+						// if(sb != null){
+						// 	m_selectedSBDoneTransaction = false;
+						// }else{
+						// 	m_selectedSBDoneTransaction = true;
+						// }
 					}
 				}
 			SlotGroup m_selectedSG;
@@ -171,11 +184,11 @@ namespace SlotSystem{
 					if(m_selectedSG != sg){
 						m_selectedSG = sg;
 						UpdateTransaction();
-						if(sg != null){
-							m_selectedSGDoneTransaction = false;
-						}else{
-							m_selectedSGDoneTransaction = true;
-						}
+						// if(sg != null){
+						// 	m_selectedSGDoneTransaction = false;
+						// }else{
+						// 	m_selectedSGDoneTransaction = true;
+						// }
 					}
 				}
 			Slottable m_pickedSB;
@@ -184,14 +197,13 @@ namespace SlotSystem{
 				}
 				public void SetPickedSB(Slottable sb){
 					this.m_pickedSB = sb;
-					if(sb != null){
-						m_pickedSBDoneTransaction = false;
-						m_origSGDoneTransaction = false;
-					}else{
-						m_pickedSBDoneTransaction = true;
-						m_origSGDoneTransaction = true;
-					}
-
+					// if(sb != null){
+					// 	m_pickedSBDoneTransaction = false;
+					// 	m_origSGDoneTransaction = false;
+					// }else{
+					// 	m_pickedSBDoneTransaction = true;
+					// 	m_origSGDoneTransaction = true;
+					// }
 				}
 			InventoryManagerPage m_rootPage;
 				public InventoryManagerPage RootPage{
@@ -253,6 +265,7 @@ namespace SlotSystem{
 		}
 		public void Initialize(){
 			m_rootPage.Activate();
+			UpdateEquipStatus();
 		}
 		
 		public void Focus(){
@@ -314,28 +327,32 @@ namespace SlotSystem{
 				}
 			}
 		}
-		public void ClearFields(){
-			m_selectedSB = null;
-			if(m_selectedSG != null)
-				m_selectedSG.SetState(SlotGroup.FocusedState);
-			m_selectedSG = null;
-			m_pickedSB = null;
-			
-			m_pickedSBDoneTransaction = true;
-			m_selectedSBDoneTransaction = true;
-			m_origSGDoneTransaction = true;
-			m_selectedSGDoneTransaction = true;
+		public EquipmentSet GetFocusedEquipSet(){
+			return (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
 		}
 		public BowInstanceMock GetEquippedBow(){
-			foreach(SlotGroup sg in SlotGroups){
-				if(!sg.IsPool && sg.Filter.GetType() == typeof(SGBowFilter))
+			// foreach(SlotGroup sg in SlotGroups){
+			// 	if(!sg.IsPool && sg.Filter.GetType() == typeof(SGBowFilter))
+			// 		return (BowInstanceMock)sg.Slots[0].Sb.Item;
+			// }
+
+			// return null;
+			foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){
+				SlotGroup sg = (SlotGroup)ele;
+				if(sg.Filter is SGBowFilter)
 					return (BowInstanceMock)sg.Slots[0].Sb.Item;
 			}
 			return null;
 		}
 		public WearInstanceMock GetEquippedWear(){
-			foreach(SlotGroup sg in SlotGroups){
-				if(!sg.IsPool && sg.Filter.GetType() == typeof(SGWearFilter))
+			// foreach(SlotGroup sg in SlotGroups){
+			// 	if(!sg.IsPool && sg.Filter.GetType() == typeof(SGWearFilter))
+			// 		return (WearInstanceMock)sg.Slots[0].Sb.Item;
+			// }
+			// return null;
+			foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){
+				SlotGroup sg = (SlotGroup)ele;
+				if(sg.Filter is SGWearFilter)
 					return (WearInstanceMock)sg.Slots[0].Sb.Item;
 			}
 			return null;
@@ -358,7 +375,19 @@ namespace SlotSystem{
 			this.SetTransaction(null);
 			this.SetState(SlotGroupManager.FocusedState);
 			this.ClearFields();
-			Focus();
+			// Focus();
+		}
+		public void ClearFields(){
+			m_selectedSB = null;
+			if(m_selectedSG != null && m_selectedSG.CurState != SlotGroup.FocusedState)
+				m_selectedSG.SetState(SlotGroup.FocusedState);
+			m_selectedSG = null;
+			m_pickedSB = null;
+			
+			m_pickedSBDoneTransaction = true;
+			m_selectedSBDoneTransaction = true;
+			m_origSGDoneTransaction = true;
+			m_selectedSGDoneTransaction = true;
 		}
 		public void Deactivate(){
 			SetState(SlotGroupManager.DeactivatedState);
@@ -371,7 +400,40 @@ namespace SlotSystem{
 		public SlotGroup GetFocusedPoolSG(){
 			SlotSystemElement focusedEle = RootPage.PoolBundle.GetFocusedBundleElement();
 			return (SlotGroup)focusedEle;
-		} 
+		}
+		public void DestroyDraggedIcon(){}
+		public void UpdateEquipStatus(){
+			GetEquippedBow().IsEquipped = true;
+			GetEquippedWear().IsEquipped = true;
+			foreach(CarriedGearInstanceMock cGear in GetEquippedCarriedGears()){
+				cGear.IsEquipped = true;
+			}
+			SlotGroup poolSG = GetFocusedPoolSG();
+			foreach(InventoryItemInstanceMock item in poolSG.Inventory.Items){
+				if(item.IsEquipped){
+					if(item is BowInstanceMock){
+						if(GetEquippedBow() != (BowInstanceMock)item)
+							item.IsEquipped = false;
+					}else if(item is WearInstanceMock){
+						if(GetEquippedWear() != (WearInstanceMock)item)
+							item.IsEquipped = false;
+					}else if(item is CarriedGearInstanceMock){
+						List<CarriedGearInstanceMock> cGears = GetEquippedCarriedGears();
+						if(cGears.Count == 0)
+							item.IsEquipped = false;
+						else{
+							bool found = false;
+							foreach(CarriedGearInstanceMock cGear in cGears){
+								if(cGear == (CarriedGearInstanceMock)item)
+									found = true;
+							}
+							if(!found)
+								item.IsEquipped = false;
+						}
+					}
+				}
+			}
+		}
 	}
 
 }

@@ -67,6 +67,14 @@ namespace SlotSystem{
 					return m_selectedState;
 				}
 			}
+			private static SlotGroupState m_performingTransactionState;
+			public static SlotGroupState PerformingTransactionState{
+				get{
+					if(m_performingTransactionState == null)
+						m_performingTransactionState = new SGPerformingTransactionState();
+					return m_performingTransactionState;
+				}
+			}
 
 		/*	public fields
 		*/
@@ -153,14 +161,14 @@ namespace SlotSystem{
 				public void CreateSlottables(){
 					m_createSbsCommand.Execute(this);
 				}
-			SlotGroupCommand m_updateEquipStatusCommand;
-				public SlotGroupCommand UpdateEquipStatusCommand{
-					get{return m_updateEquipStatusCommand;}
-					set{m_updateEquipStatusCommand = value;}
-				}
-				public void UpdateEquipStatus(){
-					m_updateEquipStatusCommand.Execute(this);
-				}
+			// SlotGroupCommand m_updateEquipStatusCommand;
+			// 	public SlotGroupCommand UpdateEquipStatusCommand{
+			// 		get{return m_updateEquipStatusCommand;}
+			// 		set{m_updateEquipStatusCommand = value;}
+			// 	}
+			// 	public void UpdateEquipStatus(){
+			// 		m_updateEquipStatusCommand.Execute(this);
+			// 	}
 			SlotGroupCommand m_focusCommand = new SGFocusCommandV2();
 				public SlotGroupCommand FocusCommand{
 					get{return m_focusCommand;}
@@ -252,6 +260,9 @@ namespace SlotSystem{
 			public IEnumeratorMock InstantGreyinCoroutine(){
 				return null;
 			}
+			public IEnumeratorMock UpdateTransactionCoroutine(){
+				return null;
+			}
 
 		public void Activate(){
 			InitializeItems();
@@ -265,12 +276,12 @@ namespace SlotSystem{
 			}
 		}
 		
-		public Slottable GetSlottable(InventoryItemInstanceMock itemInst){
+		public Slottable GetSlottable(SlottableItem itemInst){
 			foreach(Slot slot in this.Slots){
 				if(slot.Sb != null){
 					InventoryItemInstanceMock invItemInst = (InventoryItemInstanceMock)slot.Sb.Item;
 					if(itemInst.IsStackable){
-						if(invItemInst == itemInst)
+						if(invItemInst == (InventoryItemInstanceMock)itemInst)
 							return slot.Sb;
 					}else if(object.ReferenceEquals(itemInst, invItemInst))
 						return slot.Sb;
@@ -348,7 +359,49 @@ namespace SlotSystem{
 			return null;
 		}
 		public void TransactionUpdate(Slottable added, Slottable removed){
+			SetState(SlotGroup.PerformingTransactionState);
+			/*	addition
+			*/
+			if(added != null && !Inventory.Items.Contains(added.Item)){
+				Slot emptySlot = GetNextEmptySlot();
+				GameObject newSBGO = new GameObject("newSlottableGO");
+				Slottable newSlottable = newSBGO.AddComponent<Slottable>();
+				newSlottable.Initialize(this, true, (InventoryItemInstanceMock)added.Item);
 
+				if(emptySlot != null){
+					emptySlot.Sb = newSlottable;
+				}else{// got to be expandable
+					Slot newSlot = new Slot();
+					newSlot.Sb = newSlottable;
+					Slots.Add(newSlot);
+				}
+				Inventory.AddItem(added.Item);
+			}
+			/*	removal
+			*/
+			if(removed != null && GetSlottable(removed.Item) != null){
+				EquipmentSet focusedEquipSet = (EquipmentSet)SGM.RootPage.EquipBundle.GetFocusedBundleElement();
+				if(focusedEquipSet.ContainsElement(this))
+					// Inventory.Items.Remove(removed.Item);
+					Inventory.RemoveItem(removed.Item);
+			}
+		}
+		public void RemoveSB(Slottable sb){
+			/*	sb-slot relation stays intact until process is completed
+			*/
+			foreach(Slot slot in Slots){
+				if(slot.Sb != null){
+					if(slot.Sb == sb){
+						if(SGM.PickedSB == sb)
+							SGM.SetPickedSB(null);
+						else if(SGM.SelectedSB == sb)
+							SGM.SetSelectedSB(null);
+						slot.Sb = null;
+						DestroyImmediate(sb.gameObject);
+						DestroyImmediate(sb);
+					}
+				}
+			}
 		}
 	}
 }

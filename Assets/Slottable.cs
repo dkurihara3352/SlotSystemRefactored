@@ -93,7 +93,7 @@ namespace SlotSystem{
 					}
 				}
 			static SlottableState m_pickedUpAndSelectedState;
-				public static SlottableState PickedUpAndSelectedState{
+				public static SlottableState PickedAndSelectedState{
 					get{
 						if(Slottable.m_pickedUpAndSelectedState != null)
 							return Slottable.m_pickedUpAndSelectedState;
@@ -104,7 +104,7 @@ namespace SlotSystem{
 					}
 				}
 			static SlottableState m_pickedUpAndDeselectedState;
-				public static SlottableState PickedUpAndDeselectedState{
+				public static SlottableState PickedAndDeselectedState{
 					get{
 						if(Slottable.m_pickedUpAndDeselectedState != null)
 							return Slottable.m_pickedUpAndDeselectedState;
@@ -128,15 +128,27 @@ namespace SlotSystem{
 			static SlottableState m_movingState;
 				public static SlottableState MovingState{
 					get{
-						if(Slottable.m_movingState != null)
-							return Slottable.m_movingState;
-						else{
+						if(Slottable.m_movingState == null)
 							Slottable.m_movingState = new MovingState();
-							return Slottable.m_movingState;
-						}
+						return Slottable.m_movingState;	
 					}
 				}
-
+			static SlottableState m_removingState;
+				public static SlottableState RemovingState{
+					get{
+						if(m_removingState == null)
+							m_removingState = new SBRemovingState();
+						return m_removingState;
+					}
+				}
+			static SlottableState m_equippingState;
+				public static SlottableState EquippingState{
+					get{
+						if(m_equippingState == null)
+							m_equippingState = new SBEquippingState();
+						return m_equippingState;
+					}
+				}
 			static SlottableState m_equippedAndDeselectedState;
 				public static SlottableState EquippedAndDeselectedState{
 					get{
@@ -178,17 +190,14 @@ namespace SlotSystem{
 							return Slottable.m_selectedState;
 					}
 				}
-			// static SlottableState m_revertingState;
-				// public static SlottableState RevertingState{
-				// 	get{
-				// 		if(Slottable.m_revertingState != null)
-				// 			return Slottable.m_revertingState;
-				// 		else
-				// 			Slottable.m_revertingState = new SBRevertingState();
-				// 			return Slottable.m_revertingState;
-				// 	}
-				// }
-		
+			static SlottableState m_unpickingState;
+				public static SlottableState UnpickingState{
+					get{
+						if(Slottable.m_unpickingState == null)
+							Slottable.m_unpickingState = new SBUnpickingState();
+						return Slottable.m_unpickingState;			
+					}
+				}
 		/* commands
 		*/
 			static SlottableCommand m_instantDeactivateCommand = new DefInstantDeactivateCommand();
@@ -235,6 +244,16 @@ namespace SlotSystem{
 						InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)m_item;
 						return invInst.IsEquipped;
 					}
+				}
+				public void Equip(){
+					InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)m_item;
+					invInst.IsEquipped = true;
+					m_isEquipped = true;
+				}
+				public void Unequip(){
+					InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)m_item;
+					invInst.IsEquipped = false;
+					m_isEquipped = false;
 				}
 			SlotGroup m_destinationSG;
 				public SlotGroup DestinationSG{
@@ -315,7 +334,7 @@ namespace SlotSystem{
 				public IEnumeratorMock UnequipCoroutine(){
 					return null;
 				}
-				public IEnumeratorMock EquipCoroutine(){
+				public IEnumeratorMock EquippingCoroutine(){
 					return null;
 				}
 				public IEnumeratorMock UnpickCoroutine(){
@@ -324,36 +343,12 @@ namespace SlotSystem{
 				public IEnumeratorMock PickUpCoroutine(){
 					return null;
 				}
-				// public IEnumeratorMock InstantGreyoutCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock EquipGreyoutCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock InstantEquipGreyoutCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock InstantGreyinCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock EquipGreyinCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock InstantEquipGreyinCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock EquipHighlightCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock EquipDehighlightCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock UnpickGreyinCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock UnpickGreyoutCoroutine(){
-					// 	return null;
-					// }
+				public IEnumeratorMock RemovingCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock UnpickingCoroutine(){
+					return null;
+				}
 				
 		/*	Event methods
 		*/
@@ -383,13 +378,15 @@ namespace SlotSystem{
 			}
 		/**/
 		
-		public void Initialize(SlotGroup sg){
+		public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
 			m_curState = Slottable.DeactivatedState;
 			m_prevState = Slottable.DeactivatedState;
 			this.m_sgm = sg.SGM;
+			Delayed = delayed;
+			this.SetItem(item);
 		}
 		public void PickUp(){
-			SetState(Slottable.PickedUpAndSelectedState);
+			SetState(Slottable.PickedAndSelectedState);
 			m_pickedAmount = 1;
 		}
 		public void Increment(){
@@ -408,9 +405,8 @@ namespace SlotSystem{
 		public void ExecuteTransaction(){
 			SGM.Transaction.Execute();
 		}
-		public void Move(SlotGroup sg, Slot slot){
+		public void MoveIcon(SlotGroup sg, Slot slot){
 			SetDestination(sg, slot);
-			this.SetState(Slottable.MovingState);
 		}
 		public void SetDestination(SlotGroup sg, Slot slot){
 			this.m_destinationSG = sg;

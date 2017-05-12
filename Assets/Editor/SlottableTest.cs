@@ -67,7 +67,7 @@ public class SlottableTest {
 				sgpAll = sgpAllGO.AddComponent<SlotGroup>();
 				sgpAll.Filter = new SGNullFilter();
 				sgpAll.Sorter = new SGItemIndexSorter();
-				sgpAll.UpdateEquipStatusCommand = new UpdateEquipStatusForPoolCommmand();
+				// sgpAll.UpdateEquipStatusCommand = new UpdateEquipStatusForPoolCommmand();
 				PoolInventory inventory = new PoolInventory();
 				sgpAll.SetInventory(inventory);
 				sgpAll.IsShrinkable = true;
@@ -78,7 +78,7 @@ public class SlottableTest {
 				sgBow = sgBowGO.AddComponent<SlotGroup>();
 				sgBow.Filter = new SGBowFilter();
 				sgBow.Sorter = new SGItemIndexSorter();
-				sgBow.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
+				// sgBow.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
 				EquipmentSetInventory equipInventory = new EquipmentSetInventory();
 				sgBow.SetInventory(equipInventory);
 				sgBow.IsShrinkable = false;
@@ -94,7 +94,7 @@ public class SlottableTest {
 				sgWear = sgWearGO.AddComponent<SlotGroup>();
 				sgWear.Filter = new SGWearFilter();
 				sgWear.Sorter = new SGItemIndexSorter();
-				sgWear.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
+				// sgWear.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
 				sgWear.SetInventory(equipInventory);
 				sgWear.IsShrinkable = false;
 				sgWear.IsExpandable = false;
@@ -109,7 +109,7 @@ public class SlottableTest {
 				sgpParts = sgpPartsGO.AddComponent<SlotGroup>();
 				sgpParts.Filter = new SGPartsFilter();
 				sgpParts.Sorter = new SGItemIndexSorter();
-				sgpParts.UpdateEquipStatusCommand = new UpdateEquipStatusForPoolCommmand();
+				// sgpParts.UpdateEquipStatusCommand = new UpdateEquipStatusForPoolCommmand();
 				sgpParts.SetInventory(inventory);
 				sgpParts.IsShrinkable = true;
 				sgpParts.IsExpandable = true;
@@ -119,7 +119,7 @@ public class SlottableTest {
 				sgCGears = sgCGearsGO.AddComponent<SlotGroup>();
 				sgCGears.Filter = new SGCarriedGearFilter();
 				sgCGears.Sorter = new SGItemIndexSorter();
-				sgCGears.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
+				// sgCGears.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
 				sgCGears.SetInventory(equipInventory);
 				sgCGears.IsShrinkable = true;
 				sgCGears.IsExpandable = false;
@@ -142,14 +142,14 @@ public class SlottableTest {
 				
 				BowInstanceMock defBowA = new BowInstanceMock();//	equipped
 				defBowA.Item = defBow;
-				sgpAll.Inventory.Add(defBowA);
-				sgBow.Inventory.Add(defBowA);
+				sgpAll.Inventory.AddItem(defBowA);
+				sgBow.Inventory.AddItem(defBowA);
 				BowInstanceMock defBowB = new BowInstanceMock();
 				defBowB.Item = defBow;
-				sgpAll.Inventory.Add(defBowB);
+				sgpAll.Inventory.AddItem(defBowB);
 				BowInstanceMock crfBowA = new BowInstanceMock();
 				crfBowA.Item = crfBow;
-				sgpAll.Inventory.Add(crfBowA);
+				sgpAll.Inventory.AddItem(crfBowA);
 			/*	wears
 			*/
 					WearMock defWear = new WearMock();
@@ -159,14 +159,14 @@ public class SlottableTest {
 					
 					WearInstanceMock defWearA = new WearInstanceMock();//	equipped
 					defWearA.Item = defWear;
-					sgpAll.Inventory.Add(defWearA);
-					sgWear.Inventory.Add(defWearA);
+					sgpAll.Inventory.AddItem(defWearA);
+					sgWear.Inventory.AddItem(defWearA);
 					WearInstanceMock defWearB = new WearInstanceMock();
 					defWearB.Item = defWear;
-					sgpAll.Inventory.Add(defWearB);
+					sgpAll.Inventory.AddItem(defWearB);
 					WearInstanceMock crfWearA = new WearInstanceMock();
 					crfWearA.Item = crfWear;
-					sgpAll.Inventory.Add(crfWearA);
+					sgpAll.Inventory.AddItem(crfWearA);
 			/*	parts
 			*/ 
 				PartsMock defParts = new PartsMock();
@@ -179,15 +179,15 @@ public class SlottableTest {
 				PartsInstanceMock defPartsA = new PartsInstanceMock();
 				defPartsA.Item = defParts;
 				defPartsA.Quantity = 10;
-				sgpAll.Inventory.Add(defPartsA);
+				sgpAll.Inventory.AddItem(defPartsA);
 				PartsInstanceMock defPartsB = new PartsInstanceMock();
 				defPartsB.Item = defParts;
 				defPartsB.Quantity = 5;
-				sgpAll.Inventory.Add(defPartsB);
+				sgpAll.Inventory.AddItem(defPartsB);
 				PartsInstanceMock crfPartsA = new PartsInstanceMock();
 				crfPartsA.Item = crfParts;
 				crfPartsA.Quantity = 3;
-				sgpAll.Inventory.Add(crfPartsA);
+				sgpAll.Inventory.AddItem(crfPartsA);
 
 				Assert.That(defPartsA, Is.EqualTo(defPartsB));
 				Assert.That(object.ReferenceEquals(defPartsA, defPartsB), Is.False);
@@ -228,14 +228,14 @@ public class SlottableTest {
 				PackInstanceMock defPackA = new PackInstanceMock();
 				defPackA.Item = defPack;
 
-				inventory.Add(defShieldA);
-				inventory.Add(crfShieldA);
-				inventory.Add(defMWeaponA);
-				inventory.Add(crfMWeaponA);
-				inventory.Add(defQuiverA);
-				inventory.Add(defPackA);
-				equipInventory.Add(defShieldA);
-				equipInventory.Add(defMWeaponA);
+				inventory.AddItem(defShieldA);
+				inventory.AddItem(crfShieldA);
+				inventory.AddItem(defMWeaponA);
+				inventory.AddItem(crfMWeaponA);
+				inventory.AddItem(defQuiverA);
+				inventory.AddItem(defPackA);
+				equipInventory.AddItem(defShieldA);
+				equipInventory.AddItem(defMWeaponA);
 
 		/**/
 		EquipmentSet equipSetA = new EquipmentSet(sgBow, sgWear, sgCGears);
@@ -626,6 +626,8 @@ public class SlottableTest {
 		// TestHover();
 		/*
 		*/
+		/*	equipping defQuiver
+		*/
 			AE(sgCGears.Slots.Count, 4);
 			AE(sgm.GetEquippedCarriedGears().Count, 2);
 			
@@ -635,22 +637,9 @@ public class SlottableTest {
 			
 			AssertSGMFocused();
 
-			TestSimHover(defQuiverA_p, null, sgCGears, out picked, out selectedSB, out selectedSG, out transaction);
-			AssertSimHover<FillTransaction>(true, null, sgCGears, false);
-
-
-				AE(sgpAll.CurState, SlotGroup.FocusedState);
-				AB(sgpAll.CurProcess == null, false);
-				// AE(sgpAll.PrevState, SlotGroup.SelectedState);
-				AE(sgpAll.PrevState, SlotGroup.FocusedState);
-				AE(sgpAll.CurProcess.GetType(), typeof(SGDehighlightProcess));
-				AB(sgpAll.CurProcess.IsRunning, true);
-				AE(sgCGears.CurState, SlotGroup.FocusedState);
-				AE(sgCGears.PrevState, SlotGroup.FocusedState);
-				AE(sgCGears.CurProcess.GetType(), typeof(SGDehighlightProcess));
 			PickUp(defQuiverA_p, out picked);
 				AssertPostPickFilter(defQuiverA_p);
-				ASSB(defQuiverA_p, Slottable.PickedUpAndSelectedState);
+				ASSB(defQuiverA_p, Slottable.PickedAndSelectedState);
 				AE(sgm.PickedSB, defQuiverA_p);
 				AE(sgm.SelectedSB, defQuiverA_p);
 				AE(sgm.SelectedSG, sgpAll);
@@ -659,48 +648,346 @@ public class SlottableTest {
 			sgm.SimSBHover(null, eventData);
 			sgm.SimSGHover(sgCGears, eventData);
 
-				ASSB(defQuiverA_p, Slottable.PickedUpAndDeselectedState);
+				ASSB(defQuiverA_p, Slottable.PickedAndDeselectedState);
 				AE(sgm.PickedSB, defQuiverA_p);
 				AE(sgm.SelectedSB, null);
 				AE(sgm.SelectedSG, sgCGears);
-				AE(sgm.Transaction.GetType(), typeof(FillTransaction));
+				AE(sgm.Transaction.GetType(), typeof(FillEquipTransaction));
 
-				AE(sgm.PickedSBDoneTransaction, false);
+				AE(sgm.PickedSBDoneTransaction, true);
 				AE(sgm.SelectedSBDoneTransaction, true);
-				AE(sgm.OrigSGDoneTransaction, false);
-				AE(sgm.SelectedSGDoneTransaction, false);
+				AE(sgm.OrigSGDoneTransaction, true);
+				AE(sgm.SelectedSGDoneTransaction, true);
 
 				AE(sgm.CurState, SlotGroupManager.ProbingState);
 				AE(sgm.CurProcess.GetType(), typeof(SGMProbingStateProcess));
 
 				ASSG(sgpAll, SlotGroup.FocusedState);
-				// AB(sgpAll.CurProcess == null, true);
-				
 				ASSG(sgCGears, SlotGroup.SelectedState);
-				// AB(sgCGears.CurProcess == null, true);
-				
-			// bool reverted;
-			// Revert(defQuiverA_p, out reverted);
-			// AB(picked, true); AB(reverted, true);
+			
+			/*	pre transaction
+			*/
+				AB(defQuiverA_p.IsEquipped, false);
+				AB(sgCGears.Inventory.Items.Contains(defQuiverA_p.Item), false);
+				AE(sgCGears.GetSlottable((InventoryItemInstanceMock)defQuiverA_p.Item), null);
 
 			defQuiverA_p.OnPointerUpMock(eventData);
+			/*	post transaction
+			*/
+				AE(sgm.PickedSBDoneTransaction, false);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, false);
+				AE(sgm.SelectedSGDoneTransaction, false);
+
 				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-				AE(sgm.CurProcess.GetType(), typeof(SGMFillTransactionProcess));
-				ASSB(defQuiverA_p, Slottable.MovingState);
-				AE(defQuiverA_p.CurProcess.GetType(), typeof(MoveProcess));
+				AE(sgm.CurProcess.GetType(), typeof(SGMFillEquipTransactionProcess));
+				AE(sgm.GetSlotGroup(defQuiverA_p), sgpAll);
+				
+				AB(sgpAll.Inventory.Items.Contains(defQuiverA_p.Item), true);
+				AE(sgpAll.Slots.Count, 14);
+				AE(sgpAll.GetSlottable((InventoryItemInstanceMock)defQuiverA_p.Item), defQuiverA_p);
+				AB(sgCGears.Inventory.Items.Contains(defQuiverA_p.Item), true);
+				AE(sgCGears.Slots.Count, 4);
+				AB(sgCGears.GetSlottable((InventoryItemInstanceMock)defQuiverA_p.Item) != null, true);
+
+				Slottable defQuiverA_e = sgCGears.GetSlottable((InventoryItemInstanceMock)defQuiverA_p.Item);
+				ASSB(defQuiverA_p, Slottable.EquippingState);
+				AE(defQuiverA_p.PrevState, Slottable.PickedAndDeselectedState);
+				AB(defQuiverA_p.IsEquipped, false);
+				AE(defQuiverA_p.CurProcess.GetType(), typeof(SBEquippingProcess));
 				AE(defQuiverA_p.DestinationSG, sgCGears);
-				AE(defQuiverA_p.DestinationSlot, sgCGears.GetNextEmptySlot());
+				AE(defQuiverA_p.DestinationSlot, sgCGears.GetSlot(defQuiverA_e));
 			
+
+			/*	pre completion SBA
+			*/
 			defQuiverA_p.CurProcess.Expire();
+			/*	post completion SBA
+			*/
 				AB(sgm.PickedSBDoneTransaction, true);
 				AB(sgm.SelectedSBDoneTransaction, true);
 				AB(sgm.OrigSGDoneTransaction, false);
 				AB(sgm.SelectedSGDoneTransaction, false);
-				AE(sgm.CurProcess.GetType(), typeof(SGMFillTransactionProcess));
+				AE(sgm.CurProcess.GetType(), typeof(SGMFillEquipTransactionProcess));
 				AB(sgm.CurProcess.IsRunning, true);
 				AB(sgm.CurProcess.IsExpired, false);
+				
+				ASSG(sgpAll, SlotGroup.PerformingTransactionState);
+				AE(sgpAll.CurProcess.GetType(), typeof(SGUpdateTransactionProcess));
+				AB(sgpAll.CurProcess.IsRunning, true);
+				AB(sgpAll.CurProcess.IsExpired, false);
+				ASSG(sgCGears, SlotGroup.PerformingTransactionState);
+				AE(sgCGears.CurProcess.GetType(), typeof(SGUpdateTransactionProcess));
+				AB(sgCGears.CurProcess.IsRunning, true);
+				AB(sgCGears.CurProcess.IsExpired, false);
 
+				ASSB(defQuiverA_p, Slottable.EquippingState);
+				AE(defQuiverA_p.PrevState, Slottable.PickedAndDeselectedState);//
+				AE(defQuiverA_p.CurProcess.GetType(), typeof(SBEquippingProcess));
+				AB(defQuiverA_p.CurProcess.IsRunning, false);
+				AB(defQuiverA_p.CurProcess.IsExpired, true);
 
+			sgpAll.CurProcess.Expire();
+				AB(sgm.PickedSBDoneTransaction, true);
+				AB(sgm.SelectedSBDoneTransaction, true);
+				AB(sgm.OrigSGDoneTransaction, true);
+				AB(sgm.SelectedSGDoneTransaction, false);
+				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMFillEquipTransactionProcess));
+
+				ASSG(sgpAll, SlotGroup.PerformingTransactionState);
+				AE(sgpAll.CurProcess.GetType(), typeof(SGUpdateTransactionProcess));
+				AE(sgpAll.CurProcess.IsRunning, false);
+				AE(sgpAll.CurProcess.IsExpired, true);
+				
+				ASSG(sgCGears, SlotGroup.PerformingTransactionState);
+				AE(sgCGears.CurProcess.GetType(), typeof(SGUpdateTransactionProcess));
+				AE(sgCGears.CurProcess.IsRunning, true);
+				AE(sgCGears.CurProcess.IsExpired, false);
+
+			sgCGears.CurProcess.Expire();
+				AB(sgm.PickedSBDoneTransaction, true);
+				AB(sgm.SelectedSBDoneTransaction, true);
+				AB(sgm.OrigSGDoneTransaction, true);
+				AB(sgm.SelectedSGDoneTransaction, true);
+				AE(sgm.CurState, SlotGroupManager.FocusedState);
+				AE(sgm.CurProcess, null);
+
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				AE(sgpAll.PrevState, SlotGroup.PerformingTransactionState);
+				AE(sgpAll.CurProcess, null);
+				
+				ASSG(sgCGears, SlotGroup.FocusedState);
+				AE(sgCGears.PrevState, SlotGroup.PerformingTransactionState);
+				AE(sgCGears.CurProcess, null);
+				
+				AB(defQuiverA_p.IsEquipped, true);
+				ASSB(defQuiverA_p, Slottable.EquippedAndDefocusedState);
+				AE(defQuiverA_p.PrevState, Slottable.EquippingState);
+				AE(defQuiverA_p.CurProcess, null);
+				AB(defQuiverA_e.IsEquipped, true);
+				ASSB(defQuiverA_e, Slottable.EquippedAndDeselectedState);
+
+				AE(sgm.GetEquippedCarriedGears().Count , 3);
+		/*	equipping pack
+		*/
+				AssertSGMFocused();
+			PickUp(defPackA_p, out picked);
+			sgm.SimSBHover(null, eventData);
+			sgm.SimSGHover(sgCGears, eventData);
+				AE(sgm.PickedSB, defPackA_p);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, sgCGears);
+
+				AE(sgm.CurState, SlotGroupManager.ProbingState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMProbingStateProcess));
+				AE(sgm.Transaction.GetType(), typeof(FillEquipTransaction));
+
+				AE(sgpAll.PrevState, SlotGroup.SelectedState);
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				AE(sgpAll.CurProcess.GetType(), typeof(SGDehighlightProcess));
+
+				AE(sgCGears.PrevState, SlotGroup.FocusedState);
+				ASSG(sgCGears, SlotGroup.SelectedState);
+				AE(sgCGears.CurProcess.GetType(), typeof(SGHighlightProcess));
+
+				AE(defPackA_p.PrevState, Slottable.PickedAndSelectedState);
+				ASSB(defPackA_p, Slottable.PickedAndDeselectedState);
+				AE(defPackA_p.CurProcess.GetType(), typeof(SBDehighlightProcess));
+				AE(defPackA_p.DestinationSG, null);
+				AE(defPackA_p.DestinationSlot, null);
+
+				AB(sgCGears.GetNextEmptySlot() != null, true);
+			
+			defPackA_p.OnPointerUpMock(eventData);
+			sgpAll.CurProcess.Expire();
+			defPackA_p.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+
+				AE(sgm.PickedSB, null);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, null);
+
+				AE(sgm.CurState, SlotGroupManager.FocusedState);
+				AE(sgm.CurProcess, null);
+				AE(sgm.Transaction, null);
+
+				AE(sgpAll.PrevState, SlotGroup.PerformingTransactionState);
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				AE(sgpAll.CurProcess, null);
+
+				AE(sgCGears.PrevState, SlotGroup.PerformingTransactionState);
+				ASSG(sgCGears, SlotGroup.FocusedState);
+				AE(sgCGears.CurProcess, null);
+
+				AE(defPackA_p.PrevState, Slottable.EquippingState);
+				ASSB(defPackA_p, Slottable.EquippedAndDefocusedState);
+				AE(defPackA_p.CurProcess, null);
+				AB(defPackA_p.IsEquipped, true);
+				AE(defPackA_p.DestinationSG, null);
+				AE(defPackA_p.DestinationSlot, null);
+
+				AB(sgCGears.GetNextEmptySlot() != null, false);
+				AE(sgm.GetEquippedCarriedGears().Count, 4);
+				AB(sgCGears.GetSlottable((InventoryItemInstanceMock)defPackA_p.Item) == null, false);
+
+				Slottable defPackA_e = sgCGears.GetSlottable((InventoryItemInstanceMock)defPackA_p.Item);
+				ASSB(defPackA_e, Slottable.EquippedAndDeselectedState);
+
+				AssertSGMFocused();
+		/*	make sure no more Fill transaction is allowed
+		*/
+			AB(crfShieldA_e == null, true);
+			AB(sgm.GetSlotGroup(crfShieldA_p), sgpAll);
+				AE(sgCGears.GetNextEmptySlot(), null);
+				AB(sgCGears.AcceptsFilter(crfShieldA_p), true);
+				AB(sgCGears.Filter is SGCarriedGearFilter, true);
+			PickUp(crfShieldA_p, out picked);
+				ASSG(sgCGears, SlotGroup.DefocusedState);
+			sgm.SimSBHover(null, eventData);
+			sgm.SimSGHover(sgCGears, eventData);
+
+				AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+				AE(sgm.PickedSB, crfShieldA_p);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, null);
+				AE(sgCGears.GetNextEmptySlot(), null);
+			crfShieldA_p.OnPointerUpMock(eventData);
+				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMRevertTransactionProcess));
+				AE(crfShieldA_p.CurProcess.GetType(), typeof(SBUnpickingProcess));
+			crfShieldA_p.CurProcess.Expire();
+		/*	removing from equipment
+		*/
+			AssertSGMFocused();
+			PickUp(defShieldA_e, out picked);
+				AE(sgm.CurState, SlotGroupManager.ProbingState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMProbingStateProcess));
+				AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+				AE(sgm.PickedSB, defShieldA_e);
+				AE(sgm.SelectedSB, defShieldA_e);
+				AE(sgm.SelectedSG, sgCGears);
+
+				ASSG(sgCGears, SlotGroup.SelectedState);
+				AE(sgCGears.PrevState, SlotGroup.FocusedState);
+				AE(sgCGears.CurProcess.GetType(),typeof(SGHighlightProcess));
+
+				ASSB(defShieldA_e, Slottable.PickedAndSelectedState);
+				AE(defShieldA_e.PrevState, Slottable.WaitForPickUpState);
+				AE(defShieldA_e.CurProcess.GetType(), typeof(SBPickUpProcess));
+
+				ASSG(sgpAll, SlotGroup.FocusedState);
+			sgm.SimSBHover(null, eventData);
+			sgm.SimSGHover(sgpAll, eventData);
+				AE(sgm.CurState, SlotGroupManager.ProbingState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMProbingStateProcess));
+				AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
+				AE(sgm.PickedSB, defShieldA_e);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, sgpAll);
+
+				ASSG(sgCGears, SlotGroup.FocusedState);
+				AE(sgCGears.PrevState, SlotGroup.SelectedState);
+				AE(sgCGears.CurProcess.GetType(),typeof(SGDehighlightProcess));
+				AB(sgCGears.Inventory.Items.Contains(defShieldA_p.Item), true);
+				AB(sgCGears.GetSlottable(defShieldA_e.Item), defShieldA_e);
+
+				ASSB(defShieldA_e, Slottable.PickedAndDeselectedState);
+				AE(defShieldA_e.PrevState, Slottable.PickedAndSelectedState);
+				AE(defShieldA_e.CurProcess.GetType(), typeof(SBDehighlightProcess));
+
+				ASSG(sgpAll, SlotGroup.SelectedState);
+				AE(sgpAll.PrevState, SlotGroup.FocusedState);
+				AE(sgpAll.CurProcess.GetType(), typeof(SGHighlightProcess));
+			defShieldA_e.OnPointerUpMock(eventData);
+				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMUnequipTransactionProcess));
+				AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
+				AE(sgm.PickedSB, defShieldA_e);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, sgpAll);
+				AE(sgm.PickedSBDoneTransaction, false);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, false);
+				AE(sgm.SelectedSGDoneTransaction, false);
+
+				EquipmentSet focusedEquipSet = (EquipmentSet)sgm.RootPage.EquipBundle.GetFocusedBundleElement();
+				AB(focusedEquipSet.ContainsElement(sgCGears), true);
+
+				ASSG(sgCGears, SlotGroup.PerformingTransactionState);
+				AE(sgCGears.PrevState, SlotGroup.FocusedState);
+				AE(sgCGears.CurProcess.GetType(),typeof(SGUpdateTransactionProcess));
+				AE(sgCGears.Inventory.Items.Contains(defShieldA_p.Item), false);
+
+				ASSB(defShieldA_e, Slottable.RemovingState);
+				AE(defShieldA_e.PrevState, Slottable.PickedAndDeselectedState);
+				AE(defShieldA_e.CurProcess.GetType(), typeof(SBRemovingProcess));
+				AE(defShieldA_e.DestinationSG, sgpAll);
+				AE(defShieldA_e.DestinationSlot, sgpAll.GetSlot(defShieldA_p));//
+
+				AE(sgm.GetSlotGroup(defShieldA_e), sgCGears);
+				AE(defShieldA_e.IsEquipped, true);
+				AE(defShieldA_p.IsEquipped, true);
+
+				ASSG(sgpAll, SlotGroup.PerformingTransactionState);
+				AE(sgpAll.PrevState, SlotGroup.SelectedState);
+				AE(sgpAll.CurProcess.GetType(), typeof(SGUpdateTransactionProcess));
+			
+				AE(sgm.PickedSBDoneTransaction, false);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, false);
+				AE(sgm.SelectedSGDoneTransaction, false);
+			defShieldA_e.CurProcess.Expire();
+				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMUnequipTransactionProcess));
+				AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
+				AE(sgm.PickedSB, defShieldA_e);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, sgpAll);
+				AE(sgm.PickedSBDoneTransaction, true);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, false);
+				AE(sgm.SelectedSGDoneTransaction, false);
+			sgpAll.CurProcess.Expire();
+				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
+				AE(sgm.CurProcess.GetType(), typeof(SGMUnequipTransactionProcess));
+				AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
+				AE(sgm.PickedSB, defShieldA_e);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, sgpAll);
+				AE(sgm.PickedSBDoneTransaction, true);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, false);
+				AE(sgm.SelectedSGDoneTransaction, true);
+			sgCGears.CurProcess.Expire();
+				AE(sgm.PickedSBDoneTransaction, true);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, true);
+				AE(sgm.SelectedSGDoneTransaction, true);
+				AE(sgm.CurProcess, null);
+				AE(sgm.Transaction, null);
+				AE(sgm.PickedSB, null);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, null);
+				AE(sgm.CurState, SlotGroupManager.FocusedState);
+
+				ASSG(sgCGears, SlotGroup.FocusedState);
+				AE(sgCGears.PrevState, SlotGroup.PerformingTransactionState);
+				AE(sgCGears.CurProcess, null);
+				AB(sgCGears.Inventory.Items.Contains(defShieldA_p.Item), false);
+				AE(sgCGears.Slots.Count, 4);
+				AE(sgm.GetEquippedCarriedGears().Count, 3);
+				AE(sgCGears.GetSlottable((InventoryItemInstanceMock)defShieldA_p.Item), null);
+				AB(sgCGears.GetNextEmptySlot() != null, true);
+
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				AE(sgpAll.PrevState, SlotGroup.PerformingTransactionState);
+				AE(sgpAll.CurProcess, null);
+				AB(sgpAll.Inventory.Items.Contains(defShieldA_p.Item), true);
+		
+				AB(defShieldA_e == null, true);
+				AE(defShieldA_p.IsEquipped, false);
+				ASSB(defShieldA_p, Slottable.FocusedState);
 	}
 	/*	CarriedGearsTesting
 	*/
@@ -710,7 +997,7 @@ public class SlottableTest {
 				AB(sgCGears != null, true);
 				AE(sgCGears.Filter.GetType(), typeof(SGCarriedGearFilter));
 				AE(sgCGears.Sorter.GetType(), typeof(SGItemIndexSorter));
-				AE(sgCGears.UpdateEquipStatusCommand.GetType(), typeof(UpdateEquipStatusForEquipSGCommand));
+				// AE(sgCGears.UpdateEquipStatusCommand.GetType(), typeof(UpdateEquipStatusForEquipSGCommand));
 				AE(sgCGears.Inventory, sgBow.Inventory);
 				AB(sgCGears.IsShrinkable, true);
 				AB(sgCGears.IsExpandable, false);
@@ -843,7 +1130,7 @@ public class SlottableTest {
 			PickUp(defBowB_p, out picked);
 				ASSG(sgpAll, SlotGroup.SelectedState);
 					ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);
-					ASSB(defBowB_p, Slottable.PickedUpAndSelectedState);
+					ASSB(defBowB_p, Slottable.PickedAndSelectedState);
 					ASSB(crfBowA_p, Slottable.DefocusedState);
 					ASSB(defWearA_p, Slottable.EquippedAndDefocusedState);
 					ASSB(defWearB_p, Slottable.DefocusedState);
@@ -874,7 +1161,7 @@ public class SlottableTest {
 			PickUp(defBowB_p, out picked);
 				ASSG(sgpAll, SlotGroup.SelectedState);
 					ASSB(defBowA_p, Slottable.EquippedAndDeselectedState);
-					ASSB(defBowB_p, Slottable.PickedUpAndSelectedState);
+					ASSB(defBowB_p, Slottable.PickedAndSelectedState);
 					ASSB(crfBowA_p, Slottable.FocusedState);
 					ASSB(defWearA_p, Slottable.EquippedAndDeselectedState);
 					ASSB(defWearB_p, Slottable.FocusedState);
@@ -943,7 +1230,7 @@ public class SlottableTest {
 					ASSB(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
 					ASSB(crfMWeaponA_p, Slottable.DefocusedState);
 				ASSG(sgBow, SlotGroup.SelectedState);
-					ASSB(defBowA_e, Slottable.PickedUpAndSelectedState);
+					ASSB(defBowA_e, Slottable.PickedAndSelectedState);
 				ASSG(sgWear, SlotGroup.DefocusedState);
 					ASSB(defWearA_e, Slottable.EquippedAndDefocusedState);
 				ASSG(sgCGears, SlotGroup.DefocusedState);
@@ -977,7 +1264,7 @@ public class SlottableTest {
 					ASSB(defParts_p, Slottable.FocusedState);
 					ASSB(crfParts_p, Slottable.FocusedState);
 					ASSB(defShieldA_p, Slottable.EquippedAndDeselectedState);
-					ASSB(crfShieldA_p, Slottable.PickedUpAndSelectedState);
+					ASSB(crfShieldA_p, Slottable.PickedAndSelectedState);
 					ASSB(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
 					ASSB(crfMWeaponA_p, Slottable.FocusedState);
 				ASSG(sgBow, SlotGroup.DefocusedState);
@@ -1021,7 +1308,7 @@ public class SlottableTest {
 				ASSG(sgWear, SlotGroup.DefocusedState);
 					ASSB(defWearA_e, Slottable.EquippedAndDefocusedState);
 				ASSG(sgCGears, SlotGroup.SelectedState);
-					ASSB(defShieldA_e, Slottable.PickedUpAndSelectedState);
+					ASSB(defShieldA_e, Slottable.PickedAndSelectedState);
 					ASSB(defMWeaponA_e, Slottable.EquippedAndDeselectedState);
 				ASSG(sgpParts, SlotGroup.DefocusedState);
 					ASSB(defParts_p2, Slottable.DefocusedState);
@@ -1502,7 +1789,7 @@ public class SlottableTest {
 			if(pickedSB.CurState == Slottable.FocusedState || pickedSB.CurState == Slottable.EquippedAndDeselectedState){
 
 				PickUp(pickedSB, out picked);//picked = true;
-				ASSB(pickedSB, Slottable.PickedUpAndSelectedState);
+				ASSB(pickedSB, Slottable.PickedAndSelectedState);
 				AssertPostPickFilter(pickedSB);
 				
 				if(hoveredSB != null){
@@ -1514,8 +1801,8 @@ public class SlottableTest {
 						selectedSG = origSG;
 						sgm.SimSBHover(hoveredSB, eventData);
 
-						AE(hoveredSB.PrevState, Slottable.PickedUpAndSelectedState);
-						ASSB(hoveredSB, Slottable.PickedUpAndSelectedState);
+						AE(hoveredSB.PrevState, Slottable.PickedAndSelectedState);
+						ASSB(hoveredSB, Slottable.PickedAndSelectedState);
 						AB((hoveredSB.CurProcess.GetType() == typeof(SBPickUpProcess) || hoveredSB.CurProcess.GetType() == typeof(SBHighlightProcess)), true);
 						// AE(hoveredSB.CurProcess.GetType(), typeof(PickedUpAndSelectedProcess));
 						AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
@@ -1531,7 +1818,7 @@ public class SlottableTest {
 								sgm.SimSGHover(hoveredSG, eventData);
 								ASSB(hoveredSB, Slottable.SelectedState);
 								AE(hoveredSB.CurProcess.GetType(), typeof(SBHighlightProcess));
-								ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+								ASSB(pickedSB, Slottable.PickedAndDeselectedState);
 								AE(pickedSB.CurProcess.GetType(), typeof(SBDehighlightProcess));
 
 								AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
@@ -1545,7 +1832,7 @@ public class SlottableTest {
 								sgm.SimSGHover(hoveredSG, eventData);
 								ASSB(hoveredSB, Slottable.EquippedAndSelectedState);
 								AE(hoveredSB.CurProcess.GetType(), typeof(SBHighlightProcess));
-								ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+								ASSB(pickedSB, Slottable.PickedAndDeselectedState);
 								AE(pickedSB.CurProcess.GetType(), typeof(SBDehighlightProcess));
 
 								AE(sgm.Transaction.GetType(), typeof(ReorderTransaction));
@@ -1559,8 +1846,8 @@ public class SlottableTest {
 								sgm.SimSBHover(hoveredSB, eventData);
 								sgm.SimSGHover(hoveredSG, eventData);
 								ASSB(hoveredSB, preState);
-								AE(pickedSB.PrevState, Slottable.PickedUpAndSelectedState);
-								ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+								AE(pickedSB.PrevState, Slottable.PickedAndSelectedState);
+								ASSB(pickedSB, Slottable.PickedAndDeselectedState);
 								AE(pickedSB.CurProcess.GetType(), typeof(SBDehighlightProcess));
 
 								AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
@@ -1578,17 +1865,17 @@ public class SlottableTest {
 							AE(sgm.SelectedSB, pickedSB);
 							AE(sgm.SelectedSG, origSG);
 							// ASSB(defBowASB_p, Slottable.EquippedAndDefocusedState);
-							if(hoveredSB.CurState == Slottable.FocusedState || hoveredSB.CurState == Slottable.EquippedAndDeselectedState || hoveredSB.CurState == Slottable.PickedUpAndDeselectedState){
+							if(hoveredSB.CurState == Slottable.FocusedState || hoveredSB.CurState == Slottable.EquippedAndDeselectedState || hoveredSB.CurState == Slottable.PickedAndDeselectedState){
 								sgm.SimSBHover(hoveredSB, eventData);
 									AE(sgm.SelectedSB, hoveredSB);
 									selectedSB = hoveredSB;
-									if(hoveredSB.CurState != Slottable.PickedUpAndSelectedState){
+									if(hoveredSB.CurState != Slottable.PickedAndSelectedState){
 										if(hoveredSB.IsEquipped)
 											ASSB(hoveredSB, Slottable.EquippedAndSelectedState);
 										else
 											ASSB(hoveredSB, Slottable.SelectedState);
 									}else
-										ASSB(hoveredSB, Slottable.PickedUpAndSelectedState);
+										ASSB(hoveredSB, Slottable.PickedAndSelectedState);
 								
 								if(hoveredSB.Item.IsStackable)
 									AE(sgm.Transaction.GetType(), typeof(StackTransaction));
@@ -1611,7 +1898,7 @@ public class SlottableTest {
 							}
 
 
-							ASSB(pickedSB, Slottable.PickedUpAndDeselectedState);
+							ASSB(pickedSB, Slottable.PickedAndDeselectedState);
 							/*	selected, eqSelected, pickSele, 
 							*/
 							if(hoveredSG.CurState == SlotGroup.FocusedState){
@@ -1774,14 +2061,14 @@ public class SlottableTest {
 					ASSB(sb, Slottable.WaitForPickUpState);
 					sb.CurProcess.Expire();
 					pickedUp = true;
-					ASSB(sb, Slottable.PickedUpAndSelectedState);
+					ASSB(sb, Slottable.PickedAndSelectedState);
 					AssertPostPickFilter(sb);
 				}else{
 					pickedUp = false;
 				}
 			}
 			public void Revert(Slottable sb, out bool reverted){
-				if(sb.CurState == Slottable.PickedUpAndSelectedState){
+				if(sb.CurState == Slottable.PickedAndSelectedState){
 					sb.OnPointerUpMock(eventData);
 					if(sb.Item.IsStackable){
 						ASSB(sb, Slottable.WaitForNextTouchWhilePUState);
@@ -1840,7 +2127,7 @@ public class SlottableTest {
 			
 		}
 		public void AssertPostPickFilter(Slottable sb){
-			ASSB(sb, Slottable.PickedUpAndSelectedState);
+			ASSB(sb, Slottable.PickedAndSelectedState);
 			SlotGroup origSG = sgm.GetSlotGroup(sb);
 				ASSG(origSG, SlotGroup.SelectedState);
 				
@@ -1872,7 +2159,7 @@ public class SlottableTest {
 						}else{//	origSG is poolSGs memeber
 							foreach(Slot slot in sg.Slots){
 								if(slot.Sb == sb)
-									ASSB(slot.Sb, Slottable.PickedUpAndSelectedState);
+									ASSB(slot.Sb, Slottable.PickedAndSelectedState);
 								else if(sg.AutoSort){
 									if(slot.Sb.IsEquipped)
 										ASSB(slot.Sb, Slottable.EquippedAndDefocusedState);
@@ -2182,7 +2469,7 @@ public class SlottableTest {
 				/*	1.0	Expire
 				*/
 				sb.CurProcess.Expire();
-					ASSB(sb, Slottable.PickedUpAndSelectedState);
+					ASSB(sb, Slottable.PickedAndSelectedState);
 					AssertPostPickFilter(sb);
 					AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
 				/**/
@@ -2277,7 +2564,7 @@ public class SlottableTest {
 					AB(sb.CurProcess.IsExpired, false);
 				
 				sb.CurProcess.Expire();
-					ASSB(sb, Slottable.PickedUpAndSelectedState);
+					ASSB(sb, Slottable.PickedAndSelectedState);
 					AssertPostPickFilter(sb);
 					AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
 				/*	1.0 OnPointerUp --> TestWaitForPickUpState
@@ -2300,7 +2587,7 @@ public class SlottableTest {
 					AB(sb.CurProcess.IsExpired, false);
 				
 				sb.CurProcess.Expire();
-					ASSB(sb, Slottable.PickedUpAndSelectedState);
+					ASSB(sb, Slottable.PickedAndSelectedState);
 					AssertPostPickFilter(sb);
 					AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
 
@@ -2317,7 +2604,7 @@ public class SlottableTest {
 					/*	1.1	OnPointerDwon
 					*/
 					sb.OnPointerDownMock(eventData);
-					ASSB(sb, Slottable.PickedUpAndSelectedState);
+					ASSB(sb, Slottable.PickedAndSelectedState);
 					AE(sb.PickedAmount, 2);
 
 					sb.OnPointerUpMock(eventData);
@@ -2373,7 +2660,7 @@ public class SlottableTest {
 					
 					sb.OnPointerDownMock(eventData);
 						AE(sb.PrevState, Slottable.WaitForNextTouchState);
-						ASSB(sb, Slottable.PickedUpAndSelectedState);
+						ASSB(sb, Slottable.PickedAndSelectedState);
 						AE(sb.PickedAmount, 1);
 						AE(sb.CurProcess.GetType(), typeof(SBPickUpProcess));
 						AB(sb.CurProcess.IsRunning, true);
