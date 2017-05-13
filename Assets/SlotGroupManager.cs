@@ -100,8 +100,17 @@ namespace SlotSystem{
 						this.CurProcess.Expire();
 					return null;
 				}
-				
 				public IEnumeratorMock WaitForUnequipDone(){
+					bool done = true;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
+					if(done)
+						this.CurProcess.Expire();
+					return null;
+				}
+				public IEnumeratorMock WaitForSwapDone(){
 					bool done = true;
 					done &= m_pickedSBDoneTransaction;
 					done &= m_selectedSBDoneTransaction;
@@ -168,7 +177,7 @@ namespace SlotSystem{
 				public void SetSelectedSB(Slottable sb){
 					if(m_selectedSB != sb){
 						m_selectedSB = sb;
-						UpdateTransaction();
+						// UpdateTransaction();
 						// if(sb != null){
 						// 	m_selectedSBDoneTransaction = false;
 						// }else{
@@ -183,7 +192,7 @@ namespace SlotSystem{
 				public void SetSelectedSG(SlotGroup sg){
 					if(m_selectedSG != sg){
 						m_selectedSG = sg;
-						UpdateTransaction();
+						// UpdateTransaction();
 						// if(sg != null){
 						// 	m_selectedSGDoneTransaction = false;
 						// }else{
@@ -311,6 +320,7 @@ namespace SlotSystem{
 					}
 				}
 			}
+			UpdateTransaction();
 		}
 		public void SimSGHover(SlotGroup sg, PointerEventDataMock eventData){
 			if(CurState == SlotGroupManager.m_probingState){
@@ -326,6 +336,36 @@ namespace SlotSystem{
 					}
 				}
 			}
+			UpdateTransaction();
+		}
+		public void SimHover(Slottable sb, SlotGroup sg, PointerEventDataMock eventData){
+			/*	in actual implementation, this method is called whenever either sb or sg's 		boarder is crossed
+			*/
+			if(CurState == SlotGroupManager.m_probingState){
+				if(sb != null){
+					if(SelectedSB != sb){
+						if(SelectedSB != null)
+							SelectedSB.OnHoverExitMock(eventData);
+						sb.OnHoverEnterMock(eventData);
+					}
+				}else{
+					if(SelectedSB != null){
+						SelectedSB.OnHoverExitMock(eventData);
+					}
+				}
+				if(sg != null){
+					if(SelectedSG != sg){
+						if(SelectedSG != null)
+							SelectedSG.OnHoverExitMock(eventData);
+						sg.OnHoverEnterMock(eventData);
+					}
+				}else{
+					if(SelectedSG != null){
+						SelectedSG.OnHoverExitMock(eventData);
+					}
+				}
+			}
+			UpdateTransaction();
 		}
 		public EquipmentSet GetFocusedEquipSet(){
 			return (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
@@ -433,6 +473,21 @@ namespace SlotSystem{
 					}
 				}
 			}
+		}
+		public SlotGroup GetFocusedCGearsSG(){
+			foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){
+				if(((SlotGroup)ele).Filter is SGCarriedGearFilter)
+					return (SlotGroup)ele;
+			}
+			return null;
+		}
+		public List<Slot> GetCGEmptySlots(){
+			List<Slot> result = new List<Slot>();
+			foreach(Slot slot in GetFocusedCGearsSG().Slots){
+				if(slot.Sb == null)
+					result.Add(slot);
+			}
+			return result;
 		}
 	}
 

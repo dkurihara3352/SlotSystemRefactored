@@ -363,18 +363,18 @@ namespace SlotSystem{
 			/*	addition
 			*/
 			if(added != null && !Inventory.Items.Contains(added.Item)){
-				Slot emptySlot = GetNextEmptySlot();
-				GameObject newSBGO = new GameObject("newSlottableGO");
-				Slottable newSlottable = newSBGO.AddComponent<Slottable>();
-				newSlottable.Initialize(this, true, (InventoryItemInstanceMock)added.Item);
+				// Slot emptySlot = GetNextEmptySlot();
+				// GameObject newSBGO = new GameObject("newSlottableGO");
+				// Slottable newSlottable = newSBGO.AddComponent<Slottable>();
+				// newSlottable.Initialize(this, true, (InventoryItemInstanceMock)added.Item);
 
-				if(emptySlot != null){
-					emptySlot.Sb = newSlottable;
-				}else{// got to be expandable
-					Slot newSlot = new Slot();
-					newSlot.Sb = newSlottable;
-					Slots.Add(newSlot);
-				}
+				// if(emptySlot != null){
+				// 	emptySlot.Sb = newSlottable;
+				// }else{// got to be expandable
+				// 	Slot newSlot = new Slot();
+				// 	newSlot.Sb = newSlottable;
+				// 	Slots.Add(newSlot);
+				// }
 				Inventory.AddItem(added.Item);
 			}
 			/*	removal
@@ -401,6 +401,33 @@ namespace SlotSystem{
 						DestroyImmediate(sb);
 					}
 				}
+			}
+		}
+		public void AddSB(ref Slot toSlot){
+			/*	needs to be called after removing, when there's something to remove
+			*/
+			GameObject addedSBGO = new GameObject("newSBGO");
+			Slottable addedSB = addedSBGO.AddComponent<Slottable>();
+			InventoryItemInstanceMock item = null;
+			foreach(InventoryItemInstanceMock it in Inventory.Items){
+				if((Filter is SGBowFilter && it is BowInstanceMock) || (Filter is SGWearFilter && it is WearInstanceMock) || (Filter is SGCarriedGearFilter && it is CarriedGearInstanceMock)){
+					bool found = false;
+					foreach(Slot slot in Slots){
+						if(slot.Sb != null){
+							InventoryItemInstanceMock sbItem = (InventoryItemInstanceMock)slot.Sb.Item;
+							if(sbItem == it)
+								found = true;
+						}
+					}
+					if(!found)
+						item = it;
+				}
+			}
+			if(item == null){
+				throw new System.InvalidOperationException("a slottable with specified inventory item already exist.");
+			}else{
+				addedSB.Initialize(this, true, item);
+				toSlot.Sb = addedSB;
 			}
 		}
 	}
