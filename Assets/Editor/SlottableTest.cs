@@ -136,9 +136,9 @@ public class SlottableTest {
 			/*	bows
 			*/
 				BowMock defBow = new BowMock();
-				defBow.ItemID = 1;
+				defBow.ItemID = 0;
 				BowMock crfBow = new BowMock();
-				crfBow.ItemID = 2;
+				crfBow.ItemID = 1;
 				
 				BowInstanceMock defBowA = new BowInstanceMock();//	equipped
 				defBowA.Item = defBow;
@@ -153,9 +153,9 @@ public class SlottableTest {
 			/*	wears
 			*/
 					WearMock defWear = new WearMock();
-					defWear.ItemID = 101;
+					defWear.ItemID = 100;
 					WearMock crfWear = new WearMock();
-					crfWear.ItemID = 102;
+					crfWear.ItemID = 101;
 					
 					WearInstanceMock defWearA = new WearInstanceMock();//	equipped
 					defWearA.Item = defWear;
@@ -170,10 +170,10 @@ public class SlottableTest {
 			/*	parts
 			*/ 
 				PartsMock defParts = new PartsMock();
-				defParts.ItemID = 601;
+				defParts.ItemID = 600;
 				defParts.IsStackable = true;
 				PartsMock crfParts = new PartsMock();
-				crfParts.ItemID = 602;
+				crfParts.ItemID = 601;
 				crfParts.IsStackable = true;
 				
 				PartsInstanceMock defPartsA = new PartsInstanceMock();
@@ -220,11 +220,11 @@ public class SlottableTest {
 				crfMWeaponA.Item = crfMWeapon;
 
 				QuiverMock defQuiver = new QuiverMock();
-				defQuiver.ItemID = 401;
+				defQuiver.ItemID = 400;
 				QuiverInstanceMock defQuiverA = new QuiverInstanceMock();
 				defQuiverA.Item = defQuiver;
 				PackMock defPack = new PackMock();
-				defPack.ItemID = 501;
+				defPack.ItemID = 500;
 				PackInstanceMock defPackA = new PackInstanceMock();
 				defPackA.Item = defPack;
 
@@ -1162,7 +1162,266 @@ public class SlottableTest {
 				AE(sgm.GetSlotGroup(crfBowA_e), sgBow);
 				AE(sgm.GetEquippedBow(), crfBowA_e.Item);
 					
+		/*	swapping some more
+		*/
+			PickUp(defBowB_p, out picked);
+			sgm.SimHover(null, sgBow, eventData);
+			defBowB_p.OnPointerUpMock(eventData);
+			defBowB_p.CurProcess.Expire();
+			crfBowA_e.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgBow.CurProcess.Expire();
+				AE(sgm.CurState, SlotGroupManager.FocusedState);
+				AE(sgm.CurProcess, null);
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				ASSG(sgBow, SlotGroup.FocusedState);
+				ASSB(defBowB_p, Slottable.EquippedAndDefocusedState);
+				Slottable defBowB_e = sgBow.GetSlottable(defBowB_p.Item);
+				ASSB(defBowB_e, Slottable.EquippedAndDeselectedState);
+				AB(crfBowA_e == null, true);
+				ASSB(crfBowA_p, Slottable.FocusedState);
+
+				AE(sgm.GetEquippedBow(), defBowB_p.Item);
+				AE(sgBow.Slots[0].Sb, defBowB_e);
+			PickUp(defBowA_p, out picked);
+			sgm.SimHover(null, sgBow, eventData);
+			defBowA_p.OnPointerUpMock(eventData);
+			defBowA_p.CurProcess.Expire();
+			defBowB_e.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgBow.CurProcess.Expire();
+				AE(sgm.CurState, SlotGroupManager.FocusedState);
+				AE(sgm.CurProcess, null);
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				ASSG(sgBow, SlotGroup.FocusedState);
+				ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);
+				defBowA_e = sgBow.GetSlottable(defBowA_p.Item);
+				ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
+				AB(defBowB_e == null, true);
+				ASSB(defBowB_p, Slottable.FocusedState);
+
+				AE(sgm.GetEquippedBow(), defBowA_p.Item);
+				AE(sgBow.Slots[0].Sb, defBowA_e);
+		/*	swap equip defWearB_p and then to crfWearA_p
+		*/
+			PickUp(defWearB_p, out picked);
+			sgm.SimHover(null, sgWear, eventData);
+			defWearB_p.OnPointerUpMock(eventData);
+			defWearB_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgWear.CurProcess.Expire();
+			defWearA_e.CurProcess.Expire();
+				AE(sgm.CurState, SlotGroupManager.FocusedState);
+				AE(sgm.CurProcess, null);
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				ASSG(sgWear, SlotGroup.FocusedState);
+				ASSB(defWearB_p, Slottable.EquippedAndDefocusedState);
+				Slottable defWearB_e = sgWear.GetSlottable(defWearB_p.Item);
+				ASSB(defWearB_e, Slottable.EquippedAndDeselectedState);
+				AB(defWearA_e == null, true);
+				ASSB(defWearA_p, Slottable.FocusedState);
+				AE(sgm.GetEquippedWear(), defWearB_p.Item);
+				AE(sgWear.Slots[0].Sb, defWearB_e);
+			PickUp(crfWearA_p, out picked);
+			sgm.SimHover(null, sgWear, eventData);
+			crfWearA_p.OnPointerUpMock(eventData);
+			crfWearA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgWear.CurProcess.Expire();
+			defWearB_e.CurProcess.Expire();
+				AE(sgm.CurState, SlotGroupManager.FocusedState);
+				AE(sgm.CurProcess, null);
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				ASSG(sgWear, SlotGroup.FocusedState);
+				ASSB(crfWearA_p, Slottable.EquippedAndDefocusedState);
+				Slottable crfWearA_e = sgWear.GetSlottable(crfWearA_p.Item);
+				ASSB(crfWearA_e, Slottable.EquippedAndDeselectedState);
+				AB(defWearB_e == null, true);
+				ASSB(defWearB_p, Slottable.FocusedState);
+				AE(sgm.GetEquippedWear(), crfWearA_p.Item);
+				AE(sgWear.Slots[0].Sb, crfWearA_e);
+		/*	swap bow explicitly on equipped sb back to defBowA_p
+		*/
+				AE(sgm.GetEquippedBow(), defBowA_e.Item);
+				AE(sgBow.Slots[0].Sb, defBowA_e);
+			PickUp(defBowB_p, out picked);
+			sgm.SimHover(defBowA_e, sgBow, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+			sgm.SimHover(defBowB_p, sgpAll, eventData);
+			bool reverted = false;
+			Revert(defBowB_p, out reverted);
+				AB(reverted, true);
+
+				AssertEquippedBow(defBowA_p, defBowB_p);
+			PickUp(defBowB_p, out picked);
+			sgm.SimHover(defBowA_e, sgBow, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+			defBowB_p.OnPointerUpMock(eventData);
+			defBowB_p.CurProcess.Expire();
+			defBowA_e.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgBow.CurProcess.Expire();
+				AssertEquippedBow(defBowB_p, defBowA_p);
+			
+			defBowB_e = sgBow.Slots[0].Sb;
+			PickUp(defBowA_p, out picked);
+			sgm.SimHover(defBowB_e, sgBow, eventData);
+			defBowA_p.OnPointerUpMock(eventData);
+			defBowA_p.CurProcess.Expire();
+			defBowB_e.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgBow.CurProcess.Expire();
+				AssertEquippedBow(defBowA_p, defBowB_p);
+		/*	swap wears explicitly to defWearB_p
+		*/
+			PickUp(defWearB_p, out picked);
+			sgm.SimHover(crfWearA_e, sgWear, eventData);
+			defWearB_p.OnPointerUpMock(eventData);
+			defWearB_p.CurProcess.Expire();
+			crfWearA_e.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgWear.CurProcess.Expire();
+				AssertEquippedWear(defWearB_p, crfWearA_p);
+		/*	explicity swap on pool bow defBowB_p
+		*/
+			AE(sgm.GetEquippedBow(), defBowA_p.Item);
+			defBowA_e = sgBow.GetSlottable(defBowA_p.Item);
+				ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
+			PickUp(defBowA_e, out picked);
+				AB(picked, true);
+			sgm.SimHover(defBowB_p, sgpAll, eventData);
+				AB(sgm.Transaction == null, false);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+					AE(sgm.PickedSB, defBowA_e);
+					AE(sgm.SelectedSB, defBowB_p);
+					AE(sgm.SelectedSG, sgpAll);
+			defBowA_e.OnPointerUpMock(eventData);
+			defBowA_e.CurProcess.Expire();
+			defBowB_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgBow.CurProcess.Expire();
+				AssertEquippedBow(defBowB_p, defBowA_p);
+			/*	make sure it reverts back when dropped on sg only
+			*/
+					defBowB_e = sgBow.GetSlottable(defBowB_p.Item);
+				PickUp(defBowB_e, out picked);
+				sgm.SimHover(null, sgpAll, eventData);
+					AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+				Revert(defBowB_e, out reverted);
+					AB(reverted, true);
+		/*	then back to defWearA_p
+		*/
+			PickUp(defBowB_e, out picked);
+			sgm.SimHover(defBowA_p, sgpAll, eventData);
+			defBowB_e.OnPointerUpMock(eventData);
+			defBowB_e.CurProcess.Expire();
+			defBowA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgBow.CurProcess.Expire();
+				AssertEquippedBow(defBowA_p, defBowB_p);
+		/*	explicitly swap wear from defWearB_e to crfWearA_p
+		*/
+				AE(sgm.GetEquippedWear(), defWearB_p.Item);
+				defWearB_e = sgWear.Slots[0].Sb;
+			PickUp(defWearB_e, out picked);
+			sgm.SimHover(crfWearA_p, sgpAll, eventData);
+			defWearB_e.OnPointerUpMock(eventData);
+			defWearB_e.CurProcess.Expire();
+			crfWearA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgWear.CurProcess.Expire();
+				AssertEquippedWear(crfWearA_p, defWearB_p);
+				AB(picked, true);
+		/*	explicitly swap wear from crfWearA_e to defWearA_p
+		*/
+			crfWearA_e = sgWear.Slots[0].Sb;
+			PickUp(crfWearA_e, out picked);
+			sgm.SimHover(defWearA_p, sgpAll, eventData);
+			crfWearA_e.OnPointerUpMock(eventData);
+			crfWearA_e.CurProcess.Expire();
+			defWearA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgWear.CurProcess.Expire();
+				AssertEquippedWear(defWearA_p, crfWearA_p);
+		/*	explicitly swap from defQuiverA_p to defShieldA_e, then from defQuiverA_p to 		crfMWeaponA_e
+		*/
+				AssertFocusedGeneric();
+				AE(sgm.GetEquippedCarriedGears().Count, 2);
+				AssertEquippedCGears(crfShieldA_p, crfMWeaponA_p, null, null);
+			PickUp(defShieldA_p, out picked);
+			crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.Item);
+			sgm.SimHover(crfShieldA_e, sgCGears, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+			defShieldA_p.OnPointerUpMock(eventData);
+			defShieldA_p.CurProcess.Expire();
+			crfShieldA_e.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defShieldA_p, crfMWeaponA_p, null, null);
+			
+			PickUp(defQuiverA_p, out picked);
+			crfMWeaponA_e = sgCGears.GetSlottable(crfMWeaponA_p.Item);
+			sgm.SimHover(crfMWeaponA_e, sgCGears, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+			defQuiverA_p.OnPointerUpMock(eventData);
+			crfMWeaponA_e.CurProcess.Expire();
+			defQuiverA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, defShieldA_p, null, null);
+		/*	explicit swap from defShieldA_e to defPackA_p, then from defPackA_e to 			crfShieldA_p
+		*/
+			defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+			PickUp(defShieldA_e, out picked);
+			sgm.SimHover(defPackA_p, sgpAll, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+			defShieldA_e.OnPointerUpMock(eventData);
+			defShieldA_e.CurProcess.Expire();
+			defPackA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, defPackA_p, null, null);
+			
+			defPackA_e = sgCGears.GetSlottable(defPackA_p.Item);
+			PickUp(defPackA_e, out picked);
+			sgm.SimHover(crfShieldA_p, sgpAll, eventData);
+			defPackA_e.OnPointerUpMock(eventData);
+			defPackA_e.CurProcess.Expire();
+			crfShieldA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, crfShieldA_p, null, null);
+		/*	fill equip defMWeaponA_p and defPackA_p
+		*/
+			PickUp(defMWeaponA_p, out picked);
+			sgm.SimHover(null, sgCGears, eventData);
+			defMWeaponA_p.OnPointerUpMock(eventData);
+			defMWeaponA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, crfShieldA_p, defMWeaponA_p, null);
+			PickUp(defPackA_p, out picked);
+			sgm.SimHover(null, sgCGears, eventData);
+			defPackA_p.OnPointerUpMock(eventData);
+			defPackA_p.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, crfShieldA_p, defMWeaponA_p, defPackA_p);
+		/*	assert equipment
+		*/
+			
+			AssertEquipped(defBowA_p);
+			AssertEquipped(defWearA_p);
+			AssertEquippedCGears(defQuiverA_p, crfShieldA_p, defMWeaponA_p, defPackA_p);
+
 	}
+	
 	/*	CarriedGearsTesting
 	*/
 		public void TestCarriedGearsSetup(){
@@ -2242,7 +2501,7 @@ public class SlottableTest {
 				}
 			}
 			public void Revert(Slottable sb, out bool reverted){
-				if(sb.CurState == Slottable.PickedAndSelectedState){
+				if(sb.CurState == Slottable.PickedAndSelectedState || sb.CurState == Slottable.PickedAndDeselectedState){
 					sb.OnPointerUpMock(eventData);
 					if(sb.Item.IsStackable){
 						ASSB(sb, Slottable.WaitForNextTouchWhilePUState);
@@ -2254,7 +2513,7 @@ public class SlottableTest {
 				}else{
 					reverted = false;
 				}
-				AssertSGMFocused();
+				// AssertSGMFocused();
 			}
 	
 		
@@ -2434,6 +2693,69 @@ public class SlottableTest {
 				ASSB(defShieldA_e, Slottable.EquippedAndDeselectedState);
 				AB(defMWeaponA_e.IsEquipped, true);
 				ASSB(defMWeaponA_e, Slottable.EquippedAndDeselectedState);
+		}
+		public void AssertFocusedGeneric(){
+			AE(sgm.CurState, SlotGroupManager.FocusedState);
+				AE(sgm.CurProcess == null, true);
+				AE(sgm.Transaction == null, true);
+			foreach(SlotSystemElement ele in sgm.RootPage.PoolBundle.Elements){
+				SlotGroup sg = (SlotGroup)ele;
+				if(sg == sgm.GetFocusedPoolSG()){
+					ASSG(sg, SlotGroup.FocusedState);
+					foreach(Slot slot in sg.Slots){
+						if(slot.Sb != null){
+							if(slot.Sb.IsEquipped)
+								ASSB(slot.Sb, Slottable.EquippedAndDefocusedState);
+							else{
+								if(slot.Sb.Item is PartsInstanceMock)
+									ASSB(slot.Sb, Slottable.DefocusedState);
+								else
+									ASSB(slot.Sb, Slottable.FocusedState);
+							}
+						}
+					}
+				}else{
+					ASSG(sg, SlotGroup.DefocusedState);
+					foreach(Slot slot in sg.Slots){
+						if(slot.Sb != null){
+							if(slot.Sb.IsEquipped)
+								ASSB(slot.Sb, Slottable.EquippedAndDefocusedState);
+							else
+								ASSB(slot.Sb, Slottable.DefocusedState);
+						}
+					}
+				}
+			}
+			foreach(SlotSystemElement ele in sgm.RootPage.EquipBundle.Elements){
+				EquipmentSet equipSet = (EquipmentSet)ele;
+				if(equipSet == sgm.GetFocusedEquipSet()){
+					foreach(SlotSystemElement sgEle in equipSet.Elements){
+						SlotGroup sg = (SlotGroup)sgEle;
+						ASSG(sg, SlotGroup.FocusedState);
+						foreach(Slot slot in sg.Slots){
+							if(slot.Sb != null){
+								if(slot.Sb.IsEquipped)
+									ASSB(slot.Sb, Slottable.EquippedAndDeselectedState);
+								else
+									ASSB(slot.Sb, Slottable.DefocusedState);
+							}
+						}
+					}
+				}else{
+					foreach(SlotSystemElement sgEle in equipSet.Elements){
+						SlotGroup sg = (SlotGroup)sgEle;
+						ASSG(sg, SlotGroup.DefocusedState);
+						foreach(Slot slot in sg.Slots){
+							if(slot.Sb != null){
+								if(slot.Sb.IsEquipped)
+									ASSB(slot.Sb, Slottable.EquippedAndDefocusedState);
+								else
+									ASSB(slot.Sb, Slottable.DefocusedState);
+							}
+						}
+					}
+				}
+			}
 		}
 		public void AssertSGMDefocus(){
 			AE(sgm.CurState, SlotGroupManager.DefocusedState);
@@ -2924,5 +3246,169 @@ public class SlottableTest {
 				}
 			}
 			AB(isMember, false);
+		}
+		public void AssertEquippedBow(Slottable equippedInPool, Slottable prevInPool){
+			AE(sgm.CurState, SlotGroupManager.FocusedState);
+			AB(sgm.CurProcess == null, true);
+			AB(sgm.Transaction == null, true);
+			AE(sgm.PickedSB, null);
+			AE(sgm.SelectedSG, null);
+			AE(sgm.SelectedSB, null);
+
+			ASSG(sgpAll, SlotGroup.FocusedState);
+			ASSG(sgBow, SlotGroup.FocusedState);
+
+			ASSB(equippedInPool, Slottable.EquippedAndDefocusedState);
+			AB(equippedInPool.IsEquipped, true);
+
+			ASSB(prevInPool, Slottable.FocusedState);
+			AB(prevInPool.IsEquipped, false);
+
+			Slottable equippedInEq = sgBow.Slots[0].Sb;
+			AE(equippedInEq.Item, equippedInPool.Item);
+			ASSB(equippedInEq, Slottable.EquippedAndDeselectedState);
+			AE(sgpAll.Slots.Count, 14);
+			AE(sgBow.Slots.Count, 1);
+		}
+		public void AssertEquippedWear(Slottable equippedInPool, Slottable prevInPool){
+			AE(sgm.CurState, SlotGroupManager.FocusedState);
+			AB(sgm.CurProcess == null, true);
+			AB(sgm.Transaction == null, true);
+			AE(sgm.PickedSB, null);
+			AE(sgm.SelectedSG, null);
+			AE(sgm.SelectedSB, null);
+
+			ASSG(sgpAll, SlotGroup.FocusedState);
+			ASSG(sgWear, SlotGroup.FocusedState);
+
+			ASSB(equippedInPool, Slottable.EquippedAndDefocusedState);
+			AB(equippedInPool.IsEquipped, true);
+
+			ASSB(prevInPool, Slottable.FocusedState);
+			AB(prevInPool.IsEquipped, false);
+
+			Slottable equippedInEq = sgWear.Slots[0].Sb;
+			AE(equippedInEq.Item, equippedInPool.Item);
+			ASSB(equippedInEq, Slottable.EquippedAndDeselectedState);
+			AE(sgpAll.Slots.Count, 14);
+			AE(sgWear.Slots.Count, 1);
+		}
+		public void PrintEquipped(){
+			string bowName = null;
+			switch(sgm.GetEquippedBow().Item.ItemID){
+				case 0:
+					bowName = "defBow";
+					break;
+				case 1:
+					bowName = "crfBow";
+					break;
+			}
+			string wearName = null;
+			switch(sgm.GetEquippedWear().Item.ItemID){
+				case 100:
+					wearName = "defWear";
+					break;
+				case 101:
+					wearName = "crfWear";
+					break;
+			}
+			List<string> cgNamesList = new List<string>();
+			foreach(CarriedGearInstanceMock cgInst in sgm.GetEquippedCarriedGears()){
+				switch(cgInst.Item.ItemID){
+					case 200:
+						cgNamesList.Add("defShield");
+						break;
+					case 201:
+						cgNamesList.Add("crfShield");
+						break;
+					case 300:
+						cgNamesList.Add("defMWeapon");
+						break;
+					case 301:
+						cgNamesList.Add("crfMWeapon");
+						break;
+					case 400:
+						cgNamesList.Add("defQuiver");
+						break;
+					case 401:
+						cgNamesList.Add("crfQuiver");
+						break;
+					case 500:
+						cgNamesList.Add("defPack");
+						break;
+					case 501:
+						cgNamesList.Add("crfPack");
+						break;
+				}
+			}
+			string cGearsNames = "";
+			foreach(string name in cgNamesList){
+				cGearsNames += name + ", ";
+			}
+			Debug.Log("<b>Bow</b>: " + bowName + "<b> Wear: </b>" + wearName + "<b> CGears: </b>" + cGearsNames);
+		}
+		public void AssertEquipped(Slottable sbInPool){
+			if(sbInPool.Item is BowInstanceMock){
+				foreach(Slot slot in sgpAll.Slots){
+					if(slot.Sb != null){
+						if(slot.Sb.Item is BowInstanceMock){
+							if(slot.Sb == sbInPool){
+								AB(slot.Sb.IsEquipped, true);
+								AE(sgm.GetEquippedBow(), slot.Sb.Item);
+								AB(sgBow.GetSlottable(slot.Sb.Item) != null, true);
+							}else{
+								AB(slot.Sb.IsEquipped, false);
+								AB(sgm.GetEquippedBow() != (BowInstanceMock)slot.Sb.Item, true);
+								AB(sgBow.GetSlottable(slot.Sb.Item) == null, true);
+							}
+						}
+					}
+				}
+			}else if(sbInPool.Item is WearInstanceMock){
+				foreach(Slot slot in sgpAll.Slots){
+					if(slot.Sb != null){
+						if(slot.Sb.Item is WearInstanceMock){
+							if(slot.Sb == sbInPool){
+								AB(slot.Sb.IsEquipped, true);
+								AE(sgm.GetEquippedWear(), slot.Sb.Item);
+								AB(sgWear.GetSlottable(slot.Sb.Item) != null, true);
+							}else{
+								AB(slot.Sb.IsEquipped, false);
+								AB(sgm.GetEquippedWear() != (WearInstanceMock)slot.Sb.Item, true);
+								AB(sgWear.GetSlottable(slot.Sb.Item) == null, true);
+							}
+						}
+					}
+				}
+			}
+		} 
+		public void AssertEquippedCGears(Slottable cg1, Slottable cg2, Slottable cg3, Slottable cg4){
+			List<CarriedGearInstanceMock> checkedList = new List<CarriedGearInstanceMock>();
+			if(cg1 != null)
+			checkedList.Add((CarriedGearInstanceMock)cg1.Item);
+			if(cg2 != null)
+			checkedList.Add((CarriedGearInstanceMock)cg2.Item);
+			if(cg3 != null)
+			checkedList.Add((CarriedGearInstanceMock)cg3.Item);
+			if(cg4 != null)
+			checkedList.Add((CarriedGearInstanceMock)cg4.Item);
+			foreach(Slot slot in sgpAll.Slots){
+				if(slot.Sb != null){
+					if(slot.Sb.Item is CarriedGearInstanceMock){
+						bool found = false;
+						foreach(CarriedGearInstanceMock checkedCG in checkedList){
+							if((CarriedGearInstanceMock)slot.Sb.Item == checkedCG)
+								found = true;
+						}
+						if(found){
+							AB(slot.Sb.IsEquipped, true);
+							AB(sgCGears.GetSlottable(slot.Sb.Item) != null, true);
+						}else{
+							AB(slot.Sb.IsEquipped, false);
+							AB(sgCGears.GetSlottable(slot.Sb.Item) == null, true);
+						}
+					}
+				}
+			} 
 		}
 }

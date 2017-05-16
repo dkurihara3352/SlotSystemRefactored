@@ -104,10 +104,16 @@ namespace SlotSystem{
 					Slot pickedSBSlot = origSG.GetSlot(pickedSB);
 
 					selectedSB.MoveIcon(origSG, pickedSBSlot);
-					selectedSB.SetState(Slottable.RemovingState);
+					if(sgm.GetSlotGroup(selectedSB) == sgm.GetFocusedPoolSG())
+						selectedSB.SetState(Slottable.EquippingState);
+					else
+						selectedSB.SetState(Slottable.RemovingState);
 
 					pickedSB.MoveIcon(selectedSG, selectedSBSlot);
-					pickedSB.SetState(Slottable.EquippingState);
+					if(sgm.GetSlotGroup(pickedSB) == sgm.GetFocusedPoolSG())
+						pickedSB.SetState(Slottable.EquippingState);
+					else
+						pickedSB.SetState(Slottable.RemovingState);
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
@@ -250,7 +256,7 @@ namespace SlotSystem{
 					SlotGroup origSG = sgm.GetSlotGroup(pickedSB);
 					if(pickedSB != null){
 						if(selectedSB == null){
-							if(selectedSG == null || selectedSG == origSG){
+							if(selectedSG == null || selectedSG == origSG || !origSG.IsShrinkable){
 								SlotSystemTransaction revertTs = new RevertTransaction(pickedSB);
 								sgm.SetTransaction(revertTs);
 							}else{
