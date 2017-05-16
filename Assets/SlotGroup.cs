@@ -360,23 +360,11 @@ namespace SlotSystem{
 		}
 		public void TransactionUpdate(Slottable added, Slottable removed){
 			SetState(SlotGroup.PerformingTransactionState);
-			/*	addition
-			*/
-			if(added != null && !Inventory.Items.Contains(added.Item)){
-				// Slot emptySlot = GetNextEmptySlot();
-				// GameObject newSBGO = new GameObject("newSlottableGO");
-				// Slottable newSlottable = newSBGO.AddComponent<Slottable>();
-				// newSlottable.Initialize(this, true, (InventoryItemInstanceMock)added.Item);
-
-				// if(emptySlot != null){
-				// 	emptySlot.Sb = newSlottable;
-				// }else{// got to be expandable
-				// 	Slot newSlot = new Slot();
-				// 	newSlot.Sb = newSlottable;
-				// 	Slots.Add(newSlot);
-				// }
-				Inventory.AddItem(added.Item);
-			}
+			// /*	addition
+			// */
+			// if(added != null && !Inventory.Items.Contains(added.Item)){
+			// 	Inventory.AddItem(added.Item);
+			// }
 			/*	removal
 			*/
 			if(removed != null && GetSlottable(removed.Item) != null){
@@ -384,6 +372,11 @@ namespace SlotSystem{
 				if(focusedEquipSet.ContainsElement(this))
 					// Inventory.Items.Remove(removed.Item);
 					Inventory.RemoveItem(removed.Item);
+			}
+			/*	addition
+			*/
+			if(added != null && !Inventory.Items.Contains(added.Item)){
+				Inventory.AddItem(added.Item);
 			}
 		}
 		public void RemoveSB(Slottable sb){

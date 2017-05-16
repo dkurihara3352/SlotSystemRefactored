@@ -232,6 +232,8 @@ namespace SlotSystem{
 			public void CompleteTransactionOnSG(SlotGroup sg){
 				if(sg == GetSlotGroup(PickedSB)) m_origSGDoneTransaction = true;
 				else if(sg == SelectedSG) m_selectedSGDoneTransaction = true;
+				else if(sg == GetSlotGroup(m_selectedSB))
+					m_selectedSGDoneTransaction = true;
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
 			}
 			public void CompleteAllTransaction(){

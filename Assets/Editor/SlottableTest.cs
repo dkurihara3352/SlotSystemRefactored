@@ -1415,11 +1415,45 @@ public class SlottableTest {
 				AssertEquippedCGears(defQuiverA_p, crfShieldA_p, defMWeaponA_p, defPackA_p);
 		/*	assert equipment
 		*/
-			
 			AssertEquipped(defBowA_p);
 			AssertEquipped(defWearA_p);
 			AssertEquippedCGears(defQuiverA_p, crfShieldA_p, defMWeaponA_p, defPackA_p);
-
+		/*	explicitly swap from defShieldA_p to crfShieldA_e while there's no empty slot
+		*/	
+			PickUp(defShieldA_p, out picked);
+			crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.Item);
+				ASSG(sgCGears, SlotGroup.DefocusedState);
+			sgm.SimHover(crfShieldA_e, sgCGears, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+				ASSB(defShieldA_p, Slottable.PickedAndDeselectedState);
+				AB(sgm.SelectedSG == null, true);
+			defShieldA_p.OnPointerUpMock(eventData);
+			defShieldA_p.CurProcess.Expire();
+			crfShieldA_e.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+				ASSG(sgCGears, SlotGroup.PerformingTransactionState);
+				AE(sgCGears.CurProcess.GetType(), typeof(SGUpdateTransactionProcess));
+			sgCGears.CurProcess.Expire();
+				AB(sgm.PickedSBDoneTransaction, true);
+				AB(sgm.SelectedSBDoneTransaction, true);
+				AB(sgm.OrigSGDoneTransaction, true);
+				AB(sgm.SelectedSGDoneTransaction, true);
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, defShieldA_p, defMWeaponA_p, defPackA_p);
+		/*	explicitly swap from defMWeaponA_e to crfMWeaponA_p while maxed out
+		*/
+			defMWeaponA_e = sgCGears.GetSlottable(defMWeaponA_p.Item);
+			PickUp(defMWeaponA_e, out picked);
+			sgm.SimHover(crfMWeaponA_p, sgpAll, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+			defMWeaponA_e.OnPointerUpMock(eventData);
+			
+			defMWeaponA_e.CurProcess.Expire();
+			crfMWeaponA_p.CurProcess.Expire();
+			sgCGears.CurProcess.Expire();
+			sgpAll.CurProcess.Expire();
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, defShieldA_p, crfMWeaponA_p, defPackA_p);
 	}
 	
 	/*	CarriedGearsTesting
