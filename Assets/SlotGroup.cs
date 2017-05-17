@@ -161,14 +161,7 @@ namespace SlotSystem{
 				public void CreateSlottables(){
 					m_createSbsCommand.Execute(this);
 				}
-			// SlotGroupCommand m_updateEquipStatusCommand;
-			// 	public SlotGroupCommand UpdateEquipStatusCommand{
-			// 		get{return m_updateEquipStatusCommand;}
-			// 		set{m_updateEquipStatusCommand = value;}
-			// 	}
-			// 	public void UpdateEquipStatus(){
-			// 		m_updateEquipStatusCommand.Execute(this);
-			// 	}
+			
 			SlotGroupCommand m_focusCommand = new SGFocusCommandV2();
 				public SlotGroupCommand FocusCommand{
 					get{return m_focusCommand;}
@@ -193,23 +186,36 @@ namespace SlotSystem{
 				public void Defocus(){
 					m_defocusCommand.Execute(this);
 				}
-			// SlotGroupCommand m_prePickFilterCommand;
-			// 	public SlotGroupCommand PrePickFilterCommand{
-			// 		get{return m_prePickFilterCommand;}
-			// 	}
-			// 	public void SetPrePickFilterCommand(SlotGroupCommand comm){
-			// 		m_prePickFilterCommand = comm;
-			// 	}
-			// 	public void PrePickFilter(){
-			// 		m_prePickFilterCommand.Execute(this);
-			// 	}
+			
+			
+			
+		/*	sorter
+		*/
+			static SGSorter m_itemIDSorter = new SGItemIDSorter();
+			public static SGSorter ItemIDSorter{
+				get{
+					return m_itemIDSorter;
+				}
+			}
+			static SGSorter m_acquisitionOrderSorter = new SGAcquisitionOrderSorter();
+			public static SGSorter AcquisitionOrderSorter{
+				get{
+					return m_acquisitionOrderSorter;
+				}
+			}
+			
 			SGSorter m_sorter;
 				public SGSorter Sorter{
 					get{return m_sorter;}
-					set{m_sorter = value;}
 				}
-				public void SortItems(){
+				// public void SortItems(){
+				// 	m_sorter.Execute(this);
+				// }
+				public void Sort(){
 					m_sorter.Execute(this);
+				}
+				public void SetSorter(SGSorter sorter){
+					m_sorter = sorter;
 				}
 			SGFilter m_filter;
 				public SGFilter Filter{

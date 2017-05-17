@@ -1141,9 +1141,11 @@ namespace SlotSystem{
 			public class SGInitItemsCommand: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
 					sg.FilterItems();//setup Items list
-					sg.SortItems();//sort Items
+					// sg.SortItems();//sort Items
 					sg.CreateSlots();
 					sg.CreateSlottables();
+					if(sg.AutoSort)
+						sg.InstantSort();
 					// sg.UpdateEquipStatus();
 				}
 			}
@@ -1287,18 +1289,78 @@ namespace SlotSystem{
 			public interface SGSorter{
 				void Execute(SlotGroup sg);
 			}
-			public class SGItemIndexSorter: SGSorter{
+			
+			/*	non-instant sorting
+					SlotGroup manages its entire slottables movement in a corrdinated way
+					SlotGroup creates SlotMovement class for each slottable and executes its Move command
+					Each SlotMovement notifies SlotGroup its completion
+					SlotGroup keeps a tally of every SlotMovements's execution status
+					SlotGroup self invokes a CompleteAllMovements method upon completion of every movement's termination
+
+					SlotMovement's motion is independent of each slottable's state and processes
+					
+					SlotGroup calls SGM's CompleteTransactionOnSG in its CompleteAllMovements method
+
+				SGM's sorting transaction
+					SGM creates SortTransaction with the target SG (and only the target SG)
+					SortTransaction.Execute triggers the sorting
+			*/
+				
+			public class　SGItemIDSorter: SGSorter{
 				public void Execute(SlotGroup sg){
-					SlottableItem[] itemsArray = sg.FilteredItems.ToArray();
-					Array.Sort(itemsArray);
-					List<SlottableItem> newList = new List<SlottableItem>();
-					foreach(SlottableItem item in itemsArray){
-						newList.Add(item);
+					List<Slottable> sbList = new List<Slottable>();
+					foreach(Slot slot in sg.Slots){
+						if(slot.Sb != null)
+							sbList.Add(slot.Sb);
+						slot.Sb = null;
 					}
-					sg.SetFilteredItems(newList);
+					sbList.Sort();
+					int count = 0;
+					foreach(Slot slot in sg.Slots){
+						if(count < sbList.Count)
+							slot.Sb = sbList[count];
+						count ++;
+					}
 				}
 			}
-				
+			public class SGAcquisitionOrderSorter: SGSorter{
+				public void Execute(SlotGroup sg){
+					
+					List<Slottable> sbList = new List<Slottable>();
+					foreach(Slot slot in sg.Slots){
+						if(slot.Sb != null)
+							sbList.Add(slot.Sb);
+						slot.Sb = null;
+					}
+					
+					List<Slottable> temp = new List<Slottable>();
+					Slottable addedMax = null;
+					while(temp.Count < sbList.Count){
+						int indexAtMin = -1;
+						int addedAO;
+						if(addedMax == null) addedAO = -1;
+						else addedAO = ((InventoryItemInstanceMock)addedMax.Item).AcquisitionOrder;
+
+						for(int i = 0; i < sbList.Count; i++){
+							InventoryItemInstanceMock inst = (InventoryItemInstanceMock)sbList[i].Item;
+							if(inst.AcquisitionOrder > addedAO){
+								if(indexAtMin == -1 || inst.AcquisitionOrder < ((InventoryItemInstanceMock)sbList[indexAtMin].Item).AcquisitionOrder){
+									indexAtMin = i;
+								}
+							}
+						}
+						Slottable added = sbList[indexAtMin];
+						temp.Add(added);
+						addedMax = added;
+					}
+					int count = 0;
+					foreach(Slot slot in sg.Slots){
+						if(count < temp.Count)
+							slot.Sb = temp[count];
+						count ++;
+					}
+				}
+			}
 	/*	Slottable Classses
 	*/
 		/*	process
@@ -2261,6 +2323,13 @@ namespace SlotSystem{
 						get{return m_quantity;}
 						set{m_quantity = value;}
 					}
+					int m_acquisitionOrder;
+					public int AcquisitionOrder{
+						get{return m_acquisitionOrder;}
+					}
+					public void SetAcquisitionOrder(int id){
+						m_acquisitionOrder = id;
+					}
 					bool m_isStackable;
 					public bool IsStackable{
 						get{
@@ -2285,24 +2354,11 @@ namespace SlotSystem{
 							return m_item.Equals(otherInst.Item);
 						else
 							return object.ReferenceEquals(this, other);
-						// bool flag = m_item.Equals(otherInst.Item);
-						// flag &= m_item.IsStackable && otherInst.Item.IsStackable;
-						// return flag;
 					}
 					public override int GetHashCode(){
 						return m_item.ItemID.GetHashCode() + 31;
 					}
 					public static bool operator ==(InventoryItemInstanceMock a, InventoryItemInstanceMock b){
-						// if(object.ReferenceEquals(a, null)){
-						// 	return object.ReferenceEquals(b, null);
-						// }
-						// if(object.ReferenceEquals(b, null)){
-						// 	return object.ReferenceEquals(a, null);
-						// }
-						// bool flag = a.Item.ItemID == b.Item.ItemID;
-						// flag &= a.IsStackable && b.IsStackable;
-						// bool flag = object.ReferenceEquals(a, b);
-						// return flag;
 						return a.Equals(b);
 					}
 					public static bool operator != (InventoryItemInstanceMock a, InventoryItemInstanceMock b){
@@ -2323,7 +2379,12 @@ namespace SlotSystem{
 						if(!(other is InventoryItemInstanceMock))
 							throw new InvalidOperationException("System.Object.CompareTo: not an InventoryItemInstance");
 						InventoryItemInstanceMock otherInst = (InventoryItemInstanceMock)other;
-						return m_item.ItemID.CompareTo(otherInst.Item.ItemID);
+
+						int result = m_item.ItemID.CompareTo(otherInst.Item.ItemID);
+						if(result == 0)
+							result = this.AcquisitionOrder.CompareTo(otherInst.AcquisitionOrder);
+						
+						return result;
 					}
 				}
 				public class InventoryItemMock: IEquatable<InventoryItemMock>, IComparable, IComparable<InventoryItemMock>{
@@ -2401,6 +2462,7 @@ namespace SlotSystem{
 							}
 						}
 						m_items.Add(item);
+						IndexItems();
 					}
 					public void RemoveItem(SlottableItem item){
 						foreach(SlottableItem it in Items){
@@ -2415,6 +2477,13 @@ namespace SlotSystem{
 										Items.Remove(it);
 								}
 							}
+						}
+						IndexItems();
+					}
+
+					void IndexItems(){
+						for(int i = 0; i < m_items.Count; i ++){
+							((InventoryItemInstanceMock)m_items[i]).SetAcquisitionOrder(i);
 						}
 					}
 				}

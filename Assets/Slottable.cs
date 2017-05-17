@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 namespace SlotSystem{
-	public class Slottable : MonoBehaviour{
+	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable{
 
 		
 		/* States
@@ -265,6 +265,19 @@ namespace SlotSystem{
 				public Slot DestinationSlot{
 					get{return m_destinationSlot;}
 				}
+		
+			public int SlotID{
+				get{
+					int result = -1;
+					List<Slot> slots = SGM.GetSlotGroup(this).Slots;
+					for(int i = 0; i < slots.Count; i++){
+						if(slots[i].Sb != null)
+							if(slots[i].Sb == this)
+								result = i;
+					}
+					return result;
+				}
+			}
 		/*	processes
 		*/
 			SBProcess m_curProcess;
@@ -376,7 +389,23 @@ namespace SlotSystem{
 			public void Defocus(){
 				m_curState.Defocus(this);
 			}
-		/**/
+		/*	Interface implementation
+		*/
+			int IComparable.CompareTo(object other){
+				if(!(other is Slottable))
+					throw new InvalidOperationException("CompareTo: no a slottable");
+				return CompareTo((Slottable)other);
+
+			}
+			public int CompareTo(Slottable other){
+				return this.Item.CompareTo(other.Item);
+			}
+			public static bool operator > (Slottable a, Slottable b){
+				return a.CompareTo(b) > 0;
+			}
+			public static bool operator < (Slottable a, Slottable b){
+				return a.CompareTo(b) < 0;
+			}
 		
 		public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
 			m_curState = Slottable.DeactivatedState;

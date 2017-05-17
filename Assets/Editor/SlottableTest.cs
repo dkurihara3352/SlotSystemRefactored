@@ -66,7 +66,8 @@ public class SlottableTest {
 				sgpAllGO = new GameObject("PoolSlotGroup");
 				sgpAll = sgpAllGO.AddComponent<SlotGroup>();
 				sgpAll.Filter = new SGNullFilter();
-				sgpAll.Sorter = new SGItemIndexSorter();
+				// sgpAll.Sorter = new SGItemIndexSorter();
+				sgpAll.SetSorter(SlotGroup.ItemIDSorter);
 				// sgpAll.UpdateEquipStatusCommand = new UpdateEquipStatusForPoolCommmand();
 				PoolInventory inventory = new PoolInventory();
 				sgpAll.SetInventory(inventory);
@@ -77,7 +78,8 @@ public class SlottableTest {
 				sgBowGO = new GameObject("BowSlotGroup");
 				sgBow = sgBowGO.AddComponent<SlotGroup>();
 				sgBow.Filter = new SGBowFilter();
-				sgBow.Sorter = new SGItemIndexSorter();
+				// sgBow.Sorter = new SGItemIndexSorter();
+				sgBow.SetSorter(SlotGroup.ItemIDSorter);
 				// sgBow.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
 				EquipmentSetInventory equipInventory = new EquipmentSetInventory();
 				sgBow.SetInventory(equipInventory);
@@ -93,7 +95,8 @@ public class SlottableTest {
 				sgWearGO = new GameObject("WearSlotGroup");
 				sgWear = sgWearGO.AddComponent<SlotGroup>();
 				sgWear.Filter = new SGWearFilter();
-				sgWear.Sorter = new SGItemIndexSorter();
+				// sgWear.Sorter = new SGItemIndexSorter();
+				sgWear.SetSorter(SlotGroup.ItemIDSorter);
 				// sgWear.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
 				sgWear.SetInventory(equipInventory);
 				sgWear.IsShrinkable = false;
@@ -108,7 +111,8 @@ public class SlottableTest {
 				sgpPartsGO = new GameObject("PartsSlotGroupPool");
 				sgpParts = sgpPartsGO.AddComponent<SlotGroup>();
 				sgpParts.Filter = new SGPartsFilter();
-				sgpParts.Sorter = new SGItemIndexSorter();
+				// sgpParts.Sorter = new SGItemIndexSorter();
+				sgpParts.SetSorter(SlotGroup.ItemIDSorter);
 				// sgpParts.UpdateEquipStatusCommand = new UpdateEquipStatusForPoolCommmand();
 				sgpParts.SetInventory(inventory);
 				sgpParts.IsShrinkable = true;
@@ -118,7 +122,8 @@ public class SlottableTest {
 				sgCGearsGO = new GameObject("CarriedGearsSG");
 				sgCGears = sgCGearsGO.AddComponent<SlotGroup>();
 				sgCGears.Filter = new SGCarriedGearFilter();
-				sgCGears.Sorter = new SGItemIndexSorter();
+				// sgCGears.Sorter = new SGItemIndexSorter();
+				sgCGears.SetSorter(SlotGroup.ItemIDSorter);
 				// sgCGears.UpdateEquipStatusCommand = new UpdateEquipStatusForEquipSGCommand();
 				sgCGears.SetInventory(equipInventory);
 				sgCGears.IsShrinkable = true;
@@ -238,15 +243,15 @@ public class SlottableTest {
 				equipInventory.AddItem(defMWeaponA);
 
 		/**/
-		EquipmentSet equipSetA = new EquipmentSet(sgBow, sgWear, sgCGears);
-		SlotSystemBundle equipBundle = new SlotSystemBundle();
-		equipBundle.Elements.Add(equipSetA);
-		equipBundle.SetFocusedBundleElement(equipSetA);
-		SlotSystemBundle poolBundle = new SlotSystemBundle();
-		poolBundle.Elements.Add(sgpAll);
-		poolBundle.Elements.Add(sgpParts);
-		poolBundle.SetFocusedBundleElement(sgpAll);
-		InventoryManagerPage invManPage = new InventoryManagerPage(poolBundle, equipBundle);
+			EquipmentSet equipSetA = new EquipmentSet(sgBow, sgWear, sgCGears);
+			SlotSystemBundle equipBundle = new SlotSystemBundle();
+			equipBundle.Elements.Add(equipSetA);
+			equipBundle.SetFocusedBundleElement(equipSetA);
+			SlotSystemBundle poolBundle = new SlotSystemBundle();
+			poolBundle.Elements.Add(sgpAll);
+			poolBundle.Elements.Add(sgpParts);
+			poolBundle.SetFocusedBundleElement(sgpAll);
+			InventoryManagerPage invManPage = new InventoryManagerPage(poolBundle, equipBundle);
 	
 		sgm.SetRootPage(invManPage);	
 			/*	Assert Setup
@@ -324,7 +329,7 @@ public class SlottableTest {
 			*/
 			Assert.That(sgpAll.CurState, Is.EqualTo(SlotGroup.DeactivatedState));
 			Assert.That(sgpAll.FilteredItems.Count, Is.EqualTo(14));
-			Assert.That(sgpAll.FilteredItems, Is.Ordered);
+			Assert.That(sgpAll.FilteredItems, Is.Not.Ordered);
 			Assert.That(sgpAll.Slots.Count, Is.EqualTo(14));
 			foreach(Slot slot in sgpAll.Slots){
 				Assert.That(slot.Sb.CurState, Is.EqualTo(Slottable.DeactivatedState));
@@ -622,6 +627,61 @@ public class SlottableTest {
 	}
 	[Test]
 	public void Test(){
+		
+	}
+	public void TestInstantSort(){
+		PrintItems(sgpAll);
+			AssertOrderReset();
+			AssertOrder(defBowA_p);
+			AssertOrder(defBowB_p);
+			AssertOrder(crfBowA_p);
+			AssertOrder(defWearA_p);
+			AssertOrder(defWearB_p);
+			AssertOrder(crfWearA_p);
+			AssertOrder(defShieldA_p);
+			AssertOrder(crfShieldA_p);
+			AssertOrder(defMWeaponA_p);
+			AssertOrder(crfMWeaponA_p);
+			AssertOrder(defQuiverA_p);
+			AssertOrder(defPackA_p);
+			AssertOrder(defParts_p);
+			AssertOrder(crfParts_p);
+		sgpAll.SetSorter(SlotGroup.AcquisitionOrderSorter);
+		sgpAll.InstantSort();
+		PrintItems(sgpAll);
+			AssertOrderReset();
+			AssertOrder(defBowA_p);
+			AssertOrder(defBowB_p);
+			AssertOrder(crfBowA_p);
+			AssertOrder(defWearA_p);
+			AssertOrder(defWearB_p);
+			AssertOrder(crfWearA_p);
+			AssertOrder(defParts_p);
+			AssertOrder(crfParts_p);
+			AssertOrder(defShieldA_p);
+			AssertOrder(crfShieldA_p);
+			AssertOrder(defMWeaponA_p);
+			AssertOrder(crfMWeaponA_p);
+			AssertOrder(defQuiverA_p);
+			AssertOrder(defPackA_p);
+	}
+	public void PrintItems(SlotGroup sg){
+		string result = "";
+		string title = null;
+		if(sg == sgpAll) title = "<b>sgpAll</b> ";
+		else if(sg == sgBow) title = "<b>sgBow</b> ";
+		else if(sg == sgWear) title = "<b>sgWear</b>  ";
+		else if(sg == sgCGears) title = "<b>sgCGears</b>  ";
+		// foreach(InventoryItemInstanceMock itemInst in sg.Inventory.Items){
+		// 	result += itemInst.Item.ItemID.ToString() + ", ";
+		// }
+		foreach(Slot slot in sg.Slots){
+			if(slot.Sb != null)
+				result += ((InventoryItemInstanceMock)slot.Sb.Item).Item.ItemID.ToString() + ", ";
+		}
+		Debug.Log(title + result);
+	}
+	public void TestSwap(){
 		
 		// TestHover();
 		/*
@@ -1454,8 +1514,11 @@ public class SlottableTest {
 			sgpAll.CurProcess.Expire();
 				AssertFocusedGeneric();
 				AssertEquippedCGears(defQuiverA_p, defShieldA_p, crfMWeaponA_p, defPackA_p);
+		AssertEquipped(defBowA_p);
+		AssertEquipped(defWearA_p);
+		AssertEquippedCGears(defQuiverA_p, defShieldA_p, crfMWeaponA_p, defPackA_p);
+		
 	}
-	
 	/*	CarriedGearsTesting
 	*/
 		public void TestCarriedGearsSetup(){
@@ -1463,7 +1526,7 @@ public class SlottableTest {
 			*/
 				AB(sgCGears != null, true);
 				AE(sgCGears.Filter.GetType(), typeof(SGCarriedGearFilter));
-				AE(sgCGears.Sorter.GetType(), typeof(SGItemIndexSorter));
+				// AE(sgCGears.Sorter.GetType(), typeof(SGItemIndexSorter));
 				// AE(sgCGears.UpdateEquipStatusCommand.GetType(), typeof(UpdateEquipStatusForEquipSGCommand));
 				AE(sgCGears.Inventory, sgBow.Inventory);
 				AB(sgCGears.IsShrinkable, true);
@@ -3444,5 +3507,16 @@ public class SlottableTest {
 					}
 				}
 			} 
+		}
+		public void AssertOrder(Slottable sb, int ind){
+			AE(sb.SlotID, ind);
+		}
+		int aoCount = 0;
+		public void AssertOrder(Slottable sb){
+			AE(sb.SlotID, aoCount);
+			aoCount ++;
+		}
+		public void AssertOrderReset(){
+			aoCount = 0;
 		}
 }
