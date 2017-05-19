@@ -120,6 +120,16 @@ namespace SlotSystem{
 						this.CurProcess.Expire();
 					return null;
 				}
+				public IEnumeratorMock WaitForSortingDone(){
+					bool done = true;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
+					if(done)
+						this.CurProcess.Expire();
+					return null;
+				}
 		/*	states
 		*/
 			SGMState m_curState;
@@ -233,6 +243,8 @@ namespace SlotSystem{
 				if(sg == GetSlotGroup(PickedSB)) m_origSGDoneTransaction = true;
 				else if(sg == SelectedSG) m_selectedSGDoneTransaction = true;
 				else if(sg == GetSlotGroup(m_selectedSB))
+					m_selectedSGDoneTransaction = true;
+				else if(sg.CurState == SlotGroup.SortingState)
 					m_selectedSGDoneTransaction = true;
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
 			}
@@ -490,6 +502,35 @@ namespace SlotSystem{
 					result.Add(slot);
 			}
 			return result;
+		}
+		public void SortSG(SlotGroup sg, SGSorter sorter){
+			sg.SetSorter(sorter);
+			SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
+			SetTransaction(sortTransaction);
+			Transaction.Execute();
+		}
+		Slottable m_removedSb;
+		public Slottable removedSB{
+			set{
+				m_removedSb = value;
+			}
+		}
+		public void DestroyRemovedSB(){
+			if(m_removedSb != null){
+				GameObject go = m_removedSb.gameObject;
+				DestroyImmediate(m_removedSb);
+				DestroyImmediate(go);
+				m_removedSb = null;
+			}
+		}
+		public int GetInvInstID(InventoryItemInstanceMock invInst){
+			PoolInventory poolInv = (PoolInventory)GetFocusedPoolSG().Inventory;
+			List<InventoryItemInstanceMock> sameItemList = new List<InventoryItemInstanceMock>();
+			foreach(InventoryItemInstanceMock ii in poolInv.Items){
+				if(ii.Item == invInst.Item)
+					sameItemList.Add(ii);
+			}
+			return sameItemList.IndexOf(invInst);
 		}
 	}
 

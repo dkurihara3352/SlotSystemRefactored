@@ -27,27 +27,33 @@ public class SlottableTest {
 		/*	items
 		*/
 			Slottable defBowB_p;
+			Slottable defBowB_e;
 			Slottable defBowA_p;
+			Slottable defBowA_e;
 			Slottable crfBowA_p;
+			Slottable crfBowA_e;
 			Slottable defWearB_p;
+			Slottable defWearB_e;
 			Slottable defWearA_p;
+			Slottable defWearA_e;
 			Slottable crfWearA_p;
+			Slottable crfWearA_e;
 			Slottable defParts_p;
 			Slottable crfParts_p;
-			Slottable defBowA_e;
-			Slottable defWearA_e;
 			Slottable defParts_p2;
 			Slottable crfParts_p2;
-			Slottable defShieldA_e;
 			Slottable defShieldA_p;
-			Slottable defMWeaponA_e;
+			Slottable defShieldA_e;
 			Slottable defMWeaponA_p;
-			Slottable crfShieldA_e;
+			Slottable defMWeaponA_e;
 			Slottable crfShieldA_p;
-			Slottable crfMWeaponA_e;
+			Slottable crfShieldA_e;
 			Slottable crfMWeaponA_p;
+			Slottable crfMWeaponA_e;
 			Slottable defQuiverA_p;
+			Slottable defQuiverA_e;
 			Slottable defPackA_p;
+			Slottable defPackA_e;
 
 	/*
 	*/
@@ -392,242 +398,290 @@ public class SlottableTest {
 		sgm.Focus();
 			AssertSGMFocused();
 	}
-	public void TestSGProcesses(){
-		sgm.Defocus();
-		sgm.Focus();
-
-		AssertSGMFocused();
-			ASSG(sgpAll, SlotGroup.FocusedState);
-			AE(sgpAll.PrevState, SlotGroup.DefocusedState);
-			AE(sgpAll.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgBow, SlotGroup.FocusedState);
-			AE(sgBow.PrevState, SlotGroup.DefocusedState);
-			AE(sgBow.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgWear, SlotGroup.FocusedState);
-			AE(sgWear.PrevState, SlotGroup.DefocusedState);
-			AE(sgWear.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgCGears, SlotGroup.FocusedState);
-			AE(sgCGears.PrevState, SlotGroup.DefocusedState);
-			AE(sgCGears.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgpParts, SlotGroup.DefocusedState);
-			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
-			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
-		sgm.Focus();
-			ASSG(sgpAll, SlotGroup.FocusedState);
-			AE(sgpAll.PrevState, SlotGroup.FocusedState);
-			AE(sgpAll.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgBow, SlotGroup.FocusedState);
-			AE(sgBow.PrevState, SlotGroup.FocusedState);
-			AE(sgBow.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgWear, SlotGroup.FocusedState);
-			AE(sgWear.PrevState, SlotGroup.FocusedState);
-			AE(sgWear.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgCGears, SlotGroup.FocusedState);
-			AE(sgCGears.PrevState, SlotGroup.FocusedState);
-			AE(sgCGears.CurProcess.GetType(), typeof(SGGreyinProcess));
-			ASSG(sgpParts, SlotGroup.DefocusedState);
-			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
-			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
-		sgm.Defocus();
-			ASSG(sgpAll, SlotGroup.DefocusedState);
-			AE(sgpAll.PrevState, SlotGroup.FocusedState);
-			AE(sgpAll.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			ASSG(sgBow, SlotGroup.DefocusedState);
-			AE(sgBow.PrevState, SlotGroup.FocusedState);
-			AE(sgBow.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			ASSG(sgWear, SlotGroup.DefocusedState);
-			AE(sgWear.PrevState, SlotGroup.FocusedState);
-			AE(sgWear.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			ASSG(sgCGears, SlotGroup.DefocusedState);
-			AE(sgCGears.PrevState, SlotGroup.FocusedState);
-			AE(sgCGears.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			ASSG(sgpParts, SlotGroup.DefocusedState);
-			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
-			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
-		sgm.Deactivate();
-			ASSG(sgpAll, SlotGroup.DeactivatedState);
-			AE(sgpAll.PrevState, SlotGroup.DefocusedState);
-			// AE(sgpAll.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			AB(sgpAll.CurProcess == null, true);
-
-			ASSG(sgBow, SlotGroup.DeactivatedState);
-			AE(sgBow.PrevState, SlotGroup.DefocusedState);
-			// AE(sgBow.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			AB(sgBow.CurProcess == null, true);
-
-			ASSG(sgWear, SlotGroup.DeactivatedState);
-			AE(sgWear.PrevState, SlotGroup.DefocusedState);
-			// AE(sgWear.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			AB(sgWear.CurProcess == null, true);
-			
-			ASSG(sgCGears, SlotGroup.DeactivatedState);
-			AE(sgCGears.PrevState, SlotGroup.DefocusedState);
-			// AE(sgCGears.CurProcess.GetType(), typeof(SGGreyoutProcess));
-			AB(sgCGears.CurProcess == null, true);
-			
-			ASSG(sgpParts, SlotGroup.DeactivatedState);
-			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
-			// AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
-			AB(sgpParts.CurProcess == null, true);
-		sgm.Focus();
-			ASSG(sgpAll, SlotGroup.FocusedState);
-			AE(sgpAll.PrevState, SlotGroup.DeactivatedState);
-			AE(sgpAll.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
-			ASSG(sgBow, SlotGroup.FocusedState);
-			AE(sgBow.PrevState, SlotGroup.DeactivatedState);
-			AE(sgBow.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
-			ASSG(sgWear, SlotGroup.FocusedState);
-			AE(sgWear.PrevState, SlotGroup.DeactivatedState);
-			AE(sgWear.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
-			ASSG(sgCGears, SlotGroup.FocusedState);
-			AE(sgCGears.PrevState, SlotGroup.DeactivatedState);
-			AE(sgCGears.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
-			ASSG(sgpParts, SlotGroup.DefocusedState);
-			AE(sgpParts.PrevState, SlotGroup.DeactivatedState);
-			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
-		
-		PickUp(defBowB_p, out picked);
-			ASSG(sgpAll, SlotGroup.SelectedState);
-			AE(sgpAll.PrevState, SlotGroup.FocusedState);
-			AE(sgpAll.CurProcess.GetType(), typeof(SGHighlightProcess));
-		sgm.SimSGHover(sgBow, eventData);
-			ASSG(sgpAll, SlotGroup.FocusedState);
-			AE(sgpAll.PrevState, SlotGroup.SelectedState);
-			AE(sgpAll.CurProcess.GetType(), typeof(SGDehighlightProcess));
-			ASSG(sgBow, SlotGroup.SelectedState);
-			AE(sgBow.PrevState, SlotGroup.FocusedState);
-			AE(sgBow.CurProcess.GetType(), typeof(SGHighlightProcess));
-		sgm.SimSGHover(sgpAll, eventData);
-		bool reverted = false;
-		Revert(defBowB_p, out reverted);
-		AssertSGMFocused();
-		AB(picked, true);
-		AB(reverted, true);
-
-	}
-	public void TestSBProcesses(){
-		/*	FocusedState
-		*/
-			sgm.Defocus();
-			sgm.Focus();
-			ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);
-			AE(defBowA_p.PrevState, Slottable.EquippedAndDefocusedState);
-			AB(defBowA_p.CurProcess == null, true);
-			ASSB(defBowB_p, Slottable.FocusedState);
-			AE(defBowB_p.PrevState, Slottable.DefocusedState);
-			AE(defBowB_p.CurProcess.GetType(), typeof(SBGreyinProcess));
-			ASSB(defParts_p, Slottable.DefocusedState);
-			AE(defParts_p.PrevState, Slottable.DefocusedState);
-			AB(defParts_p.CurProcess == null, true);
-			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
-			AE(defBowA_e.PrevState, Slottable.EquippedAndDefocusedState);
-			AE(defBowA_e.CurProcess.GetType(), typeof(SBGreyinProcess));
-
-			sgpAll.AutoSort = false;
-			PickUp(defBowB_p, out picked);
-			sgm.SimSBHover(defWearB_p, eventData);
-			ASSB(defWearB_p, Slottable.SelectedState);
-			sgm.SimSBHover(defBowB_p, eventData);
-			ASSB(defWearB_p, Slottable.FocusedState);
-			AE(defWearB_p.PrevState, Slottable.SelectedState);
-			AE(defWearB_p.CurProcess.GetType(), typeof(SBDehighlightProcess));
-			bool reverted;
-			Revert(defBowB_p, out reverted);
-
-			sgpAll.AutoSort = true;
-			sgm.Focus();
-			AssertSGMFocused();
-
-			ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);
-			defBowA_p.SetState(Slottable.FocusedState);
-			AE(defBowA_p.PrevState, Slottable.EquippedAndDefocusedState);
-			ASSB(defBowA_p, Slottable.FocusedState);
-			AE(defBowA_p.CurProcess.GetType(), typeof(SBUnequipAndGreyinProcess));
-			defBowA_p.SetState(Slottable.EquippedAndDefocusedState);
-			AssertSGMFocused();
-			
-			defBowB_p.SetState(Slottable.EquippedAndSelectedState);
-			defBowB_p.SetState(Slottable.FocusedState);
-			AE(defBowB_p.PrevState, Slottable.EquippedAndSelectedState);
-			ASSB(defBowB_p, Slottable.FocusedState);
-			AE(defBowB_p.CurProcess.GetType(), typeof(SBUnequipAndDehighlightProcess));
-			AssertSGMFocused();
-
-			sgm.Deactivate();
-			sgm.Focus();
-			AE(defBowB_p.PrevState, Slottable.DeactivatedState);
-			ASSB(defBowB_p, Slottable.FocusedState);
-			AE(defBowB_p.CurProcess, null);
-			AssertSGMFocused();
-
-			PickUp(defBowB_p, out picked);
-			defBowB_p.OnPointerUpMock(eventData);
-			ASSB(defBowB_p, Slottable.MovingState);
-			AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
-			AE(defBowB_p.CurProcess.GetType(), typeof(MoveProcess));
-			defBowB_p.CurProcess.Expire();
-			AssertSGMFocused();
-			AE(defBowB_p.PrevState, Slottable.MovingState);
-			AE(defBowB_p.CurProcess.GetType(), typeof(SBUnpickProcess));
-		/*	EquippedAndDeselectedState
-		*/
-			AssertSGMFocused();
-			sgm.Defocus();
-			sgm.Focus();
-			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
-			AE(defBowA_e.PrevState, Slottable.EquippedAndDefocusedState);
-			AE(defBowA_e.CurProcess.GetType(), typeof(SBGreyinProcess));
-			sgm.Deactivate();
-			sgm.Focus();
-			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
-			AE(defBowA_e.PrevState, Slottable.DeactivatedState);
-			AB(defBowA_e.CurProcess == null, true);
-
-			defBowA_e.SetState(Slottable.DefocusedState);
-			defBowA_e.SetState(Slottable.EquippedAndDeselectedState);
-			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
-			AE(defBowA_e.PrevState, Slottable.DefocusedState);
-			AE(defBowA_e.CurProcess.GetType(), typeof(SBEquipAndGreyinProcess));
-			
-			defBowA_e.SetState(Slottable.SelectedState);
-			defBowA_e.SetState(Slottable.EquippedAndDeselectedState);
-			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
-			AE(defBowA_e.PrevState, Slottable.SelectedState);
-			AE(defBowA_e.CurProcess.GetType(), typeof(SBEquipAndDehighlightProcess));
-		/*	EquippedAndSelectedState
-		*/
-			AssertSGMFocused();
-			sgpAll.AutoSort = false;
-			PickUp(defBowB_p, out picked);
-			sgm.SimSBHover(defBowA_p, eventData);
-			ASSB(defBowA_p, Slottable.EquippedAndSelectedState);
-			AE(defBowA_p.PrevState, Slottable.EquippedAndDeselectedState);
-			AE(defBowA_p.CurProcess.GetType(), typeof(SBHighlightProcess));
-			sgm.SimSBHover(defBowB_p, eventData);
-			Revert(defBowB_p, out reverted);
-			sgpAll.AutoSort = true;
-			AssertSGMFocused();
-
-
-		/*	EquippedAndDefocusedState
-		*/
-			AssertSGMFocused();
-			sgm.Defocus();
-			ASSB(defShieldA_e, Slottable.EquippedAndDefocusedState);
-			AE(defShieldA_e.PrevState, Slottable.EquippedAndDeselectedState);
-			AE(defShieldA_e.CurProcess.GetType(), typeof(SBGreyoutProcess));
-			defShieldA_e.SetState(Slottable.FocusedState);
-			ASSB(defShieldA_e, Slottable.FocusedState);
-			defShieldA_e.SetState(Slottable.EquippedAndDefocusedState);
-			AE(defShieldA_e.PrevState, Slottable.FocusedState);
-			ASSB(defShieldA_e, Slottable.EquippedAndDefocusedState);
-			AE(defShieldA_e.CurProcess.GetType(), typeof(SBEquipAndGreyoutProcess));
-			
-			sgm.Focus();
-	}
+	
 	[Test]
-	public void Test(){
+	public void TestRevisedTransactionUpdate(){
+		/*	AutoSort off
+		*/
+		/*	SwapTransaction	*/
+			sgCGears.AutoSort = false;
+			sgpAll.AutoSort = false;
+				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, null, null);
+			defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+			PickUp(defQuiverA_p, out picked);
+			sgm.SimHover(defShieldA_e, sgCGears, eventData);
+				AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
+				Slottable pickedSB;
+				SlotGroup origSG;
+				Slottable selectedSB;
+				SlotGroup selectedSG;
+				((SwapTransaction)sgm.Transaction).CheckFields(out pickedSB, out origSG, out selectedSB, out selectedSG);
+				AE(pickedSB, defQuiverA_p);
+				AE(origSG, sgpAll);
+				AE(selectedSB, defShieldA_e);
+				AE(selectedSG, sgCGears);
+
+				AE(sgm.PickedSB, defQuiverA_p);
+				AE(sgm.SelectedSB, defShieldA_e);
+				AE(sgm.SelectedSG, sgCGears);
+
+			defQuiverA_p.OnPointerUpMock(eventData);
+				AE(sgm.PickedSB, defQuiverA_p);
+				AE(sgm.SelectedSB, defShieldA_e);
+				AE(sgm.SelectedSG, sgCGears);
+
+				ASSB(defShieldA_p, Slottable.EquippedAndDeselectedState);
+
+				AE(sgm.CurProcess.GetType(), typeof(SGMSwapTransactionProcess));
+				AE(sgpAll.CurProcess.GetType(), typeof(SGDehighlightProcess));
+				AE(sgCGears.CurProcess.GetType(), typeof(SGHighlightProcess));
+				AE(defQuiverA_p.CurProcess.GetType(), typeof(SBEquippingProcess));
+				AE(defShieldA_e.CurProcess.GetType(), typeof(SBRemovingProcess));
+			ExpireProcesses(defQuiverA_p, defShieldA_e, sgpAll, sgCGears);
+				AE(sgm.PickedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, true);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.SelectedSGDoneTransaction, true);
+				AssertEquippedCGears(defQuiverA_p, defMWeaponA_p, null, null);
+				AB(defShieldA_p.IsEquipped, false);
+
+				
+				ASSB(defShieldA_p, Slottable.FocusedState);
+				AssertFocusedGeneric();
+		/*	FillEquip	*/
+			PickUp(defShieldA_p, out picked);
+				AB(picked, true);
+			sgm.SimHover(null, sgCGears, eventData);
+				AB(sgm.Transaction == null, false);
+				AE(sgm.Transaction.GetType(), typeof(FillEquipTransaction));
+				ASSG(sgpAll, SlotGroup.FocusedState);
+				AssertEquippedCGears(defQuiverA_p, defMWeaponA_p, null, null);
+			defShieldA_p.OnPointerUpMock(eventData);
+				AssertEquippedCGears(defQuiverA_p, defMWeaponA_p, defShieldA_p, null);
+					ASSG(sgpAll, SlotGroup.FocusedState);
+					ASSG(sgCGears, SlotGroup.SelectedState);
+			ExpireProcesses(defShieldA_p, null, sgpAll, sgCGears);
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defQuiverA_p, defMWeaponA_p, defShieldA_p, null);
+		/*	Voluntary Sort	*/
+			sgm.SortSG(sgCGears, SlotGroup.ItemIDSorter);
+					defQuiverA_e = sgCGears.GetSlottable(defQuiverA_p.Item);
+					defMWeaponA_e = sgCGears.GetSlottable(defMWeaponA_p.Item);
+					defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+					AE(sgCGears.SlotMovements.Count, 3);
+					AssertMoveSlotIndex(sgCGears, defQuiverA_e, 0, 2, false);
+					AssertMoveSlotIndex(sgCGears, defMWeaponA_e, 1, 1, true);
+					AssertMoveSlotIndex(sgCGears, defShieldA_e, 2, 0, false);
+			CompleteAllSlotMovements(sgCGears);
+				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_p, null);
+		/*	AutoSort on and Fill Equip	*/
+			sgpAll.AutoSort = true;
+			sgCGears.AutoSort = true;
+
+			PickUp(crfShieldA_p, out picked);
+			sgm.SimHover(null, sgCGears, eventData);
+			crfShieldA_p.OnPointerUpMock(eventData);
+				crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.Item);
+				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_p, crfShieldA_p);
+					AssertMoveSlotIndex(sgCGears, defShieldA_e, 0, 0, true);
+					AssertMoveSlotIndex(sgCGears, crfShieldA_e, 3, 1, false);
+					AssertMoveSlotIndex(sgCGears, defMWeaponA_e, 1, 2, false);
+					AssertMoveSlotIndex(sgCGears, defQuiverA_e, 2, 3, false);
+			ExpireProcesses(crfShieldA_p, null, sgpAll, sgCGears);
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defShieldA_p, crfShieldA_p, defMWeaponA_p, defQuiverA_p);
+
+	}
+	// [Test]
+	public void TestAutoSortOnSGCGears(){
+		sgCGears.AutoSort = false;
+			AssertEquippedCGears(defShieldA_p, defMWeaponA_p, null, null);
+		PickUp(defQuiverA_p, out picked);
+		defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+		sgm.SimHover(defShieldA_e, sgCGears, eventData);
+		defQuiverA_p.OnPointerUpMock(eventData);
+		// ExpireProcesses();
+		ExpireProcesses(defQuiverA_p, defShieldA_e, sgpAll, sgCGears);
+			AssertEquippedCGears(defQuiverA_p, defMWeaponA_p, null, null);
+		sgCGears.AutoSort = true;
+
+	}
+	public void TestVoluntarySortOnSGCGears(){
+			AssertEquippedCGears(defShieldA_p, defMWeaponA_p, null, null);
+		PickUp(defQuiverA_p, out picked);
+		sgm.SimHover(null, sgCGears, eventData);
+		defQuiverA_p.OnPointerUpMock(eventData);
+		// ExpireProcesses();
+		ExpireProcesses(defQuiverA_p, null, sgpAll, sgCGears);
+			AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_p, null);
 		
+		PickUp(crfShieldA_p, out picked);
+		defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+		sgm.SimHover(defShieldA_e, sgCGears, eventData);
+		crfShieldA_p.OnPointerUpMock(eventData);
+		// ExpireProcesses();
+		ExpireProcesses(crfShieldA_p, defShieldA_e, sgpAll, sgCGears);
+			AssertEquippedCGears(crfShieldA_p, defMWeaponA_p, defQuiverA_p, null);
+			crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.Item);
+			defMWeaponA_e = sgCGears.GetSlottable(defMWeaponA_p.Item);
+			defQuiverA_e = sgCGears.GetSlottable(defQuiverA_p.Item);
+			AssertOrderReset();
+			AssertOrder(crfShieldA_e);
+			AssertOrder(defMWeaponA_e);
+			AssertOrder(defQuiverA_e);
+		
+		PickUp(defShieldA_p, out picked);
+		sgm.SimHover(null, sgCGears, eventData);
+		defShieldA_p.OnPointerUpMock(eventData);
+		// ExpireProcesses();
+		ExpireProcesses(defShieldA_p, null, sgpAll, sgCGears);
+			AssertEquippedCGears(crfShieldA_p, defMWeaponA_p, defQuiverA_p, defShieldA_p);
+		
+		sgm.SortSG(sgCGears, SlotGroup.ItemIDSorter);
+			defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+			AssertMoveSlotIndex(sgCGears, crfShieldA_e, 0, 1, false);
+			AssertMoveSlotIndex(sgCGears, defMWeaponA_e, 1, 2, false);
+			AssertMoveSlotIndex(sgCGears, defQuiverA_e, 2, 3, false);
+			AssertMoveSlotIndex(sgCGears, defShieldA_e, 3, 0, false);
+		CompleteAllSlotMovements(sgCGears);
+			AssertOrderReset();
+			AssertOrder(defShieldA_e);
+			AssertOrder(crfShieldA_e);
+			AssertOrder(defMWeaponA_e);
+			AssertOrder(defQuiverA_e);
+			AssertEquippedCGears(defShieldA_p, crfShieldA_p, defMWeaponA_p, defQuiverA_p);
+			
+
+	}
+	public void ExpireProcesses(Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
+		if(pickedSB != null)
+			if(pickedSB.CurProcess != null)
+				pickedSB.CurProcess.Expire();
+		if(selectedSB != null)
+			if(selectedSB.CurProcess != null)
+				selectedSB.CurProcess.Expire();
+		if(origSG != null)
+			if(origSG.CurProcess != null)
+				origSG.CurProcess.Expire();
+		if(selectedSG != null)
+			if(selectedSG.CurProcess != null)
+				selectedSG.CurProcess.Expire();
+	}
+	public void TestVoluntarySortOnSGPAll(){
+		AssertOrderReset();
+			AssertOrder(defBowA_p);
+			AssertOrder(defBowB_p);
+			AssertOrder(crfBowA_p);
+			AssertOrder(defWearA_p);
+			AssertOrder(defWearB_p);
+			AssertOrder(crfWearA_p);
+			AssertOrder(defShieldA_p);
+			AssertOrder(crfShieldA_p);
+			AssertOrder(defMWeaponA_p);
+			AssertOrder(crfMWeaponA_p);
+			AssertOrder(defQuiverA_p);
+			AssertOrder(defPackA_p);
+			AssertOrder(defParts_p);
+			AssertOrder(crfParts_p);
+		sgm.SortSG(sgpAll, SlotGroup.AcquisitionOrderSorter);
+			AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
+			AE(sgm.CurProcess.GetType(), typeof(SGMSortingProcess));
+			AE(sgm.Transaction.GetType(), typeof(SortTransaction));
+			AE(sgm.PickedSB, null);
+			AE(sgm.SelectedSB, null);
+			AE(sgm.SelectedSG, null);
+
+			ASSG(sgpAll, SlotGroup.SortingState);
+			AE(sgpAll.CurProcess.GetType(), typeof(SGSortingProcess));
+
+			AE(sgpAll.SlotMovements.Count, 14);
+			AssertMoveSlotIndex(sgpAll, defBowA_p, 0, 0, true);
+			AssertMoveSlotIndex(sgpAll, defBowB_p, 1, 1, true);
+			AssertMoveSlotIndex(sgpAll, crfBowA_p, 2, 2, true);
+			AssertMoveSlotIndex(sgpAll, defWearA_p, 3, 3, true);
+			AssertMoveSlotIndex(sgpAll, defWearB_p, 4, 4, true);
+			AssertMoveSlotIndex(sgpAll, crfWearA_p, 5, 5, true);
+			AssertMoveSlotIndex(sgpAll, defShieldA_p, 6, 8, false);
+			AssertMoveSlotIndex(sgpAll, crfShieldA_p, 7, 9, false);
+			AssertMoveSlotIndex(sgpAll, defMWeaponA_p, 8, 10, false);
+			AssertMoveSlotIndex(sgpAll, crfMWeaponA_p, 9, 11, false);
+			AssertMoveSlotIndex(sgpAll, defQuiverA_p, 10, 12, false);
+			AssertMoveSlotIndex(sgpAll, defPackA_p, 11, 13, false);
+			AssertMoveSlotIndex(sgpAll, defParts_p, 12, 6, false);
+			AssertMoveSlotIndex(sgpAll, crfParts_p, 13, 7, false);
+			
+
+		CompleteAllSlotMovements(sgpAll);
+			AB(sgm.SelectedSGDoneTransaction, true);
+			AE(sgm.CurState, SlotGroupManager.FocusedState);
+		AssertOrderReset();
+			AssertOrder(defBowA_p);
+			AssertOrder(defBowB_p);
+			AssertOrder(crfBowA_p);
+			AssertOrder(defWearA_p);
+			AssertOrder(defWearB_p);
+			AssertOrder(crfWearA_p);
+			AssertOrder(defParts_p);
+			AssertOrder(crfParts_p);
+			AssertOrder(defShieldA_p);
+			AssertOrder(crfShieldA_p);
+			AssertOrder(defMWeaponA_p);
+			AssertOrder(crfMWeaponA_p);
+			AssertOrder(defQuiverA_p);
+			AssertOrder(defPackA_p);
+			
+		AssertFocusedGeneric();
+
+		sgm.SortSG(sgpAll, SlotGroup.ItemIDSorter);
+			AssertMoveSlotIndex(sgpAll, defBowA_p, 0, 0, true);
+			AssertMoveSlotIndex(sgpAll, defBowB_p, 1, 1, true);
+			AssertMoveSlotIndex(sgpAll, crfBowA_p, 2, 2, true);
+			AssertMoveSlotIndex(sgpAll, defWearA_p, 3, 3, true);
+			AssertMoveSlotIndex(sgpAll, defWearB_p, 4, 4, true);
+			AssertMoveSlotIndex(sgpAll, crfWearA_p, 5, 5, true);
+			AssertMoveSlotIndex(sgpAll, defParts_p, 6, 12, false);
+			AssertMoveSlotIndex(sgpAll, crfParts_p, 7, 13, false);
+			AssertMoveSlotIndex(sgpAll, defShieldA_p, 8, 6, false);
+			AssertMoveSlotIndex(sgpAll, crfShieldA_p, 9, 7, false);
+			AssertMoveSlotIndex(sgpAll, defMWeaponA_p, 10, 8, false);
+			AssertMoveSlotIndex(sgpAll, crfMWeaponA_p, 11, 9, false);
+			AssertMoveSlotIndex(sgpAll, defQuiverA_p, 12, 10, false);
+			AssertMoveSlotIndex(sgpAll, defPackA_p, 13, 11, false);
+		CompleteAllSlotMovements(sgpAll);
+		
+		AssertOrderReset();
+			AssertOrder(defBowA_p);
+			AssertOrder(defBowB_p);
+			AssertOrder(crfBowA_p);
+			AssertOrder(defWearA_p);
+			AssertOrder(defWearB_p);
+			AssertOrder(crfWearA_p);
+			AssertOrder(defShieldA_p);
+			AssertOrder(crfShieldA_p);
+			AssertOrder(defMWeaponA_p);
+			AssertOrder(crfMWeaponA_p);
+			AssertOrder(defQuiverA_p);
+			AssertOrder(defPackA_p);
+			AssertOrder(defParts_p);
+			AssertOrder(crfParts_p);
+	}
+	public void CompleteAllSlotMovements(SlotGroup sg){
+		foreach(Slot slot in sg.Slots){
+			if(slot.Sb != null){
+				SlotMovement sm = sg.GetSlotMovement(slot.Sb);
+				sm.Complete();
+			}
+		}
+	}
+	public void AssertMoveSlotIndex(SlotGroup sg, Slottable sb, int curId, int newId, bool completed){
+		SlotMovement sm = sg.GetSlotMovement(sb);
+		int actCurId;
+		int actNewId;
+		sm.GetIndex(out actCurId, out actNewId);
+		AE(actCurId, curId);
+		AE(actNewId, newId);
+		AB(sm.Completed, completed);
+		AB(sm.Completed, completed);
 	}
 	public void TestInstantSort(){
 		PrintItems(sgpAll);
@@ -1519,6 +1573,239 @@ public class SlottableTest {
 		AssertEquippedCGears(defQuiverA_p, defShieldA_p, crfMWeaponA_p, defPackA_p);
 		
 	}
+	public void TestSGProcesses(){
+		sgm.Defocus();
+		sgm.Focus();
+
+		AssertSGMFocused();
+			ASSG(sgpAll, SlotGroup.FocusedState);
+			AE(sgpAll.PrevState, SlotGroup.DefocusedState);
+			AE(sgpAll.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgBow, SlotGroup.FocusedState);
+			AE(sgBow.PrevState, SlotGroup.DefocusedState);
+			AE(sgBow.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgWear, SlotGroup.FocusedState);
+			AE(sgWear.PrevState, SlotGroup.DefocusedState);
+			AE(sgWear.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgCGears, SlotGroup.FocusedState);
+			AE(sgCGears.PrevState, SlotGroup.DefocusedState);
+			AE(sgCGears.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgpParts, SlotGroup.DefocusedState);
+			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
+			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
+		sgm.Focus();
+			ASSG(sgpAll, SlotGroup.FocusedState);
+			AE(sgpAll.PrevState, SlotGroup.FocusedState);
+			AE(sgpAll.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgBow, SlotGroup.FocusedState);
+			AE(sgBow.PrevState, SlotGroup.FocusedState);
+			AE(sgBow.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgWear, SlotGroup.FocusedState);
+			AE(sgWear.PrevState, SlotGroup.FocusedState);
+			AE(sgWear.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgCGears, SlotGroup.FocusedState);
+			AE(sgCGears.PrevState, SlotGroup.FocusedState);
+			AE(sgCGears.CurProcess.GetType(), typeof(SGGreyinProcess));
+			ASSG(sgpParts, SlotGroup.DefocusedState);
+			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
+			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
+		sgm.Defocus();
+			ASSG(sgpAll, SlotGroup.DefocusedState);
+			AE(sgpAll.PrevState, SlotGroup.FocusedState);
+			AE(sgpAll.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			ASSG(sgBow, SlotGroup.DefocusedState);
+			AE(sgBow.PrevState, SlotGroup.FocusedState);
+			AE(sgBow.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			ASSG(sgWear, SlotGroup.DefocusedState);
+			AE(sgWear.PrevState, SlotGroup.FocusedState);
+			AE(sgWear.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			ASSG(sgCGears, SlotGroup.DefocusedState);
+			AE(sgCGears.PrevState, SlotGroup.FocusedState);
+			AE(sgCGears.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			ASSG(sgpParts, SlotGroup.DefocusedState);
+			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
+			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
+		sgm.Deactivate();
+			ASSG(sgpAll, SlotGroup.DeactivatedState);
+			AE(sgpAll.PrevState, SlotGroup.DefocusedState);
+			// AE(sgpAll.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			AB(sgpAll.CurProcess == null, true);
+
+			ASSG(sgBow, SlotGroup.DeactivatedState);
+			AE(sgBow.PrevState, SlotGroup.DefocusedState);
+			// AE(sgBow.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			AB(sgBow.CurProcess == null, true);
+
+			ASSG(sgWear, SlotGroup.DeactivatedState);
+			AE(sgWear.PrevState, SlotGroup.DefocusedState);
+			// AE(sgWear.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			AB(sgWear.CurProcess == null, true);
+			
+			ASSG(sgCGears, SlotGroup.DeactivatedState);
+			AE(sgCGears.PrevState, SlotGroup.DefocusedState);
+			// AE(sgCGears.CurProcess.GetType(), typeof(SGGreyoutProcess));
+			AB(sgCGears.CurProcess == null, true);
+			
+			ASSG(sgpParts, SlotGroup.DeactivatedState);
+			AE(sgpParts.PrevState, SlotGroup.DefocusedState);
+			// AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
+			AB(sgpParts.CurProcess == null, true);
+		sgm.Focus();
+			ASSG(sgpAll, SlotGroup.FocusedState);
+			AE(sgpAll.PrevState, SlotGroup.DeactivatedState);
+			AE(sgpAll.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
+			ASSG(sgBow, SlotGroup.FocusedState);
+			AE(sgBow.PrevState, SlotGroup.DeactivatedState);
+			AE(sgBow.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
+			ASSG(sgWear, SlotGroup.FocusedState);
+			AE(sgWear.PrevState, SlotGroup.DeactivatedState);
+			AE(sgWear.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
+			ASSG(sgCGears, SlotGroup.FocusedState);
+			AE(sgCGears.PrevState, SlotGroup.DeactivatedState);
+			AE(sgCGears.CurProcess.GetType(), typeof(SGInstantGreyinProcess));
+			ASSG(sgpParts, SlotGroup.DefocusedState);
+			AE(sgpParts.PrevState, SlotGroup.DeactivatedState);
+			AE(sgpParts.CurProcess.GetType(), typeof(SGInstantGreyoutProcess));
+		
+		PickUp(defBowB_p, out picked);
+			ASSG(sgpAll, SlotGroup.SelectedState);
+			AE(sgpAll.PrevState, SlotGroup.FocusedState);
+			AE(sgpAll.CurProcess.GetType(), typeof(SGHighlightProcess));
+		sgm.SimSGHover(sgBow, eventData);
+			ASSG(sgpAll, SlotGroup.FocusedState);
+			AE(sgpAll.PrevState, SlotGroup.SelectedState);
+			AE(sgpAll.CurProcess.GetType(), typeof(SGDehighlightProcess));
+			ASSG(sgBow, SlotGroup.SelectedState);
+			AE(sgBow.PrevState, SlotGroup.FocusedState);
+			AE(sgBow.CurProcess.GetType(), typeof(SGHighlightProcess));
+		sgm.SimSGHover(sgpAll, eventData);
+		bool reverted = false;
+		Revert(defBowB_p, out reverted);
+		AssertSGMFocused();
+		AB(picked, true);
+		AB(reverted, true);
+
+	}
+	public void TestSBProcesses(){
+		/*	FocusedState
+		*/
+			sgm.Defocus();
+			sgm.Focus();
+			ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);
+			AE(defBowA_p.PrevState, Slottable.EquippedAndDefocusedState);
+			AB(defBowA_p.CurProcess == null, true);
+			ASSB(defBowB_p, Slottable.FocusedState);
+			AE(defBowB_p.PrevState, Slottable.DefocusedState);
+			AE(defBowB_p.CurProcess.GetType(), typeof(SBGreyinProcess));
+			ASSB(defParts_p, Slottable.DefocusedState);
+			AE(defParts_p.PrevState, Slottable.DefocusedState);
+			AB(defParts_p.CurProcess == null, true);
+			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
+			AE(defBowA_e.PrevState, Slottable.EquippedAndDefocusedState);
+			AE(defBowA_e.CurProcess.GetType(), typeof(SBGreyinProcess));
+
+			sgpAll.AutoSort = false;
+			PickUp(defBowB_p, out picked);
+			sgm.SimSBHover(defWearB_p, eventData);
+			ASSB(defWearB_p, Slottable.SelectedState);
+			sgm.SimSBHover(defBowB_p, eventData);
+			ASSB(defWearB_p, Slottable.FocusedState);
+			AE(defWearB_p.PrevState, Slottable.SelectedState);
+			AE(defWearB_p.CurProcess.GetType(), typeof(SBDehighlightProcess));
+			bool reverted;
+			Revert(defBowB_p, out reverted);
+
+			sgpAll.AutoSort = true;
+			sgm.Focus();
+			AssertSGMFocused();
+
+			ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);
+			defBowA_p.SetState(Slottable.FocusedState);
+			AE(defBowA_p.PrevState, Slottable.EquippedAndDefocusedState);
+			ASSB(defBowA_p, Slottable.FocusedState);
+			AE(defBowA_p.CurProcess.GetType(), typeof(SBUnequipAndGreyinProcess));
+			defBowA_p.SetState(Slottable.EquippedAndDefocusedState);
+			AssertSGMFocused();
+			
+			defBowB_p.SetState(Slottable.EquippedAndSelectedState);
+			defBowB_p.SetState(Slottable.FocusedState);
+			AE(defBowB_p.PrevState, Slottable.EquippedAndSelectedState);
+			ASSB(defBowB_p, Slottable.FocusedState);
+			AE(defBowB_p.CurProcess.GetType(), typeof(SBUnequipAndDehighlightProcess));
+			AssertSGMFocused();
+
+			sgm.Deactivate();
+			sgm.Focus();
+			AE(defBowB_p.PrevState, Slottable.DeactivatedState);
+			ASSB(defBowB_p, Slottable.FocusedState);
+			AE(defBowB_p.CurProcess, null);
+			AssertSGMFocused();
+
+			PickUp(defBowB_p, out picked);
+			defBowB_p.OnPointerUpMock(eventData);
+			ASSB(defBowB_p, Slottable.MovingState);
+			AE(sgm.Transaction.GetType(), typeof(RevertTransaction));
+			AE(defBowB_p.CurProcess.GetType(), typeof(MoveProcess));
+			defBowB_p.CurProcess.Expire();
+			AssertSGMFocused();
+			AE(defBowB_p.PrevState, Slottable.MovingState);
+			AE(defBowB_p.CurProcess.GetType(), typeof(SBUnpickProcess));
+		/*	EquippedAndDeselectedState
+		*/
+			AssertSGMFocused();
+			sgm.Defocus();
+			sgm.Focus();
+			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
+			AE(defBowA_e.PrevState, Slottable.EquippedAndDefocusedState);
+			AE(defBowA_e.CurProcess.GetType(), typeof(SBGreyinProcess));
+			sgm.Deactivate();
+			sgm.Focus();
+			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
+			AE(defBowA_e.PrevState, Slottable.DeactivatedState);
+			AB(defBowA_e.CurProcess == null, true);
+
+			defBowA_e.SetState(Slottable.DefocusedState);
+			defBowA_e.SetState(Slottable.EquippedAndDeselectedState);
+			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
+			AE(defBowA_e.PrevState, Slottable.DefocusedState);
+			AE(defBowA_e.CurProcess.GetType(), typeof(SBEquipAndGreyinProcess));
+			
+			defBowA_e.SetState(Slottable.SelectedState);
+			defBowA_e.SetState(Slottable.EquippedAndDeselectedState);
+			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
+			AE(defBowA_e.PrevState, Slottable.SelectedState);
+			AE(defBowA_e.CurProcess.GetType(), typeof(SBEquipAndDehighlightProcess));
+		/*	EquippedAndSelectedState
+		*/
+			AssertSGMFocused();
+			sgpAll.AutoSort = false;
+			PickUp(defBowB_p, out picked);
+			sgm.SimSBHover(defBowA_p, eventData);
+			ASSB(defBowA_p, Slottable.EquippedAndSelectedState);
+			AE(defBowA_p.PrevState, Slottable.EquippedAndDeselectedState);
+			AE(defBowA_p.CurProcess.GetType(), typeof(SBHighlightProcess));
+			sgm.SimSBHover(defBowB_p, eventData);
+			Revert(defBowB_p, out reverted);
+			sgpAll.AutoSort = true;
+			AssertSGMFocused();
+
+
+		/*	EquippedAndDefocusedState
+		*/
+			AssertSGMFocused();
+			sgm.Defocus();
+			ASSB(defShieldA_e, Slottable.EquippedAndDefocusedState);
+			AE(defShieldA_e.PrevState, Slottable.EquippedAndDeselectedState);
+			AE(defShieldA_e.CurProcess.GetType(), typeof(SBGreyoutProcess));
+			defShieldA_e.SetState(Slottable.FocusedState);
+			ASSB(defShieldA_e, Slottable.FocusedState);
+			defShieldA_e.SetState(Slottable.EquippedAndDefocusedState);
+			AE(defShieldA_e.PrevState, Slottable.FocusedState);
+			ASSB(defShieldA_e, Slottable.EquippedAndDefocusedState);
+			AE(defShieldA_e.CurProcess.GetType(), typeof(SBEquipAndGreyoutProcess));
+			
+			sgm.Focus();
+	}
 	/*	CarriedGearsTesting
 	*/
 		public void TestCarriedGearsSetup(){
@@ -1590,6 +1877,7 @@ public class SlottableTest {
 	/*	Test hover
 	*/
 		bool picked;
+		bool reverted;
 		Slottable selectedSB;
 		SlotGroup selectedSG;
 		SlotSystemTransaction transaction;
@@ -3481,32 +3769,39 @@ public class SlottableTest {
 		} 
 		public void AssertEquippedCGears(Slottable cg1, Slottable cg2, Slottable cg3, Slottable cg4){
 			List<CarriedGearInstanceMock> checkedList = new List<CarriedGearInstanceMock>();
+			
 			if(cg1 != null)
-			checkedList.Add((CarriedGearInstanceMock)cg1.Item);
+				checkedList.Add((CarriedGearInstanceMock)cg1.Item);
+			else
+				checkedList.Add(null);
 			if(cg2 != null)
-			checkedList.Add((CarriedGearInstanceMock)cg2.Item);
+				checkedList.Add((CarriedGearInstanceMock)cg2.Item);
+			else
+				checkedList.Add(null);
 			if(cg3 != null)
-			checkedList.Add((CarriedGearInstanceMock)cg3.Item);
+				checkedList.Add((CarriedGearInstanceMock)cg3.Item);
+			else
+				checkedList.Add(null);
 			if(cg4 != null)
-			checkedList.Add((CarriedGearInstanceMock)cg4.Item);
-			foreach(Slot slot in sgpAll.Slots){
-				if(slot.Sb != null){
-					if(slot.Sb.Item is CarriedGearInstanceMock){
-						bool found = false;
-						foreach(CarriedGearInstanceMock checkedCG in checkedList){
-							if((CarriedGearInstanceMock)slot.Sb.Item == checkedCG)
-								found = true;
-						}
-						if(found){
-							AB(slot.Sb.IsEquipped, true);
-							AB(sgCGears.GetSlottable(slot.Sb.Item) != null, true);
-						}else{
-							AB(slot.Sb.IsEquipped, false);
-							AB(sgCGears.GetSlottable(slot.Sb.Item) == null, true);
-						}
-					}
-				}
-			} 
+				checkedList.Add((CarriedGearInstanceMock)cg4.Item);
+			else
+				checkedList.Add(null);
+			
+			int allowedCount = ((EquipmentSetInventory)sgCGears.Inventory).EquippableCGearsCount;
+			
+			for(int i = 0; i < checkedList.Count; i++){
+				if(i +1 > allowedCount)
+					if(checkedList[i] != null)
+						throw new System.InvalidOperationException("Slottable at index " + i + " is not checked since it exceeds the max slot count");
+			}
+			
+			for(int i = 0; i < allowedCount; i++){
+				Slottable sb = sgCGears.Slots[i].Sb;
+				if(sb != null)
+					AE(sb.Item, checkedList[i]);
+				else
+					Assert.That(checkedList[i], Is.Null);
+			}
 		}
 		public void AssertOrder(Slottable sb, int ind){
 			AE(sb.SlotID, ind);

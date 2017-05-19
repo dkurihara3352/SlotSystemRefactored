@@ -36,7 +36,7 @@ namespace SlotSystem{
 					//implement reverting here
 					SlotGroup sg = sgm.GetSlotGroup(pickedSB);
 					Slot slot = sg.GetSlot(pickedSB);
-					pickedSB.MoveIcon(sg, slot);
+					pickedSB.MoveDraggedIcon(sg, slot);
 					pickedSB.SetState(Slottable.UnpickingState);
 					SGMRevertTransactionProcess revertProcess = new SGMRevertTransactionProcess(sgm, sgm.WaitForRevertDone);
 					sgm.SetAndRun(revertProcess);
@@ -92,41 +92,32 @@ namespace SlotSystem{
 					this.selectedSG = sgm.GetSlotGroup(selected);
 				}
 				public void Indicate(){}
+				public void CheckFields(out Slottable pickedSB, out SlotGroup origSG, out Slottable selectedSB, out SlotGroup selectedSG){
+					pickedSB = this.pickedSB;
+					origSG = this.origSG;
+					selectedSB = this.selectedSB;
+					selectedSG = this.selectedSG;
+				}
 				public void Execute(){
 					SGMSwapTransactionProcess process = new SGMSwapTransactionProcess(sgm, sgm.WaitForSwapDone);
 					sgm.SetAndRun(process);
 					sgm.SetState(SlotGroupManager.PerformingTransactionState);
-
-					origSG.TransactionUpdate(selectedSB, pickedSB);
-					selectedSG.TransactionUpdate(pickedSB, selectedSB);
+					
+					origSG.TransactionUpdateV2(selectedSB, pickedSB);
+					selectedSG.TransactionUpdateV2(pickedSB, selectedSB);
 
 					Slot selectedSBSlot = selectedSG.GetSlot(selectedSB);
 					Slot pickedSBSlot = origSG.GetSlot(pickedSB);
 
-					selectedSB.MoveIcon(origSG, pickedSBSlot);
-					if(sgm.GetSlotGroup(selectedSB) == sgm.GetFocusedPoolSG())
-						selectedSB.SetState(Slottable.EquippingState);
-					else
-						selectedSB.SetState(Slottable.RemovingState);
-
-					pickedSB.MoveIcon(selectedSG, selectedSBSlot);
-					if(sgm.GetSlotGroup(pickedSB) == sgm.GetFocusedPoolSG())
-						pickedSB.SetState(Slottable.EquippingState);
-					else
-						pickedSB.SetState(Slottable.RemovingState);
+					selectedSB.MoveDraggedIcon(origSG, pickedSBSlot);
+					pickedSB.MoveDraggedIcon(selectedSG, selectedSBSlot);
+					
+					selectedSB.SetState(Slottable.MovingState);
+					pickedSB.SetState(Slottable.MovingState);
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
-					if(selectedSG != sgm.GetFocusedPoolSG()){
-						Slot slot = selectedSG.GetSlot(selectedSB);
-						selectedSG.RemoveSB(selectedSB);
-						selectedSG.AddSB(ref slot);
-					}
-					if(origSG != sgm.GetFocusedPoolSG()){
-						Slot slot = origSG.GetSlot(pickedSB);
-						origSG.RemoveSB(pickedSB);
-						origSG.AddSB(ref slot);
-					}
+					sgm.DestroyRemovedSB();
 					sgm.UpdateEquipStatus();
 					sgm.ClearAndReset();
 				}
@@ -158,7 +149,7 @@ namespace SlotSystem{
 					/*	perform focusing of scroller if something is to be added
 						perform Inventory update, sorting ,filtering and updating slots and sbs, and moving of all the elements it contains
 					*/
-					pickedSB.MoveIcon(selectedSG, slot);
+					pickedSB.MoveDraggedIcon(selectedSG, slot);
 					SGMFillTransactionProcess fillProcess = new SGMFillTransactionProcess(sgm, sgm.WaitForFillDone);
 					sgm.SetAndRun(fillProcess);
 					sgm.SetState(SlotGroupManager.PerformingTransactionState);
@@ -194,7 +185,7 @@ namespace SlotSystem{
 					selectedSG.TransactionUpdate(pickedSB, null);
 
 					Slot slot = selectedSG.GetSlot(selectedSG.GetSlottable((InventoryItemInstanceMock)pickedSB.Item));
-					pickedSB.MoveIcon(selectedSG, slot);
+					pickedSB.MoveDraggedIcon(selectedSG, slot);
 					pickedSB.SetState(Slottable.RemovingState);
 				}
 				public void OnComplete(){
@@ -226,19 +217,43 @@ namespace SlotSystem{
 					sgm.SetAndRun(process);
 					sgm.SetState(SlotGroupManager.PerformingTransactionState);
 
-					origSG.TransactionUpdate(null, pickedSB);
-					selectedSG.TransactionUpdate(pickedSB, null);
+					// origSG.TransactionUpdate(null, pickedSB);
+					// selectedSG.TransactionUpdate(pickedSB, null);
+					origSG.TransactionUpdateV2(null, pickedSB);
+					selectedSG.TransactionUpdateV2(pickedSB, null);
 
-					pickedSB.MoveIcon(selectedSG, slot);
-					pickedSB.SetState(Slottable.EquippingState);
+					pickedSB.MoveDraggedIcon(selectedSG, slot);
+					// pickedSB.SetState(Slottable.EquippingState);
+					pickedSB.SetState(Slottable.MovingState);
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
-					Slot slot = selectedSG.GetNextEmptySlot();
-					selectedSG.AddSB(ref slot);
-					// origSG.UpdateEquipStatus();
-					// selectedSG.UpdateEquipStatus();
+					// Slot slot = selectedSG.GetNextEmptySlot();
+					// selectedSG.AddSB(ref slot);
 					sgm.UpdateEquipStatus();
+					sgm.ClearAndReset();
+				}
+			}
+			public class SortTransaction: SlotSystemTransaction{
+				SlotGroup m_sg;
+				SGSorter m_sorter;
+				SlotGroupManager sgm;
+				public SortTransaction(SlotGroup sg, SGSorter sorter){
+					m_sg = sg;
+					m_sorter = sorter;
+					sgm = sg.SGM;
+				}
+				public void Indicate(){}
+				public void Execute(){
+					SGMSortingProcess process = new SGMSortingProcess(sgm, sgm.WaitForSortingDone);
+					sgm.SetAndRun(process);
+					sgm.SetState(SlotGroupManager.PerformingTransactionState);
+
+					// m_sg.TransactionUpdate(null, null);
+					m_sg.TransactionUpdateV2(null, null);
+				}
+				public void OnComplete(){
+					//enable imput
 					sgm.ClearAndReset();
 				}
 			}
@@ -662,6 +677,23 @@ namespace SlotSystem{
 					SGM.CompleteAllTransaction();
 				}
 			}
+			public class SGMSortingProcess: AbsSGMProcess{
+				public SGMSortingProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
+					this.SGM = sgm;
+					this.CoroutineMock = coroutineMock;
+				}
+				public override void Start(){
+					SGM.SetPickedSBDoneTransaction(true);
+					SGM.SetSelectedSBDoneTransaction(true);
+					SGM.SetOrigSGDoneTransaction(true);
+					SGM.SetSelectedSGDoneTransaction(false);
+					base.Start();
+				}
+				public override void Expire(){
+					base.Expire();
+					SGM.CompleteAllTransaction();
+				}
+			}
 		/*	state
 		*/
 			public interface SGMState{
@@ -836,6 +868,27 @@ namespace SlotSystem{
 				public void Defocus(SlotGroup sg){
 				}
 			}
+			public class SGSortingState: SlotGroupState{
+				// SlotGroupState prevState;
+				public void EnterState(SlotGroup sg){
+					// prevState = sg.PrevState;
+					SGProcess process = new SGSortingProcess(sg, sg.WaitForAllSlotMovementsDone);
+					sg.SetAndRun(process);
+					/*	implement SlotMovements creation and stuff in the process
+					*/
+				}
+				public void ExitState(SlotGroup sg){}
+				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
+				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+				}
+				public void Focus(SlotGroup sg){
+					sg.SetState(SlotGroup.FocusedState);
+					sg.FocusSBs();
+					// sg.SetState(prevState);
+				}
+				public void Defocus(SlotGroup sg){
+				}
+			}
 		/*	process
 		*/
 			public interface SGProcess{
@@ -999,20 +1052,95 @@ namespace SlotSystem{
 						base.Expire();
 					}
 			}
+			public class SlotMovement{
+				SlotGroup m_sg;
+				Slottable m_sb;
+				public Slottable SB{
+					get{return m_sb;}
+				}
+				int m_curSlotID;
+				int m_newSlotID;
+				public SlotMovement(SlotGroup sg, Slottable sb, int curSlotID, int newSlotID){
+					m_sg = sg;
+					m_sb = sb;
+					m_curSlotID = curSlotID;
+					m_newSlotID = newSlotID;
+					m_sg.AddSlotMovement(this);
+				}
+				bool m_completed = false;
+				public bool Completed{
+					get{return m_completed;}
+				}
+				public void Execute(){
+					if(m_curSlotID == m_newSlotID)
+						m_completed = true;
+					else
+						m_completed = false;
+				}
+				public void Complete(){
+					m_completed = true;
+					IEnumeratorMock tryInvoke = m_sg.WaitForAllSlotMovementsDone();
+				}
+				public void GetIndex(out int curId, out int newId){
+					curId = m_curSlotID;
+					newId = m_newSlotID;
+				}
+			}
 			public class SGUpdateTransactionProcess: AbsSGProcess{
 				public SGUpdateTransactionProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+					this.SG = sg;
+					this.CoroutineMock = coroutineMock;
+				}
+				
+				/*	overridden functions
+				*/
+					public override void Start(){
+						base.Start();
+						
+					}
+					public override void Stop(){
+						base.Stop();
+					}
+					public override void Expire(){
+						base.Expire();
+						SG.SGM.CompleteTransactionOnSG(SG);
+					}
+			}
+			public class SGSortingProcess: AbsSGProcess{
+				public SGSortingProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
 					this.SG = sg;
 					this.CoroutineMock = coroutineMock;
 				}
 				/*	overridden functions
 				*/
 					public override void Start(){
+						// base.Start();
+						/*	implement SlotMovements here
+								Create SlotMovement instance for every slottables
+									1. Get current Slot index
+									2. Sort SG
+									3. Get new Slot index
+									4. pass 1, 3, and the slottable into it
+									5. and execute it
+									6. store each SlotMovement into sg's slotMovements list
+						*/
+						List<Slottable> newSlotOrderList = SG.OrderedSbs();
+						for(int i = 0; i < SG.Slots.Count; i++){
+							if(SG.Slots[i].Sb != null){
+								Slottable sb = SG.Slots[i].Sb;
+								int curSlotID = sb.SlotID;
+								int newSlotID = newSlotOrderList.IndexOf(sb);
+								SlotMovement slotMovement = new SlotMovement(SG, sb, curSlotID, newSlotID);
+								slotMovement.Execute();
+							}
+						}
 						base.Start();
 					}
 					public override void Stop(){
 						base.Stop();
 					}
 					public override void Expire(){
+						SG.InstantSort();
 						base.Expire();
 						SG.SGM.CompleteTransactionOnSG(SG);
 					}
@@ -1287,10 +1415,10 @@ namespace SlotSystem{
 		/*	sorters
 		*/
 			public interface SGSorter{
-				void Execute(SlotGroup sg);
+				List<Slottable> OrderedSbs(SlotGroup sg);
 			}
 			
-			/*	non-instant sorting
+			/*	non-instant sorting and AutoSorting
 					SlotGroup manages its entire slottables movement in a corrdinated way
 					SlotGroup creates SlotMovement class for each slottable and executes its Move command
 					Each SlotMovement notifies SlotGroup its completion
@@ -1299,38 +1427,35 @@ namespace SlotSystem{
 
 					SlotMovement's motion is independent of each slottable's state and processes
 					
-					SlotGroup calls SGM's CompleteTransactionOnSG in its CompleteAllMovements method
+					SlotGroup's SGUpdateTransactionProcess expires within CompleteAllMovements method
+					NOT SlotGroup calls SGM's CompleteTransactionOnSG in its CompleteAllMovements method
 
-				SGM's sorting transaction
+				Voluntary Sorting
 					SGM creates SortTransaction with the target SG (and only the target SG)
 					SortTransaction.Execute triggers the sorting
 			*/
 				
 			public class　SGItemIDSorter: SGSorter{
-				public void Execute(SlotGroup sg){
-					List<Slottable> sbList = new List<Slottable>();
-					foreach(Slot slot in sg.Slots){
-						if(slot.Sb != null)
-							sbList.Add(slot.Sb);
-						slot.Sb = null;
-					}
-					sbList.Sort();
-					int count = 0;
-					foreach(Slot slot in sg.Slots){
-						if(count < sbList.Count)
-							slot.Sb = sbList[count];
-						count ++;
-					}
-				}
-			}
-			public class SGAcquisitionOrderSorter: SGSorter{
-				public void Execute(SlotGroup sg){
+				public List<Slottable> OrderedSbs(SlotGroup sg){
 					
 					List<Slottable> sbList = new List<Slottable>();
 					foreach(Slot slot in sg.Slots){
 						if(slot.Sb != null)
 							sbList.Add(slot.Sb);
-						slot.Sb = null;
+						// slot.Sb = null;
+					}
+					sbList.Sort();
+					return sbList;
+				}
+			}
+			public class SGAcquisitionOrderSorter: SGSorter{
+				
+				public List<Slottable> OrderedSbs(SlotGroup sg){
+					List<Slottable> sbList = new List<Slottable>();
+					foreach(Slot slot in sg.Slots){
+						if(slot.Sb != null)
+							sbList.Add(slot.Sb);
+						// slot.Sb = null;
 					}
 					
 					List<Slottable> temp = new List<Slottable>();
@@ -1353,12 +1478,7 @@ namespace SlotSystem{
 						temp.Add(added);
 						addedMax = added;
 					}
-					int count = 0;
-					foreach(Slot slot in sg.Slots){
-						if(count < temp.Count)
-							slot.Sb = temp[count];
-						count ++;
-					}
+					return temp;
 				}
 			}
 	/*	Slottable Classses
@@ -1544,7 +1664,7 @@ namespace SlotSystem{
 						then updateSBstates
 					*/
 					base.Expire();
-					SB.ClearDestination();
+					SB.ClearDraggedIconDestination();
 					SB.SGM.CompleteTransactionOnSB(SB);
 				}
 			}
@@ -1598,7 +1718,7 @@ namespace SlotSystem{
 				}
 				public override void Expire(){
 					base.Expire();
-					SB.ClearDestination();
+					SB.ClearDraggedIconDestination();
 					SB.SGM.CompleteTransactionOnSB(SB);
 				}
 			}
@@ -1609,7 +1729,7 @@ namespace SlotSystem{
 				}
 				public override void Expire(){
 					base.Expire();
-					SB.ClearDestination();
+					SB.ClearDraggedIconDestination();
 					SB.SGM.CompleteTransactionOnSB(SB);
 				}
 			}
@@ -1620,7 +1740,7 @@ namespace SlotSystem{
 				}
 				public override void Expire(){
 					base.Expire();
-					SB.ClearDestination();
+					SB.ClearDraggedIconDestination();
 					SB.SGM.CompleteTransactionOnSB(SB);
 				}
 			}
@@ -2022,10 +2142,22 @@ namespace SlotSystem{
 					// sb.SetState(Slottable.DefocusedState);
 				}
 			}
-			public class MovingState: SlottableState{
+			public class MovingOutState: SlottableState{
 				public void EnterState(Slottable slottable){
 					MoveProcess moveProcess = new MoveProcess(slottable, slottable.MoveCoroutine);
 					slottable.SetAndRun(moveProcess);
+
+					SlotGroupManager sgm = slottable.SGM;
+					SlotGroup sg = sgm.GetSlotGroup(slottable);
+					if(sgm.GetFocusedPoolSG() == sg){
+						/*	Create and Run Equipping Process	*/
+						SBEquippingProcess process = new SBEquippingProcess(slottable, slottable.EquippingCoroutine);
+						slottable.SetAndRun(process);
+					}else{
+						/*	Create and Run Removing Process	*/
+						SBRemovingProcess process = new SBRemovingProcess(slottable, slottable.RemovingCoroutine);
+						slottable.SetAndRun(process);
+					}
 				}
 				public void ExitState(Slottable Slottable){
 				}
@@ -2041,10 +2173,8 @@ namespace SlotSystem{
 				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				public void Focus(Slottable sb){
 					// sb.SetState(Slottable.FocusedState);
-					if(sb.IsEquipped){
-						
-							sb.SetState(Slottable.EquippedAndDeselectedState);
-					}
+					if(sb.IsEquipped)
+						sb.SetState(Slottable.EquippedAndDeselectedState);
 					else
 						sb.SetState(Slottable.FocusedState);
 				}

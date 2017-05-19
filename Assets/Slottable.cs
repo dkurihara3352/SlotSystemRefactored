@@ -129,7 +129,7 @@ namespace SlotSystem{
 				public static SlottableState MovingState{
 					get{
 						if(Slottable.m_movingState == null)
-							Slottable.m_movingState = new MovingState();
+							Slottable.m_movingState = new MovingOutState();
 						return Slottable.m_movingState;	
 					}
 				}
@@ -229,6 +229,11 @@ namespace SlotSystem{
 			SlottableItem m_item;
 				public SlottableItem Item{
 					get{return m_item;}
+				}
+				public InventoryItemInstanceMock ItemInst{
+					get{
+						return (InventoryItemInstanceMock)Item;
+					}
 				}
 				public void SetItem(SlottableItem item){
 					m_item = item;
@@ -434,14 +439,14 @@ namespace SlotSystem{
 		public void ExecuteTransaction(){
 			SGM.Transaction.Execute();
 		}
-		public void MoveIcon(SlotGroup sg, Slot slot){
-			SetDestination(sg, slot);
+		public void MoveDraggedIcon(SlotGroup sg, Slot slot){
+			SetDraggedIconDestination(sg, slot);
 		}
-		public void SetDestination(SlotGroup sg, Slot slot){
+		public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
 			this.m_destinationSG = sg;
 			this.m_destinationSlot = slot;
 		}
-		public void ClearDestination(){
+		public void ClearDraggedIconDestination(){
 			this.m_destinationSG = null;
 			this.m_destinationSlot = null;
 		}

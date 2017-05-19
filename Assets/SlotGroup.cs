@@ -75,6 +75,14 @@ namespace SlotSystem{
 					return m_performingTransactionState;
 				}
 			}
+			private static SlotGroupState m_sortingState;
+			public static SlotGroupState SortingState{
+				get{
+					if(m_sortingState == null)
+						m_sortingState = new SGSortingState();
+					return m_sortingState;
+				}
+			}
 
 		/*	public fields
 		*/
@@ -211,12 +219,34 @@ namespace SlotSystem{
 				// public void SortItems(){
 				// 	m_sorter.Execute(this);
 				// }
-				public void Sort(){
-					m_sorter.Execute(this);
-				}
+				// public void InstantSort(){
+				// 	m_sorter.Execute(this);
+				// }
 				public void SetSorter(SGSorter sorter){
 					m_sorter = sorter;
 				}
+		
+			public List<Slottable> OrderedSbs(){
+				return Sorter.OrderedSbs(this);
+			}
+			public void InstantSort(){
+				List<Slottable> newSlotOrderedSbs = OrderedSbs();
+				List<Slottable> sbs = new List<Slottable>();
+				foreach(Slot slot in Slots){
+					if(slot.Sb != null)
+						sbs.Add(slot.Sb);
+					slot.Sb = null;
+				}
+				// for(int i = 0; i < Slots.Count; i++){
+				// 	if(newSlotOrderedSbs[i] != null)
+				// 		Slots[i].Sb = newSlotOrderedSbs[i];
+				// }
+				for(int i = 0; i < newSlotOrderedSbs.Count; i++){
+					Slots[i].Sb = newSlotOrderedSbs[i];
+				}
+			}
+		/*	filter
+		*/
 			SGFilter m_filter;
 				public SGFilter Filter{
 					get{return m_filter;}
@@ -267,6 +297,38 @@ namespace SlotSystem{
 				return null;
 			}
 			public IEnumeratorMock UpdateTransactionCoroutine(){
+				return null;
+			}
+			public IEnumeratorMock WaitForAllSlotMovementsDone(){
+				bool flag = true;
+				foreach(SlotMovement sm in slotMovements){
+					flag &= sm.Completed;
+				}
+				if(flag){
+					CurProcess.Expire();
+					slotMovements.Clear();
+				}
+				return null;
+			}
+		/*	SlotMovement	*/
+			List<SlotMovement> slotMovements;
+			public List<SlotMovement> SlotMovements{
+				get{
+					if(slotMovements == null)
+						slotMovements = new List<SlotMovement>();
+					return slotMovements;
+				}
+			}
+			public void AddSlotMovement(SlotMovement sm){
+				if(slotMovements == null)
+					slotMovements = new List<SlotMovement>();
+				slotMovements.Add(sm);
+			}
+			public SlotMovement GetSlotMovement(Slottable sb){
+				foreach(SlotMovement sm in SlotMovements){
+					if(sm.SB == sb)
+						return sm;
+				}
 				return null;
 			}
 
@@ -365,12 +427,19 @@ namespace SlotSystem{
 			return null;
 		}
 		public void TransactionUpdate(Slottable added, Slottable removed){
-			SetState(SlotGroup.PerformingTransactionState);
-			// /*	addition
-			// */
-			// if(added != null && !Inventory.Items.Contains(added.Item)){
-			// 	Inventory.AddItem(added.Item);
-			// }
+			// if(added == null && removed == null)
+			// 	SetState(SlotGroup.SortingState);
+			// else
+			// 	SetState(SlotGroup.PerformingTransactionState);
+			if(SGM.Transaction.GetType() == typeof(SortTransaction))
+				SetState(SlotGroup.SortingState);
+			else{
+				if(!AutoSort)
+					SGM.CompleteTransactionOnSG(this);
+				else
+					SetState(SlotGroup.SortingState);
+			}
+			
 			/*	removal
 			*/
 			if(removed != null && GetSlottable(removed.Item) != null){
@@ -384,6 +453,58 @@ namespace SlotSystem{
 			if(added != null && !Inventory.Items.Contains(added.Item)){
 				Inventory.AddItem(added.Item);
 			}
+		}
+			
+		public void TransactionUpdateV2(Slottable added, Slottable removed){
+			/*	add/remove InventoryItem and Slottable
+				do not destroy the removed Slottable yet (it remain in situ)
+				then sort
+				destruction is handled in Sb's removeingProcess's expiration
+
+				if sg is Pool then Inventory addition and removal are exempted
+				so are Slottable addition/removal
+			*/
+			/*	Addition and Removal  */
+				Slot swapSlot = null;
+				if(SGM.GetFocusedPoolSG() != this){
+					/*	remove
+					*/
+					if(removed != null && Inventory.Items.Contains(removed.Item) && GetSlottable(removed.Item) != null){
+						Inventory.RemoveItem(removed.Item);
+						Slot slot = GetSlot(removed);
+						SGM.removedSB = slot.Sb;
+						slot.Sb = null;
+						if(added != null)
+							swapSlot = slot;
+					}
+					/*	add
+					*/
+					if(added != null && !Inventory.Items.Contains(added.Item) && GetSlottable(added.Item) == null){
+						Inventory.AddItem(added.Item);
+						/*	SB	*/
+						GameObject newSBGO = new GameObject("newSBGO");
+						Slottable newSB = newSBGO.AddComponent<Slottable>();
+						InventoryItemInstanceMock item = (InventoryItemInstanceMock)added.Item;
+						/*	slot	*/
+						Slot slot = null;
+						if(removed != null)
+							slot = swapSlot;
+						else
+							slot = GetNextEmptySlot();
+						/*	assemble	*/
+						newSB.Initialize(this, true, item);
+						slot.Sb = newSB;
+					}
+				}
+			/*	Sorting  */
+				if(SGM.Transaction.GetType() == typeof(SortTransaction))
+					SetState(SlotGroup.SortingState);
+				else{
+					if(!AutoSort)
+						SGM.CompleteTransactionOnSG(this);
+					else
+						SetState(SlotGroup.SortingState);
+				}
 		}
 		public void RemoveSB(Slottable sb){
 			/*	sb-slot relation stays intact until process is completed
