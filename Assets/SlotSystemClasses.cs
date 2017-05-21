@@ -181,19 +181,23 @@ namespace SlotSystem{
 					sgm.SetAndRun(process);
 					sgm.SetState(SlotGroupManager.PerformingTransactionState);
 
-					origSG.TransactionUpdate(null, pickedSB);
-					selectedSG.TransactionUpdate(pickedSB, null);
+					// origSG.TransactionUpdate(null, pickedSB);
+					// selectedSG.TransactionUpdate(pickedSB, null);
+					origSG.TransactionUpdateV2(null, pickedSB);
+					selectedSG.TransactionUpdateV2(pickedSB, null);
 
 					Slot slot = selectedSG.GetSlot(selectedSG.GetSlottable((InventoryItemInstanceMock)pickedSB.Item));
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
-					pickedSB.SetState(Slottable.RemovingState);
+					// pickedSB.SetState(Slottable.RemovingState);
+					pickedSB.SetState(Slottable.MovingState);
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
+					sgm.DestroyRemovedSB();
 					/*	TransactionUpdate HIDES (not removes) the pickedSB the moment the transaction is 	executed (only dragged icon persists)
 						performing the equip state update checks all the equipped sbs in pool to see if there's matching sb in one of equip egs, unequip if there's none
 					*/	
-					origSG.RemoveSB(pickedSB);
+					// origSG.RemoveSB(pickedSB);
 					sgm.UpdateEquipStatus();
 					sgm.ClearAndReset();
 				}
@@ -248,7 +252,6 @@ namespace SlotSystem{
 					SGMSortingProcess process = new SGMSortingProcess(sgm, sgm.WaitForSortingDone);
 					sgm.SetAndRun(process);
 					sgm.SetState(SlotGroupManager.PerformingTransactionState);
-
 					// m_sg.TransactionUpdate(null, null);
 					m_sg.TransactionUpdateV2(null, null);
 				}
@@ -598,10 +601,10 @@ namespace SlotSystem{
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Start(){
-					SGM.SetPickedSBDoneTransaction(false);
-					SGM.SetSelectedSBDoneTransaction(true);
-					SGM.SetOrigSGDoneTransaction(true);
-					SGM.SetSelectedSGDoneTransaction(true);
+					SGM.SetPickedSBDoneTransaction(SGM.PickedSB, false);
+					SGM.SetSelectedSBDoneTransaction(null, true);
+					SGM.SetOrigSGDoneTransaction(null, true);
+					SGM.SetSelectedSGDoneTransaction(null, true);
 					base.Start();
 				}
 				public override void Expire(){
@@ -615,10 +618,10 @@ namespace SlotSystem{
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Start(){
-					SGM.SetPickedSBDoneTransaction(false);
-					SGM.SetSelectedSBDoneTransaction(true);
-					SGM.SetOrigSGDoneTransaction(false);
-					SGM.SetSelectedSGDoneTransaction(false);
+					SGM.SetPickedSBDoneTransaction(SGM.PickedSB,false);
+					SGM.SetSelectedSBDoneTransaction(null,true);
+					SGM.SetOrigSGDoneTransaction(SGM.GetSlotGroup(SGM.PickedSB), false);
+					SGM.SetSelectedSGDoneTransaction(SGM.SelectedSG, false);
 					base.Start();
 				}
 				public override void Expire(){
@@ -632,10 +635,10 @@ namespace SlotSystem{
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Start(){
-					SGM.SetPickedSBDoneTransaction(false);
-					SGM.SetSelectedSBDoneTransaction(true);
-					SGM.SetOrigSGDoneTransaction(false);
-					SGM.SetSelectedSGDoneTransaction(false);
+					SGM.SetPickedSBDoneTransaction(SGM.PickedSB, false);
+					SGM.SetSelectedSBDoneTransaction(null, true);
+					SGM.SetOrigSGDoneTransaction(SGM.GetSlotGroup(SGM.PickedSB),false);
+					SGM.SetSelectedSGDoneTransaction(SGM.SelectedSG, false);
 					base.Start();
 				}
 				public override void Expire(){
@@ -649,10 +652,10 @@ namespace SlotSystem{
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Start(){
-					SGM.SetPickedSBDoneTransaction(false);
-					SGM.SetSelectedSBDoneTransaction(true);
-					SGM.SetOrigSGDoneTransaction(false);
-					SGM.SetSelectedSGDoneTransaction(false);
+					SGM.SetPickedSBDoneTransaction(SGM.PickedSB, false);
+					SGM.SetSelectedSBDoneTransaction(null, true);
+					SGM.SetOrigSGDoneTransaction(SGM.GetSlotGroup(SGM.PickedSB),false);
+					SGM.SetSelectedSGDoneTransaction(SGM.SelectedSG, false);
 					base.Start();
 				}
 				public override void Expire(){
@@ -666,10 +669,11 @@ namespace SlotSystem{
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Start(){
-					SGM.SetPickedSBDoneTransaction(false);
-					SGM.SetSelectedSBDoneTransaction(false);
-					SGM.SetOrigSGDoneTransaction(false);
-					SGM.SetSelectedSGDoneTransaction(false);
+					SGM.SetPickedSBDoneTransaction(SGM.PickedSB, false);
+					SGM.SetSelectedSBDoneTransaction(SGM.SelectedSB, false);
+					SGM.SetOrigSGDoneTransaction(SGM.GetSlotGroup(SGM.PickedSB),false);
+					SGM.SetSelectedSGDoneTransaction(SGM.SelectedSG, false);
+					
 					base.Start();
 				}
 				public override void Expire(){
@@ -683,10 +687,10 @@ namespace SlotSystem{
 					this.CoroutineMock = coroutineMock;
 				}
 				public override void Start(){
-					SGM.SetPickedSBDoneTransaction(true);
-					SGM.SetSelectedSBDoneTransaction(true);
-					SGM.SetOrigSGDoneTransaction(true);
-					SGM.SetSelectedSGDoneTransaction(false);
+					SGM.SetPickedSBDoneTransaction(null, true);
+					SGM.SetSelectedSBDoneTransaction(null, true);
+					SGM.SetOrigSGDoneTransaction(null ,true);
+					SGM.SetSelectedSGDoneTransaction(SGM.SelectedSG, false);
 					base.Start();
 				}
 				public override void Expire(){
@@ -1131,9 +1135,13 @@ namespace SlotSystem{
 								int curSlotID = sb.SlotID;
 								int newSlotID = newSlotOrderList.IndexOf(sb);
 								SlotMovement slotMovement = new SlotMovement(SG, sb, curSlotID, newSlotID);
-								slotMovement.Execute();
+								// slotMovement.Execute();
 							}
 						}
+						foreach(SlotMovement sm in SG.SlotMovements){
+							sm.Execute();
+						}
+						SG.WaitForAllSlotMovementsDone();
 						base.Start();
 					}
 					public override void Stop(){
@@ -1442,9 +1450,20 @@ namespace SlotSystem{
 					foreach(Slot slot in sg.Slots){
 						if(slot.Sb != null)
 							sbList.Add(slot.Sb);
-						// slot.Sb = null;
 					}
 					sbList.Sort();
+					return sbList;
+				}
+			}
+			public class SGInverseItemIDSorter: SGSorter{
+				public List<Slottable> OrderedSbs(SlotGroup sg){
+					List<Slottable> sbList = new List<Slottable>();
+					foreach(Slot slot in sg.Slots){
+						if(slot.Sb != null)
+							sbList.Add(slot.Sb);
+					}
+					sbList.Sort();
+					sbList.Reverse();
 					return sbList;
 				}
 			}

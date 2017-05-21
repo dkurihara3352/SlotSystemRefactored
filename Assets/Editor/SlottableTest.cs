@@ -399,6 +399,241 @@ public class SlottableTest {
 			AssertSGMFocused();
 	}
 	
+	
+	public void TestVolSortWhileAutoSort(){
+		/*	voluntary sort while auto sort on	*/
+			sgpAll.AutoSort = true;
+			sgCGears.AutoSort = true;
+				AssertFocusedGeneric();
+				AssertOrderReset();
+					AssertOrder(defBowA_p);
+					AssertOrder(defBowB_p);
+					AssertOrder(crfBowA_p);
+					AssertOrder(defWearA_p);
+					AssertOrder(defWearB_p);
+					AssertOrder(crfWearA_p);
+					AssertOrder(defShieldA_p);
+					AssertOrder(crfShieldA_p);
+					AssertOrder(defMWeaponA_p);
+					AssertOrder(crfMWeaponA_p);
+					AssertOrder(defQuiverA_p);
+					AssertOrder(defPackA_p);
+					AssertOrder(defParts_p);
+					AssertOrder(crfParts_p);
+			sgm.SortSG(sgpAll, SlotGroup.InverseItemIDSorter);
+				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
+				AE(sgm.SelectedSGDoneTransaction, false);
+				AE(sgm.Transaction.GetType(), typeof(SortTransaction));
+				ASSG(sgpAll, SlotGroup.SortingState);
+				AssertMoveSlotIndex(sgpAll, defBowA_p, 0, 13, false);
+				AssertMoveSlotIndex(sgpAll, defBowB_p, 1, 12, false);
+				AssertMoveSlotIndex(sgpAll, crfBowA_p, 2, 11, false);
+				AssertMoveSlotIndex(sgpAll, defWearA_p, 3, 10, false);
+				AssertMoveSlotIndex(sgpAll, defWearB_p, 4, 9, false);
+				AssertMoveSlotIndex(sgpAll, crfWearA_p, 5, 8, false);
+				AssertMoveSlotIndex(sgpAll, defShieldA_p, 6, 7, false);
+				AssertMoveSlotIndex(sgpAll, crfShieldA_p, 7, 6, false);
+				AssertMoveSlotIndex(sgpAll, defMWeaponA_p, 8, 5, false);
+				AssertMoveSlotIndex(sgpAll, crfMWeaponA_p, 9, 4, false);
+				AssertMoveSlotIndex(sgpAll, defQuiverA_p, 10, 3, false);
+				AssertMoveSlotIndex(sgpAll, defPackA_p, 11, 2, false);
+				AssertMoveSlotIndex(sgpAll, defParts_p, 12, 1, false);
+				AssertMoveSlotIndex(sgpAll, crfParts_p, 13, 0, false);
+			CompleteAllSlotMovements(sgpAll);
+				AE(sgm.SelectedSGDoneTransaction, true);
+				AssertFocusedGeneric();/*	transaction no done? */
+				AssertOrderReset();
+					AssertOrder(crfParts_p);
+					AssertOrder(defParts_p);
+					AssertOrder(defPackA_p);
+					AssertOrder(defQuiverA_p);
+					AssertOrder(crfMWeaponA_p);
+					AssertOrder(defMWeaponA_p);
+					AssertOrder(crfShieldA_p);
+					AssertOrder(defShieldA_p);
+					AssertOrder(crfWearA_p);
+					AssertOrder(defWearB_p);
+					AssertOrder(defWearA_p);
+					AssertOrder(crfBowA_p);
+					AssertOrder(defBowB_p);
+					AssertOrder(defBowA_p);
+	}
+	public void TestUnequipTransaction(){
+		/*	Unequip Transaction	*/
+			/*	AutoSort off	*/
+			AE(sgpAll.SlotMovements.Count , 0);
+			AE(sgCGears.SlotMovements.Count , 0);
+				sgpAll.AutoSort = false;
+				sgCGears.AutoSort = false;
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defShieldA_p, crfShieldA_p, defMWeaponA_p, defQuiverA_p);
+				defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+			PickUp(defShieldA_e, out picked);
+			sgm.SimHover(null, sgpAll, eventData);
+				AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
+				AE(sgm.PickedSB, defShieldA_e);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, sgpAll);
+			defShieldA_e.OnPointerUpMock(eventData);
+				AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
+				ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
+				ASSB(defShieldA_e, Slottable.MovingState);
+				ASSG(sgpAll, SlotGroup.SelectedState);
+				ASSG(sgCGears, SlotGroup.FocusedState);
+				AE(sgm.PickedSBDoneTransaction, false);
+				AE(sgm.SelectedSBDoneTransaction, true);
+				AE(sgm.OrigSGDoneTransaction, true);
+				AE(sgm.SelectedSGDoneTransaction, true);
+				AssertProcess<SGMUnequipTransactionProcess>(sgm, false);
+				AssertProcess<SBRemovingProcess>(defShieldA_e, false);
+				AssertProcess<SGHighlightProcess>(sgpAll, false);
+				AssertProcess<SGDehighlightProcess>(sgCGears, false);
+				crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.Item);
+				defMWeaponA_e = sgCGears.GetSlottable(defMWeaponA_p.Item);
+				defQuiverA_e = sgCGears.GetSlottable(defQuiverA_p.Item);
+				AB(sgCGears.GetSlotMovement(crfShieldA_e) == null, true);
+				AB(sgCGears.GetSlotMovement(defMWeaponA_e) == null, true);
+				AB(sgCGears.GetSlotMovement(defQuiverA_e) == null, true);
+			ExpireProcesses(defShieldA_e, null, sgCGears, sgpAll);
+				AssertFocusedGeneric();
+				AssertEquippedCGears(null, crfShieldA_p, defMWeaponA_p, defQuiverA_p);
+	}
+	public void TestUnequipTransactionFuck(){
+		sgpAll.AutoSort = false;
+		sgCGears.AutoSort = false;
+		defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+		PickUp(defShieldA_e, out picked);
+		sgm.SimHover(null, sgpAll, eventData);
+			AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
+			AE(sgm.PickedSB, defShieldA_e);
+			AE(sgm.SelectedSB, null);
+			AE(sgm.SelectedSG, sgpAll);
+		defShieldA_e.OnPointerUpMock(eventData);
+			AT<UnequipTransaction>(false);
+			ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
+			ASSB(defShieldA_e, Slottable.MovingState);
+			ASSG(sgpAll, SlotGroup.SelectedState);
+			ASSG(sgCGears, SlotGroup.FocusedState);
+			AE(sgm.PickedSBDoneTransaction, false);
+			AE(sgm.SelectedSBDoneTransaction, true);
+			AE(sgm.OrigSGDoneTransaction, true);
+			AE(sgm.SelectedSGDoneTransaction, true);
+			AssertProcess<SGMUnequipTransactionProcess>(sgm, false);
+			AssertProcess<SBRemovingProcess>(defShieldA_e, false);
+			AssertProcess<SGHighlightProcess>(sgpAll, false);
+			AssertProcess<SGDehighlightProcess>(sgCGears, false);
+			defMWeaponA_e = sgCGears.GetSlottable(defMWeaponA_p.Item);
+			Assert.That(sgCGears.GetSlotMovement(defMWeaponA_e), Is.Null);
+
+		ExpireProcesses(defShieldA_e, null, null, null);
+		
+			AssertFocusedGeneric();
+				AssertEquippedCGears(null, defMWeaponA_p, null, null);
+
+	}
+	public void TestUnequipWhileAutoSort(){
+			sgpAll.AutoSort = true;
+			sgCGears.AutoSort = true;
+			AssertFocusedGeneric();
+			AssertEquippedCGears(null, crfShieldA_p, defMWeaponA_p, defQuiverA_p);
+		defMWeaponA_e = sgCGears.GetSlottable(defMWeaponA_p.Item);
+		PickUp(defMWeaponA_e, out picked);
+		sgm.SimHover(null, sgpAll, eventData);
+			AT<UnequipTransaction>(false);
+			ASSGM(sgm, SlotGroupManager.ProbingState);
+			ASSG(sgpAll, SlotGroup.SelectedState);
+			ASSG(sgCGears, SlotGroup.FocusedState);
+		defMWeaponA_e.OnPointerUpMock(eventData);
+			AssertEquippedCGears(null, crfShieldA_p, null, defQuiverA_p);
+			ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
+			ASSG(sgpAll, SlotGroup.SortingState);
+			ASSG(sgCGears, SlotGroup.SortingState);
+			AssertProcess<SGMUnequipTransactionProcess>(sgm, false);
+			AssertProcess<SGSortingProcess>(sgpAll, false);
+			AssertProcess<SGSortingProcess>(sgCGears, false);
+			AB(sgm.CurProcess.IsExpired, false);
+			AB(sgpAll.CurProcess.IsExpired, true);
+			AB(sgCGears.CurProcess.IsExpired, false);
+			AssertMoveSlotIndex(sgCGears, crfShieldA_p, 1, 0, false);
+			AssertMoveSlotIndex(sgCGears, defQuiverA_p, 3, 1, false);
+		ExpireProcesses(defMWeaponA_e, null, sgCGears, null);
+			AssertFocusedGeneric();
+			AssertEquippedCGears(crfShieldA_p, defQuiverA_p, null, null);
+
+	}
+	public void TestSwapTransactionWhileAutoSort(){
+		/*	AutoSort on and Swap Equip while not maxed	*/
+			sgpAll.AutoSort = true;
+			sgCGears.AutoSort = true;
+				AssertFocusedGeneric();
+				AssertEquippedCGears(crfShieldA_p, defQuiverA_p, null, null);
+			FillEquip(defShieldA_p, sgCGears);
+				AssertEquippedCGears(defShieldA_p, crfShieldA_p, defQuiverA_p, null);
+			
+				AssertFocusedGeneric();
+			sgpAll.AutoSort = true;
+			sgCGears.AutoSort = true;
+
+			PickUp(defPackA_p, out picked);
+			defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
+			sgm.SimHover(defShieldA_e, sgCGears, eventData);
+				AT<SwapTransaction>(false);
+			defPackA_p.OnPointerUpMock(eventData);
+
+				AssertEquippedCGears(defPackA_p, crfShieldA_p, defQuiverA_p, null);
+					AssertMoveSlotIndex(sgCGears, crfShieldA_p, 1, 0, false);
+					AssertMoveSlotIndex(sgCGears, defQuiverA_p, 2, 1, false);
+					AssertMoveSlotIndex(sgCGears, defPackA_p, 0, 2, false);
+			ExpireProcesses(defPackA_p, defShieldA_e, sgpAll, sgCGears);
+				AssertFocusedGeneric();
+				AssertEquippedCGears(crfShieldA_p, defQuiverA_p, defPackA_p, null);
+		/*	while maxed	*/
+				AssertFocusedGeneric();
+				AssertEquippedCGears(crfShieldA_p, defQuiverA_p, defPackA_p, null);
+			FillEquip(crfMWeaponA_p, sgCGears);
+				AssertEquippedCGears(crfShieldA_p, crfMWeaponA_p ,defQuiverA_p, defPackA_p);
+			
+			PickUp(defMWeaponA_p, out picked);
+			defPackA_e = sgCGears.GetSlottable(defPackA_p.Item);
+			sgm.SimHover(defPackA_e, sgCGears, eventData);
+				AT<SwapTransaction>(false);
+			defMWeaponA_p.OnPointerUpMock(eventData);
+				AssertEquippedCGears(crfShieldA_p, crfMWeaponA_p ,defQuiverA_p, defMWeaponA_p);
+					AssertMoveSlotIndex(sgCGears, crfShieldA_p, 0, 0, true);
+					AssertMoveSlotIndex(sgCGears, crfMWeaponA_p, 1, 2, false);
+					AssertMoveSlotIndex(sgCGears, defQuiverA_p, 2, 3, false);
+					AssertMoveSlotIndex(sgCGears, defMWeaponA_p, 3, 1, false);
+			ExpireProcesses(defMWeaponA_p, defPackA_e, sgpAll, sgCGears);
+				AssertFocusedGeneric();
+				AssertEquippedCGears(crfShieldA_p, defMWeaponA_p, crfMWeaponA_p ,defQuiverA_p);
+	}
+	public void TestFillEquipWhileAutoSort(){
+		/*	AutoSort on and Fill Equip	*/
+				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_p, null);
+			sgpAll.AutoSort = true;
+			sgCGears.AutoSort = true;
+
+			PickUp(crfShieldA_p, out picked);
+			sgm.SimHover(null, sgCGears, eventData);
+			crfShieldA_p.OnPointerUpMock(eventData);
+				crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.Item);
+				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_p, crfShieldA_p);
+				AE(sgCGears.SlotMovements.Count, 4);
+					AssertMoveSlotIndex(sgCGears, defShieldA_p, 0, 0, true);
+					AssertMoveSlotIndex(sgCGears, crfShieldA_p, 3, 1, false);
+					AssertMoveSlotIndex(sgCGears, defMWeaponA_p, 1, 2, false);
+					AssertMoveSlotIndex(sgCGears, defQuiverA_p, 2, 3, false);
+			ExpireProcesses(crfShieldA_p, null, sgpAll, sgCGears);
+				AssertFocusedGeneric();
+				AssertEquippedCGears(defShieldA_p, crfShieldA_p, defMWeaponA_p, defQuiverA_p);
+	}
+	public void FillEquip(Slottable sb, SlotGroup destSG){
+		PickUp(sb, out picked);
+		sgm.SimHover(null, destSG, eventData);
+			AT<FillEquipTransaction>(false);
+		sb.OnPointerUpMock(eventData);
+		ExpireProcesses(sb, null, sgm.GetSlotGroup(sb), destSG);
+	}
 	[Test]
 	public void TestRevisedTransactionUpdate(){
 		/*	AutoSort off
@@ -465,32 +700,18 @@ public class SlottableTest {
 				AssertEquippedCGears(defQuiverA_p, defMWeaponA_p, defShieldA_p, null);
 		/*	Voluntary Sort	*/
 			sgm.SortSG(sgCGears, SlotGroup.ItemIDSorter);
-					defQuiverA_e = sgCGears.GetSlottable(defQuiverA_p.Item);
-					defMWeaponA_e = sgCGears.GetSlottable(defMWeaponA_p.Item);
-					defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
-					AE(sgCGears.SlotMovements.Count, 3);
-					AssertMoveSlotIndex(sgCGears, defQuiverA_e, 0, 2, false);
-					AssertMoveSlotIndex(sgCGears, defMWeaponA_e, 1, 1, true);
-					AssertMoveSlotIndex(sgCGears, defShieldA_e, 2, 0, false);
+				AE(sgCGears.SlotMovements.Count, 3);
+				AssertMoveSlotIndex(sgCGears, defQuiverA_p, 0, 2, false);
+				AssertMoveSlotIndex(sgCGears, defMWeaponA_p, 1, 1, true);
+				AssertMoveSlotIndex(sgCGears, defShieldA_p, 2, 0, false);
 			CompleteAllSlotMovements(sgCGears);
 				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_p, null);
-		/*	AutoSort on and Fill Equip	*/
-			sgpAll.AutoSort = true;
-			sgCGears.AutoSort = true;
-
-			PickUp(crfShieldA_p, out picked);
-			sgm.SimHover(null, sgCGears, eventData);
-			crfShieldA_p.OnPointerUpMock(eventData);
-				crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.Item);
-				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_p, crfShieldA_p);
-					AssertMoveSlotIndex(sgCGears, defShieldA_e, 0, 0, true);
-					AssertMoveSlotIndex(sgCGears, crfShieldA_e, 3, 1, false);
-					AssertMoveSlotIndex(sgCGears, defMWeaponA_e, 1, 2, false);
-					AssertMoveSlotIndex(sgCGears, defQuiverA_e, 2, 3, false);
-			ExpireProcesses(crfShieldA_p, null, sgpAll, sgCGears);
-				AssertFocusedGeneric();
-				AssertEquippedCGears(defShieldA_p, crfShieldA_p, defMWeaponA_p, defQuiverA_p);
-
+		/*	*/
+			TestFillEquipWhileAutoSort();
+			TestVolSortWhileAutoSort();
+			TestUnequipTransaction();
+			TestUnequipWhileAutoSort();
+			TestSwapTransactionWhileAutoSort();
 	}
 	// [Test]
 	public void TestAutoSortOnSGCGears(){
@@ -539,10 +760,10 @@ public class SlottableTest {
 		
 		sgm.SortSG(sgCGears, SlotGroup.ItemIDSorter);
 			defShieldA_e = sgCGears.GetSlottable(defShieldA_p.Item);
-			AssertMoveSlotIndex(sgCGears, crfShieldA_e, 0, 1, false);
-			AssertMoveSlotIndex(sgCGears, defMWeaponA_e, 1, 2, false);
-			AssertMoveSlotIndex(sgCGears, defQuiverA_e, 2, 3, false);
-			AssertMoveSlotIndex(sgCGears, defShieldA_e, 3, 0, false);
+			AssertMoveSlotIndex(sgCGears, crfShieldA_p, 0, 1, false);
+			AssertMoveSlotIndex(sgCGears, defMWeaponA_p, 1, 2, false);
+			AssertMoveSlotIndex(sgCGears, defQuiverA_p, 2, 3, false);
+			AssertMoveSlotIndex(sgCGears, defShieldA_p, 3, 0, false);
 		CompleteAllSlotMovements(sgCGears);
 			AssertOrderReset();
 			AssertOrder(defShieldA_e);
@@ -673,15 +894,20 @@ public class SlottableTest {
 			}
 		}
 	}
-	public void AssertMoveSlotIndex(SlotGroup sg, Slottable sb, int curId, int newId, bool completed){
-		SlotMovement sm = sg.GetSlotMovement(sb);
-		int actCurId;
-		int actNewId;
-		sm.GetIndex(out actCurId, out actNewId);
-		AE(actCurId, curId);
-		AE(actNewId, newId);
-		AB(sm.Completed, completed);
-		AB(sm.Completed, completed);
+	public void AssertMoveSlotIndex(SlotGroup sg, Slottable sb_p, int curId, int newId, bool completed){
+		Slottable sb = sg.GetSlottable(sb_p.Item);
+		if(sb == null)
+			throw new System.InvalidOperationException("AssertMoveSlotIndex: there's no sb with specified Item within the given sg");
+		else{
+			SlotMovement sm = sg.GetSlotMovement(sb);
+			int actCurId;
+			int actNewId;
+			sm.GetIndex(out actCurId, out actNewId);
+			AE(actCurId, curId);
+			AE(actNewId, newId);
+			AB(sm.Completed, completed);
+			AB(sm.Completed, completed);
+		}
 	}
 	public void TestInstantSort(){
 		PrintItems(sgpAll);
@@ -3607,6 +3833,9 @@ public class SlottableTest {
 		public void ASSG(SlotGroup sg, SlotGroupState state){
 			AE(sg.CurState, state);
 		}
+		public void ASSGM(SlotGroupManager sgm, SGMState state){
+			AE(sgm.CurState, state);
+		}
 		public void AM(Slottable sb, SlotGroup sg, bool isMember){
 			if(sg.Filter is SGBowFilter){
 				if((InventoryItemInstanceMock)sg.Slots[0].Sb.Item == (InventoryItemInstanceMock)sb.Item){
@@ -3789,7 +4018,7 @@ public class SlottableTest {
 			
 			int allowedCount = ((EquipmentSetInventory)sgCGears.Inventory).EquippableCGearsCount;
 			
-			for(int i = 0; i < checkedList.Count; i++){
+			for(int i = 0; i < 4; i++){
 				if(i +1 > allowedCount)
 					if(checkedList[i] != null)
 						throw new System.InvalidOperationException("Slottable at index " + i + " is not checked since it exceeds the max slot count");
@@ -3813,5 +4042,32 @@ public class SlottableTest {
 		}
 		public void AssertOrderReset(){
 			aoCount = 0;
+		}
+		public void AssertProcess<T>(Slottable sb, bool isNull) where T: SBProcess{
+			if(!isNull)
+				AE(sb.CurProcess.GetType(),typeof(T));
+			else
+				Assert.That(sb.CurProcess, Is.Null);
+		}
+		public void AssertProcess<T>(SlotGroup sg, bool isNull) where T: SGProcess{
+			if(!isNull)
+				AE(sg.CurProcess.GetType(),typeof(T));
+			else
+				Assert.That(sg.CurProcess, Is.Null);
+		}
+		public void AssertProcess<T>(SlotGroupManager sgm, bool isNull) where T: SGMProcess{
+			if(!isNull)
+				AE(sgm.CurProcess.GetType(),typeof(T));
+			else
+				Assert.That(sgm.CurProcess, Is.Null);
+		}
+		public void AT<T>(bool isNull) where T: SlotSystemTransaction{
+			if(!isNull)
+				AE(sgm.Transaction.GetType(), typeof(T));
+			else
+				Assert.That(sgm.Transaction, Is.Null);
+		}
+		public void ANull(object obj){
+			Assert.That(obj, Is.Null);
 		}
 }

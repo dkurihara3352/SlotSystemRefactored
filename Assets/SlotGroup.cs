@@ -205,6 +205,12 @@ namespace SlotSystem{
 					return m_itemIDSorter;
 				}
 			}
+			static SGSorter m_inverseItemIDSorter = new SGInverseItemIDSorter();
+			public static SGSorter InverseItemIDSorter{
+				get{
+					return m_inverseItemIDSorter;
+				}
+			}
 			static SGSorter m_acquisitionOrderSorter = new SGAcquisitionOrderSorter();
 			public static SGSorter AcquisitionOrderSorter{
 				get{
@@ -216,12 +222,6 @@ namespace SlotSystem{
 				public SGSorter Sorter{
 					get{return m_sorter;}
 				}
-				// public void SortItems(){
-				// 	m_sorter.Execute(this);
-				// }
-				// public void InstantSort(){
-				// 	m_sorter.Execute(this);
-				// }
 				public void SetSorter(SGSorter sorter){
 					m_sorter = sorter;
 				}
@@ -237,10 +237,6 @@ namespace SlotSystem{
 						sbs.Add(slot.Sb);
 					slot.Sb = null;
 				}
-				// for(int i = 0; i < Slots.Count; i++){
-				// 	if(newSlotOrderedSbs[i] != null)
-				// 		Slots[i].Sb = newSlotOrderedSbs[i];
-				// }
 				for(int i = 0; i < newSlotOrderedSbs.Count; i++){
 					Slots[i].Sb = newSlotOrderedSbs[i];
 				}
@@ -306,7 +302,6 @@ namespace SlotSystem{
 				}
 				if(flag){
 					CurProcess.Expire();
-					slotMovements.Clear();
 				}
 				return null;
 			}
@@ -497,11 +492,13 @@ namespace SlotSystem{
 					}
 				}
 			/*	Sorting  */
-				if(SGM.Transaction.GetType() == typeof(SortTransaction))
+						
+				if(SGM.Transaction.GetType() == typeof(SortTransaction)){
 					SetState(SlotGroup.SortingState);
-				else{
-					if(!AutoSort)
+				}else{
+					if(!AutoSort){
 						SGM.CompleteTransactionOnSG(this);
+					}
 					else
 						SetState(SlotGroup.SortingState);
 				}
