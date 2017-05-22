@@ -127,13 +127,17 @@ namespace SlotSystem{
 			}
 			public bool IsPool{
 				get{
-					bool flag = true;
-					flag &= IsExpandable;
-					flag &= IsShrinkable;
-					return flag;
+					return SGM.RootPage.PoolBundle.ContainsElement(this);
 				}
 			}
-			public bool AutoSort = true;
+			bool m_autoSort = true;
+			public bool IsAutoSort{
+				get{return m_autoSort;}
+			}
+			public void ToggleAutoSort(bool on){
+				m_autoSort = on;
+				SGM.Focus();
+			}
 		
 		/* commands
 		*/
@@ -225,8 +229,50 @@ namespace SlotSystem{
 				public void SetSorter(SGSorter sorter){
 					m_sorter = sorter;
 				}
-		
+			List<Slottable> ReorderedSBs;
+			// public void SetReorderedSBs(Slottable picked, Slottable hovered){
+			// 	List<Slottable> result = new List<Slottable>();
+			// 	foreach(Slot slot in Slots){
+			// 		result.Add(slot.Sb);
+			// 	}
+			// 	int pickedId = result.IndexOf(picked);
+			// 	int hoveredId = result.IndexOf(hovered);
+			// 	result[pickedId] = hovered;
+			// 	result[hoveredId] = picked;
+			// 	this.ReorderedSBs = result;
+			// }
+			public void SetReorderedSBs(Slottable picked, Slottable hovered){
+				List<Slottable> result = new List<Slottable>();
+				foreach(Slot slot in Slots){
+					result.Add(slot.Sb);
+				}
+				int pickedId = result.IndexOf(picked);
+				int hoveredId = result.IndexOf(hovered);
+				Slottable pickedOrig =  result[pickedId];
+				if(pickedId < hoveredId){
+					for (int i = 0; i < result.Count; i++)
+					{
+						if(i >= pickedId && i < hoveredId){
+							result[i] = result[i + 1];
+						}
+					}
+				}else{
+					for(int i = result.Count - 1; i >= 0; i --){
+						if(i > hoveredId && i <= pickedId){
+							result[i] = result[i - 1];
+						}
+					}
+				}
+				result[hoveredId] = pickedOrig;
+				this.ReorderedSBs = result;
+			}
 			public List<Slottable> OrderedSbs(){
+				if(SGM.Transaction != null && SGM.Transaction.GetType()== typeof(ReorderTransaction)){
+					// List<Slottable> result = ReorderedSBs;
+					// // ReorderedSBs = null;
+					// return result;
+					return ReorderedSBs;
+				}
 				return Sorter.OrderedSbs(this);
 			}
 			public void InstantSort(){
@@ -371,14 +417,25 @@ namespace SlotSystem{
 		}
 		public void FocusSBs(){
 			foreach(Slot slot in Slots){
-				if(slot.Sb != null){
-					if(SGM.RootPage.PoolBundle.ContainsElement(this)){
-						if(slot.Sb.IsEquipped){
-							slot.Sb.Defocus();
-							continue;
+				Slottable sb = slot.Sb;
+				if(sb != null){
+					if(!this.IsAutoSort){
+						sb.Focus();
+						continue;
+					}else{
+						if(this.IsPool){
+							if(sb.Item is PartsInstanceMock && !(this.Filter is SGPartsFilter)){
+								sb.Defocus();
+								continue;
+							}else{
+								if(sb.IsEquipped){
+									sb.Defocus();
+									continue;
+								}
+							}
 						}
 					}
-					slot.Sb.Focus();
+					sb.Focus();
 				}
 			}
 		}
@@ -429,7 +486,7 @@ namespace SlotSystem{
 			if(SGM.Transaction.GetType() == typeof(SortTransaction))
 				SetState(SlotGroup.SortingState);
 			else{
-				if(!AutoSort)
+				if(!m_autoSort)
 					SGM.CompleteTransactionOnSG(this);
 				else
 					SetState(SlotGroup.SortingState);
@@ -493,10 +550,10 @@ namespace SlotSystem{
 				}
 			/*	Sorting  */
 						
-				if(SGM.Transaction.GetType() == typeof(SortTransaction)){
+				if(SGM.Transaction.GetType() == typeof(SortTransaction) || SGM.Transaction.GetType() == typeof(ReorderTransaction)){
 					SetState(SlotGroup.SortingState);
 				}else{
-					if(!AutoSort){
+					if(!m_autoSort){
 						SGM.CompleteTransactionOnSG(this);
 					}
 					else

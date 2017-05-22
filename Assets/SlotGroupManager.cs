@@ -130,6 +130,16 @@ namespace SlotSystem{
 						this.CurProcess.Expire();
 					return null;
 				}
+				public IEnumeratorMock WaitForReorderDone(){
+					bool done = true;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
+					if(done)
+						this.CurProcess.Expire();
+					return null;
+				}
 		/*	states
 		*/
 			SGMState m_curState;

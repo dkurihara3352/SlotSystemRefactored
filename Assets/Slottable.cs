@@ -283,6 +283,14 @@ namespace SlotSystem{
 					return result;
 				}
 			}
+			SlotGroup m_sg;
+			public SlotGroup SG{
+				get{
+					if(m_sg == null)
+						m_sg = SGM.GetSlotGroup(this);
+					return m_sg;
+				}
+			}
 		/*	processes
 		*/
 			SBProcess m_curProcess;
@@ -367,7 +375,9 @@ namespace SlotSystem{
 				public IEnumeratorMock UnpickingCoroutine(){
 					return null;
 				}
-				
+				public IEnumeratorMock ReorderingCoroutine(){
+					return null;
+				}
 		/*	Event methods
 		*/
 			public void OnPointerDownMock(PointerEventDataMock eventDataMock){
