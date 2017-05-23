@@ -250,12 +250,6 @@ namespace SlotSystem{
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
 			}
 			public void CompleteTransactionOnSG(SlotGroup sg){
-				// if(sg == GetSlotGroup(PickedSB)) m_origSGDoneTransaction = true;
-				// else if(sg == SelectedSG) m_selectedSGDoneTransaction = true;
-				// else if(sg == GetSlotGroup(m_selectedSB))
-				// 	m_selectedSGDoneTransaction = true;
-				// else if(sg.CurState == SlotGroup.SortingState)
-				// 	m_selectedSGDoneTransaction = true;
 				if(m_selectedSGForTS != null && sg == m_selectedSGForTS)
 					m_selectedSGDoneTransaction = true;
 				else if(m_origSGForTS != null && sg == m_origSGForTS)

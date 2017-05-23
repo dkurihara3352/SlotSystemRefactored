@@ -240,19 +240,14 @@ namespace SlotSystem{
 					sgm.SetAndRun(process);
 					sgm.SetState(SlotGroupManager.PerformingTransactionState);
 
-					// origSG.TransactionUpdate(null, pickedSB);
-					// selectedSG.TransactionUpdate(pickedSB, null);
 					origSG.TransactionUpdateV2(null, pickedSB);
 					selectedSG.TransactionUpdateV2(pickedSB, null);
 
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
-					// pickedSB.SetState(Slottable.EquippingState);
 					pickedSB.SetState(Slottable.MovingState);
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
-					// Slot slot = selectedSG.GetNextEmptySlot();
-					// selectedSG.AddSB(ref slot);
 					sgm.UpdateEquipStatus();
 					sgm.ClearAndReset();
 				}
@@ -355,6 +350,7 @@ namespace SlotSystem{
 					}
 				}
 			}
+			/*	use this */
 			public class PostPickFilterV3Command: SGMCommand{
 				public void Execute(SlotGroupManager sgm){
 					Slottable pickedSb = sgm.PickedSB;
@@ -362,19 +358,21 @@ namespace SlotSystem{
 					SlotSystemBundle poolBundle = sgm.RootPage.PoolBundle;
 					SlotSystemBundle equipBundle = sgm.RootPage.EquipBundle;
 
-					if(poolBundle.ContainsElement(origSG)){// in the pool
+					if(poolBundle.ContainsElement(origSG)){// pickedSb in the pool
 						foreach(Slot slot in origSG.Slots){
 							if(slot.Sb != null && slot.Sb != pickedSb){
 								if(origSG.IsAutoSort){
-									if(slot.Sb.IsEquipped)
-										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-									else
-										slot.Sb.SetState(Slottable.DefocusedState);
+									// if(slot.Sb.IsEquipped)
+									// 	slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									// else
+									// 	slot.Sb.SetState(Slottable.DefocusedState);
+									slot.Sb.Defocus();
 								}else{
-									if(slot.Sb.IsEquipped)
-										slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-									else
-										slot.Sb.SetState(Slottable.FocusedState);
+									// if(slot.Sb.IsEquipped)
+									// 	slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+									// else
+									// 	slot.Sb.SetState(Slottable.FocusedState);
+									slot.Sb.Focus();
 								}
 							}
 						}
@@ -388,21 +386,23 @@ namespace SlotSystem{
 									sg.SetState(SlotGroup.FocusedState);
 								foreach(Slot slot in sg.Slots){
 									if(slot.Sb != null){
-										if(slot.Sb.IsEquipped){
-											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-										}else{
-											slot.Sb.SetState(Slottable.FocusedState);
-										}
+										// if(slot.Sb.IsEquipped){
+										// 	slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+										// }else{
+										// 	slot.Sb.SetState(Slottable.FocusedState);
+										// }
+										slot.Sb.Focus();
 									}
 								}
 							}else{// sg filtered out
 								sg.SetState(SlotGroup.DefocusedState);
 								foreach(Slot slot in sg.Slots){
 									if(slot.Sb != null){
-										if(slot.Sb.IsEquipped)
-											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-										else
-											slot.Sb.SetState(Slottable.DefocusedState);
+										// if(slot.Sb.IsEquipped)
+										// 	slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+										// else
+										// 	slot.Sb.SetState(Slottable.DefocusedState);
+										slot.Sb.Defocus();
 									}
 								}
 							}
@@ -419,13 +419,15 @@ namespace SlotSystem{
 											sg.SetState(SlotGroup.FocusedState);
 											foreach(Slot slot in sg.Slots){
 												if(slot.Sb != null)
-													slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+													// slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+													slot.Sb.Focus();
 											}
 										}else{
 											sg.SetState(SlotGroup.DefocusedState);
 											foreach(Slot slot in sg.Slots){
 												if(slot.Sb != null)
-													slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+													// slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+													slot.Sb.Defocus();
 											}
 										}
 									}else{// sg == origSG, the state is Selected
@@ -433,9 +435,9 @@ namespace SlotSystem{
 											if(slot.Sb != null){
 												if(slot.Sb != pickedSb){
 													if(!sg.IsAutoSort)
-														slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+														slot.Sb.Focus();
 													else
-														slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+														slot.Sb.Defocus();
 												}
 											}
 										}
@@ -449,21 +451,26 @@ namespace SlotSystem{
 								if(SlotSystem.Utility.HaveCommonItemFamily(slot.Sb, pickedSb)){
 									if(object.ReferenceEquals(slot.Sb.Item, pickedSb.Item)){
 										if(origSG.IsShrinkable)// unequip
-											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+											// slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+											slot.Sb.Focus();
 										else
-											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+											// slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+											slot.Sb.Defocus();
 									}
 									else{
 										if(slot.Sb.IsEquipped)
-											slot.Sb.SetState(/*Slottable.EquippedAndDeselectedState*/Slottable.EquippedAndDefocusedState);
+											// slot.Sb.SetState(/*Slottable.EquippedAndDeselectedState*/Slottable.EquippedAndDefocusedState);
+											slot.Sb.Defocus();
 										else
-											slot.Sb.SetState(Slottable.FocusedState);
+											// slot.Sb.SetState(Slottable.FocusedState);
+											slot.Sb.Focus();
 									}
 								}else{	// different item family
-									if(slot.Sb.IsEquipped)
-										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-									else
-										slot.Sb.SetState(Slottable.DefocusedState);
+									// if(slot.Sb.IsEquipped)
+									// 	slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+									// else
+									// 	slot.Sb.SetState(Slottable.DefocusedState);
+									slot.Sb.Defocus();
 								}
 							}
 						}
@@ -512,6 +519,7 @@ namespace SlotSystem{
 					}
 				}
 			}
+			
 			public class PostPickFilterV2Command: SGMCommand{
 				public void Execute(SlotGroupManager sgm){
 					Slottable pickedSb = sgm.PickedSB;
