@@ -1351,7 +1351,7 @@ namespace SlotSystem{
 						GameObject go = new GameObject("SlottablePrefab");
 						Slottable sb = go.AddComponent<Slottable>();
 						InventoryItemInstanceMock item = (InventoryItemInstanceMock)sg.FilteredItems[i];
-						sb.Initialize(sg, true, item);
+						sb.Initialize(sg.SGM, true, item);
 						sg.Slots[i].Sb = sb;
 					}
 				}
@@ -1413,6 +1413,7 @@ namespace SlotSystem{
 		*/
 			public interface SGFilter{
 				void Execute(SlotGroup sg);
+				List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList);
 			}
 			public class SGNullFilter: SGFilter{
 				public void Execute(SlotGroup sg){
@@ -1422,6 +1423,9 @@ namespace SlotSystem{
 						filteredItems.Add(item);
 					}
 					sg.SetFilteredItems(filteredItems);
+				}
+				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					return prefilteredList;
 				}
 			}
 			public class SGBowFilter: SGFilter{
@@ -1433,6 +1437,14 @@ namespace SlotSystem{
 					}
 					sg.SetFilteredItems(filteredItems);
 				}
+				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+						if(itemInst is BowInstanceMock)
+							result.Add(itemInst);
+					}
+					return result;
+				}
 			}
 			public class SGWearFilter: SGFilter{
 				public void Execute(SlotGroup sg){
@@ -1442,6 +1454,14 @@ namespace SlotSystem{
 							filteredItems.Add(item);
 					}
 					sg.SetFilteredItems(filteredItems);
+				}
+				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+						if(itemInst is WearInstanceMock)
+							result.Add(itemInst);
+					}
+					return result;
 				}
 			}
 			public class SGCarriedGearFilter: SGFilter{
@@ -1453,6 +1473,14 @@ namespace SlotSystem{
 					}
 					sg.SetFilteredItems(filteredItems);
 				}
+				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+						if(itemInst is CarriedGearInstanceMock)
+							result.Add(itemInst);
+					}
+					return result;
+				}
 			}
 			public class SGPartsFilter: SGFilter{
 				public void Execute(SlotGroup sg){
@@ -1462,6 +1490,14 @@ namespace SlotSystem{
 							filteredItems.Add(item);
 					}
 					sg.SetFilteredItems(filteredItems);
+				}
+				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+						if(itemInst is PartsInstanceMock)
+							result.Add(itemInst);
+					}
+					return result;
 				}
 			}
 			
@@ -2624,19 +2660,22 @@ namespace SlotSystem{
 						IndexItems();
 					}
 					public void RemoveItem(SlottableItem item){
+						SlottableItem itemToRemove = null;
 						foreach(SlottableItem it in Items){
 							InventoryItemInstanceMock checkedInst = (InventoryItemInstanceMock)it;
 							InventoryItemInstanceMock removedInst = (InventoryItemInstanceMock)item;
 							if(checkedInst == removedInst){
 								if(!removedInst.IsStackable)
-									Items.Remove(it);
+									itemToRemove = it;
 								else{
 									checkedInst.Quantity -= removedInst.Quantity;
 									if(checkedInst.Quantity <= 0)
-										Items.Remove(it);
+										itemToRemove = it;
 								}
 							}
 						}
+						if(itemToRemove != null)
+							Items.Remove(itemToRemove);
 						IndexItems();
 					}
 

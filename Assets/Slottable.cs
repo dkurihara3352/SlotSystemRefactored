@@ -422,10 +422,10 @@ namespace SlotSystem{
 				return a.CompareTo(b) < 0;
 			}
 		
-		public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
+		public void Initialize(SlotGroupManager sgm, bool delayed, InventoryItemInstanceMock item){
 			m_curState = Slottable.DeactivatedState;
 			m_prevState = Slottable.DeactivatedState;
-			this.m_sgm = sg.SGM;
+			this.m_sgm = sgm;
 			Delayed = delayed;
 			this.SetItem(item);
 		}

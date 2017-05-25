@@ -289,10 +289,49 @@ namespace SlotSystem{
 			}
 		/*	filter
 		*/
+			static SGFilter m_nullFilter;
+				public static SGFilter NullFilter{
+					get{
+						if(m_nullFilter == null)
+							m_nullFilter = new SGNullFilter();
+						return m_nullFilter;
+					}
+				}
+			static SGFilter m_bowFilter;
+				public static SGFilter BowFilter{
+					get{
+						if(m_bowFilter == null)
+							m_bowFilter = new SGBowFilter();
+						return m_bowFilter;
+					}
+				}
+			static SGFilter m_wearFilter;
+				public static SGFilter WearFilter{
+					get{
+						if(m_wearFilter == null)
+							m_wearFilter = new SGWearFilter();
+						return m_wearFilter;
+					}
+				}
+			static SGFilter m_cGearsFilter;
+				public static SGFilter CGearsFilter{
+					get{
+						if(m_cGearsFilter == null)
+							m_cGearsFilter = new SGCarriedGearFilter();
+						return m_cGearsFilter;
+					}
+				}
+			static SGFilter m_partsFilter;
+				public static SGFilter PartsFilter{
+					get{
+						if(m_partsFilter == null)
+							m_partsFilter = new SGPartsFilter();
+						return m_partsFilter;
+					}
+				}
 			SGFilter m_filter;
 				public SGFilter Filter{
 					get{return m_filter;}
-					set{m_filter = value;}
 				}
 				public void FilterItems(){
 					m_filter.Execute(this);
@@ -373,6 +412,23 @@ namespace SlotSystem{
 				return null;
 			}
 
+		public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int slotCountCumExpandable){
+			m_filter = filter;
+			SetSorter(SlotGroup.ItemIDSorter);
+			SetInventory(inv);
+			this.IsShrinkable = isShrinkable;
+			if(slotCountCumExpandable == 0)
+				this.IsExpandable = true;
+			else{
+				this.IsExpandable = false;
+				for(int i = 0; i < slotCountCumExpandable; i++){
+					Slot newSlot = new Slot();
+					newSlot.Position = Vector2.zero;
+					this.Slots.Add(newSlot);
+				}
+			}
+
+		}
 		public void Activate(){
 			InitializeItems();
 		}
@@ -544,7 +600,7 @@ namespace SlotSystem{
 						else
 							slot = GetNextEmptySlot();
 						/*	assemble	*/
-						newSB.Initialize(this, true, item);
+						newSB.Initialize(this.SGM, true, item);
 						slot.Sb = newSB;
 					}
 				}
@@ -600,8 +656,27 @@ namespace SlotSystem{
 			if(item == null){
 				throw new System.InvalidOperationException("a slottable with specified inventory item already exist.");
 			}else{
-				addedSB.Initialize(this, true, item);
+				addedSB.Initialize(this.SGM, true, item);
 				toSlot.Sb = addedSB;
+			}
+		}
+		public List<Slottable> Slottables{
+			get{
+				List<Slottable> result = new List<Slottable>();
+					foreach(Slot slot in this.Slots){
+						if(slot.Sb != null)
+							result.Add(slot.Sb);
+					}
+				return result;
+			}
+		}
+		public List<InventoryItemInstanceMock> ItemInstances{
+			get{
+				List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					foreach(Slottable sb in Slottables){
+						result.Add(sb.ItemInst);
+					}
+				return result;
 			}
 		}
 	}
