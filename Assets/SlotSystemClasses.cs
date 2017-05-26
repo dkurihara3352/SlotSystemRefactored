@@ -266,7 +266,6 @@ namespace SlotSystem{
 					SGMSortingProcess process = new SGMSortingProcess(sgm, sgm.WaitForSortingDone);
 					sgm.SetAndRun(process);
 					sgm.SetState(SlotGroupManager.PerformingTransactionState);
-					// m_sg.TransactionUpdate(null, null);
 					m_sg.TransactionUpdateV2(null, null);
 				}
 				public void OnComplete(){
@@ -918,9 +917,7 @@ namespace SlotSystem{
 				}
 			}
 			public class SGSortingState: SlotGroupState{
-				// SlotGroupState prevState;
 				public void EnterState(SlotGroup sg){
-					// prevState = sg.PrevState;
 					SGProcess process = new SGSortingProcess(sg, sg.WaitForAllSlotMovementsDone);
 					sg.SetAndRun(process);
 					/*	implement SlotMovements creation and stuff in the process
@@ -1186,7 +1183,6 @@ namespace SlotSystem{
 						foreach(SlotMovement sm in SG.SlotMovements){
 							sm.Execute();
 						}
-						SG.WaitForAllSlotMovementsDone();
 						base.Start();
 					}
 					public override void Stop(){

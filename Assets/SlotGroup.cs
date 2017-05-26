@@ -230,17 +230,6 @@ namespace SlotSystem{
 					m_sorter = sorter;
 				}
 			List<Slottable> ReorderedSBs;
-			// public void SetReorderedSBs(Slottable picked, Slottable hovered){
-			// 	List<Slottable> result = new List<Slottable>();
-			// 	foreach(Slot slot in Slots){
-			// 		result.Add(slot.Sb);
-			// 	}
-			// 	int pickedId = result.IndexOf(picked);
-			// 	int hoveredId = result.IndexOf(hovered);
-			// 	result[pickedId] = hovered;
-			// 	result[hoveredId] = picked;
-			// 	this.ReorderedSBs = result;
-			// }
 			public void SetReorderedSBs(Slottable picked, Slottable hovered){
 				List<Slottable> result = new List<Slottable>();
 				foreach(Slot slot in Slots){
@@ -268,9 +257,6 @@ namespace SlotSystem{
 			}
 			public List<Slottable> OrderedSbs(){
 				if(SGM.Transaction != null && SGM.Transaction.GetType()== typeof(ReorderTransaction)){
-					// List<Slottable> result = ReorderedSBs;
-					// // ReorderedSBs = null;
-					// return result;
 					return ReorderedSBs;
 				}
 				return Sorter.OrderedSbs(this);
