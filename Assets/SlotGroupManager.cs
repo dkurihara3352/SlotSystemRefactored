@@ -65,6 +65,11 @@ namespace SlotSystem{
 				if(m_curProcess != null)
 					m_curProcess.Start();
 			}
+			public void SetAndRunTransactionProcess(Slottable pickedSB, Slottable selectedSB, SlotGroup pickedSG, SlotGroup selectedSG){
+				SGMTransactionProcess process = new SGMTransactionProcess(this, pickedSB, selectedSB, pickedSG, selectedSG);
+				this.SetAndRun(process);
+				this.SetState(SlotGroupManager.PerformingTransactionState);
+			}
 			/*	coroutines
 			*/
 				public IEnumeratorMock ProbingStateCoroutine(){
@@ -138,6 +143,17 @@ namespace SlotSystem{
 					done &= m_selectedSGDoneTransaction;
 					if(done)
 						this.CurProcess.Expire();
+					return null;
+				}
+				public IEnumeratorMock WaitForTransactionDone(){
+					bool done = true;
+					done &= m_pickedSBDoneTransaction;
+					done &= m_selectedSBDoneTransaction;
+					done &= m_origSGDoneTransaction;
+					done &= m_selectedSGDoneTransaction;
+					if(done){
+						this.CurProcess.Expire();
+					}
 					return null;
 				}
 		/*	states
@@ -256,19 +272,25 @@ namespace SlotSystem{
 					m_origSGDoneTransaction = true;
 				else if(sg.CurState == SlotGroup.SortingState)
 					m_selectedSGDoneTransaction = true;
-				sg.SlotMovements.Clear();
+				// sg.SlotMovements.Clear();
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)CurProcess).CoroutineMock();
 			}
 			public void CompleteAllTransaction(){
 				Transaction.OnComplete();
+			}
+			public void SetTransactionFields(Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
+				SetPickedSBDoneTransaction(pickedSB);
+				SetSelectedSBDoneTransaction(selectedSB);
+				SetOrigSGDoneTransaction(origSG);
+				SetSelectedSGDoneTransaction(selectedSG);
 			}
 			bool m_pickedSBDoneTransaction = true;
 				Slottable m_pickedSBForTS;
 				public bool PickedSBDoneTransaction{
 					get{return m_pickedSBDoneTransaction;}
 				}
-				public void SetPickedSBDoneTransaction(Slottable sb, bool done){
-					m_pickedSBDoneTransaction = done;
+				public void SetPickedSBDoneTransaction(Slottable sb){
+					m_pickedSBDoneTransaction = sb == null;
 					m_pickedSBForTS = sb;
 				}
 			bool m_selectedSBDoneTransaction = true;
@@ -276,8 +298,8 @@ namespace SlotSystem{
 				public bool SelectedSBDoneTransaction{
 					get{return m_selectedSBDoneTransaction;}
 				}
-				public void SetSelectedSBDoneTransaction(Slottable sb, bool done){
-					m_selectedSBDoneTransaction = done;
+				public void SetSelectedSBDoneTransaction(Slottable sb){
+					m_selectedSBDoneTransaction = sb == null;
 					m_selectedSBForTS = sb;
 				}
 			bool m_origSGDoneTransaction = true;
@@ -285,8 +307,8 @@ namespace SlotSystem{
 				public bool OrigSGDoneTransaction{
 					get{return m_origSGDoneTransaction;}
 				}
-				public void SetOrigSGDoneTransaction(SlotGroup sg, bool done){
-					m_origSGDoneTransaction = done;
+				public void SetOrigSGDoneTransaction(SlotGroup sg){
+					m_origSGDoneTransaction = sg == null;
 					m_origSGForTS = sg;
 				}
 			bool m_selectedSGDoneTransaction = true;
@@ -294,8 +316,8 @@ namespace SlotSystem{
 				public bool SelectedSGDoneTransaction{
 					get{return m_selectedSGDoneTransaction;}
 				}
-				public void SetSelectedSGDoneTransaction(SlotGroup sg, bool done){
-					m_selectedSGDoneTransaction = done;
+				public void SetSelectedSGDoneTransaction(SlotGroup sg){
+					m_selectedSGDoneTransaction = sg ==null;
 					m_selectedSGForTS = sg;
 				}
 		/**/

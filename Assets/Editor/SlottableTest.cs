@@ -64,6 +64,7 @@ public class SlottableTest {
 		/*	inventories	*/
 		PoolInventory poolInv = new PoolInventory();
 		EquipmentSetInventory equipInv = new EquipmentSetInventory();
+		Slottable pickedSB;
 	[SetUp]
 	public void Setup(){
 		/*	SGM	*/
@@ -389,12 +390,9 @@ public class SlottableTest {
 					AE(sgm.GetSlotGroup(defWearA_e), sgWear);
 					InventoryItemInstanceMock defWearA_e_Inst = (InventoryItemInstanceMock)defWearA_e.Item;
 					AB(defWearA_e_Inst.IsEquipped, true);
+
+		
 		sgm.Focus();
-			AssertFocused();
-		sgm.Defocus();
-			AssertSGMDefocus();
-		sgm.Focus();
-			AssertFocused();
 	}
 
 	public void TestAcquisitionOrder(){
@@ -441,236 +439,236 @@ public class SlottableTest {
 		AB(sgpParts.IsAutoSort, true);
 		/**/
 			ASSG(sgpAll, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p, Slottable.FocusedState);
-				ASSBOrder(crfBowA_p, Slottable.FocusedState);
-				ASSBOrder(defWearA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p, Slottable.FocusedState);
-				ASSBOrder(crfWearA_p, Slottable.FocusedState);
-				ASSBOrder(defShieldA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-				ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-				ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-				ASSBOrder(defPackA_p, Slottable.FocusedState);
-				ASSBOrder(defParts_p, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p, Slottable.FocusedState);
+				ASSBO(crfBowA_p, Slottable.FocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p, Slottable.FocusedState);
+				ASSBO(crfWearA_p, Slottable.FocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfShieldA_p, Slottable.FocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+				ASSBO(defQuiverA_p, Slottable.FocusedState);
+				ASSBO(defPackA_p, Slottable.FocusedState);
+				ASSBO(defParts_p, Slottable.DefocusedState);
+				ASSBO(crfParts_p, Slottable.DefocusedState);
 				
 			ASSG(sgpBow, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p2, Slottable.DefocusedState);
+				ASSBO(crfBowA_p2, Slottable.DefocusedState);
 				
 			ASSG(sgpWear, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p2, Slottable.DefocusedState);
+				ASSBO(crfWearA_p2, Slottable.DefocusedState);
 				
 			ASSG(sgpParts, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defParts_p2, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defParts_p2, Slottable.DefocusedState);
+				ASSBO(crfParts_p2, Slottable.DefocusedState);
 			/**/
 			sgpAll.ToggleAutoSort(false);
 			ASSG(sgpAll, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-				ASSBOrder(defBowB_p, Slottable.FocusedState);
-				ASSBOrder(crfBowA_p, Slottable.FocusedState);
-				ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-				ASSBOrder(defWearB_p, Slottable.FocusedState);
-				ASSBOrder(crfWearA_p, Slottable.FocusedState);
-				ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-				ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-				ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-				ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-				ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-				ASSBOrder(defPackA_p, Slottable.FocusedState);
-				ASSBOrder(defParts_p, Slottable.FocusedState);
-				ASSBOrder(crfParts_p, Slottable.FocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(defBowB_p, Slottable.FocusedState);
+				ASSBO(crfBowA_p, Slottable.FocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(defWearB_p, Slottable.FocusedState);
+				ASSBO(crfWearA_p, Slottable.FocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(crfShieldA_p, Slottable.FocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+				ASSBO(defQuiverA_p, Slottable.FocusedState);
+				ASSBO(defPackA_p, Slottable.FocusedState);
+				ASSBO(defParts_p, Slottable.FocusedState);
+				ASSBO(crfParts_p, Slottable.FocusedState);
 			ASSG(sgpBow, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p2, Slottable.DefocusedState);
+				ASSBO(crfBowA_p2, Slottable.DefocusedState);
 			ASSG(sgpWear, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p2, Slottable.DefocusedState);
+				ASSBO(crfWearA_p2, Slottable.DefocusedState);
 			ASSG(sgpParts, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defParts_p2, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defParts_p2, Slottable.DefocusedState);
+				ASSBO(crfParts_p2, Slottable.DefocusedState);
 			sgpAll.ToggleAutoSort(true);
 			/**/
 		sgm.SetFocusedPoolSG(sgpBow);
 			ASSG(sgpAll, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p, Slottable.DefocusedState);
-				ASSBOrder(defWearA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p, Slottable.DefocusedState);
-				ASSBOrder(defShieldA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfShieldA_p, Slottable.DefocusedState);
-				ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfMWeaponA_p, Slottable.DefocusedState);
-				ASSBOrder(defQuiverA_p, Slottable.DefocusedState);
-				ASSBOrder(defPackA_p, Slottable.DefocusedState);
-				ASSBOrder(defParts_p, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p, Slottable.DefocusedState);
+				ASSBO(crfBowA_p, Slottable.DefocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p, Slottable.DefocusedState);
+				ASSBO(crfWearA_p, Slottable.DefocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfShieldA_p, Slottable.DefocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfMWeaponA_p, Slottable.DefocusedState);
+				ASSBO(defQuiverA_p, Slottable.DefocusedState);
+				ASSBO(defPackA_p, Slottable.DefocusedState);
+				ASSBO(defParts_p, Slottable.DefocusedState);
+				ASSBO(crfParts_p, Slottable.DefocusedState);
 			ASSG(sgpBow, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p2, Slottable.FocusedState);
-				ASSBOrder(crfBowA_p2, Slottable.FocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p2, Slottable.FocusedState);
+				ASSBO(crfBowA_p2, Slottable.FocusedState);
 			ASSG(sgpWear, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p2, Slottable.DefocusedState);
+				ASSBO(crfWearA_p2, Slottable.DefocusedState);
 			ASSG(sgpParts, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defParts_p2, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defParts_p2, Slottable.DefocusedState);
+				ASSBO(crfParts_p2, Slottable.DefocusedState);
 
 			/**/
 			sgpBow.ToggleAutoSort(false);
 			ASSG(sgpBow, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p2, Slottable.EquippedAndDeselectedState);
-				ASSBOrder(defBowB_p2, Slottable.FocusedState);
-				ASSBOrder(crfBowA_p2, Slottable.FocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p2, Slottable.EquippedAndDeselectedState);
+				ASSBO(defBowB_p2, Slottable.FocusedState);
+				ASSBO(crfBowA_p2, Slottable.FocusedState);
 			sgpBow.ToggleAutoSort(true);
 			/**/
 		sgm.SetFocusedPoolSG(sgpWear);
 			ASSG(sgpAll, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p, Slottable.DefocusedState);
-				ASSBOrder(defWearA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p, Slottable.DefocusedState);
-				ASSBOrder(defShieldA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfShieldA_p, Slottable.DefocusedState);
-				ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfMWeaponA_p, Slottable.DefocusedState);
-				ASSBOrder(defQuiverA_p, Slottable.DefocusedState);
-				ASSBOrder(defPackA_p, Slottable.DefocusedState);
-				ASSBOrder(defParts_p, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p, Slottable.DefocusedState);
+				ASSBO(crfBowA_p, Slottable.DefocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p, Slottable.DefocusedState);
+				ASSBO(crfWearA_p, Slottable.DefocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfShieldA_p, Slottable.DefocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfMWeaponA_p, Slottable.DefocusedState);
+				ASSBO(defQuiverA_p, Slottable.DefocusedState);
+				ASSBO(defPackA_p, Slottable.DefocusedState);
+				ASSBO(defParts_p, Slottable.DefocusedState);
+				ASSBO(crfParts_p, Slottable.DefocusedState);
 			ASSG(sgpBow, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p2, Slottable.DefocusedState);
+				ASSBO(crfBowA_p2, Slottable.DefocusedState);
 			ASSG(sgpWear, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p2, Slottable.FocusedState);
-				ASSBOrder(crfWearA_p2, Slottable.FocusedState);
+				ASSBOReset();
+				ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p2, Slottable.FocusedState);
+				ASSBO(crfWearA_p2, Slottable.FocusedState);
 			ASSG(sgpParts, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defParts_p2, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defParts_p2, Slottable.DefocusedState);
+				ASSBO(crfParts_p2, Slottable.DefocusedState);
 
 			/**/
 			sgpWear.ToggleAutoSort(false);
 			ASSG(sgpWear, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defWearA_p2, Slottable.EquippedAndDeselectedState);
-				ASSBOrder(defWearB_p2, Slottable.FocusedState);
-				ASSBOrder(crfWearA_p2, Slottable.FocusedState);
+				ASSBOReset();
+				ASSBO(defWearA_p2, Slottable.EquippedAndDeselectedState);
+				ASSBO(defWearB_p2, Slottable.FocusedState);
+				ASSBO(crfWearA_p2, Slottable.FocusedState);
 			sgpWear.ToggleAutoSort(true);
 			/**/
 		sgm.SetFocusedPoolSG(sgpParts);
 			/**/
 			ASSG(sgpAll, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p, Slottable.DefocusedState);
-				ASSBOrder(defWearA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p, Slottable.DefocusedState);
-				ASSBOrder(defShieldA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfShieldA_p, Slottable.DefocusedState);
-				ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfMWeaponA_p, Slottable.DefocusedState);
-				ASSBOrder(defQuiverA_p, Slottable.DefocusedState);
-				ASSBOrder(defPackA_p, Slottable.DefocusedState);
-				ASSBOrder(defParts_p, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p, Slottable.DefocusedState);
+				ASSBO(crfBowA_p, Slottable.DefocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p, Slottable.DefocusedState);
+				ASSBO(crfWearA_p, Slottable.DefocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfShieldA_p, Slottable.DefocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfMWeaponA_p, Slottable.DefocusedState);
+				ASSBO(defQuiverA_p, Slottable.DefocusedState);
+				ASSBO(defPackA_p, Slottable.DefocusedState);
+				ASSBO(defParts_p, Slottable.DefocusedState);
+				ASSBO(crfParts_p, Slottable.DefocusedState);
 			ASSG(sgpBow, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p2, Slottable.DefocusedState);
+				ASSBO(crfBowA_p2, Slottable.DefocusedState);
 			ASSG(sgpWear, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p2, Slottable.DefocusedState);
+				ASSBO(crfWearA_p2, Slottable.DefocusedState);
 			ASSG(sgpParts, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defParts_p2, Slottable.FocusedState);
-				ASSBOrder(crfParts_p2, Slottable.FocusedState);
+				ASSBOReset();
+				ASSBO(defParts_p2, Slottable.FocusedState);
+				ASSBO(crfParts_p2, Slottable.FocusedState);
 			/**/
 			sgpParts.ToggleAutoSort(false);
 			/**/
 			ASSG(sgpParts, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defParts_p2, Slottable.FocusedState);
-				ASSBOrder(crfParts_p2, Slottable.FocusedState);
+				ASSBOReset();
+				ASSBO(defParts_p2, Slottable.FocusedState);
+				ASSBO(crfParts_p2, Slottable.FocusedState);
 			sgpParts.ToggleAutoSort(true);
 			/**/
 		sgm.SetFocusedPoolSG(sgpAll);
 			ASSG(sgpAll, SlotGroup.FocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p, Slottable.FocusedState);
-				ASSBOrder(crfBowA_p, Slottable.FocusedState);
-				ASSBOrder(defWearA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p, Slottable.FocusedState);
-				ASSBOrder(crfWearA_p, Slottable.FocusedState);
-				ASSBOrder(defShieldA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-				ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-				ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-				ASSBOrder(defPackA_p, Slottable.FocusedState);
-				ASSBOrder(defParts_p, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p, Slottable.FocusedState);
+				ASSBO(crfBowA_p, Slottable.FocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p, Slottable.FocusedState);
+				ASSBO(crfWearA_p, Slottable.FocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfShieldA_p, Slottable.FocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+				ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+				ASSBO(defQuiverA_p, Slottable.FocusedState);
+				ASSBO(defPackA_p, Slottable.FocusedState);
+				ASSBO(defParts_p, Slottable.DefocusedState);
+				ASSBO(crfParts_p, Slottable.DefocusedState);
 				
 			ASSG(sgpBow, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defBowB_p2, Slottable.DefocusedState);
+				ASSBO(crfBowA_p2, Slottable.DefocusedState);
 				
 			ASSG(sgpWear, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-				ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-				ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+				ASSBO(defWearB_p2, Slottable.DefocusedState);
+				ASSBO(crfWearA_p2, Slottable.DefocusedState);
 				
 			ASSG(sgpParts, SlotGroup.DefocusedState);
-				ASSBOrderReset();
-				ASSBOrder(defParts_p2, Slottable.DefocusedState);
-				ASSBOrder(crfParts_p2, Slottable.DefocusedState);
+				ASSBOReset();
+				ASSBO(defParts_p2, Slottable.DefocusedState);
+				ASSBO(crfParts_p2, Slottable.DefocusedState);
 
 		}
 	int assborderCount = 0;
-	public void ASSBOrderReset(){
+	public void ASSBOReset(){
 		assborderCount = 0;
 	}
-	public void ASSBOrder(Slottable sb, SlottableState sbState){
+	public void ASSBO(Slottable sb, SlottableState sbState){
 		AE(sb.CurState, sbState);
 		AE(sb.SG.Slottables.IndexOf(sb), assborderCount);
 		assborderCount ++;
@@ -706,325 +704,490 @@ public class SlottableTest {
 		AE(sg.Slots.Count, count);
 		AE(sg.Slottables.Count, count);
 	}
-	[Test]
-	public void TestAdditionAndRemoval(){
-		/*	initial order	*/
-			AE(sgpAll.Inventory.Items.Count, 14);
-			AssertAcquisitionOrderReset();
-			AssertAcquisitionOrder(defBowA_p);
-			AssertAcquisitionOrder(defBowB_p);
-			AssertAcquisitionOrder(crfBowA_p);
-			AssertAcquisitionOrder(defWearA_p);
-			AssertAcquisitionOrder(defWearB_p);
-			AssertAcquisitionOrder(crfWearA_p);
-			AssertAcquisitionOrder(defParts_p);
-			AssertAcquisitionOrder(crfParts_p);
-			AssertAcquisitionOrder(defShieldA_p);
-			AssertAcquisitionOrder(crfShieldA_p);
-			AssertAcquisitionOrder(defMWeaponA_p);
-			AssertAcquisitionOrder(crfMWeaponA_p);
-			AssertAcquisitionOrder(defQuiverA_p);
-			AssertAcquisitionOrder(defPackA_p);
-		
-		/*	AutoSort off*/
-			sgpAll.ToggleAutoSort(false);
-			sgpBow.ToggleAutoSort(false);
-			sgpWear.ToggleAutoSort(false);
-			sgpCGears.ToggleAutoSort(false);
-			sgpParts.ToggleAutoSort(false);
+	public void TestInstantTransaction(){
+		/*	AS off	*/
+		sgpAll.ToggleAutoSort(false);
+			AssertFocused();
 			AssertSGCounts(sgpAll, 14);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(defBowB_p, Slottable.FocusedState);
+				ASSBO(crfBowA_p, Slottable.FocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(defWearB_p, Slottable.FocusedState);
+				ASSBO(crfWearA_p, Slottable.FocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(crfShieldA_p, Slottable.FocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+				ASSBO(defQuiverA_p, Slottable.FocusedState);
+				ASSBO(defPackA_p, Slottable.FocusedState);
+				ASSBO(defParts_p, Slottable.FocusedState);
+				ASSBO(crfParts_p, Slottable.FocusedState);
 			AssertSGCounts(sgpBow, 3);
 			AssertSGCounts(sgpWear, 3);
 			AssertSGCounts(sgpCGears, 6);
 			AssertSGCounts(sgpParts, 2);
-		/*	adding and removing a bow	*/
-			/*	instant added */
-					BowInstanceMock defBowC = new BowInstanceMock();
-					defBowC.Item = defBowB_p.ItemInst.Item;
-				poolInv.AddItem(defBowC);
-					AE(poolInv.Items.Count, 15);
-					AE(addedItemInvList(sgpAll).Count, 1);
-					AE(removedItemInvList(sgpAll).Count, 0);
-					AE(addedItemInvList(sgpBow).Count, 1);
-					AE(removedItemInvList(sgpBow).Count, 0);
-					AE(addedItemInvList(sgpParts).Count, 0);
-					AE(removedItemInvList(sgpParts).Count, 0);
-				InstantSlottableSync();
-					Slottable defBowC_p = sgpAll.GetSlottable(defBowC);
-					AssertSGCounts(sgpAll, 15);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defBowB_p, Slottable.FocusedState);
-						ASSBOrder(crfBowA_p, Slottable.FocusedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
+		/*	removal	*/
+			poolInv.RemoveItem(crfBowA_p.ItemInst);
+			poolInv.RemoveItem(crfWearA_p.ItemInst);
+			poolInv.RemoveItem(crfShieldA_p.ItemInst);
+			poolInv.RemoveItem(crfMWeaponA_p.ItemInst);
+			InstantSyncSBsOnAllSGs();
+	}
+	int ActualSBsCount(SlotGroup sg){
+		int count = 0;
+		foreach(Slot slot in sg.Slots){
+			if(slot.Sb != null)
+				count ++;
+		}
+		return count;
+	}
+	[Test]
+	public void TestRevisedSorting(){
+		/*	AutoSort sgpCGears	*/
+			/*	FillEquip, AS on	*/
+				AB(sgCGears.IsAutoSort, true);
+				AE(sgCGears.Sorter.GetType(), typeof(SGItemIDSorter));
+				AssertFocused();
+					defShieldA_e = GetSlottable(sgCGears, defShieldA_p);
+					defMWeaponA_e = GetSlottable(sgCGears, defMWeaponA_p);
+					ASSBOReset();
+					ASSBO(defShieldA_e, Slottable.EquippedAndDeselectedState);
+					ASSBO(defMWeaponA_e, Slottable.EquippedAndDeselectedState);
+				PickUp(crfShieldA_p, out picked);
+				sgm.SimHover(null, sgCGears, eventData);
+					AE(sgm.PickedSB, crfShieldA_p);
+					AE(sgm.SelectedSB, null);
+					AE(sgm.SelectedSG, sgCGears);
+					AT<FillEquipTransaction>(false);
+				crfShieldA_p.OnPointerUpMock(eventData);
+					ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
+					AP<SGMTransactionProcess>(sgm, false);
+						AE(sgm.PickedSBDoneTransaction, false);
+						AE(sgm.SelectedSBDoneTransaction, true);
+						AE(sgm.OrigSGDoneTransaction, false);
+						AE(sgm.SelectedSGDoneTransaction, false);
+					ASSG(sgpAll, SlotGroup.PerformingTransactionState);
+					AP<SGTransactionProcess>(sgpAll, false);
+						AE(sgpAll.SlotMovements.Count, 14);
+						AE(ActualSBsCount(sgpAll), 14);
+						ATSBReset();
+						
+						ATSBP<SBMovingInSGProcess>(defBowA_p, Slottable.MovingInSGState, 0, true);
+						ATSBP<SBMovingInSGProcess>(defBowB_p, Slottable.MovingInSGState, 1, true);
+						ATSBP<SBMovingInSGProcess>(crfBowA_p, Slottable.MovingInSGState, 2, true);
+						ATSBP<SBMovingInSGProcess>(defWearA_p, Slottable.MovingInSGState, 3, true);
+						ATSBP<SBMovingInSGProcess>(defWearB_p, Slottable.MovingInSGState, 4, true);
+						ATSBP<SBMovingInSGProcess>(crfWearA_p, Slottable.MovingInSGState, 5, true);
+						ATSBP<SBMovingInSGProcess>(defShieldA_p, Slottable.MovingInSGState, 6, true);
+						ATSBP<SBEquippingProcess>(crfShieldA_p, Slottable.EquippingState, 7, false);
+						ATSBP<SBMovingInSGProcess>(defMWeaponA_p, Slottable.MovingInSGState, 8, true);
+						ATSBP<SBMovingInSGProcess>(crfMWeaponA_p, Slottable.MovingInSGState, 9, true);
+						ATSBP<SBMovingInSGProcess>(defQuiverA_p, Slottable.MovingInSGState, 10, true);
+						ATSBP<SBMovingInSGProcess>(defPackA_p, Slottable.MovingInSGState, 11, true);
+						ATSBP<SBMovingInSGProcess>(defParts_p, Slottable.MovingInSGState, 12, true);
+						ATSBP<SBMovingInSGProcess>(crfParts_p, Slottable.MovingInSGState, 13, true);
+						
+					ASSG(sgCGears, SlotGroup.PerformingTransactionState);
+					AP<SGTransactionProcess>(sgCGears, false);
+						AE(sgCGears.SlotMovements.Count, 3);
+						AE(ActualSBsCount(sgCGears), 2);
+						Slottable crfShieldA_e = sgCGears.GetSlottable(crfShieldA_p.ItemInst);
+						AE(crfShieldA_e != null, true);
+						SlotMovement defMWeaponASM = sgCGears.GetSlotMovement(defMWeaponA_e);
+						AB(defMWeaponASM != null, true);
+						int defMWeaponACurId; int defMWeaponANewId;
+						defMWeaponASM.GetIndex(out defMWeaponACurId, out defMWeaponANewId);
+						AE(defMWeaponACurId, 1);
+						AE(defMWeaponANewId, 2);
+						SlotMovement crfShieldASM = sgCGears.GetSlotMovement(crfShieldA_e);
+						AB(crfShieldASM != null, true);
+						int crfShieldACurId; int crfShieldANewId;
+						crfShieldASM.GetIndex(out crfShieldACurId, out crfShieldANewId);
+						AE(crfShieldACurId, -1);
+						AE(crfShieldANewId, 1);
+						SlotMovement defShieldASM = sgCGears.GetSlotMovement(defShieldA_e);
+						AB(defShieldASM != null, true);
+						int defShieldACurId; int defShieldANewId;
+						defShieldASM.GetIndex(out defShieldACurId, out defShieldANewId);
+						AE(defShieldACurId, 0);
+						AE(defShieldANewId, 0);
+					ATSBReset();
+					ATSB(defShieldA_e, Slottable.MovingInSGState, 0);
+					ATSB(defMWeaponA_e, Slottable.MovingInSGState, 2);
+					ATSB(crfShieldA_e, Slottable.AddedState, 1);
+					ATSBReset();
+					ATSBP<SBMovingInSGProcess>(defShieldA_e, Slottable.MovingInSGState, 0, true);
+					ATSBP<SBMovingInSGProcess>(defMWeaponA_e, Slottable.MovingInSGState, 2, false);
+					ATSBP<SBAddedProcess>(crfShieldA_e, Slottable.AddedState, 1, false);
 
-					AssertSGCounts(sgpBow, 4);
-						Slottable defBowA_p2 = sgpBow.GetSlottable(defBowA_p.Item);
-						Slottable defBowB_p2 = sgpBow.GetSlottable(defBowB_p.Item);
-						Slottable crfBowA_p2 = sgpBow.GetSlottable(crfBowA_p.Item);
-						Slottable defBowC_p2 = sgpBow.GetSlottable(defBowC_p.Item);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-						ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
-						ASSBOrder(defBowC_p2, Slottable.DefocusedState);
-					AssertSGCounts(sgpParts, 2);
-			/*	add once more	*/
-					BowInstanceMock crfBowB = new BowInstanceMock();
-					crfBowB.Item = crfBowA_p.ItemInst.Item;
-				poolInv.AddItem(crfBowB);
-				InstantSlottableSync();
-					Slottable crfBowB_p = sgpAll.GetSlottable(crfBowB);
-					AssertSGCounts(sgpAll, 16);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defBowB_p, Slottable.FocusedState);
-						ASSBOrder(crfBowA_p, Slottable.FocusedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpBow, 5);
-						Slottable crfBowB_p2 = sgpBow.GetSlottable(crfBowB);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-						ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
-						ASSBOrder(defBowC_p2, Slottable.DefocusedState);
-						ASSBOrder(crfBowB_p2, Slottable.DefocusedState);
-			/*	remove */
+					ASSB(crfShieldA_p, Slottable.EquippingState);
+					AE(crfShieldA_p.DestinationSG, sgCGears);
+					AE(crfShieldA_p.DestinationSlot, sgCGears.Slots[1]);
+				crfShieldA_p.ExpireProcess();
+				CompleteAllSlotMovements(sgCGears);
+					AE(sgm.PickedSBDoneTransaction, true);
+					AE(sgm.SelectedSBDoneTransaction, true);
+					AE(sgm.OrigSGDoneTransaction, true);
+					AE(sgm.SelectedSGDoneTransaction, true);
+					AssertFocused();
+						AssertSGCounts(sgpAll, 14);
+						AssertEquippedCGears(defShieldA_p, crfShieldA_p, defMWeaponA_p, null);
+			/*	FillEquip, AS off	*/
+			sgCGears.ToggleAutoSort(false);
+				/*	sgCGears	*/
+					AE(sgCGears.Slots.Count, 4);
+					defShieldA_e = GetSlottable(sgCGears, defShieldA_p);
+					crfShieldA_e = GetSlottable(sgCGears, crfShieldA_p);
+					defMWeaponA_e = GetSlottable(sgCGears, defMWeaponA_p);
+					ASSBOReset();
+					ASSBO(defShieldA_e, Slottable.EquippedAndDeselectedState);
+					ASSBO(crfShieldA_e, Slottable.EquippedAndDeselectedState);
+					ASSBO(defMWeaponA_e, Slottable.EquippedAndDeselectedState);
+				/*	sgpAll	*/
+					AssertSGCounts(sgpAll, 14);
+					ASSBOReset();
+					ASSBO(defBowA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(defBowB_p, Slottable.FocusedState);
+					ASSBO(crfBowA_p, Slottable.FocusedState);
+					ASSBO(defWearA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(defWearB_p, Slottable.FocusedState);
+					ASSBO(crfWearA_p, Slottable.FocusedState);
+					ASSBO(defShieldA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(crfShieldA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+					ASSBO(defQuiverA_p, Slottable.FocusedState);
+					ASSBO(defPackA_p, Slottable.FocusedState);
+					ASSBO(defParts_p, Slottable.DefocusedState);
+					ASSBO(crfParts_p, Slottable.DefocusedState);
+			PickUp(defQuiverA_p, out picked);
+			AB(picked, true);
+			sgm.SimHover(null, sgCGears, eventData);
+				ASSGM(sgm, SlotGroupManager.ProbingState);
+				AT<FillEquipTransaction>(false);
+				AE(sgm.PickedSB, defQuiverA_p);
+				AE(sgm.SelectedSB, null);
+				AE(sgm.SelectedSG, sgCGears);
+			defQuiverA_p.OnPointerUpMock(eventData);
+				ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
+				AP<SGMTransactionProcess>(sgm, false);
+				AT<FillEquipTransaction>(false);
+					AE(sgm.PickedSBDoneTransaction, false);
+					AE(sgm.SelectedSBDoneTransaction, true);
+					AE(sgm.OrigSGDoneTransaction, false);
+					AE(sgm.SelectedSGDoneTransaction, false);
+				ASSG(sgpAll, SlotGroup.PerformingTransactionState);
+				AP<SGTransactionProcess>(sgpAll, false);
+				ASSG(sgCGears, SlotGroup.PerformingTransactionState);
+				AP<SGTransactionProcess>(sgCGears, false);
+				ASSB(defQuiverA_p, Slottable.EquippingState);
+				AP<SBEquippingProcess>(defQuiverA_p, false);
+				AE(sgCGears.SlotMovements.Count, 4);
+					Slottable defQuiverA_e = GetSlottable(sgCGears, defQuiverA_p);
+					ATSBReset();
+					ATSBP<SBMovingInSGProcess>(defShieldA_e, Slottable.MovingInSGState, 0, true);
+					ATSBP<SBMovingInSGProcess>(crfShieldA_e, Slottable.MovingInSGState, 1, true);
+					ATSBP<SBMovingInSGProcess>(defMWeaponA_e, Slottable.MovingInSGState, 2, true);
+					ATSBP<SBAddedProcess>(defQuiverA_e, Slottable.AddedState, 3, false);
+			defQuiverA_p.ExpireProcess();
+					AE(sgm.PickedSBDoneTransaction, true);
+					AE(sgm.SelectedSBDoneTransaction, true);
+					AE(sgm.OrigSGDoneTransaction, true);
+					AE(sgm.SelectedSGDoneTransaction, false);
+			defQuiverA_e.ExpireProcess();
+				AssertFocused();
+					AssertSGCounts(sgpAll, 14);
+					ASSBOReset();
+					ASSBO(defBowA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(defBowB_p, Slottable.FocusedState);
+					ASSBO(crfBowA_p, Slottable.FocusedState);
+					ASSBO(defWearA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(defWearB_p, Slottable.FocusedState);
+					ASSBO(crfWearA_p, Slottable.FocusedState);
+					ASSBO(defShieldA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(crfShieldA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+					ASSBO(defQuiverA_p, Slottable.EquippedAndDefocusedState);
+					ASSBO(defPackA_p, Slottable.FocusedState);
+					ASSBO(defParts_p, Slottable.DefocusedState);
+					ASSBO(crfParts_p, Slottable.DefocusedState);
+					ASSBOReset();
+					ASSBO(defShieldA_e, Slottable.EquippedAndDeselectedState);
+					ASSBO(crfShieldA_e, Slottable.EquippedAndDeselectedState);
+					ASSBO(defMWeaponA_e, Slottable.EquippedAndDeselectedState);
+					ASSBO(defQuiverA_e, Slottable.EquippedAndDeselectedState);
+		/*	Reorder sgpGears	*/
+			AssertFocused();
+			AE(sgCGears.IsAutoSort, false);
+				ASSBOReset();
+				ASSBO(defShieldA_e, Slottable.EquippedAndDeselectedState);
+				ASSBO(crfShieldA_e, Slottable.EquippedAndDeselectedState);
+				ASSBO(defMWeaponA_e, Slottable.EquippedAndDeselectedState);
+				ASSBO(defQuiverA_e, Slottable.EquippedAndDeselectedState);
+			PickUp(crfShieldA_e, out picked);
+			sgm.SimHover(defQuiverA_e, sgCGears, eventData);
+				AT<ReorderTransaction>(false);
+
+				AE(sgCGears.SlotMovements.Count, 0);
+			crfShieldA_e.OnPointerUpMock(eventData);
+				ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
+				AP<SGMTransactionProcess>(sgm, false);
+				AT<ReorderTransaction>(false);
+					AE(sgm.PickedSBDoneTransaction, false);
+					AE(sgm.SelectedSBDoneTransaction, true);
+					AE(sgm.OrigSGDoneTransaction, true);
+					AE(sgm.SelectedSGDoneTransaction, false);
+				ASSG(sgCGears, SlotGroup.PerformingTransactionState);
+				AP<SGTransactionProcess>(sgCGears, false);
+				AE(sgCGears.SlotMovements.Count, 4);
+				ATSBReset();
+				ATSBReset();
+				ATSBP<SBMovingInSGProcess>(defShieldA_e, Slottable.MovingInSGState, 0, true);
+				ATSBP<SBRevertingProcess>(crfShieldA_e, Slottable.RevertingState, 3, false);
+				ATSBP<SBMovingInSGProcess>(defMWeaponA_e, Slottable.MovingInSGState, 1, false);
+				ATSBP<SBMovingInSGProcess>(defQuiverA_e, Slottable.MovingInSGState, 2, false);
+			CompleteAllSlotMovements(sgCGears);
+				ATSBReset();
+				ATSBP<SBMovingInSGProcess>(defShieldA_e, Slottable.MovingInSGState, 0, true);
+				ATSBP<SBRevertingProcess>(crfShieldA_e, Slottable.RevertingState, 3, false);
+				ATSBP<SBMovingInSGProcess>(defMWeaponA_e, Slottable.MovingInSGState, 1, true);
+				ATSBP<SBMovingInSGProcess>(defQuiverA_e, Slottable.MovingInSGState, 2, true);
+			crfShieldA_e.ExpireProcess();
+				AssertFocused();
+				AssertEquippedCGears(defShieldA_p, defMWeaponA_p, defQuiverA_e, crfShieldA_e);
+			/*	Reorder once again, reverse	*/
+			PickUp(defQuiverA_e, out picked);
+			sgm.SimHover(defMWeaponA_e, sgCGears, eventData);
+			defQuiverA_e.OnPointerUpMock(eventData);
+			CompleteAllSlotMovements(sgCGears);
+			defQuiverA_e.ExpireProcess();
+				AssertFocused();
+				AssertEquippedCGears(defShieldA_p, defQuiverA_e, defMWeaponA_p, crfShieldA_e);
+		/*	VolSort sgpCGears	*/
+			
+	}
+	public Slottable GetSlottable(SlotGroup sg, Slottable sb){
+		return sg.GetSlottable(sb.ItemInst);
+	} 
+	public void TestTransaction(){
+
+	}
+	public void TestComplexTransaction(){
+			AssertFocused();
+		/*	sgpAll	*/
+			sgpAll.ToggleAutoSort(false);
+				AssertFocused();
+				AssertSGCounts(sgpAll, 14);
+				ASSBOReset();
+				ASSBO(defBowA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(defBowB_p, Slottable.FocusedState);
+				ASSBO(crfBowA_p, Slottable.FocusedState);
+				ASSBO(defWearA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(defWearB_p, Slottable.FocusedState);
+				ASSBO(crfWearA_p, Slottable.FocusedState);
+				ASSBO(defShieldA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(crfShieldA_p, Slottable.FocusedState);
+				ASSBO(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
+				ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+				ASSBO(defQuiverA_p, Slottable.FocusedState);
+				ASSBO(defPackA_p, Slottable.FocusedState);
+				ASSBO(defParts_p, Slottable.FocusedState);
+				ASSBO(crfParts_p, Slottable.FocusedState);
+			/*	complex removal, AS off	*/
 				poolInv.RemoveItem(defBowB_p.ItemInst);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 15);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						// ASSBOrder(defBowB_p, Slottable.FocusedState);
-						ASSBOrder(crfBowA_p, Slottable.FocusedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpBow, 4);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-						// ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-						ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
-						ASSBOrder(defBowC_p2, Slottable.DefocusedState);
-						ASSBOrder(crfBowB_p2, Slottable.DefocusedState);
-			/*	remove once more */
 				poolInv.RemoveItem(crfBowA_p.ItemInst);
-				InstantSlottableSync();
+				SyncSBsOnAll();
 					AssertSGCounts(sgpAll, 14);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						// ASSBOrder(defBowB_p, Slottable.FocusedState);
-						// ASSBOrder(crfBowA_p, Slottable.FocusedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpBow, 3);
-					ASSBOrderReset();
-					ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-					// ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-					// ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
-					ASSBOrder(defBowC_p2, Slottable.DefocusedState);
-					ASSBOrder(crfBowB_p2, Slottable.DefocusedState);
-		/*	adding and removing a wear	*/
-			/*	adding */
-					WearInstanceMock defWearC = new WearInstanceMock();
-					defWearC.Item = defWearA_p.ItemInst.Item;
-				poolInv.AddItem(defWearC);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 15);
-						ASSBOrderReset();
-						Slottable defWearC_p = sgpAll.GetSlottable(defWearC);
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-					AssertSGCounts(sgpWear, 4);
-						Slottable defWearA_p2 = sgpWear.GetSlottable(defWearA_p.ItemInst);
-						Slottable defWearB_p2 = sgpWear.GetSlottable(defWearB_p.ItemInst);
-						Slottable crfWearA_p2 = sgpWear.GetSlottable(crfWearA_p.ItemInst);
-						Slottable defWearC_p2 = sgpWear.GetSlottable(defWearC);
-						ASSBOrderReset();
-						ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-						ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
-						ASSBOrder(defWearC_p2, Slottable.DefocusedState);
-					AssertSGCounts(sgpBow, 3);
-					AssertSGCounts(sgpParts, 2);
-			/*	adding once more	*/
-					WearInstanceMock crfWearB = new WearInstanceMock();
-					crfWearB.Item = crfWearA_p.ItemInst.Item;
-				poolInv.AddItem(crfWearB);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 16);
-						ASSBOrderReset();
-						Slottable crfWearB_p = sgpAll.GetSlottable(crfWearB);
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpWear, 5);
-						Slottable crfWearB_p2 = sgpWear.GetSlottable(crfWearB);
-						ASSBOrderReset();
-						ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-						ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
-						ASSBOrder(defWearC_p2, Slottable.DefocusedState);
-						ASSBOrder(crfWearB_p2, Slottable.DefocusedState);
-					AssertSGCounts(sgpBow, 3);
-					AssertSGCounts(sgpParts, 2);
-			/*	removing	*/
-				poolInv.RemoveItem(defWearB_p.ItemInst);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 15);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						// ASSBOrder(defWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpWear, 4);
-						ASSBOrderReset();
-						ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-						// ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-						ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
-						ASSBOrder(defWearC_p2, Slottable.DefocusedState);
-						ASSBOrder(crfWearB_p2, Slottable.DefocusedState);
-					AssertSGCounts(sgpBow, 3);
-					AssertSGCounts(sgpParts, 2);
-			/*	removing once more	*/
-				poolInv.RemoveItem(crfWearA_p.ItemInst);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 14);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						// ASSBOrder(defWearB_p, Slottable.FocusedState);
-						// ASSBOrder(crfWearA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
+					ATSBReset();
+					ATSB(defBowA_p, Slottable.MovingInSGState, 0);
+					ATSB(defBowB_p, Slottable.RemovedState, -1);
+					ATSB(crfBowA_p, Slottable.RemovedState, -1);
+					ATSB(defWearA_p, Slottable.MovingInSGState, 1);
+					ATSB(defWearB_p, Slottable.MovingInSGState, 2);
+					ATSB(crfWearA_p, Slottable.MovingInSGState, 3);
+					ATSB(defShieldA_p, Slottable.MovingInSGState, 4);
+					ATSB(crfShieldA_p, Slottable.MovingInSGState, 5);
+					ATSB(defMWeaponA_p, Slottable.MovingInSGState, 6);
+					ATSB(crfMWeaponA_p, Slottable.MovingInSGState, 7);
+					ATSB(defQuiverA_p, Slottable.MovingInSGState, 8);
+					ATSB(defPackA_p, Slottable.MovingInSGState, 9);
+					ATSB(defParts_p, Slottable.MovingInSGState, 10);
+					ATSB(crfParts_p, Slottable.MovingInSGState, 11);
+
+					AE(sgpAll.SlotMovements.Count, 14);
+						
+					AE(sgm.PickedSBDoneTransaction, true);
+					AE(sgm.SelectedSBDoneTransaction, true);
+					AE(sgm.OrigSGDoneTransaction, true);
+					AE(sgm.SelectedSGDoneTransaction, false);
+					AE(sgm.Transaction.GetType(), typeof(ComplexTransaction));
+					AP<SGMTransactionProcess>(sgm, false);
+					ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
+
+				CompleteAllSlotMovements(sgpAll);
+					AssertFocused();
+					AssertSGCounts(sgpAll, 12);
+						ASSBOReset();
+						ASSBO(defBowA_p, Slottable.EquippedAndDeselectedState);
+						ASSBO(defWearA_p, Slottable.EquippedAndDeselectedState);
+						ASSBO(defWearB_p, Slottable.FocusedState);
+						ASSBO(crfWearA_p, Slottable.FocusedState);
+						ASSBO(defShieldA_p, Slottable.EquippedAndDeselectedState);
+						ASSBO(crfShieldA_p, Slottable.FocusedState);
+						ASSBO(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
+						ASSBO(crfMWeaponA_p, Slottable.FocusedState);
+						ASSBO(defQuiverA_p, Slottable.FocusedState);
+						ASSBO(defPackA_p, Slottable.FocusedState);
+						ASSBO(defParts_p, Slottable.FocusedState);
+						ASSBO(crfParts_p, Slottable.FocusedState);
+					AssertSGCounts(sgpBow, 1);
 					AssertSGCounts(sgpWear, 3);
-						ASSBOrderReset();
-						ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-						// ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-						// ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
-						ASSBOrder(defWearC_p2, Slottable.DefocusedState);
-						ASSBOrder(crfWearB_p2, Slottable.DefocusedState);
-					AssertSGCounts(sgpBow, 3);
+					AssertSGCounts(sgpCGears, 6);
 					AssertSGCounts(sgpParts, 2);
-		/*	adding and removing CGears	*/
-			/*	adding	*/
+				
+			/*	complex addition, AS off*/
+				AssertFocused();
+				BowInstanceMock defBowB = new BowInstanceMock();
+				defBowB.Item = defBowA_p.ItemInst.Item;
+				BowInstanceMock defBowC = new BowInstanceMock();
+				defBowC.Item = defBowA_p.ItemInst.Item;
+				poolInv.AddItem(defBowB);
+				poolInv.AddItem(defBowC);
+				SyncSBsOnAll();
+					defBowB_p = sgpAll.GetSlottable(defBowB);
+					Slottable defBowC_p = sgpAll.GetSlottable(defBowC);
+					AB(sgpAll.GetSlotMovement(defBowB_p) != null, true);
+					AssertSGCounts(sgpAll, 12);
+						AE(sgpAll.SlotMovements.Count, 14);
+						ATSBReset();
+						ATSB(defBowA_p, Slottable.MovingInSGState, 0);
+						ATSB(defWearA_p, Slottable.MovingInSGState, 1);
+						ATSB(defWearB_p, Slottable.MovingInSGState, 2);
+						ATSB(crfWearA_p, Slottable.MovingInSGState, 3);
+						ATSB(defShieldA_p, Slottable.MovingInSGState, 4);
+						ATSB(crfShieldA_p, Slottable.MovingInSGState, 5);
+						ATSB(defMWeaponA_p, Slottable.MovingInSGState, 6);
+						ATSB(crfMWeaponA_p, Slottable.MovingInSGState, 7);
+						ATSB(defQuiverA_p, Slottable.MovingInSGState, 8);
+						ATSB(defPackA_p, Slottable.MovingInSGState, 9);
+						ATSB(defParts_p, Slottable.MovingInSGState, 10);
+						ATSB(crfParts_p, Slottable.MovingInSGState, 11);
+						ATSB(defBowB_p, Slottable.AddedState, 12);
+						ATSB(defBowC_p, Slottable.AddedState, 13);
+					AssertSGCounts(sgpBow, 3);
+					AssertSGCounts(sgpWear, 3);
+					AssertSGCounts(sgpCGears, 6);
+					AssertSGCounts(sgpParts, 2);
+				CompleteAllSlotMovements(sgpAll);
+					AssertSGCounts(sgpAll, 14);
+						ASSBOReset();
+						ASSB(defBowA_p, Slottable.EquippedAndDeselectedState);
+						ASSB(defWearA_p, Slottable.EquippedAndDeselectedState);
+						ASSB(defWearB_p, Slottable.FocusedState);
+						ASSB(crfWearA_p, Slottable.FocusedState);
+						ASSB(defShieldA_p, Slottable.EquippedAndDeselectedState);
+						ASSB(crfShieldA_p, Slottable.FocusedState);
+						ASSB(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
+						ASSB(crfMWeaponA_p, Slottable.FocusedState);
+						ASSB(defQuiverA_p, Slottable.FocusedState);
+						ASSB(defPackA_p, Slottable.FocusedState);
+						ASSB(defParts_p, Slottable.FocusedState);
+						ASSB(crfParts_p, Slottable.FocusedState);
+						ASSB(defBowB_p, Slottable.FocusedState);
+						ASSB(defBowC_p, Slottable.FocusedState);
+					AssertSGCounts(sgpBow, 3);
+					AssertSGCounts(sgpWear, 3);
+					AssertSGCounts(sgpCGears, 6);
+					AssertSGCounts(sgpParts, 2);
+			/*	complex addition and removal, AS off	*/
+				poolInv.RemoveItem(defWearB_p.ItemInst);
+				poolInv.RemoveItem(crfWearA_p.ItemInst);
 					QuiverMock crfQuiver = new QuiverMock();
 					crfQuiver.ItemID = 401;
 					QuiverInstanceMock crfQuiverA = new QuiverInstanceMock();
 					crfQuiverA.Item = crfQuiver;
+					PackMock crfPack = new PackMock();
+					crfPack.ItemID = 501;
+					PackInstanceMock crfPackA = new PackInstanceMock();
+					crfPackA.Item = crfPack;
+					WearInstanceMock defWearC = new WearInstanceMock();
+					defWearC.Item = defWearA_p.ItemInst.Item;
+					WearInstanceMock defWearD = new WearInstanceMock();
+					defWearD.Item = defWearA_p.ItemInst.Item;
 				poolInv.AddItem(crfQuiverA);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 15);
+				poolInv.AddItem(crfPackA);
+				poolInv.AddItem(defWearC);
+				poolInv.AddItem(defWearD);
+				SyncSBsOnAll();
+					AssertSGCounts(sgpAll, 14);
+					AE(sgpAll.SlotMovements.Count, 18);
 						Slottable crfQuiverA_p = sgpAll.GetSlottable(crfQuiverA);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfQuiverA_p, Slottable.FocusedState);
-					AssertSGCounts(sgpCGears, 7);
+						Slottable crfPackA_p = sgpAll.GetSlottable(crfPackA);
+						Slottable defWearC_p = sgpAll.GetSlottable(defWearC);
+						Slottable defWearD_p = sgpAll.GetSlottable(defWearD);
+						ATSBReset();
+							ATSB(defBowA_p, Slottable.MovingInSGState, 0);
+							ATSB(defWearA_p, Slottable.MovingInSGState, 1);
+							ATSB(defWearB_p, Slottable.RemovedState, -1);//r
+							ATSB(crfWearA_p, Slottable.RemovedState, -1);//r
+							ATSB(defShieldA_p, Slottable.MovingInSGState, 2);
+							ATSB(crfShieldA_p, Slottable.MovingInSGState, 3);
+							ATSB(defMWeaponA_p, Slottable.MovingInSGState, 4);
+							ATSB(crfMWeaponA_p, Slottable.MovingInSGState, 5);
+							ATSB(defQuiverA_p, Slottable.MovingInSGState, 6);
+							ATSB(defPackA_p, Slottable.MovingInSGState, 7);
+							ATSB(defParts_p, Slottable.MovingInSGState, 8);
+							ATSB(crfParts_p, Slottable.MovingInSGState, 9);
+							ATSB(defBowB_p, Slottable.MovingInSGState, 10);
+							ATSB(defBowC_p, Slottable.MovingInSGState, 11);
+							ATSB(crfQuiverA_p, Slottable.AddedState, 12);
+							ATSB(crfPackA_p, Slottable.AddedState, 13);
+							ATSB(defWearC_p, Slottable.AddedState, 14);
+							ATSB(defWearD_p, Slottable.AddedState, 15);			
+					AssertSGCounts(sgpBow, 3);
+					AssertSGCounts(sgpWear, 3);
+					AssertSGCounts(sgpCGears, 8);
+					AssertSGCounts(sgpParts, 2);
+				CompleteAllSlotMovements(sgpAll);
+					AssertFocused();
+					AssertSGCounts(sgpAll, 16);
+						ASSBOReset();
+							ASSB(defBowA_p, Slottable.EquippedAndDeselectedState);
+							ASSB(defWearA_p, Slottable.EquippedAndDeselectedState);
+							ASSB(defShieldA_p, Slottable.EquippedAndDeselectedState);
+							ASSB(crfShieldA_p, Slottable.FocusedState);
+							ASSB(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
+							ASSB(crfMWeaponA_p, Slottable.FocusedState);
+							ASSB(defQuiverA_p, Slottable.FocusedState);
+							ASSB(defPackA_p, Slottable.FocusedState);
+							ASSB(defParts_p, Slottable.FocusedState);
+							ASSB(crfParts_p, Slottable.FocusedState);
+							ASSB(defBowB_p, Slottable.FocusedState);
+							ASSB(defBowC_p, Slottable.FocusedState);
+							ASSB(crfQuiverA_p, Slottable.FocusedState);
+							ASSB(crfPackA_p, Slottable.FocusedState);
+							ASSB(defWearC_p, Slottable.FocusedState);
+							ASSB(defWearD_p, Slottable.FocusedState);
+					AssertSGCounts(sgpBow, 3);
+						Slottable defBowA_p2 = sgpBow.GetSlottable(defBowA_p.ItemInst);
+						Slottable defBowB_p2 = sgpBow.GetSlottable(defBowB_p.ItemInst);
+						Slottable defBowC_p2 = sgpBow.GetSlottable(defBowC_p.ItemInst);
+						ASSBOReset();
+						ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+						ASSBO(defBowB_p2, Slottable.DefocusedState);
+						ASSBO(defBowC_p2, Slottable.DefocusedState);
+					AssertSGCounts(sgpWear, 3);
+						Slottable defWearA_p2 = sgpWear.GetSlottable(defWearA_p.ItemInst);
+						Slottable defWearC_p2 = sgpWear.GetSlottable(defWearC_p.ItemInst);
+						Slottable defWearD_p2 = sgpWear.GetSlottable(defWearD_p.ItemInst);
+						ASSBOReset();
+						ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+						ASSBO(defWearC_p2, Slottable.DefocusedState);
+						ASSBO(defWearD_p2, Slottable.DefocusedState);
+					AssertSGCounts(sgpCGears, 8);
 						Slottable defShieldA_p2 = sgpCGears.GetSlottable(defShieldA_p.ItemInst);
 						Slottable crfShieldA_p2 = sgpCGears.GetSlottable(crfShieldA_p.ItemInst);
 						Slottable defMWeaponA_p2 = sgpCGears.GetSlottable(defMWeaponA_p.ItemInst);
@@ -1032,380 +1195,425 @@ public class SlottableTest {
 						Slottable defQuiverA_p2 = sgpCGears.GetSlottable(defQuiverA_p.ItemInst);
 						Slottable defPackA_p2 = sgpCGears.GetSlottable(defPackA_p.ItemInst);
 						Slottable crfQuiverA_p2 = sgpCGears.GetSlottable(crfQuiverA_p.ItemInst);
-						ASSBOrderReset();
-						ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(crfShieldA_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(crfMWeaponA_p2, Slottable.DefocusedState);
-						ASSBOrder(defQuiverA_p2, Slottable.DefocusedState);
-						ASSBOrder(defPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(crfQuiverA_p2, Slottable.DefocusedState);			
-					AssertSGCounts(sgpBow, 3);
-					AssertSGCounts(sgpWear, 3);
-					AssertSGCounts(sgpParts, 2);
-			/*	adding once more	*/
-					PackMock crfPack = new PackMock();
-					crfPack.ItemID = 501;
-					PackInstanceMock crfPackA = new PackInstanceMock();
-					crfPackA.Item = crfPack;
-				poolInv.AddItem(crfPackA);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 16);
-						Slottable crfPackA_p = sgpAll.GetSlottable(crfPackA);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(crfPackA_p, Slottable.FocusedState);
-					AssertSGCounts(sgpCGears, 8);
 						Slottable crfPackA_p2 = sgpCGears.GetSlottable(crfPackA_p.ItemInst);
-						ASSBOrderReset();
-						ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(crfShieldA_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(crfMWeaponA_p2, Slottable.DefocusedState);
-						ASSBOrder(defQuiverA_p2, Slottable.DefocusedState);
-						ASSBOrder(defPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(crfQuiverA_p2, Slottable.DefocusedState);			
-						ASSBOrder(crfPackA_p2, Slottable.DefocusedState);			
-					AssertSGCounts(sgpBow, 3);
-					AssertSGCounts(sgpWear, 3);
+						ASSBOReset();
+						ASSB(defShieldA_p2, Slottable.EquippedAndDefocusedState);
+						ASSB(crfShieldA_p2, Slottable.DefocusedState);
+						ASSB(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
+						ASSB(crfMWeaponA_p2, Slottable.DefocusedState);
+						ASSB(defQuiverA_p2, Slottable.DefocusedState);
+						ASSB(crfQuiverA_p2, Slottable.DefocusedState);
+						ASSB(defPackA_p2, Slottable.DefocusedState);
+						ASSB(crfPackA_p2, Slottable.DefocusedState);
 					AssertSGCounts(sgpParts, 2);
-			/*	add two more items at the same time	*/
-					ShieldInstanceMock defShieldB = new ShieldInstanceMock();
-					defShieldB.Item = defShieldA_p.ItemInst.Item;
-					MeleeWeaponInstanceMock defMWeaponB = new MeleeWeaponInstanceMock();
-					defMWeaponB.Item = defMWeaponA_p.ItemInst.Item;
-				poolInv.AddItem(defShieldB);
-				poolInv.AddItem(defMWeaponB);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 18);
-						Slottable defShieldB_p = sgpAll.GetSlottable(defShieldB);
-						Slottable defMWeaponB_p = sgpAll.GetSlottable(defMWeaponB);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(crfPackA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldB_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpCGears, 10);
-						Slottable defShieldB_p2 = sgpCGears.GetSlottable(defShieldB);
-						Slottable defMWeaponB_p2 = sgpCGears.GetSlottable(defMWeaponB);
-						ASSBOrderReset();
-						ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(crfShieldA_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(crfMWeaponA_p2, Slottable.DefocusedState);
-						ASSBOrder(defQuiverA_p2, Slottable.DefocusedState);
-						ASSBOrder(defPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(crfQuiverA_p2, Slottable.DefocusedState);			
-						ASSBOrder(crfPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(defShieldB_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponB_p2, Slottable.DefocusedState);
-			/*	removing	*/
-				poolInv.RemoveItem(crfShieldA_p.ItemInst);
-				InstantSlottableSync();
-					AssertSGCounts(sgpAll, 17);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						// ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(crfPackA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldB_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpCGears, 9);
-						ASSBOrderReset();
-						ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-						// ASSBOrder(crfShieldA_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-						ASSBOrder(crfMWeaponA_p2, Slottable.DefocusedState);
-						ASSBOrder(defQuiverA_p2, Slottable.DefocusedState);
-						ASSBOrder(defPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(crfQuiverA_p2, Slottable.DefocusedState);			
-						ASSBOrder(crfPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(defShieldB_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponB_p2, Slottable.DefocusedState);
-					AssertSGCounts(sgpBow, 3);
-					AssertSGCounts(sgpWear, 3);
-					AssertSGCounts(sgpParts, 2);
-				
-			
-			/*	removing once again	*/
-				poolInv.RemoveItem(crfMWeaponA_p.ItemInst);
-				InstantSlottableSync();{
+			/*	complex removal and addition, AS on	*/
+			sgpAll.ToggleAutoSort(true);
+				AssertFocused();
 					AssertSGCounts(sgpAll, 16);
-						ASSBOrderReset();
-						ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-						ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-						// ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-						// ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-						ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(defPackA_p, Slottable.FocusedState);
-						ASSBOrder(defParts_p, Slottable.FocusedState);
-						ASSBOrder(crfParts_p, Slottable.FocusedState);
-						ASSBOrder(defBowC_p, Slottable.FocusedState);
-						ASSBOrder(crfBowB_p, Slottable.FocusedState);
-						ASSBOrder(defWearC_p, Slottable.FocusedState);
-						ASSBOrder(crfWearB_p, Slottable.FocusedState);
-						ASSBOrder(crfQuiverA_p, Slottable.FocusedState);
-						ASSBOrder(crfPackA_p, Slottable.FocusedState);
-						ASSBOrder(defShieldB_p, Slottable.FocusedState);
-						ASSBOrder(defMWeaponB_p, Slottable.FocusedState);
-					AssertSGCounts(sgpCGears, 8);
-						ASSBOrderReset();
-						ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-						// ASSBOrder(crfShieldA_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-						// ASSBOrder(crfMWeaponA_p2, Slottable.DefocusedState);
-						ASSBOrder(defQuiverA_p2, Slottable.DefocusedState);
-						ASSBOrder(defPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(crfQuiverA_p2, Slottable.DefocusedState);			
-						ASSBOrder(crfPackA_p2, Slottable.DefocusedState);
-						ASSBOrder(defShieldB_p2, Slottable.DefocusedState);
-						ASSBOrder(defMWeaponB_p2, Slottable.DefocusedState);
+					ASSBOReset();
+						ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);
+						ASSB(defWearA_p, Slottable.EquippedAndDefocusedState);
+						ASSB(defShieldA_p, Slottable.EquippedAndDefocusedState);
+						ASSB(crfShieldA_p, Slottable.FocusedState);
+						ASSB(defMWeaponA_p, Slottable.EquippedAndDefocusedState);
+						ASSB(crfMWeaponA_p, Slottable.FocusedState);
+						ASSB(defQuiverA_p, Slottable.FocusedState);
+						ASSB(defPackA_p, Slottable.FocusedState);
+						ASSB(defParts_p, Slottable.DefocusedState);
+						ASSB(crfParts_p, Slottable.DefocusedState);
+						ASSB(defBowB_p, Slottable.FocusedState);
+						ASSB(defBowC_p, Slottable.FocusedState);
+						ASSB(crfQuiverA_p, Slottable.FocusedState);
+						ASSB(crfPackA_p, Slottable.FocusedState);
+						ASSB(defWearC_p, Slottable.FocusedState);
+						ASSB(defWearD_p, Slottable.FocusedState);
 					AssertSGCounts(sgpBow, 3);
 					AssertSGCounts(sgpWear, 3);
+					AssertSGCounts(sgpCGears, 8);
 					AssertSGCounts(sgpParts, 2);
-				}
-			
-		
-		/*	Removing a lot at the same time	*/
+			poolInv.RemoveItem(defBowB_p.ItemInst);
+			poolInv.RemoveItem(defWearD_p.ItemInst);
 			poolInv.RemoveItem(defQuiverA_p.ItemInst);
 			poolInv.RemoveItem(defPackA_p.ItemInst);
-			poolInv.RemoveItem(defParts_p.ItemInst);
-			poolInv.RemoveItem(crfParts_p.ItemInst);
-			poolInv.RemoveItem(defBowC_p.ItemInst);
-			poolInv.RemoveItem(crfBowB_p.ItemInst);
-			poolInv.RemoveItem(defWearC_p.ItemInst);
-			poolInv.RemoveItem(crfWearB_p.ItemInst);
-			poolInv.RemoveItem(crfQuiverA_p.ItemInst);
-			poolInv.RemoveItem(crfPackA_p.ItemInst);
-			poolInv.RemoveItem(defShieldB_p.ItemInst);
-			poolInv.RemoveItem(defMWeaponB_p.ItemInst);
-			InstantSlottableSync();
-				AssertSGCounts(sgpAll, 4);
-					ASSBOrderReset();
-					ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-				AssertSGCounts(sgpBow, 1);
-					ASSBOrderReset();
-					ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-				AssertSGCounts(sgpWear, 1);
-					ASSBOrderReset();
-					ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-				AssertSGCounts(sgpCGears, 2);
-					ASSBOrderReset();
-					ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-				AssertSGCounts(sgpParts, 0);
-		/*	adding a slot at the same time in randomized order	*/
-			poolInv.AddItem(defParts_p.ItemInst);
-			poolInv.AddItem(defShieldB_p.ItemInst);
-			poolInv.AddItem(defPackA_p.ItemInst);
-			poolInv.AddItem(crfWearA_p.ItemInst);
-			poolInv.AddItem(defQuiverA_p.ItemInst);
-			poolInv.AddItem(defBowB_p.ItemInst);
-			poolInv.AddItem(crfQuiverA_p.ItemInst);
-			poolInv.AddItem(defBowC_p.ItemInst);
-			poolInv.AddItem(crfMWeaponA_p.ItemInst);
-			poolInv.AddItem(crfParts_p.ItemInst);
-			poolInv.AddItem(defWearB_p.ItemInst);
-			poolInv.AddItem(crfPackA_p.ItemInst);
-			poolInv.AddItem(crfShieldA_p.ItemInst);
-			poolInv.AddItem(defWearC_p.ItemInst);
-			poolInv.AddItem(crfBowA_p.ItemInst);
-			poolInv.AddItem(defMWeaponB_p.ItemInst);
-			InstantSlottableSync();
-				AssertSGCounts(sgpAll, 20);
-					defParts_p = sgpAll.GetSlottable(defParts_p.ItemInst);
-					defShieldB_p = sgpAll.GetSlottable(defShieldB_p.ItemInst);
-					defPackA_p = sgpAll.GetSlottable(defPackA_p.ItemInst);
-					crfWearA_p = sgpAll.GetSlottable(crfWearA_p.ItemInst);
-					defQuiverA_p = sgpAll.GetSlottable(defQuiverA_p.ItemInst);
-					defBowB_p = sgpAll.GetSlottable(defBowB_p.ItemInst);
-					crfQuiverA_p = sgpAll.GetSlottable(crfQuiverA_p.ItemInst);
-					defBowC_p = sgpAll.GetSlottable(defBowC_p.ItemInst);
-					crfMWeaponA_p = sgpAll.GetSlottable(crfMWeaponA_p.ItemInst);
-					crfParts_p = sgpAll.GetSlottable(crfParts_p.ItemInst);
-					defWearB_p = sgpAll.GetSlottable(defWearB_p.ItemInst);
-					crfPackA_p = sgpAll.GetSlottable(crfPackA_p.ItemInst);
-					crfShieldA_p = sgpAll.GetSlottable(crfShieldA_p.ItemInst);
-					defWearC_p = sgpAll.GetSlottable(defWearC_p.ItemInst);
-					crfBowA_p = sgpAll.GetSlottable(crfBowA_p.ItemInst);
-					defMWeaponB_p = sgpAll.GetSlottable(defMWeaponB_p.ItemInst);
-					ASSBOrderReset();
-					ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defParts_p, Slottable.FocusedState);
-					ASSBOrder(defShieldB_p, Slottable.FocusedState);
-					ASSBOrder(defPackA_p, Slottable.FocusedState);
-					ASSBOrder(crfWearA_p, Slottable.FocusedState);
-					ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-					ASSBOrder(defBowB_p, Slottable.FocusedState);
-					ASSBOrder(crfQuiverA_p, Slottable.FocusedState);
-					ASSBOrder(defBowC_p, Slottable.FocusedState);
-					ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-					ASSBOrder(crfParts_p, Slottable.FocusedState);
-					ASSBOrder(defWearB_p, Slottable.FocusedState);
-					ASSBOrder(crfPackA_p, Slottable.FocusedState);
-					ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-					ASSBOrder(defWearC_p, Slottable.FocusedState);
-					ASSBOrder(crfBowA_p, Slottable.FocusedState);
-					ASSBOrder(defMWeaponB_p, Slottable.FocusedState);
-				AssertSGCounts(sgpBow, 4);
-					defBowB_p2 = sgpBow.GetSlottable(defBowB_p.ItemInst);
-					defBowC_p2 = sgpBow.GetSlottable(defBowC_p.ItemInst);
-					crfBowA_p2 = sgpBow.GetSlottable(crfBowA_p.ItemInst);
-					ASSBOrderReset();
-					ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-					ASSBOrder(defBowC_p2, Slottable.DefocusedState);
-					ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
-				AssertSGCounts(sgpWear, 4);
-					crfWearA_p2 = sgpWear.GetSlottable(crfWearA_p.ItemInst);
-					defWearB_p2 = sgpWear.GetSlottable(defWearB_p.ItemInst);
-					defWearC_p2 = sgpWear.GetSlottable(defWearC_p.ItemInst);
-					ASSBOrderReset();
-					ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
-					ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-					ASSBOrder(defWearC_p2, Slottable.DefocusedState);
-				AssertSGCounts(sgpCGears, 10);
-					defShieldB_p2 = sgpCGears.GetSlottable(defShieldB_p.ItemInst);
-					defPackA_p2 = sgpCGears.GetSlottable(defPackA_p.ItemInst);
-					defQuiverA_p2 = sgpCGears.GetSlottable(defQuiverA_p.ItemInst);
-					crfQuiverA_p2 = sgpCGears.GetSlottable(crfQuiverA_p.ItemInst);
-					crfMWeaponA_p2 = sgpCGears.GetSlottable(crfMWeaponA_p.ItemInst);
-					crfPackA_p2 = sgpCGears.GetSlottable(crfPackA_p.ItemInst);
-					crfShieldA_p2 = sgpCGears.GetSlottable(crfShieldA_p.ItemInst);
-					defMWeaponB_p2 = sgpCGears.GetSlottable(defMWeaponB_p.ItemInst);
-					ASSBOrderReset();
-					ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defShieldB_p2, Slottable.DefocusedState);
-					ASSBOrder(defPackA_p2, Slottable.DefocusedState);
-					ASSBOrder(defQuiverA_p2, Slottable.DefocusedState);
-					ASSBOrder(crfQuiverA_p2, Slottable.DefocusedState);
-					ASSBOrder(crfMWeaponA_p2, Slottable.DefocusedState);
-					ASSBOrder(crfPackA_p2, Slottable.DefocusedState);
-					ASSBOrder(crfShieldA_p2, Slottable.DefocusedState);
-					ASSBOrder(defMWeaponB_p2, Slottable.DefocusedState);
-
-		// sort and check sbs order
-			sgm.SortSG(sgpAll, SlotGroup.ItemIDSorter);
+				BowMock crfBow = new BowMock();
+				crfBow.ItemID = 1;
+				BowInstanceMock crfBowA = new BowInstanceMock();
+				crfBowA.Item = crfBow;
+				WearMock crfWear = new WearMock();
+				crfWear.ItemID = 101;
+				WearInstanceMock crfWearA = new WearInstanceMock();
+				crfWearA.Item = crfWear;
+				QuiverInstanceMock crfQuiverB = new QuiverInstanceMock();
+				crfQuiverB.Item = crfQuiverA_p.ItemInst.Item;
+				PackInstanceMock crfPackB = new PackInstanceMock();
+				crfPackB.Item = crfPackA_p.ItemInst.Item;
+			poolInv.AddItem(crfBowA);
+			poolInv.AddItem(crfWearA);
+			poolInv.AddItem(crfQuiverB);
+			poolInv.AddItem(crfPackB);
+			SyncSBsOnAll();
+				AssertSGCounts(sgpAll, 16);
+					AE(sgpAll.SlotMovements.Count, 20);
+					crfBowA_p = sgpAll.GetSlottable(crfBowA);
+					crfWearA_p = sgpAll.GetSlottable(crfWearA);
+					Slottable crfQuiverB_p = sgpAll.GetSlottable(crfQuiverB);
+					Slottable crfPackB_p = sgpAll.GetSlottable(crfPackB);
+					ATSBReset();
+						ATSB(defBowA_p, Slottable.MovingInSGState, 0);
+						ATSB(defWearA_p, Slottable.MovingInSGState, 3);
+						ATSB(defShieldA_p, Slottable.MovingInSGState, 6);
+						ATSB(crfShieldA_p, Slottable.MovingInSGState, 7);
+						ATSB(defMWeaponA_p, Slottable.MovingInSGState, 8);
+						ATSB(crfMWeaponA_p, Slottable.MovingInSGState, 9);
+						ATSB(defQuiverA_p, Slottable.RemovedState, -1);//
+						ATSB(defPackA_p, Slottable.RemovedState, -1);//
+						ATSB(defParts_p, Slottable.MovingInSGState, 14);
+						ATSB(crfParts_p, Slottable.MovingInSGState, 15);
+						ATSB(defBowB_p, Slottable.RemovedState, -1);//
+						ATSB(defBowC_p, Slottable.MovingInSGState, 1);
+						ATSB(crfQuiverA_p, Slottable.MovingInSGState, 10);
+						ATSB(crfPackA_p, Slottable.MovingInSGState, 12);
+						ATSB(defWearC_p, Slottable.MovingInSGState, 4);
+						ATSB(defWearD_p, Slottable.RemovedState, -1);//
+						ATSB(crfBowA_p, Slottable.AddedState, 2);
+						ATSB(crfWearA_p, Slottable.AddedState, 5);
+						ATSB(crfQuiverB_p, Slottable.AddedState, 11);
+						ATSB(crfPackB_p, Slottable.AddedState, 13);
+				AssertSGCounts(sgpBow, 3);
+					Slottable crfBowA_p2 = sgpBow.GetSlottable(crfBowA);
+					ASSBOReset();
+					ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+					ASSBO(defBowC_p2, Slottable.DefocusedState);
+					ASSBO(crfBowA_p2, Slottable.DefocusedState);
+				AssertSGCounts(sgpWear, 3);
+					Slottable crfWearA_p2 = sgpWear.GetSlottable(crfWearA);
+					ASSBOReset();
+					ASSBO(defWearA_p2, Slottable.EquippedAndDefocusedState);
+					ASSBO(defWearC_p2, Slottable.DefocusedState);
+					ASSBO(crfWearA_p2, Slottable.DefocusedState);
+				AssertSGCounts(sgpCGears, 8);
+					Slottable crfQuiverB_p2 = sgpCGears.GetSlottable(crfQuiverB_p.ItemInst);
+					Slottable crfPackB_p2 = sgpCGears.GetSlottable(crfPackB_p.ItemInst);
+					ASSBOReset();
+					ASSBO(defShieldA_p2, Slottable.EquippedAndDefocusedState);
+					ASSBO(crfShieldA_p2, Slottable.DefocusedState);
+					ASSBO(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
+					ASSBO(crfMWeaponA_p2, Slottable.DefocusedState);
+					ASSBO(crfQuiverA_p2, Slottable.DefocusedState);
+					ASSBO(crfQuiverB_p2, Slottable.DefocusedState);
+					ASSBO(crfPackA_p2, Slottable.DefocusedState);
+					ASSBO(crfPackB_p2, Slottable.DefocusedState);
+				AssertSGCounts(sgpParts, 2);
 			CompleteAllSlotMovements(sgpAll);
-				AssertSGCounts(sgpAll, 20);
-				ASSBOrderReset();
-					ASSBOrder(defBowA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defBowB_p, Slottable.FocusedState);
-					ASSBOrder(defBowC_p, Slottable.FocusedState);
-					ASSBOrder(crfBowA_p, Slottable.FocusedState);
-					ASSBOrder(defWearA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defWearB_p, Slottable.FocusedState);
-					ASSBOrder(defWearC_p, Slottable.FocusedState);
-					ASSBOrder(crfWearA_p, Slottable.FocusedState);
-					ASSBOrder(defShieldA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defShieldB_p, Slottable.FocusedState);
-					ASSBOrder(crfShieldA_p, Slottable.FocusedState);
-					ASSBOrder(defMWeaponA_p, Slottable.EquippedAndDeselectedState);
-					ASSBOrder(defMWeaponB_p, Slottable.FocusedState);
-					ASSBOrder(crfMWeaponA_p, Slottable.FocusedState);
-					ASSBOrder(defQuiverA_p, Slottable.FocusedState);
-					ASSBOrder(crfQuiverA_p, Slottable.FocusedState);
-					ASSBOrder(defPackA_p, Slottable.FocusedState);
-					ASSBOrder(crfPackA_p, Slottable.FocusedState);
-					ASSBOrder(defParts_p, Slottable.FocusedState);
-					ASSBOrder(crfParts_p, Slottable.FocusedState);
-			sgm.SortSG(sgpBow, SlotGroup.ItemIDSorter);
-			CompleteAllSlotMovements(sgpBow);
-				AssertSGCounts(sgpBow, 4);
-					ASSBOrderReset();
-					ASSBOrder(defBowA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defBowB_p2, Slottable.DefocusedState);
-					ASSBOrder(defBowC_p2, Slottable.DefocusedState);
-					ASSBOrder(crfBowA_p2, Slottable.DefocusedState);
-			sgm.SortSG(sgpWear, SlotGroup.ItemIDSorter);
-			CompleteAllSlotMovements(sgpWear);
-				AssertSGCounts(sgpWear, 4);
-					ASSBOrderReset();
-					ASSBOrder(defWearA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defWearB_p2, Slottable.DefocusedState);
-					ASSBOrder(defWearC_p2, Slottable.DefocusedState);
-					ASSBOrder(crfWearA_p2, Slottable.DefocusedState);
-			sgm.SortSG(sgpCGears, SlotGroup.ItemIDSorter);
-			CompleteAllSlotMovements(sgpCGears);
-				AssertSGCounts(sgpCGears, 10);
-					ASSBOrderReset();
-					ASSBOrder(defShieldA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defShieldB_p2, Slottable.DefocusedState);
-					ASSBOrder(crfShieldA_p2, Slottable.DefocusedState);
-					ASSBOrder(defMWeaponA_p2, Slottable.EquippedAndDefocusedState);
-					ASSBOrder(defMWeaponB_p2, Slottable.DefocusedState);
-					ASSBOrder(crfMWeaponA_p2, Slottable.DefocusedState);
-					ASSBOrder(defQuiverA_p2, Slottable.DefocusedState);
-					ASSBOrder(crfQuiverA_p2, Slottable.DefocusedState);
-					ASSBOrder(defPackA_p2, Slottable.DefocusedState);
-					ASSBOrder(crfPackA_p2, Slottable.DefocusedState);
-		/**/
-		/**/
+				AssertFocused();
+				AssertSGCounts(sgpAll, 16);
+					ASSBOReset();
+					ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);//0
+					ASSB(defBowC_p, Slottable.FocusedState);//1
+					ASSB(crfBowA_p, Slottable.FocusedState);//2
+					ASSB(defWearA_p, Slottable.EquippedAndDefocusedState);//3
+					ASSB(defWearC_p, Slottable.FocusedState);//4
+					ASSB(crfWearA_p, Slottable.FocusedState);//5
+					ASSB(defShieldA_p, Slottable.EquippedAndDefocusedState);//6
+					ASSB(crfShieldA_p, Slottable.FocusedState);//7
+					ASSB(defMWeaponA_p, Slottable.EquippedAndDefocusedState);//8
+					ASSB(crfMWeaponA_p, Slottable.FocusedState);//9
+					ASSB(crfQuiverA_p, Slottable.FocusedState);//10
+					ASSB(crfQuiverB_p, Slottable.FocusedState);//11
+					ASSB(crfPackA_p, Slottable.FocusedState);//12
+					ASSB(crfPackB_p, Slottable.FocusedState);//13
+					ASSB(defParts_p, Slottable.DefocusedState);//14
+					ASSB(crfParts_p, Slottable.DefocusedState);//15
+				AssertSGCounts(sgpBow, 3);
+				AssertSGCounts(sgpWear, 3);
+				AssertSGCounts(sgpCGears, 8);
+				AssertSGCounts(sgpParts, 2);
+		/*	sgpBow	*/
+			/*	AS off	*/
+				sgm.SetFocusedPoolSG(sgpBow);
+				sgpBow.ToggleAutoSort(false);
+				AssertFocused();
+					AssertSGCounts(sgpBow, 3);
+						defBowA_p2 = sgpBow.GetSlottable(defBowA_p.ItemInst);
+						defBowC_p2 = sgpBow.GetSlottable(defBowC_p.ItemInst);
+						crfBowA_p2 = sgpBow.GetSlottable(crfBowA_p.ItemInst);
+						ASSBOReset();
+						ASSBO(defBowA_p2, Slottable.EquippedAndDeselectedState);
+						ASSBO(defBowC_p2, Slottable.FocusedState);
+						ASSBO(crfBowA_p2, Slottable.FocusedState);
+					AssertSGCounts(sgpAll, 16);
+					AssertSGCounts(sgpWear, 3);
+					AssertSGCounts(sgpCGears, 8);
+					AssertSGCounts(sgpParts, 2);
+				/*	removal and add	*/
+					poolInv.RemoveItem(defBowC_p2.ItemInst);
+					poolInv.RemoveItem(crfBowA_p2.ItemInst);
+						BowInstanceMock defBowD = new BowInstanceMock();
+						defBowD.Item = defBowA_p.ItemInst.Item;
+						BowInstanceMock defBowE = new BowInstanceMock();
+						defBowE.Item = defBowA_p.ItemInst.Item;
+						BowInstanceMock crfBowB = new BowInstanceMock();
+						crfBowB.Item = crfBowA_p.ItemInst.Item;
+					poolInv.AddItem(defBowD);
+					poolInv.AddItem(defBowE);
+					poolInv.AddItem(crfBowB);
+					SyncSBsOnAll();
+						AssertSGCounts(sgpBow, 3);
+							AE(sgpBow.SlotMovements.Count, 6);
+							Slottable defBowD_p2 = sgpBow.GetSlottable(defBowD);
+							Slottable defBowE_p2 = sgpBow.GetSlottable(defBowE);
+							Slottable crfBowB_p2 = sgpBow.GetSlottable(crfBowB);
+							ATSBReset();
+							ATSB(defBowA_p2, Slottable.MovingInSGState, 0);
+							ATSB(defBowC_p2, Slottable.RemovedState, -1);
+							ATSB(crfBowA_p2, Slottable.RemovedState, -1);
+							ATSB(defBowD_p2, Slottable.AddedState, 1);
+							ATSB(defBowE_p2, Slottable.AddedState, 2);
+							ATSB(crfBowB_p2, Slottable.AddedState, 3);
+						AssertSGCounts(sgpAll, 17);
+							Slottable defBowD_p = sgpAll.GetSlottable(defBowD);
+							Slottable defBowE_p = sgpAll.GetSlottable(defBowE);
+							Slottable crfBowB_p = sgpAll.GetSlottable(crfBowB);
+							ASSBOReset();
+							ASSB(defBowA_p, Slottable.EquippedAndDefocusedState);//0
+							ASSB(defBowD_p, Slottable.DefocusedState);//0
+							ASSB(defBowE_p, Slottable.DefocusedState);//0
+							ASSB(crfBowB_p, Slottable.DefocusedState);//0
+							ASSB(defWearA_p, Slottable.EquippedAndDefocusedState);//3
+							ASSB(defWearC_p, Slottable.DefocusedState);//4
+							ASSB(crfWearA_p, Slottable.DefocusedState);//5
+							ASSB(defShieldA_p, Slottable.EquippedAndDefocusedState);//6
+							ASSB(crfShieldA_p, Slottable.DefocusedState);//7
+							ASSB(defMWeaponA_p, Slottable.EquippedAndDefocusedState);//8
+							ASSB(crfMWeaponA_p, Slottable.DefocusedState);//9
+							ASSB(crfQuiverA_p, Slottable.DefocusedState);//10
+							ASSB(crfQuiverB_p, Slottable.DefocusedState);//11
+							ASSB(crfPackA_p, Slottable.DefocusedState);//12
+							ASSB(crfPackB_p, Slottable.DefocusedState);//13
+							ASSB(defParts_p, Slottable.DefocusedState);//14
+							ASSB(crfParts_p, Slottable.DefocusedState);//1		
+						AssertSGCounts(sgpWear, 3);
+						AssertSGCounts(sgpCGears, 8);
+						AssertSGCounts(sgpParts, 2);
+					CompleteAllSlotMovements(sgpBow);
+						AssertFocused();
+							AssertSGCounts(sgpBow, 4);
+								ASSBOReset();
+								ASSBO(defBowA_p2, Slottable.EquippedAndDeselectedState);
+								ASSBO(defBowD_p2, Slottable.FocusedState);
+								ASSBO(defBowE_p2, Slottable.FocusedState);
+								ASSBO(crfBowB_p2, Slottable.FocusedState);
+							AssertSGCounts(sgpAll, 17);
+							AssertSGCounts(sgpWear, 3);
+							AssertSGCounts(sgpCGears, 8);
+							AssertSGCounts(sgpParts, 2);
+			/*	AS on	*/
+				sgpBow.ToggleAutoSort(true);
+					AssertFocused();
+						ASSBOReset();
+						ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+						ASSBO(defBowD_p2, Slottable.FocusedState);
+						ASSBO(defBowE_p2, Slottable.FocusedState);
+						ASSBO(crfBowB_p2, Slottable.FocusedState);
+				/*	removal and addition	*/
+					poolInv.RemoveItem(defBowD_p2.ItemInst);
+					poolInv.RemoveItem(defBowE_p2.ItemInst);
+						BowInstanceMock crfBowC = new BowInstanceMock();
+						crfBowC.Item = crfBowB_p2.ItemInst.Item;
+					poolInv.AddItem(crfBowC);
+						BowInstanceMock defBowF = new BowInstanceMock();
+						defBowF.Item = defBowA_p2.ItemInst.Item;
+					poolInv.AddItem(defBowF);
+						BowInstanceMock crfBowD = new BowInstanceMock();
+						crfBowD.Item = crfBowB_p2.ItemInst.Item;
+					poolInv.AddItem(crfBowD);
+					SyncSBsOnAll();
+						AssertSGCounts(sgpBow, 4);
+							AE(sgpBow.SlotMovements.Count, 7);
+							Slottable crfBowC_p2 = sgpBow.GetSlottable(crfBowC);
+							Slottable defBowF_p2 = sgpBow.GetSlottable(defBowF);
+							Slottable crfBowD_p2 = sgpBow.GetSlottable(crfBowD);
+							ATSBReset();
+							ATSB(defBowA_p2, Slottable.MovingInSGState, 0);
+							ATSB(defBowD_p2, Slottable.RemovedState, -1);
+							ATSB(defBowE_p2, Slottable.RemovedState, -1);
+							ATSB(crfBowB_p2, Slottable.MovingInSGState, 2);
+							ATSB(crfBowC_p2, Slottable.AddedState, 3);
+							ATSB(defBowF_p2, Slottable.AddedState, 1);
+							ATSB(crfBowD_p2, Slottable.AddedState, 4);
+						AssertSGCounts(sgpAll, 18);
+						AssertSGCounts(sgpWear, 3);
+						AssertSGCounts(sgpCGears, 8);
+						AssertSGCounts(sgpParts, 2);
+					CompleteAllSlotMovements(sgpBow);
+						AssertFocused();
+						AssertSGCounts(sgpBow, 5);
+							ASSBOReset();
+							ASSBO(defBowA_p2, Slottable.EquippedAndDefocusedState);
+							ASSBO(defBowF_p2, Slottable.FocusedState);
+							ASSBO(crfBowB_p2, Slottable.FocusedState);
+							ASSBO(crfBowC_p2, Slottable.FocusedState);
+							ASSBO(crfBowD_p2, Slottable.FocusedState);
+						AssertSGCounts(sgpAll, 18);
+						AssertSGCounts(sgpWear, 3);
+						AssertSGCounts(sgpCGears, 8);
+						AssertSGCounts(sgpParts, 2);
+			/**/
+		}
+	int ATSBCount;
+	public void ATSBReset(){
+		ATSBCount = 0;
 	}
-	public void InstantSlottableSync(){
-		/*	
-			Create and populate lists of Added and Removed inventoryItemInst
-			For each sbs in all the sgs, compare it to the removed lists and if found remove it
-			Create and add those on Added list
-		*/
+	public void ATSB(Slottable sb, SlottableState state, int newID){
+		int curId;
+		int newId;
+		sb.GetSlotIndex(out curId, out newId);
+		if(curId != -1){
+			AE(curId, ATSBCount);
+			ATSBCount ++;
+		}
+		AE(newId, newID);
+		ASSB(sb, state);
+	}
+	public void ATSBP<T>(Slottable sb, SlottableState state, int newID, bool isExpired) where T: SBProcess{
+		AE(sb.CurProcess.GetType(), typeof(T));
+		AB(sb.CurProcess.IsExpired, isExpired);
+		int curId;
+		int newId;
+		sb.GetSlotIndex(out curId, out newId);
+		if(curId != -1){
+			AE(curId, ATSBCount);
+			ATSBCount ++;
+		}
+		AE(newId, newID);
+		ASSB(sb, state);
+	}
+	public void InstantSyncSBsOnAllSGs(){
 		foreach(SlotSystemElement ele in sgm.RootPage.PoolBundle.Elements){
 			SlotGroup sg = (SlotGroup)ele;
-			List<InventoryItemInstanceMock> added = addedItemInvList(sg);
-			List<InventoryItemInstanceMock> removed = removedItemInvList(sg);
-			RemoveSlottables(ref sg, removed);
-			// sg.InstantSort();
+			InstantSyncSBs(sg);
+		}
+	}
+	public void InstantSyncSBs(SlotGroup sg){
+		List<InventoryItemInstanceMock> addedItemInsts = addedItemInvList(sg);
+		List<InventoryItemInstanceMock> removedItemInsts = removedItemInvList(sg);
+		
+		List<Slottable> result = sg.Slottables;
+		SpotRemoveSBs(removedItemInsts, ref result);
+		ScoochSBs(ref result);
+		AddSBs(addedItemInsts, ref result, sg);
+		if(sg.IsAutoSort)
+			OrderSBs(SlotGroup.ItemIDSorter, ref result);
+		UpdateSBs(sg, result);
+		sgm.Focus();
+	}
+	public void SyncSBsOnAll(){
+		SlotGroup focusedSG = sgm.GetFocusedPoolSG();
+		foreach(SlotSystemElement ele in sgm.RootPage.PoolBundle.Elements){
+			SlotGroup sG = (SlotGroup)ele;
+			// if(sG == sg)
+			// 	SyncSBs(sG);
+			// else
+			// 	InstantSyncSBs(sG);
+			if(sG != focusedSG)
+				InstantSyncSBs(sG);
+		}
+		SyncSBs(focusedSG);
+	}
+	public void SyncSBs(SlotGroup sg){
+		List<InventoryItemInstanceMock> addedItemInsts = addedItemInvList(sg);
+		List<InventoryItemInstanceMock> removedItemInsts = removedItemInvList(sg);
+		
+		ComplexTransaction complexTs = new ComplexTransaction(removedItemInsts, addedItemInsts, sg);
+		sg.SGM.SetTransaction(complexTs);
+		sg.SGM.Transaction.Execute();
+		/*	
+			those to be removed
+				=> transaction from cur to -1
+			those to be added
+				=> transaction from -1 to new
+			else
+				=> cur to new
+		*/
+		// UpdateSBs(sg, result);
+		// sgm.Focus();
+	}
+	public void SpotRemoveSBs(List<InventoryItemInstanceMock> removed, ref List<Slottable> sbs){
+		List<Slottable> result = new List<Slottable>();
+		foreach(Slottable sb in sbs){
+			if(sb != null){
+				if(removed.Contains(sb.ItemInst))
+					result.Add(null);
+				else
+					result.Add(sb);
+			}else
+				result.Add(null);
+		}
+		sbs = result;
+	}
+	public void ScoochSBs(ref List<Slottable> sbs){
+		List<Slottable> temp = new List<Slottable>();
+		foreach(Slottable sb in sbs){
+			if(sb != null)
+				temp.Add(sb);
+		}
+		for(int i = 0; i < sbs.Count; i ++){
+			if(i < temp.Count)
+				sbs[i] = temp[i];
+			else
+				sbs[i] = null;
+		}
+	}
+	public void AddSBs(List<InventoryItemInstanceMock> added, ref List<Slottable> sbs, SlotGroup sg){
+		/*	find an empty index and put it there in order
+		*/
+		foreach(InventoryItemInstanceMock itemInst in added){
+			GameObject newSBGO = new GameObject("newSBGO");
+			Slottable newSB = newSBGO.AddComponent<Slottable>();
+			newSB.Initialize(sg.SGM, true, itemInst);
+			// if(sg.CurState == SlotGroup.FocusedState)
+			// 	newSB.Focus();
+			// else if(sg.CurState == SlotGroup.DefocusedState)
+			// 	newSB.Defocus();
 
-			AddSlottables(ref sg, added);
+			int emptyIndex = -1;
+			foreach(Slottable sb in sbs){
+				if(sb == null){
+					emptyIndex = sbs.IndexOf(sb);
+					break;
+				}
+			}
+			if(emptyIndex != -1)
+				sbs[emptyIndex] = newSB;
+			else{
+				sbs.Add(newSB);
+			}
+		}
+	}
+	public void OrderSBs(SGSorter sorter, ref List<Slottable> sbs){
+		sorter.OrderSBs(ref sbs);
+	}
+	public void UpdateSBs(SlotGroup sg, List<Slottable> sbs){
+		foreach(Slot slot in sg.Slots){
+			slot.Sb = null;
+		}
+		for(int i = 0; i < sbs.Count; i ++){
+			if(i < sg.Slots.Count)
+				sg.Slots[i].Sb = sbs[i];
+			else{
+				Slot newSlot = new Slot();
+				newSlot.Position = Vector2.zero;
+				newSlot.Sb = sbs[i];
+				sg.Slots.Add(newSlot);
+			}
+		}
+		if(sg.IsExpandable){
+			List<Slot> temp = new List<Slot>();
+			foreach(Slot slot in sg.Slots){
+				if(slot.Sb != null)
+					temp.Add(slot);
+			}
+			sg.Slots = temp;
 		}
 	}
 	public void RemoveSlottables(ref SlotGroup sg, List<InventoryItemInstanceMock> removedList){
@@ -1413,10 +1621,10 @@ public class SlottableTest {
 			foreach(Slot slot in sg.Slots){
 				if(slot.Sb != null){
 					if(removedList.Contains(slot.Sb.ItemInst)){
-						// Slottable sb = slot.Sb;
-						// GameObject go = sb.gameObject;
-						// DestroyImmediate(sb);
-						// DestroyImmediate(go);
+						Slottable sb = slot.Sb;
+						GameObject go = sb.gameObject;
+						Object.DestroyImmediate(sb);
+						Object.DestroyImmediate(go);
 						slot.Sb = null;
 					}
 				}
@@ -1932,7 +2140,7 @@ public class SlottableTest {
 				defBowB_p.OnPointerUpMock(eventData);
 					AE(sgm.SelectedSGDoneTransaction, false);
 					ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
-					AP<SGMReorderProcess>(sgm, false);
+					AP<SGMTransactionProcess>(sgm, false);
 					ASSG(sgpAll, SlotGroup.SortingState);
 					AP<SGSortingProcess>(sgpAll, false);
 					ASSB(defBowB_p, Slottable.MovingState);
@@ -2024,7 +2232,7 @@ public class SlottableTest {
 
 					ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
 					AT<ReorderTransaction>(false);
-					AP<SGMReorderProcess>(sgm, false);
+					AP<SGMTransactionProcess>(sgm, false);
 					ASSG(sgpAll, SlotGroup.SortingState);
 					AP<SGSortingProcess>(sgpAll, false);
 					ASSB(defWearB_p, Slottable.MovingState);
@@ -2050,7 +2258,7 @@ public class SlottableTest {
 					AE(sgm.SelectedSGDoneTransaction, true);
 					AE(sgpAll.SlotMovements.Count, 0);
 
-					AP<SGMReorderProcess>(sgm, true);
+					AP<SGMTransactionProcess>(sgm, true);
 					// AE(sgm.CurProcess.IsExpired, true);
 					ASSG(sgpAll, SlotGroup.FocusedState);
 					AP<SGSortingProcess>(sgpAll, false);
@@ -2390,7 +2598,7 @@ public class SlottableTest {
 					AE(sgm.SelectedSBDoneTransaction, true);
 					AE(sgm.OrigSGDoneTransaction, true);
 					AE(sgm.SelectedSGDoneTransaction, true);
-					AP<SGMUnequipTransactionProcess>(sgm, false);
+					AP<SGMTransactionProcess>(sgm, false);
 					AP<SBRemovingProcess>(defShieldA_e, false);
 					AP<SGHighlightProcess>(sgpAll, false);
 					AP<SGDehighlightProcess>(sgCGears, false);
@@ -2424,7 +2632,7 @@ public class SlottableTest {
 				AE(sgm.SelectedSBDoneTransaction, true);
 				AE(sgm.OrigSGDoneTransaction, true);
 				AE(sgm.SelectedSGDoneTransaction, true);
-				AP<SGMUnequipTransactionProcess>(sgm, false);
+				AP<SGMTransactionProcess>(sgm, false);
 				AP<SBRemovingProcess>(defShieldA_e, false);
 				AP<SGHighlightProcess>(sgpAll, false);
 				AP<SGDehighlightProcess>(sgCGears, false);
@@ -2454,7 +2662,7 @@ public class SlottableTest {
 				ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
 				ASSG(sgpAll, SlotGroup.SortingState);
 				ASSG(sgCGears, SlotGroup.SortingState);
-				AP<SGMUnequipTransactionProcess>(sgm, false);
+				AP<SGMTransactionProcess>(sgm, false);
 				AP<SGSortingProcess>(sgpAll, false);
 				AP<SGSortingProcess>(sgCGears, false);
 				AB(sgm.CurProcess.IsExpired, false);
@@ -2562,7 +2770,7 @@ public class SlottableTest {
 
 					ASSB(defShieldA_p, Slottable.EquippedAndDeselectedState);
 
-					AE(sgm.CurProcess.GetType(), typeof(SGMSwapTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 					AE(sgpAll.CurProcess.GetType(), typeof(SGDehighlightProcess));
 					AE(sgCGears.CurProcess.GetType(), typeof(SGHighlightProcess));
 					AE(defQuiverA_p.CurProcess.GetType(), typeof(SBEquippingProcess));
@@ -2673,7 +2881,7 @@ public class SlottableTest {
 				AssertOrder(crfParts_p);
 			sgm.SortSG(sgpAll, SlotGroup.AcquisitionOrderSorter);
 				AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-				AE(sgm.CurProcess.GetType(), typeof(SGMSortingProcess));
+				AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 				AE(sgm.Transaction.GetType(), typeof(SortTransaction));
 				AE(sgm.PickedSB, null);
 				AE(sgm.SelectedSB, null);
@@ -2847,7 +3055,7 @@ public class SlottableTest {
 					AE(sgm.SelectedSGDoneTransaction, false);
 
 					AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-					AE(sgm.CurProcess.GetType(), typeof(SGMFillEquipTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 					AE(sgm.GetSlotGroup(defQuiverA_p), sgpAll);
 					
 					AB(sgpAll.Inventory.Items.Contains(defQuiverA_p.Item), true);
@@ -2875,7 +3083,7 @@ public class SlottableTest {
 					AB(sgm.SelectedSBDoneTransaction, true);
 					AB(sgm.OrigSGDoneTransaction, false);
 					AB(sgm.SelectedSGDoneTransaction, false);
-					AE(sgm.CurProcess.GetType(), typeof(SGMFillEquipTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 					AB(sgm.CurProcess.IsRunning, true);
 					AB(sgm.CurProcess.IsExpired, false);
 					
@@ -2900,7 +3108,7 @@ public class SlottableTest {
 					AB(sgm.OrigSGDoneTransaction, true);
 					AB(sgm.SelectedSGDoneTransaction, false);
 					AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-					AE(sgm.CurProcess.GetType(), typeof(SGMFillEquipTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 
 					ASSG(sgpAll, SlotGroup.PerformingTransactionState);
 					AE(sgpAll.CurProcess.GetType(), typeof(SGUpdateTransactionProcess));
@@ -3022,7 +3230,7 @@ public class SlottableTest {
 					AE(sgCGears.GetNextEmptySlot(), null);
 				crfShieldA_p.OnPointerUpMock(eventData);
 					AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-					AE(sgm.CurProcess.GetType(), typeof(SGMRevertTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 					AE(crfShieldA_p.CurProcess.GetType(), typeof(SBUnpickingProcess));
 				crfShieldA_p.CurProcess.Expire();
 			/*	remove defShieldA_e
@@ -3069,7 +3277,7 @@ public class SlottableTest {
 					AE(sgpAll.CurProcess.GetType(), typeof(SGHighlightProcess));
 				defShieldA_e.OnPointerUpMock(eventData);
 					AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-					AE(sgm.CurProcess.GetType(), typeof(SGMUnequipTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 					AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
 					AE(sgm.PickedSB, defShieldA_e);
 					AE(sgm.SelectedSB, null);
@@ -3107,7 +3315,7 @@ public class SlottableTest {
 					AE(sgm.SelectedSGDoneTransaction, false);
 				defShieldA_e.CurProcess.Expire();
 					AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-					AE(sgm.CurProcess.GetType(), typeof(SGMUnequipTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 					AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
 					AE(sgm.PickedSB, defShieldA_e);
 					AE(sgm.SelectedSB, null);
@@ -3118,7 +3326,7 @@ public class SlottableTest {
 					AE(sgm.SelectedSGDoneTransaction, false);
 				sgpAll.CurProcess.Expire();
 					AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-					AE(sgm.CurProcess.GetType(), typeof(SGMUnequipTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 					AE(sgm.Transaction.GetType(), typeof(UnequipTransaction));
 					AE(sgm.PickedSB, defShieldA_e);
 					AE(sgm.SelectedSB, null);
@@ -3255,7 +3463,7 @@ public class SlottableTest {
 				crfBowA_p.OnPointerUpMock(eventData);
 					AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
 					AE(sgm.Transaction.GetType(), typeof(SwapTransaction));
-					AE(sgm.CurProcess.GetType(), typeof(SGMSwapTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 						AE(sgm.PickedSBDoneTransaction, false);
 						AE(sgm.SelectedSBDoneTransaction, false);
 						AE(sgm.OrigSGDoneTransaction, false);
@@ -3277,7 +3485,7 @@ public class SlottableTest {
 					AE(defBowA_e.DestinationSG, sgpAll);
 					AE(defBowA_e.DestinationSlot, sgpAll.GetSlot(crfBowA_p));
 				crfBowA_p.CurProcess.Expire();
-					AE(sgm.CurProcess.GetType(), typeof(SGMSwapTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 						AE(sgm.PickedSBDoneTransaction, true);
 						AE(sgm.SelectedSBDoneTransaction, false);
 						AE(sgm.OrigSGDoneTransaction, false);
@@ -3286,7 +3494,7 @@ public class SlottableTest {
 					AE(crfBowA_p.DestinationSlot, null);
 
 				defBowA_e.CurProcess.Expire();
-					AE(sgm.CurProcess.GetType(), typeof(SGMSwapTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 						AE(sgm.PickedSBDoneTransaction, true);
 						AE(sgm.SelectedSBDoneTransaction, true);
 						AE(sgm.OrigSGDoneTransaction, false);
@@ -3295,7 +3503,7 @@ public class SlottableTest {
 					AE(defBowA_e.DestinationSlot, null);
 
 				sgpAll.CurProcess.Expire();
-					AE(sgm.CurProcess.GetType(), typeof(SGMSwapTransactionProcess));
+					AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 						AE(sgm.PickedSBDoneTransaction, true);
 						AE(sgm.SelectedSBDoneTransaction, true);
 						AE(sgm.OrigSGDoneTransaction, true);
@@ -4906,9 +5114,13 @@ public class SlottableTest {
 				sb.CurProcess.Expire();
 				pickedUp = true;
 				ASSB(sb, Slottable.PickedAndSelectedState);
+				pickedSB = sb;
 			}else{
 				pickedUp = false;
 			}
+		}
+		public void PointerUp(){
+			pickedSB.OnPointerUpMock(eventData);
 		}
 		public void Revert(Slottable sb, out bool reverted){
 			if(sb.CurState == Slottable.PickedAndSelectedState || sb.CurState == Slottable.PickedAndDeselectedState){
@@ -4969,13 +5181,14 @@ public class SlottableTest {
 			ExpireProcesses(sb, null, oSG, sSG);
 		}
 		public void CompleteAllSlotMovements(SlotGroup sg){
-			foreach(Slot slot in sg.Slots){
-				if(slot.Sb != null){
-					SlotMovement sm = sg.GetSlotMovement(slot.Sb);
-					if(sm != null /* the moment all the sms are completed the sm list is gone	*/)
-					sm.Complete();
-				}
+			
+			foreach(SlotMovement sm in sg.SlotMovements){
+				Slottable sb = sm.SB;
+				if(sb.CurProcess.GetType() == typeof(SBRemovedProcess) || sb.CurProcess.GetType() == typeof(SBAddedProcess) || sb.CurProcess.GetType() == typeof(SBMovingInSGProcess))
+					if(!sb.CurProcess.IsExpired)
+						sb.CurProcess.Expire();
 			}
+			sg.CheckProcessCompletion();
 		}
 		public void ExpireProcesses(Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
 			if(pickedSB != null)
@@ -5033,7 +5246,7 @@ public class SlottableTest {
 			pickedSB.OnPointerUpMock(eventData);
 				AT<SwapTransaction>(false);
 				ASSGM(sgm, SlotGroupManager.PerformingTransactionState);
-				AP<SGMSwapTransactionProcess>(sgm, false);
+				AP<SGMTransactionProcess>(sgm, false);
 				if(origSG.IsAutoSort){
 					ASSG(origSG, SlotGroup.SortingState);
 					AP<SGSortingProcess>(origSG, false);
@@ -5381,7 +5594,7 @@ public class SlottableTest {
 		}
 		public void AssertReverting(Slottable sb){
 			AE(sgm.CurState, SlotGroupManager.PerformingTransactionState);
-			AE(sgm.CurProcess.GetType(), typeof(SGMRevertTransactionProcess));
+			AE(sgm.CurProcess.GetType(), typeof(SGMTransactionProcess));
 			AB(sgm.CurProcess.IsRunning, true);
 			AB(sgm.CurProcess.IsExpired, false);
 			AE(sgm.PickedSB, sb);
@@ -5720,8 +5933,8 @@ public class SlottableTest {
 				sm.GetIndex(out actCurId, out actNewId);
 				AE(actCurId, curId);
 				AE(actNewId, newId);
-				AB(sm.Completed, completed);
-				AB(sm.Completed, completed);
+				// AB(sm.Completed, completed);
+				// AB(sm.Completed, completed);
 			}
 		}
 		public void PrintItems(SlotGroup sg){

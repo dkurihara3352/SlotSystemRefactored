@@ -198,6 +198,38 @@ namespace SlotSystem{
 						return Slottable.m_unpickingState;			
 					}
 				}
+			static SlottableState m_removedState;
+				public static SlottableState RemovedState{
+					get{
+						if(Slottable.m_removedState == null)
+							Slottable.m_removedState = new SBRemovedState();
+						return Slottable.m_removedState;			
+					}
+				}
+			static SlottableState m_addedState;
+				public static SlottableState AddedState{
+					get{
+						if(Slottable.m_addedState == null)
+							Slottable.m_addedState = new SBAddedState();
+						return Slottable.m_addedState;			
+					}
+				}
+			static SlottableState m_movingInSGState;
+				public static SlottableState MovingInSGState{
+					get{
+						if(Slottable.m_movingInSGState == null)
+							Slottable.m_movingInSGState = new SBMovingInSGState();
+						return Slottable.m_movingInSGState;			
+					}
+				}
+			static SlottableState m_revertingState;
+				public static SlottableState RevertingState{
+					get{
+						if(Slottable.m_revertingState == null)
+							Slottable.m_revertingState = new SBRevertingState();
+						return Slottable.m_revertingState;			
+					}
+				}
 		/* commands
 		*/
 			static SlottableCommand m_instantDeactivateCommand = new DefInstantDeactivateCommand();
@@ -273,23 +305,29 @@ namespace SlotSystem{
 		
 			public int SlotID{
 				get{
-					int result = -1;
-					List<Slot> slots = SGM.GetSlotGroup(this).Slots;
-					for(int i = 0; i < slots.Count; i++){
-						if(slots[i].Sb != null)
-							if(slots[i].Sb == this)
-								result = i;
-					}
-					return result;
+					// int result = -1;
+					// List<Slot> slots = SG.Slots;
+					// for(int i = 0; i < slots.Count; i++){
+					// 	if(slots[i].Sb != null)
+					// 		if(slots[i].Sb == this)
+					// 			result = i;
+					// }
+					// return result;
+					return SG.Slottables.IndexOf(this);
 				}
 			}
 			SlotGroup m_sg;
 			public SlotGroup SG{
 				get{
-					if(m_sg == null)
+					if(m_sg == null){
 						m_sg = SGM.GetSlotGroup(this);
+					}
 					return m_sg;
 				}
+			}
+			public void SetSG(SlotGroup sg){
+				/*	use this only when creating a new Sb in transaction	*/
+				m_sg = sg;
 			}
 		/*	processes
 		*/
@@ -378,6 +416,18 @@ namespace SlotSystem{
 				public IEnumeratorMock ReorderingCoroutine(){
 					return null;
 				}
+				public IEnumeratorMock RemovedCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock AddedCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock MovingInSGCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock RevertCoroutine(){
+					return null;
+				}
 		/*	Event methods
 		*/
 			public void OnPointerDownMock(PointerEventDataMock eventDataMock){
@@ -459,6 +509,13 @@ namespace SlotSystem{
 		public void ClearDraggedIconDestination(){
 			this.m_destinationSG = null;
 			this.m_destinationSlot = null;
+		}
+		public void GetSlotIndex(out int curID, out int newID){
+			SG.GetSlotMovement(this).GetIndex(out curID, out newID);
+		}
+		public void ExpireProcess(){
+			CurProcess.Expire();
+			SG.CheckProcessCompletion();
 		}
 	}
 
