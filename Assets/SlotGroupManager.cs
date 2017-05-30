@@ -507,31 +507,35 @@ namespace SlotSystem{
 			foreach(CarriedGearInstanceMock cGear in GetEquippedCarriedGears()){
 				cGear.IsEquipped = true;
 			}
-			SlotGroup poolSG = GetFocusedPoolSG();
-			foreach(InventoryItemInstanceMock item in poolSG.Inventory.Items){
-				if(item.IsEquipped){
-					if(item is BowInstanceMock){
-						if(GetEquippedBow() != (BowInstanceMock)item)
-							item.IsEquipped = false;
-					}else if(item is WearInstanceMock){
-						if(GetEquippedWear() != (WearInstanceMock)item)
-							item.IsEquipped = false;
-					}else if(item is CarriedGearInstanceMock){
-						List<CarriedGearInstanceMock> cGears = GetEquippedCarriedGears();
-						if(cGears.Count == 0)
-							item.IsEquipped = false;
-						else{
-							bool found = false;
-							foreach(CarriedGearInstanceMock cGear in cGears){
-								if(cGear == (CarriedGearInstanceMock)item)
-									found = true;
-							}
-							if(!found)
+			foreach(SlotSystemElement ele in RootPage.PoolBundle.Elements){
+				SlotGroup sg = (SlotGroup)ele;
+				foreach(InventoryItemInstanceMock item in sg.Inventory.Items){
+					if(item.IsEquipped){
+						if(item is BowInstanceMock){
+							if(GetEquippedBow() != (BowInstanceMock)item)
 								item.IsEquipped = false;
+						}else if(item is WearInstanceMock){
+							if(GetEquippedWear() != (WearInstanceMock)item)
+								item.IsEquipped = false;
+						}else if(item is CarriedGearInstanceMock){
+							List<CarriedGearInstanceMock> cGears = GetEquippedCarriedGears();
+							if(cGears.Count == 0)
+								item.IsEquipped = false;
+							else{
+								bool found = false;
+								foreach(CarriedGearInstanceMock cGear in cGears){
+									if(cGear == (CarriedGearInstanceMock)item)
+										found = true;
+								}
+								if(!found)
+									item.IsEquipped = false;
+							}
 						}
 					}
 				}
 			}
+			SlotGroup poolSG = GetFocusedPoolSG();
+			
 		}
 		public SlotGroup GetFocusedCGearsSG(){
 			foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){

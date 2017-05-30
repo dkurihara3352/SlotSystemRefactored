@@ -31,18 +31,20 @@ namespace SlotSystem{
 				}
 				public void Indicate(){}
 				public void Execute(){
+					sgm.SetAndRunTransactionProcess(pickedSB, null, null, null);
+					
 					SlotGroup sg = sgm.GetSlotGroup(pickedSB);
 					Slot slot = sg.GetSlot(pickedSB);
 					pickedSB.MoveDraggedIcon(sg, slot);
-					pickedSB.SetState(Slottable.UnpickingState);
-					sgm.SetAndRunTransactionProcess(pickedSB, null, null, null);
+					pickedSB.SetState(Slottable.RevertingState);
 				}
 				public void OnComplete(){
-					if(pickedSB.IsEquipped)
-						pickedSB.SetState(Slottable.EquippedAndDeselectedState);
-					else
-						pickedSB.SetState(Slottable.FocusedState);
-					pickedSB.PickedAmount = 0;
+					// if(pickedSB.IsEquipped)
+					// 	pickedSB.SetState(Slottable.EquippedAndDeselectedState);
+					// else
+					// 	pickedSB.SetState(Slottable.FocusedState);
+					// pickedSB.PickedAmount = 0;
+					sgm.DestroyDraggedIcon();
 					sgm.ClearAndReset();
 				}
 			}
@@ -95,12 +97,16 @@ namespace SlotSystem{
 				Slottable selectedSB;
 				SlotGroup selectedSG;
 				SlotGroupManager sgm;
+				List<InventoryItemInstanceMock> picked = new List<InventoryItemInstanceMock>();
+				List<InventoryItemInstanceMock> hovered = new List<InventoryItemInstanceMock>();
 				public SwapTransaction(Slottable picked, Slottable selected){
 					this.pickedSB = picked;
 					this.selectedSB = selected;
 					this.sgm = picked.SGM;
 					this.origSG = sgm.GetSlotGroup(picked);
 					this.selectedSG = sgm.GetSlotGroup(selected);
+					this.picked.Add(pickedSB.ItemInst);
+					this.hovered.Add(selectedSB.ItemInst);
 				}
 				public void Indicate(){}
 				public void CheckFields(out Slottable pickedSB, out SlotGroup origSG, out Slottable selectedSB, out SlotGroup selectedSG){
@@ -110,23 +116,45 @@ namespace SlotSystem{
 					selectedSG = this.selectedSG;
 				}
 				public void Execute(){
-					sgm.SetAndRunTransactionProcess(pickedSB, selectedSB, origSG, selectedSG);
 					
-					origSG.TransactionUpdateV2(selectedSB, pickedSB);
-					selectedSG.TransactionUpdateV2(pickedSB, selectedSB);
-
-					Slot selectedSBSlot = selectedSG.GetSlot(selectedSB);
-					Slot pickedSBSlot = origSG.GetSlot(pickedSB);
+					sgm.SetAndRunTransactionProcess(pickedSB, selectedSB, origSG.IsPool?null: origSG, selectedSG.IsPool?null: selectedSG);
+					
+					if(!origSG.IsPool){
+						origSG.SetAndRunSlotMovements(picked, hovered);
+						origSG.SetState(SlotGroup.PerformingTransactionState);
+					}
+					if(!selectedSG.IsPool){
+						selectedSG.SetAndRunSlotMovements(hovered, picked);
+						selectedSG.SetState(SlotGroup.PerformingTransactionState);
+					}
+					
+					Slot selectedSBSlot = selectedSG.GetSlotForAdded(pickedSB);
+					Slot pickedSBSlot = origSG.GetSlotForAdded(selectedSB);
 
 					selectedSB.MoveDraggedIcon(origSG, pickedSBSlot);
 					pickedSB.MoveDraggedIcon(selectedSG, selectedSBSlot);
 					
-					selectedSB.SetState(Slottable.MovingState);
-					pickedSB.SetState(Slottable.MovingState);
+					if(origSG.IsPool){
+						pickedSB.SetState(Slottable.MovingOutState);
+						Slottable swappedDest = origSG.GetSlottable(selectedSB.ItemInst);
+						swappedDest.SetState(Slottable.MovingInState);
+					}
+					if(selectedSG.IsPool){
+						selectedSB.SetState(Slottable.MovingInState);
+						Slottable swappedDest = selectedSG.GetSlottable(pickedSB.ItemInst);
+						swappedDest.SetState(Slottable.MovingOutState);
+					}
+
+					origSG.CheckCompletion();
+					selectedSG.CheckCompletion();
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
-					sgm.DestroyRemovedSB();
+					// sgm.DestroyRemovedSB();
+					if(!origSG.IsPool)
+						origSG.OnCompleteSlotMovements();
+					if(!selectedSG.IsPool)
+						selectedSG.OnCompleteSlotMovements();
 					sgm.UpdateEquipStatus();
 					sgm.ClearAndReset();
 				}
@@ -250,12 +278,15 @@ namespace SlotSystem{
 				}
 				public void Indicate(){}
 				public void Execute(){
-				
 					sgm.SetAndRunTransactionProcess(null, null, null, m_sg);
-					m_sg.TransactionUpdateV2(null, null);
+					// m_sg.TransactionUpdateV2(null, null);
+					// m_sg.SetAndRunSlotMovements(null, null);
+					m_sg.SetAndRunSlotMovementsForSort();
+					m_sg.SetState(SlotGroup.PerformingTransactionState);
+					m_sg.CheckCompletion();
 				}
 				public void OnComplete(){
-					//enable imput
+					m_sg.OnCompleteSlotMovements();
 					sgm.ClearAndReset();
 				}
 			}
@@ -1184,21 +1215,9 @@ namespace SlotSystem{
 					m_newSlotID = newSlotID;
 					m_sg.AddSlotMovement(this);
 				}
-				// bool m_completed = false;
-				// public bool Completed{
-				// 	get{return m_completed;}
-				// }
 				public void Execute(){
-					// if(m_curSlotID == m_newSlotID)
-					// 	m_completed = true;
-					// else
-					// 	m_completed = false;
 					StateTransit();
 				}
-				// public void Complete(){
-				// 	m_completed = true;
-				// 	IEnumeratorMock tryInvoke = m_sg.WaitForAllSlotMovementsDone();
-				// }
 				public void GetIndex(out int curId, out int newId){
 					curId = m_curSlotID;
 					newId = m_newSlotID;
@@ -1206,8 +1225,12 @@ namespace SlotSystem{
 				public void StateTransit(){
 					if(m_curSlotID == -1)
 						m_sb.SetState(Slottable.AddedState);
+					else if(m_curSlotID == -2)
+						m_sb.SetState(Slottable.MovingInState);
 					else if(m_newSlotID == -1)
 						m_sb.SetState(Slottable.RemovedState);
+					else if(m_newSlotID == -2)
+						m_sb.SetState(Slottable.MovingOutState);
 					else{
 						m_sb.SetState(Slottable.MovingInSGState);
 					}
@@ -2069,6 +2092,28 @@ namespace SlotSystem{
 					SB.SGM.CompleteTransactionOnSB(SB);
 				}
 			}
+			public class SBMovingOutProcess: AbsSBProcess{
+				public SBMovingOutProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					SB = sb;
+					CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+					SB.ClearDraggedIconDestination();
+					SB.SGM.CompleteTransactionOnSB(SB);
+				}
+			}
+			public class SBMovingInProcess: AbsSBProcess{
+				public SBMovingInProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					SB = sb;
+					CoroutineMock = coroutineMock;
+				}
+				public override void Expire(){
+					base.Expire();
+					SB.ClearDraggedIconDestination();
+					SB.SGM.CompleteTransactionOnSB(SB);
+				}
+			}
 			
 		/*	states
 		*/
@@ -2599,8 +2644,10 @@ namespace SlotSystem{
 						sb.SetState(Slottable.FocusedState);
 				}
 				public void Defocus(Slottable sb){
-					
-					sb.SetState(Slottable.EquippedAndDefocusedState);
+					if(sb.IsEquipped)	
+						sb.SetState(Slottable.EquippedAndDefocusedState);
+					else
+						sb.SetState(Slottable.DefocusedState);
 				}
 			}
 			public class SBSelectedState: SlottableState{
@@ -2771,6 +2818,52 @@ namespace SlotSystem{
 			public class SBRevertingState: SlottableState{
 				public void EnterState(Slottable sb){
 					SBRevertingProcess process = new SBRevertingProcess(sb, sb.RevertCoroutine);
+					sb.SetAndRun(process);
+				}
+				/*	*/
+					public void ExitState(Slottable sb){}
+					public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
+					}
+					public void Focus(Slottable sb){
+						if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDeselectedState);
+						else sb.SetState(Slottable.FocusedState);
+					}
+					public void Defocus(Slottable sb){
+						if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDefocusedState);
+						else sb.SetState(Slottable.DefocusedState);
+					}
+			}
+			public class SBMovingOutState: SlottableState{
+				public void EnterState(Slottable sb){
+					SBMovingOutProcess process = new SBMovingOutProcess(sb, sb.MovingOutCoroutine);
+					sb.SetAndRun(process);
+				}
+				/*	*/
+					public void ExitState(Slottable sb){}
+					public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
+					}
+					public void Focus(Slottable sb){
+						if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDeselectedState);
+						else sb.SetState(Slottable.FocusedState);
+					}
+					public void Defocus(Slottable sb){
+						if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDefocusedState);
+						else sb.SetState(Slottable.DefocusedState);
+					}
+			}
+			public class SBMovingInState: SlottableState{
+				public void EnterState(Slottable sb){
+					SBMovingInProcess process = new SBMovingInProcess(sb, sb.MovingInCoroutine);
 					sb.SetAndRun(process);
 				}
 				/*	*/

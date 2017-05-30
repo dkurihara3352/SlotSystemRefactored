@@ -620,11 +620,16 @@ namespace SlotSystem{
 				}
 		}
 		public void SetAndRunSlotMovements(List<InventoryItemInstanceMock> removed, List<InventoryItemInstanceMock> added){
+			
 			List<Slottable> newSBsList = new List<Slottable>();
 			/*	remove	and index */
 			foreach(Slottable sb in Slottables){
 				if(removed != null && removed.Contains(sb.ItemInst)){
-					SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -1);
+					if(!IsPool){
+						SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -2);
+					}else{
+						SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -1);
+					}
 				}else
 					newSBsList.Add(sb);
 			}
@@ -658,11 +663,13 @@ namespace SlotSystem{
 			/*	index	*/
 			foreach(Slottable sb in newSBsList){
 				if(sb != null){
-
 					SlotMovement newSM;
-					if(added != null && added.Contains(sb.ItemInst))
-						newSM = new SlotMovement(this, sb, -1, newListOrdered.IndexOf(sb));
-					else
+					if(added != null && added.Contains(sb.ItemInst)){
+						if(!IsPool)
+							newSM = new SlotMovement(this, sb, -2, newListOrdered.IndexOf(sb));
+						else
+							newSM = new SlotMovement(this, sb, -1, newListOrdered.IndexOf(sb));
+					}else
 						newSM = new SlotMovement(this, sb, sb.SlotID, newListOrdered.IndexOf(sb));
 				}
 			}
@@ -674,6 +681,15 @@ namespace SlotSystem{
 			foreach(Slottable sb in Slottables){
 				if(sb != null){
 					SlotMovement sm = new SlotMovement(this, sb, sb.SlotID, reorderedSB.IndexOf(sb));
+				}
+			}
+			ExecuteSlotMovements();
+		}
+		public void SetAndRunSlotMovementsForSort(){
+			List<Slottable> orderedSBs = this.OrderedSbs();
+			foreach(Slottable sb in Slottables){
+				if(sb != null){
+					SlotMovement sm = new SlotMovement(this, sb, sb.SlotID, orderedSBs.IndexOf(sb));
 				}
 			}
 			ExecuteSlotMovements();
@@ -800,7 +816,7 @@ namespace SlotSystem{
 				int curId;
 				int newId;
 				sm.GetIndex(out curId, out newId);
-				if(newId == -1){
+				if(newId == -1 || newId == -2){
 					GameObject go = sm.SB.gameObject;
 					DestroyImmediate(go);
 					DestroyImmediate(sm.SB);
@@ -820,14 +836,18 @@ namespace SlotSystem{
 		}
 		public Slot GetSlotForAdded(Slottable sb){
 			Slot slot = null;
-			foreach(SlotMovement sm in SlotMovements){
-				if(sm.SB.ItemInst == sb.ItemInst){
-					int curId; int newId;
-					sm.GetIndex(out curId, out newId);
-					slot = Slots[newId];
+			if(SlotMovements.Count == 0){
+				return GetSlot(GetSlottable(sb.ItemInst));
+			}else{
+				foreach(SlotMovement sm in SlotMovements){
+					if(sm.SB.ItemInst == sb.ItemInst){
+						int curId; int newId;
+						sm.GetIndex(out curId, out newId);
+						slot = Slots[newId];
+					}
 				}
+				return slot;
 			}
-			return slot;
 		}
 	}
 }

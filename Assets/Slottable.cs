@@ -230,6 +230,22 @@ namespace SlotSystem{
 						return Slottable.m_revertingState;			
 					}
 				}
+			static SlottableState m_movingOutState;
+				public static SlottableState MovingOutState{
+					get{
+						if(Slottable.m_movingOutState == null)
+							Slottable.m_movingOutState = new SBMovingOutState();
+						return Slottable.m_movingOutState;			
+					}
+				}
+			static SlottableState m_movingInState;
+				public static SlottableState MovingInState{
+					get{
+						if(Slottable.m_movingInState == null)
+							Slottable.m_movingInState = new SBMovingInState();
+						return Slottable.m_movingInState;			
+					}
+				}
 		/* commands
 		*/
 			static SlottableCommand m_instantDeactivateCommand = new DefInstantDeactivateCommand();
@@ -426,6 +442,12 @@ namespace SlotSystem{
 					return null;
 				}
 				public IEnumeratorMock RevertCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock MovingInCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock MovingOutCoroutine(){
 					return null;
 				}
 		/*	Event methods
