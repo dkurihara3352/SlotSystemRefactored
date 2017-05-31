@@ -120,11 +120,11 @@ namespace SlotSystem{
 					sgm.SetAndRunTransactionProcess(pickedSB, selectedSB, origSG.IsPool?null: origSG, selectedSG.IsPool?null: selectedSG);
 					
 					if(!origSG.IsPool){
-						origSG.SetAndRunSlotMovements(picked, hovered);
+						origSG.SetAndRunSlotmovementsForSwap(pickedSB, selectedSB);
 						origSG.SetState(SlotGroup.PerformingTransactionState);
 					}
 					if(!selectedSG.IsPool){
-						selectedSG.SetAndRunSlotMovements(hovered, picked);
+						selectedSG.SetAndRunSlotmovementsForSwap(selectedSB, pickedSB);
 						selectedSG.SetState(SlotGroup.PerformingTransactionState);
 					}
 					
@@ -150,7 +150,6 @@ namespace SlotSystem{
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
-					// sgm.DestroyRemovedSB();
 					if(!origSG.IsPool)
 						origSG.OnCompleteSlotMovements();
 					if(!selectedSG.IsPool)
@@ -244,25 +243,38 @@ namespace SlotSystem{
 				}
 				public void Indicate(){}
 				public void Execute(){
-					sgm.SetAndRunTransactionProcess(pickedSB, null, origSG, selectedSG);
+					sgm.SetAndRunTransactionProcess(pickedSB, null, origSG.IsPool? null: origSG, selectedSG.IsPool? null: selectedSG);
 
-					origSG.SetAndRunSlotMovements(null, null);
-					origSG.SetState(SlotGroup.PerformingTransactionState);
-					selectedSG.SetAndRunSlotMovements(null, moved);
-					selectedSG.SetState(SlotGroup.PerformingTransactionState);
+					if(!origSG.IsPool){
+						origSG.SetAndRunSlotMovements(moved, null);
+						origSG.SetState(SlotGroup.PerformingTransactionState);
+					}
+					if(!selectedSG.IsPool){
+						selectedSG.SetAndRunSlotMovements(null, moved);
+						selectedSG.SetState(SlotGroup.PerformingTransactionState);
+					}
 
 					Slot slot = selectedSG.GetSlotForAdded(pickedSB);
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
-					pickedSB.SetState(Slottable.EquippingState);
+					pickedSB.SetState(Slottable.MovingOutState);
 					
-					origSG.CheckCompletion();
-					selectedSG.CheckCompletion();
+					if(selectedSG.IsPool){
+						Slottable targetSB = selectedSG.GetSlottable(pickedSB.ItemInst);
+						targetSB.SetState(Slottable.MovingInState);
+					}
+
+					if(!origSG.IsPool)
+						origSG.CheckCompletion();
+					if(!selectedSG.IsPool)
+						selectedSG.CheckCompletion();
 				}
 				public void OnComplete(){
-					origSG.OnCompleteSlotMovements();
-					selectedSG.OnCompleteSlotMovements();
-
 					sgm.DestroyDraggedIcon();
+					if(!origSG.IsPool)
+						origSG.OnCompleteSlotMovements();
+					if(!selectedSG.IsPool)
+						selectedSG.OnCompleteSlotMovements();
+
 					sgm.UpdateEquipStatus();
 					sgm.ClearAndReset();
 				}
@@ -336,9 +348,11 @@ namespace SlotSystem{
 									there's at least one vacant slot OR there's a sb of a same stackable item
 								*/
 								if(selectedSG.HasItem((InventoryItemInstanceMock)pickedSB.Item)){
-									if(sgm.RootPage.PoolBundle.ContainsElement(selectedSG)){
-										UnequipTransaction unequipTs = new UnequipTransaction(pickedSB, selectedSG);
-										sgm.SetTransaction(unequipTs);
+									if(selectedSG.IsPool){
+										// UnequipTransaction unequipTs = new UnequipTransaction(pickedSB, selectedSG);
+										// sgm.SetTransaction(unequipTs);
+										FillEquipTransaction ta = new FillEquipTransaction(pickedSB, selectedSG);
+										sgm.SetTransaction(ta);
 									}else{
 										StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
 										sgm.SetTransaction(stackTs);

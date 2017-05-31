@@ -624,7 +624,7 @@ namespace SlotSystem{
 			List<Slottable> newSBsList = new List<Slottable>();
 			/*	remove	and index */
 			foreach(Slottable sb in Slottables){
-				if(removed != null && removed.Contains(sb.ItemInst)){
+				if(removed != null && sb != null && removed.Contains(sb.ItemInst)){
 					if(!IsPool){
 						SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -2);
 					}else{
@@ -693,6 +693,54 @@ namespace SlotSystem{
 				}
 			}
 			ExecuteSlotMovements();
+		}
+		public void SetAndRunSlotmovementsForSwap(Slottable removed, Slottable added){
+			if(removed != null && added != null){
+				List<Slottable> newSBsList = new List<Slottable>();
+				int removedId = -1;
+				/*	remove	and index */
+				foreach(Slottable sb in Slottables){
+					if(sb != null && sb.ItemInst == removed.ItemInst){
+						removedId = sb.SlotID;
+						newSBsList.Add(null);
+						if(!IsPool){
+							SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -2);
+						}else{
+							SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -1);
+						}
+					}else
+						newSBsList.Add(sb);
+				}
+				if(removedId == -1)
+					throw new System.InvalidOperationException("SetAndRunSlotMovementsForSwap: removed sb not contained in the selectedSG");
+				/*	add	*/
+					GameObject newSBGO = new GameObject("newSBGO");
+					Slottable newSB = newSBGO.AddComponent<Slottable>();
+					newSB.Initialize(SGM, true, added.ItemInst);
+					newSB.SetSG(this);
+					newSBsList[removedId] = newSB;
+				/*	sort	*/
+				List<Slottable> newListOrdered = new List<Slottable>();
+				newListOrdered = newSBsList;
+				if(IsAutoSort)
+					Sorter.OrderSBsWOSpace(ref newListOrdered);
+				/*	index	*/
+				foreach(Slottable sb in newSBsList){
+					if(sb != null){
+						SlotMovement newSM;
+						if(sb.ItemInst == added.ItemInst){
+							if(!IsPool)
+								newSM = new SlotMovement(this, sb, -2, newListOrdered.IndexOf(sb));
+							else
+								newSM = new SlotMovement(this, sb, -1, newListOrdered.IndexOf(sb));
+						}else
+							newSM = new SlotMovement(this, sb, sb.SlotID, newListOrdered.IndexOf(sb));
+					}
+				}
+				ExecuteSlotMovements();	
+			}else{
+				throw new System.InvalidOperationException("SetAndRunSlotMovementsForSwap: removed nor added sb not assigned properly");
+			}
 		}
 		public int FindNextEmpty(ref List<Slottable> sbList){
 			foreach(Slottable sb in sbList){
