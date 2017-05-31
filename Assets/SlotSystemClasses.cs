@@ -194,39 +194,6 @@ namespace SlotSystem{
 					sgm.ClearAndReset();//Focus should take care of clearing the processes
 				}
 			}
-			public class UnequipTransaction: SlotSystemTransaction{
-				Slottable pickedSB;
-				SlotGroup selectedSG;
-				SlotGroup origSG;
-				SlotGroupManager sgm;
-				public UnequipTransaction(Slottable picked, SlotGroup selSG){
-					this.pickedSB = picked;
-					this.selectedSG = selSG;
-					this.sgm = picked.SGM;
-					this.origSG = sgm.GetSlotGroup(picked);
-				}
-				public void Indicate(){}
-				public void Execute(){
-
-					sgm.SetAndRunTransactionProcess(pickedSB, null, origSG, selectedSG);
-
-					origSG.TransactionUpdateV2(null, pickedSB);
-					selectedSG.TransactionUpdateV2(pickedSB, null);
-
-					Slot slot = selectedSG.GetSlot(selectedSG.GetSlottable((InventoryItemInstanceMock)pickedSB.Item));
-					pickedSB.MoveDraggedIcon(selectedSG, slot);
-					pickedSB.SetState(Slottable.MovingState);
-				}
-				public void OnComplete(){
-					sgm.DestroyDraggedIcon();
-					sgm.DestroyRemovedSB();
-					/*	TransactionUpdate HIDES (not removes) the pickedSB the moment the transaction is 	executed (only dragged icon persists)
-						performing the equip state update checks all the equipped sbs in pool to see if there's matching sb in one of equip egs, unequip if there's none
-					*/
-					sgm.UpdateEquipStatus();
-					sgm.ClearAndReset();
-				}
-			}
 			public class FillEquipTransaction: SlotSystemTransaction{
 				Slottable pickedSB;
 				SlotGroup selectedSG;
@@ -302,37 +269,71 @@ namespace SlotSystem{
 					sgm.ClearAndReset();
 				}
 			}
-			public class ComplexTransaction: SlotSystemTransaction{
-				List<InventoryItemInstanceMock> m_removed;
-				List<InventoryItemInstanceMock> m_added;
-				SlotGroup m_sg;
-				SlotGroupManager m_sgm;
-				public ComplexTransaction(List<InventoryItemInstanceMock> removedList, List<InventoryItemInstanceMock> addedList, SlotGroup sg){
-					m_removed = removedList;
-					m_added = addedList;
-					m_sg = sg;
-					m_sgm = sg.SGM;
-				}
-				public void Indicate(){}
-				public void Execute(){
-					
-					m_sgm.SetAndRunTransactionProcess(null, null, null, m_sg);
-					
-					m_sg.SetAndRunSlotMovements(m_removed, m_added);
-					m_sg.SetState(SlotGroup.PerformingTransactionState);
-				}
-				public void OnComplete(){
-					m_sg.OnCompleteSlotMovements();
-					m_sgm.ClearAndReset();
-				}
-			}
+			/*	dump	*/
+				// public class ComplexTransaction: SlotSystemTransaction{
+					// 	List<InventoryItemInstanceMock> m_removed;
+					// 	List<InventoryItemInstanceMock> m_added;
+					// 	SlotGroup m_sg;
+					// 	SlotGroupManager m_sgm;
+					// 	public ComplexTransaction(List<InventoryItemInstanceMock> removedList, List<InventoryItemInstanceMock> addedList, SlotGroup sg){
+					// 		m_removed = removedList;
+					// 		m_added = addedList;
+					// 		m_sg = sg;
+					// 		m_sgm = sg.SGM;
+					// 	}
+					// 	public void Indicate(){}
+					// 	public void Execute(){
+							
+					// 		m_sgm.SetAndRunTransactionProcess(null, null, null, m_sg);
+							
+					// 		m_sg.SetAndRunSlotMovements(m_removed, m_added);
+					// 		m_sg.SetState(SlotGroup.PerformingTransactionState);
+					// 	}
+					// 	public void OnComplete(){
+					// 		m_sg.OnCompleteSlotMovements();
+					// 		m_sgm.ClearAndReset();
+					// 	}
+					// }
+				// public class UnequipTransaction: SlotSystemTransaction{
+					// 	Slottable pickedSB;
+					// 	SlotGroup selectedSG;
+					// 	SlotGroup origSG;
+					// 	SlotGroupManager sgm;
+					// 	public UnequipTransaction(Slottable picked, SlotGroup selSG){
+					// 		this.pickedSB = picked;
+					// 		this.selectedSG = selSG;
+					// 		this.sgm = picked.SGM;
+					// 		this.origSG = sgm.GetSlotGroup(picked);
+					// 	}
+					// 	public void Indicate(){}
+					// 	public void Execute(){
+
+					// 		sgm.SetAndRunTransactionProcess(pickedSB, null, origSG, selectedSG);
+
+					// 		origSG.TransactionUpdateV2(null, pickedSB);
+					// 		selectedSG.TransactionUpdateV2(pickedSB, null);
+
+					// 		Slot slot = selectedSG.GetSlot(selectedSG.GetSlottable((InventoryItemInstanceMock)pickedSB.Item));
+					// 		pickedSB.MoveDraggedIcon(selectedSG, slot);
+					// 		pickedSB.SetState(Slottable.MovingState);
+					// 	}
+					// 	public void OnComplete(){
+					// 		sgm.DestroyDraggedIcon();
+					// 		sgm.DestroyRemovedSB();
+					// 		/*	TransactionUpdate HIDES (not removes) the pickedSB the moment the transaction is 	executed (only dragged icon persists)
+					// 			performing the equip state update checks all the equipped sbs in pool to see if there's matching sb in one of equip egs, unequip if there's none
+					// 		*/
+					// 		sgm.UpdateEquipStatus();
+					// 		sgm.ClearAndReset();
+					// 	}
+					// }
+				//
 		/*	commands
 		*/
 			public interface SGMCommand{
 				void Execute(SlotGroupManager sgm);
 			}
-			public class UpdateTransactionCommand: SGMCommand{
-				
+			public class UpdateTransactionCommand: SGMCommand{			
 				public void Execute(SlotGroupManager sgm){
 					Slottable pickedSB = sgm.PickedSB;
 					Slottable selectedSB = sgm.SelectedSB;
@@ -388,8 +389,10 @@ namespace SlotSystem{
 								}else{// different SGs
 									if(pickedSB.Item == selectedSB.Item){
 										if(pickedSB.IsEquipped){
-											UnequipTransaction unequipTs = new UnequipTransaction(pickedSB, sgm.GetSlotGroup(selectedSB));
-											sgm.SetTransaction(unequipTs);
+											// UnequipTransaction unequipTs = new UnequipTransaction(pickedSB, sgm.GetSlotGroup(selectedSB));
+											// sgm.SetTransaction(unequipTs);
+											FillEquipTransaction ta = new FillEquipTransaction(pickedSB, selectedSB.SG);
+											sgm.SetTransaction(ta);
 										}else{
 											StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
 											sgm.SetTransaction(stackTs);
@@ -404,8 +407,7 @@ namespace SlotSystem{
 					}
 				}
 			}
-			/*	use this */
-			public class PostPickFilterV3Command: SGMCommand{
+			public class PostPickFilterCommand: SGMCommand{
 				public void Execute(SlotGroupManager sgm){
 					Slottable pickedSb = sgm.PickedSB;
 					SlotGroup origSG = sgm.SelectedSG;
@@ -531,94 +533,94 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public class PostPickFilterCommand: SGMCommand{
-				public void Execute(SlotGroupManager sgm){
-					if(sgm.PickedSB != null){
-						
-						if(sgm.PickedSB.Item is BowInstanceMock){
-							foreach(SlotGroup sg in sgm.SlotGroups){
-								if(sg.CurState != SlotGroup.SelectedState){
-									if(sg.CurState == SlotGroup.FocusedState){
-										if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGBowFilter))
-											sg.SetState(SlotGroup.DefocusedState);
-									}
-								}
-							}
-						}else if(sgm.PickedSB.Item is WearInstanceMock){
-							foreach(SlotGroup sg in sgm.SlotGroups){
-								if(sg.CurState != SlotGroup.SelectedState){
-									if(sg.CurState == SlotGroup.FocusedState){
-										if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGWearFilter))
-											sg.SetState(SlotGroup.DefocusedState);
-									}
-								}
-							}
-						}else if(sgm.PickedSB.Item is PartsInstanceMock){
-							foreach(SlotGroup sg in sgm.SlotGroups){
-								if(sg.CurState != SlotGroup.SelectedState){
-									if(sg.CurState == SlotGroup.FocusedState){
-										if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGPartsFilter))
-											sg.SetState(SlotGroup.DefocusedState);
-									}
-								}
-							}
-						}
-						foreach(SlotGroup sg in sgm.SlotGroups){
-							if(sg.CurState == SlotGroup.FocusedState || sg.CurState == SlotGroup.SelectedState){
-								// if(sg.Filter is SGNullFilter)
-									// sg.UpdateSbState();
-							}
+			/*	dump	*/
+					// public class PostPickFilterCommand: SGMCommand{
+				// 	public void Execute(SlotGroupManager sgm){
+				// 		if(sgm.PickedSB != null){
+							
+				// 			if(sgm.PickedSB.Item is BowInstanceMock){
+				// 				foreach(SlotGroup sg in sgm.SlotGroups){
+				// 					if(sg.CurState != SlotGroup.SelectedState){
+				// 						if(sg.CurState == SlotGroup.FocusedState){
+				// 							if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGBowFilter))
+				// 								sg.SetState(SlotGroup.DefocusedState);
+				// 						}
+				// 					}
+				// 				}
+				// 			}else if(sgm.PickedSB.Item is WearInstanceMock){
+				// 				foreach(SlotGroup sg in sgm.SlotGroups){
+				// 					if(sg.CurState != SlotGroup.SelectedState){
+				// 						if(sg.CurState == SlotGroup.FocusedState){
+				// 							if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGWearFilter))
+				// 								sg.SetState(SlotGroup.DefocusedState);
+				// 						}
+				// 					}
+				// 				}
+				// 			}else if(sgm.PickedSB.Item is PartsInstanceMock){
+				// 				foreach(SlotGroup sg in sgm.SlotGroups){
+				// 					if(sg.CurState != SlotGroup.SelectedState){
+				// 						if(sg.CurState == SlotGroup.FocusedState){
+				// 							if(!(sg.Filter is SGNullFilter) && !(sg.Filter is SGPartsFilter))
+				// 								sg.SetState(SlotGroup.DefocusedState);
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 			foreach(SlotGroup sg in sgm.SlotGroups){
+				// 				if(sg.CurState == SlotGroup.FocusedState || sg.CurState == SlotGroup.SelectedState){
+				// 					// if(sg.Filter is SGNullFilter)
+				// 						// sg.UpdateSbState();
+				// 				}
 
-						}
-					}
-				}
-			}
-			
-			public class PostPickFilterV2Command: SGMCommand{
-				public void Execute(SlotGroupManager sgm){
-					Slottable pickedSb = sgm.PickedSB;
-					SlotGroup origSG = sgm.SelectedSG;
-					SlotSystemBundle poolBundle = sgm.RootPage.PoolBundle;
-					SlotSystemBundle equipBundle = sgm.RootPage.EquipBundle;
+				// 			}
+				// 		}
+				// 	}
+				// }
+				
+				// public class PostPickFilterV2Command: SGMCommand{
+				// 	public void Execute(SlotGroupManager sgm){
+				// 		Slottable pickedSb = sgm.PickedSB;
+				// 		SlotGroup origSG = sgm.SelectedSG;
+				// 		SlotSystemBundle poolBundle = sgm.RootPage.PoolBundle;
+				// 		SlotSystemBundle equipBundle = sgm.RootPage.EquipBundle;
 
-					if(poolBundle.ContainsElement(origSG)){
-						foreach(Slot slot in origSG.Slots){
-							if(slot.Sb != null && slot.Sb != pickedSb){
-								if(origSG.IsAutoSort){
-									if(slot.Sb.IsEquipped)
-										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-									else
-										slot.Sb.SetState(Slottable.DefocusedState);
-								}else{
-									if(slot.Sb.IsEquipped)
-										slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-									else
-										slot.Sb.SetState(Slottable.FocusedState);
-								}
-							}
-						}
-					}else{
-						foreach(SlotSystemElement ele in equipBundle.Elements){
-							EquipmentSet equipSet = (EquipmentSet)ele;
-							if(equipSet.ContainsElement(origSG)){
-								foreach(SlotSystemElement nestedEle in equipSet.Elements){
-									SlotGroup sg = (SlotGroup)nestedEle;
-									if(sg != origSG){
-										if(sg.AcceptsFilter(pickedSb)){
-											sg.SetState(SlotGroup.FocusedState);
-											sg.Slots[0].Sb.SetState(Slottable.EquippedAndDeselectedState);
-										}else{
-											sg.SetState(SlotGroup.DefocusedState);
-											sg.Slots[0].Sb.SetState(Slottable.EquippedAndDefocusedState);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			
+				// 		if(poolBundle.ContainsElement(origSG)){
+				// 			foreach(Slot slot in origSG.Slots){
+				// 				if(slot.Sb != null && slot.Sb != pickedSb){
+				// 					if(origSG.IsAutoSort){
+				// 						if(slot.Sb.IsEquipped)
+				// 							slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 						else
+				// 							slot.Sb.SetState(Slottable.DefocusedState);
+				// 					}else{
+				// 						if(slot.Sb.IsEquipped)
+				// 							slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 						else
+				// 							slot.Sb.SetState(Slottable.FocusedState);
+				// 					}
+				// 				}
+				// 			}
+				// 		}else{
+				// 			foreach(SlotSystemElement ele in equipBundle.Elements){
+				// 				EquipmentSet equipSet = (EquipmentSet)ele;
+				// 				if(equipSet.ContainsElement(origSG)){
+				// 					foreach(SlotSystemElement nestedEle in equipSet.Elements){
+				// 						SlotGroup sg = (SlotGroup)nestedEle;
+				// 						if(sg != origSG){
+				// 							if(sg.AcceptsFilter(pickedSb)){
+				// 								sg.SetState(SlotGroup.FocusedState);
+				// 								sg.Slots[0].Sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 							}else{
+				// 								sg.SetState(SlotGroup.DefocusedState);
+				// 								sg.Slots[0].Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 							}
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// }
 		/*	process
 		*/
 			public interface SGMProcess{
@@ -676,7 +678,30 @@ namespace SlotSystem{
 					base.Expire();
 				}
 			}
-			// public class SGMRevertTransactionProcess: AbsSGMProcess{
+			public class SGMTransactionProcess: AbsSGMProcess{
+				Slottable m_pickedSB;
+				Slottable m_selectedSB;
+				SlotGroup m_origSG;
+				SlotGroup m_selectedSG;
+				public SGMTransactionProcess(SlotGroupManager sgm ,Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
+					this.m_pickedSB = pickedSB;
+					this.m_selectedSB = selectedSB;
+					this.m_origSG = origSG;
+					this.m_selectedSG = selectedSG;
+					this.SGM = sgm;
+					this.CoroutineMock = SGM.WaitForTransactionDone;
+				}
+				public override void Start(){
+					SGM.SetTransactionFields(m_pickedSB, m_selectedSB, m_origSG, m_selectedSG);
+					base.Start();
+				}
+				public override void Expire(){
+					base.Expire();
+					SGM.CompleteAllTransaction();
+				}
+			}
+			/*	dump	*/
+				// public class SGMRevertTransactionProcess: AbsSGMProcess{
 				// 	public SGMRevertTransactionProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
 				// 		this.SGM = sgm;
 				// 		this.CoroutineMock = coroutineMock;
@@ -813,28 +838,7 @@ namespace SlotSystem{
 				// 		SGM.CompleteAllTransaction();
 				// 	}
 				// }
-			public class SGMTransactionProcess: AbsSGMProcess{
-				Slottable m_pickedSB;
-				Slottable m_selectedSB;
-				SlotGroup m_origSG;
-				SlotGroup m_selectedSG;
-				public SGMTransactionProcess(SlotGroupManager sgm ,Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
-					this.m_pickedSB = pickedSB;
-					this.m_selectedSB = selectedSB;
-					this.m_origSG = origSG;
-					this.m_selectedSG = selectedSG;
-					this.SGM = sgm;
-					this.CoroutineMock = SGM.WaitForTransactionDone;
-				}
-				public override void Start(){
-					SGM.SetTransactionFields(m_pickedSB, m_selectedSB, m_origSG, m_selectedSG);
-					base.Start();
-				}
-				public override void Expire(){
-					base.Expire();
-					SGM.CompleteAllTransaction();
-				}
-			}
+			/**/
 		/*	state
 		*/
 			public interface SGMState{
