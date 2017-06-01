@@ -7,16 +7,13 @@ using System;
 namespace SlotSystem{
 	public class SlotSystemClasses{
 	}
-		/*	test classes
-		*/
+		/*	test classes	*/
 			public class IEnumeratorMock{}
 			public class PointerEventDataMock{
 				public GameObject pointerDrag;
 			}
-	/*	SGM classes
-	*/
-		/*	transaction
-		*/
+	/*	SGM classes	*/
+		/*	transaction	*/
 			public interface SlotSystemTransaction{
 				void Indicate();
 				void Execute();
@@ -31,7 +28,7 @@ namespace SlotSystem{
 				}
 				public void Indicate(){}
 				public void Execute(){
-					sgm.SetAndRunTransactionProcess(pickedSB, null, null, null);
+					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, null, null);
 					
 					SlotGroup sg = sgm.GetSlotGroup(pickedSB);
 					Slot slot = sg.GetSlot(pickedSB);
@@ -62,7 +59,7 @@ namespace SlotSystem{
 				public void Indicate(){}
 				public void Execute(){
 					
-					sgm.SetAndRunTransactionProcess(pickedSB, null, null, sg);
+					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, null, sg);
 					sg.SetAndRunSlotMovementsForReorder(pickedSB, selectedSB);
 					sg.SetState(SlotGroup.PerformingTransactionState);
 
@@ -117,7 +114,7 @@ namespace SlotSystem{
 				}
 				public void Execute(){
 					
-					sgm.SetAndRunTransactionProcess(pickedSB, selectedSB, origSG.IsPool?null: origSG, selectedSG.IsPool?null: selectedSG);
+					sgm.SetTransactionProcessAndSwitchState(pickedSB, selectedSB, origSG.IsPool?null: origSG, selectedSG.IsPool?null: selectedSG);
 					
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotmovementsForSwap(pickedSB, selectedSB);
@@ -180,13 +177,13 @@ namespace SlotSystem{
 					*/
 					
 
-					origSG.TransactionUpdate(null/*added*/, pickedSB/*removed*/);
-					selectedSG.TransactionUpdate(pickedSB, null);
+					// origSG.TransactionUpdate(null/*added*/, pickedSB/*removed*/);
+					// selectedSG.TransactionUpdate(pickedSB, null);
 					/*	perform focusing of scroller if something is to be added
 						perform Inventory update, sorting ,filtering and updating slots and sbs, and moving of all the elements it contains
 					*/
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
-					sgm.SetAndRunTransactionProcess(pickedSB, null, origSG, selectedSG);
+					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, origSG, selectedSG);
 				}
 				public void OnComplete(){
 					sgm.DestroyDraggedIcon();
@@ -210,7 +207,7 @@ namespace SlotSystem{
 				}
 				public void Indicate(){}
 				public void Execute(){
-					sgm.SetAndRunTransactionProcess(pickedSB, null, origSG.IsPool? null: origSG, selectedSG.IsPool? null: selectedSG);
+					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, origSG.IsPool? null: origSG, selectedSG.IsPool? null: selectedSG);
 
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotMovements(moved, null);
@@ -257,7 +254,7 @@ namespace SlotSystem{
 				}
 				public void Indicate(){}
 				public void Execute(){
-					sgm.SetAndRunTransactionProcess(null, null, null, m_sg);
+					sgm.SetTransactionProcessAndSwitchState(null, null, null, m_sg);
 					// m_sg.TransactionUpdateV2(null, null);
 					// m_sg.SetAndRunSlotMovements(null, null);
 					m_sg.SetAndRunSlotMovementsForSort();
@@ -328,8 +325,7 @@ namespace SlotSystem{
 					// 	}
 					// }
 				//
-		/*	commands
-		*/
+		/*	commands	*/
 			public interface SGMCommand{
 				void Execute(SlotGroupManager sgm);
 			}
@@ -621,8 +617,7 @@ namespace SlotSystem{
 				// 		}
 				// 	}
 				// }
-		/*	process
-		*/
+		/*	process	*/
 			public interface SGMProcess{
 				bool IsRunning{get;}
 				bool IsExpired{get;}
@@ -652,6 +647,7 @@ namespace SlotSystem{
 					//call StartCoroutine(m_coroutine);
 					m_isRunning = true;
 					m_isExpired = false;
+					SGM.RunningProcess.Add(this);
 					m_coroutineMock();
 				}
 				public void Stop(){
@@ -659,18 +655,20 @@ namespace SlotSystem{
 					if(m_isRunning){
 						m_isRunning = false;
 						m_isExpired = false;
+						SGM.RunningProcess.Remove(this);
 					}
 				}
 				public virtual void Expire(){
 					if(m_isRunning){
 						m_isRunning = false;
 						m_isExpired = true;
+						SGM.RunningProcess.Remove(this);
 					}
 				}
 				
 			}
-			public class SGMProbingStateProcess: AbsSGMProcess{
-				public SGMProbingStateProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
+			public class SGMProbeProcess: AbsSGMProcess{
+				public SGMProbeProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
 					this.SGM = sgm;
 					this.CoroutineMock = coroutineMock;
 				}
@@ -839,28 +837,29 @@ namespace SlotSystem{
 				// 	}
 				// }
 			/**/
-		/*	state
-		*/
+		/*	state	*/
 			public interface SGMState{
 				void EnterState(SlotGroupManager sgm);	
 				void ExitState(SlotGroupManager sgm);	
 			}
 			public class SGMDeactivatedState: SGMState{
 				public void EnterState(SlotGroupManager sgm){
-					sgm.SetAndRun(null);
+					sgm.StopAllProcess();
 				}
 				public void ExitState(SlotGroupManager sgm){}
 			}
 			public class SGMDefocusedState: SGMState{
 				public void EnterState(SlotGroupManager sgm){
-					sgm.SetAndRun(null);
+					// sgm.SetAndRun(null);
+					sgm.StopAllProcess();
 					sgm.RootPage.Defocus();
 				}
 				public void ExitState(SlotGroupManager sgm){}
 			}
 			public class SGMFocusedState: SGMState{
 				public void EnterState(SlotGroupManager sgm){
-					sgm.SetAndRun(null);
+					// sgm.SetAndRun(null);
+					sgm.StopAllProcess();
 					sgm.RootPage.Focus();
 				}
 				public void ExitState(SlotGroupManager sgm){}
@@ -868,22 +867,22 @@ namespace SlotSystem{
 			}
 			public class SGMProbingState: SGMState{
 				public void EnterState(SlotGroupManager sgm){
-					SGMProcess probingStateProcess = new SGMProbingStateProcess(sgm, sgm.ProbingStateCoroutine);
-					sgm.SetAndRun(probingStateProcess);
+					SGMProcess probeProcess = new SGMProbeProcess(sgm, sgm.ProbeCoroutine);
+					sgm.SetAndRunStateProcess(probeProcess);
 				}
 				public void ExitState(SlotGroupManager sgm){
 				}
 			}
 			public class SGMPerformingTransactionState: SGMState{
 				public void EnterState(SlotGroupManager sgm){
+					SGMProcess process = sgm.CachedProcess;
+					sgm.SetAndRunStateProcess(process);
 				}
 				public void ExitState(SlotGroupManager sgm){
 				}
 			}
-	/*	SlotGroup Classes
-	*/
-		/*	states
-		*/
+	/*	SlotGroup Classes	*/
+		/*	states	*/
 			public interface SlotGroupState{
 				void EnterState(SlotGroup sg);
 				void ExitState(SlotGroup sg);
@@ -894,7 +893,7 @@ namespace SlotSystem{
 			}
 			public class SGDeactivatedState : SlotGroupState{
 				public void EnterState(SlotGroup sg){
-					sg.SetAndRun(null);
+					sg.SetAndRunLookProcess(null);
 				}
 				public void ExitState(SlotGroup sg){
 				}
@@ -915,62 +914,68 @@ namespace SlotSystem{
 				public void EnterState(SlotGroup sg){
 					SGProcess process = null;
 
-					if(sg.PrevState == SlotGroup.DeactivatedState)
-						process = new SGInstantGreyoutProcess(sg, sg.InstantGreyoutCoroutine);
+					if(sg.PrevState == SlotGroup.DeactivatedState){
+						process = null;
+						sg.InstantGreyout();
+					}
 					else if(sg.PrevState == SlotGroup.FocusedState)
 						process = new SGGreyoutProcess(sg, sg.GreyoutCoroutine);
 					else if(sg.PrevState == SlotGroup.SelectedState)
 						process = new SGDehighlightProcess(sg, sg.DehighlightCoroutine);
 					if(process != null)
-						sg.SetAndRun(process);
+						sg.SetAndRunLookProcess(process);
 
 				}
-				public void ExitState(SlotGroup sg){}
-				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
-				}
-				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
-				}
-				public void Focus(SlotGroup sg){
-					sg.SetState(SlotGroup.FocusedState);
-					sg.FocusSBs();
-				}
-				public void Defocus(SlotGroup sg){
-					sg.SetState(SlotGroup.DefocusedState);
-					sg.DefocusSBs();
-				}
+				/**/
+					public void ExitState(SlotGroup sg){}
+					public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
+					}
+					public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+					}
+					public void Focus(SlotGroup sg){
+						sg.SetState(SlotGroup.FocusedState);
+						sg.FocusSBs();
+					}
+					public void Defocus(SlotGroup sg){
+						sg.SetState(SlotGroup.DefocusedState);
+						sg.DefocusSBs();
+					}
 			}
 			public class SGFocusedState: SlotGroupState{
 				public void EnterState(SlotGroup sg){
 					SGProcess process = null;
-					if(sg.PrevState == SlotGroup.DeactivatedState)
-						process = new SGInstantGreyinProcess(sg, sg.InstantGreyinCoroutine);
+					if(sg.PrevState == SlotGroup.DeactivatedState){
+						process = null;
+						sg.InstantGreyin();
+					}
 					else if(sg.PrevState == SlotGroup.DefocusedState)
 						process = new SGGreyinProcess(sg, sg.GreyinCoroutine);
 					else if(sg.PrevState == SlotGroup.SelectedState)
 						process = new SGDehighlightProcess(sg, sg.DehighlightCoroutine);
 					else if(sg.PrevState == SlotGroup.PerformingTransactionState){
 						process = null;
-						sg.SetAndRun(process);
+						sg.SetAndRunLookProcess(process);
 					}
 					if(process != null)
-						sg.SetAndRun(process);
+						sg.SetAndRunLookProcess(process);
 				}
-				public void ExitState(SlotGroup sg){}
-				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
-					sg.SGM.SetSelectedSG(sg);
-					sg.SetState(SlotGroup.SelectedState);
-				}
-				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
-					
-				}
-				public void Focus(SlotGroup sg){
-					sg.SetState(SlotGroup.FocusedState);
-					sg.FocusSBs();
-				}
-				public void Defocus(SlotGroup sg){
-					sg.SetState(SlotGroup.DefocusedState);
-					sg.DefocusSBs();
-				}
+				/**/
+					public void ExitState(SlotGroup sg){}
+					public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
+						sg.SGM.SetSelectedSG(sg);
+						sg.SetState(SlotGroup.SelectedState);
+					}
+					public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+						
+					}
+					public void Focus(SlotGroup sg){
+						sg.SetState(SlotGroup.FocusedState);
+						sg.FocusSBs();
+					}
+					public void Defocus(SlotGroup sg){
+						sg.SetState(SlotGroup.DefocusedState);
+						sg.DefocusSBs();
+					}
 			}
 			public class SGSelectedState: SlotGroupState{
 				public void EnterState(SlotGroup sg){
@@ -978,7 +983,7 @@ namespace SlotSystem{
 					if(sg.PrevState == SlotGroup.FocusedState)
 						process = new SGHighlightProcess(sg, sg.HighlightCoroutine);
 					if(process != null)
-						sg.SetAndRun(process);
+						sg.SetAndRunLookProcess(process);
 				}
 				public void ExitState(SlotGroup sg){}
 				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
@@ -1002,7 +1007,7 @@ namespace SlotSystem{
 					
 					// sg.SetAndRun(process);
 					SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
-					sg.SetAndRun(process);
+					sg.SetAndRunLookProcess(process);
 				}
 				public void ExitState(SlotGroup sg){}
 				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
@@ -1015,44 +1020,44 @@ namespace SlotSystem{
 				public void Defocus(SlotGroup sg){
 				}
 			}
-			public class SGSortingState: SlotGroupState{
-				public void EnterState(SlotGroup sg){
-					SGProcess process = new SGSortingProcess(sg, sg.WaitForAllSlotMovementsDone);
-					sg.SetAndRun(process);
-					/*	implement SlotMovements creation and stuff in the process
-					*/
-				}
-				public void ExitState(SlotGroup sg){}
-				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
-				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
-				}
-				public void Focus(SlotGroup sg){
-					sg.SetState(SlotGroup.FocusedState);
-					sg.FocusSBs();
-					// sg.SetState(prevState);
-				}
-				public void Defocus(SlotGroup sg){
-				}
-			}
-			public class SGComplexTransactionState: SlotGroupState{
-				public void EnterState(SlotGroup sg){
-					SGProcess process = new SGSortingProcess(sg, sg.WaitForAllSlotMovementsDone);
-					sg.SetAndRun(process);
-				}
-				public void ExitState(SlotGroup sg){}
-				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
-				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
-				}
-				public void Focus(SlotGroup sg){
-					sg.SetState(SlotGroup.FocusedState);
-					sg.FocusSBs();
-					// sg.SetState(prevState);
-				}
-				public void Defocus(SlotGroup sg){
-				}
-			}
-		/*	process
-		*/
+			/*	dump	*/
+				// public class SGSortingState: SlotGroupState{
+				// 	public void EnterState(SlotGroup sg){
+				// 		SGProcess process = new SGSortingProcess(sg, sg.WaitForAllSlotMovementsDone);
+				// 		sg.SetAndRun(process);
+				// 		/*	implement SlotMovements creation and stuff in the process
+				// 		*/
+				// 	}
+				// 	public void ExitState(SlotGroup sg){}
+				// 	public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
+				// 	public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+				// 	}
+				// 	public void Focus(SlotGroup sg){
+				// 		sg.SetState(SlotGroup.FocusedState);
+				// 		sg.FocusSBs();
+				// 		// sg.SetState(prevState);
+				// 	}
+				// 	public void Defocus(SlotGroup sg){
+				// 	}
+				// }
+				// public class SGComplexTransactionState: SlotGroupState{
+				// 	public void EnterState(SlotGroup sg){
+				// 		SGProcess process = new SGSortingProcess(sg, sg.WaitForAllSlotMovementsDone);
+				// 		sg.SetAndRun(process);
+				// 	}
+				// 	public void ExitState(SlotGroup sg){}
+				// 	public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
+				// 	public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+				// 	}
+				// 	public void Focus(SlotGroup sg){
+				// 		sg.SetState(SlotGroup.FocusedState);
+				// 		sg.FocusSBs();
+				// 		// sg.SetState(prevState);
+				// 	}
+				// 	public void Defocus(SlotGroup sg){
+				// 	}
+				// }
+		/*	process	*/
 			public interface SGProcess{
 				bool IsRunning{get;}
 				bool IsExpired{get;}
@@ -1081,40 +1086,26 @@ namespace SlotSystem{
 				public virtual void Start(){
 					m_isRunning = true;
 					m_isExpired = false;
+					SG.RunningProcess.Add(this);
 					m_coroutineMock();
 				}
 				public virtual void Stop(){
 					if(m_isRunning){
 						m_isRunning = false;
 						m_isExpired = false;
+						SG.RunningProcess.Remove(this);
 					}
 				}
 				public virtual void Expire(){
 					if(m_isRunning){
 						m_isRunning = false;
 						m_isExpired = true;
+						SG.RunningProcess.Remove(this);
 					}
 				}
 				public void Check(){
 					m_coroutineMock();
 				}
-			}
-			public class SGFocusedProcess: AbsSGProcess{
-				public SGFocusedProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
-					this.SG = sg;
-					this.CoroutineMock = coroutineMock;
-				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-					}
 			}
 			public class SGGreyinProcess: AbsSGProcess{
 				public SGGreyinProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
@@ -1184,8 +1175,42 @@ namespace SlotSystem{
 						base.Expire();
 					}
 			}
-			public class SGInstantGreyoutProcess: AbsSGProcess{
-				public SGInstantGreyoutProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+			// public class SGInstantGreyoutProcess: AbsSGProcess{
+			// 	public SGInstantGreyoutProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+			// 		this.SG = sg;
+			// 		this.CoroutineMock = coroutineMock;
+			// 	}
+			// 	/*	overridden functions
+			// 	*/
+			// 		public override void Start(){
+			// 			base.Start();
+			// 		}
+			// 		public override void Stop(){
+			// 			base.Stop();
+			// 		}
+			// 		public override void Expire(){
+			// 			base.Expire();
+			// 		}
+			// }
+			// public class SGInstantGreyinProcess: AbsSGProcess{
+			// 	public SGInstantGreyinProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+			// 		this.SG = sg;
+			// 		this.CoroutineMock = coroutineMock;
+			// 	}
+			// 	/*	overridden functions
+			// 	*/
+			// 		public override void Start(){
+			// 			base.Start();
+			// 		}
+			// 		public override void Stop(){
+			// 			base.Stop();
+			// 		}
+			// 		public override void Expire(){
+			// 			base.Expire();
+			// 		}
+			// }
+			public class SGTransactionProcess: AbsSGProcess{
+				public SGTransactionProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
 					this.SG = sg;
 					this.CoroutineMock = coroutineMock;
 				}
@@ -1199,23 +1224,7 @@ namespace SlotSystem{
 					}
 					public override void Expire(){
 						base.Expire();
-					}
-			}
-			public class SGInstantGreyinProcess: AbsSGProcess{
-				public SGInstantGreyinProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
-					this.SG = sg;
-					this.CoroutineMock = coroutineMock;
-				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
+						SG.SGM.CompleteTransactionOnSG(SG);
 					}
 			}
 			public class SlotMovement{
@@ -1255,204 +1264,87 @@ namespace SlotSystem{
 
 				}
 			}
-			public class SGUpdateTransactionProcess: AbsSGProcess{
-				public SGUpdateTransactionProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
-					this.SG = sg;
-					this.CoroutineMock = coroutineMock;
-				}
-				
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-						
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-						SG.SGM.CompleteTransactionOnSG(SG);
-					}
-			}
-			public class SGSortingProcess: AbsSGProcess{
-				public SGSortingProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
-					this.SG = sg;
-					this.CoroutineMock = coroutineMock;
-				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						// base.Start();
-						/*	implement SlotMovements here
-								Create SlotMovement instance for every slottables
-									1. Get current Slot index
-									2. Sort SG
-									3. Get new Slot index
-									4. pass 1, 3, and the slottable into it
-									5. and execute it
-									6. store each SlotMovement into sg's slotMovements list
-						*/
-						List<Slottable> newSlotOrderList = SG.OrderedSbs();
-						for(int i = 0; i < SG.Slots.Count; i++){
-							if(SG.Slots[i].Sb != null){
-								Slottable sb = SG.Slots[i].Sb;
-								int curSlotID = sb.SlotID;
-								int newSlotID = newSlotOrderList.IndexOf(sb);
-								SlotMovement slotMovement = new SlotMovement(SG, sb, curSlotID, newSlotID);
-								// slotMovement.Execute();
-							}
-						}
-						SG.ExecuteSlotMovements();
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						SG.InstantSort();
-						base.Expire();
-						SG.SGM.CompleteTransactionOnSG(SG);
-					}
-			}
-			public class SGTransactionProcess: AbsSGProcess{
-				public SGTransactionProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
-					this.SG = sg;
-					this.CoroutineMock = coroutineMock;
-				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-						SG.SGM.CompleteTransactionOnSG(SG);
-					}
-			}
-
-		/*	commands
-		*/
+			/*	dump	*/
+				// public class SGUpdateTransactionProcess: AbsSGProcess{
+				// 	public SGUpdateTransactionProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+				// 		this.SG = sg;
+				// 		this.CoroutineMock = coroutineMock;
+				// 	}
+					
+				// 	/*	overridden functions
+				// 	*/
+				// 		public override void Start(){
+				// 			base.Start();
+							
+				// 		}
+				// 		public override void Stop(){
+				// 			base.Stop();
+				// 		}
+				// 		public override void Expire(){
+				// 			base.Expire();
+				// 			SG.SGM.CompleteTransactionOnSG(SG);
+				// 		}
+				// }
+				// public class SGSortingProcess: AbsSGProcess{
+				// 	public SGSortingProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+				// 		this.SG = sg;
+				// 		this.CoroutineMock = coroutineMock;
+				// 	}
+				// 	/*	overridden functions
+				// 	*/
+				// 		public override void Start(){
+				// 			// base.Start();
+				// 			/*	implement SlotMovements here
+				// 					Create SlotMovement instance for every slottables
+				// 						1. Get current Slot index
+				// 						2. Sort SG
+				// 						3. Get new Slot index
+				// 						4. pass 1, 3, and the slottable into it
+				// 						5. and execute it
+				// 						6. store each SlotMovement into sg's slotMovements list
+				// 			*/
+				// 			List<Slottable> newSlotOrderList = SG.OrderedSbs();
+				// 			for(int i = 0; i < SG.Slots.Count; i++){
+				// 				if(SG.Slots[i].Sb != null){
+				// 					Slottable sb = SG.Slots[i].Sb;
+				// 					int curSlotID = sb.SlotID;
+				// 					int newSlotID = newSlotOrderList.IndexOf(sb);
+				// 					SlotMovement slotMovement = new SlotMovement(SG, sb, curSlotID, newSlotID);
+				// 					// slotMovement.Execute();
+				// 				}
+				// 			}
+				// 			SG.ExecuteSlotMovements();
+				// 			base.Start();
+				// 		}
+				// 		public override void Stop(){
+				// 			base.Stop();
+				// 		}
+				// 		public override void Expire(){
+				// 			SG.InstantSort();
+				// 			base.Expire();
+				// 			SG.SGM.CompleteTransactionOnSG(SG);
+				// 		}
+				// }
+				// public class SGFocusedProcess: AbsSGProcess{
+				// 	public SGFocusedProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+				// 		this.SG = sg;
+				// 		this.CoroutineMock = coroutineMock;
+				// 	}
+				// 	/*	overridden functions
+				// 	*/
+				// 		public override void Start(){
+				// 			base.Start();
+				// 		}
+				// 		public override void Stop(){
+				// 			base.Stop();
+				// 		}
+				// 		public override void Expire(){
+				// 			base.Expire();
+				// 		}
+				// }
+		/*	commands	*/
 			public interface SlotGroupCommand{
 				void Execute(SlotGroup Sg);
-			}
-
-			public class SGWakeupCommand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					if(sg.Scroller == null){
-						sg.SetState(SlotGroup.FocusedState);
-					}else{
-						if(sg == sg.SGM.InitiallyFocusedSG)
-							sg.Focus();
-					}
-					// sg.UpdateSbState();
-				}
-			}
-			public class UpdateSbStateCommand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					SlotGroupManager sgm = sg.SGM;
-					if(sg.CurState == SlotGroup.DefocusedState){
-						foreach(Slot slot in sg.Slots){
-							if(slot.Sb != null){
-								InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
-								if(invItem.IsEquipped){
-									slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-								}else
-									slot.Sb.SetState(Slottable.DefocusedState);
-							}
-						}
-					}else if(sg.CurState == SlotGroup.FocusedState){
-						foreach(Slot slot in sg.Slots){
-							if(slot.Sb != null){
-								if(slot.Sb != sgm.PickedSB){
-
-									InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
-									if(invItem.IsEquipped){
-										if(sgm.PickedSB == null)
-											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-										else if(slot.Sb.Item is BowInstanceMock){
-											if(sgm.PickedSB.Item is BowInstanceMock){
-												if(object.ReferenceEquals(sgm.PickedSB.Item, slot.Sb.Item))
-													slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-												else
-													slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-											}
-											else
-												slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-										}else if(slot.Sb.Item is WearInstanceMock){
-											if(sgm.PickedSB.Item is WearInstanceMock)
-												if(object.ReferenceEquals(sgm.PickedSB.Item, slot.Sb.Item))
-													slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-												else
-													slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-											else
-												slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-										}else
-											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-									}
-									else{
-										if(!(sg.Filter is SGPartsFilter) && (invItem is PartsInstanceMock))
-											slot.Sb.SetState(Slottable.DefocusedState);
-										else{
-											if(sgm.PickedSB == null)
-												slot.Sb.SetState(Slottable.FocusedState);
-											else{
-												if(invItem is BowInstanceMock){
-													if(sgm.PickedSB.Item is BowInstanceMock)
-														slot.Sb.SetState(Slottable.FocusedState);
-													else
-														slot.Sb.SetState(Slottable.DefocusedState);
-												}else if(invItem is WearInstanceMock){
-													if(sgm.PickedSB.Item is WearInstanceMock)
-														slot.Sb.SetState(Slottable.FocusedState);
-													else
-														slot.Sb.SetState(Slottable.DefocusedState);
-												}else if(invItem is PartsInstanceMock){
-													if(sgm.PickedSB.Item is PartsInstanceMock)
-														slot.Sb.SetState(Slottable.FocusedState);
-													else
-														slot.Sb.SetState(Slottable.DefocusedState);
-												}else{
-													slot.Sb.SetState(Slottable.DefocusedState);
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}else if(sg.CurState == SlotGroup.SelectedState){
-						//pickedSB != null;
-						foreach(Slot slot in sg.Slots){
-							if(slot.Sb != null){
-								if(sgm.PickedSB != slot.Sb){
-									BowInstanceMock equippedBow = sgm.GetEquippedBow();
-									WearInstanceMock equippedWear = sgm.GetEquippedWear();
-									if(sg.IsAutoSort){
-										if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
-											slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
-										else
-											slot.Sb.SetState(Slottable.DefocusedState);
-									}else{
-										if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
-											slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
-										else
-											slot.Sb.SetState(Slottable.FocusedState);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			public class UpdateSbStateCommandV2: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					/*	call Focus on all sbs?
-					*/
-				}
 			}
 			public class SGInitItemsCommand: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
@@ -1491,48 +1383,6 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public class UpdateEquipStatusForPoolCommmand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					foreach(Slot slot in sg.Slots){
-						if(slot.Sb != null){
-							if(slot.Sb.IsEquipped){
-								if(slot.Sb.Item is BowInstanceMock){
-									BowInstanceMock equippedBow = sg.SGM.GetEquippedBow();
-									if(equippedBow != (BowInstanceMock)slot.Sb.Item)
-										slot.Sb.Unequip();
-								}else if(slot.Sb.Item is WearInstanceMock){
-									WearInstanceMock equippedWear = sg.SGM.GetEquippedWear();
-									if(equippedWear != (WearInstanceMock)slot.Sb.Item)
-										slot.Sb.Unequip();
-								}else if(slot.Sb.Item is CarriedGearInstanceMock){
-									List<CarriedGearInstanceMock> cGears = sg.SGM.GetEquippedCarriedGears();
-									if(cGears.Count == 0)
-										slot.Sb.Unequip();
-									else{
-										bool found = false;
-										foreach(CarriedGearInstanceMock cGear in cGears){
-											if(cGear == (CarriedGearInstanceMock)slot.Sb.Item)
-												found = true;
-										}
-										if(!found)
-											slot.Sb.Unequip();
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			public class UpdateEquipStatusForEquipSGCommand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					foreach(Slot slot in sg.Slots){
-						if(slot.Sb != null){
-							InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
-							invItem.IsEquipped = true;
-						}
-					}
-				}
-			}
 			public class SGFocusCommandV2: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
 					sg.CurState.Focus(sg);
@@ -1543,9 +1393,164 @@ namespace SlotSystem{
 					sg.CurState.Defocus(sg);
 				}
 			}
-			
-		/*	filters
-		*/
+			/*	dump	*/
+				// public class SGWakeupCommand: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		if(sg.Scroller == null){
+				// 			sg.SetState(SlotGroup.FocusedState);
+				// 		}else{
+				// 			if(sg == sg.SGM.InitiallyFocusedSG)
+				// 				sg.Focus();
+				// 		}
+				// 		// sg.UpdateSbState();
+				// 	}
+				// }
+				// public class UpdateEquipStatusForPoolCommmand: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		foreach(Slot slot in sg.Slots){
+				// 			if(slot.Sb != null){
+				// 				if(slot.Sb.IsEquipped){
+				// 					if(slot.Sb.Item is BowInstanceMock){
+				// 						BowInstanceMock equippedBow = sg.SGM.GetEquippedBow();
+				// 						if(equippedBow != (BowInstanceMock)slot.Sb.Item)
+				// 							slot.Sb.Unequip();
+				// 					}else if(slot.Sb.Item is WearInstanceMock){
+				// 						WearInstanceMock equippedWear = sg.SGM.GetEquippedWear();
+				// 						if(equippedWear != (WearInstanceMock)slot.Sb.Item)
+				// 							slot.Sb.Unequip();
+				// 					}else if(slot.Sb.Item is CarriedGearInstanceMock){
+				// 						List<CarriedGearInstanceMock> cGears = sg.SGM.GetEquippedCarriedGears();
+				// 						if(cGears.Count == 0)
+				// 							slot.Sb.Unequip();
+				// 						else{
+				// 							bool found = false;
+				// 							foreach(CarriedGearInstanceMock cGear in cGears){
+				// 								if(cGear == (CarriedGearInstanceMock)slot.Sb.Item)
+				// 									found = true;
+				// 							}
+				// 							if(!found)
+				// 								slot.Sb.Unequip();
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// }
+				// public class UpdateEquipStatusForEquipSGCommand: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		foreach(Slot slot in sg.Slots){
+				// 			if(slot.Sb != null){
+				// 				InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
+				// 				invItem.IsEquipped = true;
+				// 			}
+				// 		}
+				// 	}
+				// }
+				// public class UpdateSbStateCommand: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		SlotGroupManager sgm = sg.SGM;
+				// 		if(sg.CurState == SlotGroup.DefocusedState){
+				// 			foreach(Slot slot in sg.Slots){
+				// 				if(slot.Sb != null){
+				// 					InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
+				// 					if(invItem.IsEquipped){
+				// 						slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 					}else
+				// 						slot.Sb.SetState(Slottable.DefocusedState);
+				// 				}
+				// 			}
+				// 		}else if(sg.CurState == SlotGroup.FocusedState){
+				// 			foreach(Slot slot in sg.Slots){
+				// 				if(slot.Sb != null){
+				// 					if(slot.Sb != sgm.PickedSB){
+
+				// 						InventoryItemInstanceMock invItem = (InventoryItemInstanceMock)slot.Sb.Item;
+				// 						if(invItem.IsEquipped){
+				// 							if(sgm.PickedSB == null)
+				// 								slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 							else if(slot.Sb.Item is BowInstanceMock){
+				// 								if(sgm.PickedSB.Item is BowInstanceMock){
+				// 									if(object.ReferenceEquals(sgm.PickedSB.Item, slot.Sb.Item))
+				// 										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 									else
+				// 										slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 								}
+				// 								else
+				// 									slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 							}else if(slot.Sb.Item is WearInstanceMock){
+				// 								if(sgm.PickedSB.Item is WearInstanceMock)
+				// 									if(object.ReferenceEquals(sgm.PickedSB.Item, slot.Sb.Item))
+				// 										slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 									else
+				// 										slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 								else
+				// 									slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 							}else
+				// 								slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 						}
+				// 						else{
+				// 							if(!(sg.Filter is SGPartsFilter) && (invItem is PartsInstanceMock))
+				// 								slot.Sb.SetState(Slottable.DefocusedState);
+				// 							else{
+				// 								if(sgm.PickedSB == null)
+				// 									slot.Sb.SetState(Slottable.FocusedState);
+				// 								else{
+				// 									if(invItem is BowInstanceMock){
+				// 										if(sgm.PickedSB.Item is BowInstanceMock)
+				// 											slot.Sb.SetState(Slottable.FocusedState);
+				// 										else
+				// 											slot.Sb.SetState(Slottable.DefocusedState);
+				// 									}else if(invItem is WearInstanceMock){
+				// 										if(sgm.PickedSB.Item is WearInstanceMock)
+				// 											slot.Sb.SetState(Slottable.FocusedState);
+				// 										else
+				// 											slot.Sb.SetState(Slottable.DefocusedState);
+				// 									}else if(invItem is PartsInstanceMock){
+				// 										if(sgm.PickedSB.Item is PartsInstanceMock)
+				// 											slot.Sb.SetState(Slottable.FocusedState);
+				// 										else
+				// 											slot.Sb.SetState(Slottable.DefocusedState);
+				// 									}else{
+				// 										slot.Sb.SetState(Slottable.DefocusedState);
+				// 									}
+				// 								}
+				// 							}
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}else if(sg.CurState == SlotGroup.SelectedState){
+				// 			//pickedSB != null;
+				// 			foreach(Slot slot in sg.Slots){
+				// 				if(slot.Sb != null){
+				// 					if(sgm.PickedSB != slot.Sb){
+				// 						BowInstanceMock equippedBow = sgm.GetEquippedBow();
+				// 						WearInstanceMock equippedWear = sgm.GetEquippedWear();
+				// 						if(sg.IsAutoSort){
+				// 							if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
+				// 								slot.Sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 							else
+				// 								slot.Sb.SetState(Slottable.DefocusedState);
+				// 						}else{
+				// 							if(object.ReferenceEquals(slot.Sb.Item, equippedBow) || (object.ReferenceEquals(slot.Sb.Item, equippedWear)))
+				// 								slot.Sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 							else
+				// 								slot.Sb.SetState(Slottable.FocusedState);
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// }
+				// public class UpdateSbStateCommandV2: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		/*	call Focus on all sbs?
+				// 		*/
+				// 	}
+				// }
+		/*	filters	*/
 			public interface SGFilter{
 				void Execute(SlotGroup sg);
 				List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList);
@@ -1636,31 +1641,12 @@ namespace SlotSystem{
 				}
 			}
 			
-		/*	sorters
-		*/
+		/*	sorters	*/
 			public interface SGSorter{
 				List<Slottable> OrderedSbs(SlotGroup sg);
 				void OrderSBs(ref List<Slottable> sbs);
 				void OrderSBsWOSpace(ref List<Slottable> sbs);
-			}
-			
-			/*	non-instant sorting and AutoSorting
-					SlotGroup manages its entire slottables movement in a corrdinated way
-					SlotGroup creates SlotMovement class for each slottable and executes its Move command
-					Each SlotMovement notifies SlotGroup its completion
-					SlotGroup keeps a tally of every SlotMovements's execution status
-					SlotGroup self invokes a CompleteAllMovements method upon completion of every movement's termination
-
-					SlotMovement's motion is independent of each slottable's state and processes
-					
-					SlotGroup's SGUpdateTransactionProcess expires within CompleteAllMovements method
-					NOT SlotGroup calls SGM's CompleteTransactionOnSG in its CompleteAllMovements method
-
-				Voluntary Sorting
-					SGM creates SortTransaction with the target SG (and only the target SG)
-					SortTransaction.Execute triggers the sorting
-			*/
-				
+			}	
 			public class　SGItemIDSorter: SGSorter{
 				public List<Slottable> OrderedSbs(SlotGroup sg){
 					
@@ -1795,10 +1781,8 @@ namespace SlotSystem{
 					sbs = temp2;
 				}
 			}
-	/*	Slottable Classses
-	*/
-		/*	process
-		*/
+	/*	Slottable Classses	*/
+		/*	process	*/
 			public interface SBProcess{
 				bool IsRunning{get;}
 				bool IsExpired{get;}
@@ -1869,8 +1853,7 @@ namespace SlotSystem{
 				public override void Expire(){
 					base.Expire();
 				}	
-			}
-			
+			}			
 			public class SBGreyinProcess: AbsSBProcess{
 				public SBGreyinProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 					this.SB = sb;
@@ -1964,24 +1947,6 @@ namespace SlotSystem{
 					base.Expire();
 				}
 			}
-			public class MoveProcess: AbsSBProcess{
-				public MoveProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
-					this.SB = sb;
-					this.CoroutineMock = coroutineMock;
-				}
-				public override void Expire(){
-					/*	destroy dragged icon
-						complete translation
-
-						make defocused non pool SGs focused
-						make selectedSG focused
-						then updateSBstates
-					*/
-					base.Expire();
-					SB.ClearDraggedIconDestination();
-					SB.SGM.CompleteTransactionOnSB(SB);
-				}
-			}
 			public class WaitForNextTouchWhilePUProcess: AbsSBProcess{
 				public WaitForNextTouchWhilePUProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 					this.SB = sb;
@@ -2025,41 +1990,8 @@ namespace SlotSystem{
 					SB.SetState(Slottable.FocusedState);
 				}
 			}
-			public class SBRemovingProcess: AbsSBProcess{
-				public SBRemovingProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
-					SB = sb;
-					CoroutineMock = coroutineMock;
-				}
-				public override void Expire(){
-					base.Expire();
-					SB.ClearDraggedIconDestination();
-					SB.SGM.CompleteTransactionOnSB(SB);
-				}
-			}
 			public class SBEquippingProcess: AbsSBProcess{
 				public SBEquippingProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
-					SB = sb;
-					CoroutineMock = coroutineMock;
-				}
-				public override void Expire(){
-					base.Expire();
-					SB.ClearDraggedIconDestination();
-					SB.SGM.CompleteTransactionOnSB(SB);
-				}
-			}
-			public class SBReorderingProcess: AbsSBProcess{
-				public SBReorderingProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
-					SB = sb;
-					CoroutineMock = coroutineMock;
-				}
-				public override void Expire(){
-					base.Expire();
-					SB.ClearDraggedIconDestination();
-					SB.SGM.CompleteTransactionOnSB(SB);
-				}
-			}
-			public class SBUnpickingProcess: AbsSBProcess{
-				public SBUnpickingProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 					SB = sb;
 					CoroutineMock = coroutineMock;
 				}
@@ -2132,9 +2064,59 @@ namespace SlotSystem{
 					SB.SGM.CompleteTransactionOnSB(SB);
 				}
 			}
-			
-		/*	states
-		*/
+			/*	dump	*/
+				// public class SBRemovingProcess: AbsSBProcess{
+				// 	public SBRemovingProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+				// 		SB = sb;
+				// 		CoroutineMock = coroutineMock;
+				// 	}
+				// 	public override void Expire(){
+				// 		base.Expire();
+				// 		SB.ClearDraggedIconDestination();
+				// 		SB.SGM.CompleteTransactionOnSB(SB);
+				// 	}
+				// }
+				// public class SBReorderingProcess: AbsSBProcess{
+				// 	public SBReorderingProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+				// 		SB = sb;
+				// 		CoroutineMock = coroutineMock;
+				// 	}
+				// 	public override void Expire(){
+				// 		base.Expire();
+				// 		SB.ClearDraggedIconDestination();
+				// 		SB.SGM.CompleteTransactionOnSB(SB);
+				// 	}
+				// }
+				// public class SBUnpickingProcess: AbsSBProcess{
+				// 	public SBUnpickingProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+				// 		SB = sb;
+				// 		CoroutineMock = coroutineMock;
+				// 	}
+				// 	public override void Expire(){
+				// 		base.Expire();
+				// 		SB.ClearDraggedIconDestination();
+				// 		SB.SGM.CompleteTransactionOnSB(SB);
+				// 	}
+				// }
+				// public class MoveProcess: AbsSBProcess{
+				// 	public MoveProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+				// 		this.SB = sb;
+				// 		this.CoroutineMock = coroutineMock;
+				// 	}
+				// 	public override void Expire(){
+				// 		/*	destroy dragged icon
+				// 			complete translation
+
+				// 			make defocused non pool SGs focused
+				// 			make selectedSG focused
+				// 			then updateSBstates
+				// 		*/
+				// 		base.Expire();
+				// 		SB.ClearDraggedIconDestination();
+				// 		SB.SGM.CompleteTransactionOnSB(SB);
+				// 	}
+				// }
+		/*	states	*/
 			public interface SlottableState{
 				void EnterState(Slottable sb);
 				void ExitState(Slottable sb);
@@ -2188,12 +2170,12 @@ namespace SlotSystem{
 						slottable.InstantGreyout();
 					}else if(slottable.PrevState == Slottable.EquippedAndDefocusedState){
 						process = new SBUnequipProcess(slottable, slottable.UnequipCoroutine);
-					}else if(slottable.PrevState == Slottable.MovingState){
+					}else if(slottable.PrevState == Slottable.MovingInSGState){
 						process = new SBUnpickProcess(slottable, slottable.UnpickCoroutine);
 					}else if(slottable.PrevState == Slottable.WaitForPointerUpState){
 						process = null;
 						slottable.SetAndRun(process);
-					}else if(slottable.PrevState == Slottable.MovingState){
+					}else if(slottable.PrevState == Slottable.MovingInSGState){
 						process = null;
 						slottable.SetAndRun(process);
 					}
@@ -2241,7 +2223,7 @@ namespace SlotSystem{
 						process = new SBUnequipAndDehighlightProcess(slottable, slottable.UnequipAndDehighlightCoroutine);
 					}else if(slottable.PrevState == Slottable.DeactivatedState){
 						slottable.InstantGreyin();
-					}else if(slottable.PrevState == Slottable.MovingState){
+					}else if(slottable.PrevState == Slottable.MovingInSGState){
 						// process = new SBUnpickProcess(slottable, slottable.UnpickCoroutine	
 						process = null;
 						slottable.SetAndRun(process);
@@ -2492,53 +2474,6 @@ namespace SlotSystem{
 				public void Defocus(Slottable sb){
 				}
 			}
-			public class MovingOutState: SlottableState{
-				public void EnterState(Slottable slottable){
-					MoveProcess moveProcess = new MoveProcess(slottable, slottable.MoveCoroutine);
-					slottable.SetAndRun(moveProcess);
-
-					SlotGroupManager sgm = slottable.SGM;
-					SlotGroup sg = sgm.GetSlotGroup(slottable);
-					if(sgm.Transaction.GetType() == typeof(ReorderTransaction)){
-						SBReorderingProcess process = new SBReorderingProcess(slottable, slottable.ReorderingCoroutine);
-						slottable.SetAndRun(process);
-					}else{
-						if(sgm.GetFocusedPoolSG() == sg){
-							/*	Create and Run Equipping Process	*/
-							SBEquippingProcess process = new SBEquippingProcess(slottable, slottable.EquippingCoroutine);
-							slottable.SetAndRun(process);
-						}else{
-							/*	Create and Run Removing Process	*/
-							SBRemovingProcess process = new SBRemovingProcess(slottable, slottable.RemovingCoroutine);
-							slottable.SetAndRun(process);
-						}
-					}
-				}
-				public void ExitState(Slottable Slottable){
-				}
-				public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
-				}
-				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void Focus(Slottable sb){
-					if(sb.IsEquipped)
-						sb.SetState(Slottable.EquippedAndDeselectedState);
-					else
-						sb.SetState(Slottable.FocusedState);
-				}
-				public void Defocus(Slottable sb){
-					if(sb.IsEquipped)
-						sb.SetState(Slottable.EquippedAndDefocusedState);
-					else
-						sb.SetState(Slottable.DefocusedState);
-				}
-			}
 			public class EquippedAndDeselectedState: SlottableState{
 				public void EnterState(Slottable slottable){
 					SBProcess process = null;
@@ -2552,7 +2487,7 @@ namespace SlotSystem{
 						process = new SBDehighlightProcess(slottable, slottable.DehighlightCoroutine);
 					}else if(slottable.PrevState == Slottable.DeactivatedState){
 						slottable.InstantEquipAndGreyin();
-					}else if(slottable.PrevState == Slottable.MovingState){
+					}else if(slottable.PrevState == Slottable.MovingInSGState){
 						process = null;
 						slottable.SetAndRun(process);
 					}
@@ -2634,10 +2569,10 @@ namespace SlotSystem{
 					}else if(slottable.PrevState == Slottable.WaitForPointerUpState){
 						process = null;
 						slottable.SetAndRun(process);
-					}else if(slottable.PrevState == Slottable.MovingState){
+					}else if(slottable.PrevState == Slottable.MovingInSGState){
 						process = null;
 						slottable.SetAndRun(process);
-					}else if(slottable.PrevState == Slottable.EquippingState){
+					}else if(slottable.PrevState == Slottable.MovingOutState){
 						process = null;
 						slottable.SetAndRun(process);
 					}
@@ -2695,75 +2630,6 @@ namespace SlotSystem{
 				public void Defocus(Slottable sb){
 				}
 			}
-			public class SBRemovingState: SlottableState{
-				public void EnterState(Slottable sb){
-					SBRemovingProcess process = new SBRemovingProcess(sb, sb.RemovingCoroutine);
-					sb.SetAndRun(process);
-					
-				}
-				public void ExitState(Slottable sb){}
-				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
-					if(sb.SGM.SelectedSB == sb)
-						sb.SGM.SetSelectedSB(null);
-					sb.SetState(Slottable.FocusedState);
-				}
-				public void Focus(Slottable sb){
-				}
-				public void Defocus(Slottable sb){
-				}
-			}
-			public class SBEquippingState: SlottableState{
-				public void EnterState(Slottable sb){
-					SBEquippingProcess process = new SBEquippingProcess(sb, sb.EquippingCoroutine);
-					sb.SetAndRun(process);
-					
-				}
-				public void ExitState(Slottable sb){}
-				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
-					if(sb.SGM.SelectedSB == sb)
-						sb.SGM.SetSelectedSB(null);
-					sb.SetState(Slottable.FocusedState);
-				}
-				public void Focus(Slottable sb){
-					if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDeselectedState);
-					else sb.SetState(Slottable.FocusedState);
-				}
-				public void Defocus(Slottable sb){
-					if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDefocusedState);
-					else sb.SetState(Slottable.DefocusedState);
-				}
-			}
-			public class SBUnpickingState: SlottableState{
-				public void EnterState(Slottable sb){
-					SBUnpickingProcess process = new SBUnpickingProcess(sb, sb.UnpickingCoroutine);
-					sb.SetAndRun(process);
-				}
-				public void ExitState(Slottable sb){}
-				public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
-				public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
-					if(sb.SGM.SelectedSB == sb)
-						sb.SGM.SetSelectedSB(null);
-					sb.SetState(Slottable.FocusedState);
-				}
-				public void Focus(Slottable sb){
-				}
-				public void Defocus(Slottable sb){
-				}
-			}
 			public class SBRemovedState: SlottableState{
 				public void EnterState(Slottable sb){
 					SBRemovedProcess process = new SBRemovedProcess(sb, sb.RemovedCoroutine);
@@ -2812,7 +2678,7 @@ namespace SlotSystem{
 			}
 			public class SBMovingInSGState: SlottableState{
 				public void EnterState(Slottable sb){
-					SBMovingInSGProcess process = new SBMovingInSGProcess(sb, sb.MovingInSGCoroutine);
+					SBMovingInSGProcess process = new SBMovingInSGProcess(sb, sb.MoveInSGCoroutine);
 					sb.SetAndRun(process);
 				}
 				/*	*/
@@ -2858,7 +2724,7 @@ namespace SlotSystem{
 			}
 			public class SBMovingOutState: SlottableState{
 				public void EnterState(Slottable sb){
-					SBMovingOutProcess process = new SBMovingOutProcess(sb, sb.MovingOutCoroutine);
+					SBMovingOutProcess process = new SBMovingOutProcess(sb, sb.MoveOutCoroutine);
 					sb.SetAndRun(process);
 				}
 				/*	*/
@@ -2881,7 +2747,7 @@ namespace SlotSystem{
 			}
 			public class SBMovingInState: SlottableState{
 				public void EnterState(Slottable sb){
-					SBMovingInProcess process = new SBMovingInProcess(sb, sb.MovingInCoroutine);
+					SBMovingInProcess process = new SBMovingInProcess(sb, sb.MoveInCoroutine);
 					sb.SetAndRun(process);
 				}
 				/*	*/
@@ -2902,26 +2768,139 @@ namespace SlotSystem{
 						else sb.SetState(Slottable.DefocusedState);
 					}
 			}
+			/*	dump	*/
+				// public class MovingOutState: SlottableState{
+				// 	public void EnterState(Slottable slottable){
+				// 		MoveProcess moveProcess = new MoveProcess(slottable, slottable.MoveCoroutine);
+				// 		slottable.SetAndRun(moveProcess);
 
-		/*	commands
-		*/
+				// 		SlotGroupManager sgm = slottable.SGM;
+				// 		SlotGroup sg = sgm.GetSlotGroup(slottable);
+				// 		if(sgm.Transaction.GetType() == typeof(ReorderTransaction)){
+				// 			SBReorderingProcess process = new SBReorderingProcess(slottable, slottable.ReorderingCoroutine);
+				// 			slottable.SetAndRun(process);
+				// 		}else{
+				// 			if(sgm.GetFocusedPoolSG() == sg){
+				// 				/*	Create and Run Equipping Process	*/
+				// 				SBEquippingProcess process = new SBEquippingProcess(slottable, slottable.EquippingCoroutine);
+				// 				slottable.SetAndRun(process);
+				// 			}else{
+				// 				/*	Create and Run Removing Process	*/
+				// 				SBRemovingProcess process = new SBRemovingProcess(slottable, slottable.RemovingCoroutine);
+				// 				slottable.SetAndRun(process);
+				// 			}
+				// 		}
+				// 	}
+				// 	public void ExitState(Slottable Slottable){
+				// 	}
+				// 	public void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){
+				// 	}
+				// 	public void OnPointerUpMock(Slottable slottable, PointerEventDataMock eventDataMock){
+				// 	}
+				// 	public void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){
+				// 	}
+				// 	public void OnEndDragMock(Slottable slottable, PointerEventDataMock eventDataMock){
+				// 	}
+				// 	public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void Focus(Slottable sb){
+				// 		if(sb.IsEquipped)
+				// 			sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 		else
+				// 			sb.SetState(Slottable.FocusedState);
+				// 	}
+				// 	public void Defocus(Slottable sb){
+				// 		if(sb.IsEquipped)
+				// 			sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 		else
+				// 			sb.SetState(Slottable.DefocusedState);
+				// 	}
+				// }
+				// public class SBRemovingState: SlottableState{
+				// 	public void EnterState(Slottable sb){
+				// 		SBRemovingProcess process = new SBRemovingProcess(sb, sb.RemovingCoroutine);
+				// 		sb.SetAndRun(process);
+						
+				// 	}
+				// 	public void ExitState(Slottable sb){}
+				// 	public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
+				// 		if(sb.SGM.SelectedSB == sb)
+				// 			sb.SGM.SetSelectedSB(null);
+				// 		sb.SetState(Slottable.FocusedState);
+				// 	}
+				// 	public void Focus(Slottable sb){
+				// 	}
+				// 	public void Defocus(Slottable sb){
+				// 	}
+				// }
+				// public class SBEquippingState: SlottableState{
+				// 	public void EnterState(Slottable sb){
+				// 		SBEquippingProcess process = new SBEquippingProcess(sb, sb.EquippingCoroutine);
+				// 		sb.SetAndRun(process);
+						
+				// 	}
+				// 	public void ExitState(Slottable sb){}
+				// 	public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
+				// 		if(sb.SGM.SelectedSB == sb)
+				// 			sb.SGM.SetSelectedSB(null);
+				// 		sb.SetState(Slottable.FocusedState);
+				// 	}
+				// 	public void Focus(Slottable sb){
+				// 		if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDeselectedState);
+				// 		else sb.SetState(Slottable.FocusedState);
+				// 	}
+				// 	public void Defocus(Slottable sb){
+				// 		if(sb.IsEquipped) sb.SetState(Slottable.EquippedAndDefocusedState);
+				// 		else sb.SetState(Slottable.DefocusedState);
+				// 	}
+				// }
+				// public class SBUnpickingState: SlottableState{
+				// 	public void EnterState(Slottable sb){
+				// 		SBUnpickingProcess process = new SBUnpickingProcess(sb, sb.UnpickingCoroutine);
+				// 		sb.SetAndRun(process);
+				// 	}
+				// 	public void ExitState(Slottable sb){}
+				// 	public void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){}
+				// 	public void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
+				// 		if(sb.SGM.SelectedSB == sb)
+				// 			sb.SGM.SetSelectedSB(null);
+				// 		sb.SetState(Slottable.FocusedState);
+				// 	}
+				// 	public void Focus(Slottable sb){
+				// 	}
+				// 	public void Defocus(Slottable sb){
+				// 	}
+				// }
+		/*	commands	*/
 			public interface SlottableCommand{
 				void Execute(Slottable sb);
-			}
-			public class DefInstantDeactivateCommand: SlottableCommand{
-				public void Execute(Slottable sb){
-				}
 			}
 			public class SBTapCommand: SlottableCommand{
 				public void Execute(Slottable sb){
 
 				}
 			}
-		
-	/*	Other Classes
-		*/
-			/*	Inventory Item
-			*/
+			/*	dump	*/
+				// public class DefInstantDeactivateCommand: SlottableCommand{
+				// 	public void Execute(Slottable sb){
+				// 	}
+				// }
+	/*	Other Classes	*/
+			/*	Inventory Item	*/
 				public interface SlottableItem: IEquatable<SlottableItem>, IComparable<SlottableItem>, IComparable{
 
 					int Quantity{get;}
@@ -3003,7 +2982,6 @@ namespace SlotSystem{
 					}
 				}
 				public class InventoryItemMock: IEquatable<InventoryItemMock>, IComparable, IComparable<InventoryItemMock>{
-					
 					bool m_isStackable;
 					public bool IsStackable{
 						get{return m_isStackable;}
@@ -3054,8 +3032,7 @@ namespace SlotSystem{
 						return a.CompareTo(b) < 0;
 					}
 				}
-			/*	Inventories
-			*/
+			/*	Inventories	*/
 				public interface Inventory{
 					List<SlottableItem> Items{get;}
 					void AddItem(SlottableItem item);
@@ -3187,8 +3164,7 @@ namespace SlotSystem{
 					set{m_position = value;}
 				}
 			}
-			/*	mock items
-			*/
+			/*	mock items	*/
 				public class BowMock: InventoryItemMock{
 					public BowMock(){
 						IsStackable = false;
@@ -3229,8 +3205,7 @@ namespace SlotSystem{
 					}
 				}
 				
-			/*	mock instances
-			*/
+			/*	mock instances	*/
 				public class BowInstanceMock: InventoryItemInstanceMock{
 					public BowInstanceMock(){
 						this.Quantity = 1;
@@ -3268,8 +3243,7 @@ namespace SlotSystem{
 
 				}
 
-			/*
-			*/
+			/*	*/
 				public interface SlotSystemElement{
 					void Activate();
 					void Deactivate();
@@ -3430,8 +3404,7 @@ namespace SlotSystem{
 				}
 				
 				
-	/*	utility
-	*/	
+	/*	utility	*/
 		public static class Utility{
 			public static bool HaveCommonItemFamily(Slottable sb, Slottable other){
 				if(sb.Item is BowInstanceMock)
