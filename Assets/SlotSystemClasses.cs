@@ -363,7 +363,7 @@ namespace SlotSystem{
 								}else{
 									EquipmentSet focusedEquipSet = (EquipmentSet)sgm.RootPage.EquipBundle.GetFocusedBundleElement();
 									if(focusedEquipSet.ContainsElement(selectedSG)){
-										if(selectedSG.Filter is SGCarriedGearFilter){
+										if(selectedSG.Filter is SGCGearsFilter){
 											FillEquipTransaction fillEquipTs = new FillEquipTransaction(pickedSB, selectedSG);
 											sgm.SetTransaction(fillEquipTs);
 										}else{
@@ -430,7 +430,7 @@ namespace SlotSystem{
 						foreach(SlotSystemElement ele in focusedEquipmentSet.Elements){
 							SlotGroup sg = (SlotGroup)ele;
 							if(sg.AcceptsFilter(pickedSb)){
-								if(sg.Filter is SGCarriedGearFilter && sg.GetNextEmptySlot()==null)
+								if(sg.Filter is SGCGearsFilter && sg.GetNextEmptySlot()==null)
 									sg.SetState(SlotGroup.DefocusedState);
 								else
 									sg.SetState(SlotGroup.FocusedState);
@@ -453,7 +453,7 @@ namespace SlotSystem{
 						if(focSGP.AcceptsFilter(pickedSb)){
 							foreach(Slottable sbp in focSGP.Slottables){
 								if(sbp != null){
-									if(Utility.HaveCommonItemFamily(sbp, pickedSb)){
+									if(Util.HaveCommonItemFamily(sbp, pickedSb)){
 										if(object.ReferenceEquals(sbp.Item, pickedSb.Item)){
 											if(origSG.IsShrinkable)// unequip
 												sbp.Focus();
@@ -1580,7 +1580,7 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public class SGCarriedGearFilter: SGFilter{
+			public class SGCGearsFilter: SGFilter{
 				public void Execute(SlotGroup sg){
 					List<SlottableItem> filteredItems = new List<SlottableItem>();
 					foreach(SlottableItem item in sg.Inventory.Items){
@@ -3378,7 +3378,7 @@ namespace SlotSystem{
 				
 				
 	/*	utility	*/
-		public static class Utility{
+		public static class Util{
 			public static bool HaveCommonItemFamily(Slottable sb, Slottable other){
 				if(sb.Item is BowInstanceMock)
 					return (other.Item is BowInstanceMock);
@@ -3391,6 +3391,87 @@ namespace SlotSystem{
 				else
 					return false;
 			}
+			public static string SGName(SlotGroup sg){
+				string result = "";
+				if(sg.IsPool){
+					if(sg.Filter is SGNullFilter)
+						result = "sgpAll";
+					else if(sg.Filter is SGBowFilter)
+						result = "sgpBow";
+					else if(sg.Filter is SGWearFilter)
+						result = "sgpWear";
+					else if(sg.Filter is SGCGearsFilter)
+						result = "sgpCGears";
+					else if(sg.Filter is SGPartsFilter)
+						result = "sgpParts";
+				}else if(sg.IsSGE){
+					if(sg.Filter is SGBowFilter)
+						result = "sgBow";
+					else if(sg.Filter is SGWearFilter)
+						result = "sgWear";
+					else if(sg.Filter is SGCGearsFilter)
+						result = "sgCGears";
+				}
+				return result;
+			}
+			public static string SBName(Slottable sb){
+				string result = "";
+				switch(sb.ItemInst.Item.ItemID){
+					case 0:	result = "defBow"; break;
+					case 1:	result = "crfBow"; break;
+					case 2:	result = "frgBow"; break;
+					case 3:	result = "mstBow"; break;
+					case 100: result = "defWear"; break;
+					case 101: result = "crfWear"; break;
+					case 102: result = "frgWear"; break;
+					case 103: result = "mstWear"; break;
+					case 200: result = "defShield"; break;
+					case 201: result = "crfShield"; break;
+					case 202: result = "frgShield"; break;
+					case 203: result = "mstShield"; break;
+					case 300: result = "defMWeapon"; break;
+					case 301: result = "crfMWeapon"; break;
+					case 302: result = "frgMWeapon"; break;
+					case 303: result = "mstMWeapon"; break;
+					case 400: result = "defQuiver"; break;
+					case 401: result = "crfQuiver"; break;
+					case 402: result = "frgQuiver"; break;
+					case 403: result = "mstQuiver"; break;
+					case 500: result = "defPack"; break;
+					case 501: result = "crfPack"; break;
+					case 502: result = "frgPack"; break;
+					case 503: result = "mstPack"; break;
+					case 600: result = "defParts"; break;
+					case 601: result = "crfParts"; break;
+					case 602: result = "frgParts"; break;
+					case 603: result = "mstParts"; break;
+				}
+				return result;
+			}
+			public static string Red(string str){
+				return "<color=#ff0000>" + str + "</color>";
+			}
+			public static string Blue(string str){
+				return "<color=#0000ff>" + str + "</color>";
 
+			}
+			public static string Green(string str){
+				return "<color=#00ff00>" + str + "</color>";
+
+			}
+			public static string Bold(string str){
+				return "<b>" + str + "</b>";
+			}
+			static string m_stacked;
+			public static string Stacked{
+				get{
+					string result = m_stacked;
+					m_stacked = "";
+					return result;
+				}
+			}
+			public static void Stack(string str){
+				m_stacked += str + ", ";
+			}
 		}
 }

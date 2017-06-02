@@ -332,17 +332,22 @@ namespace SlotSystem{
 				}
 			}
 			SlotGroup m_sg;
-			public SlotGroup SG{
-				get{
-					if(m_sg == null){
-						m_sg = SGM.GetSlotGroup(this);
+				public SlotGroup SG{
+					get{
+						if(m_sg == null){
+							m_sg = SGM.GetSlotGroup(this);
+						}
+						return m_sg;
 					}
-					return m_sg;
 				}
-			}
-			public void SetSG(SlotGroup sg){
-				/*	use this only when creating a new Sb in transaction	*/
-				m_sg = sg;
+				public void SetSG(SlotGroup sg){
+					/*	use this only when creating a new Sb in transaction	*/
+					m_sg = sg;
+				}
+			public bool IsPickable{
+				get{
+					return CurState == Slottable.FocusedState || CurState == Slottable.EquippedAndDeselectedState;
+				}
 			}
 		/*	processes	*/
 			SBProcess m_curProcess;

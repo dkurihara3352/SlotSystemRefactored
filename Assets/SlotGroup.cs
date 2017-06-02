@@ -193,17 +193,22 @@ namespace SlotSystem{
 				}
 			public bool IsPool{
 				get{
-					return SGM.RootPage.PoolBundle.ContainsElement(this);
+					return SGM.AllSGPs.Contains(this);
+				}
+			}
+			public bool IsSGE{
+				get{
+					return SGM.AllSGEs.Contains(this);
 				}
 			}
 			public bool IsAutoSort{
 				get{return m_autoSort;}
 			}
 				bool m_autoSort = true;
-			public void ToggleAutoSort(bool on){
-				m_autoSort = on;
-				SGM.Focus();
-			}
+				public void ToggleAutoSort(bool on){
+					m_autoSort = on;
+					SGM.Focus();
+				}
 			public List<Slottable> Slottables{
 				get{
 					List<Slottable> result = new List<Slottable>();
@@ -227,6 +232,9 @@ namespace SlotSystem{
 						}
 					return result;
 				}
+			}
+			public bool IsFocused{
+				get{return CurState == SlotGroup.FocusedState;}
 			}
 		/* commands	*/
 			SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
@@ -387,7 +395,7 @@ namespace SlotSystem{
 				public static SGFilter CGearsFilter{
 					get{
 						if(m_cGearsFilter == null)
-							m_cGearsFilter = new SGCarriedGearFilter();
+							m_cGearsFilter = new SGCGearsFilter();
 						return m_cGearsFilter;
 					}
 				}
@@ -538,7 +546,7 @@ namespace SlotSystem{
 					else if(pickedSB.Item is WearInstanceMock)
 						return this.Filter is SGWearFilter;
 					else if(pickedSB.Item is CarriedGearInstanceMock)
-						return this.Filter is SGCarriedGearFilter;
+						return this.Filter is SGCGearsFilter;
 					else// if(pickedSB.Item is PartsInstanceMock)
 						return this.Filter is SGPartsFilter;
 				}
@@ -762,6 +770,24 @@ namespace SlotSystem{
 			}
 			public void InstantGreyout(){}
 			public void InstantGreyin(){}
+			public bool IsFillEquippable(Slottable sb){
+				SlotGroup origSG = sb.SG;
+				if(this != origSG){
+					if(IsFocused){
+						if(AcceptsFilter(sb)){
+							if(IsExpandable){
+								return true;
+							}else{
+								foreach(Slot slot in Slots){
+									if(slot.Sb == null)
+										return true;
+								}
+							}
+						}
+					}
+				}
+				return false;
+			}
 		/*	dump	*/
 			// public void CheckTransactionCompletionOnSBs(){
 			// 	bool flag = true;

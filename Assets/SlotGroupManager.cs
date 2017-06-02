@@ -356,6 +356,15 @@ namespace SlotSystem{
 					return result;
 				}
 			}
+			public List<EquipmentSet> EquipmentSets{
+				get{
+					List<EquipmentSet> result = new List<EquipmentSet>();
+					foreach(SlotSystemElement ele in RootPage.EquipBundle.Elements){
+						result.Add((EquipmentSet)ele);
+					}
+					return result;
+				}
+			}
 			/*	dump	*/
 				// List<SlotGroup> m_slotGroups;
 				// public List<SlotGroup> SlotGroups{
@@ -422,7 +431,7 @@ namespace SlotSystem{
 				EquipmentSet equipSet = (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
 				foreach(SlotSystemElement ele in equipSet.Elements){
 					SlotGroup sg = (SlotGroup)ele;
-					if(sg.Filter is SGCarriedGearFilter){
+					if(sg.Filter is SGCGearsFilter){
 						foreach(Slot slot in sg.Slots){
 							if(slot.Sb != null)
 								result.Add((CarriedGearInstanceMock)slot.Sb.Item);
@@ -463,6 +472,14 @@ namespace SlotSystem{
 			public SlotGroup GetFocusedPoolSG(){
 				SlotSystemElement focusedEle = RootPage.PoolBundle.GetFocusedBundleElement();
 				return (SlotGroup)focusedEle;
+			}
+			public void SetFocusedEquipmentSet(EquipmentSet eSet){
+				RootPage.EquipBundle.SetFocusedBundleElement(eSet);
+				Focus();
+			}
+			public EquipmentSet GetFocusedEquipmetSet(){
+				SlotSystemElement focEle = RootPage.EquipBundle.GetFocusedBundleElement();
+				return (EquipmentSet)focEle;
 			}
 			public void DestroyDraggedIcon(){}
 			public void UpdateEquipStatus(){

@@ -399,11 +399,199 @@ public class SlottableTest {
 	public void TestAll(){	
 		// TestVolSortOnAll();
 		// TestRevertOnAllSBs();
-		TestReorderOnAll();
+		// TestReorderOnAll();
+		// TestFillEquipOnAll();
+		// TestFillEquippableOnAll();
+	}
+	public void TestFillEquippableOnAll(){
+		PerformOnAllSBs(TestFillEquippable);
+	}
+		public void TestFillEquippable(Slottable sb){
+			CrossTestingSGs(CrossTestFillEquippable, sb);
+		}
+		public void CrossTestFillEquippable(SlotGroup sg, Slottable sb){
+			SlotGroup origSG = sb.SG;
+			bool isFillEquippable = false;
+			if(sg != origSG){
+				if(sg.IsFocused){
+					if(sg.AcceptsFilter(sb)){
+						if(sg.IsExpandable){
+							isFillEquippable = true;
+							Debug.Log(Util.Bold(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Valid"));
+						}else{
+							bool emptyFound = false;
+							foreach(Slot slot in sg.Slots){
+								if(slot.Sb == null)
+									emptyFound = true;
+							}
+							if(emptyFound){
+								isFillEquippable = true;
+								Debug.Log(Util.Bold(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Valid"));
+							}else{
+								Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid : Not Expandable and No space"));
+							}
+						}
+					}else{
+						Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid: Filtered out"));
+					}
+				}else{
+					Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid : Not Focused"));
+				}
+			}else{
+				Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid : OrigSG"));
+			}
+			if(isFillEquippable)
+				AB(sg.IsFillEquippable(sb), true);
+			else
+				AB(sg.IsFillEquippable(sb), false);
+				
+		}
+	public void TestFillEquipOnAll(){
+		PerformOnAllSBs(TestFillEquip);
+	}
+		public void TestFillEquip(Slottable sb){
+			SlotGroup origSG = sb.SG;
+			if(origSG.IsPool){
+				foreach(EquipmentSet eSet in sgm.EquipmentSets){
+					sgm.SetFocusedEquipmentSet(eSet);
+					foreach(SlotSystemElement ele in sgm.GetFocusedEquipmetSet().Elements){
+						SlotGroup sge = (SlotGroup)ele;
+						if(sge.IsFillEquippable(sb)){
+							if(sb.IsPickable){
+								/*	on null sb	*/
+								PickUp(sb, out picked);
+								SimHover(null, sge, eventData);
+									AssertSGM(sgm,
+										SGMProbing,
+										SGMFocused,
+										typeof(FillEquipTransaction),
+										typeof(SGMProbeProcess),
+										sb,	null, sge,
+										true, true, true, true);
+									AssertSG(origSG,
+										SGFocused,
+										SGSelected,
+										1, typeof(SGDehighlightProcess), false);
+									AssertSG(sge,
+										SGSelected,
+										SGFocused,
+										1, typeof(SGHighlightProcess), false);
+								PointerUp();
+									AssertSGM(sgm,
+										SGMTransaction,
+										SGMProbing,
+										typeof(FillEquipTransaction),
+										typeof(SGMTransactionProcess),
+										sb, null, sge,
+										false, true, true, false);
+									AssertSG(origSG,
+										SGFocused,
+										SGSelected,
+										1, typeof(SGDehighlightProcess), false);
+									AssertSG(sge,
+										SGSelected,
+										SGFocused,
+										2, typeof(SGHighlightProcess), true);
+								sb.ExpireProcess();
+									AE(sgm.PickedSBDoneTransaction, true);
+								CompleteAllSBProcesses(sge);
+									AssertFocused();
+									AssertSGM(sgm,
+										SGMFocused,
+										SGMTransaction,
+										null,
+										null,
+										null, null, null,
+										false, true, true, false);
+									AssertSG(origSG,
+										SGFocused,
+										SGSelected,
+										1, typeof(SGDehighlightProcess), false);
+									AssertSG(sge,
+										SGFocused,
+										SGSelected,
+										1, typeof(SGDehighlightProcess), false);
+								/*	on inval sb	*/
+							}
+						}
+					}
+				}
+			}
+		}
+	public void ANull(object obj){
+		Assert.That(obj, Is.Null);
+	}
+	public void AssertSGM(SlotGroupManager sgm, SGMState curState, SGMState prevState, System.Type taType, System.Type sgmProcessType, Slottable pickedSB, Slottable selectedSB, SlotGroup selectedSG, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
+		ASSGM(sgm, curState);
+		AE(sgm.PrevState, prevState);
+		if(taType == null)
+			ANull(sgm.Transaction);
+		else
+			AE(sgm.Transaction.GetType(), taType);
+		if(sgmProcessType == null)
+			ANull(sgm.StateProcess);
+		else
+			AE(sgm.StateProcess.GetType(), sgmProcessType);
+		AE(sgm.PickedSB, pickedSB);
+		AE(sgm.SelectedSB, selectedSB);
+		AE(sgm.SelectedSG, selectedSG);
+		AE(sgm.PickedSBDoneTransaction, pSBDone);
+		AE(sgm.SelectedSBDoneTransaction, sSBDone);
+		AE(sgm.OrigSGDoneTransaction, oSGDone);
+		AE(sgm.SelectedSGDoneTransaction, sSGDone);
 	}
 	public void TestReorderOnAll(){
-		
+		PerformOnAllSBs(TestReorder);
 	}
+		public void TestReorder(Slottable sb){
+			SlotGroup origSG = sb.SG;
+			if(!origSG.IsAutoSort){
+				foreach(Slottable other in origSG.Slottables){
+					string stacked;
+					if(other != null){
+						stacked = Util.SBName(other);
+						if(!InvalidSBs(sb, origSG).Contains(other)){
+							if(sb.IsPickable){
+								PickUp(sb, out picked);
+								SimHover(other, origSG, eventData);
+									AT<ReorderTransaction>(false);
+								PointerUp();
+									ASSGM(sgm, SGMTransaction);
+									AP<SGMTransactionProcess>(sgm, false);
+									AT<ReorderTransaction>(false);
+									AE(sgm.PickedSB, sb);
+									AE(sgm.SelectedSB, other);
+									AE(sgm.SelectedSG, origSG);
+									AE(sgm.PickedSBDoneTransaction, false);
+									AE(sgm.SelectedSBDoneTransaction, true);
+									AE(sgm.OrigSGDoneTransaction, true);
+									AE(sgm.SelectedSGDoneTransaction, false);
+									AssertSG(origSG, SGSelected, SGFocused, 2, typeof(SGHighlightProcess), true);
+								sb.ExpireProcess();
+								CompleteAllSBProcesses(origSG);
+									AssertFocused();
+									AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+							}
+						}else{
+							stacked = Util.Red(stacked);
+						}
+					}else{
+						stacked = Util.Red("null");
+					}
+					Util.Stack(stacked);
+				}
+			}
+			string origSGstr = Util.SGName(origSG);
+			if(origSG.IsAutoSort)
+				origSGstr = Util.Red(origSGstr);
+			string pickedStr = Util.SBName(sb);
+			string stackStr = Util.Stacked;
+			if(!sb.IsPickable){
+				pickedStr = Util.Red(pickedStr);
+				stackStr = "";
+			}
+			// Debug.Log(Utility.Bold("SG: ") + origSGstr + Utility.Bold(", Picked: ") + pickedStr + Utility.Bold(", hovered: ") + stackStr);
+		}
 	public void TestRevertOnAllSBs(){
 		PerformOnAllSBs(TestRevert);
 	}
@@ -427,7 +615,7 @@ public class SlottableTest {
 		}
 	}
 	public void TestVolSortOnAll(){
-		SetFocusedAndPerformOnSG(TestVolSort);
+		PerformOnAllSGAfterFocusing(TestVolSort);
 	}
 	public void AssertSBsSorted(SlotGroup sg, SGSorter sorter){
 		List<Slottable> sbs = sg.Slottables;
@@ -454,22 +642,25 @@ public class SlottableTest {
 				}
 			}
 		}
-		foreach(SlotGroup sge in sgm.FocusedSGEs){
-			sge.ToggleAutoSort(true);
-			foreach(Slottable sb in sge.Slottables){
-				if(sb != null){
-					act(sb);
+		foreach(EquipmentSet eSet in sgm.EquipmentSets){
+			sgm.SetFocusedEquipmentSet(eSet);
+			foreach(SlotGroup sge in sgm.FocusedSGEs){
+				sge.ToggleAutoSort(true);
+				foreach(Slottable sb in sge.Slottables){
+					if(sb != null){
+						act(sb);
+					}
 				}
-			}
-			sge.ToggleAutoSort(false);
-			foreach(Slottable sb in sge.Slottables){
-				if(sb != null){
-					act(sb);
+				sge.ToggleAutoSort(false);
+				foreach(Slottable sb in sge.Slottables){
+					if(sb != null){
+						act(sb);
+					}
 				}
 			}
 		}
 	}
-	public void SetFocusedAndPerformOnSG(System.Action<SlotGroup> act){
+	public void PerformOnAllSGAfterFocusing(System.Action<SlotGroup> act){
 		foreach(SlotGroup sgp in sgm.AllSGPs){
 			sgm.SetFocusedPoolSG(sgp);
 			sgp.ToggleAutoSort(true);
@@ -477,11 +668,41 @@ public class SlottableTest {
 			sgp.ToggleAutoSort(false);
 			act(sgp);
 		}
-		foreach(SlotGroup sge in sgm.FocusedSGEs){
-			sge.ToggleAutoSort(true);
-			act(sge);
-			sge.ToggleAutoSort(false);
-			act(sge);
+		foreach(EquipmentSet eSet in sgm.EquipmentSets){
+			sgm.SetFocusedEquipmentSet(eSet);
+			foreach(SlotGroup sge in sgm.FocusedSGEs){
+				sge.ToggleAutoSort(true);
+				act(sge);
+				sge.ToggleAutoSort(false);
+				act(sge);
+			}
+		}
+	}
+	public void CrossTestingSGs(System.Action<SlotGroup, Slottable> act, Slottable sb){
+		if(sb.SG.IsPool){
+			foreach(EquipmentSet eSet in sgm.EquipmentSets){
+				sgm.SetFocusedEquipmentSet(eSet);
+				foreach(SlotGroup sge in sgm.FocusedSGEs){
+					sge.ToggleAutoSort(true);
+					act(sge, sb);
+					sge.ToggleAutoSort(false);
+					act(sge, sb);
+				}
+			}
+		}else if(sb.SG.IsSGE){
+			foreach(SlotGroup sgp in sgm.AllSGPs){
+				sgm.SetFocusedPoolSG(sgp);
+				sgp.ToggleAutoSort(true);
+				act(sgp, sb);
+				sgp.ToggleAutoSort(false);
+				act(sgp, sb);
+			}
+			foreach(SlotGroup sge in sgm.FocusedSGEs){
+				sge.ToggleAutoSort(true);
+				act(sge, sb);
+				sge.ToggleAutoSort(false);
+				act(sge, sb);
+			}
 		}
 	}
 	public void PerformOnAllSGs(System.Action<SlotGroup> act){
@@ -610,9 +831,6 @@ public class SlottableTest {
 				}
 		}
 	}
-	bool IsPickable(Slottable sb){
-		return sb.CurState == SBFocused || sb.CurState == SBEADeselected;
-	}
 	public void TestInvalidSBs(){
 		foreach(SlotSystemElement ele in sgm.RootPage.PoolBundle.Elements){
 			SlotGroup focPSG = (SlotGroup)ele;
@@ -620,7 +838,7 @@ public class SlottableTest {
 			focPSG.ToggleAutoSort(true);
 			foreach(Slottable sbInPSG in focPSG.Slottables){
 				if(sbInPSG != null){
-					if(IsPickable(sbInPSG)){
+					if(sbInPSG.IsPickable){
 						PickUp(sbInPSG, out picked);
 						foreach(Slottable invSB in InvalidSBs(sbInPSG, focPSG)){
 							bool flag = true;
@@ -651,7 +869,7 @@ public class SlottableTest {
 			focPSG.ToggleAutoSort(false);
 			foreach(Slottable sbInPSG in focPSG.Slottables){
 				if(sbInPSG != null){
-					if(IsPickable(sbInPSG)){
+					if(sbInPSG.IsPickable){
 						PickUp(sbInPSG, out picked);
 						foreach(Slottable invSB in InvalidSBs(sbInPSG, focPSG)){
 							bool flag = true;
@@ -685,7 +903,7 @@ public class SlottableTest {
 			eSG.ToggleAutoSort(true);
 			foreach(Slottable sbInESG in eSG.Slottables){
 				if(sbInESG != null){
-					if(IsPickable(sbInESG)){
+					if(sbInESG.IsPickable){
 						PickUp(sbInESG, out picked);
 						foreach(SlotSystemElement ele2 in sgm.GetFocusedEquipSet().Elements){
 							SlotGroup eSG2 = (SlotGroup)ele2;
@@ -707,7 +925,7 @@ public class SlottableTest {
 			eSG.ToggleAutoSort(false);
 			foreach(Slottable sbInESG in eSG.Slottables){
 				if(sbInESG != null){
-					if(IsPickable(sbInESG)){
+					if(sbInESG.IsPickable){
 						PickUp(sbInESG, out picked);
 						foreach(SlotSystemElement ele2 in sgm.GetFocusedEquipSet().Elements){
 							SlotGroup eSG2 = (SlotGroup)ele2;
@@ -735,7 +953,7 @@ public class SlottableTest {
 				eSG.ToggleAutoSort(true);
 				foreach(Slottable sbInESG in eSG.Slottables){
 					if(sbInESG != null){
-						if(IsPickable(sbInESG)){
+						if(sbInESG.IsPickable){
 							PickUp(sbInESG, out picked);
 							foreach(Slottable invSB in InvalidSBs(sbInESG, pSG)){
 								bool flag = true;
@@ -754,7 +972,7 @@ public class SlottableTest {
 				eSG.ToggleAutoSort(false);
 				foreach(Slottable sbInESG in eSG.Slottables){
 					if(sbInESG != null){
-						if(IsPickable(sbInESG)){
+						if(sbInESG.IsPickable){
 							PickUp(sbInESG, out picked);
 							foreach(Slottable invSB in InvalidSBs(sbInESG, pSG)){
 								bool flag = true;
@@ -797,7 +1015,7 @@ public class SlottableTest {
 						if(!targetSG.AcceptsFilter(sb))
 							result.Add(sb);
 						else{
-							if(!Utility.HaveCommonItemFamily(picked, sb)){
+							if(!Util.HaveCommonItemFamily(picked, sb)){
 								result.Add(sb);
 							}else{// either 1) sgpAll, 2) sgpSame, 3) sgeSame
 								if(origSG != targetSG){// 1) or 2)
@@ -872,6 +1090,12 @@ public class SlottableTest {
 	/*	SGM and SG states shortcut	*/
 		SGMState SGMTransaction{
 			get{return SlotGroupManager.PerformingTransactionState;}
+		}
+		SGMState SGMFocused{
+			get{return SlotGroupManager.FocusedState;}
+		}
+		SGMState SGMProbing{
+			get{return SlotGroupManager.ProbingState;}
 		}
 		SGState SGFocused{
 			get{return SlotGroup.FocusedState;}
