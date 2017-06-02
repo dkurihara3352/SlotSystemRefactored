@@ -5,63 +5,68 @@ using UnityEngine;
 namespace SlotSystem{
 	public class SlotGroup : MonoBehaviour, SlotSystemElement {
 		/*	states	*/
-			public void SetState(SlotGroupState state){
+			public void SetState(SGState state){
 				m_prevState = m_curState;
 				m_curState = state;
 				if(m_curState != m_prevState){
 					m_prevState.ExitState(this);
 					m_curState.EnterState(this);
+					m_changedPrevState = m_prevState;
 				}	
 			}	
-			SlotGroupState m_curState;
-				public SlotGroupState CurState{
+			SGState m_curState;
+				public SGState CurState{
 					get{
 						if(m_curState == null)
 							m_curState = SlotGroup.DeactivatedState;
 						return m_curState;}
 				}
-			SlotGroupState m_prevState;
-				public SlotGroupState PrevState{
+			SGState m_prevState;
+				public SGState PrevState{
 					get{
 						if(m_prevState == null)
 							m_prevState = SlotGroup.DeactivatedState;
 						return m_prevState;
 					}
 				}
-			private static SlotGroupState m_deactivatedState;
-				public static SlotGroupState DeactivatedState{
+			SGState m_changedPrevState;
+				public SGState ChangedPrevState{
+					get{return m_changedPrevState;}
+				}
+			private static SGState m_deactivatedState;
+				public static SGState DeactivatedState{
 					get{
 						if(SlotGroup.m_deactivatedState == null)
 							m_deactivatedState = new SGDeactivatedState();
 						return m_deactivatedState;
 					}
 				}
-			private static SlotGroupState m_defocusedState;
-				public static SlotGroupState DefocusedState{
+			private static SGState m_defocusedState;
+				public static SGState DefocusedState{
 					get{
 						if(SlotGroup.m_defocusedState == null)
 							m_defocusedState = new SGDefocusedState();
 						return m_defocusedState;
 					}
 				}
-			private static SlotGroupState m_focusedState;
-				public static SlotGroupState FocusedState{
+			private static SGState m_focusedState;
+				public static SGState FocusedState{
 					get{
 						if(SlotGroup.m_focusedState == null)
 							m_focusedState = new SGFocusedState();
 						return m_focusedState;
 					}
 				}
-			private static SlotGroupState m_selectedState;
-				public static SlotGroupState SelectedState{
+			private static SGState m_selectedState;
+				public static SGState SelectedState{
 					get{
 						if(m_selectedState == null)
 							m_selectedState = new SGSelectedState();
 						return m_selectedState;
 					}
 				}
-			private static SlotGroupState m_performingTransactionState;
-				public static SlotGroupState PerformingTransactionState{
+			private static SGState m_performingTransactionState;
+				public static SGState PerformingTransactionState{
 					get{
 						if(m_performingTransactionState == null)
 							m_performingTransactionState = new SGPerformingTransactionState();
@@ -128,7 +133,7 @@ namespace SlotSystem{
 					flag &= sm.SB.CurProcess.IsExpired;
 				}
 				if(flag){
-					StateProcess.Expire();
+					TransactionProcess.Expire();
 				}
 				return null;
 			}
@@ -198,6 +203,30 @@ namespace SlotSystem{
 			public void ToggleAutoSort(bool on){
 				m_autoSort = on;
 				SGM.Focus();
+			}
+			public List<Slottable> Slottables{
+				get{
+					List<Slottable> result = new List<Slottable>();
+						foreach(Slot slot in this.Slots){
+							if(slot.Sb != null)
+								result.Add(slot.Sb);
+							else
+								result.Add(null);
+						}
+					return result;
+				}
+			}
+			public List<InventoryItemInstanceMock> ItemInstances{
+				get{
+					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+						foreach(Slottable sb in Slottables){
+							if(sb != null)
+								result.Add(sb.ItemInst);
+							else
+								result.Add(null);
+						}
+					return result;
+				}
 			}
 		/* commands	*/
 			SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
@@ -315,7 +344,7 @@ namespace SlotSystem{
 				if(SGM.Transaction != null && SGM.Transaction.GetType()== typeof(ReorderTransaction)){
 					return ReorderedSBs;
 				}
-				return Sorter.OrderedSbs(this);
+				return Sorter.OrderedSBs(this);
 			}
 			public void InstantSort(){
 				List<Slottable> newSlotOrderedSbs = OrderedSbs();
@@ -682,31 +711,8 @@ namespace SlotSystem{
 				}
 			}
 			public void CheckProcessCompletion(){
-				StateProcess.Check();
-			}
-			public List<Slottable> Slottables{
-				get{
-					List<Slottable> result = new List<Slottable>();
-						foreach(Slot slot in this.Slots){
-							if(slot.Sb != null)
-								result.Add(slot.Sb);
-							else
-								result.Add(null);
-						}
-					return result;
-				}
-			}
-			public List<InventoryItemInstanceMock> ItemInstances{
-				get{
-					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
-						foreach(Slottable sb in Slottables){
-							if(sb != null)
-								result.Add(sb.ItemInst);
-							else
-								result.Add(null);
-						}
-					return result;
-				}
+				// StateProcess.Check();
+				TransactionProcess.Check();
 			}
 			public void OnCompleteSlotMovements(){
 				foreach(Slot slot in Slots){

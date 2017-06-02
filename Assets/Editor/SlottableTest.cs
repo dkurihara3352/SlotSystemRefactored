@@ -396,7 +396,533 @@ public class SlottableTest {
 		sgm.Focus();
 	}
 	[Test]
-	public void TestSGProcesses(){
+	public void TestAll(){	
+		// TestVolSortOnAll();
+		// TestRevertOnAllSBs();
+		TestReorderOnAll();
+	}
+	public void TestReorderOnAll(){
+		
+	}
+	public void TestRevertOnAllSBs(){
+		PerformOnAllSBs(TestRevert);
+	}
+	public void TestVolSort(SlotGroup sg){
+		if(!sg.IsAutoSort){
+			sgm.SortSG(sg, SlotGroup.InverseItemIDSorter);
+			if(sg.TransactionProcess.IsRunning)
+				CompleteAllSBProcesses(sg);
+				AssertFocused();
+				AssertSBsSorted(sg, SlotGroup.InverseItemIDSorter);
+			sgm.SortSG(sg, SlotGroup.AcquisitionOrderSorter);
+			if(sg.TransactionProcess.IsRunning)
+				CompleteAllSBProcesses(sg);
+				AssertFocused();
+				AssertSBsSorted(sg, SlotGroup.AcquisitionOrderSorter);
+			sgm.SortSG(sg, SlotGroup.ItemIDSorter);
+			if(sg.TransactionProcess.IsRunning)
+				CompleteAllSBProcesses(sg);
+				AssertFocused();
+				AssertSBsSorted(sg, SlotGroup.ItemIDSorter);
+		}
+	}
+	public void TestVolSortOnAll(){
+		SetFocusedAndPerformOnSG(TestVolSort);
+	}
+	public void AssertSBsSorted(SlotGroup sg, SGSorter sorter){
+		List<Slottable> sbs = sg.Slottables;
+		sorter.OrderSBs(ref sbs);
+		AE(sbs.Count, sg.Slottables.Count);
+		for(int i = 0; i < sg.Slottables.Count; i++){
+
+			AE(sg.Slottables[i], sbs[i]);
+		}
+	}
+	public void PerformOnAllSBs(System.Action<Slottable> act){
+		foreach(SlotGroup sgp in sgm.AllSGPs){
+			sgm.SetFocusedPoolSG(sgp);
+			sgp.ToggleAutoSort(true);
+			foreach(Slottable sb in sgp.Slottables){
+				if(sb != null){
+					act(sb);
+				}
+			}
+			sgp.ToggleAutoSort(false);
+			foreach(Slottable sb in sgp.Slottables){
+				if(sb != null){
+					act(sb);
+				}
+			}
+		}
+		foreach(SlotGroup sge in sgm.FocusedSGEs){
+			sge.ToggleAutoSort(true);
+			foreach(Slottable sb in sge.Slottables){
+				if(sb != null){
+					act(sb);
+				}
+			}
+			sge.ToggleAutoSort(false);
+			foreach(Slottable sb in sge.Slottables){
+				if(sb != null){
+					act(sb);
+				}
+			}
+		}
+	}
+	public void SetFocusedAndPerformOnSG(System.Action<SlotGroup> act){
+		foreach(SlotGroup sgp in sgm.AllSGPs){
+			sgm.SetFocusedPoolSG(sgp);
+			sgp.ToggleAutoSort(true);
+			act(sgp);
+			sgp.ToggleAutoSort(false);
+			act(sgp);
+		}
+		foreach(SlotGroup sge in sgm.FocusedSGEs){
+			sge.ToggleAutoSort(true);
+			act(sge);
+			sge.ToggleAutoSort(false);
+			act(sge);
+		}
+	}
+	public void PerformOnAllSGs(System.Action<SlotGroup> act){
+		foreach(SlotGroup sgp in sgm.AllSGs){
+			act(sgp);
+		}
+	}
+	public void TestRevert(Slottable sb){
+		if(sb.CurState == SBFocused || sb.CurState == SBEADeselected){
+			SlotGroup origSG = sb.SG;
+				AssertFocused();
+			/*	release on spot	*/
+				PickUp(sb, out picked);
+					AB(picked, true);
+					AT<RevertTransaction>(false);
+				LetGo();
+					ASSGM(sgm, SGMTransaction);
+					AP<SGMTransactionProcess>(sgm, false);
+					AT<RevertTransaction>(false);
+						AE(sgm.PickedSB, sb);
+						AE(sgm.SelectedSB, sb);
+						AE(sgm.SelectedSG, origSG);
+						AE(sgm.PickedSBDoneTransaction, false);
+						AE(sgm.SelectedSBDoneTransaction, true);
+						AE(sgm.OrigSGDoneTransaction, true);
+						AE(sgm.SelectedSGDoneTransaction, true);
+						AssertSG(origSG, SGSelected, SGFocused, 1, typeof(SGHighlightProcess), false);
+				sb.ExpireProcess();
+					AssertFocused();
+					AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+			/*	nullSB, origSG	*/
+				PickUp(sb, out picked);
+					AB(picked, true);
+					AT<RevertTransaction>(false);
+				SimHover(null, origSG, eventData);
+				LetGo();
+					ASSGM(sgm, SGMTransaction);
+					AP<SGMTransactionProcess>(sgm, false);
+					AT<RevertTransaction>(false);
+						AE(sgm.PickedSB, sb);
+						AE(sgm.SelectedSB, null);
+						AE(sgm.SelectedSG, origSG);
+						AE(sgm.PickedSBDoneTransaction, false);
+						AE(sgm.SelectedSBDoneTransaction, true);
+						AE(sgm.OrigSGDoneTransaction, true);
+						AE(sgm.SelectedSGDoneTransaction, true);
+						AssertSG(origSG, SGSelected, SGFocused, 1, typeof(SGHighlightProcess), false);
+				sb.ExpireProcess();
+					AssertFocused();
+					AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+			/*	nullSB, nullSG	*/
+				PickUp(sb, out picked);
+					AB(picked, true);
+					AT<RevertTransaction>(false);
+				SimHover(null, null, eventData);
+				LetGo();
+					ASSGM(sgm, SGMTransaction);
+					AP<SGMTransactionProcess>(sgm, false);
+					AT<RevertTransaction>(false);
+						AE(sgm.PickedSB, sb);
+						AE(sgm.SelectedSB, null);
+						AE(sgm.SelectedSG, null);
+						AE(sgm.PickedSBDoneTransaction, false);
+						AE(sgm.SelectedSBDoneTransaction, true);
+						AE(sgm.OrigSGDoneTransaction, true);
+						AE(sgm.SelectedSGDoneTransaction, true);
+						AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+				sb.ExpireProcess();
+					AssertFocused();
+					AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+			/*	invalidSB, origSG	*/
+				foreach(Slottable invalidSB in InvalidSBs(sb, origSG)){
+					PickUp(sb, out picked);
+						AB(picked, true);
+						AT<RevertTransaction>(false);
+					SimHover(invalidSB, origSG, eventData);
+					LetGo();
+						ASSGM(sgm, SGMTransaction);
+						AP<SGMTransactionProcess>(sgm, false);
+						AT<RevertTransaction>(false);
+							AE(sgm.PickedSB, sb);
+							if(sb == invalidSB)
+								AE(sgm.SelectedSB, sb);
+							else
+								AE(sgm.SelectedSB, null);
+							AE(sgm.SelectedSG, origSG);
+							AE(sgm.PickedSBDoneTransaction, false);
+							AE(sgm.SelectedSBDoneTransaction, true);
+							AE(sgm.OrigSGDoneTransaction, true);
+							AE(sgm.SelectedSGDoneTransaction, true);
+							AssertSG(origSG, SGSelected, SGFocused, 1, typeof(SGHighlightProcess), false);
+					sb.ExpireProcess();
+						AssertFocused();
+						AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+				}
+			/*	invalidSB, invalidSG	*/
+				foreach(SlotGroup invSG in InvalidSGs(sb)){
+					foreach(Slottable sbInInvSG in invSG.Slottables){
+						if(sbInInvSG != null){
+							if(InvalidSBs(sb, invSG).Contains(sbInInvSG)){
+								PickUp(sb, out picked);
+									AB(picked, true);
+									AT<RevertTransaction>(false);
+								SimHover(sbInInvSG, invSG, eventData);
+								LetGo();
+									ASSGM(sgm, SGMTransaction);
+									AP<SGMTransactionProcess>(sgm, false);
+									AT<RevertTransaction>(false);
+										AE(sgm.PickedSB, sb);
+										if(sb == sbInInvSG)
+											AE(sgm.SelectedSB, sb);
+										else
+											AE(sgm.SelectedSB, null);
+										AE(sgm.SelectedSG, null);
+										AE(sgm.PickedSBDoneTransaction, false);
+										AE(sgm.SelectedSBDoneTransaction, true);
+										AE(sgm.OrigSGDoneTransaction, true);
+										AE(sgm.SelectedSGDoneTransaction, true);
+										AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+								sb.ExpireProcess();
+									AssertFocused();
+									AssertSG(origSG, SGFocused, SGSelected, 1, typeof(SGDehighlightProcess), false);
+							}
+						}
+					}
+				}
+		}
+	}
+	bool IsPickable(Slottable sb){
+		return sb.CurState == SBFocused || sb.CurState == SBEADeselected;
+	}
+	public void TestInvalidSBs(){
+		foreach(SlotSystemElement ele in sgm.RootPage.PoolBundle.Elements){
+			SlotGroup focPSG = (SlotGroup)ele;
+			sgm.SetFocusedPoolSG(focPSG);
+			focPSG.ToggleAutoSort(true);
+			foreach(Slottable sbInPSG in focPSG.Slottables){
+				if(sbInPSG != null){
+					if(IsPickable(sbInPSG)){
+						PickUp(sbInPSG, out picked);
+						foreach(Slottable invSB in InvalidSBs(sbInPSG, focPSG)){
+							bool flag = true;
+							if(invSB == sbInPSG)
+								flag &= invSB.CurState == SBPASelected;
+							else{
+								flag &= (invSB.CurState == SBDefocused || invSB.CurState == SBEADefocused);
+							}
+							AB(flag, true);
+						}
+						foreach(SlotSystemElement ele2 in sgm.GetFocusedEquipSet().Elements){
+							SlotGroup eSG = (SlotGroup)ele2;
+							foreach(Slottable invSB2 in InvalidSBs(sbInPSG, eSG)){
+								bool flag = true;
+								if(invSB2 == sbInPSG)
+									flag &= invSB2.CurState == SBPASelected;
+								else{
+									flag &= (invSB2.CurState == SBDefocused || invSB2.CurState == SBEADefocused);
+								}
+								AB(flag, true);
+							}
+						}
+						LetGo();
+						sbInPSG.ExpireProcess();
+					}
+				}
+			}
+			focPSG.ToggleAutoSort(false);
+			foreach(Slottable sbInPSG in focPSG.Slottables){
+				if(sbInPSG != null){
+					if(IsPickable(sbInPSG)){
+						PickUp(sbInPSG, out picked);
+						foreach(Slottable invSB in InvalidSBs(sbInPSG, focPSG)){
+							bool flag = true;
+							if(invSB == sbInPSG)
+								flag &= invSB.CurState == SBPASelected;
+							else{
+								flag &= (invSB.CurState == SBDefocused || invSB.CurState == SBEADefocused);
+							}
+							AB(flag, true);
+						}
+						foreach(SlotSystemElement ele2 in sgm.GetFocusedEquipSet().Elements){
+							SlotGroup eSG = (SlotGroup)ele2;
+							foreach(Slottable invSB2 in InvalidSBs(sbInPSG, eSG)){
+								bool flag = true;
+								if(invSB2 == sbInPSG)
+									flag &= invSB2.CurState == SBPASelected;
+								else{
+									flag &= (invSB2.CurState == SBDefocused || invSB2.CurState == SBEADefocused);
+								}
+								AB(flag, true);
+							}
+						}
+						LetGo();
+						sbInPSG.ExpireProcess();
+					}
+				}
+			}
+		}
+		foreach(SlotSystemElement ele in sgm.GetFocusedEquipSet().Elements){
+			SlotGroup eSG = (SlotGroup)ele;
+			eSG.ToggleAutoSort(true);
+			foreach(Slottable sbInESG in eSG.Slottables){
+				if(sbInESG != null){
+					if(IsPickable(sbInESG)){
+						PickUp(sbInESG, out picked);
+						foreach(SlotSystemElement ele2 in sgm.GetFocusedEquipSet().Elements){
+							SlotGroup eSG2 = (SlotGroup)ele2;
+							foreach(Slottable invSB in InvalidSBs(sbInESG, eSG2)){
+								bool flag = true;
+								if(invSB == sbInESG)
+									flag &= invSB.CurState == SBPASelected;
+								else{
+									flag &= (invSB.CurState == SBDefocused || invSB.CurState == SBEADefocused);
+								}
+								AB(flag, true);
+							}
+						}
+						LetGo();
+						sbInESG.ExpireProcess();
+					}
+				}
+			}
+			eSG.ToggleAutoSort(false);
+			foreach(Slottable sbInESG in eSG.Slottables){
+				if(sbInESG != null){
+					if(IsPickable(sbInESG)){
+						PickUp(sbInESG, out picked);
+						foreach(SlotSystemElement ele2 in sgm.GetFocusedEquipSet().Elements){
+							SlotGroup eSG2 = (SlotGroup)ele2;
+							foreach(Slottable invSB in InvalidSBs(sbInESG, eSG2)){
+								bool flag = true;
+								if(invSB == sbInESG)
+									flag &= invSB.CurState == SBPASelected;
+								else{
+									flag &= (invSB.CurState == SBDefocused || invSB.CurState == SBEADefocused);
+								}
+								AB(flag, true);
+							}
+						}
+						LetGo();
+						sbInESG.ExpireProcess();
+					}
+				}
+			}
+		}
+		foreach(SlotSystemElement ele in sgm.RootPage.PoolBundle.Elements){
+			SlotGroup pSG = (SlotGroup)ele;
+			sgm.SetFocusedPoolSG(pSG);
+			foreach(SlotSystemElement ele2 in sgm.GetFocusedEquipSet().Elements){
+				SlotGroup eSG = (SlotGroup)ele2;
+				eSG.ToggleAutoSort(true);
+				foreach(Slottable sbInESG in eSG.Slottables){
+					if(sbInESG != null){
+						if(IsPickable(sbInESG)){
+							PickUp(sbInESG, out picked);
+							foreach(Slottable invSB in InvalidSBs(sbInESG, pSG)){
+								bool flag = true;
+								if(invSB == sbInESG)
+									flag &= invSB.CurState == SBPASelected;
+								else{
+									flag &= (invSB.CurState == SBDefocused || invSB.CurState == SBEADefocused);
+								}
+								AB(flag, true);
+							}
+							LetGo();
+							sbInESG.ExpireProcess();
+						}
+					}
+				}
+				eSG.ToggleAutoSort(false);
+				foreach(Slottable sbInESG in eSG.Slottables){
+					if(sbInESG != null){
+						if(IsPickable(sbInESG)){
+							PickUp(sbInESG, out picked);
+							foreach(Slottable invSB in InvalidSBs(sbInESG, pSG)){
+								bool flag = true;
+								if(invSB == sbInESG)
+									flag &= invSB.CurState == SBPASelected;
+								else{
+									flag &= (invSB.CurState == SBDefocused || invSB.CurState == SBEADefocused);
+								}
+								AB(flag, true);
+							}
+							LetGo();
+							sbInESG.ExpireProcess();
+						}
+					}
+				}
+			}	
+		}
+	}
+	/*	always includes picked itself */
+	List<Slottable> InvalidSBs(Slottable picked, SlotGroup targetSG){
+		SlotGroup origSG = picked.SG;
+		List<Slottable> result = new List<Slottable>();
+		foreach(Slottable sb in targetSG.Slottables){
+			if(sb != null){
+				if(sb == picked)
+					result.Add(sb);
+				else{
+					if(origSG.IsPool){
+						if(targetSG.IsPool){
+							if(targetSG.IsAutoSort){
+								result.Add(sb);
+							}else{
+
+							}
+						}else{
+							if(!targetSG.AcceptsFilter(sb))
+								result.Add(sb);
+						}
+					}else{
+						if(!targetSG.AcceptsFilter(sb))
+							result.Add(sb);
+						else{
+							if(!Utility.HaveCommonItemFamily(picked, sb)){
+								result.Add(sb);
+							}else{// either 1) sgpAll, 2) sgpSame, 3) sgeSame
+								if(origSG != targetSG){// 1) or 2)
+									if(origSG.ItemInstances.Contains(sb.ItemInst)){
+										if(!(picked.ItemInst == sb.ItemInst && origSG.IsShrinkable))
+										result.Add(sb);
+									}
+								}else{
+									if(targetSG.IsAutoSort)
+										result.Add(sb);
+								}
+							} 
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+	public void TestInvalidSGs(){
+		foreach(SlotGroup sgp in sgm.AllSGPs){
+			sgm.SetFocusedPoolSG(sgp);
+			sgp.ToggleAutoSort(true);
+			foreach(Slottable sb in sgp.Slottables){
+				if(sb != null){
+					if(sb.ItemInst is PartsInstanceMock)
+						AE(InvalidSGs(sb).Count, 7);
+					else
+						AE(InvalidSGs(sb).Count, 6);
+				}
+			}
+			sgp.ToggleAutoSort(false);
+			foreach(Slottable sb in sgp.Slottables){
+				if(sb != null){
+					if(sb.ItemInst is PartsInstanceMock)
+						AE(InvalidSGs(sb).Count, 7);
+					else
+						AE(InvalidSGs(sb).Count, 6);
+				}
+			}
+		}
+		foreach(SlotGroup sgp in sgm.AllSGPs){
+			sgm.SetFocusedPoolSG(sgp);
+			foreach(SlotGroup sge in sgm.FocusedSGEs){
+				foreach(Slottable sb_e in sge.Slottables){
+					if(sb_e != null){
+						if(sgp.AcceptsFilter(sb_e))
+							AE(InvalidSGs(sb_e).Count, 6);
+						else
+							AE(InvalidSGs(sb_e).Count, 7);
+					}
+				}
+			}
+		}
+	}
+	List<SlotGroup> InvalidSGs(Slottable pickedSB){
+		List<SlotGroup> result = new List<SlotGroup>();
+		foreach(SlotGroup sgp in sgm.AllSGPs){
+			if(sgm.GetFocusedPoolSG() != sgp)
+				result.Add(sgp);
+			else{
+				if(!sgp.AcceptsFilter(pickedSB))
+					result.Add(sgp);
+			}
+		}
+		foreach(SlotGroup sge in sgm.FocusedSGEs){
+			if(!sge.AcceptsFilter(pickedSB))
+				result.Add(sge);
+		}
+		return result;
+	}
+	/*	SGM and SG states shortcut	*/
+		SGMState SGMTransaction{
+			get{return SlotGroupManager.PerformingTransactionState;}
+		}
+		SGState SGFocused{
+			get{return SlotGroup.FocusedState;}
+		}
+		SGState SGDefocused{
+			get{return SlotGroup.DefocusedState;}
+		}
+		SGState SGDeactivated{
+			get{return SlotGroup.DeactivatedState;}
+		}
+		SGState SGSelected{
+			get{return SlotGroup.SelectedState;}
+		}
+	/*	SB states shortcut	*/
+		SBState SBReverting{
+			get{return Slottable.RevertingState;}
+		}
+		SBState SBMovingInSG{
+			get{return Slottable.MovingInSGState;}
+		}
+		SBState SBFocused{
+			get{return Slottable.FocusedState;}
+		}
+		SBState SBDefocused{
+			get{return Slottable.DefocusedState;}
+		}
+		SBState SBDeactivated{
+			get{return Slottable.DeactivatedState;}
+		}
+		SBState SBEADeselected{
+			get{return Slottable.EquippedAndDeselectedState;}
+		}
+		SBState SBEADefocused{
+			get{return Slottable.EquippedAndDefocusedState;}
+		}
+		SBState SBPADeselected{
+			get{return Slottable.PickedAndDeselectedState;}
+		}
+		SBState SBPASelected{
+			get{return Slottable.PickedAndSelectedState;}
+		}
+	/*	*/
+	public void AssertSG(SlotGroup sg, SGState curState, SGState changedPrevState, int runningProcessCount, System.Type stateProcessType, bool taProcessRunning){
+		ASSG(sg, curState);
+		AE(sg.ChangedPrevState, changedPrevState);
+		ARPC(sg, runningProcessCount);
+		if(stateProcessType == null)
+			APN(sg.StateProcess);
+		else
+			AE(sg.StateProcess.GetType(), stateProcessType);
+		AB(sg.TransactionProcess.IsRunning, taProcessRunning);
 	}
 	public void TestSGMProcesses(){
 			APN(sgm.StateProcess);
@@ -1448,6 +1974,11 @@ public class SlottableTest {
 		public void PointerUp(){
 			pickedSB.OnPointerUpMock(eventData);
 		}
+		public void LetGo(){
+			pickedSB.OnPointerUpMock(eventData);
+			if(pickedSB.CurState == Slottable.WaitForNextTouchState || pickedSB.CurState == Slottable.WaitForNextTouchWhilePUState)
+			pickedSB.CurProcess.Expire();
+		}
 		public void CompleteAllSBProcesses(SlotGroup sg){	
 			foreach(SlotMovement sm in sg.SlotMovements){
 				Slottable sb = sm.SB;
@@ -1608,10 +2139,10 @@ public class SlottableTest {
 			else
 				Assert.That(inspectedBool, Is.False);
 		}
-		public void ASSB(Slottable sb, SlottableState state){
+		public void ASSB(Slottable sb, SBState state){
 			AE(sb.CurState, state);
 		}
-		public void ASSG(SlotGroup sg, SlotGroupState state){
+		public void ASSG(SlotGroup sg, SGState state){
 			AE(sg.CurState, state);
 		}
 		public void ASSGM(SlotGroupManager sgm, SGMState state){
@@ -1924,7 +2455,7 @@ public class SlottableTest {
 		public void ASSBOReset(){
 			assborderCount = 0;
 		}
-		public void ASSBO(Slottable sb, SlottableState sbState){
+		public void ASSBO(Slottable sb, SBState sbState){
 			AE(sb.CurState, sbState);
 			AE(sb.SG.Slottables.IndexOf(sb), assborderCount);
 			assborderCount ++;
@@ -1938,7 +2469,7 @@ public class SlottableTest {
 		public void ATSBReset(){
 			ATSBCount = 0;
 		}
-		public void ATSB(Slottable sb, SlottableState state, int newID){
+		public void ATSB(Slottable sb, SBState state, int newID){
 			/*	AssertTransactionSlottable	*/
 			int curId;
 			int newId;
@@ -1950,7 +2481,7 @@ public class SlottableTest {
 			AE(newId, newID);
 			ASSB(sb, state);
 		}
-		public void ATSBP<T>(Slottable sb, SlottableState state, int newID, bool isExpired) where T: SBProcess{
+		public void ATSBP<T>(Slottable sb, SBState state, int newID, bool isExpired) where T: SBProcess{
 			/*	AssertTransactionSlottableProcess	*/
 			AE(sb.CurProcess.GetType(), typeof(T));
 			AB(sb.CurProcess.IsExpired, isExpired);

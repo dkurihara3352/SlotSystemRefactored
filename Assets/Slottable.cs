@@ -7,7 +7,7 @@ namespace SlotSystem{
 
 		
 		/*	States	*/	
-			public void SetState(SlottableState state){
+			public void SetState(SBState state){
 					this.m_prevState = this.m_curState;
 					this.m_curState = state;
 				if(this.m_curState != this.m_prevState){
@@ -15,16 +15,16 @@ namespace SlotSystem{
 					this.m_curState.EnterState(this);
 				}
 			}
-			SlottableState m_curState;
-				public SlottableState CurState{
+			SBState m_curState;
+				public SBState CurState{
 					get{return m_curState;}
 				}
-			SlottableState m_prevState;
-				public SlottableState PrevState{
+			SBState m_prevState;
+				public SBState PrevState{
 					get{return m_prevState;}
 				}
-			static SlottableState m_deactivatedState;
-				public static SlottableState DeactivatedState{
+			static SBState m_deactivatedState;
+				public static SBState DeactivatedState{
 					get{
 						if(Slottable.m_deactivatedState != null)
 							return Slottable.m_deactivatedState;
@@ -35,8 +35,8 @@ namespace SlotSystem{
 					}
 				}
 			
-			static SlottableState m_defocusedState;
-				public static SlottableState DefocusedState{
+			static SBState m_defocusedState;
+				public static SBState DefocusedState{
 					get{
 						if(Slottable.m_defocusedState != null)
 							return Slottable.m_defocusedState;
@@ -46,8 +46,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-			static SlottableState m_focusedState;
-				public static SlottableState FocusedState{
+			static SBState m_focusedState;
+				public static SBState FocusedState{
 					get{
 						if(Slottable.m_focusedState != null)
 							return Slottable.m_focusedState;
@@ -57,8 +57,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-			static SlottableState m_waitForPointerUpState;
-				public static SlottableState WaitForPointerUpState{
+			static SBState m_waitForPointerUpState;
+				public static SBState WaitForPointerUpState{
 					get{
 						if(m_waitForPointerUpState != null)
 							return m_waitForPointerUpState;
@@ -69,8 +69,8 @@ namespace SlotSystem{
 					}
 				}
 
-			static SlottableState m_waitForPickUpState;
-				public static SlottableState WaitForPickUpState{
+			static SBState m_waitForPickUpState;
+				public static SBState WaitForPickUpState{
 					get{
 						if(Slottable.m_waitForPickUpState != null)
 							return Slottable.m_waitForPickUpState;
@@ -80,8 +80,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-			static SlottableState m_waitForNextTouchState;
-				public static SlottableState WaitForNextTouchState{
+			static SBState m_waitForNextTouchState;
+				public static SBState WaitForNextTouchState{
 					get{
 						if(Slottable.m_waitForNextTouchState != null)
 							return Slottable.m_waitForNextTouchState;
@@ -91,8 +91,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-			static SlottableState m_pickedUpAndSelectedState;
-				public static SlottableState PickedAndSelectedState{
+			static SBState m_pickedUpAndSelectedState;
+				public static SBState PickedAndSelectedState{
 					get{
 						if(Slottable.m_pickedUpAndSelectedState != null)
 							return Slottable.m_pickedUpAndSelectedState;
@@ -102,8 +102,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-			static SlottableState m_pickedUpAndDeselectedState;
-				public static SlottableState PickedAndDeselectedState{
+			static SBState m_pickedUpAndDeselectedState;
+				public static SBState PickedAndDeselectedState{
 					get{
 						if(Slottable.m_pickedUpAndDeselectedState != null)
 							return Slottable.m_pickedUpAndDeselectedState;
@@ -113,8 +113,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-			static SlottableState m_waitForNextTouchWhilePUState;
-				public static SlottableState WaitForNextTouchWhilePUState{
+			static SBState m_waitForNextTouchWhilePUState;
+				public static SBState WaitForNextTouchWhilePUState{
 					get{
 						if(Slottable.m_waitForNextTouchWhilePUState != null)
 							return Slottable.m_waitForNextTouchWhilePUState;
@@ -124,8 +124,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-			static SlottableState m_equippedAndDeselectedState;
-				public static SlottableState EquippedAndDeselectedState{
+			static SBState m_equippedAndDeselectedState;
+				public static SBState EquippedAndDeselectedState{
 					get{
 						if(Slottable.m_equippedAndDeselectedState != null)
 							return Slottable.m_equippedAndDeselectedState;
@@ -134,8 +134,8 @@ namespace SlotSystem{
 							return Slottable.m_equippedAndDeselectedState;
 					}
 				}
-			static SlottableState m_equippedAndSelectedState;
-				public static SlottableState EquippedAndSelectedState{
+			static SBState m_equippedAndSelectedState;
+				public static SBState EquippedAndSelectedState{
 					get{
 						if(Slottable.m_equippedAndSelectedState != null)
 							return Slottable.m_equippedAndSelectedState;
@@ -144,8 +144,8 @@ namespace SlotSystem{
 							return Slottable.m_equippedAndSelectedState;
 					}
 				}
-			static SlottableState m_equippedAndDefocusedState;
-				public static SlottableState EquippedAndDefocusedState{
+			static SBState m_equippedAndDefocusedState;
+				public static SBState EquippedAndDefocusedState{
 					get{
 						if(Slottable.m_equippedAndDefocusedState != null)
 							return Slottable.m_equippedAndDefocusedState;
@@ -155,8 +155,8 @@ namespace SlotSystem{
 					}
 				}
 
-			static SlottableState m_selectedState;
-				public static SlottableState SelectedState{
+			static SBState m_selectedState;
+				public static SBState SelectedState{
 					get{
 						if(Slottable.m_selectedState != null)
 							return Slottable.m_selectedState;
@@ -165,48 +165,48 @@ namespace SlotSystem{
 							return Slottable.m_selectedState;
 					}
 				}
-			static SlottableState m_removedState;
-				public static SlottableState RemovedState{
+			static SBState m_removedState;
+				public static SBState RemovedState{
 					get{
 						if(Slottable.m_removedState == null)
 							Slottable.m_removedState = new SBRemovedState();
 						return Slottable.m_removedState;			
 					}
 				}
-			static SlottableState m_addedState;
-				public static SlottableState AddedState{
+			static SBState m_addedState;
+				public static SBState AddedState{
 					get{
 						if(Slottable.m_addedState == null)
 							Slottable.m_addedState = new SBAddedState();
 						return Slottable.m_addedState;			
 					}
 				}
-			static SlottableState m_movingInSGState;
-				public static SlottableState MovingInSGState{
+			static SBState m_movingInSGState;
+				public static SBState MovingInSGState{
 					get{
 						if(Slottable.m_movingInSGState == null)
 							Slottable.m_movingInSGState = new SBMovingInSGState();
 						return Slottable.m_movingInSGState;			
 					}
 				}
-			static SlottableState m_revertingState;
-				public static SlottableState RevertingState{
+			static SBState m_revertingState;
+				public static SBState RevertingState{
 					get{
 						if(Slottable.m_revertingState == null)
 							Slottable.m_revertingState = new SBRevertingState();
 						return Slottable.m_revertingState;			
 					}
 				}
-			static SlottableState m_movingOutState;
-				public static SlottableState MovingOutState{
+			static SBState m_movingOutState;
+				public static SBState MovingOutState{
 					get{
 						if(Slottable.m_movingOutState == null)
 							Slottable.m_movingOutState = new SBMovingOutState();
 						return Slottable.m_movingOutState;			
 					}
 				}
-			static SlottableState m_movingInState;
-				public static SlottableState MovingInState{
+			static SBState m_movingInState;
+				public static SBState MovingInState{
 					get{
 						if(Slottable.m_movingInState == null)
 							Slottable.m_movingInState = new SBMovingInState();
@@ -532,7 +532,8 @@ namespace SlotSystem{
 		}
 		public void ExpireProcess(){
 			CurProcess.Expire();
-			SG.CheckProcessCompletion();
+			// SG.CheckProcessCompletion();
+			// SGM.CompleteTransactionOnSB(this);
 		}
 	}
 

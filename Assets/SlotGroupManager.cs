@@ -315,6 +315,47 @@ namespace SlotSystem{
 					m_rootPage = rootPage;
 					m_rootPage.SGM = this;
 				}
+			//
+			public List<SlotGroup> AllSGs{
+				get{
+					List<SlotGroup> result = new List<SlotGroup>();
+					result.AddRange(AllSGPs);
+					result.AddRange(AllSGEs);
+					return result;
+				}
+			}
+			public List<SlotGroup> AllSGPs{
+				get{
+					List<SlotGroup> result = new List<SlotGroup>();
+					foreach(SlotSystemElement ele in RootPage.PoolBundle.Elements){
+						result.Add((SlotGroup)ele);
+					}
+					return result;
+				}
+			}
+			public List<SlotGroup> AllSGEs{
+				get{
+					List<SlotGroup> result = new List<SlotGroup>();
+					foreach(SlotSystemElement ele in RootPage.EquipBundle.Elements){
+						EquipmentSet equiSet = (EquipmentSet)ele;
+						foreach(SlotSystemElement ele2 in equiSet.Elements){
+							SlotGroup sge = (SlotGroup)ele2;
+							result.Add(sge);
+						}
+					}
+					return result;
+				}
+			}
+			public List<SlotGroup> FocusedSGEs{
+				get{
+					List<SlotGroup> result = new List<SlotGroup>();
+					EquipmentSet focusedEquipSet = GetFocusedEquipSet();
+					foreach(SlotSystemElement ele in focusedEquipSet.Elements){
+						result.Add((SlotGroup)ele);
+					}
+					return result;
+				}
+			}
 			/*	dump	*/
 				// List<SlotGroup> m_slotGroups;
 				// public List<SlotGroup> SlotGroups{
@@ -326,6 +367,7 @@ namespace SlotSystem{
 				// 	set{m_initiallyFocusedSG = value;}
 				// }
 				/*	methods	*/
+		/*	methods	*/
 			public void Initialize(){
 				m_rootPage.Activate();
 				UpdateEquipStatus();
