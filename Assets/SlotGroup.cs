@@ -236,6 +236,16 @@ namespace SlotSystem{
 			public bool IsFocused{
 				get{return CurState == SlotGroup.FocusedState;}
 			}
+			public bool HasEmptySlot{
+				get{
+					bool emptyFound = false;
+					foreach(Slot slot in Slots){
+						if(slot.Sb == null)
+							emptyFound = true;
+					}
+					return emptyFound;
+				}
+			}
 		/* commands	*/
 			SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
 				public void InitializeItems(){
@@ -772,15 +782,17 @@ namespace SlotSystem{
 			public void InstantGreyin(){}
 			public bool IsFillEquippable(Slottable sb){
 				SlotGroup origSG = sb.SG;
-				if(this != origSG){
-					if(IsFocused){
-						if(AcceptsFilter(sb)){
-							if(IsExpandable){
-								return true;
-							}else{
-								foreach(Slot slot in Slots){
-									if(slot.Sb == null)
-										return true;
+				if(origSG.IsShrinkable){
+					if(this != origSG){
+						if(IsFocused){
+							if(AcceptsFilter(sb)){
+								if(IsExpandable){
+									return true;
+								}else{
+									foreach(Slot slot in Slots){
+										if(slot.Sb == null)
+											return true;
+									}
 								}
 							}
 						}

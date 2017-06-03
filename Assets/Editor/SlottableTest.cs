@@ -400,9 +400,30 @@ public class SlottableTest {
 		// TestVolSortOnAll();
 		// TestRevertOnAllSBs();
 		// TestReorderOnAll();
-		// TestFillEquipOnAll();
 		// TestFillEquippableOnAll();
+		// TestFillEquipOnAll();
+		CheckTransactionOnAll();
 	}
+	public void CheckTransactionOnAll(){
+		PerformOnAllSBs(CheckTransaction);
+	}
+		public void CheckTransaction(Slottable sb){
+			CrossTestingSGs(CrossCheckTransaction, sb);
+		}
+		public void CrossCheckTransaction(SlotGroup sg, Slottable sb){
+			if(sb.IsPickable){
+				sgm.SetPickedSB(sb);
+				sgm.SetSelectedSB(null);
+				if(!InvalidSGs(sb).Contains(sg))
+					sgm.SetSelectedSG(sg);
+				else
+					sgm.SetSelectedSG(null);
+				sgm.UpdateTransaction();
+				if(sgm.Transaction.GetType() ==  typeof(StackTransaction))
+				Debug.Log(Name(sb.SG) + "'s " + Name(sb) + " on " + Name(sg) + ": " + sgm.Transaction.GetType().ToString());
+				sgm.ClearFields();
+			}
+		}
 	public void TestFillEquippableOnAll(){
 		PerformOnAllSBs(TestFillEquippable);
 	}
@@ -412,33 +433,37 @@ public class SlottableTest {
 		public void CrossTestFillEquippable(SlotGroup sg, Slottable sb){
 			SlotGroup origSG = sb.SG;
 			bool isFillEquippable = false;
-			if(sg != origSG){
-				if(sg.IsFocused){
-					if(sg.AcceptsFilter(sb)){
-						if(sg.IsExpandable){
-							isFillEquippable = true;
-							Debug.Log(Util.Bold(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Valid"));
-						}else{
-							bool emptyFound = false;
-							foreach(Slot slot in sg.Slots){
-								if(slot.Sb == null)
-									emptyFound = true;
-							}
-							if(emptyFound){
+			if(origSG.IsShrinkable){
+				if(sg != origSG){
+					if(sg.IsFocused){
+						if(sg.AcceptsFilter(sb)){
+							if(sg.IsExpandable){
 								isFillEquippable = true;
-								Debug.Log(Util.Bold(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Valid"));
+								Debug.Log(Bold(Name(origSG) + "'s " + Name(sb) + ": " + Name(sg) + " Valid"));
 							}else{
-								Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid : Not Expandable and No space"));
+								bool emptyFound = false;
+								foreach(Slot slot in sg.Slots){
+									if(slot.Sb == null)
+										emptyFound = true;
+								}
+								if(emptyFound){
+									isFillEquippable = true;
+									Debug.Log(Bold(Name(origSG) + "'s " + Name(sb) + ": " + Name(sg) + " Valid"));
+								}else{
+									Debug.Log(Red(Name(origSG) + "'s " + Name(sb) + ": " + Name(sg) + " Invalid : Not Expandable and No space"));
+								}
 							}
+						}else{
+							Debug.Log(Red(Name(origSG) + "'s " + Name(sb) + ": " + Name(sg) + " Invalid: Filtered out"));
 						}
 					}else{
-						Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid: Filtered out"));
+						Debug.Log(Red(Name(origSG) + "'s " + Name(sb) + ": " + Name(sg) + " Invalid : Not Focused"));
 					}
 				}else{
-					Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid : Not Focused"));
+					Debug.Log(Red(Name(origSG) + "'s " + Name(sb) + ": " + Name(sg) + " Invalid : OrigSG"));
 				}
 			}else{
-				Debug.Log(Util.Red(Util.SGName(origSG) + "'s " + Util.SBName(sb) + ": " + Util.SGName(sg) + " Invalid : OrigSG"));
+				Debug.Log(Red(Name(origSG) + "'s " + Name(sb) + ": " + Name(sg) + " Invalid : OrigSG Not Shrinkable"));
 			}
 			if(isFillEquippable)
 				AB(sg.IsFillEquippable(sb), true);
@@ -449,75 +474,91 @@ public class SlottableTest {
 	public void TestFillEquipOnAll(){
 		PerformOnAllSBs(TestFillEquip);
 	}
-		public void TestFillEquip(Slottable sb){
-			SlotGroup origSG = sb.SG;
-			if(origSG.IsPool){
-				foreach(EquipmentSet eSet in sgm.EquipmentSets){
-					sgm.SetFocusedEquipmentSet(eSet);
-					foreach(SlotSystemElement ele in sgm.GetFocusedEquipmetSet().Elements){
-						SlotGroup sge = (SlotGroup)ele;
-						if(sge.IsFillEquippable(sb)){
-							if(sb.IsPickable){
-								/*	on null sb	*/
-								PickUp(sb, out picked);
-								SimHover(null, sge, eventData);
-									AssertSGM(sgm,
-										SGMProbing,
-										SGMFocused,
-										typeof(FillEquipTransaction),
-										typeof(SGMProbeProcess),
-										sb,	null, sge,
-										true, true, true, true);
-									AssertSG(origSG,
-										SGFocused,
-										SGSelected,
-										1, typeof(SGDehighlightProcess), false);
-									AssertSG(sge,
-										SGSelected,
-										SGFocused,
-										1, typeof(SGHighlightProcess), false);
-								PointerUp();
-									AssertSGM(sgm,
-										SGMTransaction,
-										SGMProbing,
-										typeof(FillEquipTransaction),
-										typeof(SGMTransactionProcess),
-										sb, null, sge,
-										false, true, true, false);
-									AssertSG(origSG,
-										SGFocused,
-										SGSelected,
-										1, typeof(SGDehighlightProcess), false);
-									AssertSG(sge,
-										SGSelected,
-										SGFocused,
-										2, typeof(SGHighlightProcess), true);
-								sb.ExpireProcess();
-									AE(sgm.PickedSBDoneTransaction, true);
-								CompleteAllSBProcesses(sge);
-									AssertFocused();
-									AssertSGM(sgm,
-										SGMFocused,
-										SGMTransaction,
-										null,
-										null,
-										null, null, null,
-										false, true, true, false);
-									AssertSG(origSG,
-										SGFocused,
-										SGSelected,
-										1, typeof(SGDehighlightProcess), false);
-									AssertSG(sge,
-										SGFocused,
-										SGSelected,
-										1, typeof(SGDehighlightProcess), false);
-								/*	on inval sb	*/
-							}
-						}
-					}
-				}
-			}
-		}
+		 public void TestFillEquip(Slottable sb){
+			CrossTestingSGs(CrossTestFillEquip, sb);
+		 }
+		 public void CrossTestFillEquip(SlotGroup sg, Slottable sb){
+			 InventoryItemInstanceMock pickedItem = sb.ItemInst;
+			 SlotGroup origSG = sb.SG;
+			 if(sg.IsFillEquippable(sb)){
+				 if(sb.IsPickable){
+					Debug.Log(Name(origSG)+"'s " + Name(sb)+" on " + Name(sg));
+					/*	on null sb	*/
+					PickUp(sb, out picked);
+					SimHover(null, sg, eventData);
+						AssertSGM(sgm,
+							SGMProbing,
+							SGMFocused,
+							typeof(FillEquipTransaction),
+							typeof(SGMProbeProcess),
+							sb,	null, sg,
+							true, true, true, true);
+						AssertSG(origSG,
+							SGFocused,
+							SGSelected,
+							1, typeof(SGDehighlightProcess), false);
+						AssertSG(sg,
+							SGSelected,
+							SGFocused,
+							1, typeof(SGHighlightProcess), false);
+					PointerUp();
+						AssertSGM(sgm,
+							SGMTransaction,
+							SGMProbing,
+							typeof(FillEquipTransaction),
+							typeof(SGMTransactionProcess),
+							sb, null, sg,
+							false, true, origSG.IsPool?true: false, sg.IsPool?true: false);
+						AssertSG(origSG,
+							SGFocused,
+							SGSelected,
+							origSG.IsPool?1: 2, typeof(SGDehighlightProcess), origSG.IsPool?false: true);
+						AssertSG(sg,
+							SGSelected,
+							SGFocused,
+							sg.IsPool?1:2, typeof(SGHighlightProcess), sg.IsPool?false:true);
+					sb.ExpireProcess();
+						AE(sgm.PickedSBDoneTransaction, true);
+					if(!sg.IsPool)
+						CompleteAllSBProcesses(sg);
+					if(!origSG.IsPool)
+						CompleteAllSBProcesses(origSG);
+						AssertFocused();
+						AssertSGM(sgm,
+							SGMFocused,
+							SGMTransaction,
+							null,
+							null,
+							null, null, null,
+							true, true, true, true);
+						AssertSG(origSG,
+							SGFocused,
+							SGSelected,
+							1, typeof(SGDehighlightProcess), false);
+						AssertSG(sg,
+							SGFocused,
+							SGSelected,
+							1, typeof(SGDehighlightProcess), false);
+					/*	reverse	*/
+						Slottable revPickedSB = GetSB(sg, pickedItem);
+						PickUp(revPickedSB, out picked);
+						SimHover(null ,origSG, eventData);
+						PointerUp();
+						if(!origSG.IsPool)
+							CompleteAllSBProcesses(origSG);
+						if(!sg.IsPool)
+							CompleteAllSBProcesses(sg);
+						revPickedSB.ExpireProcess();
+							AssertFocused();
+						
+					/*	on inval sb	*/
+				 }
+			 }
+		 }
+	
+	Slottable GetSB(SlotGroup sg, InventoryItemInstanceMock itemInst){
+		return sg.GetSlottable(itemInst);
+	}
 	public void ANull(object obj){
 		Assert.That(obj, Is.Null);
 	}
@@ -2718,6 +2759,19 @@ public class SlottableTest {
 			}
 			AE(newId, newID);
 			ASSB(sb, state);
+		}
+	/*	shortcut	*/
+		public string Name(SlotGroup sg){
+			return Util.SGName(sg);
+		}
+		public string Name(Slottable sb){
+			return Util.SBName(sb);
+		}
+		public string Bold(string str){
+			return Util.Bold(str);
+		}
+		public string Red(string str){
+			return Util.Red(str);
 		}
 	/*	dump	*/
 		// int aoCount = 0;

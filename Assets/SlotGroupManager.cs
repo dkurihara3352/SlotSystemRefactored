@@ -5,7 +5,19 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SlotGroupManager : MonoBehaviour {
-		
+			public static SlotGroupManager CurSGM;
+			void SetCurSGM(){
+				if(CurSGM != null){
+					if(CurSGM != this){
+						CurSGM.Defocus();
+						CurSGM = this;
+					}else{
+						// no change
+					}
+				}else{
+					CurSGM = this;
+				}
+			}
 		/*	transaction	*/
 			SlotSystemTransaction m_transaction;
 				public SlotSystemTransaction Transaction{
@@ -124,10 +136,6 @@ namespace SlotSystem{
 			public SGMProcess CachedProcess{
 				get{return m_cachedProcess;}
 				set{m_cachedProcess = value;}
-			}
-			public void SetTransactionProcessAndSwitchState(Slottable pickedSB, Slottable selectedSB, SlotGroup pickedSG, SlotGroup selectedSG){
-				this.CachedProcess = new SGMTransactionProcess(this, pickedSB, selectedSB, pickedSG, selectedSG);
-				this.SetState(SlotGroupManager.PerformingTransactionState);
 			}
 			/*	coroutines
 			*/
@@ -382,6 +390,7 @@ namespace SlotSystem{
 				UpdateEquipStatus();
 			}
 			public void Focus(){
+				SetCurSGM();
 				if(CurState == SlotGroupManager.FocusedState){
 					RootPage.Focus();
 				}else

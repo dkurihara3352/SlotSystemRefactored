@@ -536,7 +536,8 @@ namespace SlotSystem{
 			SG.GetSlotMovement(this).GetIndex(out curID, out newID);
 		}
 		public void ExpireProcess(){
-			CurProcess.Expire();
+			if(CurProcess.IsRunning)
+				CurProcess.Expire();
 			// SG.CheckProcessCompletion();
 			// SGM.CompleteTransactionOnSB(this);
 		}

@@ -15,116 +15,128 @@ namespace SlotSystem{
 	/*	SGM classes	*/
 		/*	transaction	*/
 			public interface SlotSystemTransaction{
+				void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg);
 				void Indicate();
 				void Execute();
 				void OnComplete();
 			}
-			public class RevertTransaction: SlotSystemTransaction{
-				Slottable pickedSB;
-				SlotGroupManager sgm;
-				public RevertTransaction(Slottable sb){
-					this.pickedSB = sb;
-					this.sgm = sb.SGM;
+			public abstract class AbsSlotSystemTransaction: SlotSystemTransaction{
+				protected SlotGroupManager sgm = SlotGroupManager.CurSGM;
+				protected void SetTransactionProcessAndSwitchState(Slottable pickedSB, Slottable selectedSB, SlotGroup pickedSG, SlotGroup selectedSG){
+					sgm.CachedProcess = new SGMTransactionProcess(sgm, pickedSB, selectedSB, pickedSG, selectedSG);
+					sgm.SetState(SlotGroupManager.PerformingTransactionState);
 				}
-				public void Indicate(){}
-				public void Execute(){
-					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, null, null);
+				public virtual void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = null;
+					sg = null;
+				}
+				public virtual void Indicate(){}
+				public virtual void Execute(){}
+				public virtual void OnComplete(){}
+			}
+			public class RevertTransaction: AbsSlotSystemTransaction{
+				Slottable pickedSB;
+				public RevertTransaction(){
+					this.pickedSB = sgm.PickedSB;
+				}
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = null;
+					sg = pickedSB.SG;
+				}
+				public override void Indicate(){}
+				public override void Execute(){
+					SetTransactionProcessAndSwitchState(pickedSB, null, null, null);
 					
 					SlotGroup sg = sgm.GetSlotGroup(pickedSB);
 					Slot slot = sg.GetSlot(pickedSB);
 					pickedSB.MoveDraggedIcon(sg, slot);
 					pickedSB.SetState(Slottable.RevertingState);
 				}
-				public void OnComplete(){
-					// if(pickedSB.IsEquipped)
-					// 	pickedSB.SetState(Slottable.EquippedAndDeselectedState);
-					// else
-					// 	pickedSB.SetState(Slottable.FocusedState);
-					// pickedSB.PickedAmount = 0;
+				public override void OnComplete(){
+					
 					sgm.DestroyDraggedIcon();
 					sgm.ClearAndReset();
 				}
 			}
-			public class ReorderTransaction: SlotSystemTransaction{
+			public class ReorderTransaction: AbsSlotSystemTransaction{
 				Slottable pickedSB;
 				Slottable selectedSB;
-				SlotGroup sg;
-				SlotGroupManager sgm;
-				public ReorderTransaction(Slottable picked, Slottable selected){
-					this.pickedSB = picked;
+				SlotGroup selectedSG;
+				public ReorderTransaction(Slottable selected){
+					this.pickedSB = sgm.PickedSB;
 					this.selectedSB = selected;
-					this.sgm = picked.SGM;
-					this.sg = sgm.GetSlotGroup(pickedSB);
+					this.selectedSG = this.pickedSB.SG;
 				}
-				public void Indicate(){}
-				public void Execute(){
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = selectedSB;
+					sg = selectedSG;
+				}
+				public override void Indicate(){}
+				public override void Execute(){
 					
-					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, null, sg);
-					sg.SetAndRunSlotMovementsForReorder(pickedSB, selectedSB);
-					// sg.SetState(SlotGroup.PerformingTransactionState);
-					sg.TransactionProcess.Start();
+					SetTransactionProcessAndSwitchState(pickedSB, null, null, selectedSG);
+					selectedSG.SetAndRunSlotMovementsForReorder(pickedSB, selectedSB);
+					selectedSG.TransactionProcess.Start();
 
-					Slot slot = sg.GetSlot(selectedSB);
-					pickedSB.MoveDraggedIcon(sg, slot);
+					Slot slot = selectedSG.GetSlot(selectedSB);
+					pickedSB.MoveDraggedIcon(selectedSG, slot);
 					pickedSB.SetState(Slottable.RevertingState);
 
-					sg.CheckCompletion();
+					selectedSG.CheckCompletion();
 				}
-				public void OnComplete(){
-					sg.OnCompleteSlotMovements();
+				public override void OnComplete(){
+					selectedSG.OnCompleteSlotMovements();
 					sgm.DestroyDraggedIcon();
 					sgm.ClearAndReset();
 				}
 			}
-			public class StackTransaction: SlotSystemTransaction{
+			public class StackTransaction: AbsSlotSystemTransaction{
 				Slottable pickedSB;
 				Slottable selectedSB;
-				public StackTransaction(Slottable picked, Slottable selected){
-					this.pickedSB = picked;
+				public StackTransaction(Slottable selected){
+					this.pickedSB = sgm.PickedSB;
 					this.selectedSB = selected;
 				}
-				public void Indicate(){}
-				public void Execute(){
-					pickedSB.SGM.ClearAndReset();
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = selectedSB;
+					sg = selectedSB.SG;
 				}
-				public void OnComplete(){}
+				public override void Indicate(){}
+				public override void Execute(){
+					sgm.ClearAndReset();
+				}
+				public override void OnComplete(){}
 			}
-			public class SwapTransaction: SlotSystemTransaction{
+			public class SwapTransaction: AbsSlotSystemTransaction{
 				Slottable pickedSB;
 				SlotGroup origSG;
 				Slottable selectedSB;
 				SlotGroup selectedSG;
-				SlotGroupManager sgm;
 				List<InventoryItemInstanceMock> picked = new List<InventoryItemInstanceMock>();
 				List<InventoryItemInstanceMock> hovered = new List<InventoryItemInstanceMock>();
-				public SwapTransaction(Slottable picked, Slottable selected){
-					this.pickedSB = picked;
+				public SwapTransaction(Slottable selected){
+					this.pickedSB = sgm.PickedSB;
 					this.selectedSB = selected;
-					this.sgm = picked.SGM;
-					this.origSG = sgm.GetSlotGroup(picked);
-					this.selectedSG = sgm.GetSlotGroup(selected);
+					this.origSG = pickedSB.SG;
+					this.selectedSG = selectedSB.SG;
 					this.picked.Add(pickedSB.ItemInst);
 					this.hovered.Add(selectedSB.ItemInst);
 				}
-				public void Indicate(){}
-				public void CheckFields(out Slottable pickedSB, out SlotGroup origSG, out Slottable selectedSB, out SlotGroup selectedSG){
-					pickedSB = this.pickedSB;
-					origSG = this.origSG;
-					selectedSB = this.selectedSB;
-					selectedSG = this.selectedSG;
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = selectedSB;
+					sg = selectedSG;
 				}
-				public void Execute(){
+				public override void Indicate(){}
+				public override void Execute(){
 					
-					sgm.SetTransactionProcessAndSwitchState(pickedSB, selectedSB, origSG.IsPool?null: origSG, selectedSG.IsPool?null: selectedSG);
+					SetTransactionProcessAndSwitchState(pickedSB, selectedSB, origSG.IsPool?null: origSG, selectedSG.IsPool?null: selectedSG);
 					
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotmovementsForSwap(pickedSB, selectedSB);
-						// origSG.SetState(SlotGroup.PerformingTransactionState);
 						origSG.TransactionProcess.Start();
 					}
 					if(!selectedSG.IsPool){
 						selectedSG.SetAndRunSlotmovementsForSwap(selectedSB, pickedSB);
-						// selectedSG.SetState(SlotGroup.PerformingTransactionState);
 						selectedSG.TransactionProcess.Start();
 					}
 					
@@ -148,7 +160,7 @@ namespace SlotSystem{
 					origSG.CheckCompletion();
 					selectedSG.CheckCompletion();
 				}
-				public void OnComplete(){
+				public override void OnComplete(){
 					sgm.DestroyDraggedIcon();
 					if(!origSG.IsPool)
 						origSG.OnCompleteSlotMovements();
@@ -158,68 +170,66 @@ namespace SlotSystem{
 					sgm.ClearAndReset();
 				}
 			}
-			public class FillTransaction: SlotSystemTransaction{
+			public class FillTransaction: AbsSlotSystemTransaction{
 				Slottable pickedSB;
 				SlotGroup origSG;
 				SlotGroup selectedSG;
-				SlotGroupManager sgm;
-				public FillTransaction(Slottable picked, SlotGroup selSG){
-					this.pickedSB = picked;
-					this.selectedSG = selSG;
-					this.sgm = picked.SGM;
-					this.origSG = sgm.GetSlotGroup(picked
-					);
+				public FillTransaction(SlotGroup selected){
+					this.pickedSB = sgm.PickedSB;
+					this.selectedSG = selected;
+					this.origSG = pickedSB.SG;
 				}
-				public void Indicate(){}
-				public void Execute(){
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = null;
+					sg = selectedSG;
+				}
+				public override void Indicate(){}
+				public override void Execute(){
 
 					Slot slot = selectedSG.GetNextEmptySlot();
 					/*	precondition for GetNext...
 							1. it has an empty slot OR isExpandable
 							2. does not have the same stackable item
 					*/
-					
 
-					// origSG.TransactionUpdate(null/*added*/, pickedSB/*removed*/);
-					// selectedSG.TransactionUpdate(pickedSB, null);
 					/*	perform focusing of scroller if something is to be added
 						perform Inventory update, sorting ,filtering and updating slots and sbs, and moving of all the elements it contains
 					*/
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
-					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, origSG, selectedSG);
+					SetTransactionProcessAndSwitchState(pickedSB, null, origSG, selectedSG);
 				}
-				public void OnComplete(){
+				public override void OnComplete(){
 					sgm.DestroyDraggedIcon();
 					sgm.UpdateEquipStatus();
 					sgm.ClearAndReset();//Focus should take care of clearing the processes
 				}
 			}
-			public class FillEquipTransaction: SlotSystemTransaction{
+			public class FillEquipTransaction: AbsSlotSystemTransaction{
 				Slottable pickedSB;
 				SlotGroup selectedSG;
 				SlotGroup origSG;
-				SlotGroupManager sgm;
 				List<InventoryItemInstanceMock> moved = new List<InventoryItemInstanceMock>();
 				
-				public FillEquipTransaction(Slottable picked, SlotGroup selSG){
-					this.pickedSB = picked;
-					this.selectedSG = selSG;
-					this.sgm = picked.SGM;
-					this.origSG = sgm.GetSlotGroup(picked);
+				public FillEquipTransaction(SlotGroup selected){
+					this.pickedSB = sgm.PickedSB;
+					this.selectedSG = selected;
+					this.origSG = pickedSB.SG;
 					this.moved.Add(pickedSB.ItemInst);
 				}
-				public void Indicate(){}
-				public void Execute(){
-					sgm.SetTransactionProcessAndSwitchState(pickedSB, null, origSG.IsPool? null: origSG, selectedSG.IsPool? null: selectedSG);
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = null;
+					sg = selectedSG;
+				}
+				public override void Indicate(){}
+				public override void Execute(){
+					SetTransactionProcessAndSwitchState(pickedSB, null, origSG.IsPool? null: origSG, selectedSG.IsPool? null: selectedSG);
 
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotMovements(moved, null);
-						// origSG.SetState(SlotGroup.PerformingTransactionState);
 						origSG.TransactionProcess.Start();
 					}
 					if(!selectedSG.IsPool){
 						selectedSG.SetAndRunSlotMovements(null, moved);
-						// selectedSG.SetState(SlotGroup.PerformingTransactionState);
 						selectedSG.TransactionProcess.Start();
 					}
 
@@ -237,7 +247,7 @@ namespace SlotSystem{
 					if(!selectedSG.IsPool)
 						selectedSG.CheckCompletion();
 				}
-				public void OnComplete(){
+				public override void OnComplete(){
 					sgm.DestroyDraggedIcon();
 					if(!origSG.IsPool)
 						origSG.OnCompleteSlotMovements();
@@ -248,27 +258,26 @@ namespace SlotSystem{
 					sgm.ClearAndReset();
 				}
 			}
-			public class SortTransaction: SlotSystemTransaction{
-				SlotGroup m_sg;
-				SGSorter m_sorter;
-				SlotGroupManager sgm;
+			public class SortTransaction: AbsSlotSystemTransaction{
+				SlotGroup selectedSG;
+				SGSorter sorter;
 				public SortTransaction(SlotGroup sg, SGSorter sorter){
-					m_sg = sg;
-					m_sorter = sorter;
-					sgm = sg.SGM;
+					selectedSG = sg;
+					this.sorter = sorter;
 				}
-				public void Indicate(){}
-				public void Execute(){
-					sgm.SetTransactionProcessAndSwitchState(null, null, null, m_sg);
-					// m_sg.TransactionUpdateV2(null, null);
-					// m_sg.SetAndRunSlotMovements(null, null);
-					m_sg.SetAndRunSlotMovementsForSort();
-					// m_sg.SetState(SlotGroup.PerformingTransactionState);
-					m_sg.TransactionProcess.Start();
-					m_sg.CheckCompletion();
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = null;
+					sg = selectedSG;
 				}
-				public void OnComplete(){
-					m_sg.OnCompleteSlotMovements();
+				public override void Indicate(){}
+				public override void Execute(){
+					SetTransactionProcessAndSwitchState(null, null, null, selectedSG);
+					selectedSG.SetAndRunSlotMovementsForSort();
+					selectedSG.TransactionProcess.Start();
+					selectedSG.CheckCompletion();
+				}
+				public override void OnComplete(){
+					selectedSG.OnCompleteSlotMovements();
 					sgm.ClearAndReset();
 				}
 			}
@@ -336,13 +345,106 @@ namespace SlotSystem{
 				void Execute(SlotGroupManager sgm);
 			}
 			public class UpdateTransactionCommand: SGMCommand{
+				public SlotSystemTransaction GetTransaction(Slottable pickedSB, Slottable targetSB, SlotGroup targetSG){
+					/*	notes	*/
+						/*	Postpick Filter evaluation	*/
+							/*	based on the possible outcome Transaction output if the PickedSB is picked 	and put under the cursor
+								Defocus if the result is Revert , Focus otherwise
+								SBs and SGs are evaluated independently
+									SGs -> set hoveredSB null and evaluate
+									SBs -> set hoveredSG null and evaluate
+							*/
+						/*	Transaction cache and retrieval	*/
+							/*	When a SB is picked, a list of TransacionCache is created
+									Transaction cache contains 1)Transaction to be performed when executed, 2) SB and/or SG that needs to be under cursor at the time of execution
+								Probing is performed only on Focused (postpick filtered) SBs and SGs
+							*/
+						/*	SGM selection fields evaluation	*/
+							/*	also is based upon this returned value, not directly what is under cursor
+								Transaction feeds what sb and sg are selected
+									Revert:		sSB null,		sSG targetSG(orig)
+									Fill:		sSB null,		sSG targetSG(non orig)
+									Swap:		sSB targetSB/calced,	sSG targetSG
+									Reorder:	sSB targetSB,	sSG targetSG(orig)
+									Insert:		sSB targetSB,	sSG targetSG(non orig)
+									(Sort):		sSB null, 		sSG (specified)
+									Stack:		sSB targetSB/calced,	sSG targetSG
+							*/
+						/*	Precondition	*/
+							/*	pickedSB.IsPickable
+								the states of the rest is unknown
+							*/
+
+					SlotGroup origSG = pickedSB.SG;
+						
+						if(targetSB != null){
+							targetSG = targetSB.SG;
+						}
+						
+						if(targetSG == null){// meaning selectedSB is also null
+							return new RevertTransaction(pickedSB);
+						}else{// hoveredSB could be null
+
+						}
+						if(targetSB == null){// hoveredSB null, nor selectedSB not calculable
+							if(targetSG == null || targetSG == origSG || !origSG.IsShrinkable || !targetSG.AcceptsFilter(pickedSB)){
+								return new RevertTransaction(pickedSB);
+							}else{
+								if(targetSG.IsExpandable){
+									return new FillEquipTransaction(pickedSB, targetSG);
+								}else{
+									if(targetSG.HasEmptySlot){
+										return new FillEquipTransaction(pickedSB, targetSG);
+									}else{
+										return new RevertTransaction(pickedSB);
+									}
+								}
+							}
+						}
+						else{// hoveredSB not null (thus, selectedSG not null), or selectedSB calculable
+							if(targetSB == pickedSB){
+								return new RevertTransaction(pickedSB);
+							}else{
+								if(targetSG == origSG){
+									if(targetSG.IsAutoSort)
+										return new ReorderTransaction(pickedSB, targetSB);
+									else
+										return new RevertTransaction(pickedSB);
+								}else{
+									if(Util.HaveCommonItemFamily(pickedSB, targetSB)){
+										return new SwapTransaction(pickedSB, targetSB);
+									}else{
+										if(!targetSG.IsAutoSort)
+											return new InsertTransaction(pickedSB, targetSB, targetSG);
+										else{
+											if(targetSG.AcceptsFilter(pickedSB) && origSG.IsShrinkable){
+												if(targetSG.IsExpandable){
+													return new FillEquipTransaction(pickedSB, targetSG);
+												}else{
+													if(targetSG.HasEmptySlot){
+														return new FillEquipTransaction(pickedSB, targetSG);
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					if(pickedSB.IsPickable){
+						
+						return new RevertTransaction(pickedSB);
+					}else{
+						return null;
+					}
+				}
 				public void Execute(SlotGroupManager sgm){
 					Slottable pickedSB = sgm.PickedSB;
 					Slottable selectedSB = sgm.SelectedSB;
 					SlotGroup selectedSG = sgm.SelectedSG;
-					SlotGroup origSG = sgm.GetSlotGroup(pickedSB);
+					SlotGroup origSG = pickedSB.SG;
 					if(pickedSB != null){
-						if(selectedSB == null){
+						if(selectedSB == null){// drop on SG
 							if(selectedSG == null || selectedSG == origSG || !origSG.IsShrinkable){
 								SlotSystemTransaction revertTs = new RevertTransaction(pickedSB);
 								sgm.SetTransaction(revertTs);
@@ -352,8 +454,6 @@ namespace SlotSystem{
 								*/
 								if(selectedSG.HasItem((InventoryItemInstanceMock)pickedSB.Item)){
 									if(selectedSG.IsPool){
-										// UnequipTransaction unequipTs = new UnequipTransaction(pickedSB, selectedSG);
-										// sgm.SetTransaction(unequipTs);
 										FillEquipTransaction ta = new FillEquipTransaction(pickedSB, selectedSG);
 										sgm.SetTransaction(ta);
 									}else{
@@ -391,8 +491,7 @@ namespace SlotSystem{
 								}else{// different SGs
 									if(pickedSB.Item == selectedSB.Item){
 										if(pickedSB.IsEquipped){
-											// UnequipTransaction unequipTs = new UnequipTransaction(pickedSB, sgm.GetSlotGroup(selectedSB));
-											// sgm.SetTransaction(unequipTs);
+											
 											FillEquipTransaction ta = new FillEquipTransaction(pickedSB, selectedSB.SG);
 											sgm.SetTransaction(ta);
 										}else{
