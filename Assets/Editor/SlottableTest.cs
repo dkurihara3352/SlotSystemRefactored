@@ -397,12 +397,14 @@ public class SlottableTest {
 	}
 	[Test]
 	public void TestAll(){	
-		// TestVolSortOnAll();
-		// TestRevertOnAllSBs();
-		// TestReorderOnAll();
-		// TestFillEquippableOnAll();
-		// TestFillEquipOnAll();
-		CheckTransactionOnAll();
+		//	done
+			// TestVolSortOnAll();
+			// TestRevertOnAllSBs();
+			// TestReorderOnAll();
+			// TestFillEquippableOnAll();
+		// TestFillEquipOnAll(); 
+		// CheckTransactionOnAll();
+		//TestSwappable();
 	}
 	public void CheckTransactionOnAll(){
 		PerformOnAllSBs(CheckTransaction);

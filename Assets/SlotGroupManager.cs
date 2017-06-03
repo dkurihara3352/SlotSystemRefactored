@@ -486,10 +486,6 @@ namespace SlotSystem{
 				RootPage.EquipBundle.SetFocusedBundleElement(eSet);
 				Focus();
 			}
-			public EquipmentSet GetFocusedEquipmetSet(){
-				SlotSystemElement focEle = RootPage.EquipBundle.GetFocusedBundleElement();
-				return (EquipmentSet)focEle;
-			}
 			public void DestroyDraggedIcon(){}
 			public void UpdateEquipStatus(){
 				GetEquippedBow().IsEquipped = true;

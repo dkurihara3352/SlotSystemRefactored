@@ -364,78 +364,76 @@ namespace SlotSystem{
 								Transaction feeds what sb and sg are selected
 									Revert:		sSB null,		sSG targetSG(orig)
 									Fill:		sSB null,		sSG targetSG(non orig)
-									Swap:		sSB targetSB/calced,	sSG targetSG
+									Swap:		sSB targetSB/calced,	sSG targetSG(non orig)
 									Reorder:	sSB targetSB,	sSG targetSG(orig)
 									Insert:		sSB targetSB,	sSG targetSG(non orig)
 									(Sort):		sSB null, 		sSG (specified)
-									Stack:		sSB targetSB/calced,	sSG targetSG
+									Stack:		sSB targetSB/calced,	sSG targetSG(non orig)
 							*/
 						/*	Precondition	*/
-							/*	pickedSB.IsPickable
-								the states of the rest is unknown
+							/*	1)	pickedSB.IsPickable
+								2)	the states of the rest is unknown
+								3)	a. this method is performed upon All SBs and SGs in Focused SGP and Focused SGEs, not ones in defocused (although the state of target SB or SG is not necessarily focused due to prepick filtering)
+									b. this means that those elements that are defocused before prepick filtering are not going to be accidentally focused
 							*/
 
+					if(!pickedSB.IsPickable){
+						throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
+					}
 					SlotGroup origSG = pickedSB.SG;
-						
-						if(targetSB != null){
-							targetSG = targetSB.SG;
-						}
-						
-						if(targetSG == null){// meaning selectedSB is also null
-							return new RevertTransaction(pickedSB);
-						}else{// hoveredSB could be null
 
-						}
-						if(targetSB == null){// hoveredSB null, nor selectedSB not calculable
-							if(targetSG == null || targetSG == origSG || !origSG.IsShrinkable || !targetSG.AcceptsFilter(pickedSB)){
-								return new RevertTransaction(pickedSB);
-							}else{
-								if(targetSG.IsExpandable){
-									return new FillEquipTransaction(pickedSB, targetSG);
-								}else{
-									if(targetSG.HasEmptySlot){
-										return new FillEquipTransaction(pickedSB, targetSG);
+					if(targetSB != null){
+						targetSG = targetSB.SG;
+					}
+					if(targetSG != null){
+						if(targetSG.IsPool && targetSG != SlotGroupManager.CurSGM.GetFocusedPoolSG())
+							throw new System.InvalidOperationException("GetTransaction: targetSG is poolSG but not focused");
+						else if(targetSG.IsSGE && !SlotGroupManager.CurSGM.FocusedSGEs.Contains(targetSG))
+							throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
+					}
+					if(targetSG == null){// meaning selectedSB is also null
+						return new RevertTransaction();
+					}else{// hoveredSB could be null
+						if(targetSB == null){// on SG
+							if(targetSG.AcceptsFilter(pickedSB)){
+								if(targetSG != origSG && origSG.IsShrinkable){
+									if(targetSG.HasItem(pickedSB.ItemInst)){
+										if(pickedSB.ItemInst.Item.IsStackable)
+											return new StackTransaction(targetSG.GetSlottable(pickedSB.ItemInst));
 									}else{
-										return new RevertTransaction(pickedSB);
-									}
-								}
-							}
-						}
-						else{// hoveredSB not null (thus, selectedSG not null), or selectedSB calculable
-							if(targetSB == pickedSB){
-								return new RevertTransaction(pickedSB);
-							}else{
-								if(targetSG == origSG){
-									if(targetSG.IsAutoSort)
-										return new ReorderTransaction(pickedSB, targetSB);
-									else
-										return new RevertTransaction(pickedSB);
-								}else{
-									if(Util.HaveCommonItemFamily(pickedSB, targetSB)){
-										return new SwapTransaction(pickedSB, targetSB);
-									}else{
-										if(!targetSG.IsAutoSort)
-											return new InsertTransaction(pickedSB, targetSB, targetSG);
-										else{
-											if(targetSG.AcceptsFilter(pickedSB) && origSG.IsShrinkable){
-												if(targetSG.IsExpandable){
-													return new FillEquipTransaction(pickedSB, targetSG);
-												}else{
-													if(targetSG.HasEmptySlot){
-														return new FillEquipTransaction(pickedSB, targetSG);
-													}
-												}
+										if(targetSG.HasEmptySlot){
+											return new FillEquipTransaction(targetSG);
+										}else{
+											if(targetSG.SwappableSBs(pickedSB).Count == 1){
+												return new SwapTransaction(targetSG.SwappableSBs(pickedSB)[0]);
+											}else{
+												if(targetSG.IsExpandable)
+													return new FillEquipTransaction(targetSG);
 											}
 										}
 									}
 								}
 							}
+							return new RevertTransaction();
+						}else{// targetSB specified, targetSG == targetSB.SG
+							if(targetSG == origSG){
+								if(targetSB != pickedSB){
+									if(!targetSG.IsAutoSort)
+										return new ReorderTransaction(targetSB);
+								}
+							}else{
+								if(targetSG.AcceptsFilter(pickedSB)){
+									//swap or stack, else insert
+									if(targetSG.IsSwappable(pickedSB, targetSB))
+										return new SwapTransaction(targetSB);
+									if(Util.IsStackable(pickedSB, targetSB))
+										return new StackTransaction(targetSB);
+									if(!targetSG.IsAutoSort)
+										return new InsertTransaction(tagetSB);
+								}
+							}
+							return new RevertTransaction();
 						}
-					if(pickedSB.IsPickable){
-						
-						return new RevertTransaction(pickedSB);
-					}else{
-						return null;
 					}
 				}
 				public void Execute(SlotGroupManager sgm){
@@ -446,7 +444,7 @@ namespace SlotSystem{
 					if(pickedSB != null){
 						if(selectedSB == null){// drop on SG
 							if(selectedSG == null || selectedSG == origSG || !origSG.IsShrinkable){
-								SlotSystemTransaction revertTs = new RevertTransaction(pickedSB);
+								SlotSystemTransaction revertTs = new RevertTransaction();
 								sgm.SetTransaction(revertTs);
 							}else{
 								/*	selectedSG != null && != origSG
@@ -454,25 +452,25 @@ namespace SlotSystem{
 								*/
 								if(selectedSG.HasItem((InventoryItemInstanceMock)pickedSB.Item)){
 									if(selectedSG.IsPool){
-										FillEquipTransaction ta = new FillEquipTransaction(pickedSB, selectedSG);
+										FillEquipTransaction ta = new FillEquipTransaction(selectedSG);
 										sgm.SetTransaction(ta);
 									}else{
-										StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
+										StackTransaction stackTs = new StackTransaction(selectedSB);
 										sgm.SetTransaction(stackTs);
 									}
 								}else{
 									EquipmentSet focusedEquipSet = (EquipmentSet)sgm.RootPage.EquipBundle.GetFocusedBundleElement();
 									if(focusedEquipSet.ContainsElement(selectedSG)){
 										if(selectedSG.Filter is SGCGearsFilter){
-											FillEquipTransaction fillEquipTs = new FillEquipTransaction(pickedSB, selectedSG);
+											FillEquipTransaction fillEquipTs = new FillEquipTransaction(selectedSG);
 											sgm.SetTransaction(fillEquipTs);
 										}else{
 											sgm.SetSelectedSB(selectedSG.Slots[0].Sb);
-											SwapTransaction swapTs = new SwapTransaction(pickedSB, selectedSG.Slots[0].Sb);
+											SwapTransaction swapTs = new SwapTransaction(selectedSG.Slots[0].Sb);
 											sgm.SetTransaction(swapTs);
 										}
 									}else{
-										FillTransaction fillTs = new FillTransaction(pickedSB, selectedSG);
+										FillTransaction fillTs = new FillTransaction(selectedSG);
 										sgm.SetTransaction(fillTs);
 									}
 								}
@@ -480,26 +478,26 @@ namespace SlotSystem{
 
 						}else{// selectedSB != null
 							if(pickedSB == selectedSB){
-								SlotSystemTransaction revertTs = new RevertTransaction(pickedSB);
+								SlotSystemTransaction revertTs = new RevertTransaction();
 								sgm.SetTransaction(revertTs);
 							}else{
 								if(sgm.GetSlotGroup(selectedSB) == sgm.GetSlotGroup(pickedSB)){
 									if(!sgm.GetSlotGroup(pickedSB).IsAutoSort){
-										SlotSystemTransaction reorderTs = new ReorderTransaction(pickedSB, selectedSB);
+										SlotSystemTransaction reorderTs = new ReorderTransaction(selectedSB);
 										sgm.SetTransaction(reorderTs);
 									}
 								}else{// different SGs
 									if(pickedSB.Item == selectedSB.Item){
 										if(pickedSB.IsEquipped){
 											
-											FillEquipTransaction ta = new FillEquipTransaction(pickedSB, selectedSB.SG);
+											FillEquipTransaction ta = new FillEquipTransaction(selectedSB.SG);
 											sgm.SetTransaction(ta);
 										}else{
-											StackTransaction stackTs = new StackTransaction(pickedSB, selectedSB);
+											StackTransaction stackTs = new StackTransaction(selectedSB);
 											sgm.SetTransaction(stackTs);
 										}
 									}else{
-										SwapTransaction swapTs = new SwapTransaction(pickedSB, selectedSB);
+										SwapTransaction swapTs = new SwapTransaction(selectedSB);
 										sgm.SetTransaction(swapTs);
 									}
 								}
@@ -3489,6 +3487,13 @@ namespace SlotSystem{
 					return (other.Item is PartsInstanceMock);
 				else
 					return false;
+			}
+			public static bool IsStackable(Slottable pickedSB, Slottable otherSB){
+				if(pickedSB.ItemInst == otherSB.ItemInst){
+					if(pickedSB.ItemInst.Item.IsStackable)
+						return true;
+				}
+				return false;
 			}
 			public static string SGName(SlotGroup sg){
 				string result = "";
