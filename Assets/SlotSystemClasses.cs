@@ -21,6 +21,100 @@ namespace SlotSystem{
 				void OnComplete();
 			}
 			public abstract class AbsSlotSystemTransaction: SlotSystemTransaction{
+				public static SlotSystemTransaction GetTransaction(Slottable pickedSB, Slottable targetSB, SlotGroup targetSG){
+					/*	notes	*/
+						/*	Postpick Filter evaluation	*/
+							/*	based on the possible outcome Transaction output if the PickedSB is picked 	and put under the cursor
+								Defocus if the result is Revert , Focus otherwise
+								SBs and SGs are evaluated independently
+									SGs -> set hoveredSB null and evaluate
+									SBs -> set hoveredSG null and evaluate
+							*/
+						/*	Transaction cache and retrieval	*/
+							/*	When a SB is picked, a list of TransacionCache is created
+									Transaction cache contains 1)Transaction to be performed when executed, 2) SB and/or SG that needs to be under cursor at the time of execution
+								Probing is performed only on Focused (postpick filtered) SBs and SGs
+							*/
+						/*	SGM selection fields evaluation	*/
+							/*	also is based upon this returned value, not directly what is under cursor
+								Transaction feeds what sb and sg are selected
+									Revert:		sSB null,		sSG targetSG(orig)
+									Fill:		sSB null,		sSG targetSG(non orig)
+									Swap:		sSB targetSB/calced,	sSG targetSG(non orig)
+									Reorder:	sSB targetSB,	sSG targetSG(orig)
+									Insert:		sSB targetSB,	sSG targetSG(non orig)
+									(Sort):		sSB null, 		sSG (specified)
+									Stack:		sSB targetSB/calced,	sSG targetSG(non orig)
+							*/
+						/*	Precondition	*/
+							/*	1)	pickedSB.IsPickable
+								2)	the states of the rest is unknown
+								3)	a. this method is performed upon All SBs and SGs in Focused SGP and Focused SGEs, not ones in defocused (although the state of target SB or SG is not necessarily focused due to prepick filtering)
+									b. this means that those elements that are defocused before prepick filtering are not going to be accidentally focused
+							*/
+
+					if(!pickedSB.IsPickable){
+						throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
+					}
+					SlotGroup origSG = pickedSB.SG;
+
+					if(targetSB != null){
+						targetSG = targetSB.SG;
+					}
+					if(targetSG != null){
+						if(targetSG.IsPool && targetSG != SlotGroupManager.CurSGM.GetFocusedPoolSG())
+							throw new System.InvalidOperationException("GetTransaction: targetSG is poolSG but not focused");
+						else if(targetSG.IsSGE && !SlotGroupManager.CurSGM.FocusedSGEs.Contains(targetSG))
+							throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
+					}
+					if(targetSG == null){// meaning selectedSB is also null
+						return new RevertTransaction();
+					}else{// hoveredSB could be null
+						if(targetSB == null){// on SG
+							if(targetSG.AcceptsFilter(pickedSB)){
+								if(targetSG != origSG && origSG.IsShrinkable){
+									if(targetSG.HasItem(pickedSB.ItemInst)){
+										if(pickedSB.ItemInst.Item.IsStackable)
+											return new StackTransaction(targetSG.GetSlottable(pickedSB.ItemInst));
+									}else{
+										if(targetSG.HasEmptySlot){
+											return new FillEquipTransaction(targetSG);
+										}else{
+											if(targetSG.SwappableSBs(pickedSB).Count == 1){
+												return new SwapTransaction(targetSG.SwappableSBs(pickedSB)[0]);
+											}else{
+												if(targetSG.IsExpandable)
+													return new FillEquipTransaction(targetSG);
+											}
+										}
+									}
+								}
+							}
+							return new RevertTransaction();
+						}else{// targetSB specified, targetSG == targetSB.SG
+							if(targetSG == origSG){//
+								if(targetSB != pickedSB){
+									if(!targetSG.IsAutoSort)
+										return new ReorderTransaction(targetSB);
+								}
+							}else{
+								if(targetSG.AcceptsFilter(pickedSB)){
+									//swap or stack, else insert
+									if(pickedSB.ItemInst == targetSB.ItemInst){
+										if(pickedSB.ItemInst.Item.IsStackable)
+											return new StackTransaction(targetSB);
+									}else{
+										if(pickedSB.SG.AcceptsFilter(targetSB))
+											return new SwapTransaction(targetSB);
+									}
+									if(!targetSG.IsAutoSort)
+										return new InsertTransaction(targetSB);
+								}
+							}
+							return new RevertTransaction();
+						}
+					}
+				}
 				protected SlotGroupManager sgm = SlotGroupManager.CurSGM;
 				protected void SetTransactionProcessAndSwitchState(Slottable pickedSB, Slottable selectedSB, SlotGroup pickedSG, SlotGroup selectedSG){
 					sgm.CachedProcess = new SGMTransactionProcess(sgm, pickedSB, selectedSB, pickedSG, selectedSG);
@@ -281,6 +375,26 @@ namespace SlotSystem{
 					sgm.ClearAndReset();
 				}
 			}
+			public class InsertTransaction: AbsSlotSystemTransaction{
+				Slottable selectedSB;
+				SlotGroup selectedSG;
+				public InsertTransaction(Slottable sb){
+					this.selectedSB = sb;
+					this.selectedSG = sb.SG;
+				}
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = selectedSB;
+					sg = selectedSG;
+				}
+				public override void Indicate(){}
+				public override void Execute(){
+					
+				}
+				public override void OnComplete(){
+					
+					sgm.ClearAndReset();
+				}
+			}
 			/*	dump	*/
 				// public class ComplexTransaction: SlotSystemTransaction{
 					// 	List<InventoryItemInstanceMock> m_removed;
@@ -345,97 +459,6 @@ namespace SlotSystem{
 				void Execute(SlotGroupManager sgm);
 			}
 			public class UpdateTransactionCommand: SGMCommand{
-				public SlotSystemTransaction GetTransaction(Slottable pickedSB, Slottable targetSB, SlotGroup targetSG){
-					/*	notes	*/
-						/*	Postpick Filter evaluation	*/
-							/*	based on the possible outcome Transaction output if the PickedSB is picked 	and put under the cursor
-								Defocus if the result is Revert , Focus otherwise
-								SBs and SGs are evaluated independently
-									SGs -> set hoveredSB null and evaluate
-									SBs -> set hoveredSG null and evaluate
-							*/
-						/*	Transaction cache and retrieval	*/
-							/*	When a SB is picked, a list of TransacionCache is created
-									Transaction cache contains 1)Transaction to be performed when executed, 2) SB and/or SG that needs to be under cursor at the time of execution
-								Probing is performed only on Focused (postpick filtered) SBs and SGs
-							*/
-						/*	SGM selection fields evaluation	*/
-							/*	also is based upon this returned value, not directly what is under cursor
-								Transaction feeds what sb and sg are selected
-									Revert:		sSB null,		sSG targetSG(orig)
-									Fill:		sSB null,		sSG targetSG(non orig)
-									Swap:		sSB targetSB/calced,	sSG targetSG(non orig)
-									Reorder:	sSB targetSB,	sSG targetSG(orig)
-									Insert:		sSB targetSB,	sSG targetSG(non orig)
-									(Sort):		sSB null, 		sSG (specified)
-									Stack:		sSB targetSB/calced,	sSG targetSG(non orig)
-							*/
-						/*	Precondition	*/
-							/*	1)	pickedSB.IsPickable
-								2)	the states of the rest is unknown
-								3)	a. this method is performed upon All SBs and SGs in Focused SGP and Focused SGEs, not ones in defocused (although the state of target SB or SG is not necessarily focused due to prepick filtering)
-									b. this means that those elements that are defocused before prepick filtering are not going to be accidentally focused
-							*/
-
-					if(!pickedSB.IsPickable){
-						throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
-					}
-					SlotGroup origSG = pickedSB.SG;
-
-					if(targetSB != null){
-						targetSG = targetSB.SG;
-					}
-					if(targetSG != null){
-						if(targetSG.IsPool && targetSG != SlotGroupManager.CurSGM.GetFocusedPoolSG())
-							throw new System.InvalidOperationException("GetTransaction: targetSG is poolSG but not focused");
-						else if(targetSG.IsSGE && !SlotGroupManager.CurSGM.FocusedSGEs.Contains(targetSG))
-							throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
-					}
-					if(targetSG == null){// meaning selectedSB is also null
-						return new RevertTransaction();
-					}else{// hoveredSB could be null
-						if(targetSB == null){// on SG
-							if(targetSG.AcceptsFilter(pickedSB)){
-								if(targetSG != origSG && origSG.IsShrinkable){
-									if(targetSG.HasItem(pickedSB.ItemInst)){
-										if(pickedSB.ItemInst.Item.IsStackable)
-											return new StackTransaction(targetSG.GetSlottable(pickedSB.ItemInst));
-									}else{
-										if(targetSG.HasEmptySlot){
-											return new FillEquipTransaction(targetSG);
-										}else{
-											if(targetSG.SwappableSBs(pickedSB).Count == 1){
-												return new SwapTransaction(targetSG.SwappableSBs(pickedSB)[0]);
-											}else{
-												if(targetSG.IsExpandable)
-													return new FillEquipTransaction(targetSG);
-											}
-										}
-									}
-								}
-							}
-							return new RevertTransaction();
-						}else{// targetSB specified, targetSG == targetSB.SG
-							if(targetSG == origSG){
-								if(targetSB != pickedSB){
-									if(!targetSG.IsAutoSort)
-										return new ReorderTransaction(targetSB);
-								}
-							}else{
-								if(targetSG.AcceptsFilter(pickedSB)){
-									//swap or stack, else insert
-									if(targetSG.IsSwappable(pickedSB, targetSB))
-										return new SwapTransaction(targetSB);
-									if(Util.IsStackable(pickedSB, targetSB))
-										return new StackTransaction(targetSB);
-									if(!targetSG.IsAutoSort)
-										return new InsertTransaction(tagetSB);
-								}
-							}
-							return new RevertTransaction();
-						}
-					}
-				}
 				public void Execute(SlotGroupManager sgm){
 					Slottable pickedSB = sgm.PickedSB;
 					Slottable selectedSB = sgm.SelectedSB;
@@ -3489,10 +3512,27 @@ namespace SlotSystem{
 					return false;
 			}
 			public static bool IsStackable(Slottable pickedSB, Slottable otherSB){
-				if(pickedSB.ItemInst == otherSB.ItemInst){
-					if(pickedSB.ItemInst.Item.IsStackable)
-						return true;
+				SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, otherSB, null);
+				if(ta is StackTransaction) return true;
+				return false;
+			}
+			public static bool IsSwappable(Slottable pickedSB, Slottable otherSB){
+				/*	precondition
+						1) they do not share same SG
+						2) otherSB.SG accepts pickedSB
+						3) not stackable
+				*/
+				if(pickedSB.SG != otherSB.SG){
+					if(otherSB.SG.AcceptsFilter(pickedSB)){
+						if(!(pickedSB.ItemInst == otherSB.ItemInst && pickedSB.ItemInst.Item.IsStackable))
+						 if(pickedSB.SG.AcceptsFilter(otherSB))
+							return true;
+					}
 				}
+				// if(!IsStackable(pickedSB, otherSB)){
+				// 	if(pickedSB.SG.AcceptsFilter(otherSB))
+				// 		return true;
+				// }
 				return false;
 			}
 			public static string SGName(SlotGroup sg){

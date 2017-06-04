@@ -800,6 +800,16 @@ namespace SlotSystem{
 				}
 				return false;
 			}
+			public List<Slottable> SwappableSBs(Slottable pickedSB){
+				List<Slottable> result = new List<Slottable>();
+				foreach(Slottable sb in Slottables){
+					if(sb != null){
+						if(Util.IsSwappable(pickedSB, sb))
+							result.Add(sb);
+					}
+				}
+				return result;
+			}
 		/*	dump	*/
 			// public void CheckTransactionCompletionOnSBs(){
 			// 	bool flag = true;

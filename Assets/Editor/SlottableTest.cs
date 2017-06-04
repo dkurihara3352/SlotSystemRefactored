@@ -6,7 +6,91 @@ using System.Collections.Generic;
 public class SlottableTest {
 
 
-	
+	class CrossTestResult{
+		bool isPAS;
+		bool isTAS;
+		public string pAS;
+		public string tAS;
+		SlotGroup sg;
+		public string sgName;
+		Slottable sb;
+		public string sbName;
+		public int i;
+		public string Val;
+		public CrossTestResult(bool isPAS, bool isTAS, SlotGroup sg, Slottable sb, int i){
+			this.isPAS = isPAS; this.isTAS = isTAS; this.sg = sg; this.sb = sb; this.i = i;
+			this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
+			this.tAS = "tAS: " + (isTAS?Util.Blue("on "):Util.Red("off "));
+			this.sgName = Util.SGName(sg);
+				if(sg.IsPool)
+					sgName = Util.Red(sgName);
+				else
+					sgName = Util.Blue(sgName);
+
+			this.sbName = Util.SBName(sb) + " of " + Util.SGName(sb.SG);
+				if(sb.SG.IsPool)
+					sbName = Util.Red(sbName);
+				else
+					sbName = Util.Blue(sbName);
+			this.Val = i.ToString();
+		}
+		public bool SameSGSB(CrossTestResult other){
+			return this.sg == other.sg && this.sb == other.sb;
+		}
+		
+	}
+	List<CrossTestResult> crossResults = new List<CrossTestResult>();
+	List<List<CrossTestResult>> crossResultsBundles{
+		get{
+			List<List<CrossTestResult>> result = new List<List<CrossTestResult>>();
+			foreach(CrossTestResult res in crossResults){
+				bool found = false;
+				foreach(List<CrossTestResult> bundle in result){
+					if(res.SameSGSB(bundle[0]))
+						found = true;
+				}
+				if(!found){
+					List<CrossTestResult> bundle = new List<CrossTestResult>();
+					bundle.Add(res);
+					foreach(CrossTestResult res2 in crossResults){
+						if(res != res2)
+							if(res.SameSGSB(res2)){
+								bundle.Add(res2);
+							}
+					}
+					result.Add(bundle);
+				}
+			}
+			foreach(List<CrossTestResult> bundle in result)
+				AE(bundle.Count, 4);
+			return result;
+		}
+	}
+	public void PrintCrossResult(bool suppress0){
+		foreach(List<CrossTestResult> bundle in crossResultsBundles){
+			if(HasAllSameValue(bundle))
+				if(!(suppress0 && bundle[0].i == 0))
+					Debug.Log(bundle[0].sbName + " on " + bundle[0].sgName + " " + bundle[0].Val);
+			else
+				foreach(CrossTestResult res in bundle){
+					if(!(suppress0 && res.i == 0))
+						Debug.Log(res.pAS + " " + res.tAS +" "+ res.sbName + " on " + res.sgName + " " + res.Val);
+				}
+		}
+		ClearCResults();
+	}
+	bool HasAllSameValue(List<CrossTestResult> bundle){
+		bool flag = true;
+		int prevInt = -1;
+		foreach(CrossTestResult res in bundle){
+			flag &= prevInt == -1? true: res.i == prevInt;
+			prevInt = res.i;
+		}
+		return flag;
+	}
+	public void ClearCResults(){
+		crossResults.Clear();
+	}
 	/*	fields 	*/
 		PointerEventDataMock eventData = new PointerEventDataMock();
 		GameObject sgmGO;
@@ -402,17 +486,29 @@ public class SlottableTest {
 			// TestRevertOnAllSBs();
 			// TestReorderOnAll();
 			// TestFillEquippableOnAll();
+			// TestSwappable();
 		// TestFillEquipOnAll(); 
 		// CheckTransactionOnAll();
-		//TestSwappable();
 	}
+	public void TestSwappable(){
+		PerformOnAllSBs(CheckSwappable);
+		PrintCrossResult(true);
+	}
+		public void CheckSwappable(Slottable sb, bool isPickedAS){
+			CrossTestingSGs(CrossCheckSwappable, sb, isPickedAS);
+		}
+		public void CrossCheckSwappable(SlotGroup sg, Slottable sb, bool isPickedAS ,bool isTargetAS){
+			int count = sg.SwappableSBs(sb).Count;
+			CrossTestResult newRes = new CrossTestResult(isPickedAS, isTargetAS, sg, sb, count);
+			crossResults.Add(newRes);
+		}
 	public void CheckTransactionOnAll(){
 		PerformOnAllSBs(CheckTransaction);
 	}
-		public void CheckTransaction(Slottable sb){
-			CrossTestingSGs(CrossCheckTransaction, sb);
+		public void CheckTransaction(Slottable sb, bool isPickedAS){
+			CrossTestingSGs(CrossCheckTransaction, sb, isPickedAS);
 		}
-		public void CrossCheckTransaction(SlotGroup sg, Slottable sb){
+		public void CrossCheckTransaction(SlotGroup sg, Slottable sb, bool isPickedAS ,bool isTargetAS){
 			if(sb.IsPickable){
 				sgm.SetPickedSB(sb);
 				sgm.SetSelectedSB(null);
@@ -429,10 +525,10 @@ public class SlottableTest {
 	public void TestFillEquippableOnAll(){
 		PerformOnAllSBs(TestFillEquippable);
 	}
-		public void TestFillEquippable(Slottable sb){
-			CrossTestingSGs(CrossTestFillEquippable, sb);
+		public void TestFillEquippable(Slottable sb, bool isPickedAS){
+			CrossTestingSGs(CrossTestFillEquippable, sb, isPickedAS);
 		}
-		public void CrossTestFillEquippable(SlotGroup sg, Slottable sb){
+		public void CrossTestFillEquippable(SlotGroup sg, Slottable sb, bool isPickedAS, bool isTargetAS){
 			SlotGroup origSG = sb.SG;
 			bool isFillEquippable = false;
 			if(origSG.IsShrinkable){
@@ -476,10 +572,10 @@ public class SlottableTest {
 	public void TestFillEquipOnAll(){
 		PerformOnAllSBs(TestFillEquip);
 	}
-		 public void TestFillEquip(Slottable sb){
-			CrossTestingSGs(CrossTestFillEquip, sb);
+		 public void TestFillEquip(Slottable sb, bool isPickedAS){
+			CrossTestingSGs(CrossTestFillEquip, sb, isPickedAS);
 		 }
-		 public void CrossTestFillEquip(SlotGroup sg, Slottable sb){
+		 public void CrossTestFillEquip(SlotGroup sg, Slottable sb, bool isPickedAS, bool isTargetAS){
 			 InventoryItemInstanceMock pickedItem = sb.ItemInst;
 			 SlotGroup origSG = sb.SG;
 			 if(sg.IsFillEquippable(sb)){
@@ -586,7 +682,7 @@ public class SlottableTest {
 	public void TestReorderOnAll(){
 		PerformOnAllSBs(TestReorder);
 	}
-		public void TestReorder(Slottable sb){
+		public void TestReorder(Slottable sb, bool isAutoSort){
 			SlotGroup origSG = sb.SG;
 			if(!origSG.IsAutoSort){
 				foreach(Slottable other in origSG.Slottables){
@@ -669,19 +765,19 @@ public class SlottableTest {
 			AE(sg.Slottables[i], sbs[i]);
 		}
 	}
-	public void PerformOnAllSBs(System.Action<Slottable> act){
+	public void PerformOnAllSBs(System.Action<Slottable, bool> act){
 		foreach(SlotGroup sgp in sgm.AllSGPs){
 			sgm.SetFocusedPoolSG(sgp);
 			sgp.ToggleAutoSort(true);
 			foreach(Slottable sb in sgp.Slottables){
 				if(sb != null){
-					act(sb);
+					act(sb, true);
 				}
 			}
 			sgp.ToggleAutoSort(false);
 			foreach(Slottable sb in sgp.Slottables){
 				if(sb != null){
-					act(sb);
+					act(sb, false);
 				}
 			}
 		}
@@ -691,13 +787,13 @@ public class SlottableTest {
 				sge.ToggleAutoSort(true);
 				foreach(Slottable sb in sge.Slottables){
 					if(sb != null){
-						act(sb);
+						act(sb, true);
 					}
 				}
 				sge.ToggleAutoSort(false);
 				foreach(Slottable sb in sge.Slottables){
 					if(sb != null){
-						act(sb);
+						act(sb, false);
 					}
 				}
 			}
@@ -721,30 +817,30 @@ public class SlottableTest {
 			}
 		}
 	}
-	public void CrossTestingSGs(System.Action<SlotGroup, Slottable> act, Slottable sb){
+	public void CrossTestingSGs(System.Action<SlotGroup, Slottable, bool, bool> act, Slottable sb, bool isPickedAS){
 		if(sb.SG.IsPool){
 			foreach(EquipmentSet eSet in sgm.EquipmentSets){
 				sgm.SetFocusedEquipmentSet(eSet);
 				foreach(SlotGroup sge in sgm.FocusedSGEs){
 					sge.ToggleAutoSort(true);
-					act(sge, sb);
+					act(sge, sb, isPickedAS, true);
 					sge.ToggleAutoSort(false);
-					act(sge, sb);
+					act(sge, sb, isPickedAS, false);
 				}
 			}
 		}else if(sb.SG.IsSGE){
 			foreach(SlotGroup sgp in sgm.AllSGPs){
 				sgm.SetFocusedPoolSG(sgp);
 				sgp.ToggleAutoSort(true);
-				act(sgp, sb);
+				act(sgp, sb, isPickedAS, true);
 				sgp.ToggleAutoSort(false);
-				act(sgp, sb);
+				act(sgp, sb, isPickedAS, false);
 			}
 			foreach(SlotGroup sge in sgm.FocusedSGEs){
 				sge.ToggleAutoSort(true);
-				act(sge, sb);
+				act(sge, sb, isPickedAS, true);
 				sge.ToggleAutoSort(false);
-				act(sge, sb);
+				act(sge, sb, isPickedAS, false);
 			}
 		}
 	}
@@ -753,7 +849,7 @@ public class SlottableTest {
 			act(sgp);
 		}
 	}
-	public void TestRevert(Slottable sb){
+	public void TestRevert(Slottable sb, bool isPickedAS){
 		if(sb.CurState == SBFocused || sb.CurState == SBEADeselected){
 			SlotGroup origSG = sb.SG;
 				AssertFocused();
@@ -2774,6 +2870,9 @@ public class SlottableTest {
 		}
 		public string Red(string str){
 			return Util.Red(str);
+		}
+		public string Blue(string str){
+			return Util.Blue(str);
 		}
 	/*	dump	*/
 		// int aoCount = 0;
