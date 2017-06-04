@@ -373,6 +373,11 @@ namespace SlotSystem{
 					return result;
 				}
 			}
+			public PoolInventory PoolInv{
+				get{
+					return (PoolInventory)GetFocusedPoolSG().Inventory;
+				}
+			}
 			/*	dump	*/
 				// List<SlotGroup> m_slotGroups;
 				// public List<SlotGroup> SlotGroups{

@@ -73,19 +73,20 @@ namespace SlotSystem{
 						if(targetSB == null){// on SG
 							if(targetSG.AcceptsFilter(pickedSB)){
 								if(targetSG != origSG && origSG.IsShrinkable){
-									if(targetSG.HasItem(pickedSB.ItemInst)){
-										if(pickedSB.ItemInst.Item.IsStackable)
-											return new StackTransaction(targetSG.GetSlottable(pickedSB.ItemInst));
-									}else{
-										if(targetSG.HasEmptySlot){
+									if(targetSG.HasItem(pickedSB.ItemInst) && pickedSB.ItemInst.Item.IsStackable)
+										return new StackTransaction(targetSG.GetSlottable(pickedSB.ItemInst));
+										
+									if(targetSG.HasEmptySlot){
+										if(!targetSG.HasItem(pickedSB.ItemInst))
 											return new FillEquipTransaction(targetSG);
+									}else{
+										if(targetSG.SwappableSBs(pickedSB).Count == 1){
+											Slottable calcedSB = targetSG.SwappableSBs(pickedSB)[0];
+											if(calcedSB.ItemInst != pickedSB.ItemInst)
+												return new SwapTransaction(calcedSB);
 										}else{
-											if(targetSG.SwappableSBs(pickedSB).Count == 1){
-												return new SwapTransaction(targetSG.SwappableSBs(pickedSB)[0]);
-											}else{
-												if(targetSG.IsExpandable)
-													return new FillEquipTransaction(targetSG);
-											}
+											if(targetSG.IsExpandable)
+												return new FillEquipTransaction(targetSG);
 										}
 									}
 								}
@@ -104,8 +105,17 @@ namespace SlotSystem{
 										if(pickedSB.ItemInst.Item.IsStackable)
 											return new StackTransaction(targetSB);
 									}else{
-										if(pickedSB.SG.AcceptsFilter(targetSB))
-											return new SwapTransaction(targetSB);
+										if(targetSG.HasEmptySlot){
+											if(!targetSG.HasItem(pickedSB.ItemInst))
+												return new FillEquipTransaction(targetSG);
+											}else{
+												if(origSG.AcceptsFilter(targetSB)){
+													return new SwapTransaction(targetSB);
+												}else{
+													if(targetSG.IsExpandable)
+														return new FillEquipTransaction(targetSG);
+												}
+											}
 									}
 									if(!targetSG.IsAutoSort)
 										return new InsertTransaction(targetSB);
@@ -3590,6 +3600,13 @@ namespace SlotSystem{
 					case 602: result = "frgParts"; break;
 					case 603: result = "mstParts"; break;
 				}
+				List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
+				foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.PoolInv.Items){
+					if(itemInst.Item == sb.ItemInst.Item)
+						sameItemInsts.Add(itemInst);
+				}
+				int index = sameItemInsts.IndexOf(sb.ItemInst);
+				result += "_"+index.ToString();
 				return result;
 			}
 			public static string Red(string str){
@@ -3601,8 +3618,29 @@ namespace SlotSystem{
 			}
 			public static string Green(string str){
 				return "<color=#00ff00>" + str + "</color>";
-
 			}
+			public static string Ciel(string str){
+				return "<color=#11A795>" + str + "</color>";
+			}
+			public static string Aqua(string str){
+				return "<color=#128582>" + str + "</color>";
+			}
+			public static string Forest(string str){
+				return "<color=#046C57>" + str + "</color>";
+			}
+			public static string Brown(string str){
+				return "<color=#805A05>" + str + "</color>";
+			}
+			public static string Terra(string str){
+				return "<color=#EA650F>" + str + "</color>";
+			}
+			public static string Berry(string str){
+				return "<color=#A41565>" + str + "</color>";
+			}
+			public static string Violet(string str){
+				return "<color=#793DBD>" + str + "</color>";
+			}
+			
 			public static string Bold(string str){
 				return "<b>" + str + "</b>";
 			}
