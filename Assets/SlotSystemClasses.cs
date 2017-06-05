@@ -102,23 +102,29 @@ namespace SlotSystem{
 								if(targetSG.AcceptsFilter(pickedSB)){
 									//swap or stack, else insert
 									if(pickedSB.ItemInst == targetSB.ItemInst){
+										if(targetSG.IsPool && origSG.IsShrinkable)
+											return new FillEquipTransaction(targetSG);
 										if(pickedSB.ItemInst.Item.IsStackable)
 											return new StackTransaction(targetSB);
 									}else{
-										if(targetSG.HasEmptySlot){
-											if(!targetSG.HasItem(pickedSB.ItemInst))
-												return new FillEquipTransaction(targetSG);
-											}else{
-												if(origSG.AcceptsFilter(targetSB)){
+										if(targetSG.HasItem(pickedSB.ItemInst)){
+											if(targetSG.IsPool){
+												if(origSG.AcceptsFilter(targetSB))
 													return new SwapTransaction(targetSB);
-												}else{
-													if(targetSG.IsExpandable)
-														return new FillEquipTransaction(targetSG);
-												}
+												if(origSG.IsShrinkable)
+													return new FillEquipTransaction(targetSG);
 											}
+											if(!targetSG.IsAutoSort)
+												return new ReorderInOtherSGTransaction(targetSB);
+										}else{
+											if(origSG.AcceptsFilter(targetSB))
+												return new SwapTransaction(targetSB);
+											if(targetSG.HasEmptySlot || targetSG.IsExpandable)
+												return new FillEquipTransaction(targetSG);
+											if(!targetSG.IsAutoSort)
+												return new InsertTransaction(targetSB);
+										}
 									}
-									if(!targetSG.IsAutoSort)
-										return new InsertTransaction(targetSB);
 								}
 							}
 							return new RevertTransaction();
@@ -184,6 +190,38 @@ namespace SlotSystem{
 
 					Slot slot = selectedSG.GetSlot(selectedSB);
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
+					pickedSB.SetState(Slottable.RevertingState);
+
+					selectedSG.CheckCompletion();
+				}
+				public override void OnComplete(){
+					selectedSG.OnCompleteSlotMovements();
+					sgm.DestroyDraggedIcon();
+					sgm.ClearAndReset();
+				}
+			}
+			public class ReorderInOtherSGTransaction: AbsSlotSystemTransaction{
+				Slottable pickedSB;
+				Slottable selectedSB;
+				SlotGroup selectedSG;
+				public ReorderInOtherSGTransaction(Slottable selected){
+					this.pickedSB = sgm.PickedSB;
+					this.selectedSB = selected;
+					this.selectedSG = this.selectedSB.SG;
+				}
+				public override void GetSelectedSBAndSG(out Slottable sb, out SlotGroup sg){
+					sb = selectedSB;
+					sg = selectedSG;
+				}
+				public override void Indicate(){}
+				public override void Execute(){
+					
+					SetTransactionProcessAndSwitchState(pickedSB, null, null, selectedSG);
+					selectedSG.SetAndRunSlotMovementsForReorder(selectedSG.GetSlottable(pickedSB.ItemInst), selectedSB);
+					selectedSG.TransactionProcess.Start();
+
+					Slot slot = pickedSB.SG.GetSlot(pickedSB);
+					pickedSB.MoveDraggedIcon(pickedSB.SG, slot);
 					pickedSB.SetState(Slottable.RevertingState);
 
 					selectedSG.CheckCompletion();
@@ -3639,6 +3677,9 @@ namespace SlotSystem{
 			}
 			public static string Violet(string str){
 				return "<color=#793DBD>" + str + "</color>";
+			}
+			public static string Khaki(string str){
+				return "<color=#747925>" + str + "</color>";
 			}
 			
 			public static string Bold(string str){

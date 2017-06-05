@@ -349,6 +349,9 @@ namespace SlotSystem{
 					return CurState == Slottable.FocusedState || CurState == Slottable.EquippedAndDeselectedState;
 				}
 			}
+			public bool IsFocused{
+				get{return CurState == Slottable.FocusedState || CurState == Slottable.EquippedAndDeselectedState;}
+			}
 		/*	processes	*/
 			SBProcess m_curProcess;
 			public SBProcess CurProcess{
