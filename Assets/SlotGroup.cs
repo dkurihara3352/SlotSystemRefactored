@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Utility;
 namespace SlotSystem{
-	public class SlotGroup : MonoBehaviour, SlotSystemElement {
+	public class SlotGroup : MonoBehaviour, SlotSystemElement, StateHandler{
 		/*	states	*/
 			public void SetState(SGState state){
 				m_prevState = m_curState;
@@ -130,7 +130,7 @@ namespace SlotSystem{
 			public IEnumeratorMock TransactionCoroutine(){
 				bool flag = true;
 				foreach(SlotMovement sm in slotMovements){
-					flag &= sm.SB.CurProcess.IsExpired;
+					flag &= sm.SB.ActionProcess.IsExpired;
 				}
 				if(flag){
 					TransactionProcess.Expire();
@@ -233,6 +233,16 @@ namespace SlotSystem{
 					return result;
 				}
 			}
+			public List<InventoryItemInstanceMock> ActualItemInsts{
+				get{
+					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					foreach(InventoryItemInstanceMock itemInst in ItemInstances){
+						if(itemInst != null)
+							result.Add(itemInst);
+					}
+					return result;
+				}
+			}
 			public bool IsFocused{
 				get{return CurState == SlotGroup.FocusedState;}
 			}
@@ -246,7 +256,27 @@ namespace SlotSystem{
 					return emptyFound;
 				}
 			}
-		/* commands	*/
+			public int ActualSBsCount{
+				get{
+					int count = 0;
+					foreach(Slot slot in Slots){
+						if(slot.Sb != null)
+							count ++;
+					}
+					return count;
+				}
+			}
+			public List<Slottable> EquippedSBs{
+				get{
+					List<Slottable> result = new List<Slottable>();
+					foreach(Slottable sb in Slottables){
+						if(sb != null && sb.IsEquipped)
+							result.Add(sb);
+					}
+					return result;
+				}
+			}
+		/*	commands	*/
 			SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
 				public void InitializeItems(){
 					m_initItemsCommand.Execute(this);
@@ -472,8 +502,13 @@ namespace SlotSystem{
 						this.Slots.Add(newSlot);
 					}
 				}
-
+				InitializeState();
 			}
+				public void InitializeState(){
+					m_prevState = SlotGroup.DeactivatedState;
+					m_curState = SlotGroup.DeactivatedState;
+					m_changedPrevState = SlotGroup.DeactivatedState;
+				}
 			public void Activate(){
 				InitializeItems();
 			}
@@ -481,7 +516,7 @@ namespace SlotSystem{
 				SetState(SlotGroup.DeactivatedState);
 				foreach(Slot slot in Slots){
 					if(slot.Sb != null){
-						slot.Sb.SetState(Slottable.DeactivatedState);
+						slot.Sb.SetSelState(Slottable.DeactivatedState);
 					}
 				}
 			}
@@ -718,13 +753,13 @@ namespace SlotSystem{
 			}
 			public void CheckSBsSlotMovementCompletion(){
 				foreach(SlotMovement sm in SlotMovements){
-					if(sm.SB.CurProcess.GetType() == typeof(SBMovingInSGProcess) ||
-					sm.SB.CurProcess.GetType() == typeof(SBRemovedProcess) ||
-					sm.SB.CurProcess.GetType() == typeof(SBAddedProcess)){
+					if(sm.SB.ActionProcess.GetType() == typeof(SBMovingInSGProcess) ||
+					sm.SB.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
+					sm.SB.ActionProcess.GetType() == typeof(SBAddedProcess)){
 						int curId; int newId;
 						sm.GetIndex(out curId, out newId);
 						if(curId == newId)
-							sm.SB.ExpireProcess();
+							sm.SB.ExpireActionProcess();
 					}
 				}
 			}

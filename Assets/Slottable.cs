@@ -2,251 +2,263 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Utility;
 namespace SlotSystem{
-	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable{
+	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, StateHandler{
 
 		
-		/*	States	*/	
-			public void SetState(SBState state){
-					this.m_prevState = this.m_curState;
-					this.m_curState = state;
-				if(this.m_curState != this.m_prevState){
-					this.m_prevState.ExitState(this);
-					this.m_curState.EnterState(this);
-				}
-			}
-			SBState m_curState;
-				public SBState CurState{
-					get{return m_curState;}
-				}
-			SBState m_prevState;
-				public SBState PrevState{
-					get{return m_prevState;}
-				}
-			static SBState m_deactivatedState;
-				public static SBState DeactivatedState{
+		/*	States	*/
+			/*	Selection State	*/
+				SBStateEngine SelStateEngine{
 					get{
-						if(Slottable.m_deactivatedState != null)
-							return Slottable.m_deactivatedState;
-						else{
-							Slottable.m_deactivatedState = new DeactivatedState();	
-							return Slottable.m_deactivatedState;
-						}
+						if(m_selStateEngine == null)
+							m_selStateEngine = new SBStateEngine(this);
+						return m_selStateEngine;
 					}
-				}
-			
-			static SBState m_defocusedState;
-				public static SBState DefocusedState{
-					get{
-						if(Slottable.m_defocusedState != null)
-							return Slottable.m_defocusedState;
-						else{
-							Slottable.m_defocusedState = new DefocusedState();
-							return Slottable.m_defocusedState;
-						}
+					}SBStateEngine m_selStateEngine;
+					public SBSelectionState CurSelState{
+						get{return (SBSelectionState)SelStateEngine.curState;}
 					}
-				}
-			static SBState m_focusedState;
-				public static SBState FocusedState{
+					public SBSelectionState PrevSelState{
+						get{return (SBSelectionState)SelStateEngine.prevState;}
+					}
+					public void SetSelState(SBSelectionState selState){
+						SelStateEngine.SetState(selState);
+					}
+				// public void SetSelectionState(SBSelectionState state){
+					// 		m_prevSelectionState = CurSelectionState;
+					// 		m_curSelectionState = state;
+					// 	if(CurSelectionState != PrevSelectionState){
+					// 		PrevSelectionState.ExitState(this);
+					// 		CurSelectionState.EnterState(this);
+					// 	}
+					// }
+					// public SBSelectionState CurSelectionState{
+					// 	get{return m_curSelectionState;}
+					// 	}SBSelectionState m_curSelectionState;
+					// public SBSelectionState PrevSelectionState{
+					// 	get{return m_prevSelectionState;}
+					// 	}SBSelectionState m_prevSelectionState;
+				// static states
+					public static SBSelectionState DeactivatedState{
+						get{
+							if(Slottable.m_deactivatedState != null)
+								return Slottable.m_deactivatedState;
+							else{
+								Slottable.m_deactivatedState = new DeactivatedState();	
+								return Slottable.m_deactivatedState;
+							}
+						}
+						}static SBSelectionState m_deactivatedState;
+					public static SBSelectionState SelectedState{
+						get{
+							if(Slottable.m_selectedState != null)
+								return Slottable.m_selectedState;
+							else
+								Slottable.m_selectedState = new SBSelectedState();
+								return Slottable.m_selectedState;
+						}
+						}static SBSelectionState m_selectedState;			
+					public static SBSelectionState DefocusedState{
+						get{
+							if(Slottable.m_defocusedState != null)
+								return Slottable.m_defocusedState;
+							else{
+								Slottable.m_defocusedState = new SBDefocusedState();
+								return Slottable.m_defocusedState;
+							}
+						}
+						}static SBSelectionState m_defocusedState;
+					public static SBSelectionState FocusedState{
 					get{
 						if(Slottable.m_focusedState != null)
 							return Slottable.m_focusedState;
 						else{
-							Slottable.m_focusedState = new FocusedState();
+							Slottable.m_focusedState = new SBFocusedState();
 							return Slottable.m_focusedState;
 						}
 					}
-				}
-			static SBState m_waitForPointerUpState;
-				public static SBState WaitForPointerUpState{
+					}static SBSelectionState m_focusedState;
+			/*	Action State	*/
+				SBStateEngine ActStateEngine{
 					get{
-						if(m_waitForPointerUpState != null)
-							return m_waitForPointerUpState;
-						else{
-							m_waitForPointerUpState = new WaitForPointerUpState();
-							return m_waitForPointerUpState;
+						if(m_actStateEngine == null)
+							m_actStateEngine = new SBStateEngine(this);
+						return m_actStateEngine;
+					}
+					}SBStateEngine m_actStateEngine;
+					public SBActionState CurActState{
+						get{return (SBActionState)ActStateEngine.curState;}
+					}
+					public SBActionState PrevActState{
+						get{return (SBActionState)ActStateEngine.prevState;}
+					}
+					public void SetActState(SBActionState actState){
+						ActStateEngine.SetState(actState);
+					}
+				// public void SetActionState(SBActionState state){
+					// 		m_prevActionState = CurActionState;
+					// 		m_curActionState = state;
+					// 	if(CurActionState != PrevActionState){
+					// 		PrevActionState.ExitState(this);
+					// 		CurActionState.EnterState(this);
+					// 	}
+					// 	m_curActionState = state;
+					// 	if(CurActionState != null)
+					// 		CurActionState.EnterState(this);
+					// }
+					// public SBActionState CurActionState{
+					// 	get{return m_curActionState;}
+					// 	}SBActionState m_curActionState;
+					// public SBActionState PrevActionState{
+					// 	get{return m_prevActionState;}
+					// 	}SBActionState m_prevActionState;
+				//	static states
+					public static SBActionState WaitForActionState{
+						get{
+							if(m_waitForActionState != null)
+								return m_waitForActionState;
+							else{
+								m_waitForActionState = new WaitForActionState();
+								return m_waitForActionState;
+							}
 						}
-					}
-				}
-
-			static SBState m_waitForPickUpState;
-				public static SBState WaitForPickUpState{
-					get{
-						if(Slottable.m_waitForPickUpState != null)
-							return Slottable.m_waitForPickUpState;
-						else{
-							Slottable.m_waitForPickUpState = new WaitForPickUpState();
-							return Slottable.m_waitForPickUpState;
+						}static SBActionState m_waitForActionState;
+					public static SBActionState WaitForPointerUpState{
+						get{
+							if(m_waitForPointerUpState != null)
+								return m_waitForPointerUpState;
+							else{
+								m_waitForPointerUpState = new WaitForPointerUpState();
+								return m_waitForPointerUpState;
+							}
 						}
-					}
-				}
-			static SBState m_waitForNextTouchState;
-				public static SBState WaitForNextTouchState{
-					get{
-						if(Slottable.m_waitForNextTouchState != null)
-							return Slottable.m_waitForNextTouchState;
-						else{
-							Slottable.m_waitForNextTouchState = new WaitForNextTouchState();
-							return Slottable.m_waitForNextTouchState;
+						}static SBActionState m_waitForPointerUpState;
+					public static SBActionState WaitForPickUpState{
+						get{
+							if(Slottable.m_waitForPickUpState != null)
+								return Slottable.m_waitForPickUpState;
+							else{
+								Slottable.m_waitForPickUpState = new WaitForPickUpState();
+								return Slottable.m_waitForPickUpState;
+							}
 						}
-					}
-				}
-			static SBState m_pickedUpAndSelectedState;
-				public static SBState PickedAndSelectedState{
-					get{
-						if(Slottable.m_pickedUpAndSelectedState != null)
-							return Slottable.m_pickedUpAndSelectedState;
-						else{
-							Slottable.m_pickedUpAndSelectedState = new PickedUpAndSelectedState();
-							return Slottable.m_pickedUpAndSelectedState;
+						}static SBActionState m_waitForPickUpState;
+					public static SBActionState WaitForNextTouchState{
+						get{
+							if(Slottable.m_waitForNextTouchState != null)
+								return Slottable.m_waitForNextTouchState;
+							else{
+								Slottable.m_waitForNextTouchState = new WaitForNextTouchState();
+								return Slottable.m_waitForNextTouchState;
+							}
 						}
-					}
-				}
-			static SBState m_pickedUpAndDeselectedState;
-				public static SBState PickedAndDeselectedState{
-					get{
-						if(Slottable.m_pickedUpAndDeselectedState != null)
-							return Slottable.m_pickedUpAndDeselectedState;
-						else{
-							Slottable.m_pickedUpAndDeselectedState = new PickedUpAndDeselectedState();
-							return Slottable.m_pickedUpAndDeselectedState;
+						}static SBActionState m_waitForNextTouchState;
+					public static SBActionState PickedUpState{
+						get{
+							if(Slottable.m_pickedUpState != null)
+								return Slottable.m_pickedUpState;
+							else{
+								Slottable.m_pickedUpState = new PickedUpState();
+								return Slottable.m_pickedUpState;
+							}
 						}
-					}
-				}
-			static SBState m_waitForNextTouchWhilePUState;
-				public static SBState WaitForNextTouchWhilePUState{
-					get{
-						if(Slottable.m_waitForNextTouchWhilePUState != null)
-							return Slottable.m_waitForNextTouchWhilePUState;
-						else{
-							Slottable.m_waitForNextTouchWhilePUState = new WaitForNextTouchWhilePUState();
-							return Slottable.m_waitForNextTouchWhilePUState;
+						}static SBActionState m_pickedUpState;
+					public static SBActionState RemovedState{
+						get{
+							if(Slottable.m_removedState == null)
+								Slottable.m_removedState = new SBRemovedState();
+							return Slottable.m_removedState;			
 						}
-					}
+						}static SBActionState m_removedState;
+					public static SBActionState AddedState{
+						get{
+							if(Slottable.m_addedState == null)
+								Slottable.m_addedState = new SBAddedState();
+							return Slottable.m_addedState;			
+						}
+						}static SBActionState m_addedState;
+					public static SBActionState MovingInSGState{
+						get{
+							if(Slottable.m_movingInSGState == null)
+								Slottable.m_movingInSGState = new SBMovingInSGState();
+							return Slottable.m_movingInSGState;			
+						}
+						}static SBActionState m_movingInSGState;
+					public static SBActionState RevertingState{
+						get{
+							if(Slottable.m_revertingState == null)
+								Slottable.m_revertingState = new SBRevertingState();
+							return Slottable.m_revertingState;			
+						}
+						}static SBActionState m_revertingState;
+					public static SBActionState MovingOutState{
+						get{
+							if(Slottable.m_movingOutState == null)
+								Slottable.m_movingOutState = new SBMovingOutState();
+							return Slottable.m_movingOutState;			
+						}
+						}static SBActionState m_movingOutState;
+					public static SBActionState MovingInState{
+						get{
+							if(Slottable.m_movingInState == null)
+								Slottable.m_movingInState = new SBMovingInState();
+							return Slottable.m_movingInState;			
+						}
+						}static SBActionState m_movingInState;
+		/*	processes	*/
+			public SBProcess SelectionProcess{
+				get{return m_selectionProcess;}
+				}SBProcess m_selectionProcess;
+				public void SetAndRunSelectionProcess(SBProcess process){
+					if(m_selectionProcess != null)
+						m_selectionProcess.Stop();
+					m_selectionProcess = process;
+					if(m_selectionProcess != null)
+						m_selectionProcess.Start();
 				}
-			static SBState m_equippedAndDeselectedState;
-				public static SBState EquippedAndDeselectedState{
-					get{
-						if(Slottable.m_equippedAndDeselectedState != null)
-							return Slottable.m_equippedAndDeselectedState;
-						else
-							Slottable.m_equippedAndDeselectedState = new EquippedAndDeselectedState();
-							return Slottable.m_equippedAndDeselectedState;
-					}
+			/*	coroutine	*/
+				public IEnumeratorMock GreyoutCoroutine(){return null;}
+				public IEnumeratorMock GreyinCoroutine(){return null;}
+				public IEnumeratorMock HighlightCoroutine(){return null;}
+				public IEnumeratorMock DehighlightCoroutine(){return null;}
+			public SBProcess ActionProcess{
+				get{return m_actionProcess;}
+				}SBProcess m_actionProcess;
+				public void SetAndRunActionProcess(SBProcess process){
+					if(m_actionProcess != null)
+						m_actionProcess.Stop();
+					m_actionProcess = process;
+					if(m_actionProcess != null)
+						m_actionProcess.Start();
 				}
-			static SBState m_equippedAndSelectedState;
-				public static SBState EquippedAndSelectedState{
-					get{
-						if(Slottable.m_equippedAndSelectedState != null)
-							return Slottable.m_equippedAndSelectedState;
-						else
-							Slottable.m_equippedAndSelectedState = new EquippedAndSelectedState();
-							return Slottable.m_equippedAndSelectedState;
-					}
+			/*	coroutine */
+				public IEnumeratorMock WaitForPointerUpCoroutine(){return null;}
+				public IEnumeratorMock WaitForPickUpCoroutine(){return null;}
+				public IEnumeratorMock PickedUpCoroutine(){return null;}
+				public IEnumeratorMock WaitForNextTouchCoroutine(){return null;}
+				public IEnumeratorMock UnpickCoroutine(){return null;}
+				public IEnumeratorMock PickUpCoroutine(){return null;}
+				public IEnumeratorMock RemovedCoroutine(){return null;}
+				public IEnumeratorMock AddedCoroutine(){return null;}
+				public IEnumeratorMock MoveInSGCoroutine(){return null;}
+				public IEnumeratorMock RevertCoroutine(){return null;}
+				public IEnumeratorMock MoveInCoroutine(){return null;}
+				public IEnumeratorMock MoveOutCoroutine(){return null;}
+			public SBProcess EquipProcess{
+				get{return m_equipProcess;}
+				}SBProcess m_equipProcess;
+				public void SetAndRunEquipProcess(SBProcess process){
+					if(m_equipProcess != null)
+						m_equipProcess.Stop();
+					m_equipProcess = process;
+					if(m_equipProcess != null)
+						m_equipProcess.Start();
 				}
-			static SBState m_equippedAndDefocusedState;
-				public static SBState EquippedAndDefocusedState{
-					get{
-						if(Slottable.m_equippedAndDefocusedState != null)
-							return Slottable.m_equippedAndDefocusedState;
-						else
-							Slottable.m_equippedAndDefocusedState = new EquippedAndDefocusedState();
-							return Slottable.m_equippedAndDefocusedState;
-					}
-				}
-
-			static SBState m_selectedState;
-				public static SBState SelectedState{
-					get{
-						if(Slottable.m_selectedState != null)
-							return Slottable.m_selectedState;
-						else
-							Slottable.m_selectedState = new SBSelectedState();
-							return Slottable.m_selectedState;
-					}
-				}
-			static SBState m_removedState;
-				public static SBState RemovedState{
-					get{
-						if(Slottable.m_removedState == null)
-							Slottable.m_removedState = new SBRemovedState();
-						return Slottable.m_removedState;			
-					}
-				}
-			static SBState m_addedState;
-				public static SBState AddedState{
-					get{
-						if(Slottable.m_addedState == null)
-							Slottable.m_addedState = new SBAddedState();
-						return Slottable.m_addedState;			
-					}
-				}
-			static SBState m_movingInSGState;
-				public static SBState MovingInSGState{
-					get{
-						if(Slottable.m_movingInSGState == null)
-							Slottable.m_movingInSGState = new SBMovingInSGState();
-						return Slottable.m_movingInSGState;			
-					}
-				}
-			static SBState m_revertingState;
-				public static SBState RevertingState{
-					get{
-						if(Slottable.m_revertingState == null)
-							Slottable.m_revertingState = new SBRevertingState();
-						return Slottable.m_revertingState;			
-					}
-				}
-			static SBState m_movingOutState;
-				public static SBState MovingOutState{
-					get{
-						if(Slottable.m_movingOutState == null)
-							Slottable.m_movingOutState = new SBMovingOutState();
-						return Slottable.m_movingOutState;			
-					}
-				}
-			static SBState m_movingInState;
-				public static SBState MovingInState{
-					get{
-						if(Slottable.m_movingInState == null)
-							Slottable.m_movingInState = new SBMovingInState();
-						return Slottable.m_movingInState;			
-					}
-				}
-			/*	dump	*/
-				// static SlottableState m_movingState;
-				// 	public static SlottableState MovingState{
-				// 		get{
-				// 			if(Slottable.m_movingState == null)
-				// 				Slottable.m_movingState = new MovingOutState();
-				// 			return Slottable.m_movingState;	
-				// 		}
-				// 	}
-				// static SlottableState m_removingState;
-				// 	public static SlottableState RemovingState{
-				// 		get{
-				// 			if(m_removingState == null)
-				// 				m_removingState = new SBRemovingState();
-				// 			return m_removingState;
-				// 		}
-				// 	}
-				// static SlottableState m_equippingState;
-				// 	public static SlottableState EquippingState{
-				// 		get{
-				// 			if(m_equippingState == null)
-				// 				m_equippingState = new SBEquippingState();
-				// 			return m_equippingState;
-				// 		}
-				// 	}
-				// static SlottableState m_unpickingState;
-				// 	public static SlottableState UnpickingState{
-				// 		get{
-				// 			if(Slottable.m_unpickingState == null)
-				// 				Slottable.m_unpickingState = new SBUnpickingState();
-				// 			return Slottable.m_unpickingState;			
-				// 		}
-				// 	}
-		/* commands	*/
+			/*	coroutine	*/
+				public IEnumeratorMock UnequipCoroutine(){return null;}
+				public IEnumeratorMock EquipCoroutine(){return null;}
+		/*	commands	*/
 			static SlottableCommand m_tapCommand = new SBTapCommand();
 				static public SlottableCommand TapCommand{
 					get{return m_tapCommand;}
@@ -262,225 +274,104 @@ namespace SlotSystem{
 				// 	public void InstantDeactivate(){
 				// 		m_instantDeactivateCommand.Execute(this);
 				// 	}
-		/* public fields	*/	
-			bool m_delayed = true;
-				public bool Delayed{
-					get{return m_delayed;}
-					set{m_delayed = value;}
-				}	
-			int m_pickedAmount = 0;
-				public int PickedAmount{
-					get{return m_pickedAmount;}
-					set{m_pickedAmount = value;}
-				}
-			SlottableItem m_item;
-				public SlottableItem Item{
-					get{return m_item;}
-				}
-				public InventoryItemInstanceMock ItemInst{
-					get{
-						return (InventoryItemInstanceMock)Item;
-					}
-				}
+		/*	public fields	*/
+			public bool Delayed{
+				get{return m_delayed;}
+				set{m_delayed = value;}
+				}bool m_delayed = true;
+			public int PickedAmount{
+				get{return m_pickedAmount;}
+				set{m_pickedAmount = value;}
+				}int m_pickedAmount = 0;
+			public SlottableItem Item{
+				get{return m_item;}
+				}SlottableItem m_item;
 				public void SetItem(SlottableItem item){
 					m_item = item;
 				}
-			SlotGroupManager m_sgm;
-				public SlotGroupManager SGM{
-					get{return m_sgm;}
-					set{m_sgm = value;}
+			public InventoryItemInstanceMock ItemInst{
+					get{return (InventoryItemInstanceMock)Item;}
 				}
-			bool m_isEquipped;
-				public bool IsEquipped{
-					get{
-						InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)m_item;
-						return invInst.IsEquipped;
-					}
-				}
-				public void Equip(){
-					InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)m_item;
-					invInst.IsEquipped = true;
-					m_isEquipped = true;
-				}
-				public void Unequip(){
-					InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)m_item;
-					invInst.IsEquipped = false;
-					m_isEquipped = false;
-				}
-			SlotGroup m_destinationSG;
-				public SlotGroup DestinationSG{
-					get{
-						return m_destinationSG;
-					}
-				}
-			Slot m_destinationSlot;
-				public Slot DestinationSlot{
-					get{return m_destinationSlot;}
-				}
-		
+			public SlotGroupManager SGM{
+				get{return m_sgm;}
+				set{m_sgm = value;}
+				}SlotGroupManager m_sgm;
+			public SlotGroup DestinationSG{
+				get{return m_destinationSG;}
+				}SlotGroup m_destinationSG;
+			public Slot DestinationSlot{
+				get{return m_destinationSlot;}
+				}Slot m_destinationSlot;
 			public int SlotID{
-				get{
-					// int result = -1;
-					// List<Slot> slots = SG.Slots;
-					// for(int i = 0; i < slots.Count; i++){
-					// 	if(slots[i].Sb != null)
-					// 		if(slots[i].Sb == this)
-					// 			result = i;
-					// }
-					// return result;
-					return SG.Slottables.IndexOf(this);
-				}
+				get{return SG.Slottables.IndexOf(this);}
 			}
-			SlotGroup m_sg;
-				public SlotGroup SG{
-					get{
-						if(m_sg == null){
-							m_sg = SGM.GetSlotGroup(this);
-						}
-						return m_sg;
+			public SlotGroup SG{
+				get{
+					if(m_sg == null){
+						m_sg = SGM.GetSlotGroup(this);
 					}
+					return m_sg;
 				}
+				}SlotGroup m_sg;
 				public void SetSG(SlotGroup sg){
 					/*	use this only when creating a new Sb in transaction	*/
 					m_sg = sg;
 				}
 			public bool IsPickable{
 				get{
-					return CurState == Slottable.FocusedState || CurState == Slottable.EquippedAndDeselectedState;
+					bool result = true;
+					if(SG.IsPool){
+						if(SG.IsAutoSort){
+							if(IsEquipped || ItemInst is PartsInstanceMock)
+								result = false;
+						}
+					}
+					return result;
 				}
 			}
 			public bool IsFocused{
-				get{return CurState == Slottable.FocusedState || CurState == Slottable.EquippedAndDeselectedState;}
+				get{return CurSelState == Slottable.FocusedState;}
 			}
-		/*	processes	*/
-			SBProcess m_curProcess;
-			public SBProcess CurProcess{
-				get{return m_curProcess;}
+			public bool IsPickedUp{
+				get{
+					return SGM.PickedSB == this;
+				}
 			}
-			public void SetAndRun(SBProcess process){
-				if(m_curProcess != null)
-					m_curProcess.Stop();
-				m_curProcess = process;
-				if(m_curProcess != null)
-					m_curProcess.Start();
-			}
-			/*	coroutines	*/		
-				public IEnumeratorMock GreyoutCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock UnequipAndGreyoutCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock EquipAndGreyoutCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock GreyinCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock UnequipAndGreyinCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock EquipAndGreyinCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock HighlightCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock DehighlightCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock UnequipAndDehighlightCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock EquipAndDehighlightCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock WaitForPointerUpCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock WaitForPickUpCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock PickedUpAndSelectedCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock PickedUpAndDeselectedCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock WaitForNextTouchWhilePUCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock WaitForNextTouchCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock UnequipCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock EquipCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock UnpickCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock PickUpCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock RemovedCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock AddedCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock MoveInSGCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock RevertCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock MoveInCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock MoveOutCoroutine(){
-					return null;
-				}
-				/*	dump	*/
-					// public IEnumeratorMock MoveCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock RemovingCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock UnpickingCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock ReorderingCoroutine(){
-					// 	return null;
-					// }
+			public bool IsEquipped{
+				get{ return ItemInst.IsEquipped;}
+				}public void Equip(){ ItemInst.IsEquipped = true;}
+				public void Unequip(){	ItemInst.IsEquipped = false;}
+		
 		/*	Event methods	*/
-			public void OnPointerDownMock(PointerEventDataMock eventDataMock){
-				m_curState.OnPointerDownMock(this, eventDataMock);
-			}
-			public void OnPointerUpMock(PointerEventDataMock eventDataMock){
-				m_curState.OnPointerUpMock(this, eventDataMock);
-			}
-			public void OnHoverEnterMock(PointerEventDataMock eventDataMock){
-				m_curState.OnHoverEnterMock(this, eventDataMock);
-			}
-			public void OnHoverExitMock(PointerEventDataMock eventDataMock){
-				m_curState.OnHoverExitMock(this, eventDataMock);
-			}
-			public void OnDeselectedMock(PointerEventDataMock eventDataMock){
-				CurState.OnDeselectedMock(this, eventDataMock);
-			}
-			public void OnEndDragMock(PointerEventDataMock eventDataMock){
-				m_curState.OnEndDragMock(this, eventDataMock);
-			}
-			public void Focus(){
-				m_curState.Focus(this);
-			}
-			public void Defocus(){
-				m_curState.Defocus(this);
-			}
+			/*	Selection event	*/
+				public void Focus(){
+					if(IsPickable)
+						SetSelState(Slottable.FocusedState);
+					else
+						SetSelState(Slottable.DefocusedState);
+				}
+				public void Defocus(){
+					SetSelState(Slottable.DefocusedState);
+				}
+				public void OnHoverEnterMock(PointerEventDataMock eventDataMock){
+					CurSelState.OnHoverEnterMock(this, eventDataMock);
+				}
+				public void OnHoverExitMock(PointerEventDataMock eventDataMock){
+					CurSelState.OnHoverExitMock(this, eventDataMock);
+				}
+			/*	Action Event	*/
+				public void OnPointerDownMock(PointerEventDataMock eventDataMock){
+					CurActState.OnPointerDownMock(this, eventDataMock);
+				}
+				public void OnPointerUpMock(PointerEventDataMock eventDataMock){
+					CurActState.OnPointerUpMock(this, eventDataMock);
+				}
+				public void OnDeselectedMock(PointerEventDataMock eventDataMock){
+					CurActState.OnDeselectedMock(this, eventDataMock);
+				}
+				public void OnEndDragMock(PointerEventDataMock eventDataMock){
+					CurActState.OnEndDragMock(this, eventDataMock);
+				}
 		/*	Interface implementation	*/
 			int IComparable.CompareTo(object other){
 				if(!(other is Slottable))
@@ -504,46 +395,50 @@ namespace SlotSystem{
 			public void InstantEquipAndGreyin(){}
 			public void InstantEquip(){}
 			public void InstantUnequip(){}
-		public void Initialize(SlotGroupManager sgm, bool delayed, InventoryItemInstanceMock item){
-			m_curState = Slottable.DeactivatedState;
-			m_prevState = Slottable.DeactivatedState;
-			this.m_sgm = sgm;
-			Delayed = delayed;
-			this.SetItem(item);
-		}
-		public void PickUp(){
-			SetState(Slottable.PickedAndSelectedState);
-			m_pickedAmount = 1;
-		}
-		public void Increment(){
-			if(m_item.IsStackable && m_item.Quantity > m_pickedAmount){
-				m_pickedAmount ++;
+			public void InstantHighlight(){}
+		/*	methods	*/
+			public void Initialize(SlotGroupManager sgm, bool delayed, InventoryItemInstanceMock item){
+				SelStateEngine.SetState(Slottable.DeactivatedState);
+				ActStateEngine.SetState(Slottable.WaitForActionState);
+				this.m_sgm = sgm;
+				Delayed = delayed;
+				this.SetItem(item);
 			}
-		}
-		public void Deactivate(){}
-		public void ExecuteTransaction(){
-			SGM.Transaction.Execute();
-		}
-		public void MoveDraggedIcon(SlotGroup sg, Slot slot){
-			SetDraggedIconDestination(sg, slot);
-		}
-		public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
-			this.m_destinationSG = sg;
-			this.m_destinationSlot = slot;
-		}
-		public void ClearDraggedIconDestination(){
-			this.m_destinationSG = null;
-			this.m_destinationSlot = null;
-		}
-		public void GetSlotIndex(out int curID, out int newID){
-			SG.GetSlotMovement(this).GetIndex(out curID, out newID);
-		}
-		public void ExpireProcess(){
-			if(CurProcess.IsRunning)
-				CurProcess.Expire();
-			// SG.CheckProcessCompletion();
-			// SGM.CompleteTransactionOnSB(this);
-		}
+			public void PickUp(){
+				SetActState(Slottable.PickedUpState);
+				m_pickedAmount = 1;
+			}
+			public void Increment(){
+				if(m_item.IsStackable && m_item.Quantity > m_pickedAmount){
+					m_pickedAmount ++;
+				}
+			}
+			public void Deactivate(){}
+			public void ExecuteTransaction(){
+				SGM.Transaction.Execute();
+			}
+			public void MoveDraggedIcon(SlotGroup sg, Slot slot){
+				SetDraggedIconDestination(sg, slot);
+			}
+			public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
+				this.m_destinationSG = sg;
+				this.m_destinationSlot = slot;
+			}
+			public void ClearDraggedIconDestination(){
+				this.m_destinationSG = null;
+				this.m_destinationSlot = null;
+			}
+			public void GetSlotIndex(out int curID, out int newID){
+				SG.GetSlotMovement(this).GetIndex(out curID, out newID);
+			}
+			public void ExpireSelectionProcess(){
+				if(SelectionProcess.IsRunning)
+					SelectionProcess.Expire();
+			}
+			public void ExpireActionProcess(){
+				if(ActionProcess.IsRunning)
+					ActionProcess.Expire();
+			}
 	}
 
 }

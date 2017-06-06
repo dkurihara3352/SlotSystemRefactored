@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Utility;
 
 namespace SlotSystem{
-	public class SlotGroupManager : MonoBehaviour {
+	public class SlotGroupManager : MonoBehaviour, StateHandler{
 			public static SlotGroupManager CurSGM;
 			void SetCurSGM(){
 				if(CurSGM != null){
@@ -91,18 +91,17 @@ namespace SlotSystem{
 					m_selectedSGForTS = sg;
 				}
 
-		/*	command	*/
+		/*	command	methods */
 			public void SetupCommands(){
-				m_updateTransactionCommand = new UpdateTransactionCommand();
+				// m_updateTransactionCommand = new UpdateTransactionCommand();
 				m_postPickFilterCommand = new PostPickFilterCommand();
 			}
-			SGMCommand m_updateTransactionCommand;
-				public SGMCommand UpdateTransactionCommand{
-					get{return m_updateTransactionCommand;}
-				}
-				public void UpdateTransaction(){
-					m_updateTransactionCommand.Execute(this);
-				}
+			// public void UpdateTransaction(){
+				// 	m_updateTransactionCommand.Execute(this);
+				// 	}SGMCommand m_updateTransactionCommand;
+				// 	public SGMCommand UpdateTransactionCommand{
+				// 		get{return m_updateTransactionCommand;}
+				// 	}
 			SGMCommand m_postPickFilterCommand;
 				public SGMCommand PostPickFilterCommand{
 					get{return m_postPickFilterCommand;}
@@ -533,6 +532,9 @@ namespace SlotSystem{
 				SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
 				SetTransaction(sortTransaction);
 				Transaction.Execute();
+			}
+			public void UpdateTransaction(){
+				/* tbc */
 			}
 		/*	dump	*/
 			// public SlotGroup GetFocusedCGearsSG(){
