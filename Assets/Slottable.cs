@@ -25,27 +25,13 @@ namespace SlotSystem{
 					public void SetSelState(SBSelectionState selState){
 						SelStateEngine.SetState(selState);
 					}
-				// public void SetSelectionState(SBSelectionState state){
-					// 		m_prevSelectionState = CurSelectionState;
-					// 		m_curSelectionState = state;
-					// 	if(CurSelectionState != PrevSelectionState){
-					// 		PrevSelectionState.ExitState(this);
-					// 		CurSelectionState.EnterState(this);
-					// 	}
-					// }
-					// public SBSelectionState CurSelectionState{
-					// 	get{return m_curSelectionState;}
-					// 	}SBSelectionState m_curSelectionState;
-					// public SBSelectionState PrevSelectionState{
-					// 	get{return m_prevSelectionState;}
-					// 	}SBSelectionState m_prevSelectionState;
 				// static states
 					public static SBSelectionState DeactivatedState{
 						get{
 							if(Slottable.m_deactivatedState != null)
 								return Slottable.m_deactivatedState;
 							else{
-								Slottable.m_deactivatedState = new DeactivatedState();	
+								Slottable.m_deactivatedState = new SBDeactivatedState();	
 								return Slottable.m_deactivatedState;
 							}
 						}
@@ -96,23 +82,6 @@ namespace SlotSystem{
 					public void SetActState(SBActionState actState){
 						ActStateEngine.SetState(actState);
 					}
-				// public void SetActionState(SBActionState state){
-					// 		m_prevActionState = CurActionState;
-					// 		m_curActionState = state;
-					// 	if(CurActionState != PrevActionState){
-					// 		PrevActionState.ExitState(this);
-					// 		CurActionState.EnterState(this);
-					// 	}
-					// 	m_curActionState = state;
-					// 	if(CurActionState != null)
-					// 		CurActionState.EnterState(this);
-					// }
-					// public SBActionState CurActionState{
-					// 	get{return m_curActionState;}
-					// 	}SBActionState m_curActionState;
-					// public SBActionState PrevActionState{
-					// 	get{return m_prevActionState;}
-					// 	}SBActionState m_prevActionState;
 				//	static states
 					public static SBActionState WaitForActionState{
 						get{
@@ -206,6 +175,44 @@ namespace SlotSystem{
 							return Slottable.m_movingInState;			
 						}
 						}static SBActionState m_movingInState;
+			/*	Equip State	*/
+				SBStateEngine EqpStateEngine{
+					get{
+						if(m_eqpStateEngine == null)
+							m_eqpStateEngine = new SBStateEngine(this);
+						return m_eqpStateEngine;
+					}
+					}SBStateEngine m_eqpStateEngine;
+					public SBEquipState CurEqpState{
+						get{return (SBEquipState)EqpStateEngine.curState;}
+					}
+					public SBEquipState PrevEqpState{
+						get{return (SBEquipState)EqpStateEngine.prevState;}
+					}
+					public void SetEqpState(SBEquipState actState){
+						EqpStateEngine.SetState(actState);
+					}
+				//	static states
+					public static SBEquipState EquippedState{
+						get{
+							if(m_equippedState != null)
+								return m_equippedState;
+							else{
+								m_equippedState = new SBEquippedState();
+								return m_equippedState;
+							}
+						}
+						}static SBEquipState m_equippedState;
+					public static SBEquipState UnequippedState{
+						get{
+							if(m_unequippedState != null)
+								return m_unequippedState;
+							else{
+								m_unequippedState = new SBUnequippedState();
+								return m_unequippedState;
+							}
+						}
+						}static SBEquipState m_unequippedState;
 		/*	processes	*/
 			public SBProcess SelectionProcess{
 				get{return m_selectionProcess;}
@@ -322,7 +329,7 @@ namespace SlotSystem{
 					bool result = true;
 					if(SG.IsPool){
 						if(SG.IsAutoSort){
-							if(IsEquipped || ItemInst is PartsInstanceMock)
+							if(IsEquipped || ItemInst is PartsInstanceMock && !(SG.Filter is SGPartsFilter))
 								result = false;
 						}
 					}
@@ -339,12 +346,20 @@ namespace SlotSystem{
 			}
 			public bool IsEquipped{
 				get{ return ItemInst.IsEquipped;}
-				}public void Equip(){ ItemInst.IsEquipped = true;}
-				public void Unequip(){	ItemInst.IsEquipped = false;}
+				}public void Equip(){
+					SetEqpState(Slottable.EquippedState);
+				}
+				public void Unequip(){
+					SetEqpState(Slottable.UnequippedState);
+				}
+			public bool IsStackable{
+				get{return ItemInst.Item.IsStackable;}
+			}
 		
 		/*	Event methods	*/
 			/*	Selection event	*/
 				public void Focus(){
+					SetActState(Slottable.WaitForActionState);
 					if(IsPickable)
 						SetSelState(Slottable.FocusedState);
 					else
@@ -397,12 +412,14 @@ namespace SlotSystem{
 			public void InstantUnequip(){}
 			public void InstantHighlight(){}
 		/*	methods	*/
-			public void Initialize(SlotGroupManager sgm, bool delayed, InventoryItemInstanceMock item){
-				SelStateEngine.SetState(Slottable.DeactivatedState);
-				ActStateEngine.SetState(Slottable.WaitForActionState);
+			public void Initialize(SlotGroupManager sgm, SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
 				this.m_sgm = sgm;
+				SetSG(sg);
 				Delayed = delayed;
 				this.SetItem(item);
+				SelStateEngine.SetState(Slottable.DeactivatedState);
+				ActStateEngine.SetState(Slottable.WaitForActionState);
+				EqpStateEngine.SetState(Slottable.UnequippedState);
 			}
 			public void PickUp(){
 				SetActState(Slottable.PickedUpState);
@@ -438,6 +455,10 @@ namespace SlotSystem{
 			public void ExpireActionProcess(){
 				if(ActionProcess.IsRunning)
 					ActionProcess.Expire();
+			}
+			public void UpdateEquipState(){
+				if(ItemInst.IsEquipped) Equip();
+				else Unequip();
 			}
 	}
 

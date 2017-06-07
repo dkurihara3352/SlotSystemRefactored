@@ -32,8 +32,8 @@ namespace SlotSystem{
 					}
 				}
 			public void CompleteTransactionOnSB(Slottable sb){
-				if(sb == m_pickedSBForTS) m_pickedSBDoneTransaction = true;
-				else if(sb == m_selectedSBForTS) m_selectedSBDoneTransaction = true;
+				if(m_pickedSBForTS != null && sb == m_pickedSBForTS) m_pickedSBDoneTransaction = true;
+				else if(m_selectedSBForTS != null && sb == m_selectedSBForTS)m_selectedSBDoneTransaction = true;
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)StateProcess).CoroutineMock();
 			}
 			public void CompleteTransactionOnSG(SlotGroup sg){
@@ -270,19 +270,28 @@ namespace SlotSystem{
 				}
 		
 		/*	public field	*/
-			Slottable m_selectedSB;
-				public Slottable SelectedSB{
-					get{return m_selectedSB;}
+			public Slottable HoveredSB{
+				get{return m_hoveredSB;}
+				set{m_hoveredSB = value;}
+				}Slottable m_hoveredSB;
+			public SlotGroup HoveredSG{
+				get{return m_hoveredSG;}
+				set{m_hoveredSG = value;}
+				}SlotGroup m_hoveredSG;
+			public void SetHovered(Slottable sb, SlotGroup sg){
+				HoveredSB = sb; HoveredSG = sg;
+			}
+			public Slottable SelectedSB{
+				get{
+					Slottable sb = null;
+					if(Transaction != null)
+						sb = Transaction.SelectedSB;
+					return sb;
 				}
-				public void SetSelectedSB(Slottable sb){
+				}Slottable m_selectedSB;
+				public void SetSelectedSB(Slottable sb){/* obsolete */
 					if(m_selectedSB != sb){
 						m_selectedSB = sb;
-						// UpdateTransaction();
-						// if(sb != null){
-						// 	m_selectedSBDoneTransaction = false;
-						// }else{
-						// 	m_selectedSBDoneTransaction = true;
-						// }
 					}
 				}
 			SlotGroup m_selectedSG;
@@ -353,13 +362,32 @@ namespace SlotSystem{
 					return result;
 				}
 			}
+			public SlotGroup FocusedSGP{
+				get{
+					SlotSystemElement focusedEle = RootPage.PoolBundle.GetFocusedBundleElement();
+					return (SlotGroup)focusedEle;
+				}
+			}
+			public EquipmentSet FocusedEqSet{
+				get{
+					return (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
+				}
+			}
 			public List<SlotGroup> FocusedSGEs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					EquipmentSet focusedEquipSet = GetFocusedEquipSet();
+					EquipmentSet focusedEquipSet = FocusedEqSet;
 					foreach(SlotSystemElement ele in focusedEquipSet.Elements){
 						result.Add((SlotGroup)ele);
 					}
+					return result;
+				}
+			}
+			public List<SlotGroup> FocusedSGs{
+				get{
+					List<SlotGroup> result = new List<SlotGroup>();
+					result.Add(FocusedSGP);
+					result.AddRange(FocusedSGEs);
 					return result;
 				}
 			}
@@ -374,8 +402,43 @@ namespace SlotSystem{
 			}
 			public PoolInventory PoolInv{
 				get{
-					return (PoolInventory)GetFocusedPoolSG().Inventory;
+					return (PoolInventory)FocusedSGP.Inventory;
 				}
+			}
+			public BowInstanceMock EquippedBowInst{
+				get{
+					foreach(SlotGroup sge in FocusedSGEs){
+						if(sge.Filter is SGBowFilter)
+							return (BowInstanceMock)sge.Slots[0].Sb.ItemInst;
+					}
+					return null;
+				}
+			}
+			public WearInstanceMock EquippedWearInst{
+				get{
+					foreach(SlotGroup sge in FocusedSGEs){
+						if(sge.Filter is SGWearFilter)
+							return (WearInstanceMock)sge.Slots[0].Sb.ItemInst;
+					}
+					return null;
+				}
+			}
+			public List<CarriedGearInstanceMock> EquippedCarriedGears{
+				get{
+					List<CarriedGearInstanceMock> result = new List<CarriedGearInstanceMock>();
+					foreach(SlotGroup sge in FocusedSGEs){
+						if(sge.Filter is SGCGearsFilter){
+							foreach(Slottable sb in sge.Slottables){
+								if(sb != null)
+									result.Add((CarriedGearInstanceMock)sb.ItemInst);
+							}
+						}
+					}
+					return result;
+				}
+			}
+			public List<PartsInstanceMock> EquippedParts{
+				get{return null;}
 			}
 			/*	dump	*/
 				// List<SlotGroup> m_slotGroups;
@@ -391,7 +454,7 @@ namespace SlotSystem{
 		/*	methods	*/
 			public void Initialize(){
 				m_rootPage.Activate();
-				UpdateEquipStatus();
+				UpdateEquipStatesOnAll();
 			}
 			public void Focus(){
 				SetCurSGM();
@@ -408,50 +471,6 @@ namespace SlotSystem{
 			}
 			public SlotGroup GetSlotGroup(Slottable sb){
 				return this.RootPage.GetSlotGroup(sb);	
-			}
-			public EquipmentSet GetFocusedEquipSet(){
-				return (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
-			}
-			public BowInstanceMock GetEquippedBow(){
-				// foreach(SlotGroup sg in SlotGroups){
-				// 	if(!sg.IsPool && sg.Filter.GetType() == typeof(SGBowFilter))
-				// 		return (BowInstanceMock)sg.Slots[0].Sb.Item;
-				// }
-
-				// return null;
-				foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){
-					SlotGroup sg = (SlotGroup)ele;
-					if(sg.Filter is SGBowFilter)
-						return (BowInstanceMock)sg.Slots[0].Sb.Item;
-				}
-				return null;
-			}
-			public WearInstanceMock GetEquippedWear(){
-				// foreach(SlotGroup sg in SlotGroups){
-				// 	if(!sg.IsPool && sg.Filter.GetType() == typeof(SGWearFilter))
-				// 		return (WearInstanceMock)sg.Slots[0].Sb.Item;
-				// }
-				// return null;
-				foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){
-					SlotGroup sg = (SlotGroup)ele;
-					if(sg.Filter is SGWearFilter)
-						return (WearInstanceMock)sg.Slots[0].Sb.Item;
-				}
-				return null;
-			}
-			public List<CarriedGearInstanceMock> GetEquippedCarriedGears(){
-				List<CarriedGearInstanceMock> result = new List<CarriedGearInstanceMock>();
-				EquipmentSet equipSet = (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
-				foreach(SlotSystemElement ele in equipSet.Elements){
-					SlotGroup sg = (SlotGroup)ele;
-					if(sg.Filter is SGCGearsFilter){
-						foreach(Slot slot in sg.Slots){
-							if(slot.Sb != null)
-								result.Add((CarriedGearInstanceMock)slot.Sb.Item);
-						}
-					}
-				}
-				return result;
 			}
 			public void ClearAndReset(){
 				this.SetTransaction(null);
@@ -482,50 +501,32 @@ namespace SlotSystem{
 				RootPage.PoolBundle.SetFocusedBundleElement(sg);
 				Focus();
 			}
-			public SlotGroup GetFocusedPoolSG(){
-				SlotSystemElement focusedEle = RootPage.PoolBundle.GetFocusedBundleElement();
-				return (SlotGroup)focusedEle;
-			}
 			public void SetFocusedEquipmentSet(EquipmentSet eSet){
 				RootPage.EquipBundle.SetFocusedBundleElement(eSet);
 				Focus();
 			}
 			public void DestroyDraggedIcon(){}
-			public void UpdateEquipStatus(){
-				GetEquippedBow().IsEquipped = true;
-				GetEquippedWear().IsEquipped = true;
-				foreach(CarriedGearInstanceMock cGear in GetEquippedCarriedGears()){
-					cGear.IsEquipped = true;
+			public void UpdateEquipStatesOnAll(){
+				/*	
+					ItemInst of spe is marked the equipped one
+					all sbs compare its iteminst with it and Equip or Unequip according to the result
+				*/
+				foreach(InventoryItemInstanceMock itemInst in PoolInv.Items){
+					if(itemInst is BowInstanceMock)
+						itemInst.IsEquipped = itemInst == EquippedBowInst;
+					else if (itemInst is WearInstanceMock)
+						itemInst.IsEquipped = itemInst == EquippedWearInst;
+					else if(itemInst is CarriedGearInstanceMock)
+						itemInst.IsEquipped = EquippedCarriedGears != null && EquippedCarriedGears.Contains((CarriedGearInstanceMock)itemInst);
+					else if(itemInst is PartsInstanceMock)
+						itemInst.IsEquipped = EquippedParts != null && EquippedParts.Contains((PartsInstanceMock)itemInst);
 				}
-				foreach(SlotSystemElement ele in RootPage.PoolBundle.Elements){
-					SlotGroup sg = (SlotGroup)ele;
-					foreach(InventoryItemInstanceMock item in sg.Inventory.Items){
-						if(item.IsEquipped){
-							if(item is BowInstanceMock){
-								if(GetEquippedBow() != (BowInstanceMock)item)
-									item.IsEquipped = false;
-							}else if(item is WearInstanceMock){
-								if(GetEquippedWear() != (WearInstanceMock)item)
-									item.IsEquipped = false;
-							}else if(item is CarriedGearInstanceMock){
-								List<CarriedGearInstanceMock> cGears = GetEquippedCarriedGears();
-								if(cGears.Count == 0)
-									item.IsEquipped = false;
-								else{
-									bool found = false;
-									foreach(CarriedGearInstanceMock cGear in cGears){
-										if(cGear == (CarriedGearInstanceMock)item)
-											found = true;
-									}
-									if(!found)
-										item.IsEquipped = false;
-								}
-							}
-						}
+				foreach(SlotGroup sg in AllSGs){
+					foreach(Slottable sb in sg.Slottables){
+						if(sb!= null)
+							sb.UpdateEquipState();
 					}
 				}
-				SlotGroup poolSG = GetFocusedPoolSG();
-				
 			}
 			public void SortSG(SlotGroup sg, SGSorter sorter){
 				sg.SetSorter(sorter);
@@ -533,8 +534,45 @@ namespace SlotSystem{
 				SetTransaction(sortTransaction);
 				Transaction.Execute();
 			}
+			TransactionResults TransactionResults{
+				get{return m_transactionResults;}
+				set{
+					m_transactionResults = value;
+				}
+				}TransactionResults m_transactionResults;
+			public void CreateTransactionResults(){
+				/*	Create TransactionResult class instance with Transaction and SelectedSG, SelectedSB
+					and store them in a list for lookup
+					Filter all sbs and sgs according to the transaction result
+					make sure to initialize with RevertTransaction with orig sg and pickedSB
+					Perform Transaction update at SimHover looing up the list
+				*/
+				TransactionResults transactionResults = new TransactionResults();
+				foreach(SlotGroup sg in FocusedSGs){
+					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(PickedSB, null, sg);
+					TransactionResult tr = new TransactionResult(null, sg, ta);
+					transactionResults.AddTransactionResult(tr);
+					if(ta is RevertTransaction)
+						sg.Defocus();
+					else
+						sg.Focus();
+					foreach(Slottable sb in sg.Slottables){
+						if(sb != null){
+							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(PickedSB, sb, null);
+							TransactionResult tr2 = new TransactionResult(sb, null, ta);
+							transactionResults.AddTransactionResult(tr2);
+							if(ta2 is RevertTransaction)
+								sb.Defocus();
+							else
+								sb.Focus();
+						}
+					}
+				}
+				this.TransactionResults = transactionResults;
+			}
 			public void UpdateTransaction(){
-				/* tbc */
+				SlotSystemTransaction ta = TransactionResults.GetTransaction(HoveredSB, HoveredSG);
+				SetTransaction(ta);
 			}
 		/*	dump	*/
 			// public SlotGroup GetFocusedCGearsSG(){

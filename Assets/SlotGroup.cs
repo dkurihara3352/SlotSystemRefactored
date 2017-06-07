@@ -554,8 +554,7 @@ namespace SlotSystem{
 				return false;
 			}
 			public void FocusSBs(){
-				foreach(Slot slot in Slots){
-					Slottable sb = slot.Sb;
+				foreach(Slottable sb in Slottables){
 					if(sb != null){
 						if(!this.IsAutoSort){
 							sb.Focus();
@@ -644,8 +643,7 @@ namespace SlotSystem{
 						foreach(InventoryItemInstanceMock invInst in added){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							newSB.Initialize(SGM, true, invInst);
-							newSB.SetSG(this);
+							newSB.Initialize(SGM, this, true, invInst);
 							int index = FindNextEmpty(ref newSBsList);
 							// newSBsList.Add(newSB);
 							newSBsList[index] = newSB;
@@ -713,8 +711,7 @@ namespace SlotSystem{
 					/*	add	*/
 						GameObject newSBGO = new GameObject("newSBGO");
 						Slottable newSB = newSBGO.AddComponent<Slottable>();
-						newSB.Initialize(SGM, true, added.ItemInst);
-						newSB.SetSG(this);
+						newSB.Initialize(SGM, this, true, added.ItemInst);
 						newSBsList[removedId] = newSB;
 					/*	sort	*/
 					List<Slottable> newListOrdered = new List<Slottable>();
@@ -753,7 +750,7 @@ namespace SlotSystem{
 			}
 			public void CheckSBsSlotMovementCompletion(){
 				foreach(SlotMovement sm in SlotMovements){
-					if(sm.SB.ActionProcess.GetType() == typeof(SBMovingInSGProcess) ||
+					if(sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
 					sm.SB.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
 					sm.SB.ActionProcess.GetType() == typeof(SBAddedProcess)){
 						int curId; int newId;

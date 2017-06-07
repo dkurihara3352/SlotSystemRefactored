@@ -128,6 +128,37 @@ public class SlottableTest {
 				if(state is WaitForPointerUpState)
 					Val = Util.Aqua(Val);
 		}
+		public SlotSystemTestResult(bool isPAS, Slottable pickedSB, SBSelectionState curSelSt, SBSelectionState prevSelSt, SBProcess selProcess ,SBActionState curActSt, SBActionState prevActSt, SBProcess actProcess){
+			this.pickedSB = pickedSB;
+			this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
+			this.pickedSBName = Util.SBofSG(pickedSB);
+
+			string curSelStStr = Util.SBStateName(curSelSt);
+			string prevSelStStr = Util.SBStateName(prevSelSt);
+			string selProcStr;
+			if(selProcess == null) selProcStr = "null";
+			else selProcStr = Util.SBProcessName(selProcess);
+			string curActStStr = Util.SBStateName(curActSt);
+			string prevActStStr = Util.SBStateName(prevActSt);
+			string actProcStr;
+			if(actProcess == null) actProcStr = "null";
+			else actProcStr = Util.SBProcessName(actProcess);
+			
+			this.Val = Util.Bold("Sel: ") + prevSelStStr + " to " + curSelStStr + ", Process: " + selProcStr + Util.Bold(" Act: ") + prevActStStr + " to " + curActStStr + ", Process: " + actProcStr;
+		}
+		public SlotSystemTestResult(bool isPAS, Slottable pickedSB, SGMState curState, SGMState prevState, SlotSystemTransaction ta, SGMProcess proc, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
+			this.pickedSB = pickedSB;
+			this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
+			this.pickedSBName = Util.SBofSG(pickedSB);
+
+			string curSGMSt = Util.SGMStateName(curState);
+			string prevSGMSt = Util.SGMStateName(prevState);
+			string taStr = Util.TransactionName(ta);
+			string procStr = Util.SGMProcessName(proc);
+
+			this.Val = "PickedSB: " + pickedSBName + " SGM: from " + prevSGMSt + " to " + curSGMSt + ", TA: " + taStr + ", Proc: " + procStr + ", taComp: " + pSBDone + ", " + sSBDone+ ", " + oSGDone + ", " + sSGDone; 
+			
+		}
 		public bool SameSGSB(SlotSystemTestResult other){
 			if(hoveredSG == null)
 				return this.pickedSB == other.pickedSB;
@@ -638,17 +669,191 @@ public class SlottableTest {
 		//	done
 			// TestFillEquippableOnAll();
 			// TestSwappable();
+			// TestVolSortOnAll();
 			// CheckShrinkableAndExpandableOnAllSGs();
 			// CheckTransactionOnAllSG();
 			// CheckTransacitonWithSBSpecifiedOnAll();
 			// CheckPickcableOnAllSB();
 			// CheckEventOnAllSB();
-		// TestVolSortOnAll();
+			// TestPickUpTransitionOnAll(); //after transaction update done
+			// TestSBStateTransitionOnAll();
 		// TestRevertOnAllSBs();
 		// TestReorderOnAll();
 		// TestFillEquipOnAll();
-		// TestPickUpOnAllSB();
+		// test transactions after each slotsys elements's state stransition is done
+		TestSGStateTransitionOnAll();
 	}
+	public void TestSGStateTransitionOnAll(){
+		PerformOnAllSGAfterFocusing(TestSGStateTransition);
+	}
+		public void TestSGStateTransition(SlotGroup sg, bool isPAS){
+
+		}
+	public void TestSBStateTransitionOnAll(){
+		PerformOnAllSBs(TestSBStateTransition);
+		PrintTestResult(null);
+	}
+		public void TestSBStateTransition(Slottable sb, bool isPAS){
+			/*	SelState */
+				// if(isPAS){
+				// 	if(sb.SG.IsPool){
+				// 		if(sb.IsEquipped || (sb.ItemInst is PartsInstanceMock && !(sb.SG.Filter is SGPartsFilter))){
+				// 			if(sb.PrevSelState == SBDeactivated){
+				// 				ASBSelState(sb, SBDeactivated, SBDefocused, null);
+
+				// 			}else
+				// 				ASBSelState(sb, SBFocused, SBDefocused, typeof(SBGreyoutProcess));
+
+				// 			sb.SetSelState(SBSelected);
+				// 				ASBSelState(sb, SBDefocused, SBSelected, typeof(SBHighlightProcess));
+				// 			sb.SetSelState(SBDefocused);
+				// 				ASBSelState(sb, SBSelected, SBDefocused, typeof(SBGreyoutProcess));
+				// 			sb.SetSelState(SBFocused);
+				// 				ASBSelState(sb, SBDefocused, SBFocused, typeof(SBGreyinProcess));
+				// 			return;
+				// 		}
+				// 	}
+				// }
+				// if(sb.PrevSelState == SBDeactivated)
+				// 	ASBSelState(sb, SBDeactivated, SBFocused, null);
+				// else
+				// 	ASBSelState(sb, SBDefocused, SBFocused, typeof(SBGreyinProcess));
+				// sb.SetSelState(SBSelected);
+				// 	ASBSelState(sb, SBFocused, SBSelected, typeof(SBHighlightProcess));
+				// sb.SetSelState(SBFocused);
+				// 	ASBSelState(sb, SBSelected, SBFocused, typeof(SBDehighlightProcess));
+				// sb.SetSelState(SBDeactivated);
+				// 	ASBSelState(sb, SBFocused, SBDeactivated, null);
+				// sb.SetSelState(SBFocused);
+				// 	ASBSelState(sb, SBDeactivated, SBFocused, null);
+				// sb.SetSelState(SBDeactivated);
+				// 	ASBSelState(sb, SBFocused, SBDeactivated, null);
+				// sb.SetSelState(SBDefocused);
+				// 	ASBSelState(sb, SBDeactivated, SBDefocused, null);
+				// sb.SetSelState(SBDeactivated);
+				// 	ASBSelState(sb, SBDefocused, SBDeactivated, null);
+				// sb.SetSelState(SBSelected);
+				// 	ASBSelState(sb, SBDeactivated, SBSelected, null);
+				// sb.SetSelState(SBDeactivated);
+				// 	ASBSelState(sb, SBSelected, SBDeactivated, null);
+			/*	Equip State	*/
+						PrintSBState(sb, isPAS);
+			if(sb.SG.IsPool){
+				if(sb.IsEquipped){
+						ASBEqpState(sb, SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+					sb.SetEqpState(SBUnequipped);
+						ASBEqpState(sb, SBEquipped, SBUnequipped, typeof(SBUnequipProcess));
+					sb.SetEqpState(SBEquipped);
+						ASBEqpState(sb, SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+				}
+				else{
+					if(sb.PrevEqpState == SBUnequipped)
+						ASBEqpState(sb, SBUnequipped, SBUnequipped, null);
+					else
+						ASBEqpState(sb, SBEquipped, SBUnequipped, typeof(SBUnequipProcess));
+
+					sb.SetEqpState(SBEquipped);
+						ASBEqpState(sb, SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+					sb.SetEqpState(SBUnequipped);
+						ASBEqpState(sb, SBEquipped, SBUnequipped, typeof(SBUnequipProcess));
+				}
+			}else{
+					ASBEqpState(sb, SBUnequipped, SBEquipped, null);
+				sb.SetEqpState(SBUnequipped);
+					ASBEqpState(sb, SBEquipped, SBUnequipped, null);
+				sb.SetEqpState(SBEquipped);
+					ASBEqpState(sb, SBUnequipped, SBEquipped, null);
+			}
+		}
+	public void TestPickUpTransitionOnAll(){
+		PerformOnAllSBs(TestPickUpTransition);
+		PrintTestResult(null);
+	}
+		public void TestPickUpTransition(Slottable sb, bool isPAS){
+				AssertFocused();
+			if(sb.IsPickable){
+				/*	tap	*/
+					sb.OnPointerDownMock(eventData);
+					sb.OnPointerUpMock(eventData);
+					sb.ActionProcess.Expire();
+					AssertFocused();
+				/*	multi tap -> pickup	*/
+					sb.OnPointerDownMock(eventData);
+					sb.OnPointerUpMock(eventData);
+					sb.OnPointerDownMock(eventData);
+					LetGo();
+					sb.ActionProcess.Expire();
+					AssertFocused();
+				/*	pickup -> release -> expire to revert	*/
+					sb.OnPointerDownMock(eventData);
+					sb.ActionProcess.Expire();
+					LetGo();
+					sb.ActionProcess.Expire();
+					AssertFocused();
+				/* pickup -> release -> touch	*/
+					PickUp(sb, out picked);
+					sb.OnPointerUpMock(eventData);
+					sb.OnPointerDownMock(eventData);
+					LetGo();
+					sb.ActionProcess.Expire();
+					AssertFocused();
+			}else{
+			}
+		}
+		public void CaptureSBState(Slottable sb, bool isPAS){
+			SBSelectionState curSelSt = sb.CurSelState;
+			SBSelectionState prevSelSt = sb.PrevSelState;
+			SBProcess selProcess = sb.SelectionProcess;
+
+			SBActionState curActState = sb.CurActState;
+			SBActionState prevActState = sb.PrevActState;
+			SBProcess actProcess = sb.ActionProcess;
+			SlotSystemTestResult res = new SlotSystemTestResult(isPAS, sb, curSelSt, prevSelSt, selProcess, curActState, prevActState, actProcess);
+			sloSysResults.Add(res);
+		}
+		public void PrintSBState(Slottable sb, bool isPAS){
+			SBSelectionState curSelSt = sb.CurSelState;
+			SBSelectionState prevSelSt = sb.PrevSelState;
+			SBProcess selProcess = sb.SelectionProcess;
+
+			SBActionState curActState = sb.CurActState;
+			SBActionState prevActState = sb.PrevActState;
+			SBProcess actProcess = sb.ActionProcess;
+
+			SBEquipState curEqpState = sb.CurEqpState;
+			SBEquipState prevEqpState = sb.PrevEqpState;
+			SBProcess eqpProces = sb.EquipProcess;
+			
+			Debug.Log("AS: " + (isPAS?"on":"off") + ", " + Util.SBofSG(sb) + ", Equipped: " + (sb.IsEquipped?"true":"false")+ " Sel: from " + Util.SBStateName(prevSelSt) + " to " + Util.SBStateName(curSelSt) + ", proc: " + Util.SBProcessName(selProcess) + " , Act: from " + Util.SBStateName(prevActState) + " to " + Util.SBStateName(curActState) + ", proc: " + Util.SBProcessName(actProcess) + ", Equip: from " + Util.SBStateName(prevEqpState) + " to " + Util.SBStateName(curEqpState) + ", proc: " + Util.SBProcessName(eqpProces));
+		}
+		public void CaptureSGMState(Slottable sb, bool isPAS){
+			Slottable pickedSB = sb;
+			SGMState curState = sgm.CurState;
+			SGMState prevState = sgm.PrevState;
+			SlotSystemTransaction ta = sgm.Transaction;
+			SGMProcess proc = sgm.StateProcess;
+			bool pSBDone = sgm.PickedSBDoneTransaction;
+			bool sSBDOne = sgm.SelectedSBDoneTransaction;
+			bool oSGDone = sgm.OrigSGDoneTransaction;
+			bool sSGDone = sgm.SelectedSGDoneTransaction;
+
+			SlotSystemTestResult res = new SlotSystemTestResult(isPAS, sb, curState, prevState, ta, proc, pSBDone, sSBDOne, oSGDone, sSGDone);
+			sloSysResults.Add(res);
+		}
+		public void PrintSGMState(Slottable sb, bool isPAS){
+			Slottable pickedSB = sb;
+			SGMState curState = sgm.CurState;
+			SGMState prevState = sgm.PrevState;
+			SlotSystemTransaction ta = sgm.Transaction;
+			SGMProcess proc = sgm.StateProcess;
+			bool pSBDone = sgm.PickedSBDoneTransaction;
+			bool sSBDone = sgm.SelectedSBDoneTransaction;
+			bool oSGDone = sgm.OrigSGDoneTransaction;
+			bool sSGDone = sgm.SelectedSGDoneTransaction;
+			SlotGroup focSGP = sgm.FocusedSGP;
+
+			Debug.Log("PickedSB: " + Util.SBofSG(sb) + ", SGM: from " + Util.SGMStateName(prevState) + " to " + Util.SGMStateName(curState) + ", TA: " + Util.TransactionName(ta) + ", Proc: " + Util.SGMProcessName(proc) + ", TAComp: " + pSBDone.ToString() + ", " + sSBDone.ToString() + ", " + oSGDone.ToString() + ", " + sSGDone.ToString() + ", FocSGP: " + Util.SGName(focSGP));
+		}
 	public void CheckEventOnAllSB(){
 		PerformOnAllSBs(CheckEvent);
 		PrintTestResult(null);
@@ -670,13 +875,7 @@ public class SlottableTest {
 			SlotSystemTestResult res = new SlotSystemTestResult(isPas, sb, pickable);
 			sloSysResults.Add(res);
 		}
-	public void TestPickUpOnAllSB(){
-		PerformOnAllSBs(TestPickUp);
-		}public void TestPickUp(Slottable sb, bool isPAS){
-			if(sb.IsPickable){
-				sb.OnPointerDownMock(eventData);
-			}
-		}
+	
 	/*	Test on all	*/
 		public void CheckTransacitonWithSBSpecifiedOnAll(){
 			PerformOnAllSBs(CheckTransactionWithSB);
@@ -796,7 +995,7 @@ public class SlottableTest {
 								SGMFocused,
 								typeof(FillEquipTransaction),
 								typeof(SGMProbeProcess),
-								sb,	null, sg,
+								sb,	/*null, sg,*/
 								true, true, true, true);
 							AssertSG(origSG,
 								SGFocused,
@@ -812,7 +1011,7 @@ public class SlottableTest {
 								SGMProbing,
 								typeof(FillEquipTransaction),
 								typeof(SGMTransactionProcess),
-								sb, null, sg,
+								sb, /*null, sg,*/
 								false, true, origSG.IsPool?true: false, sg.IsPool?true: false);
 							AssertSG(origSG,
 								SGFocused,
@@ -834,7 +1033,7 @@ public class SlottableTest {
 								SGMTransaction,
 								null,
 								null,
-								null, null, null,
+								null, /*null, null,*/
 								true, true, true, true);
 							AssertSG(origSG,
 								SGFocused,
@@ -863,7 +1062,7 @@ public class SlottableTest {
 		public void TestVolSortOnAll(){
 			PerformOnAllSGAfterFocusing(TestVolSort);
 		}
-		public void TestVolSort(SlotGroup sg){
+		public void TestVolSort(SlotGroup sg, bool isPAS){
 			if(!sg.IsAutoSort){
 				sgm.SortSG(sg, SlotGroup.InverseItemIDSorter);
 				if(sg.TransactionProcess.IsRunning)
@@ -919,21 +1118,21 @@ public class SlottableTest {
 			}
 		}
 	}
-	public void PerformOnAllSGAfterFocusing(System.Action<SlotGroup> act){
+	public void PerformOnAllSGAfterFocusing(System.Action<SlotGroup, bool> act){
 		foreach(SlotGroup sgp in sgm.AllSGPs){
 			sgm.SetFocusedPoolSG(sgp);
 			sgp.ToggleAutoSort(true);
-			act(sgp);
+			act(sgp, true);
 			sgp.ToggleAutoSort(false);
-			act(sgp);
+			act(sgp, false);
 		}
 		foreach(EquipmentSet eSet in sgm.EquipmentSets){
 			sgm.SetFocusedEquipmentSet(eSet);
 			foreach(SlotGroup sge in sgm.FocusedSGEs){
 				sge.ToggleAutoSort(true);
-				act(sge);
+				act(sge, true);
 				sge.ToggleAutoSort(false);
-				act(sge);
+				act(sge, false);
 			}
 		}
 	}
@@ -1053,7 +1252,7 @@ public class SlottableTest {
 	List<SlotGroup> InvalidSGs(Slottable pickedSB){
 		List<SlotGroup> result = new List<SlotGroup>();
 		foreach(SlotGroup sgp in sgm.AllSGPs){
-			if(sgm.GetFocusedPoolSG() != sgp)
+			if(sgm.FocusedSGP != sgp)
 				result.Add(sgp);
 			else{
 				if(!sgp.AcceptsFilter(pickedSB))
@@ -1075,7 +1274,7 @@ public class SlottableTest {
 				ASSB(sb, SBSelected, SBFocused, typeof(SBHighlightProcess),
 					SBWFPickUp, SBWFA, typeof(WaitForPickUpProcess), false);
 				sb.ActionProcess.Expire();
-				ASSB(sb, SBSelected, SBFocused, typeof(SBHighlightProcess),
+				ASSB(sb, SBDefocused, SBSelected, typeof(SBGreyoutProcess),
 					SBPickedUp, SBWFPickUp, typeof(PickedUpProcess), false);
 				pickedUp = true;
 			}else{
@@ -1095,9 +1294,9 @@ public class SlottableTest {
 				Slottable sb = sm.SB;
 				if(sb.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
 				sb.ActionProcess.GetType() == typeof(SBAddedProcess) ||
-				sb.ActionProcess.GetType() == typeof(SBMovingInSGProcess) ||
-				sb.ActionProcess.GetType() == typeof(SBMovingOutProcess) ||
-				sb.ActionProcess.GetType() == typeof(SBMovingInProcess))
+				sb.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
+				sb.ActionProcess.GetType() == typeof(SBMoveOutProcess) ||
+				sb.ActionProcess.GetType() == typeof(SBMoveInProcess))
 					if(!sb.ActionProcess.IsExpired)
 						sb.ActionProcess.Expire();
 			}
@@ -1185,14 +1384,14 @@ public class SlottableTest {
 					}
 				}
 			}
-			sgm.UpdateTransaction();
+			sgm.CreateTransactionResults();
 		}
 	/*	Assertions	*/
 		/*	SGM	*/
 			public void ASSGM_s(SlotGroupManager sgm, SGMState state){
 				AE(sgm.CurState, state);
 			}
-			public void ASSGM(SlotGroupManager sgm, SGMState curState, SGMState prevState, System.Type taType, System.Type sgmProcessType, Slottable pickedSB, Slottable selectedSB, SlotGroup selectedSG, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
+			public void ASSGM(SlotGroupManager sgm, SGMState curState, SGMState prevState, System.Type taType, System.Type sgmProcessType, Slottable pickedSB, /*Slottable selectedSB, SlotGroup selectedSG, */bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
 				ASSGM_s(sgm, curState);
 				if(prevState != null)
 					AE(sgm.PrevState, prevState);
@@ -1205,8 +1404,8 @@ public class SlottableTest {
 				else
 					AE(sgm.StateProcess.GetType(), sgmProcessType);
 				AE(sgm.PickedSB, pickedSB);
-				AE(sgm.SelectedSB, selectedSB);
-				AE(sgm.SelectedSG, selectedSG);
+				// AE(sgm.SelectedSB, selectedSB);
+				// AE(sgm.SelectedSG, selectedSG);
 				AE(sgm.PickedSBDoneTransaction, pSBDone);
 				AE(sgm.SelectedSBDoneTransaction, sSBDone);
 				AE(sgm.OrigSGDoneTransaction, oSGDone);
@@ -1253,7 +1452,7 @@ public class SlottableTest {
 			public void ASSB(Slottable sb, SBSelectionState curSelState, SBSelectionState prevSelState , System.Type selProcT, SBActionState curActState, SBActionState prevActState, System.Type actProcT, bool assertOrder){
 				AE(sb.CurSelState, curSelState);
 				if(prevSelState != null){
-					AE(sb.PrevSelState, prevActState);
+					AE(sb.PrevSelState, prevSelState);
 					AE(sb.SelectionProcess.GetType(), selProcT);
 					AB(sb.SelectionProcess.IsRunning, true);
 					AB(sb.SelectionProcess.IsExpired, false);
@@ -1317,6 +1516,14 @@ public class SlottableTest {
 				else
 					ANull(sb.ActionProcess);
 			}
+			public void ASBEqpState(Slottable sb, SBEquipState prevEqpState, SBEquipState curEqpState, System.Type EqpProcT){
+				AE(sb.PrevEqpState, prevEqpState);
+				AE(sb.CurEqpState, curEqpState);
+				if(EqpProcT != null)
+					AE(sb.EquipProcess.GetType(), EqpProcT);
+				else
+					ANull(sb.EquipProcess);
+			}
 		/**/
 		public void ANull(object obj){
 			Assert.That(obj, Is.Null);
@@ -1342,14 +1549,14 @@ public class SlottableTest {
 							if(sbp == sbInPool){
 								AB(sbp.IsEquipped, true);
 								if(isBow)
-									AE(sgm.GetEquippedBow(), itemInst);
+									AE(sgm.EquippedBowInst, itemInst);
 								else
-									AE(sgm.GetEquippedWear(), itemInst);
+									AE(sgm.EquippedWearInst, itemInst);
 								Slottable sbe = isBow?sgBow.GetSlottable(itemInst): sgWear.GetSlottable(itemInst);
 								AB(sbe!= null, true);
 								ASSB(sbe, SBFocused, null, null, SBWFA, null, null, false);
 								AB(sbe.IsEquipped, true);
-								if(sgpAll == sgm.GetFocusedPoolSG()){
+								if(sgpAll == sgm.FocusedSGP){
 									if(sgpAll.IsAutoSort){
 										ASSB(sbp, SBDefocused, null, null, SBWFA, null, null, false);
 									}else{
@@ -1361,13 +1568,13 @@ public class SlottableTest {
 							}else{// deemed not the equipped bow/wear
 								AB(sbp.IsEquipped, false);
 								if(isBow){
-									AB(sgm.GetEquippedBow() != (BowInstanceMock)itemInst, true);
+									AB(sgm.EquippedBowInst != (BowInstanceMock)itemInst, true);
 									AB(sgBow.GetSlottable(itemInst) == null, true);
 								}else{
-									AB(sgm.GetEquippedWear() != (WearInstanceMock)itemInst, true);
+									AB(sgm.EquippedWearInst != (WearInstanceMock)itemInst, true);
 									AB(sgWear.GetSlottable(itemInst) == null, true);
 								}
-								if(sgpAll == sgm.GetFocusedPoolSG()){
+								if(sgpAll == sgm.FocusedSGP){
 									ASSB(sbp, SBFocused, null, null, SBWFA, null, null, false);
 								}else{
 									ASSB(sbp, SBDefocused, null, null, SBWFA, null, null, false);
@@ -1381,7 +1588,7 @@ public class SlottableTest {
 					if(sbp != null){
 						if(sbp.ItemInst == sbInPool.ItemInst){
 							AB(sbp.IsEquipped, true);
-							if(sgp == sgm.GetFocusedPoolSG()){
+							if(sgp == sgm.FocusedSGP){
 								if(sgp.IsAutoSort)
 									ASSB(sbp, SBDefocused, null, null, SBWFA, null, null, false);
 								else
@@ -1391,7 +1598,7 @@ public class SlottableTest {
 							}
 						}else{/* deemed not equipped	*/
 							AB(sbp.IsEquipped, false);
-							if(sgp == sgm.GetFocusedPoolSG())
+							if(sgp == sgm.FocusedSGP)
 								ASSB(sbp, SBFocused, null, null, SBWFA, null, null, false);
 							else
 								ASSB(sbp, SBDefocused, null, null, SBWFA, null, null, false);
@@ -1439,7 +1646,7 @@ public class SlottableTest {
 						if(sbp != null){
 							if(sbp.ItemInst is CarriedGearInstanceMock){
 								if(checkedList.Contains((CarriedGearInstanceMock)sbp.ItemInst)){
-									if(sgp == sgm.GetFocusedPoolSG()){
+									if(sgp == sgm.FocusedSGP){
 										if(sgp.IsAutoSort){
 											ASSB(sbp, SBDefocused, null, null, SBWFA, null, null, false);
 											AB(sbp.IsEquipped, true);
@@ -1452,7 +1659,7 @@ public class SlottableTest {
 										AB(sbp.IsEquipped, true);
 									}
 								}else{	/* deemed not equipped */
-									if(sgp == sgm.GetFocusedPoolSG()){
+									if(sgp == sgm.FocusedSGP){
 										ASSB(sbp, SBFocused, null, null, SBWFA, null, null, false);
 										AB(sbp.IsEquipped, false);
 									}else{
@@ -1472,10 +1679,10 @@ public class SlottableTest {
 				null,//prev state
 				null,//ta
 				null,//process
-				null, null, null,
+				null, /*null, null,*/
 				true, true, true, true);
 			foreach(SlotGroup sgp in sgm.AllSGPs){
-				if(sgp == sgm.GetFocusedPoolSG()){
+				if(sgp == sgm.FocusedSGP){
 					ASSG_s(sgp, SlotGroup.FocusedState);
 					foreach(Slottable sb in sgp.Slottables){
 						if(sb != null){
@@ -1487,8 +1694,9 @@ public class SlottableTest {
 								else
 									if(sb.IsEquipped)
 										ASSB_s(sb, SBDefocused, SBWFA);
-									else
+									else{
 										ASSB_s(sb, SBFocused, SBWFA);
+									}
 							}
 						}
 					}
@@ -1612,6 +1820,12 @@ public class SlottableTest {
 			}
 			SBActionState SBMovingInSG{
 				get{return Slottable.MovingInSGState;}
+			}
+			SBEquipState SBEquipped{
+				get{return Slottable.EquippedState;}
+			}
+			SBEquipState SBUnequipped{
+				get{return Slottable.UnequippedState;}
 			}
 
 	/*	dump	*/
@@ -2482,7 +2696,7 @@ public class SlottableTest {
 		// 		sgm.Focus();
 		// 	}
 		// 	public void SyncSBsOnAll(){
-		// 		SlotGroup focusedSG = sgm.GetFocusedPoolSG();
+		// 		SlotGroup focusedSG = sgm.FocusedSGP;
 		// 		foreach(SlotSystemElement ele in sgm.RootPage.PoolBundle.Elements){
 		// 			SlotGroup sG = (SlotGroup)ele;
 		// 			// if(sG == sg)
@@ -2698,7 +2912,7 @@ public class SlottableTest {
 		// 		Slottable defWearB_p2 = sgpWear.GetSlottable(defWearB_p.Item);
 		// 		Slottable crfWearA_p2 = sgpWear.GetSlottable(crfWearA_p.Item);
 				
-		// 		AE(sgm.GetFocusedPoolSG(), sgpAll);
+		// 		AE(sgm.FocusedSGP, sgpAll);
 		// 		AB(sgpAll.IsAutoSort, true);
 		// 		AB(sgpBow.IsAutoSort, true);
 		// 		AB(sgpWear.IsAutoSort, true);
