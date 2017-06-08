@@ -4,8 +4,6 @@ using NUnit.Framework;
 using SlotSystem;
 using System.Collections.Generic;
 public class SlottableTest {
-
-
 	class SlotSystemTestResult{
 		public string pAS;
 		public string tAS;
@@ -146,18 +144,21 @@ public class SlottableTest {
 			
 			this.Val = Util.Bold("Sel: ") + prevSelStStr + " to " + curSelStStr + ", Process: " + selProcStr + Util.Bold(" Act: ") + prevActStStr + " to " + curActStStr + ", Process: " + actProcStr;
 		}
-		public SlotSystemTestResult(bool isPAS, Slottable pickedSB, SGMState curState, SGMState prevState, SlotSystemTransaction ta, SGMProcess proc, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
+		public SlotSystemTestResult(bool isPAS, Slottable pickedSB, SGMSelectionState prevSel, SGMSelectionState curSel, SGMProcess selProc, SGMActionState prevAct, SGMActionState curAct, SGMProcess actProc, SlotSystemTransaction ta, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
 			this.pickedSB = pickedSB;
 			this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
 			this.pickedSBName = Util.SBofSG(pickedSB);
 
-			string curSGMSt = Util.SGMStateName(curState);
-			string prevSGMSt = Util.SGMStateName(prevState);
-			string taStr = Util.TransactionName(ta);
-			string procStr = Util.SGMProcessName(proc);
-
-			this.Val = "PickedSB: " + pickedSBName + " SGM: from " + prevSGMSt + " to " + curSGMSt + ", TA: " + taStr + ", Proc: " + procStr + ", taComp: " + pSBDone + ", " + sSBDone+ ", " + oSGDone + ", " + sSGDone; 
-			
+			this.Val = Util.SBofSG(pickedSB) + 
+				" SGM: Sel from " + Util.SGMStateName(prevSel) + " to " + Util.SGMStateName(curSel) +  ", proc " + Util.SGMProcessName(selProc) + 
+				" Act from " + Util.SGMStateName(prevAct) + " to " + Util.SGMStateName(curAct) +
+				", proc " + Util.SGMProcessName(actProc) +
+				", TA " + Util.TransactionName(ta) + 
+				", TAComp: " + 
+				pSBDone.ToString() + ", " + 
+				sSBDone.ToString() + ", " + 
+				oSGDone.ToString() + ", " + 
+				sSGDone.ToString();
 		}
 		public SlotSystemTestResult(bool isPAS, SlotGroup sg, SGSelectionState prevSel, SGSelectionState curSel, SGProcess selProc, SGActionState prevAct, SGActionState curAct, SGProcess actProc){
 			this.hoveredSG = sg;
@@ -454,16 +455,11 @@ public class SlottableTest {
 				validate all the required fields are filled within the inspector window or at the time of declaration
 			*/
 			/*	SGM setup */
-				// Assert.That(sgm.UpdateTransactionCommand, Is.Not.Null);
-				// AB(sgm.PostPickFilterCommand != null, true);
-				ANull(sgm.Transaction);
-				
-				AE(sgm.PrevState, SGMDeactivated);
-				AE(sgm.CurState, SGMDeactivated);
-
-				ANull(sgm.SelectedSB);
-				ANull(sgm.SelectedSG);
-				ANull(sgm.PickedSB);
+				// ASSGM(sgm,
+				// 	SGMDeactivated, SGMDeactivated, null,
+				// 	SGMWFA, SGMWFA, null,
+				// 	null, null,
+				// 	true, true, true, true);
 
 				Assert.That(sgm.RootPage, Is.TypeOf(typeof(InventoryManagerPage)));
 				AE(sgm.RootPage.SGM, sgm);
@@ -496,7 +492,6 @@ public class SlottableTest {
 				AE(sgBow.SGM, sgm);
 				AE(equipSetA.ContainsElement(sgWear), true);
 				AE(sgWear.SGM, sgm);
-
 		sgm.Initialize();
 			/*	Assert Initialization
 				when the scene is loaded, but not yet focused
@@ -522,8 +517,11 @@ public class SlottableTest {
 				defMWeaponA_e = sgCGears.GetSB(defMWeaponA);
 				defQuiverA_p = sgpAll.GetSB(defQuiverA);
 				defPackA_p = sgpAll.GetSB(defPackA);
-
-			AE(sgm.CurState, SGMDeactivated);
+			ASSGM(sgm,
+				SGMDeactivated, SGMDeactivated, null,
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
 				/*	SGPs	*/
 					/*	sgpAll	*/
 						ASSG(sgpAll,
@@ -685,11 +683,59 @@ public class SlottableTest {
 		// TestRevertOnAllSBs();
 		// TestReorderOnAll();
 		// TestFillEquipOnAll();
-		// test transactions after each slotsys elements's state stransition is done
-		TestSGMStateTransition();
+		
+		// TestSGMStateTransition();// after transaction is done
 	}
 	public void TestSGMStateTransition(){
-
+		/*	Selecttion state */
+				ASSGM(sgm, 
+				SGMDeactivated, SGMFocused, null,
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
+			sgm.SetSelState(SlotGroupManager.DefocusedState);
+				ASSGM(sgm, 
+				SGMFocused, SGMDefocused, typeof(SGMGreyoutProcess),
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
+			sgm.SetSelState(SlotGroupManager.FocusedState);
+				ASSGM(sgm, 
+				SGMDefocused, SGMFocused, typeof(SGMGreyinProcess),
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
+			sgm.SetSelState(SlotGroupManager.DeactivatedState);
+				ASSGM(sgm, 
+				SGMFocused, SGMDeactivated, null,
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
+			sgm.SetSelState(SlotGroupManager.DefocusedState);
+				ASSGM(sgm,
+				SGMDeactivated, SGMDefocused, null,
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
+			sgm.SetSelState(SlotGroupManager.DeactivatedState);
+				ASSGM(sgm,
+				SGMDefocused, SGMDeactivated, null,
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
+			sgm.SetSelState(SlotGroupManager.FocusedState);
+				ASSGM(sgm,
+				SGMDeactivated, SGMFocused, null,
+				SGMWFA, SGMWFA, null,
+				null, null,
+				true, true, true, true);
+		/*	Action state */	// maybe after transaction is done 
+			// 	ASSGM(sgm,
+			// 	SGMDeactivated, SGMFocused, null,
+			// 	SGMWFA, SGMWFA, null,
+			// 	null, null,
+			// 	true, true, true, true);
+			// sgm.SetActState(SlotGroupManager.ProbingState)
 	}
 	public void TestSGStateTransitionOnAll(){
 		PerformOnAllSGAfterFocusing(TestSGStateTransition);
@@ -890,31 +936,48 @@ public class SlottableTest {
 	}
 	public void CaptureSGMState(Slottable sb, bool isPAS){
 		Slottable pickedSB = sb;
-		SGMState curState = sgm.CurState;
-		SGMState prevState = sgm.PrevState;
+		SGMSelectionState prevSel = sgm.PrevSelState;
+		SGMSelectionState curSel = sgm.CurSelState;
+		SGMProcess selProc = sgm.SelectionProcess;
+		SGMActionState prevAct = sgm.PrevActState;
+		SGMActionState curAct = sgm.CurActState;
+		SGMProcess actProc = sgm.ActionProcess;
 		SlotSystemTransaction ta = sgm.Transaction;
-		SGMProcess proc = sgm.StateProcess;
-		bool pSBDone = sgm.PickedSBDoneTransaction;
-		bool sSBDOne = sgm.SelectedSBDoneTransaction;
-		bool oSGDone = sgm.OrigSGDoneTransaction;
-		bool sSGDone = sgm.SelectedSGDoneTransaction;
+		bool pSBDone = sgm.PickedTASBDone;
+		bool sSBDOne = sgm.TargetTASBDone;
+		bool oSGDone = sgm.OrigTASGDone;
+		bool sSGDone = sgm.TargetTASGDone;
 
-		SlotSystemTestResult res = new SlotSystemTestResult(isPAS, sb, curState, prevState, ta, proc, pSBDone, sSBDOne, oSGDone, sSGDone);
+		SlotSystemTestResult res = new SlotSystemTestResult(isPAS, sb, prevSel, curSel, selProc, prevAct, curAct, actProc ,ta, pSBDone, sSBDOne, oSGDone, sSGDone);
 		testResults.Add(res);
 	}
 	public void PrintSGMState(Slottable sb, bool isPAS){
+		string isPASStr = "PAS: " + (isPAS?Util.Red("on"):Util.Blue("off"));
+		SlotGroupManager sgm = sb.SGM;
 		Slottable pickedSB = sb;
-		SGMState curState = sgm.CurState;
-		SGMState prevState = sgm.PrevState;
+		SGMSelectionState prevSel = sgm.PrevSelState;
+		SGMSelectionState curSel = sgm.CurSelState;
+		SGMProcess selProc = sgm.SelectionProcess;
+		SGMActionState prevAct = sgm.PrevActState;
+		SGMActionState curAct = sgm.CurActState;
+		SGMProcess actProc = sgm.ActionProcess;
 		SlotSystemTransaction ta = sgm.Transaction;
-		SGMProcess proc = sgm.StateProcess;
-		bool pSBDone = sgm.PickedSBDoneTransaction;
-		bool sSBDone = sgm.SelectedSBDoneTransaction;
-		bool oSGDone = sgm.OrigSGDoneTransaction;
-		bool sSGDone = sgm.SelectedSGDoneTransaction;
-		SlotGroup focSGP = sgm.FocusedSGP;
 
-		Debug.Log("PickedSB: " + Util.SBofSG(sb) + ", SGM: from " + Util.SGMStateName(prevState) + " to " + Util.SGMStateName(curState) + ", TA: " + Util.TransactionName(ta) + ", Proc: " + Util.SGMProcessName(proc) + ", TAComp: " + pSBDone.ToString() + ", " + sSBDone.ToString() + ", " + oSGDone.ToString() + ", " + sSGDone.ToString() + ", FocSGP: " + Util.SGName(focSGP));
+		bool pSBDone = sgm.PickedTASBDone;
+		bool sSBDone = sgm.TargetTASBDone;
+		bool oSGDone = sgm.OrigTASGDone;
+		bool sSGDone = sgm.TargetTASGDone;
+
+		Debug.Log(isPASStr + " pSB: " + Util.SBName(pickedSB) +
+			" SGM Sel from " + Util.SGMStateName(prevSel) + " to " + Util.SGMStateName(curSel) + ", proc " + Util.SGMProcessName(selProc) + 
+			", Act from" + Util.SGMStateName(prevAct) + " to " + Util.SGMStateName(curAct) + ", proc " + Util.SGMProcessName(actProc) + 
+			", TA: " + Util.TransactionName(ta) + 
+			", TACom: " + 
+			pSBDone.ToString() + ", " + 
+			sSBDone.ToString() + ", " + 
+			oSGDone.ToString() + ", " + 
+			sSGDone.ToString() 
+			);
 	}
 	public void CheckEventOnAllSB(){
 		PerformOnAllSBs(CheckEvent);
@@ -1052,13 +1115,12 @@ public class SlottableTest {
 						/*	on null sb	*/
 						PickUp(sb, out picked);
 						SimHover(null, sg, eventData);
-							ASSGM(sgm,
-								SGMProbing,
-								SGMFocused,
-								typeof(FillEquipTransaction),
-								typeof(SGMProbeProcess),
-								sb,	/*null, sg,*/
-								true, true, true, true);
+							ASSGM(sgm
+							,null, SGMFocused, null
+							,SGMWFA, SGMProbing, typeof(SGMProbeProcess)
+							,typeof(FillEquipTransaction)
+							,sb
+							,true, true, true, true);
 							ASSG(origSG,
 								SGSelected, SGFocused, typeof(SGDehighlightProcess),
 								SGWFA, SGWFA, null);
@@ -1066,13 +1128,12 @@ public class SlottableTest {
 								SGFocused, SGSelected, typeof(SGHighlightProcess),
 								SGWFA, SGWFA, null);
 						LetGo();
-							ASSGM(sgm,
-								SGMTransaction,
-								SGMProbing,
-								typeof(FillEquipTransaction),
-								typeof(SGMTransactionProcess),
-								sb, /*null, sg,*/
-								false, true, origSG.IsPool?true: false, sg.IsPool?true: false);
+							ASSGM(sgm
+							,null, SGMFocused, null
+							,SGMProbing, SGMTransaction, typeof(SGMTransactionProcess)
+							,typeof(FillEquipTransaction)
+							,sb
+							,false, true, origSG.IsPool?true: false, sg.IsPool?true: false);
 							ASSG(origSG,
 								SGSelected, SGFocused, typeof(SGDehighlightProcess),
 								SGWFA, SGTransaction, typeof(SGTransactionProcess));
@@ -1080,19 +1141,18 @@ public class SlottableTest {
 								SGFocused, SGSelected, typeof(SGHighlightProcess),
 								SGWFA, SGTransaction, typeof(SGTransactionProcess));
 						sb.ExpireActionProcess();
-							AE(sgm.PickedSBDoneTransaction, true);
+							AE(sgm.PickedTASBDone, true);
 						if(!sg.IsPool)
 							CompleteAllSBActProcesses(sg);
 						if(!origSG.IsPool)
 							CompleteAllSBActProcesses(origSG);
 							AssertFocused();
-							ASSGM(sgm,
-								SGMFocused,
-								SGMTransaction,
-								null,
-								null,
-								null, /*null, null,*/
-								true, true, true, true);
+							ASSGM(sgm
+							,null, SGMFocused, null
+							,SGMProbing, SGMWFA, null
+							,null
+							,null
+							,true, true, true, true);
 							ASSG(origSG,
 								SGSelected, SGFocused, typeof(SGDehighlightProcess),
 								SGTransaction, SGWFA, null);
@@ -1222,7 +1282,6 @@ public class SlottableTest {
 				act(sgp);
 			}
 		}
-	/*	*/
 	/*	actions	*/
 		public void PickUp(Slottable sb, out bool pickedUp){
 			AssertFocused();
@@ -1315,33 +1374,18 @@ public class SlottableTest {
 			return sg.GetSB(anySB.ItemInst);
 		} 
 		public void SimHover(Slottable sb, SlotGroup sg, PointerEventDataMock eventData){
-			/*	in actual implementation, this method is called whenever either sb or sg's 		boarder is crossed
+			/*	revised version
+					sgm.SetHovered(sb, sg);
+						=> update hovered fields
+					sgm.UpdateTransaction();
+						=> update target fields
+							=> thus the selection states of prev and current tartgets
 			*/
-			if(sgm.CurState == SlotGroupManager.ProbingState){
-				if(sb != null){
-					if(sgm.SelectedSB != sb){
-						if(sgm.SelectedSB != null)
-							sgm.SelectedSB.OnHoverExitMock(eventData);
-						sb.OnHoverEnterMock(eventData);
-					}
-				}else{
-					if(sgm.SelectedSB != null){
-						sgm.SelectedSB.OnHoverExitMock(eventData);
-					}
-				}
-				if(sg != null){
-					if(sgm.SelectedSG != sg){
-						if(sgm.SelectedSG != null)
-							sgm.SelectedSG.OnHoverExitMock(eventData);
-						sg.OnHoverEnterMock(eventData);
-					}
-				}else{
-					if(sgm.SelectedSG != null){
-						sgm.SelectedSG.OnHoverExitMock(eventData);
-					}
-				}
-			}
+			/*	in actual implementation, this method is called whenever either sb or sg's boarder is crossed
+			*/
+			sgm.SetHoveredSB(sb); sgm.SetHoveredSG(sg);
 			sgm.CreateTransactionResults();
+			sgm.UpdateTransaction();
 		}
 		List<Slottable> InvalidSBs(Slottable picked, SlotGroup targetSG){
 			/*	always includes picked itself */
@@ -1441,28 +1485,36 @@ public class SlottableTest {
 		}
 	/*	Assertions	*/
 		/*	SGM	*/
-			public void ASSGM_s(SlotGroupManager sgm, SGMState state){
-				AE(sgm.CurState, state);
+			public void ASGMSelState(SlotGroupManager sgm, SGMSelectionState prev, SGMSelectionState cur, System.Type selProcT){
+				AE(sgm.CurSelState, cur);
+				if(prev != null){
+					AE(sgm.PrevSelState, prev);
+					if(selProcT != null)
+						AE(sgm.SelectionProcess.GetType(), selProcT);
+					else
+						ANull(sgm.SelectionProcess);
+				}
 			}
-			public void ASSGM(SlotGroupManager sgm, SGMState curState, SGMState prevState, System.Type taType, System.Type sgmProcessType, Slottable pickedSB, /*Slottable selectedSB, SlotGroup selectedSG, */bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
-				ASSGM_s(sgm, curState);
-				if(prevState != null)
-					AE(sgm.PrevState, prevState);
-				if(taType == null)
-					ANull(sgm.Transaction);
-				else
-					AE(sgm.Transaction.GetType(), taType);
-				if(sgmProcessType == null)
-					ANull(sgm.StateProcess);
-				else
-					AE(sgm.StateProcess.GetType(), sgmProcessType);
+			public void ASGMActState(SlotGroupManager sgm, SGMActionState prev, SGMActionState cur, System.Type actProcT){
+				AE(sgm.CurActState, cur);
+				if(prev != null){
+					AE(sgm.PrevActState, prev);
+					if(actProcT != null)
+						AE(sgm.ActionProcess.GetType(), actProcT);
+					else
+						ANull(sgm.ActionProcess);
+				}
+			}
+			public void ASSGM(SlotGroupManager sgm, SGMSelectionState prevSel, SGMSelectionState curSel, System.Type selProcT, SGMActionState prevAct, SGMActionState curAct, System.Type actProcT, System.Type taType, Slottable pickedSB, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
+				ASGMSelState(sgm, prevSel, curSel, selProcT);
+				ASGMActState(sgm, prevAct, curAct, actProcT);
+				if(taType == null) ANull(sgm.Transaction);
+				else AE(sgm.Transaction.GetType(), taType);
 				AE(sgm.PickedSB, pickedSB);
-				// AE(sgm.SelectedSB, selectedSB);
-				// AE(sgm.SelectedSG, selectedSG);
-				AE(sgm.PickedSBDoneTransaction, pSBDone);
-				AE(sgm.SelectedSBDoneTransaction, sSBDone);
-				AE(sgm.OrigSGDoneTransaction, oSGDone);
-				AE(sgm.SelectedSGDoneTransaction, sSGDone);
+				AE(sgm.PickedTASBDone, pSBDone);
+				AE(sgm.TargetTASBDone, sSBDone);
+				AE(sgm.OrigTASGDone, oSGDone);
+				AE(sgm.TargetTASGDone, sSGDone);
 			}
 		/*	SG	*/
 			public void ASGSelState(SlotGroup sg, SGSelectionState prev, SGSelectionState cur, System.Type procT){
@@ -1739,11 +1791,9 @@ public class SlottableTest {
 			}
 			public void AssertFocused(){
 				ASSGM(sgm,
-					SGMFocused,
-					null,//prev state
-					null,//ta
-					null,//process
-					null, /*null, null,*/
+					null, SGMFocused, null,
+					null, SGMWFA, null,
+					null, null,
 					true, true, true, true);
 				foreach(SlotGroup sgp in sgm.AllSGPs){
 					if(sgp == sgm.FocusedSGP){
@@ -1841,17 +1891,23 @@ public class SlottableTest {
 				return Util.Violet(str);
 			}
 		/*	SGM	*/
-			SGMState SGMTransaction{
-				get{return SlotGroupManager.PerformingTransactionState;}
-			}
-			SGMState SGMFocused{
-				get{return SlotGroupManager.FocusedState;}
-			}
-			SGMState SGMDeactivated{
+			SGMSelectionState SGMDeactivated{
 				get{return SlotGroupManager.DeactivatedState;}
 			}
-			SGMState SGMProbing{
+			SGMSelectionState SGMDefocused{
+				get{return SlotGroupManager.DefocusedState;}
+			}
+			SGMSelectionState SGMFocused{
+				get{return SlotGroupManager.FocusedState;}
+			}
+			SGMActionState SGMWFA{
+				get{return SlotGroupManager.WaitForActionState;}
+			}
+			SGMActionState SGMProbing{
 				get{return SlotGroupManager.ProbingState;}
+			}
+			SGMActionState SGMTransaction{
+				get{return SlotGroupManager.PerformingTransactionState;}
 			}
 		/*	SG	*/
 			SGSelectionState SGFocused{

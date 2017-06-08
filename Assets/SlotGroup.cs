@@ -489,10 +489,12 @@ namespace SlotSystem{
 				}
 			}
 		/*	events	*/
-			public void OnHoverEnterMock(PointerEventDataMock eventData){
+			public void OnHoverEnterMock(){
+				PointerEventDataMock eventData = new PointerEventDataMock();
 				CurSelState.OnHoverEnterMock(this, eventData);
 			}
-			public void OnHoverExitMock(PointerEventDataMock eventData){
+			public void OnHoverExitMock(){
+				PointerEventDataMock eventData = new PointerEventDataMock();
 				CurSelState.OnHoverExitMock(this, eventData);
 			}
 		/*	SlotMovement	*/

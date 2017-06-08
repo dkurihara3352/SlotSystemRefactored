@@ -6,23 +6,22 @@ using Utility;
 namespace SlotSystem{
 	public class SlotGroupManager : MonoBehaviour, StateHandler{
 			public static SlotGroupManager CurSGM;
-			void SetCurSGM(){
-				if(CurSGM != null){
-					if(CurSGM != this){
-						CurSGM.Defocus();
-						CurSGM = this;
+				void SetCurSGM(){
+					if(CurSGM != null){
+						if(CurSGM != this){
+							CurSGM.Defocus();
+							CurSGM = this;
+						}else{
+							// no change
+						}
 					}else{
-						// no change
+						CurSGM = this;
 					}
-				}else{
-					CurSGM = this;
 				}
-			}
 		/*	transaction	*/
-			SlotSystemTransaction m_transaction;
-				public SlotSystemTransaction Transaction{
-					get{return m_transaction;}
-				}
+			public SlotSystemTransaction Transaction{
+				get{return m_transaction;}
+				}SlotSystemTransaction m_transaction;
 				public void SetTransaction(SlotSystemTransaction transaction){
 					if(m_transaction != transaction){
 						m_transaction = transaction;
@@ -32,127 +31,190 @@ namespace SlotSystem{
 					}
 				}
 			public void CompleteTransactionOnSB(Slottable sb){
-				if(m_pickedSBForTS != null && sb == m_pickedSBForTS) m_pickedSBDoneTransaction = true;
-				else if(m_selectedSBForTS != null && sb == m_selectedSBForTS)m_selectedSBDoneTransaction = true;
-				IEnumeratorMock tryInvoke = ((AbsSGMProcess)StateProcess).CoroutineMock();
+				if(PickedSB != null && sb == PickedSB) m_pickedSBDone = true;
+				else if(TargetSB != null && sb == TargetSB) m_targetSBDone = true;
+				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
 			}
 			public void CompleteTransactionOnSG(SlotGroup sg){
-				if(m_selectedSGForTS != null && sg == m_selectedSGForTS)
-					m_selectedSGDoneTransaction = true;
-				else if(m_origSGForTS != null && sg == m_origSGForTS)
-					m_origSGDoneTransaction = true;
-				else if(sg.CurActState == SlotGroup.PerformingTransactionState)
-					m_selectedSGDoneTransaction = true;
-				IEnumeratorMock tryInvoke = ((AbsSGMProcess)StateProcess).CoroutineMock();
+				if(TargetSG != null && sg == TargetSG) m_targetSGDone = true;
+				else if(PickedSB != null && sg == PickedSB.SG) m_origSGDone = true;
+				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
 			}
-			public void CompleteAllTransaction(){
+			public void OnAllTransactionComplete(){
 				Transaction.OnComplete();
 			}
-			public void SetTransactionFields(Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
-				SetPickedSBDoneTransaction(pickedSB);
-				SetSelectedSBDoneTransaction(selectedSB);
-				SetOrigSGDoneTransaction(origSG);
-				SetSelectedSGDoneTransaction(selectedSG);
-			}
-			bool m_pickedSBDoneTransaction = true;
-				Slottable m_pickedSBForTS;
-				public bool PickedSBDoneTransaction{
-					get{return m_pickedSBDoneTransaction;}
-				}
-				public void SetPickedSBDoneTransaction(Slottable sb){
-					m_pickedSBDoneTransaction = sb == null;
-					m_pickedSBForTS = sb;
-				}
-			bool m_selectedSBDoneTransaction = true;
-				Slottable m_selectedSBForTS;
-				public bool SelectedSBDoneTransaction{
-					get{return m_selectedSBDoneTransaction;}
-				}
-				public void SetSelectedSBDoneTransaction(Slottable sb){
-					m_selectedSBDoneTransaction = sb == null;
-					m_selectedSBForTS = sb;
-				}
-			bool m_origSGDoneTransaction = true;
-				SlotGroup m_origSGForTS;
-				public bool OrigSGDoneTransaction{
-					get{return m_origSGDoneTransaction;}
-				}
-				public void SetOrigSGDoneTransaction(SlotGroup sg){
-					m_origSGDoneTransaction = sg == null;
-					m_origSGForTS = sg;
-				}
-			bool m_selectedSGDoneTransaction = true;
-				SlotGroup m_selectedSGForTS;
-				public bool SelectedSGDoneTransaction{
-					get{return m_selectedSGDoneTransaction;}
-				}
-				public void SetSelectedSGDoneTransaction(SlotGroup sg){
-					m_selectedSGDoneTransaction = sg ==null;
-					m_selectedSGForTS = sg;
-				}
-
-		/*	command	methods */
-			// public void SetupCommands(){
-			// 	// m_updateTransactionCommand = new UpdateTransactionCommand();
-			// 	m_postPickFilterCommand = new PostPickFilterCommand();
+			// public void SetTransactionFields(Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
+			// 	SetPickedTASB(pickedSB);
+			// 	SetTargetTASB(selectedSB);
+			// 	SetOrigTASG(origSG);
+			// 	SetTargetTASG(selectedSG);
 			// }
-			// public void UpdateTransaction(){
-				// 	m_updateTransactionCommand.Execute(this);
-				// 	}SGMCommand m_updateTransactionCommand;
-				// 	public SGMCommand UpdateTransactionCommand{
-				// 		get{return m_updateTransactionCommand;}
+			public bool PickedTASBDone{
+				get{return m_pickedSBDone;}
+				}bool m_pickedSBDone = true;
+				// Slottable m_pickedTASB;
+				// public void SetPickedTASB(Slottable sb){
+				// 	m_pickedSBDone = sb == null;
+				// 	m_pickedTASB = sb;
+				// }
+			public bool TargetTASBDone{
+				get{return m_targetSBDone;}
+				}bool m_targetSBDone = true;
+				// Slottable m_targetTASB;
+				// public void SetTargetTASB(Slottable sb){
+				// 	m_targetSBDone = sb == null;
+				// 	m_targetTASB = sb;
+				// }
+			public bool OrigTASGDone{
+				get{return m_origSGDone;}
+				}bool m_origSGDone = true;
+				// SlotGroup m_origTASG;
+				// public void SetOrigTASG(SlotGroup sg){
+				// 	m_origSGDone = sg == null;
+				// 	m_origTASG = sg;
+				// }
+			public bool TargetTASGDone{
+				get{return m_targetSGDone;}
+				}bool m_targetSGDone = true;
+				// SlotGroup m_targetTASG;
+				// public void SetTargetTASG(SlotGroup sg){
+				// 	m_targetSGDone = sg ==null;
+				// 	m_targetTASG = sg;
+				// }
+		/*	states	*/
+			SGMStateEngine SelStateEngine{
+				get{
+					if(m_selStateEngine == null)
+						m_selStateEngine = new SGMStateEngine(this);
+					return m_selStateEngine;
+				}
+				}SGMStateEngine m_selStateEngine;
+				public SGMSelectionState CurSelState{
+					get{return (SGMSelectionState)SelStateEngine.curState;}
+				}
+				public SGMSelectionState PrevSelState{
+					get{return (SGMSelectionState)SelStateEngine.prevState;}
+				}
+				public void SetSelState(SGMSelectionState state){
+					SelStateEngine.SetState(state);
+				}
+			SGMStateEngine ActStateEngine{
+				get{
+					if(m_actStateEngine == null)
+						m_actStateEngine = new SGMStateEngine(this);
+					return m_actStateEngine;
+				}
+				}SGMStateEngine m_actStateEngine;
+				public SGMActionState CurActState{
+					get{return (SGMActionState)ActStateEngine.curState;}
+				}
+				public SGMActionState PrevActState{
+					get{return (SGMActionState)ActStateEngine.prevState;}
+				}
+				public void SetActState(SGMActionState state){
+					ActStateEngine.SetState(state);
+				}
+			/*	dump	*/
+				// public void SetState(SGMState sgmState){
+				// 	if(CurState != sgmState){
+				// 		m_prevState = CurState;
+				// 		m_prevState.ExitState(this);
+				// 		m_curState = sgmState;
+				// 		CurState.EnterState(this);
 				// 	}
-			// SGMCommand m_postPickFilterCommand;
-			// 	public SGMCommand PostPickFilterCommand{
-			// 		get{return m_postPickFilterCommand;}
-			// 	}
-			// 	public void PostPickFilter(){
-			// 		if(m_postPickFilterCommand != null)
-			// 		m_postPickFilterCommand.Execute(this);
-			// 	}
+				// }
+				// SGMState m_curState;
+				// 	public SGMState CurState{
+				// 		get{
+				// 			if(m_curState == null)
+				// 				m_curState = SlotGroupManager.DeactivatedState;
+				// 			return m_curState;}
+				// 	}
+				// SGMState m_prevState;
+				// 	public SGMState PrevState{
+				// 		get{
+				// 			if(m_prevState == null)
+				// 				m_prevState = SlotGroupManager.DeactivatedState;
+				// 			return m_prevState;
+				// 		}
+				// 	}
+			/*	static states	*/
+				/*	Selection State	*/
+					public static SGMSelectionState DeactivatedState{
+						get{return m_deactivatedState;}
+						}static SGMSelectionState m_deactivatedState = new SGMDeactivatedState();
+					public static SGMSelectionState DefocusedState{
+						get{return m_defocusedState;}
+						}static SGMSelectionState m_defocusedState = new SGMDefocusedState();
+					public static SGMSelectionState FocusedState{
+						get{return m_focusedState;}
+						}static SGMSelectionState m_focusedState = new SGMFocusedState();
+				/*	Action State	*/
+					public static SGMActionState WaitForActionState{
+						get{return m_WaitForActionState;}
+						}static SGMActionState m_WaitForActionState = new SGMWaitForActionState();
+					public static SGMActionState ProbingState{
+						get{return m_probingState;}
+						}static SGMActionState m_probingState = new SGMProbingState();
+					public static SGMActionState PerformingTransactionState{
+						get{return m_performingTransactionState;}
+						}static SGMActionState m_performingTransactionState = new SGMPerformingTransactionState();
 		/*	process	*/
-			List<SGMProcess> m_runningProcess = new List<SGMProcess>();
-				public List<SGMProcess> RunningProcess{
-					get{
-						return m_runningProcess;
-					}
+			public SGMProcess SelectionProcess{
+				get{return m_selectionProcess;}
+				}SGMProcess m_selectionProcess;
+				public void SetAndRunSelProcess(SGMProcess process){	
+					if(SelectionProcess != null)
+						SelectionProcess.Stop();
+					m_selectionProcess = process;
+					if(SelectionProcess != null)
+						SelectionProcess.Start();
 				}
-				public void StopAllProcess(){
-					SetAndRunStateProcess(null);
+			public SGMProcess ActionProcess{
+				get{return m_actionProcess;}
+				}SGMProcess m_actionProcess;
+				public void SetAndRunActProcess(SGMProcess process){	
+					if(ActionProcess != null)
+						ActionProcess.Stop();
+					m_actionProcess = process;
+					if(ActionProcess != null)
+						ActionProcess.Start();
 				}
-			SGMProcess m_stateProcess;
-				public SGMProcess StateProcess{
-					get{return m_stateProcess;}
+			/*	coroutines*/
+				public IEnumeratorMock GreyoutCoroutine(){
+					return null;
 				}
-			public void SetAndRunStateProcess(SGMProcess process){	
-				if(StateProcess != null)
-					StateProcess.Stop();
-				m_stateProcess = process;
-				if(StateProcess != null)
-					StateProcess.Start();
-			}
-			SGMProcess m_cachedProcess;
-			public SGMProcess CachedProcess{
-				get{return m_cachedProcess;}
-				set{m_cachedProcess = value;}
-			}
-			/*	coroutines
-			*/
+				public IEnumeratorMock GreyinCoroutine(){
+					return null;
+				}
 				public IEnumeratorMock ProbeCoroutine(){
 					return null;
 				}
 				public IEnumeratorMock WaitForTransactionDone(){
 					bool done = true;
-					done &= m_pickedSBDoneTransaction;
-					done &= m_selectedSBDoneTransaction;
-					done &= m_origSGDoneTransaction;
-					done &= m_selectedSGDoneTransaction;
+					done &= m_pickedSBDone;
+					done &= m_targetSBDone;
+					done &= m_origSGDone;
+					done &= m_targetSGDone;
 					if(done){
-						this.StateProcess.Expire();
+						this.ActionProcess.Expire();
 					}
 					return null;
 				}
 			/*	dump	*/
+				// public SGMProcess CachedProcess{
+				// 	get{return m_cachedProcess;}
+				// 	set{m_cachedProcess = value;}
+				// 	}SGMProcess m_cachedProcess;
+				// List<SGMProcess> m_runningProcess = new List<SGMProcess>();
+				// 	public List<SGMProcess> RunningProcess{
+				// 		get{
+				// 			return m_runningProcess;
+				// 		}
+				// 	}
+				// 	public void StopAllProcess(){
+				// 		SetAndRunStateProcess(null);
+				// 	}
 				// public IEnumeratorMock WaitForRevertDone(){
 				// 	bool done = true;
 				// 	done &= m_pickedSBDoneTransaction;
@@ -223,115 +285,106 @@ namespace SlotSystem{
 				// 		this.CurProcess.Expire();
 				// 	return null;
 				// }
-		/*	states	*/
-			public void SetState(SGMState sgmState){
-				if(CurState != sgmState){
-					m_prevState = CurState;
-					m_prevState.ExitState(this);
-					m_curState = sgmState;
-					CurState.EnterState(this);
-				}
-			}
-			SGMState m_curState;
-				public SGMState CurState{
-					get{
-						if(m_curState == null)
-							m_curState = SlotGroupManager.DeactivatedState;
-						return m_curState;}
-				}
-			SGMState m_prevState;
-				public SGMState PrevState{
-					get{
-						if(m_prevState == null)
-							m_prevState = SlotGroupManager.DeactivatedState;
-						return m_prevState;
-					}
-				}
-			static SGMState m_deactivatedState = new SGMDeactivatedState();
-				public static SGMState DeactivatedState{
-					get{return m_deactivatedState;}
-				}
-			static SGMState m_defocusedState = new SGMDefocusedState();
-				public static SGMState DefocusedState{
-					get{return m_defocusedState;}
-				}
-			static SGMState m_focusedState = new SGMFocusedState();
-				public static SGMState FocusedState{
-					get{return m_focusedState;}
-				}
-			
-			static SGMState m_probingState = new SGMProbingState();
-				public static SGMState ProbingState{
-					get{return m_probingState;}
-				}
-			static SGMState m_performingTransactionState = new SGMPerformingTransactionState();
-				public static SGMState PerformingTransactionState{
-					get{return m_performingTransactionState;}
-				}
-		
 		/*	public field	*/
-			public Slottable HoveredSB{
-				get{return m_hoveredSB;}
-				set{m_hoveredSB = value;}
-				}Slottable m_hoveredSB;
-			public SlotGroup HoveredSG{
-				get{return m_hoveredSG;}
-				set{m_hoveredSG = value;}
-				}SlotGroup m_hoveredSG;
-			public void SetHovered(Slottable sb, SlotGroup sg){
-				HoveredSB = sb; HoveredSG = sg;
-			}
-			public Slottable SelectedSB{
-				get{
-					Slottable sb = null;
-					if(Transaction != null)
-						sb = Transaction.SelectedSB;
-					return sb;
-				}
-				}Slottable m_selectedSB;
-				public void SetSelectedSB(Slottable sb){/* obsolete */
-					if(m_selectedSB != sb){
-						m_selectedSB = sb;
-					}
-				}
-			SlotGroup m_selectedSG;
-				public SlotGroup SelectedSG{
-					get{return m_selectedSG;}
-				}
-				public void SetSelectedSG(SlotGroup sg){
-					if(m_selectedSG != sg){
-						m_selectedSG = sg;
-						// UpdateTransaction();
-						// if(sg != null){
-						// 	m_selectedSGDoneTransaction = false;
-						// }else{
-						// 	m_selectedSGDoneTransaction = true;
-						// }
-					}
-				}
-			Slottable m_pickedSB;
-				public Slottable PickedSB{
-					get{return m_pickedSB;}
-				}
+			public Slottable PickedSB{
+				get{return m_pickedSB;}
+				}Slottable m_pickedSB;
 				public void SetPickedSB(Slottable sb){
 					this.m_pickedSB = sb;
-					// if(sb != null){
-					// 	m_pickedSBDoneTransaction = false;
-					// 	m_origSGDoneTransaction = false;
-					// }else{
-					// 	m_pickedSBDoneTransaction = true;
-					// 	m_origSGDoneTransaction = true;
-					// }
+					if(PickedSB != null){
+						m_pickedSBDone = false;
+						m_origSGDone = false;
+					}else{
+						m_pickedSBDone = true;
+						m_origSGDone = true;
+					}
 				}
-			InventoryManagerPage m_rootPage;
-				public InventoryManagerPage RootPage{
-					get{return m_rootPage;}
+			public Slottable TargetSB{
+				get{return m_targetSB;}
+				}Slottable m_targetSB;
+				public void SetTargetSB(Slottable sb){
+					if(sb == null || sb != TargetSB){
+						if(TargetSB != null)
+							TargetSB.SetSelState(Slottable.FocusedState);
+					}
+					this.m_targetSB = sb;
+					if(TargetSB != null)
+						TargetSB.SetSelState(Slottable.SelectedState);
+					if(TargetSB != null)
+						m_targetSBDone = false;
+					else
+						m_targetSBDone = true;
 				}
+			public SlotGroup TargetSG{
+				get{return m_targetSG;}
+				}SlotGroup m_targetSG;
+				public void SetTargetSG(SlotGroup sg){
+					if(sg == null || sg != TargetSG){
+						if(TargetSG != null)
+							TargetSG.SetSelState(SlotGroup.FocusedState);
+					}
+					this.m_targetSG = sg;
+					if(TargetSG != null)
+						TargetSG.SetSelState(SlotGroup.SelectedState);
+					if(TargetSG != null)
+						m_targetSGDone = false;
+					else
+						m_targetSGDone = true;
+				}
+			public Slottable HoveredSB{
+				get{return m_hoveredSB;}
+				}Slottable m_hoveredSB;
+				public void SetHoveredSB(Slottable sb){
+					if(sb == null || sb != HoveredSB){
+						if(HoveredSB != null)
+							HoveredSB.OnHoverExitMock();
+					}
+					m_hoveredSB = sb;
+				}
+			public SlotGroup HoveredSG{
+				get{return m_hoveredSG;}
+				}SlotGroup m_hoveredSG;
+				public void SetHoveredSG(SlotGroup sg){
+					if(sg == null || sg != HoveredSG){
+						if(HoveredSG != null)
+							HoveredSG.OnHoverExitMock();
+					}
+					m_hoveredSG = sg;
+				}
+			// public Slottable SelectedSB{
+			// 	get{
+			// 		Slottable sb = null;
+			// 		if(Transaction != null)
+			// 			sb = Transaction.TargetSB;
+			// 		return sb;
+			// 	}
+			// 	}Slottable m_selectedSB;
+			// 	public void SetSelectedSB(Slottable sb){/* obsolete */
+			// 		if(m_selectedSB != sb){
+			// 			m_selectedSB = sb;
+			// 		}
+			// 	}
+			// public SlotGroup SelectedSG{
+			// 	get{return m_selectedSG;}
+			// 	}SlotGroup m_selectedSG;
+			// 	public void SetSelectedSG(SlotGroup sg){
+			// 		if(m_selectedSG != sg){
+			// 			m_selectedSG = sg;
+			// 			// UpdateTransaction();
+			// 			// if(sg != null){
+			// 			// 	m_selectedSGDoneTransaction = false;
+			// 			// }else{
+			// 			// 	m_selectedSGDoneTransaction = true;
+			// 			// }
+			// 		}
+			// 	}
+			public InventoryManagerPage RootPage{
+				get{return m_rootPage;}
+				}InventoryManagerPage m_rootPage;
 				public void SetRootPage(InventoryManagerPage rootPage){
 					m_rootPage = rootPage;
 					m_rootPage.SGM = this;
 				}
-			//
 			public List<SlotGroup> AllSGs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
@@ -453,48 +506,41 @@ namespace SlotSystem{
 				/*	methods	*/
 		/*	methods	*/
 			public void Initialize(){
+				SelStateEngine.SetState(SlotGroupManager.DeactivatedState);
+				ActStateEngine.SetState(SlotGroupManager.WaitForActionState);
 				m_rootPage.Activate();
 				UpdateEquipStatesOnAll();
 			}
 			public void Focus(){
 				SetCurSGM();
-				if(CurState == SlotGroupManager.FocusedState){
+				SetSelState(SlotGroupManager.FocusedState);
+				SetActState(SlotGroupManager.WaitForActionState);
+				if(CurSelState == SlotGroupManager.FocusedState)
 					RootPage.Focus();
-				}else
-					this.SetState(SlotGroupManager.FocusedState);
 			}
 			public void Defocus(){
-				if(CurState == SlotGroupManager.DefocusedState){
+				SetSelState(SlotGroupManager.DefocusedState);
+				if(CurSelState == SlotGroupManager.DefocusedState)
 					RootPage.Defocus();
-				}
-				this.SetState(SlotGroupManager.DefocusedState);
 			}
-			public SlotGroup GetSlotGroup(Slottable sb){
+			public SlotGroup GetSG(Slottable sb){
 				return this.RootPage.GetSlotGroup(sb);	
 			}
 			public void ClearAndReset(){
 				this.SetTransaction(null);
-				this.SetState(SlotGroupManager.FocusedState);
+				// this.SetState(SlotGroupManager.FocusedState);
 				this.ClearFields();
+				Focus();
 			}
 			public void ClearFields(){
-				m_selectedSB = null;
-				if(m_selectedSG != null && m_selectedSG.CurSelState != SlotGroup.FocusedState)
-					m_selectedSG.SetSelState(SlotGroup.FocusedState);
-				m_selectedSG = null;
-				m_pickedSB = null;
-				
-				m_pickedSBDoneTransaction = true;
-				m_pickedSBForTS = null;
-				m_selectedSBDoneTransaction = true;
-				m_selectedSBForTS = null;
-				m_origSGDoneTransaction = true;
-				m_origSGForTS = null;
-				m_selectedSGDoneTransaction = true;
-				m_selectedSBForTS = null;
+				SetPickedSB(null);
+				SetTargetSB(null);
+				SetTargetSG(null);
+				SetHoveredSB(null);
+				SetHoveredSG(null);
 			}
 			public void Deactivate(){
-				SetState(SlotGroupManager.DeactivatedState);
+				SetSelState(SlotGroupManager.DeactivatedState);
 				m_rootPage.Deactivate();
 			}
 			public void SetFocusedPoolSG(SlotGroup sg){
@@ -572,9 +618,30 @@ namespace SlotSystem{
 			}
 			public void UpdateTransaction(){
 				SlotSystemTransaction ta = TransactionResults.GetTransaction(HoveredSB, HoveredSG);
+				SetTargetSB(ta.TargetSB);
+				SetTargetSG(ta.TargetSG);
 				SetTransaction(ta);
 			}
 		/*	dump	*/
+			/*	command	methods */
+			// public void SetupCommands(){
+			// 	// m_updateTransactionCommand = new UpdateTransactionCommand();
+			// 	m_postPickFilterCommand = new PostPickFilterCommand();
+			// }
+			// public void UpdateTransaction(){
+			// 	m_updateTransactionCommand.Execute(this);
+			// 	}SGMCommand m_updateTransactionCommand;
+			// 	public SGMCommand UpdateTransactionCommand{
+			// 		get{return m_updateTransactionCommand;}
+			// 	}
+			// SGMCommand m_postPickFilterCommand;
+			// 	public SGMCommand PostPickFilterCommand{
+			// 		get{return m_postPickFilterCommand;}
+			// 	}
+			// 	public void PostPickFilter(){
+			// 		if(m_postPickFilterCommand != null)
+			// 		m_postPickFilterCommand.Execute(this);
+			// 	}
 			// public SlotGroup GetFocusedCGearsSG(){
 			// 	foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){
 			// 		if(((SlotGroup)ele).Filter is SGCarriedGearFilter)

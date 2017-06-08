@@ -313,7 +313,7 @@ namespace SlotSystem{
 			public SlotGroup SG{
 				get{
 					if(m_sg == null){
-						m_sg = SGM.GetSlotGroup(this);
+						m_sg = SGM.GetSG(this);
 					}
 					return m_sg;
 				}
@@ -366,11 +366,13 @@ namespace SlotSystem{
 				public void Defocus(){
 					SetSelState(Slottable.DefocusedState);
 				}
-				public void OnHoverEnterMock(PointerEventDataMock eventDataMock){
-					CurSelState.OnHoverEnterMock(this, eventDataMock);
+				public void OnHoverEnterMock(){
+					PointerEventDataMock eventData = new PointerEventDataMock();
+					CurSelState.OnHoverEnterMock(this, eventData);
 				}
-				public void OnHoverExitMock(PointerEventDataMock eventDataMock){
-					CurSelState.OnHoverExitMock(this, eventDataMock);
+				public void OnHoverExitMock(){
+					PointerEventDataMock eventData = new PointerEventDataMock();
+					CurSelState.OnHoverExitMock(this, eventData);
 				}
 			/*	Action Event	*/
 				public void OnPointerDownMock(PointerEventDataMock eventDataMock){
