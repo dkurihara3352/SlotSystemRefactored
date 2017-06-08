@@ -41,7 +41,7 @@ namespace SlotSystem{
 					m_selectedSGDoneTransaction = true;
 				else if(m_origSGForTS != null && sg == m_origSGForTS)
 					m_origSGDoneTransaction = true;
-				else if(sg.CurState == SlotGroup.PerformingTransactionState)
+				else if(sg.CurActState == SlotGroup.PerformingTransactionState)
 					m_selectedSGDoneTransaction = true;
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)StateProcess).CoroutineMock();
 			}
@@ -92,24 +92,24 @@ namespace SlotSystem{
 				}
 
 		/*	command	methods */
-			public void SetupCommands(){
-				// m_updateTransactionCommand = new UpdateTransactionCommand();
-				m_postPickFilterCommand = new PostPickFilterCommand();
-			}
+			// public void SetupCommands(){
+			// 	// m_updateTransactionCommand = new UpdateTransactionCommand();
+			// 	m_postPickFilterCommand = new PostPickFilterCommand();
+			// }
 			// public void UpdateTransaction(){
 				// 	m_updateTransactionCommand.Execute(this);
 				// 	}SGMCommand m_updateTransactionCommand;
 				// 	public SGMCommand UpdateTransactionCommand{
 				// 		get{return m_updateTransactionCommand;}
 				// 	}
-			SGMCommand m_postPickFilterCommand;
-				public SGMCommand PostPickFilterCommand{
-					get{return m_postPickFilterCommand;}
-				}
-				public void PostPickFilter(){
-					if(m_postPickFilterCommand != null)
-					m_postPickFilterCommand.Execute(this);
-				}
+			// SGMCommand m_postPickFilterCommand;
+			// 	public SGMCommand PostPickFilterCommand{
+			// 		get{return m_postPickFilterCommand;}
+			// 	}
+			// 	public void PostPickFilter(){
+			// 		if(m_postPickFilterCommand != null)
+			// 		m_postPickFilterCommand.Execute(this);
+			// 	}
 		/*	process	*/
 			List<SGMProcess> m_runningProcess = new List<SGMProcess>();
 				public List<SGMProcess> RunningProcess{
@@ -479,8 +479,8 @@ namespace SlotSystem{
 			}
 			public void ClearFields(){
 				m_selectedSB = null;
-				if(m_selectedSG != null && m_selectedSG.CurState != SlotGroup.FocusedState)
-					m_selectedSG.SetState(SlotGroup.FocusedState);
+				if(m_selectedSG != null && m_selectedSG.CurSelState != SlotGroup.FocusedState)
+					m_selectedSG.SetSelState(SlotGroup.FocusedState);
 				m_selectedSG = null;
 				m_pickedSB = null;
 				

@@ -5,8 +5,6 @@ using System;
 using Utility;
 namespace SlotSystem{
 	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, StateHandler{
-
-		
 		/*	States	*/
 			/*	Selection State	*/
 				SBStateEngine SelStateEngine{
@@ -447,10 +445,6 @@ namespace SlotSystem{
 			}
 			public void GetSlotIndex(out int curID, out int newID){
 				SG.GetSlotMovement(this).GetIndex(out curID, out newID);
-			}
-			public void ExpireSelectionProcess(){
-				if(SelectionProcess.IsRunning)
-					SelectionProcess.Expire();
 			}
 			public void ExpireActionProcess(){
 				if(ActionProcess.IsRunning)

@@ -75,7 +75,7 @@ namespace SlotSystem{
 							if(targetSG.AcceptsFilter(pickedSB)){
 								if(targetSG != origSG && origSG.IsShrinkable){
 									if(targetSG.HasItem(pickedSB.ItemInst) && pickedSB.ItemInst.Item.IsStackable)
-										return new StackTransaction(targetSG.GetSlottable(pickedSB.ItemInst));
+										return new StackTransaction(targetSG.GetSB(pickedSB.ItemInst));
 										
 									if(targetSG.HasEmptySlot){
 										if(!targetSG.HasItem(pickedSB.ItemInst))
@@ -179,7 +179,7 @@ namespace SlotSystem{
 					
 					SetTransactionProcessAndSwitchState(pickedSB, null, null, selectedSG);
 					selectedSG.SetAndRunSlotMovementsForReorder(pickedSB, selectedSB);
-					selectedSG.TransactionProcess.Start();
+					selectedSG.ActionProcess.Start();
 
 					Slot slot = selectedSG.GetSlot(selectedSB);
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
@@ -208,8 +208,8 @@ namespace SlotSystem{
 				public override void Execute(){
 					
 					SetTransactionProcessAndSwitchState(pickedSB, null, null, selectedSG);
-					selectedSG.SetAndRunSlotMovementsForReorder(selectedSG.GetSlottable(pickedSB.ItemInst), selectedSB);
-					selectedSG.TransactionProcess.Start();
+					selectedSG.SetAndRunSlotMovementsForReorder(selectedSG.GetSB(pickedSB.ItemInst), selectedSB);
+					selectedSG.ActionProcess.Start();
 
 					Slot slot = pickedSB.SG.GetSlot(pickedSB);
 					pickedSB.MoveDraggedIcon(pickedSB.SG, slot);
@@ -262,11 +262,11 @@ namespace SlotSystem{
 					
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotmovementsForSwap(pickedSB, selectedSB);
-						origSG.TransactionProcess.Start();
+						origSG.ActionProcess.Start();
 					}
 					if(!selectedSG.IsPool){
 						selectedSG.SetAndRunSlotmovementsForSwap(selectedSB, pickedSB);
-						selectedSG.TransactionProcess.Start();
+						selectedSG.ActionProcess.Start();
 					}
 					
 					Slot selectedSBSlot = selectedSG.GetSlotForAdded(pickedSB);
@@ -277,12 +277,12 @@ namespace SlotSystem{
 					
 					if(origSG.IsPool){
 						pickedSB.SetActState(Slottable.MovingOutState);
-						Slottable swappedDest = origSG.GetSlottable(selectedSB.ItemInst);
+						Slottable swappedDest = origSG.GetSB(selectedSB.ItemInst);
 						swappedDest.SetActState(Slottable.MovingInState);
 					}
 					if(selectedSG.IsPool){
 						selectedSB.SetActState(Slottable.MovingInState);
-						Slottable swappedDest = selectedSG.GetSlottable(pickedSB.ItemInst);
+						Slottable swappedDest = selectedSG.GetSB(pickedSB.ItemInst);
 						swappedDest.SetActState(Slottable.MovingOutState);
 					}
 
@@ -351,11 +351,11 @@ namespace SlotSystem{
 
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotMovements(moved, null);
-						origSG.TransactionProcess.Start();
+						origSG.ActionProcess.Start();
 					}
 					if(!selectedSG.IsPool){
 						selectedSG.SetAndRunSlotMovements(null, moved);
-						selectedSG.TransactionProcess.Start();
+						selectedSG.ActionProcess.Start();
 					}
 
 					Slot slot = selectedSG.GetSlotForAdded(pickedSB);
@@ -363,7 +363,7 @@ namespace SlotSystem{
 					pickedSB.SetActState(Slottable.MovingOutState);
 					
 					if(selectedSG.IsPool){
-						Slottable targetSB = selectedSG.GetSlottable(pickedSB.ItemInst);
+						Slottable targetSB = selectedSG.GetSB(pickedSB.ItemInst);
 						targetSB.SetActState(Slottable.MovingInState);
 					}
 
@@ -396,7 +396,7 @@ namespace SlotSystem{
 				public override void Execute(){
 					SetTransactionProcessAndSwitchState(null, null, null, selectedSG);
 					selectedSG.SetAndRunSlotMovementsForSort();
-					selectedSG.TransactionProcess.Start();
+					selectedSG.ActionProcess.Start();
 					selectedSG.CheckCompletion();
 				}
 				public override void OnComplete(){
@@ -485,175 +485,175 @@ namespace SlotSystem{
 			public interface SGMCommand{
 				void Execute(SlotGroupManager sgm);
 			}
-			public class UpdateTransactionCommand: SGMCommand{
-				public void Execute(SlotGroupManager sgm){
-					Slottable pickedSB = sgm.PickedSB;
-					Slottable selectedSB = sgm.SelectedSB;
-					SlotGroup selectedSG = sgm.SelectedSG;
-					SlotGroup origSG = pickedSB.SG;
-					if(pickedSB != null){
-						if(selectedSB == null){// drop on SG
-							if(selectedSG == null || selectedSG == origSG || !origSG.IsShrinkable){
-								SlotSystemTransaction revertTs = new RevertTransaction();
-								sgm.SetTransaction(revertTs);
-							}else{
-								/*	selectedSG != null && != origSG
-									there's at least one vacant slot OR there's a sb of a same stackable item
-								*/
-								if(selectedSG.HasItem((InventoryItemInstanceMock)pickedSB.Item)){
-									if(selectedSG.IsPool){
-										FillEquipTransaction ta = new FillEquipTransaction(selectedSG);
-										sgm.SetTransaction(ta);
-									}else{
-										StackTransaction stackTs = new StackTransaction(selectedSB);
-										sgm.SetTransaction(stackTs);
-									}
-								}else{
-									EquipmentSet focusedEquipSet = (EquipmentSet)sgm.RootPage.EquipBundle.GetFocusedBundleElement();
-									if(focusedEquipSet.ContainsElement(selectedSG)){
-										if(selectedSG.Filter is SGCGearsFilter){
-											FillEquipTransaction fillEquipTs = new FillEquipTransaction(selectedSG);
-											sgm.SetTransaction(fillEquipTs);
-										}else{
-											sgm.SetSelectedSB(selectedSG.Slots[0].Sb);
-											SwapTransaction swapTs = new SwapTransaction(selectedSG.Slots[0].Sb);
-											sgm.SetTransaction(swapTs);
-										}
-									}else{
-										FillTransaction fillTs = new FillTransaction(selectedSG);
-										sgm.SetTransaction(fillTs);
-									}
-								}
-							}
-
-						}else{// selectedSB != null
-							if(pickedSB == selectedSB){
-								SlotSystemTransaction revertTs = new RevertTransaction();
-								sgm.SetTransaction(revertTs);
-							}else{
-								if(sgm.GetSlotGroup(selectedSB) == sgm.GetSlotGroup(pickedSB)){
-									if(!sgm.GetSlotGroup(pickedSB).IsAutoSort){
-										SlotSystemTransaction reorderTs = new ReorderTransaction(selectedSB);
-										sgm.SetTransaction(reorderTs);
-									}
-								}else{// different SGs
-									if(pickedSB.Item == selectedSB.Item){
-										if(pickedSB.IsEquipped){
-											
-											FillEquipTransaction ta = new FillEquipTransaction(selectedSB.SG);
-											sgm.SetTransaction(ta);
-										}else{
-											StackTransaction stackTs = new StackTransaction(selectedSB);
-											sgm.SetTransaction(stackTs);
-										}
-									}else{
-										SwapTransaction swapTs = new SwapTransaction(selectedSB);
-										sgm.SetTransaction(swapTs);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			public class PostPickFilterCommand: SGMCommand{
-				public void Execute(SlotGroupManager sgm){
-					Slottable pickedSb = sgm.PickedSB;
-					SlotGroup origSG = sgm.SelectedSG;
-					SlotSystemBundle poolBundle = sgm.RootPage.PoolBundle;
-					SlotSystemBundle equipBundle = sgm.RootPage.EquipBundle;
-
-					if(poolBundle.ContainsElement(origSG)){// pickedSb in the pool
-						foreach(Slot slot in origSG.Slots){
-							if(slot.Sb != null && slot.Sb != pickedSb){
-								if(origSG.IsAutoSort){
-									slot.Sb.Defocus();
-								}else{
-									slot.Sb.Focus();
-								}
-							}
-						}
-						EquipmentSet focusedEquipmentSet = (EquipmentSet)equipBundle.GetFocusedBundleElement();
-						foreach(SlotSystemElement ele in focusedEquipmentSet.Elements){
-							SlotGroup sg = (SlotGroup)ele;
-							if(sg.AcceptsFilter(pickedSb)){
-								if(sg.Filter is SGCGearsFilter && sg.GetNextEmptySlot()==null)
-									sg.SetState(SlotGroup.DefocusedState);
-								else
-									sg.SetState(SlotGroup.FocusedState);
-								foreach(Slot slot in sg.Slots){
-									if(slot.Sb != null){
-										slot.Sb.Focus();
-									}
-								}
-							}else{// sg filtered out
-								sg.SetState(SlotGroup.DefocusedState);
-								foreach(Slot slot in sg.Slots){
-									if(slot.Sb != null){
-										slot.Sb.Defocus();
-									}
-								}
-							}
-						}
-					}else{// if pickedSB in sge
-						SlotGroup focSGP = sgm.FocusedSGP;
-						if(focSGP.AcceptsFilter(pickedSb)){
-							foreach(Slottable sbp in focSGP.Slottables){
-								if(sbp != null){
-									if(Util.HaveCommonItemFamily(sbp, pickedSb)){
-										if(object.ReferenceEquals(sbp.Item, pickedSb.Item)){
-											if(origSG.IsShrinkable)// unequip
-												sbp.Focus();
-											else
-												sbp.Defocus();
-										}
-										else{
-											if(sbp.IsEquipped)
-												sbp.Defocus();
-											else
-												sbp.Focus();
-										}
-									}else{	// different item family
-										sbp.Defocus();
-									}
-								}
-							}
-						}else{
-							focSGP.Defocus();
-						}
-						foreach(SlotGroup sge in sgm.FocusedSGEs){
-							if(sge != origSG){
-								if(sge.AcceptsFilter(pickedSb)){
-									sge.SetState(SlotGroup.FocusedState);
-									foreach(Slot slot in sge.Slots){
-										if(slot.Sb != null)
-											slot.Sb.Focus();
-									}
-								}else{
-									sge.SetState(SlotGroup.DefocusedState);
-									foreach(Slot slot in sge.Slots){
-										if(slot.Sb != null)
-											slot.Sb.Defocus();
-									}
-								}
-							}else{// sge == origSG, the state is Selected
-								foreach(Slot slot in sge.Slots){
-									if(slot.Sb != null){
-										if(slot.Sb != pickedSb){
-											if(!sge.IsAutoSort)
-												slot.Sb.Focus();
-											else
-												slot.Sb.Defocus();
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
 			/*	dump	*/
-					// public class PostPickFilterCommand: SGMCommand{
+				// public class UpdateTransactionCommand: SGMCommand{
+				// 	public void Execute(SlotGroupManager sgm){
+				// 		Slottable pickedSB = sgm.PickedSB;
+				// 		Slottable selectedSB = sgm.SelectedSB;
+				// 		SlotGroup selectedSG = sgm.SelectedSG;
+				// 		SlotGroup origSG = pickedSB.SG;
+				// 		if(pickedSB != null){
+				// 			if(selectedSB == null){// drop on SG
+				// 				if(selectedSG == null || selectedSG == origSG || !origSG.IsShrinkable){
+				// 					SlotSystemTransaction revertTs = new RevertTransaction();
+				// 					sgm.SetTransaction(revertTs);
+				// 				}else{
+				// 					/*	selectedSG != null && != origSG
+				// 						there's at least one vacant slot OR there's a sb of a same stackable item
+				// 					*/
+				// 					if(selectedSG.HasItem((InventoryItemInstanceMock)pickedSB.Item)){
+				// 						if(selectedSG.IsPool){
+				// 							FillEquipTransaction ta = new FillEquipTransaction(selectedSG);
+				// 							sgm.SetTransaction(ta);
+				// 						}else{
+				// 							StackTransaction stackTs = new StackTransaction(selectedSB);
+				// 							sgm.SetTransaction(stackTs);
+				// 						}
+				// 					}else{
+				// 						EquipmentSet focusedEquipSet = (EquipmentSet)sgm.RootPage.EquipBundle.GetFocusedBundleElement();
+				// 						if(focusedEquipSet.ContainsElement(selectedSG)){
+				// 							if(selectedSG.Filter is SGCGearsFilter){
+				// 								FillEquipTransaction fillEquipTs = new FillEquipTransaction(selectedSG);
+				// 								sgm.SetTransaction(fillEquipTs);
+				// 							}else{
+				// 								sgm.SetSelectedSB(selectedSG.Slots[0].Sb);
+				// 								SwapTransaction swapTs = new SwapTransaction(selectedSG.Slots[0].Sb);
+				// 								sgm.SetTransaction(swapTs);
+				// 							}
+				// 						}else{
+				// 							FillTransaction fillTs = new FillTransaction(selectedSG);
+				// 							sgm.SetTransaction(fillTs);
+				// 						}
+				// 					}
+				// 				}
+
+				// 			}else{// selectedSB != null
+				// 				if(pickedSB == selectedSB){
+				// 					SlotSystemTransaction revertTs = new RevertTransaction();
+				// 					sgm.SetTransaction(revertTs);
+				// 				}else{
+				// 					if(sgm.GetSlotGroup(selectedSB) == sgm.GetSlotGroup(pickedSB)){
+				// 						if(!sgm.GetSlotGroup(pickedSB).IsAutoSort){
+				// 							SlotSystemTransaction reorderTs = new ReorderTransaction(selectedSB);
+				// 							sgm.SetTransaction(reorderTs);
+				// 						}
+				// 					}else{// different SGs
+				// 						if(pickedSB.Item == selectedSB.Item){
+				// 							if(pickedSB.IsEquipped){
+												
+				// 								FillEquipTransaction ta = new FillEquipTransaction(selectedSB.SG);
+				// 								sgm.SetTransaction(ta);
+				// 							}else{
+				// 								StackTransaction stackTs = new StackTransaction(selectedSB);
+				// 								sgm.SetTransaction(stackTs);
+				// 							}
+				// 						}else{
+				// 							SwapTransaction swapTs = new SwapTransaction(selectedSB);
+				// 							sgm.SetTransaction(swapTs);
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// }
+				// public class PostPickFilterCommand: SGMCommand{
+				// 	public void Execute(SlotGroupManager sgm){
+				// 		Slottable pickedSb = sgm.PickedSB;
+				// 		SlotGroup origSG = sgm.SelectedSG;
+				// 		SlotSystemBundle poolBundle = sgm.RootPage.PoolBundle;
+				// 		SlotSystemBundle equipBundle = sgm.RootPage.EquipBundle;
+
+				// 		if(poolBundle.ContainsElement(origSG)){// pickedSb in the pool
+				// 			foreach(Slot slot in origSG.Slots){
+				// 				if(slot.Sb != null && slot.Sb != pickedSb){
+				// 					if(origSG.IsAutoSort){
+				// 						slot.Sb.Defocus();
+				// 					}else{
+				// 						slot.Sb.Focus();
+				// 					}
+				// 				}
+				// 			}
+				// 			EquipmentSet focusedEquipmentSet = (EquipmentSet)equipBundle.GetFocusedBundleElement();
+				// 			foreach(SlotSystemElement ele in focusedEquipmentSet.Elements){
+				// 				SlotGroup sg = (SlotGroup)ele;
+				// 				if(sg.AcceptsFilter(pickedSb)){
+				// 					if(sg.Filter is SGCGearsFilter && sg.GetNextEmptySlot()==null)
+				// 						sg.SetSelState(SlotGroup.DefocusedState);
+				// 					else
+				// 						sg.SetSelState(SlotGroup.FocusedState);
+				// 					foreach(Slot slot in sg.Slots){
+				// 						if(slot.Sb != null){
+				// 							slot.Sb.Focus();
+				// 						}
+				// 					}
+				// 				}else{// sg filtered out
+				// 					sg.SetSelState(SlotGroup.DefocusedState);
+				// 					foreach(Slot slot in sg.Slots){
+				// 						if(slot.Sb != null){
+				// 							slot.Sb.Defocus();
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}else{// if pickedSB in sge
+				// 			SlotGroup focSGP = sgm.FocusedSGP;
+				// 			if(focSGP.AcceptsFilter(pickedSb)){
+				// 				foreach(Slottable sbp in focSGP.Slottables){
+				// 					if(sbp != null){
+				// 						if(Util.HaveCommonItemFamily(sbp, pickedSb)){
+				// 							if(object.ReferenceEquals(sbp.Item, pickedSb.Item)){
+				// 								if(origSG.IsShrinkable)// unequip
+				// 									sbp.Focus();
+				// 								else
+				// 									sbp.Defocus();
+				// 							}
+				// 							else{
+				// 								if(sbp.IsEquipped)
+				// 									sbp.Defocus();
+				// 								else
+				// 									sbp.Focus();
+				// 							}
+				// 						}else{	// different item family
+				// 							sbp.Defocus();
+				// 						}
+				// 					}
+				// 				}
+				// 			}else{
+				// 				focSGP.Defocus();
+				// 			}
+				// 			foreach(SlotGroup sge in sgm.FocusedSGEs){
+				// 				if(sge != origSG){
+				// 					if(sge.AcceptsFilter(pickedSb)){
+				// 						sge.SetSelState(SlotGroup.FocusedState);
+				// 						foreach(Slot slot in sge.Slots){
+				// 							if(slot.Sb != null)
+				// 								slot.Sb.Focus();
+				// 						}
+				// 					}else{
+				// 						sge.SetSelState(SlotGroup.DefocusedState);
+				// 						foreach(Slot slot in sge.Slots){
+				// 							if(slot.Sb != null)
+				// 								slot.Sb.Defocus();
+				// 						}
+				// 					}
+				// 				}else{// sge == origSG, the state is Selected
+				// 					foreach(Slot slot in sge.Slots){
+				// 						if(slot.Sb != null){
+				// 							if(slot.Sb != pickedSb){
+				// 								if(!sge.IsAutoSort)
+				// 									slot.Sb.Focus();
+				// 								else
+				// 									slot.Sb.Defocus();
+				// 							}
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// }
+				// public class PostPickFilterCommand: SGMCommand{
 				// 	public void Execute(SlotGroupManager sgm){
 				// 		if(sgm.PickedSB != null){
 							
@@ -1005,143 +1005,130 @@ namespace SlotSystem{
 			}
 	/*	SlotGroup Classes	*/
 		/*	states	*/
-			public interface SGState{
-				void EnterState(SlotGroup sg);
-				void ExitState(SlotGroup sg);
-				void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData);
-				void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData);
-				void Focus(SlotGroup sg);
-				void Defocus(SlotGroup sg);
-			}
-			public class SGDeactivatedState : SGState{
-				public void EnterState(SlotGroup sg){
-					sg.SetAndRunStateProcess(null);
-				}
-				public void ExitState(SlotGroup sg){
-				}
-				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
-				}
-				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
-				}
-				public void Focus(SlotGroup sg){
-					sg.SetState(SlotGroup.FocusedState);
-					sg.FocusSBs();
-				}
-				public void Defocus(SlotGroup sg){
-					sg.SetState(SlotGroup.DefocusedState);
-					sg.DefocusSBs();
-				}
-			}
-			public class SGDefocusedState: SGState{
-				public void EnterState(SlotGroup sg){
-					SGProcess process = null;
-
-					if(sg.PrevState == SlotGroup.DeactivatedState){
-						process = null;
-						sg.InstantGreyout();
+			/*	superclasses	*/
+				public class SGStateEngine: SwitchableStateEngine{
+					public SGStateEngine(SlotGroup sg){
+						this.handler = sg;
 					}
-					else if(sg.PrevState == SlotGroup.FocusedState)
-						process = new SGGreyoutProcess(sg, sg.GreyoutCoroutine);
-					else if(sg.PrevState == SlotGroup.SelectedState)
-						process = new SGDehighlightProcess(sg, sg.DehighlightCoroutine);
-					if(process != null)
-						sg.SetAndRunStateProcess(process);
-
+					public void SetState(SGState sgState){
+						base.SetState(sgState);
+					}
 				}
-				/**/
-					public void ExitState(SlotGroup sg){}
-					public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
+				public abstract class SGState: SwitchableState{
+					protected SlotGroup sg;
+					public virtual void EnterState(StateHandler handler){
+						sg = (SlotGroup)handler;
 					}
-					public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+					public virtual void ExitState(StateHandler handler){
+						sg = (SlotGroup)handler;
 					}
-					public void Focus(SlotGroup sg){
-						sg.SetState(SlotGroup.FocusedState);
-						sg.FocusSBs();
-					}
-					public void Defocus(SlotGroup sg){
-						sg.SetState(SlotGroup.DefocusedState);
-						sg.DefocusSBs();
-					}
-			}
-			public class SGFocusedState: SGState{
-				public void EnterState(SlotGroup sg){
-					SGProcess process = null;
-					if(sg.PrevState == SlotGroup.DeactivatedState){
-						process = null;
-						sg.InstantGreyin();
-					}
-					else if(sg.PrevState == SlotGroup.DefocusedState)
-						process = new SGGreyinProcess(sg, sg.GreyinCoroutine);
-					else if(sg.PrevState == SlotGroup.SelectedState)
-						process = new SGDehighlightProcess(sg, sg.DehighlightCoroutine);
-					else if(sg.PrevState == SlotGroup.PerformingTransactionState){
-						process = null;
-						sg.SetAndRunStateProcess(process);
-					}
-					if(process != null)
-						sg.SetAndRunStateProcess(process);
 				}
-				/**/
-					public void ExitState(SlotGroup sg){}
-					public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
-						sg.SGM.SetSelectedSG(sg);
-						sg.SetState(SlotGroup.SelectedState);
-					}
-					public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
-						
-					}
-					public void Focus(SlotGroup sg){
-						sg.SetState(SlotGroup.FocusedState);
-						sg.FocusSBs();
-					}
-					public void Defocus(SlotGroup sg){
-						sg.SetState(SlotGroup.DefocusedState);
-						sg.DefocusSBs();
-					}
-			}
-			public class SGSelectedState: SGState{
-				public void EnterState(SlotGroup sg){
-					SGProcess process = null;
-					if(sg.PrevState == SlotGroup.FocusedState)
-						process = new SGHighlightProcess(sg, sg.HighlightCoroutine);
-					if(process != null)
-						sg.SetAndRunStateProcess(process);
+				public abstract class SGSelectionState: SGState{
+					public abstract void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventDataMock);
+					public abstract void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventDataMock);
 				}
-				public void ExitState(SlotGroup sg){}
-				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
-				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
-					if(sg.SGM.SelectedSG == sg){
-						sg.SGM.SetSelectedSG(null);
+				public abstract class SGActionState: SGState{
+				}
+			/*	Selection States	*/
+				public class SGDeactivatedState : SGSelectionState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						sg.SetAndRunSelProcess(null);
 					}
-					sg.SetState(SlotGroup.FocusedState);
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
+					public override void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
+					public override void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){}
 				}
-				public void Focus(SlotGroup sg){
-					sg.FocusSBs();
+				public class SGDefocusedState: SGSelectionState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						SGProcess process = null;
+						if(sg.PrevSelState == SlotGroup.DeactivatedState){
+							process = null;
+							sg.InstantGreyout();
+						}else if(sg.PrevSelState == SlotGroup.FocusedState)
+							process = new SGGreyoutProcess(sg, sg.GreyoutCoroutine);
+						else if(sg.PrevSelState == SlotGroup.SelectedState)
+							process = new SGDehighlightProcess(sg, sg.GreyoutCoroutine);
+						sg.SetAndRunSelProcess(process);
+					}
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
+					public override void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
+					public override void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){}
 				}
-				public void Defocus(SlotGroup sg){
-					sg.SetState(SlotGroup.DefocusedState);
-					sg.DefocusSBs();
-				}
-			}
-			public class SGPerformingTransactionState: SGState{
-				public void EnterState(SlotGroup sg){
-					// SGProcess process = new SGUpdateTransactionProcess(sg, sg.UpdateTransactionCoroutine);
+				public class SGFocusedState: SGSelectionState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						SGProcess process = null;
+						if(sg.PrevSelState == SlotGroup.DeactivatedState){
+							process = null;
+							sg.InstantGreyin();
+						}
+						else if(sg.PrevSelState == SlotGroup.DefocusedState)
+							process = new SGGreyinProcess(sg, sg.GreyinCoroutine);
+						else if(sg.PrevSelState == SlotGroup.SelectedState)
+							process = new SGDehighlightProcess(sg, sg.DehighlightCoroutine);
+						sg.SetAndRunSelProcess(process);
+					}
 					
-					// sg.SetAndRun(process);
-					SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
-					sg.SetAndRunStateProcess(process);
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
+					public override void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){
+						sg.SGM.SetSelectedSG(sg);
+						sg.SetSelState(SlotGroup.SelectedState);
+					}
+					public override void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){}
 				}
-				public void ExitState(SlotGroup sg){}
-				public void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
-				public void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+				public class SGSelectedState: SGSelectionState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						SGProcess process = null;
+						if(sg.PrevSelState == SlotGroup.DeactivatedState){
+							sg.InstantHighlight();
+						}else if(sg.PrevSelState == SlotGroup.DefocusedState)
+							process = new SGHighlightProcess(sg, sg.HighlightCoroutine);
+						else if(sg.PrevSelState == SlotGroup.FocusedState)
+							process = new SGHighlightProcess(sg, sg.HighlightCoroutine);
+						sg.SetAndRunSelProcess(process);
+					}
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
+					public override void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventData){}
+					public override void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventData){
+						if(sg.SGM.SelectedSG == sg){
+							sg.SGM.SetSelectedSG(null);
+						}
+						sg.SetSelState(SlotGroup.FocusedState);
+					}
 				}
-				public void Focus(SlotGroup sg){
-					sg.SetState(SlotGroup.FocusedState);
-					sg.FocusSBs();
+			/*	Action State	*/
+				public class SGWaitForActionState: SGActionState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						sg.SetAndRunActProcess(null);
+					}
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
 				}
-				public void Defocus(SlotGroup sg){
+				public class SGPerformingTransactionState: SGActionState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						if(sg.PrevActState != null && sg.PrevActState == SlotGroup.WaitForActionState){
+							SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
+							sg.SetAndRunActProcess(process);
+						}
+					}
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
 				}
-			}
 			/*	dump	*/
 				// public class SGSortingState: SlotGroupState{
 				// 	public void EnterState(SlotGroup sg){
@@ -1208,21 +1195,21 @@ namespace SlotSystem{
 				public virtual void Start(){
 					m_isRunning = true;
 					m_isExpired = false;
-					SG.RunningProcess.Add(this);
+					// SG.RunningProcess.Add(this);
 					m_coroutineMock();
 				}
 				public virtual void Stop(){
 					if(m_isRunning){
 						m_isRunning = false;
 						m_isExpired = false;
-						SG.RunningProcess.Remove(this);
+						// SG.RunningProcess.Remove(this);
 					}
 				}
 				public virtual void Expire(){
 					if(m_isRunning){
 						m_isRunning = false;
 						m_isExpired = true;
-						SG.RunningProcess.Remove(this);
+						// SG.RunningProcess.Remove(this);
 					}
 				}
 				public void Check(){
@@ -1234,86 +1221,34 @@ namespace SlotSystem{
 					this.SG = sg;
 					this.CoroutineMock = coroutineMock;
 				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-					}
 			}
 			public class SGGreyoutProcess: AbsSGProcess{
 				public SGGreyoutProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
 					this.SG = sg;
 					this.CoroutineMock = coroutineMock;
 				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-					}
 			}
 			public class SGHighlightProcess: AbsSGProcess{
 				public SGHighlightProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
 					this.SG = sg;
 					this.CoroutineMock = coroutineMock;
 				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-					}
 			}
 			public class SGDehighlightProcess: AbsSGProcess{
 				public SGDehighlightProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
 					this.SG = sg;
 					this.CoroutineMock = coroutineMock;
 				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-					}
 			}
 			public class SGTransactionProcess: AbsSGProcess{
 				public SGTransactionProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
 					this.SG = sg;
 					this.CoroutineMock = coroutineMock;
 				}
-				/*	overridden functions
-				*/
-					public override void Start(){
-						base.Start();
-					}
-					public override void Stop(){
-						base.Stop();
-					}
-					public override void Expire(){
-						base.Expire();
-						SG.SGM.CompleteTransactionOnSG(SG);
-					}
+				public override void Expire(){
+					base.Expire();
+					SG.SGM.CompleteTransactionOnSG(SG);
+				}
 			}
 			public class SlotMovement{
 				Slottable m_sb;
@@ -1505,16 +1440,16 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public class SGFocusCommandV2: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					sg.CurState.Focus(sg);
-				}
-			}
-			public class SGDefocusCommandV2: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					sg.CurState.Defocus(sg);
-				}
-			}
+			// public class SGFocusCommandV2: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		sg.CurState.Focus(sg);
+				// 	}
+				// }
+				// public class SGDefocusCommandV2: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		sg.CurState.Defocus(sg);
+				// 	}
+				// }
 			/*	dump	*/
 				// public class SGWakeupCommand: SlotGroupCommand{
 				// 	public void Execute(SlotGroup sg){
@@ -2243,8 +2178,6 @@ namespace SlotSystem{
 				// 	}
 				// }
 		/*	states	*/
-			/*	Equipped and Picked states needs to be removed
-			*/
 			/*	superclasses	*/
 				public class SBStateEngine: SwitchableStateEngine{
 					public SBStateEngine(Slottable sb){
@@ -3539,264 +3472,301 @@ namespace SlotSystem{
 				}
 				return false;
 			}
-			public static string SGName(SlotGroup sg){
-				string result = "";
-				if(sg.IsPool){
-					if(sg.Filter is SGNullFilter)
-						result = "sgpAll";
-					else if(sg.Filter is SGBowFilter)
-						result = "sgpBow";
-					else if(sg.Filter is SGWearFilter)
-						result = "sgpWear";
-					else if(sg.Filter is SGCGearsFilter)
-						result = "sgpCGears";
-					else if(sg.Filter is SGPartsFilter)
-						result = "sgpParts";
-				}else if(sg.IsSGE){
-					if(sg.Filter is SGBowFilter)
-						result = "sgBow";
-					else if(sg.Filter is SGWearFilter)
-						result = "sgWear";
-					else if(sg.Filter is SGCGearsFilter)
-						result = "sgCGears";
+			/*	SGM	*/
+				public static string SGMStateName(SGMState state){
+					string res = "";
+					if(state is SGMDeactivatedState)
+						res = Util.Red("Deactivated");
+					else if(state is SGMDefocusedState)
+						res = Util.Blue("Defocused");
+					else if(state is SGMFocusedState)
+						res = Util.Green("Focused");
+					else if(state is SGMProbingState)
+						res = Util.Ciel("Probing");
+					else if(state is SGMPerformingTransactionState)
+						res = Util.Terra("PerformingTransaction");
+					return res;
 				}
-				return result;
-			}
-			public static string SBName(Slottable sb){
-				string result = "";
-				switch(sb.ItemInst.Item.ItemID){
-					case 0:	result = "defBow"; break;
-					case 1:	result = "crfBow"; break;
-					case 2:	result = "frgBow"; break;
-					case 3:	result = "mstBow"; break;
-					case 100: result = "defWear"; break;
-					case 101: result = "crfWear"; break;
-					case 102: result = "frgWear"; break;
-					case 103: result = "mstWear"; break;
-					case 200: result = "defShield"; break;
-					case 201: result = "crfShield"; break;
-					case 202: result = "frgShield"; break;
-					case 203: result = "mstShield"; break;
-					case 300: result = "defMWeapon"; break;
-					case 301: result = "crfMWeapon"; break;
-					case 302: result = "frgMWeapon"; break;
-					case 303: result = "mstMWeapon"; break;
-					case 400: result = "defQuiver"; break;
-					case 401: result = "crfQuiver"; break;
-					case 402: result = "frgQuiver"; break;
-					case 403: result = "mstQuiver"; break;
-					case 500: result = "defPack"; break;
-					case 501: result = "crfPack"; break;
-					case 502: result = "frgPack"; break;
-					case 503: result = "mstPack"; break;
-					case 600: result = "defParts"; break;
-					case 601: result = "crfParts"; break;
-					case 602: result = "frgParts"; break;
-					case 603: result = "mstParts"; break;
+				public static string TransactionName(SlotSystemTransaction ta){
+					string res = "";
+					if(ta is RevertTransaction)
+						res = Util.Red("RevertTA");
+					else if(ta is ReorderTransaction)
+						res = Util.Blue("ReorderTA");
+					else if(ta is ReorderInOtherSGTransaction)
+						res = Util.Green("ReorderInOtherSGTA");
+					else if(ta is StackTransaction)
+						res = Util.Aqua("StackTA");
+					else if(ta is SwapTransaction)
+						res = Util.Terra("SwapTA");
+					else if(ta is FillTransaction)
+						res = Util.Forest("FillTA");
+					else if(ta is FillEquipTransaction)
+						res = Util.Berry("FillEquipTA");
+					else if(ta is SortTransaction)
+						res = Util.Khaki("SortTA");
+					else if(ta is InsertTransaction)
+						res = Util.Midnight("InsertTA");
+					return res;
 				}
-				List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-				foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.PoolInv.Items){
-					if(itemInst.Item == sb.ItemInst.Item)
-						sameItemInsts.Add(itemInst);
+				public static string SGMProcessName(SGMProcess proc){
+					string res = "";
+					if(proc is SGMProbeProcess)
+						res = Util.Red("Probe");
+					if(proc is SGMTransactionProcess)
+						res = Util.Blue("Transaction");
+					return res;
 				}
-				int index = sameItemInsts.IndexOf(sb.ItemInst);
-				result += "_"+index.ToString();
-				return result;
-			}
-			public static string SBofSG(Slottable sb){
-				string res = "";
-				res = Util.SBName(sb) + " of " + Util.SGName(sb.SG);
-				if(sb.SG.IsPool)
-					res = Util.Red(res);
-				else
-					res = Util.Blue(res);
-				if(sb.IsEquipped && sb.SG.IsPool)
-					res = Util.Bold(res);
-				return res;
-			}
-			public static string SBStateName(SBState state){
-				string result = "";
-				if(state is SBSelectionState){
-					if(state is SBDeactivatedState)
-						result = Red("Deactivated");
-					else if(state is SBFocusedState)
-						result = Blue("Focused");
-					else if(state is SBDefocusedState)
-						result = Green("Defocused");
-					else if(state is SBSelectedState)
-						result = Ciel("Selected");
-				}else if(state is SBActionState){
-					if(state is WaitForActionState)
-						result = Aqua("WFAction");
-					else if(state is WaitForPointerUpState)
-						result = Forest("WFPointerUp");
-					else if(state is WaitForPickUpState)
-						result = Brown("WFPickUp");
-					else if(state is WaitForNextTouchState)
-						result = Terra("WFNextTouch");
-					else if(state is PickedUpState)
-						result = Berry("PickedUp");
-					else if(state is SBRemovedState)
-						result = Violet("Removed");
-					else if(state is SBAddedState)
-						result = Khaki("Added");
-					else if(state is SBMovingInSGState)
-						result = Midnight("MovingInSG");
-					else if(state is SBRevertingState)
-						result = Beni("Reverting");
-					else if(state is SBMovingOutState)
-						result = Sangria("MovingOut");
-					else if(state is SBMovingInState)
-						result = Yamabuki("MovingIn");
-				}else if(state is SBEquipState){
-					if(state is SBEquippedState)
-						result = Red("Equipped");
-					else if(state is SBUnequippedState)
-						result = Blue("Unequipped");
-				}
-				return result;
-			}
-			public static string SBProcessName(SBProcess process){
-				string res = "";
-				if(process is SBGreyoutProcess)
-					res = Red("Greyout");
-				else if(process is SBGreyinProcess)
-					res = Blue("Greyin");
-				else if(process is SBHighlightProcess)
-					res = Green("Highlight");
-				else if(process is SBDehighlightProcess)
-					res = Ciel("Dehighlight");
-				else if(process is WaitForPointerUpProcess)
-					res = Aqua("WFPointerUp");
-				else if(process is WaitForPickUpProcess)
-					res = Forest("WFPickUp");
-				else if(process is PickedUpProcess)
-					res = Brown("PickedUp");
-				else if(process is WaitForNextTouchProcess)
-					res = Terra("WFNextTouch");
-				else if(process is SBUnpickProcess)
-					res = Berry("Unpick");
-				else if(process is SBRemovedProcess)
-					res = Violet("Removed");
-				else if(process is SBAddedProcess)
-					res = Khaki("Added");
-				else if(process is SBMoveInSGProcess)
-					res = Midnight("MovingInSG");
-				else if(process is SBRevertProcess)
-					res = Beni("Reverting");
-				else if(process is SBMoveOutProcess)
-					res = Sangria("MovingOut");
-				else if(process is SBMoveInProcess)
-					res = Yamabuki("MovingIn");
-				else if(process is SBUnequipProcess)
-					res = Red("Unequip");
-				else if(process is SBEquipProcess)
-					res = Blue("Equipping");
-				return res;
-			}
-			public static string SGMStateName(SGMState state){
-				string res = "";
-				if(state is SGMDeactivatedState)
-					res = Util.Red("Deactivated");
-				else if(state is SGMDefocusedState)
-					res = Util.Blue("Defocused");
-				else if(state is SGMFocusedState)
-					res = Util.Green("Focused");
-				else if(state is SGMProbingState)
-					res = Util.Ciel("Probing");
-				else if(state is SGMPerformingTransactionState)
-					res = Util.Terra("PerformingTransaction");
-				return res;
-			}
-			public static string TransactionName(SlotSystemTransaction ta){
-				string res = "";
-				if(ta is RevertTransaction)
-					res = Util.Red("RevertTA");
-				else if(ta is ReorderTransaction)
-					res = Util.Blue("ReorderTA");
-				else if(ta is ReorderInOtherSGTransaction)
-					res = Util.Green("ReorderInOtherSGTA");
-				else if(ta is StackTransaction)
-					res = Util.Aqua("StackTA");
-				else if(ta is SwapTransaction)
-					res = Util.Terra("SwapTA");
-				else if(ta is FillTransaction)
-					res = Util.Forest("FillTA");
-				else if(ta is FillEquipTransaction)
-					res = Util.Berry("FillEquipTA");
-				else if(ta is SortTransaction)
-					res = Util.Khaki("SortTA");
-				else if(ta is InsertTransaction)
-					res = Util.Midnight("InsertTA");
-				return res;
-			}
-			public static string SGMProcessName(SGMProcess proc){
-				string res = "";
-				if(proc is SGMProbeProcess)
-					res = Util.Red("Probe");
-				if(proc is SGMTransactionProcess)
-					res = Util.Blue("Transaction");
-				return res;
-			}
-			public static string Red(string str){
-				return "<color=#ff0000>" + str + "</color>";
-			}
-			public static string Blue(string str){
-				return "<color=#0000ff>" + str + "</color>";
-
-			}
-			public static string Green(string str){
-				return "<color=#02B902>" + str + "</color>";
-			}
-			public static string Ciel(string str){
-				return "<color=#11A795>" + str + "</color>";
-			}
-			public static string Aqua(string str){
-				return "<color=#128582>" + str + "</color>";
-			}
-			public static string Forest(string str){
-				return "<color=#046C57>" + str + "</color>";
-			}
-			public static string Brown(string str){
-				return "<color=#805A05>" + str + "</color>";
-			}
-			public static string Terra(string str){
-				return "<color=#EA650F>" + str + "</color>";
-			}
-			public static string Berry(string str){
-				return "<color=#A41565>" + str + "</color>";
-			}
-			public static string Violet(string str){
-				return "<color=#793DBD>" + str + "</color>";
-			}
-			public static string Khaki(string str){
-				return "<color=#747925>" + str + "</color>";
-			}
-			public static string Midnight(string str){
-				return "<color=#1B2768>" + str + "</color>";
-			}
-			public static string Beni(string str){
-				return "<color=#E32791>" + str + "</color>";
-			}
-			public static string Sangria(string str){
-				return "<color=#640A16>" + str + "</color>";
-			}
-			public static string Yamabuki(string str){
-				return "<color=#EAB500>" + str + "</color>";
-			}
-			public static string Bold(string str){
-				return "<b>" + str + "</b>";
-			}
-			static string m_stacked;
-			public static string Stacked{
-				get{
-					string result = m_stacked;
-					m_stacked = "";
+			/*	SG	*/
+				public static string SGName(SlotGroup sg){
+					string result = "";
+					if(sg.IsPool){
+						if(sg.Filter is SGNullFilter)
+							result = "sgpAll";
+						else if(sg.Filter is SGBowFilter)
+							result = "sgpBow";
+						else if(sg.Filter is SGWearFilter)
+							result = "sgpWear";
+						else if(sg.Filter is SGCGearsFilter)
+							result = "sgpCGears";
+						else if(sg.Filter is SGPartsFilter)
+							result = "sgpParts";
+						result = Red(result);
+					}else if(sg.IsSGE){
+						if(sg.Filter is SGBowFilter)
+							result = "sgBow";
+						else if(sg.Filter is SGWearFilter)
+							result = "sgWear";
+						else if(sg.Filter is SGCGearsFilter)
+							result = "sgCGears";
+						result = Blue(result);
+					}
 					return result;
 				}
-			}
-			public static void Stack(string str){
-				m_stacked += str + ", ";
-			}
+				public static string SGStateName(SGState state){
+					string res = "";
+					if(state is SGDeactivatedState){
+						res = Util.Sangria("SGDeactivated");
+					}else if(state is SGDefocusedState){
+						res = Util.Terra("SGDefocused");
+					}else if(state is SGFocusedState){
+						res = Util.Green("SGFocused");
+					}else if(state is SGSelectedState){
+						res = Util.Aqua("SGSelected");
+					}else if(state is SGWaitForActionState){
+						res = Util.Sangria("SGWFA");
+					}else if(state is SGPerformingTransactionState){
+						res = Util.Green("SGTransaction");
+					}
+					return res;
+				}
+				public static string SGProcessName(SGProcess proc){
+					string res = "";
+					if(proc is SGGreyinProcess)
+						res = Util.Red("Greyin");
+					else if(proc is SGGreyoutProcess)
+						res = Util.Blue("Greyout");
+					else if(proc is SGHighlightProcess)
+						res = Util.Green("Highlight");
+					else if(proc is SGDehighlightProcess)
+						res = Util.Brown("Dehighlight");
+					else if(proc is SGTransactionProcess)
+						res = Util.Khaki("Transaction");
+					return res;
+				}
+			/*	SB	*/
+				public static string SBName(Slottable sb){
+					string result = "";
+					switch(sb.ItemInst.Item.ItemID){
+						case 0:	result = "defBow"; break;
+						case 1:	result = "crfBow"; break;
+						case 2:	result = "frgBow"; break;
+						case 3:	result = "mstBow"; break;
+						case 100: result = "defWear"; break;
+						case 101: result = "crfWear"; break;
+						case 102: result = "frgWear"; break;
+						case 103: result = "mstWear"; break;
+						case 200: result = "defShield"; break;
+						case 201: result = "crfShield"; break;
+						case 202: result = "frgShield"; break;
+						case 203: result = "mstShield"; break;
+						case 300: result = "defMWeapon"; break;
+						case 301: result = "crfMWeapon"; break;
+						case 302: result = "frgMWeapon"; break;
+						case 303: result = "mstMWeapon"; break;
+						case 400: result = "defQuiver"; break;
+						case 401: result = "crfQuiver"; break;
+						case 402: result = "frgQuiver"; break;
+						case 403: result = "mstQuiver"; break;
+						case 500: result = "defPack"; break;
+						case 501: result = "crfPack"; break;
+						case 502: result = "frgPack"; break;
+						case 503: result = "mstPack"; break;
+						case 600: result = "defParts"; break;
+						case 601: result = "crfParts"; break;
+						case 602: result = "frgParts"; break;
+						case 603: result = "mstParts"; break;
+					}
+					List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
+					foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.PoolInv.Items){
+						if(itemInst.Item == sb.ItemInst.Item)
+							sameItemInsts.Add(itemInst);
+					}
+					int index = sameItemInsts.IndexOf(sb.ItemInst);
+					result += "_"+index.ToString();
+					return result;
+				}
+				public static string SBofSG(Slottable sb){
+					string res = "";
+					res = Util.SBName(sb) + " of " + Util.SGName(sb.SG);
+					if(sb.SG.IsPool)
+						res = Util.Red(res);
+					else
+						res = Util.Blue(res);
+					if(sb.IsEquipped && sb.SG.IsPool)
+						res = Util.Bold(res);
+					return res;
+				}
+				public static string SBStateName(SBState state){
+					string result = "";
+					if(state is SBSelectionState){
+						if(state is SBDeactivatedState)
+							result = Red("Deactivated");
+						else if(state is SBFocusedState)
+							result = Blue("Focused");
+						else if(state is SBDefocusedState)
+							result = Green("Defocused");
+						else if(state is SBSelectedState)
+							result = Ciel("Selected");
+					}else if(state is SBActionState){
+						if(state is WaitForActionState)
+							result = Aqua("WFAction");
+						else if(state is WaitForPointerUpState)
+							result = Forest("WFPointerUp");
+						else if(state is WaitForPickUpState)
+							result = Brown("WFPickUp");
+						else if(state is WaitForNextTouchState)
+							result = Terra("WFNextTouch");
+						else if(state is PickedUpState)
+							result = Berry("PickedUp");
+						else if(state is SBRemovedState)
+							result = Violet("Removed");
+						else if(state is SBAddedState)
+							result = Khaki("Added");
+						else if(state is SBMovingInSGState)
+							result = Midnight("MovingInSG");
+						else if(state is SBRevertingState)
+							result = Beni("Reverting");
+						else if(state is SBMovingOutState)
+							result = Sangria("MovingOut");
+						else if(state is SBMovingInState)
+							result = Yamabuki("MovingIn");
+					}else if(state is SBEquipState){
+						if(state is SBEquippedState)
+							result = Red("Equipped");
+						else if(state is SBUnequippedState)
+							result = Blue("Unequipped");
+					}
+					return result;
+				}
+				public static string SBProcessName(SBProcess process){
+					string res = "";
+					if(process is SBGreyoutProcess)
+						res = Red("Greyout");
+					else if(process is SBGreyinProcess)
+						res = Blue("Greyin");
+					else if(process is SBHighlightProcess)
+						res = Green("Highlight");
+					else if(process is SBDehighlightProcess)
+						res = Ciel("Dehighlight");
+					else if(process is WaitForPointerUpProcess)
+						res = Aqua("WFPointerUp");
+					else if(process is WaitForPickUpProcess)
+						res = Forest("WFPickUp");
+					else if(process is PickedUpProcess)
+						res = Brown("PickedUp");
+					else if(process is WaitForNextTouchProcess)
+						res = Terra("WFNextTouch");
+					else if(process is SBUnpickProcess)
+						res = Berry("Unpick");
+					else if(process is SBRemovedProcess)
+						res = Violet("Removed");
+					else if(process is SBAddedProcess)
+						res = Khaki("Added");
+					else if(process is SBMoveInSGProcess)
+						res = Midnight("MovingInSG");
+					else if(process is SBRevertProcess)
+						res = Beni("Reverting");
+					else if(process is SBMoveOutProcess)
+						res = Sangria("MovingOut");
+					else if(process is SBMoveInProcess)
+						res = Yamabuki("MovingIn");
+					else if(process is SBUnequipProcess)
+						res = Red("Unequip");
+					else if(process is SBEquipProcess)
+						res = Blue("Equipping");
+					return res;
+				}
+			/*	Debug	*/
+				public static string Red(string str){
+					return "<color=#ff0000>" + str + "</color>";
+				}
+				public static string Blue(string str){
+					return "<color=#0000ff>" + str + "</color>";
+
+				}
+				public static string Green(string str){
+					return "<color=#02B902>" + str + "</color>";
+				}
+				public static string Ciel(string str){
+					return "<color=#11A795>" + str + "</color>";
+				}
+				public static string Aqua(string str){
+					return "<color=#128582>" + str + "</color>";
+				}
+				public static string Forest(string str){
+					return "<color=#046C57>" + str + "</color>";
+				}
+				public static string Brown(string str){
+					return "<color=#805A05>" + str + "</color>";
+				}
+				public static string Terra(string str){
+					return "<color=#EA650F>" + str + "</color>";
+				}
+				public static string Berry(string str){
+					return "<color=#A41565>" + str + "</color>";
+				}
+				public static string Violet(string str){
+					return "<color=#793DBD>" + str + "</color>";
+				}
+				public static string Khaki(string str){
+					return "<color=#747925>" + str + "</color>";
+				}
+				public static string Midnight(string str){
+					return "<color=#1B2768>" + str + "</color>";
+				}
+				public static string Beni(string str){
+					return "<color=#E32791>" + str + "</color>";
+				}
+				public static string Sangria(string str){
+					return "<color=#640A16>" + str + "</color>";
+				}
+				public static string Yamabuki(string str){
+					return "<color=#EAB500>" + str + "</color>";
+				}
+				public static string Bold(string str){
+					return "<b>" + str + "</b>";
+				}
+				static string m_stacked;
+				public static string Stacked{
+					get{
+						string result = m_stacked;
+						m_stacked = "";
+						return result;
+					}
+				}
+				public static void Stack(string str){
+					m_stacked += str + ", ";
+				}
 		}
 }
