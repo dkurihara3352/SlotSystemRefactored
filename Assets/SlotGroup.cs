@@ -177,6 +177,11 @@ namespace SlotSystem{
 				if(m_slotMovements == null/* as in when testing */)
 					return null;
 				foreach(SlotMovement sm in m_slotMovements){
+					if(sm.SB.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
+					sm.SB.ActionProcess.GetType() == typeof(SBAddedProcess) ||
+					sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
+					sm.SB.ActionProcess.GetType() == typeof(SBMoveOutProcess) ||
+					sm.SB.ActionProcess.GetType() == typeof(SBMoveInProcess))
 					flag &= sm.SB.ActionProcess.IsExpired;
 				}
 				if(flag){

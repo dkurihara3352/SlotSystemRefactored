@@ -582,7 +582,7 @@ namespace SlotSystem{
 				SetTransaction(sortTransaction);
 				Transaction.Execute();
 			}
-			TransactionResults TransactionResults{
+			public TransactionResults TransactionResults{
 				get{return m_transactionResults;}
 				set{
 					m_transactionResults = value;
@@ -607,7 +607,7 @@ namespace SlotSystem{
 					foreach(Slottable sb in sg.Slottables){
 						if(sb != null){
 							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(PickedSB, sb, null);
-							TransactionResult tr2 = new TransactionResult(sb, null, ta);
+							TransactionResult tr2 = new TransactionResult(sb, null, ta2);
 							transactionResults.AddTransactionResult(tr2);
 							if(ta2 is RevertTransaction)
 								sb.Defocus();
@@ -623,6 +623,13 @@ namespace SlotSystem{
 				SetTargetSB(ta.TargetSB);
 				SetTargetSG(ta.TargetSG);
 				SetTransaction(ta);
+			}
+			public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup targetSG, Slottable targetSB){
+				Slottable prevPickedSB = PickedSB;
+				SetPickedSB(pickedSB);
+				SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, targetSB, targetSG);
+				SetPickedSB(prevPickedSB);
+				return ta;
 			}
 		/*	dump	*/
 			/*	command	methods */

@@ -185,7 +185,7 @@ public class SlottableTest{
 					this.testTargetSG = testTargetSG; this.testTargetSB = testTargetSB;
 					string selection = "testSB: " + Util.SBofSG(testSB) + 
 					" tarSG: " + (testTargetSG == null? "null": Util.SGName(testTargetSG)) + " " +
-					" tarSB: " + (testTargetSB == null? "null": Util.SBName(testTargetSB)) + " ";
+					" tarSB: " + (testTargetSB == null? "null": Util.SBofSG(testTargetSB)) + " ";
 					if(ele == TestElement.SGM)
 						this.Val = selection + Util.SGMDebug(sgm);
 					else if(ele == TestElement.SG)
@@ -709,19 +709,81 @@ public class SlottableTest{
 			// TestSBStateTransitionOnAll();
 			// TestSGStateTransitionOnAll();
 			// TestRevertOnAllSBs();
-		TestReorderOnAll();
+			// TestReorderOnAll();
 		// TestFillEquipOnAll();
 		
 		// TestSGMStateTransition();// after transaction is done
 	}
 	public void TestReorderOnAll(){
 		PerformOnAllSBs(CrossTestReorder);
+		PrintTestResult(null);
 		}
 		public void CrossTestReorder(Slottable testSB, bool isPAS){
 			CrossTestSGs(TestReorder, testSB ,isPAS);
 		}
 		public void TestReorder(SlotGroup targetSG, Slottable testSB, bool isPAS, bool isTAS){
-
+			if(testSB.IsPickable){
+				foreach(Slottable targetSB in targetSG.Slottables){
+					if(sgm.GetTransaction(testSB, null, targetSB).GetType() == typeof(ReorderTransaction)){
+						Capture(testSB.SGM, testSB, null, targetSB, isPAS, isTAS, TestElement.SB);
+						// Print(testSB.SGM, testSB, null, targetSB, isPAS, isTAS, TestElement.SB);
+						SlotGroup origSG = testSB.SG;
+							AssertFocused();
+						PickUp(testSB, out picked);
+							ASSGM(sgm,
+								testSB, null, testSB, null, null,
+								SGMDeactivated, SGMFocused, null,
+								SGMWFA, SGMProbing, typeof(SGMProbeProcess),
+								typeof(RevertTransaction), false, true, false, true);
+						SimHover(targetSB, null, eventData);
+							ASSGM(sgm,
+								testSB, null, targetSB, null, targetSB,
+								SGMDeactivated, SGMFocused, null,
+								SGMWFA, SGMProbing, typeof(SGMProbeProcess),
+								typeof(ReorderTransaction), false, false, false, true);
+							ASSB(testSB,
+								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+								SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess),
+								null, null, null, false);
+							ASSB(targetSB,
+								SBFocused, SBSelected, typeof(SBHighlightProcess),
+								null, SBWFA, null,
+								null, null, null, false);
+						LetGo();
+							ASSGM(sgm,
+								testSB, null, targetSB, null, targetSB,
+								SGMDeactivated, SGMFocused, null,
+								SGMProbing, SGMTransaction, typeof(SGMTransactionProcess),
+								typeof(ReorderTransaction), false, true, false, true);
+							ASSB(testSB,
+								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+								SBPickedUp, SBReverting, typeof(SBRevertProcess),
+								null, null, null, false);
+							ASSB(targetSB,
+								SBFocused, SBSelected, typeof(SBHighlightProcess),
+								SBWFA, SBMovingInSG, typeof(SBMoveInSGProcess),
+								null, null, null, false);
+							ASSG(origSG,
+								SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+								SGWFA, SGTransaction, typeof(SGTransactionProcess));
+						CompleteAllSBActProcesses(origSG);
+							ASSGM(sgm,
+								testSB, null, targetSB, null, targetSB,
+								SGMDeactivated, SGMFocused, null,
+								SGMProbing, SGMTransaction, typeof(SGMTransactionProcess),
+								typeof(ReorderTransaction), false, true, true, true);
+						testSB.ActionProcess.Expire();
+							AssertFocused();
+						/*	reverse	*/
+						PickUp(testSB, out picked);
+						SimHover(targetSB, null, eventData);
+						LetGo();
+						CompleteAllSBActProcesses(origSG);
+						testSB.ActionProcess.Expire();
+						AssertFocused();
+					}
+				}
+			}
 		}
 	public void TestRevertOnAllSBs(){
 		PerformOnAllSBs(CrossTestRevert);
@@ -737,7 +799,7 @@ public class SlottableTest{
 				sgm.ClearAndReset();
 				if(ta is RevertTransaction){
 					// Capture(sg.SGM, pickedSB, sg, null, isPAS, isTAS, TestElement.SGM);
-					AssertFocused();
+						AssertFocused();
 						ASSGM(pickedSB.SGM,
 							null, null, null, null, null,
 							SGMDeactivated, SGMFocused, null,
@@ -751,7 +813,7 @@ public class SlottableTest{
 							typeof(RevertTransaction), false, true, false, true);
 						ASSB(pickedSB,
 							SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-							SBWFPickUp, SBPickedUp, typeof(PickedUpProcess),
+							SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess),
 							null, null, null, false);
 						ASSG(sg,
 							null, SGDefocused, null,
@@ -778,6 +840,52 @@ public class SlottableTest{
 					pickedSB.ActionProcess.Expire();
 					// Print(sg.SGM, pickedSB, sg, null, isPAS, isTAS, TestElement.SGM);
 					AssertFocused();
+					foreach(Slottable sb in sg.Slottables){
+						if(sb != null){
+							if(sgm.GetTransaction(pickedSB, null, sb).GetType() == typeof(RevertTransaction)){
+								// Capture(sgm, pickedSB, null, sb, isPAS, isTAS, TestElement.SGM);
+								AssertFocused();
+									ASSGM(pickedSB.SGM,
+										null, null, null, null, null,
+										SGMDeactivated, SGMFocused, null,
+										null, SGMWFA, null,
+										null, true, true, true, true);
+								PickUp(pickedSB, out picked);
+									ASSGM(pickedSB.SGM,
+										pickedSB, null, pickedSB, null, null,
+										SGMDeactivated, SGMFocused, null,
+										SGMWFA, SGMProbing, typeof(SGMProbeProcess),
+										typeof(RevertTransaction), false, true, false, true);
+									ASSB(pickedSB,
+										SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+										SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess),
+										null, null, null, false);
+									ASSG(sg,
+										null, SGDefocused, null,
+										null, SGWFA, null);
+								SimHover(null, sg, eventData);
+									ASSGM(pickedSB.SGM,
+										pickedSB, sg, null, null, null,
+										SGMDeactivated, SGMFocused, null,
+										SGMWFA, SGMProbing, typeof(SGMProbeProcess),
+										typeof(RevertTransaction), false, true, false, true);
+									ASSG(sg,
+										null, SGDefocused, null,
+										null, SGWFA, null);
+								LetGo();
+									ASSGM(pickedSB.SGM,
+										pickedSB, sg, null, null, null,
+										SGMDeactivated, SGMFocused, null,
+										SGMProbing, SGMTransaction, typeof(SGMTransactionProcess),
+										typeof(RevertTransaction), false, true, true, true);
+									ASSB(pickedSB,
+										SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+										SBPickedUp, SBReverting, typeof(SBRevertProcess),
+										null, null, null, false);
+								pickedSB.ActionProcess.Expire();
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1324,7 +1432,7 @@ public class SlottableTest{
 				sb.ActionProcess.Expire();
 				ASSB(sb,
 					SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-					SBWFPickUp, SBPickedUp, typeof(PickedUpProcess), 
+					SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), 
 					null, null, null, false);
 				pickedUp = true;
 			}else{
@@ -1339,7 +1447,7 @@ public class SlottableTest{
 			if(sgm.PickedSB.CurActState == Slottable.WaitForNextTouchState)
 			sgm.PickedSB.ActionProcess.Expire();
 		}
-		public void CompleteAllSBActProcesses(SlotGroup sg){	
+		public void CompleteAllSBActProcesses(SlotGroup sg){
 			foreach(SlotMovement sm in sg.SlotMovements){
 				Slottable sb = sm.SB;
 				if(sb.ActionProcess.GetType() == typeof(SBRemovedProcess) ||

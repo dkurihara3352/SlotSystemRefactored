@@ -178,12 +178,15 @@ namespace SlotSystem{
 				public override void Indicate(){}
 				public override void Execute(){
 					// CacheProcessAndSwitchState(pickedSB, null, null, selectedSG);
+					sgm.SetActState(SlotGroupManager.PerformingTransactionState);
+					sgm.CompleteTransactionOnSB(selectedSB);
 					origSG.SetAndRunSlotMovementsForReorder(pickedSB, selectedSB);
+					origSG.SetActState(SlotGroup.PerformingTransactionState);
 					origSG.ActionProcess.Start();
 
 					Slot slot = origSG.GetSlot(selectedSB);
 					pickedSB.MoveDraggedIcon(origSG, slot);
-					pickedSB.SetActState(Slottable.RevertingState);
+					// pickedSB.SetActState(Slottable.RevertingState);
 
 					origSG.CheckCompletion();
 				}
@@ -1341,7 +1344,10 @@ namespace SlotSystem{
 					else if(m_newSlotID == -2)
 						m_sb.SetActState(Slottable.MovingOutState);
 					else{
-						m_sb.SetActState(Slottable.MovingInSGState);
+						if(m_sb == m_sg.SGM.PickedSB)
+							m_sb.SetActState(Slottable.RevertingState);
+						else
+							m_sb.SetActState(Slottable.MovingInSGState);
 					}
 
 				}
@@ -1997,8 +2003,8 @@ namespace SlotSystem{
 						// SB.SetState(Slottable.PickedUpAndSelectedState);
 					}
 				}
-				public class PickedUpProcess: AbsSBProcess{
-					public PickedUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+				public class SBPickedUpProcess: AbsSBProcess{
+					public SBPickedUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
 						this.SB = sb;
 						this.CoroutineMock = coroutineMock;
 					}
@@ -2432,7 +2438,7 @@ namespace SlotSystem{
 						sb.SGM.CreateTransactionResults();
 						sb.OnHoverEnterMock();
 						sb.SGM.UpdateTransaction();
-						SBProcess pickedUpProcess = new PickedUpProcess(sb, sb.PickedUpCoroutine);
+						SBProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickedUpCoroutine);
 						sb.SetAndRunActionProcess(pickedUpProcess);
 					}
 					public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){
@@ -2957,19 +2963,23 @@ namespace SlotSystem{
 					selectedSG = sg;
 				}
 				public SlotSystemTransaction TryGetTransaction(Slottable sb, SlotGroup sg){
-					bool same = true;
-					if(sb != null)
-						same &= selectedSB == sb;
-					else
-						same &= selectedSB == null;
-					if(sg != null)
-						same &= selectedSG == sg;
-					else
-						same &= selectedSG == null;
-					if(same)
-						return ta;
-					else
-						return null;
+					if((sb != null && this.selectedSB == sb) ||
+						(sg != null && this.selectedSG == sg))
+							return ta;
+					else return null;
+					// bool same = true;
+					// if(sb != null)
+					// 	same &= selectedSB == sb;
+					// else
+					// 	same &= selectedSB == null;
+					// if(sg != null)
+					// 	same &= selectedSG == sg;
+					// else
+					// 	same &= selectedSG == null;
+					// if(same)
+					// 	return ta;
+					// else
+					// 	return null;
 				}
 			}
 			public class TransactionResults{
@@ -3793,7 +3803,7 @@ namespace SlotSystem{
 						res = Aqua("WFPointerUp");
 					else if(process is WaitForPickUpProcess)
 						res = Forest("WFPickUp");
-					else if(process is PickedUpProcess)
+					else if(process is SBPickedUpProcess)
 						res = Brown("PickedUp");
 					else if(process is WaitForNextTouchProcess)
 						res = Terra("WFNextTouch");
