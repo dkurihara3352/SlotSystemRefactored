@@ -432,6 +432,7 @@ namespace SlotSystem{
 			}
 			public void Deactivate(){}
 			public void ExecuteTransaction(){
+				SGM.SetActState(SlotGroupManager.PerformingTransactionState);
 				SGM.Transaction.Execute();
 			}
 			public void MoveDraggedIcon(SlotGroup sg, Slot slot){

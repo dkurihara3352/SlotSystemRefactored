@@ -818,7 +818,7 @@ namespace SlotSystem{
 				public class SGMProbingState: SGMActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						if(sgm.PrevActState == SlotGroupManager.PerformingTransactionState)
+						if(sgm.PrevActState == SlotGroupManager.WaitForActionState)
 							sgm.SetAndRunActProcess(new SGMProbeProcess(sgm, sgm.ProbeCoroutine));
 						else
 							throw new System.InvalidOperationException("SGMProbingState: Entering from an invalid state");
@@ -2428,8 +2428,8 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						sb.SGM.SetPickedSB(sb);
+						sb.SGM.SetActState(SlotGroupManager.ProbingState);
 						sb.SGM.CreateTransactionResults();
-						// sb.SGM.SetHovered(sb, null);
 						sb.OnHoverEnterMock();
 						sb.SGM.UpdateTransaction();
 						SBProcess pickedUpProcess = new PickedUpProcess(sb, sb.PickedUpCoroutine);
@@ -3590,7 +3590,7 @@ namespace SlotSystem{
 					string tSBD = "tSBDone: " + (sgm.TargetSBdone?Util.Blue("true"):Util.Red("false"));
 					string oSGD = "oSGDone: " + (sgm.OrigSGDone?Util.Blue("true"):Util.Red("false"));
 					string tSGD = "tSGDone: " + (sgm.TargetSGDone?Util.Blue("true"):Util.Red("false"));
-					res = Util.Bold("SGM:") +
+					res = Bold("DebugTarget: ") + Util.Bold("SGM:") +
 							" pSB " + pSB +
 							", hSG " + hSG +
 							", hSB " + hSB +
@@ -3672,7 +3672,8 @@ namespace SlotSystem{
 					string prevAct = SGStateName(sg.PrevActState);
 					string curAct = SGStateName(sg.CurActState);
 					string actProc = SGProcessName(sg.ActionProcess);
-					res = sgName + " " +
+					res = Bold("DebugTarget: ") + 
+						sgName + " " +
 						Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
 							" proc, " + selProc + ", " +
 						Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
@@ -3828,7 +3829,7 @@ namespace SlotSystem{
 					string prevEqp = SBStateName(sb.PrevEqpState);
 					string curEqp = SBStateName(sb.CurEqpState);
 					string eqpProc = SBProcessName(sb.EquipProcess);
-					res = sbName + ": " +
+					res = Bold("DebugTarget: ") + sbName + ": " +
 						Bold("Sel ") + " from " + prevSel + " to " + curSel + " proc " + selProc + ", " + 
 						Bold("Act ") + " from " + prevAct + " to " + curAct + " proc " + actProc + ", " + 
 						Bold("Eqp ") + " from " + prevEqp + " to " + curEqp + " proc " + eqpProc;
