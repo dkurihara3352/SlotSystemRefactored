@@ -400,8 +400,9 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// CacheProcessAndSwitchState(null, null, null, selectedSG);
+					sgm.SetActState(SlotGroupManager.PerformingTransactionState);
 					selectedSG.SetAndRunSlotMovementsForSort();
+					selectedSG.SetActState(SlotGroup.PerformingTransactionState);
 					selectedSG.ActionProcess.Start();
 					selectedSG.CheckCompletion();
 				}
@@ -3571,29 +3572,63 @@ namespace SlotSystem{
 						res = Util.Blue("Transaction");
 					return res;
 				}
+				public static string SGMDebug(SlotGroupManager sgm){
+					string res = "";
+					string pSB = Util.SBofSG(sgm.PickedSB);
+					string hSG = Util.SGName(sgm.HoveredSG);
+					string hSB = Util.SBofSG(sgm.HoveredSB);
+					string tSG = Util.SGName(sgm.TargetSG);
+					string tSB = Util.SBofSG(sgm.TargetSB);
+					string prevSel = Util.SGMStateName(sgm.PrevSelState);
+					string curSel = Util.SGMStateName(sgm.CurSelState);
+					string selProc = Util.SGMProcessName(sgm.SelectionProcess);
+					string prevAct = Util.SGMStateName(sgm.PrevActState);
+					string curAct = Util.SGMStateName(sgm.CurActState);
+					string actProc = Util.SGMProcessName(sgm.ActionProcess);
+					string ta = Util.TransactionName(sgm.Transaction);
+					string pSBD = "pSBDone: " + (sgm.PickedSBDone?Util.Blue("true"):Util.Red("false"));
+					string tSBD = "tSBDone: " + (sgm.TargetSBdone?Util.Blue("true"):Util.Red("false"));
+					string oSGD = "oSGDone: " + (sgm.OrigSGDone?Util.Blue("true"):Util.Red("false"));
+					string tSGD = "tSGDone: " + (sgm.TargetSGDone?Util.Blue("true"):Util.Red("false"));
+					res = Util.Bold("SGM:") +
+							" pSB " + pSB +
+							", hSG " + hSG +
+							", hSB " + hSB +
+							", tSB " + tSB +
+							" tSG " + tSG + ", " +
+						Util.Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
+							"proc " + selProc + ", " +
+						Util.Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
+							"proc " + actProc + ", " +
+						Util.Bold("TA ") + ta + ", " + 
+						Util.Bold("TAComp ") + pSBD + " " + tSBD + " " + oSGD + " " + tSGD;
+					return res;
+				}
 			/*	SG	*/
 				public static string SGName(SlotGroup sg){
 					string result = "";
-					if(sg.IsPool){
-						if(sg.Filter is SGNullFilter)
-							result = "sgpAll";
-						else if(sg.Filter is SGBowFilter)
-							result = "sgpBow";
-						else if(sg.Filter is SGWearFilter)
-							result = "sgpWear";
-						else if(sg.Filter is SGCGearsFilter)
-							result = "sgpCGears";
-						else if(sg.Filter is SGPartsFilter)
-							result = "sgpParts";
-						result = Red(result);
-					}else if(sg.IsSGE){
-						if(sg.Filter is SGBowFilter)
-							result = "sgBow";
-						else if(sg.Filter is SGWearFilter)
-							result = "sgWear";
-						else if(sg.Filter is SGCGearsFilter)
-							result = "sgCGears";
-						result = Blue(result);
+					if(sg != null){
+						if(sg.IsPool){
+							if(sg.Filter is SGNullFilter)
+								result = "sgpAll";
+							else if(sg.Filter is SGBowFilter)
+								result = "sgpBow";
+							else if(sg.Filter is SGWearFilter)
+								result = "sgpWear";
+							else if(sg.Filter is SGCGearsFilter)
+								result = "sgpCGears";
+							else if(sg.Filter is SGPartsFilter)
+								result = "sgpParts";
+							result = Red(result);
+						}else if(sg.IsSGE){
+							if(sg.Filter is SGBowFilter)
+								result = "sgBow";
+							else if(sg.Filter is SGWearFilter)
+								result = "sgWear";
+							else if(sg.Filter is SGCGearsFilter)
+								result = "sgCGears";
+							result = Blue(result);
+						}
 					}
 					return result;
 				}
@@ -3628,57 +3663,77 @@ namespace SlotSystem{
 						res = Util.Khaki("Transaction");
 					return res;
 				}
+				public static string SGDebug(SlotGroup sg){
+					string res = "";
+					string sgName = SGName(sg);
+					string prevSel = SGStateName(sg.PrevSelState);
+					string curSel = SGStateName(sg.CurSelState);
+					string selProc = SGProcessName(sg.SelectionProcess);
+					string prevAct = SGStateName(sg.PrevActState);
+					string curAct = SGStateName(sg.CurActState);
+					string actProc = SGProcessName(sg.ActionProcess);
+					res = sgName + " " +
+						Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
+							" proc, " + selProc + ", " +
+						Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
+							" proc, " + actProc;
+					return res;
+				}
 			/*	SB	*/
 				public static string SBName(Slottable sb){
 					string result = "";
-					switch(sb.ItemInst.Item.ItemID){
-						case 0:	result = "defBow"; break;
-						case 1:	result = "crfBow"; break;
-						case 2:	result = "frgBow"; break;
-						case 3:	result = "mstBow"; break;
-						case 100: result = "defWear"; break;
-						case 101: result = "crfWear"; break;
-						case 102: result = "frgWear"; break;
-						case 103: result = "mstWear"; break;
-						case 200: result = "defShield"; break;
-						case 201: result = "crfShield"; break;
-						case 202: result = "frgShield"; break;
-						case 203: result = "mstShield"; break;
-						case 300: result = "defMWeapon"; break;
-						case 301: result = "crfMWeapon"; break;
-						case 302: result = "frgMWeapon"; break;
-						case 303: result = "mstMWeapon"; break;
-						case 400: result = "defQuiver"; break;
-						case 401: result = "crfQuiver"; break;
-						case 402: result = "frgQuiver"; break;
-						case 403: result = "mstQuiver"; break;
-						case 500: result = "defPack"; break;
-						case 501: result = "crfPack"; break;
-						case 502: result = "frgPack"; break;
-						case 503: result = "mstPack"; break;
-						case 600: result = "defParts"; break;
-						case 601: result = "crfParts"; break;
-						case 602: result = "frgParts"; break;
-						case 603: result = "mstParts"; break;
+					if(sb != null){
+						switch(sb.ItemInst.Item.ItemID){
+							case 0:	result = "defBow"; break;
+							case 1:	result = "crfBow"; break;
+							case 2:	result = "frgBow"; break;
+							case 3:	result = "mstBow"; break;
+							case 100: result = "defWear"; break;
+							case 101: result = "crfWear"; break;
+							case 102: result = "frgWear"; break;
+							case 103: result = "mstWear"; break;
+							case 200: result = "defShield"; break;
+							case 201: result = "crfShield"; break;
+							case 202: result = "frgShield"; break;
+							case 203: result = "mstShield"; break;
+							case 300: result = "defMWeapon"; break;
+							case 301: result = "crfMWeapon"; break;
+							case 302: result = "frgMWeapon"; break;
+							case 303: result = "mstMWeapon"; break;
+							case 400: result = "defQuiver"; break;
+							case 401: result = "crfQuiver"; break;
+							case 402: result = "frgQuiver"; break;
+							case 403: result = "mstQuiver"; break;
+							case 500: result = "defPack"; break;
+							case 501: result = "crfPack"; break;
+							case 502: result = "frgPack"; break;
+							case 503: result = "mstPack"; break;
+							case 600: result = "defParts"; break;
+							case 601: result = "crfParts"; break;
+							case 602: result = "frgParts"; break;
+							case 603: result = "mstParts"; break;
+						}
+						List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
+						foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.PoolInv.Items){
+							if(itemInst.Item == sb.ItemInst.Item)
+								sameItemInsts.Add(itemInst);
+						}
+						int index = sameItemInsts.IndexOf(sb.ItemInst);
+						result += "_"+index.ToString();
 					}
-					List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-					foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.PoolInv.Items){
-						if(itemInst.Item == sb.ItemInst.Item)
-							sameItemInsts.Add(itemInst);
-					}
-					int index = sameItemInsts.IndexOf(sb.ItemInst);
-					result += "_"+index.ToString();
 					return result;
 				}
 				public static string SBofSG(Slottable sb){
 					string res = "";
-					res = Util.SBName(sb) + " of " + Util.SGName(sb.SG);
-					if(sb.SG.IsPool)
-						res = Util.Red(res);
-					else
-						res = Util.Blue(res);
-					if(sb.IsEquipped && sb.SG.IsPool)
-						res = Util.Bold(res);
+					if(sb != null){
+						res = Util.SBName(sb) + " of " + Util.SGName(sb.SG);
+						if(sb.SG.IsPool)
+							res = Util.Red(res);
+						else
+							res = Util.Blue(res);
+						if(sb.IsEquipped && sb.SG.IsPool)
+							res = Util.Bold(res);
+					}
 					return res;
 				}
 				public static string SBStateName(SBState state){
@@ -3759,6 +3814,24 @@ namespace SlotSystem{
 						res = Red("Unequip");
 					else if(process is SBEquipProcess)
 						res = Blue("Equipping");
+					return res;
+				}
+				public static string SBDebug(Slottable sb){
+					string res = "";
+					string sbName = SBofSG(sb);
+					string prevSel = SBStateName(sb.PrevSelState);
+					string curSel = SBStateName(sb.CurSelState);
+					string selProc = SBProcessName(sb.SelectionProcess);
+					string prevAct = SBStateName(sb.PrevActState);
+					string curAct = SBStateName(sb.CurActState);
+					string actProc = SBProcessName(sb.ActionProcess);
+					string prevEqp = SBStateName(sb.PrevEqpState);
+					string curEqp = SBStateName(sb.CurEqpState);
+					string eqpProc = SBProcessName(sb.EquipProcess);
+					res = sbName + ": " +
+						Bold("Sel ") + " from " + prevSel + " to " + curSel + " proc " + selProc + ", " + 
+						Bold("Act ") + " from " + prevAct + " to " + curAct + " proc " + actProc + ", " + 
+						Bold("Eqp ") + " from " + prevEqp + " to " + curEqp + " proc " + eqpProc;
 					return res;
 				}
 			/*	Debug	*/

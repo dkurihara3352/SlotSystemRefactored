@@ -49,7 +49,7 @@ namespace SlotSystem{
 			// 	SetOrigTASG(origSG);
 			// 	SetTargetTASG(selectedSG);
 			// }
-			public bool PickedTASBDone{
+			public bool PickedSBDone{
 				get{return m_pickedSBDone;}
 				}bool m_pickedSBDone = true;
 				// Slottable m_pickedTASB;
@@ -57,7 +57,7 @@ namespace SlotSystem{
 				// 	m_pickedSBDone = sb == null;
 				// 	m_pickedTASB = sb;
 				// }
-			public bool TargetTASBDone{
+			public bool TargetSBdone{
 				get{return m_targetSBDone;}
 				}bool m_targetSBDone = true;
 				// Slottable m_targetTASB;
@@ -65,7 +65,7 @@ namespace SlotSystem{
 				// 	m_targetSBDone = sb == null;
 				// 	m_targetTASB = sb;
 				// }
-			public bool OrigTASGDone{
+			public bool OrigSGDone{
 				get{return m_origSGDone;}
 				}bool m_origSGDone = true;
 				// SlotGroup m_origTASG;
@@ -73,7 +73,7 @@ namespace SlotSystem{
 				// 	m_origSGDone = sg == null;
 				// 	m_origTASG = sg;
 				// }
-			public bool TargetTASGDone{
+			public bool TargetSGDone{
 				get{return m_targetSGDone;}
 				}bool m_targetSGDone = true;
 				// SlotGroup m_targetTASG;
@@ -577,6 +577,8 @@ namespace SlotSystem{
 			public void SortSG(SlotGroup sg, SGSorter sorter){
 				sg.SetSorter(sorter);
 				SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
+				SetTargetSB(sortTransaction.TargetSB);
+				SetTargetSG(sortTransaction.TargetSG);
 				SetTransaction(sortTransaction);
 				Transaction.Execute();
 			}
