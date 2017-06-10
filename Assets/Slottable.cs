@@ -353,17 +353,18 @@ namespace SlotSystem{
 			public bool IsStackable{
 				get{return ItemInst.Item.IsStackable;}
 			}
-		
 		/*	Event methods	*/
 			/*	Selection event	*/
 				public void Focus(){
-					SetActState(Slottable.WaitForActionState);
-					if(IsPickable)
-						SetSelState(Slottable.FocusedState);
-					else
-						SetSelState(Slottable.DefocusedState);
+					// SetActState(Slottable.WaitForActionState);
+					// if(IsPickable)
+					// 	SetSelState(Slottable.FocusedState);
+					// else
+					// 	SetSelState(Slottable.DefocusedState);
+					SetSelState(Slottable.FocusedState);
 				}
 				public void Defocus(){
+					// SetActState(Slottable.WaitForActionState);
 					SetSelState(Slottable.DefocusedState);
 				}
 				public void OnHoverEnterMock(){

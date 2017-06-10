@@ -177,12 +177,13 @@ namespace SlotSystem{
 				if(m_slotMovements == null/* as in when testing */)
 					return null;
 				foreach(SlotMovement sm in m_slotMovements){
-					if(sm.SB.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
-					sm.SB.ActionProcess.GetType() == typeof(SBAddedProcess) ||
-					sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
-					sm.SB.ActionProcess.GetType() == typeof(SBMoveOutProcess) ||
-					sm.SB.ActionProcess.GetType() == typeof(SBMoveInProcess))
-					flag &= sm.SB.ActionProcess.IsExpired;
+					// if(sm.SB.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
+					// sm.SB.ActionProcess.GetType() == typeof(SBAddedProcess) ||
+					// sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
+					// sm.SB.ActionProcess.GetType() == typeof(SBMoveOutProcess) ||
+					// sm.SB.ActionProcess.GetType() == typeof(SBMoveInProcess))
+					if(sm.SB != SGM.PickedSB)
+						flag &= sm.SB.ActionProcess.IsExpired;
 				}
 				if(flag){
 					ActionProcess.Expire();
@@ -319,6 +320,20 @@ namespace SlotSystem{
 							result.Add(sb);
 					}
 					return result;
+				}
+			}
+			public bool IsSMDone{
+				get{
+					bool done = true;
+					if(SlotMovements != null){
+						foreach(SlotMovement sm in SlotMovements){
+							if(sm.SB != SGM.PickedSB){
+								if(sm.SB.ActionProcess != null && sm.SB.ActionProcess.IsRunning)
+									return false;
+							}
+						}
+					}
+					return done;
 				}
 			}
 		/*	commands methods	*/
@@ -608,24 +623,31 @@ namespace SlotSystem{
 			public void FocusSBs(){
 				foreach(Slottable sb in Slottables){
 					if(sb != null){
-						if(!this.IsAutoSort){
+						sb.SetActState(Slottable.WaitForActionState);
+						if(sb.IsPickable)
 							sb.Focus();
-							continue;
-						}else{
-							if(this.IsPool){
-								if(sb.Item is PartsInstanceMock && !(this.Filter is SGPartsFilter)){
-									sb.Defocus();
-									continue;
-								}else{
-									if(sb.IsEquipped){
-										sb.Defocus();
-										continue;
-									}
-								}
-							}
-						}
-						sb.Focus();
+						else
+							sb.Defocus();
 					}
+					// if(sb != null){
+					// 	if(!this.IsAutoSort){
+					// 		sb.Focus();
+					// 		continue;
+					// 	}else{
+					// 		if(this.IsPool){
+					// 			if(sb.Item is PartsInstanceMock && !(this.Filter is SGPartsFilter)){
+					// 				sb.Defocus();
+					// 				continue;
+					// 			}else{
+					// 				if(sb.IsEquipped){
+					// 					sb.Defocus();
+					// 					continue;
+					// 				}
+					// 			}
+					// 		}
+					// 	}
+					// 	sb.Focus();
+					// }
 				}
 			}
 			public void DefocusSBs(){
@@ -850,26 +872,28 @@ namespace SlotSystem{
 			public void InstantGreyout(){}
 			public void InstantGreyin(){}
 			public void InstantHighlight(){}
-			public bool IsFillEquippable(Slottable sb){
-				SlotGroup origSG = sb.SG;
-				if(origSG.IsShrinkable){
-					if(this != origSG){
-						if(IsFocused){
-							if(AcceptsFilter(sb)){
-								if(IsExpandable){
-									return true;
-								}else{
-									foreach(Slot slot in Slots){
-										if(slot.Sb == null)
-											return true;
-									}
-								}
-							}
-						}
-					}
-				}
-				return false;
-			}
+			// public bool IsFillEquippable(Slottable sb){
+			// 	SlotGroup origSG = sb.SG;
+			// 	if(!(HasItem(sb.ItemInst) && !IsPool)){
+			// 		if(origSG.IsShrinkable){
+			// 			if(this != origSG){
+			// 				if(IsFocused){
+			// 					if(AcceptsFilter(sb)){
+			// 						if(IsExpandable){
+			// 							return true;
+			// 						}else{
+			// 							foreach(Slot slot in Slots){
+			// 								if(slot.Sb == null)
+			// 									return true;
+			// 							}
+			// 						}
+			// 					}
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// 	return false;
+			// }
 			public List<Slottable> SwappableSBs(Slottable pickedSB){
 				List<Slottable> result = new List<Slottable>();
 				foreach(Slottable sb in Slottables){

@@ -354,15 +354,17 @@ namespace SlotSystem{
 				public override void Indicate(){}
 				public override void Execute(){
 					// CacheProcessAndSwitchState(pickedSB, null, origSG.IsPool? null: origSG, selectedSG.IsPool? null: selectedSG);
-
+					pickedSB.SGM.SetActState(SlotGroupManager.PerformingTransactionState);
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotMovements(moved, null);
+						origSG.SetActState(SlotGroup.PerformingTransactionState);
 						origSG.ActionProcess.Start();
 					}else
 						sgm.CompleteTransactionOnSG(origSG);
 
 					if(!selectedSG.IsPool){
 						selectedSG.SetAndRunSlotMovements(null, moved);
+						selectedSG.SetActState(SlotGroup.PerformingTransactionState);
 						selectedSG.ActionProcess.Start();
 					}else
 						sgm.CompleteTransactionOnSG(selectedSG);
@@ -3846,6 +3848,15 @@ namespace SlotSystem{
 					return res;
 				}
 			/*	Debug	*/
+				public static string TADebug(Slottable testSB, SlotGroup tarSG, Slottable tarSB){
+					SlotSystemTransaction ta = testSB.SGM.GetTransaction(testSB, tarSG, tarSB);
+					string taStr = TransactionName(ta);
+					string taTargetSB = Util.SBofSG(ta.TargetSB);
+					string taTargetSG = Util.SGName(ta.TargetSG);
+					return "DebugTarget: " + taStr + " " +
+						"targetSB: " + taTargetSB + ", " + 
+						"targetSG: " + taTargetSG;
+				}
 				public static string Red(string str){
 					return "<color=#ff0000>" + str + "</color>";
 				}

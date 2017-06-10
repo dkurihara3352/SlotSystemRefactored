@@ -609,7 +609,7 @@ namespace SlotSystem{
 							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(PickedSB, sb, null);
 							TransactionResult tr2 = new TransactionResult(sb, null, ta2);
 							transactionResults.AddTransactionResult(tr2);
-							if(ta2 is RevertTransaction)
+							if(ta2 is RevertTransaction || ta2 is FillEquipTransaction)
 								sb.Defocus();
 							else
 								sb.Focus();
