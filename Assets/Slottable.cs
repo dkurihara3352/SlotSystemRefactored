@@ -458,6 +458,9 @@ namespace SlotSystem{
 				if(ItemInst.IsEquipped) Equip();
 				else Unequip();
 			}
+			public void ResetAction(){
+				SetActState(Slottable.WaitForActionState);
+			}
 	}
 
 }

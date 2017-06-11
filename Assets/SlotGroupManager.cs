@@ -574,7 +574,7 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public void SortSG(SlotGroup sg, SGSorter sorter){
+			public void SortSG (SlotGroup sg, SGSorter sorter){
 				sg.SetSorter(sorter);
 				SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
 				SetTargetSB(sortTransaction.TargetSB);

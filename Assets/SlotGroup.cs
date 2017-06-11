@@ -182,7 +182,7 @@ namespace SlotSystem{
 					// sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
 					// sm.SB.ActionProcess.GetType() == typeof(SBMoveOutProcess) ||
 					// sm.SB.ActionProcess.GetType() == typeof(SBMoveInProcess))
-					if(sm.SB != SGM.PickedSB)
+					if(sm.SB != SGM.PickedSB && sm.SB != SGM.TargetSB)
 						flag &= sm.SB.ActionProcess.IsExpired;
 				}
 				if(flag){
@@ -327,7 +327,7 @@ namespace SlotSystem{
 					bool done = true;
 					if(SlotMovements != null){
 						foreach(SlotMovement sm in SlotMovements){
-							if(sm.SB != SGM.PickedSB){
+							if(sm.SB != SGM.PickedSB && sm.SB != SGM.TargetSB){
 								if(sm.SB.ActionProcess != null && sm.SB.ActionProcess.IsRunning)
 									return false;
 							}
@@ -729,6 +729,8 @@ namespace SlotSystem{
 					}
 				}
 				ExecuteSlotMovements();
+				SetActState(SlotGroup.PerformingTransactionState);
+				CheckCompletion();
 			}
 			public void SetAndRunSlotMovementsForReorder(Slottable pickedSB, Slottable hoveredSB){
 				SetReorderedSBs(pickedSB, hoveredSB);
@@ -739,6 +741,8 @@ namespace SlotSystem{
 					}
 				}
 				ExecuteSlotMovements();
+				SetActState(SlotGroup.PerformingTransactionState);
+				CheckCompletion();
 			}
 			public void SetAndRunSlotMovementsForSort(){
 				List<Slottable> orderedSBs = this.OrderedSbs();
@@ -748,6 +752,8 @@ namespace SlotSystem{
 					}
 				}
 				ExecuteSlotMovements();
+				SetActState(SlotGroup.PerformingTransactionState);
+				CheckCompletion();
 			}
 			public void SetAndRunSlotmovementsForSwap(Slottable removed, Slottable added){
 				if(removed != null && added != null){

@@ -133,6 +133,8 @@ namespace SlotSystem{
 					}
 				}
 				protected SlotGroupManager sgm = SlotGroupManager.CurSGM;
+				protected List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
+				protected List<InventoryItemInstanceMock> added = new List<InventoryItemInstanceMock>();
 				// protected void CacheProcessAndSwitchState(Slottable pickedSB, Slottable selectedSB, SlotGroup pickedSG, SlotGroup selectedSG){
 				// 	sgm.CachedProcess = new SGMTransactionProcess(sgm, pickedSB, selectedSB, pickedSG, selectedSG);
 				// 	sgm.SetActState(SlotGroupManager.PerformingTransactionState);
@@ -140,26 +142,32 @@ namespace SlotSystem{
 				public abstract Slottable TargetSB{get;}
 				public abstract SlotGroup TargetSG{get;}
 				public abstract void Indicate();
-				public abstract void Execute();
+				public virtual void Execute(){
+					sgm.SetActState(SlotGroupManager.PerformingTransactionState);
+				}
 				public abstract void OnComplete();
 			}
 			public class RevertTransaction: AbsSlotSystemTransaction{
 				Slottable pickedSB;
+				SlotGroup origSG;
 				public RevertTransaction(){
 					this.pickedSB = sgm.PickedSB;
+					this.origSG = pickedSB.SG;
 				}
 				public override Slottable TargetSB{get{return null;}}
 				public override SlotGroup TargetSG{get{return null;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// CacheProcessAndSwitchState(pickedSB, null, null, null);
-					sgm.CompleteTransactionOnSG(pickedSB.SG);
+					base.Execute();
+					// sgm.CompleteTransactionOnSG(pickedSB.SG);
 					SlotGroup sg = sgm.GetSG(pickedSB);
 					Slot slot = sg.GetSlot(pickedSB);
 					pickedSB.MoveDraggedIcon(sg, slot);
 					pickedSB.SetActState(Slottable.RevertingState);
+					origSG.SetAndRunSlotMovements(removed, added);
 				}
 				public override void OnComplete(){
+					origSG.OnCompleteSlotMovements();
 					sgm.DestroyDraggedIcon();
 					sgm.ClearAndReset();
 				}
@@ -177,18 +185,15 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return null;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// CacheProcessAndSwitchState(pickedSB, null, null, selectedSG);
-					sgm.SetActState(SlotGroupManager.PerformingTransactionState);
-					sgm.CompleteTransactionOnSB(selectedSB);
+					base.Execute();
+					// sgm.CompleteTransactionOnSB(selectedSB);
 					origSG.SetAndRunSlotMovementsForReorder(pickedSB, selectedSB);
-					origSG.SetActState(SlotGroup.PerformingTransactionState);
-					origSG.ActionProcess.Start();
+					// origSG.SetActState(SlotGroup.PerformingTransactionState);
+					// origSG.ActionProcess.Start();
 
 					Slot slot = origSG.GetSlot(selectedSB);
 					pickedSB.MoveDraggedIcon(origSG, slot);
-					// pickedSB.SetActState(Slottable.RevertingState);
-
-					origSG.CheckCompletion();
+					// origSG.CheckCompletion();
 				}
 				public override void OnComplete(){
 					origSG.OnCompleteSlotMovements();
@@ -210,8 +215,7 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					
-					// CacheProcessAndSwitchState(pickedSB, null, null, selectedSG);
+					base.Execute();
 					sgm.CompleteTransactionOnSG(origSG);
 					selectedSG.SetAndRunSlotMovementsForReorder(selectedSG.GetSB(pickedSB.ItemInst), selectedSB);
 					selectedSG.ActionProcess.Start();
@@ -239,6 +243,7 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSB.SG;}}
 				public override void Indicate(){}
 				public override void Execute(){
+					base.Execute();
 					sgm.CompleteTransactionOnSG(pickedSB.SG);
 					sgm.ClearAndReset();
 				}
@@ -263,9 +268,7 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					
-					// CacheProcessAndSwitchState(pickedSB, selectedSB, origSG.IsPool?null: origSG, selectedSG.IsPool?null: selectedSG);
-					
+					base.Execute();
 					if(!origSG.IsPool){
 						origSG.SetAndRunSlotmovementsForSwap(pickedSB, selectedSB);
 						origSG.ActionProcess.Start();
@@ -318,7 +321,7 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-
+					base.Execute();
 					Slot slot = selectedSG.GetNextEmptySlot();
 					/*	precondition for GetNext...
 							1. it has an empty slot OR isExpandable
@@ -342,7 +345,6 @@ namespace SlotSystem{
 				SlotGroup selectedSG;
 				SlotGroup origSG;
 				List<InventoryItemInstanceMock> moved = new List<InventoryItemInstanceMock>();
-				
 				public FillEquipTransaction(SlotGroup selected){
 					this.pickedSB = sgm.PickedSB;
 					this.selectedSG = selected;
@@ -353,43 +355,45 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// CacheProcessAndSwitchState(pickedSB, null, origSG.IsPool? null: origSG, selectedSG.IsPool? null: selectedSG);
-					pickedSB.SGM.SetActState(SlotGroupManager.PerformingTransactionState);
-					if(!origSG.IsPool){
-						origSG.SetAndRunSlotMovements(moved, null);
-						origSG.SetActState(SlotGroup.PerformingTransactionState);
-						origSG.ActionProcess.Start();
-					}else
-						sgm.CompleteTransactionOnSG(origSG);
+					base.Execute();
+					// if(!origSG.IsPool){
+					// 	origSG.SetAndRunSlotMovements(moved, null);
+					// 	origSG.SetActState(SlotGroup.PerformingTransactionState);
+					// 	origSG.ActionProcess.Start();
+					// }else
+					// 	sgm.CompleteTransactionOnSG(origSG);
+					// if(!selectedSG.IsPool){
+					// 	selectedSG.SetAndRunSlotMovements(null, moved);
+					// 	selectedSG.SetActState(SlotGroup.PerformingTransactionState);
+					// 	selectedSG.ActionProcess.Start();
+					// }else
+					// 	sgm.CompleteTransactionOnSG(selectedSG);
 
-					if(!selectedSG.IsPool){
-						selectedSG.SetAndRunSlotMovements(null, moved);
-						selectedSG.SetActState(SlotGroup.PerformingTransactionState);
-						selectedSG.ActionProcess.Start();
-					}else
-						sgm.CompleteTransactionOnSG(selectedSG);
+					// if(selectedSG.IsPool){
+					// 	Slottable sbp = selectedSG.GetSB(pickedSB.ItemInst);
+					// 	sbp.SetActState(Slottable.MovingInState);
+					// }
 
 					Slot slot = selectedSG.GetSlotForAdded(pickedSB);
 					pickedSB.MoveDraggedIcon(selectedSG, slot);
 					pickedSB.SetActState(Slottable.MovingOutState);
-					
-					if(selectedSG.IsPool){
-						Slottable targetSB = selectedSG.GetSB(pickedSB.ItemInst);
-						targetSB.SetActState(Slottable.MovingInState);
-					}
 
-					if(!origSG.IsPool)
-						origSG.CheckCompletion();
-					if(!selectedSG.IsPool)
-						selectedSG.CheckCompletion();
+					origSG.SetAndRunSlotMovements(moved, null);
+					selectedSG.SetAndRunSlotMovements(null, moved);					
+
+					// if(!origSG.IsPool)
+					// 	origSG.CheckCompletion();
+					// if(!selectedSG.IsPool)
+					// 	selectedSG.CheckCompletion();
 				}
 				public override void OnComplete(){
 					sgm.DestroyDraggedIcon();
-					if(!origSG.IsPool)
-						origSG.OnCompleteSlotMovements();
-					if(!selectedSG.IsPool)
-						selectedSG.OnCompleteSlotMovements();
-
+					// if(!origSG.IsPool)
+					// 	origSG.OnCompleteSlotMovements();
+					// if(!selectedSG.IsPool)
+					// 	selectedSG.OnCompleteSlotMovements();
+					origSG.OnCompleteSlotMovements();
+					selectedSG.OnCompleteSlotMovements();
 					sgm.UpdateEquipStatesOnAll();
 					sgm.ClearAndReset();
 				}
@@ -405,11 +409,8 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					sgm.SetActState(SlotGroupManager.PerformingTransactionState);
+					base.Execute();
 					selectedSG.SetAndRunSlotMovementsForSort();
-					selectedSG.SetActState(SlotGroup.PerformingTransactionState);
-					selectedSG.ActionProcess.Start();
-					selectedSG.CheckCompletion();
 				}
 				public override void OnComplete(){
 					selectedSG.OnCompleteSlotMovements();
@@ -429,6 +430,7 @@ namespace SlotSystem{
 				public override SlotGroup TargetSG{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
+					base.Execute();
 					sgm.CompleteTransactionOnSG(pickedSB.SG);
 				}
 				public override void OnComplete(){
@@ -1188,6 +1190,10 @@ namespace SlotSystem{
 							SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
 							sg.SetAndRunActProcess(process);
 						}
+						/*	SB movements
+							addition and removal
+							updating index
+						*/
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
@@ -2023,6 +2029,7 @@ namespace SlotSystem{
 						base.Expire();
 						if(!SB.IsPickedUp){
 							SB.Tap();
+							SB.ResetAction();
 							SB.Focus();
 						}else{
 							SB.ExecuteTransaction();
@@ -2068,6 +2075,7 @@ namespace SlotSystem{
 					public override void Expire(){
 						base.Expire();
 						SB.ClearDraggedIconDestination();
+						SB.SGM.CompleteTransactionOnSB(SB);
 					}
 				}
 				public class SBRevertProcess: AbsSBProcess{
@@ -2375,9 +2383,11 @@ namespace SlotSystem{
 					}
 					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
 						sb.Tap();
+						sb.ResetAction();
 						sb.Defocus();
 					}
 					public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){
+						sb.ResetAction();
 						sb.Defocus();
 					}
 					public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
@@ -2447,7 +2457,7 @@ namespace SlotSystem{
 						sb.Focus();
 					}
 					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
-						if(sb.SGM.HoveredSB == sb)
+						if(sb.SGM.HoveredSB == sb && sb.IsStackable)
 							sb.SetActState(Slottable.WaitForNextTouchState);
 						else
 							sb.ExecuteTransaction();
