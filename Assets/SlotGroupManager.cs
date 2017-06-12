@@ -31,56 +31,23 @@ namespace SlotSystem{
 					}
 				}
 			public void CompleteTransactionOnSB(Slottable sb){
-				if(PickedSB != null && sb == PickedSB) m_pickedSBDone = true;
-				else if(TargetSB != null && sb == TargetSB) m_targetSBDone = true;
+				if(pickedSB != null && sb == pickedSB) m_pickedSBDone = true;
+				else if(targetSB != null && sb == targetSB) m_targetSBDone = true;
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
 			}
-			public void CompleteTransactionOnSG(SlotGroup sg){
-				if(TargetSG != null && sg == TargetSG) m_targetSGDone = true;
-				else if(PickedSB != null && sg == PickedSB.SG) m_origSGDone = true;
+			public void AcceptSGTAComp(SlotGroup sg){
+				if(sg2 != null && sg == sg2) m_sg2Done = true;
+				else if(sg1 != null && sg == sg1) m_sg1Done = true;
+				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
+			}
+			public void AcceptDITAComp(DraggedIcon di){
+				if(dIcon2 != null && di == dIcon2) m_dIcon2Done = true;
+				else if(dIcon1 != null && di == dIcon1) m_dIcon1Done = true;
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
 			}
 			public void OnAllTransactionComplete(){
 				Transaction.OnComplete();
 			}
-			// public void SetTransactionFields(Slottable pickedSB, Slottable selectedSB, SlotGroup origSG, SlotGroup selectedSG){
-			// 	SetPickedTASB(pickedSB);
-			// 	SetTargetTASB(selectedSB);
-			// 	SetOrigTASG(origSG);
-			// 	SetTargetTASG(selectedSG);
-			// }
-			public bool PickedSBDone{
-				get{return m_pickedSBDone;}
-				}bool m_pickedSBDone = true;
-				// Slottable m_pickedTASB;
-				// public void SetPickedTASB(Slottable sb){
-				// 	m_pickedSBDone = sb == null;
-				// 	m_pickedTASB = sb;
-				// }
-			public bool TargetSBdone{
-				get{return m_targetSBDone;}
-				}bool m_targetSBDone = true;
-				// Slottable m_targetTASB;
-				// public void SetTargetTASB(Slottable sb){
-				// 	m_targetSBDone = sb == null;
-				// 	m_targetTASB = sb;
-				// }
-			public bool OrigSGDone{
-				get{return m_origSGDone;}
-				}bool m_origSGDone = true;
-				// SlotGroup m_origTASG;
-				// public void SetOrigTASG(SlotGroup sg){
-				// 	m_origSGDone = sg == null;
-				// 	m_origTASG = sg;
-				// }
-			public bool TargetSGDone{
-				get{return m_targetSGDone;}
-				}bool m_targetSGDone = true;
-				// SlotGroup m_targetTASG;
-				// public void SetTargetTASG(SlotGroup sg){
-				// 	m_targetSGDone = sg ==null;
-				// 	m_targetTASG = sg;
-				// }
 		/*	states	*/
 			SGMStateEngine SelStateEngine{
 				get{
@@ -194,8 +161,8 @@ namespace SlotSystem{
 					bool done = true;
 					done &= m_pickedSBDone;
 					done &= m_targetSBDone;
-					done &= m_origSGDone;
-					done &= m_targetSGDone;
+					done &= m_sg1Done;
+					done &= m_sg2Done;
 					if(done){
 						this.ActionProcess.Expire();
 					}
@@ -286,51 +253,94 @@ namespace SlotSystem{
 				// 	return null;
 				// }
 		/*	public field	*/
-			public Slottable PickedSB{
+			public Slottable pickedSB{
 				get{return m_pickedSB;}
 				}Slottable m_pickedSB;
 				public void SetPickedSB(Slottable sb){
 					this.m_pickedSB = sb;
-					if(PickedSB != null){
-						m_pickedSBDone = false;
-						m_origSGDone = false;
-					}else{
-						m_pickedSBDone = true;
-						m_origSGDone = true;
-					}
 				}
-			public Slottable TargetSB{
+				public bool pickedSBDone{
+				get{return m_pickedSBDone;}
+				}bool m_pickedSBDone = true;
+			public Slottable targetSB{
 				get{return m_targetSB;}
 				}Slottable m_targetSB;
 				public void SetTargetSB(Slottable sb){
-					if(sb == null || sb != TargetSB){
-						if(TargetSB != null)
-							TargetSB.SetSelState(Slottable.FocusedState);
+					if(sb == null || sb != targetSB){
+						if(targetSB != null)
+							targetSB.SetSelState(Slottable.FocusedState);
 					}
 					this.m_targetSB = sb;
-					if(TargetSB != null)
-						TargetSB.SetSelState(Slottable.SelectedState);
-					if(TargetSB != null)
-						m_targetSBDone = false;
-					else
-						m_targetSBDone = true;
+					if(targetSB != null)
+						targetSB.SetSelState(Slottable.SelectedState);
 				}
-			public SlotGroup TargetSG{
-				get{return m_targetSG;}
-				}SlotGroup m_targetSG;
-				public void SetTargetSG(SlotGroup sg){
-					if(sg == null || sg != TargetSG){
-						if(TargetSG != null)
-							TargetSG.SetSelState(SlotGroup.FocusedState);
+				public bool targetSBdone{
+					get{return m_targetSBDone;}
+					}bool m_targetSBDone = true;
+			public SlotGroup sg1{
+				get{return m_sg1;}
+				}SlotGroup m_sg1;
+				public void SetSG1(SlotGroup sg){
+					if(sg == null || sg != sg1){
+						if(sg1 != null)
+							sg1.SetSelState(SlotGroup.FocusedState);
 					}
-					this.m_targetSG = sg;
-					if(TargetSG != null)
-						TargetSG.SetSelState(SlotGroup.SelectedState);
-					if(TargetSG != null)
-						m_targetSGDone = false;
+					this.m_sg1 = sg;
+					if(sg1 != null)
+						sg1.SetSelState(SlotGroup.SelectedState);
+					if(sg1 != null)
+						m_sg1Done = false;
 					else
-						m_targetSGDone = true;
+						m_sg1Done = true;
 				}
+				public bool sg1Done{
+				get{return m_sg1Done;}
+				}bool m_sg1Done = true;
+			public SlotGroup sg2{
+				get{return m_sg2;}
+				}SlotGroup m_sg2;
+				public void SetSG2(SlotGroup sg){
+					if(sg == null || sg != sg2){
+						if(sg2 != null)
+							sg2.SetSelState(SlotGroup.FocusedState);
+					}
+					this.m_sg2 = sg;
+					if(sg2 != null)
+						sg2.SetSelState(SlotGroup.SelectedState);
+					if(sg2 != null)
+						m_sg2Done = false;
+					else
+						m_sg2Done = true;
+				}
+				public bool sg2Done{
+					get{return m_sg2Done;}
+					}bool m_sg2Done = true;
+			public DraggedIcon dIcon1{
+				get{return m_dIcon1;}
+				}DraggedIcon m_dIcon1;
+				public void SetDIcon1(DraggedIcon di){
+					m_dIcon1 = di;
+					if(m_dIcon1 == null)
+						m_dIcon1Done = true;
+					else
+						m_dIcon1Done = false;
+				}
+				public bool dIcon1Done{
+				get{return m_dIcon1Done;}
+				}bool m_dIcon1Done = true;
+			public DraggedIcon dIcon2{
+				get{return m_dIcon2;}
+				}DraggedIcon m_dIcon2;
+				public void SetDIcon2(DraggedIcon di){
+					m_dIcon2 = di;
+					if(m_dIcon2 == null)
+						m_dIcon2Done = true;
+					else
+						m_dIcon2Done = false;
+				}
+				public bool dIcon2Done{
+				get{return m_dIcon2Done;}
+				}bool m_dIcon2Done = true;
 			public Slottable HoveredSB{
 				get{return m_hoveredSB;}
 				}Slottable m_hoveredSB;
@@ -351,33 +361,6 @@ namespace SlotSystem{
 					}
 					m_hoveredSG = sg;
 				}
-			// public Slottable SelectedSB{
-			// 	get{
-			// 		Slottable sb = null;
-			// 		if(Transaction != null)
-			// 			sb = Transaction.TargetSB;
-			// 		return sb;
-			// 	}
-			// 	}Slottable m_selectedSB;
-			// 	public void SetSelectedSB(Slottable sb){/* obsolete */
-			// 		if(m_selectedSB != sb){
-			// 			m_selectedSB = sb;
-			// 		}
-			// 	}
-			// public SlotGroup SelectedSG{
-			// 	get{return m_selectedSG;}
-			// 	}SlotGroup m_selectedSG;
-			// 	public void SetSelectedSG(SlotGroup sg){
-			// 		if(m_selectedSG != sg){
-			// 			m_selectedSG = sg;
-			// 			// UpdateTransaction();
-			// 			// if(sg != null){
-			// 			// 	m_selectedSGDoneTransaction = false;
-			// 			// }else{
-			// 			// 	m_selectedSGDoneTransaction = true;
-			// 			// }
-			// 		}
-			// 	}
 			public InventoryManagerPage RootPage{
 				get{return m_rootPage;}
 				}InventoryManagerPage m_rootPage;
@@ -535,9 +518,12 @@ namespace SlotSystem{
 			public void ClearFields(){
 				SetPickedSB(null);
 				SetTargetSB(null);
-				SetTargetSG(null);
+				SetSG1(null);
+				SetSG2(null);
 				SetHoveredSB(null);
 				SetHoveredSG(null);
+				SetDIcon1(null);
+				SetDIcon2(null);
 			}
 			public void Deactivate(){
 				SetSelState(SlotGroupManager.DeactivatedState);
@@ -575,10 +561,10 @@ namespace SlotSystem{
 				}
 			}
 			public void SortSG (SlotGroup sg, SGSorter sorter){
-				sg.SetSorter(sorter);
+				// sg.SetSorter(sorter);
 				SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
-				SetTargetSB(sortTransaction.TargetSB);
-				SetTargetSG(sortTransaction.TargetSG);
+				SetTargetSB(sortTransaction.targetSB);
+				SetSG1(sortTransaction.sg1);
 				SetTransaction(sortTransaction);
 				Transaction.Execute();
 			}
@@ -597,7 +583,7 @@ namespace SlotSystem{
 				*/
 				TransactionResults transactionResults = new TransactionResults();
 				foreach(SlotGroup sg in FocusedSGs){
-					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(PickedSB, null, sg);
+					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, null, sg);
 					TransactionResult tr = new TransactionResult(null, sg, ta);
 					transactionResults.AddTransactionResult(tr);
 					if(ta is RevertTransaction)
@@ -606,10 +592,10 @@ namespace SlotSystem{
 						sg.Focus();
 					foreach(Slottable sb in sg.Slottables){
 						if(sb != null){
-							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(PickedSB, sb, null);
+							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb, null);
 							TransactionResult tr2 = new TransactionResult(sb, null, ta2);
 							transactionResults.AddTransactionResult(tr2);
-							if(ta2 is RevertTransaction || ta2 is FillEquipTransaction)
+							if(ta2 is RevertTransaction || ta2 is FillTransaction)
 								sb.Defocus();
 							else
 								sb.Focus();
@@ -620,12 +606,13 @@ namespace SlotSystem{
 			}
 			public void UpdateTransaction(){
 				SlotSystemTransaction ta = TransactionResults.GetTransaction(HoveredSB, HoveredSG);
-				SetTargetSB(ta.TargetSB);
-				SetTargetSG(ta.TargetSG);
+				SetTargetSB(ta.targetSB);
+				SetSG1(ta.sg1);
+				SetSG2(ta.sg2);
 				SetTransaction(ta);
 			}
 			public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup targetSG, Slottable targetSB){
-				Slottable prevPickedSB = PickedSB;
+            Slottable prevPickedSB = this.pickedSB;
 				SetPickedSB(pickedSB);
 				SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, targetSB, targetSG);
 				SetPickedSB(prevPickedSB);

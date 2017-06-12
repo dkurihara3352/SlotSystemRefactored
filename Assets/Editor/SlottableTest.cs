@@ -754,7 +754,7 @@ public class SlottableTest{
 				SlotGroup origSG = sb.SG;
 				sb = origSG.GetSB(sb.ItemInst);
 				if(sb.IsPickable){
-					if(sgm.GetTransaction(sb, sg, null).GetType() == typeof(FillEquipTransaction)){ 
+					if(sgm.GetTransaction(sb, sg, null).GetType() == typeof(FillTransaction)){ 
 						AssertFocused();
 						/*	on SG	*/
 								ASSGM(sgm,
@@ -789,7 +789,7 @@ public class SlottableTest{
 									sb, sg, null, sg, null,
 									SGMDeactivated, SGMFocused, null,
 									SGMWFA, SGMProbing, typeof(SGMProbeProcess), 
-									typeof(FillEquipTransaction),
+									typeof(FillTransaction),
 									false, true, false, false);
 								ASSG(origSG,
 									SGFocused, SGDefocused, typeof(SGGreyoutProcess),
@@ -806,7 +806,7 @@ public class SlottableTest{
 									sb, sg, null, sg, null,
 									SGMDeactivated, SGMFocused, null,
 									SGMProbing, SGMTransaction, typeof(SGMTransactionProcess), 
-									typeof(FillEquipTransaction),
+									typeof(FillTransaction),
 									false, true, origSG.IsSMDone?true: false, sg.IsSMDone?true: false);
 								ASSG(origSG,
 									SGFocused, SGDefocused, typeof(SGGreyoutProcess),
@@ -1676,10 +1676,10 @@ public class SlottableTest{
 			}
 		}
 		public void PointerUp(){
-			sgm.PickedSB.OnPointerUpMock(eventData);
+			sgm.pickedSB.OnPointerUpMock(eventData);
 		}
 		public void LetGo(){
-			Slottable pickedSB = sgm.PickedSB;
+			Slottable pickedSB = sgm.pickedSB;
 				ASGMActState(sgm, SGMWFA, SGMProbing, typeof(SGMProbeProcess));
 				ASSG(pickedSB.SG,
 					SGFocused, SGDefocused, typeof(SGGreyoutProcess),
@@ -1688,8 +1688,8 @@ public class SlottableTest{
 					SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 					null, SBPickedUp, null,
 					null, null, null, false);
-			sgm.PickedSB.OnPointerUpMock(eventData);
-			if(sgm.PickedSB.CurActState == Slottable.WaitForNextTouchState){
+			sgm.pickedSB.OnPointerUpMock(eventData);
+			if(sgm.pickedSB.CurActState == Slottable.WaitForNextTouchState){
 				ASGMActState(sgm, SGMWFA, SGMProbing, typeof(SGMProbeProcess));
 				ASSG(pickedSB.SG,
 					SGFocused, SGDefocused, typeof(SGGreyoutProcess),
@@ -1698,7 +1698,7 @@ public class SlottableTest{
 					SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 					SBPickedUp, SBWFNT, typeof(WaitForNextTouchProcess),
 					null, null, null, false);
-				sgm.PickedSB.ActionProcess.Expire();
+				sgm.pickedSB.ActionProcess.Expire();
 			}
 				ASGMActState(sgm, SGMProbing, SGMTransaction, typeof(SGMTransactionProcess));
 				ASSG(pickedSB.SG,
@@ -1708,9 +1708,9 @@ public class SlottableTest{
 		public void CompleteAllSBActProcesses(SlotGroup sg){
 			foreach(SlotMovement sm in sg.SlotMovements){
 				Slottable sb = sm.SB;
-				if(sb != sg.SGM.PickedSB && sb != sg.SGM.TargetSB){
-					if(sb.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
-					sb.ActionProcess.GetType() == typeof(SBAddedProcess) ||
+				if(sb != sg.SGM.pickedSB && sb != sg.SGM.sg2){
+					if(sb.ActionProcess.GetType() == typeof(SBRemoveProcess) ||
+					sb.ActionProcess.GetType() == typeof(SBAddProcess) ||
 					sb.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
 					sb.ActionProcess.GetType() == typeof(SBMoveOutProcess) ||
 					sb.ActionProcess.GetType() == typeof(SBMoveInProcess))
@@ -1912,29 +1912,29 @@ public class SlottableTest{
 				SGMSelectionState prevSel, SGMSelectionState curSel, System.Type selProcT,
 				SGMActionState prevAct, SGMActionState curAct, System.Type actProcT,
 				System.Type taType, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
-				AE(sgm.PickedSB, pickedSB);
+				AE(sgm.pickedSB, pickedSB);
 				AE(sgm.HoveredSG, hoveredSG);
 				AE(sgm.HoveredSB, hoveredSB);
-				AE(sgm.TargetSG, targetSG);
-				AE(sgm.TargetSB, targetSB);
+				AE(sgm.sg2, targetSG);
+				AE(sgm.sg2, targetSB);
 				ASGMSelState(sgm, prevSel, curSel, selProcT);
 				ASGMActState(sgm, prevAct, curAct, actProcT);
 				if(taType == null) ANull(sgm.Transaction);
 				else AE(sgm.Transaction.GetType(), taType);
-				AE(sgm.PickedSBDone, pSBDone);
-				AE(sgm.TargetSBdone, sSBDone);
-				AE(sgm.OrigSGDone, oSGDone);
-				AE(sgm.TargetSGDone, sSGDone);
+				AE(sgm.pickedSBDone, pSBDone);
+				AE(sgm.targetSBdone, sSBDone);
+				AE(sgm.sg1Done, oSGDone);
+				AE(sgm.sg2Done, sSGDone);
 			}
 			public void ASSGM(SlotGroupManager sgm,
 				Slottable pickedSB, SlotGroup hoveredSG, Slottable hoveredSB, SlotGroup targetSG, Slottable targetSB, 
 				SGMSelectionState prevSel, SGMSelectionState curSel, System.Type selProcT,
 				SGMActionState prevAct, SGMActionState curAct, System.Type actProcT){
-				AE(sgm.PickedSB, pickedSB);
+				AE(sgm.pickedSB, pickedSB);
 				AE(sgm.HoveredSG, hoveredSG);
 				AE(sgm.HoveredSB, hoveredSB);
-				AE(sgm.TargetSG, targetSG);
-				AE(sgm.TargetSB, targetSB);
+				AE(sgm.sg2, targetSG);
+				AE(sgm.sg2, targetSB);
 				ASGMSelState(sgm, prevSel, curSel, selProcT);
 				ASGMActState(sgm, prevAct, curAct, actProcT);
 			}

@@ -145,6 +145,13 @@ namespace SlotSystem{
 							return Slottable.m_addedState;			
 						}
 						}static SBActionState m_addedState;
+					public static SBActionState MoveWithinState{
+						get{
+							if(Slottable.m_moveWithinState == null)
+								Slottable.m_moveWithinState = new SBMoveWithinState();
+							return Slottable.m_moveWithinState;			
+						}
+						}static SBActionState m_moveWithinState;
 					public static SBActionState MovingInSGState{
 						get{
 							if(Slottable.m_movingInSGState == null)
@@ -244,8 +251,13 @@ namespace SlotSystem{
 				public IEnumeratorMock WaitForNextTouchCoroutine(){return null;}
 				public IEnumeratorMock UnpickCoroutine(){return null;}
 				public IEnumeratorMock PickUpCoroutine(){return null;}
-				public IEnumeratorMock RemovedCoroutine(){return null;}
-				public IEnumeratorMock AddedCoroutine(){return null;}
+				public IEnumeratorMock RemoveCoroutine(){return null;}
+				public IEnumeratorMock AddCorouine(){return null;}
+				public IEnumeratorMock MoveWithinCoroutine(){
+					if(slotID == newSlotID)
+						ExpireActionProcess();
+					return null;
+				}
 				public IEnumeratorMock MoveInSGCoroutine(){return null;}
 				public IEnumeratorMock RevertCoroutine(){return null;}
 				public IEnumeratorMock MoveInCoroutine(){return null;}
@@ -284,7 +296,7 @@ namespace SlotSystem{
 				get{return m_delayed;}
 				set{m_delayed = value;}
 				}bool m_delayed = true;
-			public int PickedAmount{
+			public int pickedAmount{
 				get{return m_pickedAmount;}
 				set{m_pickedAmount = value;}
 				}int m_pickedAmount = 0;
@@ -301,15 +313,26 @@ namespace SlotSystem{
 				get{return m_sgm;}
 				set{m_sgm = value;}
 				}SlotGroupManager m_sgm;
-			public SlotGroup DestinationSG{
-				get{return m_destinationSG;}
-				}SlotGroup m_destinationSG;
-			public Slot DestinationSlot{
-				get{return m_destinationSlot;}
-				}Slot m_destinationSlot;
-			public int SlotID{
-				get{return SG.Slottables.IndexOf(this);}
+			// public SlotGroup DestinationSG{
+			// 	get{return m_destinationSG;}
+			// 	}SlotGroup m_destinationSG;
+			// public Slot DestinationSlot{
+			// 	get{return m_destinationSlot;}
+			// 	}Slot m_destinationSlot;
+			public int slotID{
+				get{
+					if(SG.Slottables.Contains(this))
+						return SG.Slottables.IndexOf(this);
+					else
+						return -1;
+				}
 			}
+			public int newSlotID{
+				get{return m_newSlotID;}
+				}int m_newSlotID = -2;
+				public void SetNewSlotID(int id){
+					m_newSlotID = id;
+				}
 			public SlotGroup SG{
 				get{
 					if(m_sg == null){
@@ -339,7 +362,7 @@ namespace SlotSystem{
 			}
 			public bool IsPickedUp{
 				get{
-					return SGM.PickedSB == this;
+					return SGM.pickedSB == this;
 				}
 			}
 			public bool IsEquipped{
@@ -353,6 +376,7 @@ namespace SlotSystem{
 			public bool IsStackable{
 				get{return ItemInst.Item.IsStackable;}
 			}
+
 		/*	Event methods	*/
 			/*	Selection event	*/
 				public void Focus(){
@@ -436,17 +460,17 @@ namespace SlotSystem{
 				SGM.SetActState(SlotGroupManager.PerformingTransactionState);
 				SGM.Transaction.Execute();
 			}
-			public void MoveDraggedIcon(SlotGroup sg, Slot slot){
-				SetDraggedIconDestination(sg, slot);
-			}
-			public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
-				this.m_destinationSG = sg;
-				this.m_destinationSlot = slot;
-			}
-			public void ClearDraggedIconDestination(){
-				this.m_destinationSG = null;
-				this.m_destinationSlot = null;
-			}
+			// public void MoveDraggedIcon(SlotGroup sg, Slot slot){
+			// 	SetDraggedIconDestination(sg, slot);
+			// }
+			// public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
+			// 	this.m_destinationSG = sg;
+			// 	this.m_destinationSlot = slot;
+			// }
+			// public void ClearDraggedIconDestination(){
+			// 	this.m_destinationSG = null;
+			// 	this.m_destinationSlot = null;
+			// }
 			public void GetSlotIndex(out int curID, out int newID){
 				SG.GetSlotMovement(this).GetIndex(out curID, out newID);
 			}
@@ -457,6 +481,11 @@ namespace SlotSystem{
 			public void UpdateEquipState(){
 				if(ItemInst.IsEquipped) Equip();
 				else Unequip();
+			}
+			public void Reset(){
+				ResetAction();
+				pickedAmount = 0;
+				SetNewSlotID(-2);
 			}
 			public void ResetAction(){
 				SetActState(Slottable.WaitForActionState);
