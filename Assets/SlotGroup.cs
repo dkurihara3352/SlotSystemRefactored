@@ -76,13 +76,13 @@ namespace SlotSystem{
 							return m_waitForActionState;
 						}
 						}private static SGActionState m_waitForActionState;
-					public static SGActionState PerformingTransactionState{
-						get{
-							if(m_performingTransactionState == null)
-								m_performingTransactionState = new SGPerformingTransactionState();
-							return m_performingTransactionState;
-						}
-						}private static SGActionState m_performingTransactionState;
+					// public static SGActionState PerformingTransactionState{
+						// 	get{
+						// 		if(m_performingTransactionState == null)
+						// 			m_performingTransactionState = new SGPerformingTransactionState();
+						// 		return m_performingTransactionState;
+						// 	}
+						// 	}private static SGActionState m_performingTransactionState;
 					public static SGActionState RevertState{
 						get{
 							if(m_revertState == null)
@@ -174,16 +174,10 @@ namespace SlotSystem{
 			}
 			public IEnumeratorMock TransactionCoroutine(){
 				bool flag = true;
-				if(m_slotMovements == null/* as in when testing */)
+				if(allTASBs == null/* as in when testing */)
 					return null;
-				foreach(SlotMovement sm in m_slotMovements){
-					// if(sm.SB.ActionProcess.GetType() == typeof(SBRemovedProcess) ||
-					// sm.SB.ActionProcess.GetType() == typeof(SBAddedProcess) ||
-					// sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
-					// sm.SB.ActionProcess.GetType() == typeof(SBMoveOutProcess) ||
-					// sm.SB.ActionProcess.GetType() == typeof(SBMoveInProcess))
-					// if(sm.SB != SGM.pickedSB && sm.SB != SGM.sg2)
-						flag &= sm.SB.ActionProcess.IsExpired;
+				foreach(Slottable sb in allTASBs){
+					flag &= sb.ActionProcess.IsExpired;
 				}
 				if(flag){
 					ActionProcess.Expire();
@@ -226,8 +220,16 @@ namespace SlotSystem{
 				}bool m_isExpandable;
 			public List<Slot> Slots{
 				get{return m_slots;}
-				set{m_slots = value;}
-				}List<Slot> m_slots = new List<Slot>();
+				}List<Slot> m_slots;
+				public void SetSlots(List<Slot> slots){
+					m_slots = slots;
+				}
+			public List<Slot> newSlots{
+				get{return m_newSlots;}
+				}List<Slot> m_newSlots;
+				public void SetNewSlots(List<Slot> newSlots){
+					m_newSlots = newSlots;
+				}
 			public List<SlottableItem> FilteredItems{
 				get{return m_filteredItems;}
 				}List<SlottableItem> m_filteredItems;
@@ -328,20 +330,26 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public bool IsSMDone{
-				get{
-					bool done = true;
-					if(SlotMovements != null){
-						foreach(SlotMovement sm in SlotMovements){
-							if(sm.SB != SGM.pickedSB && sm.SB != SGM.sg2){
-								if(sm.SB.ActionProcess != null && sm.SB.ActionProcess.IsRunning)
-									return false;
-							}
-						}
-					}
-					return done;
+			public List<Slottable> allTASBs{
+				get{return m_allTASBs;}
+				}List<Slottable> m_allTASBs;
+				public void SetAllTASBs(List<Slottable> sbs){
+					m_allTASBs = sbs;
 				}
-			}
+			// public bool IsSMDone{
+				// 	get{
+				// 		bool done = true;
+				// 		if(SlotMovements != null){
+				// 			foreach(SlotMovement sm in SlotMovements){
+				// 				if(sm.SB != SGM.pickedSB && sm.SB != SGM.sg2){
+				// 					if(sm.SB.ActionProcess != null && sm.SB.ActionProcess.IsRunning)
+				// 						return false;
+				// 				}
+				// 			}
+				// 		}
+				// 		return done;
+				// 	}
+				// }
 		/*	commands methods	*/
 			public void InitializeItems(){
 				m_initItemsCommand.Execute(this);
@@ -418,9 +426,6 @@ namespace SlotSystem{
 			// List<Slottable> ReorderedSBs;
 			public void ReorderSBs(Slottable picked, Slottable hovered, ref List<Slottable> reorderedSBs){
 				List<Slottable> result = new List<Slottable>();
-				// foreach(Slot slot in Slots){
-				// 	result.Add(slot.Sb);
-				// }
 				foreach(Slottable sb in reorderedSBs){
 					result.Add(sb);
 				}
@@ -442,29 +447,28 @@ namespace SlotSystem{
 					}
 				}
 				result[hoveredId] = pickedOrig;
-				// this.ReorderedSBs = result;
 				reorderedSBs = result;
 			}
 			// public List<Slottable> OrderedSbs(){
-			// 	List<Slottable> result = new List<Slottable>();
-			// 	if(SGM.Transaction != null && SGM.Transaction.GetType()== typeof(ReorderTransaction)){
-			// 		return ReorderedSBs;
-			// 	}
-			// 	return Sorter.OrderedSBs(this);
-			// }
+				// 	List<Slottable> result = new List<Slottable>();
+				// 	if(SGM.Transaction != null && SGM.Transaction.GetType()== typeof(ReorderTransaction)){
+				// 		return ReorderedSBs;
+				// 	}
+				// 	return Sorter.OrderedSBs(this);
+				// }
 			public void InstantSort(){
 				// List<Slottable> newSlotOrderedSbs = OrderedSbs();
-				// List<Slottable> sbs = new List<Slottable>();
-				// foreach(Slot slot in Slots){
-				// 	if(slot.Sb != null)
-				// 		sbs.Add(slot.Sb);
-				// 	slot.Sb = null;
-				// }
-				// for(int i = 0; i < newSlotOrderedSbs.Count; i++){
-				// 	Slots[i].Sb = newSlotOrderedSbs[i];
-				// }
+					// List<Slottable> sbs = new List<Slottable>();
+					// foreach(Slot slot in Slots){
+					// 	if(slot.Sb != null)
+					// 		sbs.Add(slot.Sb);
+					// 	slot.Sb = null;
+					// }
+					// for(int i = 0; i < newSlotOrderedSbs.Count; i++){
+					// 	Slots[i].Sb = newSlotOrderedSbs[i];
+					// }
 				List<Slottable> origSBs = Slottables;
-				Sorter.OrderSBs(ref origSBs);
+				Sorter.OrderSBsWithRetainedSize(ref origSBs);
 				foreach(Slot slot in Slots){
 					slot.Sb = origSBs[Slots.IndexOf(slot)];
 				}
@@ -534,30 +538,29 @@ namespace SlotSystem{
 				CurSelState.OnHoverExitMock(this, eventData);
 			}
 		/*	SlotMovement	*/
-			public List<SlotMovement> SlotMovements{
-				get{
-					if(m_slotMovements == null)
-						m_slotMovements = new List<SlotMovement>();
-					return m_slotMovements;
-				}
-				}List<SlotMovement> m_slotMovements;
-			public void AddSlotMovement(SlotMovement sm){
-				if(m_slotMovements == null)
-					m_slotMovements = new List<SlotMovement>();
-				m_slotMovements.Add(sm);
-			}
-			public SlotMovement GetSlotMovement(Slottable sb){
-				foreach(SlotMovement sm in SlotMovements){
-					if(sm.SB == sb)
-						return sm;
-				}
-				return null;
-			}
-			public void ExecuteSlotMovements(){
-				foreach(SlotMovement sm in SlotMovements)
-					sm.Execute();
-			}
-
+			// public List<SlotMovement> SlotMovements{
+			// 	get{
+			// 		if(m_slotMovements == null)
+			// 			m_slotMovements = new List<SlotMovement>();
+			// 		return m_slotMovements;
+			// 	}
+			// 	}List<SlotMovement> m_slotMovements;
+			// public void AddSlotMovement(SlotMovement sm){
+			// 	if(m_slotMovements == null)
+			// 		m_slotMovements = new List<SlotMovement>();
+			// 	m_slotMovements.Add(sm);
+			// }
+			// public SlotMovement GetSlotMovement(Slottable sb){
+			// 	foreach(SlotMovement sm in SlotMovements){
+			// 		if(sm.SB == sb)
+			// 			return sm;
+			// 	}
+			// 	return null;
+			// }
+			// public void ExecuteSlotMovements(){
+			// 	foreach(SlotMovement sm in SlotMovements)
+			// 		sm.Execute();
+			// }
 		/*	SlotSystemElement implementation	*/
 			public SlotGroup GetSlotGroup(Slottable sb){
 				/*	this is for SlotSystem implementation	*/
@@ -568,13 +571,19 @@ namespace SlotSystem{
 			}
 			public void Focus(){
 				SetSelState(SlotGroup.FocusedState);
-				SetActState(SlotGroup.WaitForActionState);
 				FocusSBs();
+				Reset();
+			}
+			public void FocusSelf(){
+				SetSelState(SlotGroup.FocusedState);
 			}
 			public void Defocus(){
 				SetSelState(SlotGroup.DefocusedState);
-				SetActState(SlotGroup.WaitForActionState);
 				DefocusSBs();
+				Reset();
+			}
+			public void DefocusSelf(){
+				SetSelState(SlotGroup.DefocusedState);
 			}
 		/*	methods	*/
 			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int slotCountCumExpandable){
@@ -609,24 +618,24 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public Slottable GetSB(SlottableItem item){
+			public Slottable GetSB(InventoryItemInstanceMock itemInst){
 				foreach(Slottable sb in this.Slottables){
 					if(sb != null){
-						InventoryItemInstanceMock itInst = sb.ItemInst;
-						if(item.IsStackable){
-							if(itInst == (InventoryItemInstanceMock)item)
-								return sb;
-						}else if(object.ReferenceEquals(item, itInst))
+						if(sb.ItemInst == itemInst)
 							return sb;
 					}
 				}
-				foreach(SlotMovement sm in SlotMovements){
-					if(sm.SB.ItemInst == (InventoryItemInstanceMock)item)
-						return sm.SB;
+				if(allTASBs != null){
+					foreach(Slottable sb in allTASBs){
+						if(sb != null){
+							if(sb.ItemInst == itemInst)
+								return sb;
+						}
+					}
 				}
 				return null;
 			}
-			public bool HasItem(InventoryItemInstanceMock invInst){
+			public bool HasItemCurrently(InventoryItemInstanceMock invInst){
 				bool result = false;
 				foreach(Slottable sb in this.Slottables){
 					if(sb != null){
@@ -640,74 +649,68 @@ namespace SlotSystem{
 				foreach(Slottable sb in Slottables){
 					if(sb != null){
 						sb.SetActState(Slottable.WaitForActionState);
+						sb.Reset();
 						if(sb.IsPickable)
 							sb.Focus();
 						else
 							sb.Defocus();
 					}
-					// if(sb != null){
-					// 	if(!this.IsAutoSort){
-					// 		sb.Focus();
-					// 		continue;
-					// 	}else{
-					// 		if(this.IsPool){
-					// 			if(sb.Item is PartsInstanceMock && !(this.Filter is SGPartsFilter)){
-					// 				sb.Defocus();
-					// 				continue;
-					// 			}else{
-					// 				if(sb.IsEquipped){
-					// 					sb.Defocus();
-					// 					continue;
-					// 				}
-					// 			}
-					// 		}
-					// 	}
-					// 	sb.Focus();
-					// }
 				}
 			}
 			public void DefocusSBs(){
-				foreach(Slot slot in Slots){
-					if(slot.Sb != null)
-						slot.Sb.Defocus();
+				foreach(Slottable sb in Slottables){
+					if(sb != null)
+						sb.SetActState(Slottable.WaitForActionState);
+						sb.Reset();
+						sb.Defocus();
 				}
 			}
-			public Slot GetSlot(Slottable sb){
+			public Slot GetSlot(InventoryItemInstanceMock itemInst){
 				foreach(Slot slot in this.Slots){
-					if(slot.Sb != null && slot.Sb == sb)
-						return slot;
+					if(slot.Sb != null){
+						if(slot.Sb.ItemInst == itemInst)
+							return slot;
+					}
 				}
 				return null;
 			}
-			public void UpdateSlots(){
-				while(Slots.Count < newSBs.Count){
+			// public void UpdateSlots(){
+				// 	while(Slots.Count < newSBs.Count){
+				// 		Slot newSlot = new Slot();
+				// 		Slots.Add(newSlot);
+				// 	}
+				// }
+			public void CreateNewSlots(){
+				List<Slot> newSlots = new List<Slot>();
+				for(int i = 0; i < newSBs.Count; i++){
 					Slot newSlot = new Slot();
-					Slots.Add(newSlot);
+					newSlots.Add(newSlot);
 				}
+				SetNewSlots(newSlots);
 			}
 			public Slot GetNewSlot(InventoryItemInstanceMock itemInst){
-				int index = -1;
+				int index = -3;
 				foreach(Slottable sb in newSBs){
 					if(sb != null){
 						if(sb.ItemInst == itemInst)
 							index = newSBs.IndexOf(sb);
 					}
 				}
-				return Slots[index];
+				return newSlots[index];
 			}
-			public Slot GetNextEmptySlot(){
-				if(IsExpandable){
-					Slot newSlot = new Slot();
-					Slots.Add(newSlot);
-					return newSlot;
-				}else{
-					foreach(Slot slot in Slots){
-						if(slot.Sb == null)
-							return slot;
-					}
-				}
-				return null;
-			}
+			// public Slot GetNextEmptySlot(){
+				// 	if(IsExpandable){
+				// 		Slot newSlot = new Slot();
+				// 		Slots.Add(newSlot);
+				// 		return newSlot;
+				// 	}else{
+				// 		foreach(Slot slot in Slots){
+				// 			if(slot.Sb == null)
+				// 				return slot;
+				// 		}
+				// 	}
+				// 	return null;
+				// }
 			// public void SetAndRunSlotMovements(List<InventoryItemInstanceMock> removed, List<InventoryItemInstanceMock> added){
 				// 	List<Slottable> newSBsList = new List<Slottable>();
 				// 	/*	remove	and index */
@@ -872,113 +875,123 @@ namespace SlotSystem{
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
 					sb.SetActState(Slottable.AddedState);
 				}
+				List<Slottable> allSBs = new List<Slottable>();
+				allSBs.AddRange(Slottables);
+				allSBs.AddRange(added);
+				SetAllTASBs(allSBs);
 			}
-			public void CheckCompletion(){
-				CheckSBsSlotMovementCompletion();
-				CheckProcessCompletion();
-			}
-			public void CheckSBsSlotMovementCompletion(){
-				foreach(SlotMovement sm in SlotMovements){
-					if(sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
-					sm.SB.ActionProcess.GetType() == typeof(SBRemoveProcess) ||
-					sm.SB.ActionProcess.GetType() == typeof(SBAddProcess)){
-						int curId; int newId;
-						sm.GetIndex(out curId, out newId);
-						if(curId == newId)
-							sm.SB.ExpireActionProcess();
-					}
-				}
-			}
+			// public void CheckCompletion(){
+				// 	CheckSBsSlotMovementCompletion();
+				// 	CheckProcessCompletion();
+				// }
+				// public void CheckSBsSlotMovementCompletion(){
+				// 	foreach(SlotMovement sm in SlotMovements){
+				// 		if(sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
+				// 		sm.SB.ActionProcess.GetType() == typeof(SBRemoveProcess) ||
+				// 		sm.SB.ActionProcess.GetType() == typeof(SBAddProcess)){
+				// 			int curId; int newId;
+				// 			sm.GetIndex(out curId, out newId);
+				// 			if(curId == newId)
+				// 				sm.SB.ExpireActionProcess();
+				// 		}
+				// 	}
+				// }
 			public void CheckProcessCompletion(){
 				ActionProcess.Check();
 			}
 			public void OnCompleteSlotMovementsV2(){
-				foreach(Slot slot in Slots){
-					slot.Sb = null;
-				}
-				List<Slot> newSlots = new List<Slot>();
-				for(int i = 0; i<newSBs.Count; i++){
-					if(Slots.Count <= i){
-						Slot newSlot = new Slot();
-						newSlots.Add(newSlot);
-					}else
-						newSlots.Add(Slots[i]);
-				}
-				foreach(Slot slot in newSlots){
-					slot.Sb = newSBs[newSlots.IndexOf(slot)];
-				}
-			}
-			public void OnCompleteSlotMovements(){
-				foreach(Slot slot in Slots){
-					slot.Sb = null;
-				}
-				while(Slots.Count < SlotMovements.Count){
-					Slot newSlot = new Slot();
-					newSlot.Position = Vector2.zero;
-					Slots.Add(newSlot);
-				}
-				foreach(SlotMovement sm in SlotMovements){
-					int curId;
-					int newId;
-					sm.GetIndex(out curId, out newId);
-					if(newId == -1 || newId == -2){
-						GameObject go = sm.SB.gameObject;
-						DestroyImmediate(go);
-						DestroyImmediate(sm.SB);
-					}else{
-						Slots[newId].Sb = sm.SB;
+				// foreach(Slot slot in Slots){
+				// 	slot.Sb = null;
+				// }
+				// List<Slot> newSlots = new List<Slot>();
+				// for(int i = 0; i<newSBs.Count; i++){
+				// 	if(Slots.Count <= i){
+				// 		Slot newSlot = new Slot();
+				// 		newSlots.Add(newSlot);
+				// 	}else
+				// 		newSlots.Add(Slots[i]);
+				// }
+				// foreach(Slot slot in newSlots){
+				// 	slot.Sb = newSBs[newSlots.IndexOf(slot)];
+				// }
+				foreach(Slottable sb in newSBs){
+					if(sb != null){
+						newSlots[sb.newSlotID].Sb = sb;
 					}
 				}
-				if(IsExpandable){
-					List<Slot> newSlots = new List<Slot>();
-					foreach(Slot slot in Slots){
-						if(slot.Sb != null)
-							newSlots.Add(slot);
-					}
-					Slots = newSlots;
-				}
-				SlotMovements.Clear();
+				SetSlots(newSlots);
 			}
-			public Slot GetSlotForAdded(Slottable sb){
-				Slot slot = null;
-				if(SlotMovements.Count == 0){
-					return GetSlot(GetSB(sb.ItemInst));
-				}else{
-					foreach(SlotMovement sm in SlotMovements){
-						if(sm.SB.ItemInst == sb.ItemInst){
-							int curId; int newId;
-							sm.GetIndex(out curId, out newId);
-							slot = Slots[newId];
-						}
-					}
-					return slot;
-				}
-			}
+			// public void OnCompleteSlotMovements(){
+				// 	foreach(Slot slot in Slots){
+				// 		slot.Sb = null;
+				// 	}
+				// 	while(Slots.Count < SlotMovements.Count){
+				// 		Slot newSlot = new Slot();
+				// 		newSlot.Position = Vector2.zero;
+				// 		Slots.Add(newSlot);
+				// 	}
+				// 	foreach(SlotMovement sm in SlotMovements){
+				// 		int curId;
+				// 		int newId;
+				// 		sm.GetIndex(out curId, out newId);
+				// 		if(newId == -1 || newId == -2){
+				// 			GameObject go = sm.SB.gameObject;
+				// 			DestroyImmediate(go);
+				// 			DestroyImmediate(sm.SB);
+				// 		}else{
+				// 			Slots[newId].Sb = sm.SB;
+				// 		}
+				// 	}
+				// 	if(IsExpandable){
+				// 		List<Slot> newSlots = new List<Slot>();
+				// 		foreach(Slot slot in Slots){
+				// 			if(slot.Sb != null)
+				// 				newSlots.Add(slot);
+				// 		}
+				// 		Slots = newSlots;
+				// 	}
+				// 	SlotMovements.Clear();
+				// }
+			// public Slot GetSlotForAdded(Slottable sb){
+				// 	Slot slot = null;
+				// 	if(SlotMovements.Count == 0){
+				// 		return GetSlot(GetSB(sb.ItemInst));
+				// 	}else{
+				// 		foreach(SlotMovement sm in SlotMovements){
+				// 			if(sm.SB.ItemInst == sb.ItemInst){
+				// 				int curId; int newId;
+				// 				sm.GetIndex(out curId, out newId);
+				// 				slot = Slots[newId];
+				// 			}
+				// 		}
+				// 		return slot;
+				// 	}
+				// }
 			public void InstantGreyout(){}
 			public void InstantGreyin(){}
 			public void InstantHighlight(){}
 			// public bool IsFillEquippable(Slottable sb){
-			// 	SlotGroup origSG = sb.SG;
-			// 	if(!(HasItem(sb.ItemInst) && !IsPool)){
-			// 		if(origSG.IsShrinkable){
-			// 			if(this != origSG){
-			// 				if(IsFocused){
-			// 					if(AcceptsFilter(sb)){
-			// 						if(IsExpandable){
-			// 							return true;
-			// 						}else{
-			// 							foreach(Slot slot in Slots){
-			// 								if(slot.Sb == null)
-			// 									return true;
-			// 							}
-			// 						}
-			// 					}
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// 	return false;
-			// }
+				// 	SlotGroup origSG = sb.SG;
+				// 	if(!(HasItem(sb.ItemInst) && !IsPool)){
+				// 		if(origSG.IsShrinkable){
+				// 			if(this != origSG){
+				// 				if(IsFocused){
+				// 					if(AcceptsFilter(sb)){
+				// 						if(IsExpandable){
+				// 							return true;
+				// 						}else{
+				// 							foreach(Slot slot in Slots){
+				// 								if(slot.Sb == null)
+				// 									return true;
+				// 							}
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 		}
+				// 	}
+				// 	return false;
+				// }
 			public List<Slottable> SwappableSBs(Slottable pickedSB){
 				List<Slottable> result = new List<Slottable>();
 				foreach(Slottable sb in Slottables){
@@ -988,6 +1001,12 @@ namespace SlotSystem{
 					}
 				}
 				return result;
+			}
+			public void Reset(){
+				SetActState(SlotGroup.WaitForActionState);
+				SetAllTASBs(null);
+				SetNewSBs(null);
+				SetNewSlots(null);
 			}
 		/*	dump	*/
 			// public void CheckTransactionCompletionOnSBs(){

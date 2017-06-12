@@ -735,11 +735,11 @@ public class SlottableTest{
 			// TestSBStateTransitionOnAll();
 			// TestSGStateTransitionOnAll();
 			// TestPickUpTransitionOnAll(); //revisit after stack
-			// TestVolSortOnAll();
-			// TestRevertOnAllSBs();
 			// TestSGMStateTransition();
-			// TestReorderOnAll();
-		TestFillEquipOnAll();
+		// TestReorderOnAll();
+		// TestFillEquipOnAll();
+		// TestVolSortOnAll();
+		// TestRevertOnAllSBs();
 		
 	}
 	/*	Test Transaction on All	*/
@@ -1501,8 +1501,6 @@ public class SlottableTest{
 				SlotSystemTestResult res = new SlotSystemTestResult(isPas, sb, pickable);
 				testResults.Add(res);
 			}
-		
-	
 		public void CheckTransacitonWithSBSpecifiedOnAll(){
 			PerformOnAllSBs(CheckTransactionWithSB);
 			PrintTestResult(null);
@@ -1550,7 +1548,7 @@ public class SlottableTest{
 				public void CheckTransaction(SlotGroup sg, Slottable sb, bool isPAS ,bool isTAS){
 					if(sb.IsPickable){
 						sgm.SetPickedSB(sb);
-						Capture(sg.SGM, sb, sg, null, isPAS, isTAS, TestElement.SGM);
+						Capture(sg.SGM, sb, sg, null, isPAS, isTAS, TestElement.TA);
 					}
 				}
 	/*	thorough testing utility	*/

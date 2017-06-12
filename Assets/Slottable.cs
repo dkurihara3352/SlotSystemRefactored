@@ -54,15 +54,15 @@ namespace SlotSystem{
 						}
 						}static SBSelectionState m_defocusedState;
 					public static SBSelectionState FocusedState{
-					get{
-						if(Slottable.m_focusedState != null)
-							return Slottable.m_focusedState;
-						else{
-							Slottable.m_focusedState = new SBFocusedState();
-							return Slottable.m_focusedState;
+						get{
+							if(Slottable.m_focusedState != null)
+								return Slottable.m_focusedState;
+							else{
+								Slottable.m_focusedState = new SBFocusedState();
+								return Slottable.m_focusedState;
+							}
 						}
-					}
-					}static SBSelectionState m_focusedState;
+						}static SBSelectionState m_focusedState;
 			/*	Action State	*/
 				SBStateEngine ActStateEngine{
 					get{
@@ -152,34 +152,34 @@ namespace SlotSystem{
 							return Slottable.m_moveWithinState;			
 						}
 						}static SBActionState m_moveWithinState;
-					public static SBActionState MovingInSGState{
-						get{
-							if(Slottable.m_movingInSGState == null)
-								Slottable.m_movingInSGState = new SBMovingInSGState();
-							return Slottable.m_movingInSGState;			
-						}
-						}static SBActionState m_movingInSGState;
-					public static SBActionState RevertingState{
-						get{
-							if(Slottable.m_revertingState == null)
-								Slottable.m_revertingState = new SBRevertingState();
-							return Slottable.m_revertingState;			
-						}
-						}static SBActionState m_revertingState;
-					public static SBActionState MovingOutState{
-						get{
-							if(Slottable.m_movingOutState == null)
-								Slottable.m_movingOutState = new SBMovingOutState();
-							return Slottable.m_movingOutState;			
-						}
-						}static SBActionState m_movingOutState;
-					public static SBActionState MovingInState{
-						get{
-							if(Slottable.m_movingInState == null)
-								Slottable.m_movingInState = new SBMovingInState();
-							return Slottable.m_movingInState;			
-						}
-						}static SBActionState m_movingInState;
+					// public static SBActionState MovingInSGState{
+						// 	get{
+						// 		if(Slottable.m_movingInSGState == null)
+						// 			Slottable.m_movingInSGState = new SBMovingInSGState();
+						// 		return Slottable.m_movingInSGState;			
+						// 	}
+						// 	}static SBActionState m_movingInSGState;
+						// public static SBActionState RevertingState{
+						// 	get{
+						// 		if(Slottable.m_revertingState == null)
+						// 			Slottable.m_revertingState = new SBRevertingState();
+						// 		return Slottable.m_revertingState;			
+						// 	}
+						// 	}static SBActionState m_revertingState;
+						// public static SBActionState MovingOutState{
+						// 	get{
+						// 		if(Slottable.m_movingOutState == null)
+						// 			Slottable.m_movingOutState = new SBMovingOutState();
+						// 		return Slottable.m_movingOutState;			
+						// 	}
+						// 	}static SBActionState m_movingOutState;
+						// public static SBActionState MovingInState{
+						// 	get{
+						// 		if(Slottable.m_movingInState == null)
+						// 			Slottable.m_movingInState = new SBMovingInState();
+						// 		return Slottable.m_movingInState;			
+						// 	}
+						// 	}static SBActionState m_movingInState;
 			/*	Equip State	*/
 				SBStateEngine EqpStateEngine{
 					get{
@@ -247,10 +247,10 @@ namespace SlotSystem{
 			/*	coroutine */
 				public IEnumeratorMock WaitForPointerUpCoroutine(){return null;}
 				public IEnumeratorMock WaitForPickUpCoroutine(){return null;}
-				public IEnumeratorMock PickedUpCoroutine(){return null;}
-				public IEnumeratorMock WaitForNextTouchCoroutine(){return null;}
-				public IEnumeratorMock UnpickCoroutine(){return null;}
 				public IEnumeratorMock PickUpCoroutine(){return null;}
+				public IEnumeratorMock WaitForNextTouchCoroutine(){return null;}
+				// public IEnumeratorMock UnpickCoroutine(){return null;}
+				// public IEnumeratorMock PickUpCoroutine(){return null;}
 				public IEnumeratorMock RemoveCoroutine(){return null;}
 				public IEnumeratorMock AddCorouine(){return null;}
 				public IEnumeratorMock MoveWithinCoroutine(){
@@ -258,10 +258,10 @@ namespace SlotSystem{
 						ExpireActionProcess();
 					return null;
 				}
-				public IEnumeratorMock MoveInSGCoroutine(){return null;}
-				public IEnumeratorMock RevertCoroutine(){return null;}
-				public IEnumeratorMock MoveInCoroutine(){return null;}
-				public IEnumeratorMock MoveOutCoroutine(){return null;}
+				// public IEnumeratorMock MoveInSGCoroutine(){return null;}
+				// public IEnumeratorMock RevertCoroutine(){return null;}
+				// public IEnumeratorMock MoveInCoroutine(){return null;}
+				// public IEnumeratorMock MoveOutCoroutine(){return null;}
 			public SBProcess EquipProcess{
 				get{return m_equipProcess;}
 				}SBProcess m_equipProcess;
@@ -461,19 +461,19 @@ namespace SlotSystem{
 				SGM.Transaction.Execute();
 			}
 			// public void MoveDraggedIcon(SlotGroup sg, Slot slot){
-			// 	SetDraggedIconDestination(sg, slot);
-			// }
-			// public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
-			// 	this.m_destinationSG = sg;
-			// 	this.m_destinationSlot = slot;
-			// }
-			// public void ClearDraggedIconDestination(){
-			// 	this.m_destinationSG = null;
-			// 	this.m_destinationSlot = null;
-			// }
-			public void GetSlotIndex(out int curID, out int newID){
-				SG.GetSlotMovement(this).GetIndex(out curID, out newID);
-			}
+				// 	SetDraggedIconDestination(sg, slot);
+				// }
+				// public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
+				// 	this.m_destinationSG = sg;
+				// 	this.m_destinationSlot = slot;
+				// }
+				// public void ClearDraggedIconDestination(){
+				// 	this.m_destinationSG = null;
+				// 	this.m_destinationSlot = null;
+				// }
+				// public void GetSlotIndex(out int curID, out int newID){
+				// 	SG.GetSlotMovement(this).GetIndex(out curID, out newID);
+				// }
 			public void ExpireActionProcess(){
 				if(ActionProcess.IsRunning)
 					ActionProcess.Expire();

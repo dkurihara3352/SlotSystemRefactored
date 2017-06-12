@@ -286,8 +286,8 @@ namespace SlotSystem{
 							sg1.SetSelState(SlotGroup.FocusedState);
 					}
 					this.m_sg1 = sg;
-					if(sg1 != null)
-						sg1.SetSelState(SlotGroup.SelectedState);
+					// if(sg1 != null)
+					// 	sg1.SetSelState(SlotGroup.SelectedState);
 					if(sg1 != null)
 						m_sg1Done = false;
 					else
@@ -587,9 +587,9 @@ namespace SlotSystem{
 					TransactionResult tr = new TransactionResult(null, sg, ta);
 					transactionResults.AddTransactionResult(tr);
 					if(ta is RevertTransaction)
-						sg.Defocus();
+						sg.DefocusSelf();
 					else
-						sg.Focus();
+						sg.FocusSelf();
 					foreach(Slottable sb in sg.Slottables){
 						if(sb != null){
 							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb, null);
