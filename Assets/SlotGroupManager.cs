@@ -458,7 +458,7 @@ namespace SlotSystem{
 					List<CarriedGearInstanceMock> result = new List<CarriedGearInstanceMock>();
 					foreach(SlotGroup sge in FocusedSGEs){
 						if(sge.Filter is SGCGearsFilter){
-							foreach(Slottable sb in sge.Slottables){
+							foreach(Slottable sb in sge.slottables){
 								if(sb != null)
 									result.Add((CarriedGearInstanceMock)sb.ItemInst);
 							}
@@ -548,7 +548,7 @@ namespace SlotSystem{
 						itemInst.IsEquipped = EquippedParts != null && EquippedParts.Contains((PartsInstanceMock)itemInst);
 				}
 				foreach(SlotGroup sg in AllSGs){
-					foreach(Slottable sb in sg.Slottables){
+					foreach(Slottable sb in sg.slottables){
 						if(sb!= null)
 							sb.UpdateEquipState();
 					}
@@ -584,7 +584,7 @@ namespace SlotSystem{
 						sg.DefocusSelf();
 					else
 						sg.FocusSelf();
-					foreach(Slottable sb in sg.Slottables){
+					foreach(Slottable sb in sg.slottables){
 						if(sb != null){
 							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb, null);
 							TransactionResult tr2 = new TransactionResult(sb, null, ta2);

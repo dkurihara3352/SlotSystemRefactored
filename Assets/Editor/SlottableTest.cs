@@ -3,6 +3,7 @@ using UnityEditor;
 using NUnit.Framework;
 using SlotSystem;
 using System.Collections.Generic;
+using Utility;
 public class SlottableTest{
 	public enum TestElement{SB, SG, SGM, TA}
 	public class SlotSystemTestResult{
@@ -608,7 +609,7 @@ public class SlottableTest{
 						14,//items
 						14);//sbs
 					AE(sgpAll.EquippedSBs.Count, 4);
-					foreach(Slottable sb in sgpAll.Slottables){
+					foreach(Slottable sb in sgpAll.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.SG, sgpAll);
@@ -625,7 +626,7 @@ public class SlottableTest{
 						3,//items
 						3);//sbs
 					AE(sgpBow.EquippedSBs.Count, 1);
-					foreach(Slottable sb in sgpBow.Slottables){
+					foreach(Slottable sb in sgpBow.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.SG, sgpBow);
@@ -642,7 +643,7 @@ public class SlottableTest{
 						3,//items
 						3);//sbs
 					AE(sgpWear.EquippedSBs.Count, 1);
-					foreach(Slottable sb in sgpWear.Slottables){
+					foreach(Slottable sb in sgpWear.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.SG, sgpWear);
@@ -659,7 +660,7 @@ public class SlottableTest{
 						6,//items
 						6);//sbs
 					AE(sgpCGears.EquippedSBs.Count, 2);
-					foreach(Slottable sb in sgpCGears.Slottables){
+					foreach(Slottable sb in sgpCGears.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.SG, sgpCGears);
@@ -676,7 +677,7 @@ public class SlottableTest{
 						2,//items
 						2);//sbs
 					AE(sgpParts.EquippedSBs.Count, 0);
-					foreach(Slottable sb in sgpParts.Slottables){
+					foreach(Slottable sb in sgpParts.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.SG, sgpParts);
@@ -694,7 +695,7 @@ public class SlottableTest{
 						1,//items
 						1);//sbs
 					AE(sgBow.EquippedSBs.Count, 1);
-					foreach(Slottable sb in sgBow.Slottables){
+					foreach(Slottable sb in sgBow.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.SG, sgBow);
@@ -712,7 +713,7 @@ public class SlottableTest{
 						1,//items
 						1);//sbs
 					AE(sgWear.EquippedSBs.Count, 1);
-					foreach(Slottable sb in sgWear.Slottables){
+					foreach(Slottable sb in sgWear.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.SG, sgWear);
@@ -730,7 +731,7 @@ public class SlottableTest{
 							2,//items
 							2);//sbs
 						AE(sgCGears.EquippedSBs.Count, 2);
-						foreach(Slottable sb in sgCGears.Slottables){
+						foreach(Slottable sb in sgCGears.slottables){
 							if(sb != null){
 								ASSB_s(sb, SBDeactivated, SBWFA);
 								AE(sb.SG, sgCGears);
@@ -747,6 +748,8 @@ public class SlottableTest{
 			// CheckTransactionOnAllSG();
 			// TestDraggedIconOnAll();
 			// TestAcceptSGTACompOnAll();
+			// TestReorderSBsMethod();
+			// TestSGActionStateSequence();
 		// TestFillEquippableOnAll();
 		// TestSwappable();
 		// CheckShrinkableAndExpandableOnAllSGs();
@@ -760,10 +763,99 @@ public class SlottableTest{
 		// TestFillEquipOnAll();
 		// TestVolSortOnAll();
 		// TestRevertOnAllSBs();
-		TestReorderSBsMethod();
+	}
+	public void TestSGActionStateSequence(){
+		List<Slot> slots = new List<Slot>();
+		sgpAll.SetSlots(slots);
+
+		List<Slottable> newSBs = new List<Slottable>();
+		newSBs.Add(defBowA_p);
+		newSBs.Add(defWearA_p);
+		newSBs.Add(null);
+		newSBs.Add(defShieldA_p);
+		sgpAll.SetNewSBs(newSBs);
+		sgpAll.CreateNewSlots();
+		sgpAll.SetSBsActStates();
+		foreach(Slottable sb in sgpAll.allTASBs){
+			if(sb != null)
+			Debug.Log(Util.SBDebug(sb));
+		}
+		PrintSBs(sgpAll.newSBs);
+		sgpAll.OnCompleteSlotMovementsV2();
+		
+		newSBs.Clear();
+		newSBs.Add(null);
+		newSBs.Add(defWearA_p);
+		newSBs.Add(defShieldA_p);
+		newSBs.Add(defBowA_p);
+		sgpAll.SetNewSBs(newSBs);
+		sgpAll.CreateNewSlots();
+		sgpAll.SetSBsActStates();
+		foreach(Slottable sb in sgpAll.allTASBs){
+			if(sb != null)
+			Debug.Log(Util.SBDebug(sb));
+		}
+		PrintSBs(sgpAll.newSBs);
+		sgpAll.OnCompleteSlotMovementsV2();
+		
+		newSBs.Clear();
+		newSBs.Add(defShieldA_p);
+		newSBs.Add(defWearA_p);
+		newSBs.Add(null);
+		newSBs.Add(null);
+		newSBs.Add(crfMWeaponA_p);
+		sgpAll.SetNewSBs(newSBs);
+		sgpAll.CreateNewSlots();
+		sgpAll.SetSBsActStates();
+		foreach(Slottable sb in sgpAll.allTASBs){
+			if(sb != null)
+			Debug.Log(Util.SBDebug(sb));
+		}
+		PrintSBs(sgpAll.newSBs);
+		sgpAll.OnCompleteSlotMovementsV2();
+
+		sgpAll.InstantSort();
+		PrintSBs(sgpAll.slottables);
+	}
+	public List<Slottable> testSBs{
+		get{
+			List<Slottable> res = new List<Slottable>();
+				res.Add(defBowA_p);
+				res.Add(crfBowA_p);
+				res.Add(defBowB_p);
+				res.Add(defWearA_p);
+				res.Add(crfWearA_p);
+				res.Add(defWearB_p);
+				res.Add(defShieldA_p);
+				res.Add(crfShieldA_p);
+				res.Add(defMWeaponA_p);
+				res.Add(crfMWeaponA_p);
+				res.Add(defQuiverA_p);
+				res.Add(defPackA_p);
+				res.Add(defParts_p);
+				res.Add(crfParts_p);
+			return res;
+		}
+	}
+	public void PrintSBs(List<Slottable> sbs){
+		foreach(Slottable sb in sbs){
+			if(sb != null)
+				Util.Stack(Util.SBName(sb));
+			else
+				Util.Stack("null");
+		}
+		string str = Util.Stacked;
+		Debug.Log("SBs: " + str);
 	}
 	public void TestReorderSBsMethod(){
-		
+		List<Slottable> sbs = testSBs;
+		PrintSBs(sbs);
+		sbs.Shuffle();
+		PrintSBs(sbs);
+		Util.ReorderSBs(sbs[0], sbs[3], ref sbs);
+		PrintSBs(sbs);
+		Util.ReorderSBs(sbs[13], sbs[0], ref sbs);
+		PrintSBs(sbs);
 	}
 	public void TestAcceptSGTACompOnAll(){
 		PerformOnAllSGAfterFocusing(TestAcceptSGTAComp);
@@ -1104,7 +1196,7 @@ public class SlottableTest{
 			public void TestReorder(SlotGroup targetSG, Slottable testSB, bool isPAS, bool isTAS){
 				if(testSB.IsPickable){
 					SlotGroup origSG = testSB.SG;
-					foreach(Slottable targetSB in targetSG.Slottables){
+					foreach(Slottable targetSB in targetSG.slottables){
 						if(sgm.GetTransaction(testSB, null, targetSB).GetType() == typeof(ReorderTransaction)){
 							Capture(testSB.SGM, testSB, null, targetSB, isPAS, isTAS, TestElement.SB);
 							// Print(testSB.SGM, testSB, null, targetSB, isPAS, isTAS, TestElement.SB);
@@ -1231,7 +1323,7 @@ public class SlottableTest{
 						sgm.dIcon1.CompleteMovement();
 						// Print(sg.SGM, pickedSB, sg, null, isPAS, isTAS, TestElement.SGM);
 						AssertFocused();
-						foreach(Slottable sb in sg.Slottables){
+						foreach(Slottable sb in sg.slottables){
 							if(sb != null){
 								if(sgm.GetTransaction(pickedSB, null, sb).GetType() == typeof(RevertTransaction)){
 									// Capture(sgm, pickedSB, null, sb, isPAS, isTAS, TestElement.SGM);
@@ -1584,7 +1676,7 @@ public class SlottableTest{
 			public void CrossCheckTransactionWithSB(SlotGroup sg, Slottable pickedSB, bool isPickedAS, bool isTargetAS){
 				if(pickedSB.IsPickable){
 					sgm.SetPickedSB(pickedSB);
-					foreach(Slottable sb in sg.Slottables){
+					foreach(Slottable sb in sg.slottables){
 						if(sb != null){
 							Capture(sb.SGM, pickedSB, sg, sb, isPickedAS, isTargetAS, TestElement.TA);
 						}
@@ -1630,13 +1722,13 @@ public class SlottableTest{
 			foreach(SlotGroup sgp in sgm.AllSGPs){
 				sgm.SetFocusedPoolSG(sgp);
 				sgp.ToggleAutoSort(true);
-				foreach(Slottable sb in sgp.Slottables){
+				foreach(Slottable sb in sgp.slottables){
 					if(sb != null){
 						act(sb, true);
 					}
 				}
 				sgp.ToggleAutoSort(false);
-				foreach(Slottable sb in sgp.Slottables){
+				foreach(Slottable sb in sgp.slottables){
 					if(sb != null){
 						act(sb, false);
 					}
@@ -1646,13 +1738,13 @@ public class SlottableTest{
 				sgm.SetFocusedEquipmentSet(eSet);
 				foreach(SlotGroup sge in sgm.FocusedSGEs){
 					sge.ToggleAutoSort(true);
-					foreach(Slottable sb in sge.Slottables){
+					foreach(Slottable sb in sge.slottables){
 						if(sb != null){
 							act(sb, true);
 						}
 					}
 					sge.ToggleAutoSort(false);
-					foreach(Slottable sb in sge.Slottables){
+					foreach(Slottable sb in sge.slottables){
 						if(sb != null){
 							act(sb, false);
 						}
@@ -1861,7 +1953,7 @@ public class SlottableTest{
 			/*	always includes picked itself */
 			SlotGroup origSG = picked.SG;
 			List<Slottable> result = new List<Slottable>();
-			foreach(Slottable sb in targetSG.Slottables){
+			foreach(Slottable sb in targetSG.slottables){
 				if(sb != null){
 					if(sb == picked)
 						result.Add(sb);
@@ -1905,7 +1997,7 @@ public class SlottableTest{
 			foreach(SlotGroup sgp in sgm.AllSGPs){
 				sgm.SetFocusedPoolSG(sgp);
 				sgp.ToggleAutoSort(true);
-				foreach(Slottable sb in sgp.Slottables){
+				foreach(Slottable sb in sgp.slottables){
 					if(sb != null){
 						if(sb.ItemInst is PartsInstanceMock)
 							AE(InvalidSGs(sb).Count, 7);
@@ -1914,7 +2006,7 @@ public class SlottableTest{
 					}
 				}
 				sgp.ToggleAutoSort(false);
-				foreach(Slottable sb in sgp.Slottables){
+				foreach(Slottable sb in sgp.slottables){
 					if(sb != null){
 						if(sb.ItemInst is PartsInstanceMock)
 							AE(InvalidSGs(sb).Count, 7);
@@ -1926,7 +2018,7 @@ public class SlottableTest{
 			foreach(SlotGroup sgp in sgm.AllSGPs){
 				sgm.SetFocusedPoolSG(sgp);
 				foreach(SlotGroup sge in sgm.FocusedSGEs){
-					foreach(Slottable sb_e in sge.Slottables){
+					foreach(Slottable sb_e in sge.slottables){
 						if(sb_e != null){
 							if(sgp.AcceptsFilter(sb_e))
 								AE(InvalidSGs(sb_e).Count, 6);
@@ -2080,11 +2172,11 @@ public class SlottableTest{
 				AE(sg.ActualSBsCount, sbsC);
 			}
 			public void AssertSBsSorted(SlotGroup sg, SGSorter sorter){
-				List<Slottable> sbs = sg.Slottables;
+				List<Slottable> sbs = sg.slottables;
 				sorter.OrderSBsWithRetainedSize(ref sbs);
-				AE(sbs.Count, sg.Slottables.Count);
-				for(int i = 0; i < sg.Slottables.Count; i++){
-					AE(sg.Slottables[i], sbs[i]);
+				AE(sbs.Count, sg.slottables.Count);
+				for(int i = 0; i < sg.slottables.Count; i++){
+					AE(sg.slottables[i], sbs[i]);
 				}
 			}
 			public void ASSG(SlotGroup sg, SGSelectionState prevSel, SGSelectionState curSel, System.Type selProcT, SGActionState prevAct, SGActionState curAct, System.Type actProcT, bool isRunning){
@@ -2175,7 +2267,7 @@ public class SlottableTest{
 					bool isBow = false;
 					if(sbInPool.ItemInst is BowInstanceMock)
 						isBow = true;
-					foreach(Slottable sbp in sgpAll.Slottables){
+					foreach(Slottable sbp in sgpAll.slottables){
 						if(sbp != null){
 							InventoryItemInstanceMock itemInst = sbp.ItemInst;
 							if((isBow && itemInst is BowInstanceMock) || (!isBow && itemInst is WearInstanceMock)){
@@ -2234,7 +2326,7 @@ public class SlottableTest{
 						}
 					}
 					SlotGroup sgp = isBow?sgpBow: sgpWear;
-					foreach(Slottable sbp in sgp.Slottables){
+					foreach(Slottable sbp in sgp.slottables){
 						if(sbp != null){
 							if(sbp.ItemInst == sbInPool.ItemInst){
 								AB(sbp.IsEquipped, true);
@@ -2307,7 +2399,7 @@ public class SlottableTest{
 				}
 				foreach(SlotGroup sgp in sgm.AllSGPs){
 					if(sgp.Filter is SGNullFilter || sgp.Filter is SGCGearsFilter){
-						foreach(Slottable sbp in sgp.Slottables){
+						foreach(Slottable sbp in sgp.slottables){
 							if(sbp != null){
 								if(sbp.ItemInst is CarriedGearInstanceMock){
 									if(checkedList.Contains((CarriedGearInstanceMock)sbp.ItemInst)){
@@ -2360,7 +2452,7 @@ public class SlottableTest{
 						ASSG(sgp,
 							null, SGFocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sb in sgp.Slottables){
+						foreach(Slottable sb in sgp.slottables){
 							if(sb != null){
 								ASBReset(sb);
 								if(!sgp.IsAutoSort){
@@ -2381,7 +2473,7 @@ public class SlottableTest{
 						ASSG(sgp,
 							null, SGDefocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sb in sgp.Slottables){
+						foreach(Slottable sb in sgp.slottables){
 							if(sb != null){
 								ASBReset(sb);
 								ASSB_s(sb, SBDefocused, SBWFA);
@@ -2395,7 +2487,7 @@ public class SlottableTest{
 						ASSG(sge,
 							null, SGFocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sbe in sge.Slottables){
+						foreach(Slottable sbe in sge.slottables){
 							if(sbe != null){
 								ASBReset(sbe);
 								ASSB_s(sbe, SBFocused, SBWFA);
@@ -2405,7 +2497,7 @@ public class SlottableTest{
 						ASSG(sge,
 							null, SGFocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sbe in sge.Slottables){
+						foreach(Slottable sbe in sge.slottables){
 							if(sbe != null){
 								ASBReset(sbe);
 								ASSB_s(sbe, SBDefocused, SBWFA);

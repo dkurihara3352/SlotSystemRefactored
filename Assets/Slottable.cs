@@ -321,8 +321,8 @@ namespace SlotSystem{
 			// 	}Slot m_destinationSlot;
 			public int slotID{
 				get{
-					if(SG.Slottables.Contains(this))
-						return SG.Slottables.IndexOf(this);
+					if(SG.slottables.Contains(this))
+						return SG.slottables.IndexOf(this);
 					else
 						return -1;
 				}

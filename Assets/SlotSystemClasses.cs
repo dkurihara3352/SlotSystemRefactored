@@ -1226,7 +1226,7 @@ namespace SlotSystem{
 				public class SGRevertState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						sg.SetNewSBs(sg.Slottables);
+						sg.SetNewSBs(sg.slottables);
 						sg.CreateNewSlots();
 						sg.SetSBsActStates();
 						if(sg.PrevActState != null && sg.PrevActState == SlotGroup.WaitForActionState){
@@ -1243,8 +1243,8 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						Slottable sb1 = sg.SGM.pickedSB;
 						Slottable sb2 = sg.SGM.targetSB;
-						List<Slottable> newSBs = sg.Slottables;
-						sg.ReorderSBs(sb1, sb2, ref newSBs);
+						List<Slottable> newSBs = sg.slottables;
+						Util.ReorderSBs(sb1, sb2, ref newSBs);
 						sg.SetNewSBs(newSBs);
 						sg.CreateNewSlots();
 						sg.SetSBsActStates();
@@ -1261,7 +1261,7 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						List<InventoryItemInstanceMock> cache = sg.SGM.Transaction.moved;
-						List<Slottable> newSBs = sg.Slottables;
+						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						// Util.Trim(ref newSBs);
 						foreach(InventoryItemInstanceMock itemInst in cache){
@@ -1307,7 +1307,7 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						List<InventoryItemInstanceMock> cache = sg.SGM.Transaction.moved;
-						List<Slottable> newSBs = sg.Slottables;
+						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						// Util.Trim(ref newSBs);
 						List<Slottable> removedList = new List<Slottable>();
@@ -1367,7 +1367,7 @@ namespace SlotSystem{
 							else
 								removed = sg.SGM.Transaction.targetSB;
 
-						List<Slottable> newSBs = sg.Slottables;
+						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						if(!sg.IsPool){
 							GameObject newSBGO = new GameObject("newSBGO");
@@ -1410,7 +1410,7 @@ namespace SlotSystem{
 							else
 								removed = null;
 
-						List<Slottable> newSBs = sg.Slottables;
+						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						if(!sg.IsPool){
 							if(added != null){
@@ -1441,7 +1441,7 @@ namespace SlotSystem{
 									newAdded = sb;
 							}
 							Slottable targetSB = sg.SGM.targetSB;
-							sg.ReorderSBs(newAdded, targetSB, ref newSBs);
+							Util.ReorderSBs(newAdded, targetSB, ref newSBs);
 						}
 						if(!sg.IsExpandable){
 							while(newSBs.Count <origCount){
@@ -1463,7 +1463,7 @@ namespace SlotSystem{
 				public class SGSortState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						List<Slottable> newSBs = sg.Slottables;
+						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						sg.Sorter.TrimAndOrderSBs(ref newSBs);
 						if(!sg.IsExpandable){
@@ -3839,6 +3839,31 @@ namespace SlotSystem{
 			public class PartsInstanceMock: InventoryItemInstanceMock{}
 	/*	utility	*/
 		public static class Util{
+			public static void ReorderSBs(Slottable picked, Slottable hovered, ref List<Slottable> reorderedSBs){
+				List<Slottable> result = new List<Slottable>();
+				foreach(Slottable sb in reorderedSBs){
+					result.Add(sb);
+				}
+				int pickedId = result.IndexOf(picked);
+				int hoveredId = result.IndexOf(hovered);
+				Slottable pickedOrig =  result[pickedId];
+				if(pickedId < hoveredId){
+					for (int i = 0; i < result.Count; i++)
+					{
+						if(i >= pickedId && i < hoveredId){
+							result[i] = result[i + 1];
+						}
+					}
+				}else{
+					for(int i = result.Count - 1; i >= 0; i --){
+						if(i > hoveredId && i <= pickedId){
+							result[i] = result[i - 1];
+						}
+					}
+				}
+				result[hoveredId] = pickedOrig;
+				reorderedSBs = result;
+			}
 			public static void Trim(ref List<Slottable> sbs){
 				List<Slottable> trimmed = new List<Slottable>();
 				foreach(Slottable sb in sbs){
@@ -4113,6 +4138,14 @@ namespace SlotSystem{
 						}
 						int index = sameItemInsts.IndexOf(sb.ItemInst);
 						result += "_"+index.ToString();
+						if(sb.ItemInst is BowInstanceMock)
+							result = Forest(result);
+						if(sb.ItemInst is WearInstanceMock)
+							result = Brown(result);
+						if(sb.ItemInst is CarriedGearInstanceMock)
+							result = Yamabuki(result);
+						if(sb.ItemInst is PartsInstanceMock)
+							result = Midnight(result);
 					}
 					return result;
 				}
@@ -4120,10 +4153,6 @@ namespace SlotSystem{
 					string res = "";
 					if(sb != null){
 						res = Util.SBName(sb) + " of " + Util.SGName(sb.SG);
-						if(sb.SG.IsPool)
-							res = Util.Red(res);
-						else
-							res = Util.Blue(res);
 						if(sb.IsEquipped && sb.SG.IsPool)
 							res = Util.Bold(res);
 					}

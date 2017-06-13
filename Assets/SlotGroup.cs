@@ -233,13 +233,7 @@ namespace SlotSystem{
 				public void SetNewSlots(List<Slot> newSlots){
 					m_newSlots = newSlots;
 				}
-			// public List<SlottableItem> FilteredItems{
-				// 	get{return m_filteredItems;}
-				// 	}List<SlottableItem> m_filteredItems;
-				// 	public void SetFilteredItems(List<SlottableItem> filteredItems){
-				// 		m_filteredItems = filteredItems;
-				// 	}
-			public SlotGroupManager SGM{
+						public SlotGroupManager SGM{
 				get{return m_sgm;}
 				set{m_sgm = value;}
 				}SlotGroupManager m_sgm;
@@ -260,7 +254,7 @@ namespace SlotSystem{
 					m_autoSort = on;
 					SGM.Focus();
 				}
-			public List<Slottable> Slottables{
+			public List<Slottable> slottables{
 				get{
 					List<Slottable> result = new List<Slottable>();
 						foreach(Slot slot in this.Slots){
@@ -281,7 +275,7 @@ namespace SlotSystem{
 			public List<InventoryItemInstanceMock> ItemInstances{
 				get{
 					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
-						foreach(Slottable sb in Slottables){
+						foreach(Slottable sb in slottables){
 							if(sb != null)
 								result.Add(sb.ItemInst);
 							else
@@ -326,7 +320,7 @@ namespace SlotSystem{
 			public List<Slottable> EquippedSBs{
 				get{
 					List<Slottable> result = new List<Slottable>();
-					foreach(Slottable sb in Slottables){
+					foreach(Slottable sb in slottables){
 						if(sb != null && sb.IsEquipped)
 							result.Add(sb);
 					}
@@ -441,31 +435,6 @@ namespace SlotSystem{
 					m_sorter = sorter;
 				}
 			// List<Slottable> ReorderedSBs;
-			public void ReorderSBs(Slottable picked, Slottable hovered, ref List<Slottable> reorderedSBs){
-				List<Slottable> result = new List<Slottable>();
-				foreach(Slottable sb in reorderedSBs){
-					result.Add(sb);
-				}
-				int pickedId = result.IndexOf(picked);
-				int hoveredId = result.IndexOf(hovered);
-				Slottable pickedOrig =  result[pickedId];
-				if(pickedId < hoveredId){
-					for (int i = 0; i < result.Count; i++)
-					{
-						if(i >= pickedId && i < hoveredId){
-							result[i] = result[i + 1];
-						}
-					}
-				}else{
-					for(int i = result.Count - 1; i >= 0; i --){
-						if(i > hoveredId && i <= pickedId){
-							result[i] = result[i - 1];
-						}
-					}
-				}
-				result[hoveredId] = pickedOrig;
-				reorderedSBs = result;
-			}
 			// public List<Slottable> OrderedSbs(){
 				// 	List<Slottable> result = new List<Slottable>();
 				// 	if(SGM.Transaction != null && SGM.Transaction.GetType()== typeof(ReorderTransaction)){
@@ -474,17 +443,7 @@ namespace SlotSystem{
 				// 	return Sorter.OrderedSBs(this);
 				// }
 			public void InstantSort(){
-				// List<Slottable> newSlotOrderedSbs = OrderedSbs();
-					// List<Slottable> sbs = new List<Slottable>();
-					// foreach(Slot slot in Slots){
-					// 	if(slot.Sb != null)
-					// 		sbs.Add(slot.Sb);
-					// 	slot.Sb = null;
-					// }
-					// for(int i = 0; i < newSlotOrderedSbs.Count; i++){
-					// 	Slots[i].Sb = newSlotOrderedSbs[i];
-					// }
-				List<Slottable> origSBs = Slottables;
+				List<Slottable> origSBs = slottables;
 				Sorter.OrderSBsWithRetainedSize(ref origSBs);
 				foreach(Slot slot in Slots){
 					slot.sb = origSBs[Slots.IndexOf(slot)];
@@ -625,14 +584,14 @@ namespace SlotSystem{
 			}
 			public void Deactivate(){
 				SetSelState(SlotGroup.DeactivatedState);
-				foreach(Slottable sb in Slottables){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						sb.SetSelState(Slottable.DeactivatedState);
 					}
 				}
 			}
 			public Slottable GetSB(InventoryItemInstanceMock itemInst){
-				foreach(Slottable sb in this.Slottables){
+				foreach(Slottable sb in this.slottables){
 					if(sb != null){
 						if(sb.ItemInst == itemInst)
 							return sb;
@@ -650,7 +609,7 @@ namespace SlotSystem{
 			}
 			public bool HasItemCurrently(InventoryItemInstanceMock invInst){
 				bool result = false;
-				foreach(Slottable sb in this.Slottables){
+				foreach(Slottable sb in this.slottables){
 					if(sb != null){
 						if(sb.ItemInst == invInst)
 							return true;
@@ -659,7 +618,7 @@ namespace SlotSystem{
 				return result;
 			}
 			public void FocusSBs(){
-				foreach(Slottable sb in Slottables){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						sb.SetActState(Slottable.WaitForActionState);
 						sb.Reset();
@@ -671,7 +630,7 @@ namespace SlotSystem{
 				}
 			}
 			public void DefocusSBs(){
-				foreach(Slottable sb in Slottables){
+				foreach(Slottable sb in slottables){
 					if(sb != null)
 						sb.SetActState(Slottable.WaitForActionState);
 						sb.Reset();
@@ -850,19 +809,19 @@ namespace SlotSystem{
 				// 		throw new System.InvalidOperationException("SetAndRunSlotMovementsForSwap: removed nor added sb not assigned properly");
 				// 	}
 				// }
-			public int FindNextEmpty(ref List<Slottable> sbList){
-				foreach(Slottable sb in sbList){
-					if(sb == null)
-						return sbList.IndexOf(sb);
-				}
-				sbList.Add(null);
-				return sbList.Count -1;
-			}
+			// public int FindNextEmpty(ref List<Slottable> sbList){
+			// 	foreach(Slottable sb in sbList){
+			// 		if(sb == null)
+			// 			return sbList.IndexOf(sb);
+			// 	}
+			// 	sbList.Add(null);
+			// 	return sbList.Count -1;
+			// }
 			public void SetSBsActStates(){
 				List<Slottable> moveWithins = new List<Slottable>();
 				List<Slottable> removed = new List<Slottable>();
 				List<Slottable> added = new List<Slottable>();
-				foreach(Slottable sb in Slottables){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(newSBs.Contains(sb))
 							moveWithins.Add(sb);
@@ -872,7 +831,7 @@ namespace SlotSystem{
 				}
 				foreach(Slottable sb in newSBs){
 					if(sb != null){
-						if(!Slottables.Contains(sb))
+						if(!slottables.Contains(sb))
 							added.Add(sb);
 					}
 				}
@@ -889,7 +848,7 @@ namespace SlotSystem{
 					sb.SetActState(Slottable.AddedState);
 				}
 				List<Slottable> allSBs = new List<Slottable>();
-				allSBs.AddRange(Slottables);
+				allSBs.AddRange(slottables);
 				allSBs.AddRange(added);
 				SetAllTASBs(allSBs);
 			}
@@ -1007,7 +966,7 @@ namespace SlotSystem{
 				// }
 			public List<Slottable> SwappableSBs(Slottable pickedSB){
 				List<Slottable> result = new List<Slottable>();
-				foreach(Slottable sb in Slottables){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(Util.IsSwappable(pickedSB, sb))
 							result.Add(sb);
