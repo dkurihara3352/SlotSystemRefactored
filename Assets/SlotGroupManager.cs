@@ -30,11 +30,11 @@ namespace SlotSystem{
 						}
 					}
 				}
-			public void CompleteTransactionOnSB(Slottable sb){
-				if(pickedSB != null && sb == pickedSB) m_pickedSBDone = true;
-				else if(targetSB != null && sb == targetSB) m_targetSBDone = true;
-				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
-			}
+			// public void CompleteTransactionOnSB(Slottable sb){
+				// 	if(pickedSB != null && sb == pickedSB) m_pickedSBDone = true;
+				// 	else if(targetSB != null && sb == targetSB) m_targetSBDone = true;
+				// 	IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
+				// }
 			public void AcceptSGTAComp(SlotGroup sg){
 				if(sg2 != null && sg == sg2) m_sg2Done = true;
 				else if(sg1 != null && sg == sg1) m_sg1Done = true;
@@ -159,8 +159,8 @@ namespace SlotSystem{
 				}
 				public IEnumeratorMock WaitForTransactionDone(){
 					bool done = true;
-					done &= m_pickedSBDone;
-					done &= m_targetSBDone;
+					done &= m_dIcon1Done;
+					done &= m_dIcon2Done;
 					done &= m_sg1Done;
 					done &= m_sg2Done;
 					if(done){
@@ -259,9 +259,6 @@ namespace SlotSystem{
 				public void SetPickedSB(Slottable sb){
 					this.m_pickedSB = sb;
 				}
-				public bool pickedSBDone{
-				get{return m_pickedSBDone;}
-				}bool m_pickedSBDone = true;
 			public Slottable targetSB{
 				get{return m_targetSB;}
 				}Slottable m_targetSB;
@@ -274,9 +271,6 @@ namespace SlotSystem{
 					if(targetSB != null)
 						targetSB.SetSelState(Slottable.SelectedState);
 				}
-				public bool targetSBdone{
-					get{return m_targetSBDone;}
-					}bool m_targetSBDone = true;
 			public SlotGroup sg1{
 				get{return m_sg1;}
 				}SlotGroup m_sg1;
@@ -438,14 +432,14 @@ namespace SlotSystem{
 			}
 			public PoolInventory PoolInv{
 				get{
-					return (PoolInventory)FocusedSGP.Inventory;
+					return (PoolInventory)FocusedSGP.inventory;
 				}
 			}
 			public BowInstanceMock EquippedBowInst{
 				get{
 					foreach(SlotGroup sge in FocusedSGEs){
 						if(sge.Filter is SGBowFilter)
-							return (BowInstanceMock)sge.Slots[0].Sb.ItemInst;
+							return (BowInstanceMock)sge.Slots[0].sb.ItemInst;
 					}
 					return null;
 				}
@@ -454,7 +448,7 @@ namespace SlotSystem{
 				get{
 					foreach(SlotGroup sge in FocusedSGEs){
 						if(sge.Filter is SGWearFilter)
-							return (WearInstanceMock)sge.Slots[0].Sb.ItemInst;
+							return (WearInstanceMock)sge.Slots[0].sb.ItemInst;
 					}
 					return null;
 				}
@@ -488,31 +482,31 @@ namespace SlotSystem{
 				// }
 				/*	methods	*/
 		/*	methods	*/
-			public void Initialize(){
+			public void Initialize(InventoryManagerPage invManPage){
+				SetRootPage(invManPage);
 				SelStateEngine.SetState(SlotGroupManager.DeactivatedState);
 				ActStateEngine.SetState(SlotGroupManager.WaitForActionState);
-				m_rootPage.Activate();
 				UpdateEquipStatesOnAll();
+				//set all sgs and fields and initialize all sgs here
 			}
 			public void Focus(){
 				SetCurSGM();
 				SetSelState(SlotGroupManager.FocusedState);
-				SetActState(SlotGroupManager.WaitForActionState);
-				if(CurSelState == SlotGroupManager.FocusedState)
-					RootPage.Focus();
+				RootPage.Focus();
 			}
 			public void Defocus(){
 				SetSelState(SlotGroupManager.DefocusedState);
-				if(CurSelState == SlotGroupManager.DefocusedState)
-					RootPage.Defocus();
+				RootPage.Defocus();
 			}
 			public SlotGroup GetSG(Slottable sb){
 				return this.RootPage.GetSlotGroup(sb);	
 			}
-			public void ClearAndReset(){
-				this.SetTransaction(null);
-				// this.SetState(SlotGroupManager.FocusedState);
-				this.ClearFields();
+			public void Reset(){
+				SetActState(SlotGroupManager.WaitForActionState);
+				ClearFields();
+			}
+			public void ResetAndFocus(){
+				Reset();
 				Focus();
 			}
 			public void ClearFields(){
@@ -524,6 +518,7 @@ namespace SlotSystem{
 				SetHoveredSG(null);
 				SetDIcon1(null);
 				SetDIcon2(null);
+				SetTransaction(null);
 			}
 			public void Deactivate(){
 				SetSelState(SlotGroupManager.DeactivatedState);
@@ -537,7 +532,6 @@ namespace SlotSystem{
 				RootPage.EquipBundle.SetFocusedBundleElement(eSet);
 				Focus();
 			}
-			public void DestroyDraggedIcon(){}
 			public void UpdateEquipStatesOnAll(){
 				/*	
 					ItemInst of spe is marked the equipped one
@@ -560,7 +554,7 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public void SortSG (SlotGroup sg, SGSorter sorter){
+			public void SortSG(SlotGroup sg, SGSorter sorter){
 				// sg.SetSorter(sorter);
 				SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
 				SetTargetSB(sortTransaction.targetSB);

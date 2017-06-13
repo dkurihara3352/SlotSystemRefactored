@@ -203,7 +203,7 @@ namespace SlotSystem{
 				get{return m_scroller;}
 				set{m_scroller = value;}
 				}AxisScrollerMock m_scroller;
-			public Inventory Inventory{
+			public Inventory inventory{
 				get{return m_inventory;}
 				}
 				Inventory m_inventory;
@@ -219,7 +219,10 @@ namespace SlotSystem{
 				set{m_isExpandable = value;}
 				}bool m_isExpandable;
 			public List<Slot> Slots{
-				get{return m_slots;}
+				get{
+					if(m_slots == null)
+						m_slots = new List<Slot>();
+					return m_slots;}
 				}List<Slot> m_slots;
 				public void SetSlots(List<Slot> slots){
 					m_slots = slots;
@@ -230,12 +233,12 @@ namespace SlotSystem{
 				public void SetNewSlots(List<Slot> newSlots){
 					m_newSlots = newSlots;
 				}
-			public List<SlottableItem> FilteredItems{
-				get{return m_filteredItems;}
-				}List<SlottableItem> m_filteredItems;
-				public void SetFilteredItems(List<SlottableItem> filteredItems){
-					m_filteredItems = filteredItems;
-				}
+			// public List<SlottableItem> FilteredItems{
+				// 	get{return m_filteredItems;}
+				// 	}List<SlottableItem> m_filteredItems;
+				// 	public void SetFilteredItems(List<SlottableItem> filteredItems){
+				// 		m_filteredItems = filteredItems;
+				// 	}
 			public SlotGroupManager SGM{
 				get{return m_sgm;}
 				set{m_sgm = value;}
@@ -261,8 +264,8 @@ namespace SlotSystem{
 				get{
 					List<Slottable> result = new List<Slottable>();
 						foreach(Slot slot in this.Slots){
-							if(slot.Sb != null)
-								result.Add(slot.Sb);
+							if(slot.sb != null)
+								result.Add(slot.sb);
 							else
 								result.Add(null);
 						}
@@ -304,7 +307,7 @@ namespace SlotSystem{
 				get{
 					bool emptyFound = false;
 					foreach(Slot slot in Slots){
-						if(slot.Sb == null)
+						if(slot.sb == null)
 							emptyFound = true;
 					}
 					return emptyFound;
@@ -314,7 +317,7 @@ namespace SlotSystem{
 				get{
 					int count = 0;
 					foreach(Slot slot in Slots){
-						if(slot.Sb != null)
+						if(slot.sb != null)
 							count ++;
 					}
 					return count;
@@ -336,6 +339,20 @@ namespace SlotSystem{
 				public void SetAllTASBs(List<Slottable> sbs){
 					m_allTASBs = sbs;
 				}
+			public bool IsAllTASBsDone{
+				get{
+					foreach(Slottable sb in allTASBs){
+						if(sb != null){
+							if(sb.ActionProcess.IsRunning)
+								return false;
+						}
+					}
+					return true;
+				}
+			}
+			public int initSlotsCount{
+				get{return m_initSlotsCount;}
+				}int m_initSlotsCount;
 			// public bool IsSMDone{
 				// 	get{
 				// 		bool done = true;
@@ -354,19 +371,19 @@ namespace SlotSystem{
 			public void InitializeItems(){
 				m_initItemsCommand.Execute(this);
 				}SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
-			public SlotGroupCommand CreateSlotsCommand{
-				get{return m_createSlotsCommand;}
-				set{m_createSlotsCommand = value;}
-				}SlotGroupCommand m_createSlotsCommand = new ConcCreateSlotsCommand();
-				public void CreateSlots(){
-					m_createSlotsCommand.Execute(this);
-				}
-			public SlotGroupCommand CreateSbsCommand{
-				get{return m_createSbsCommand;}
-				}SlotGroupCommand m_createSbsCommand = new ConcCreateSbsCommand();
-				public void CreateSlottables(){
-					m_createSbsCommand.Execute(this);
-				}
+			// public SlotGroupCommand CreateSlotsCommand{
+				// 	get{return m_createSlotsCommand;}
+				// 	set{m_createSlotsCommand = value;}
+				// 	}SlotGroupCommand m_createSlotsCommand = new ConcCreateSlotsCommand();
+				// 	public void CreateSlots(){
+				// 		m_createSlotsCommand.Execute(this);
+				// 	}
+				// public SlotGroupCommand CreateSbsCommand{
+				// 	get{return m_createSbsCommand;}
+				// 	}SlotGroupCommand m_createSbsCommand = new ConcCreateSbsCommand();
+				// 	public void CreateSlottables(){
+				// 		m_createSbsCommand.Execute(this);
+				// 	}
 			/*	dump	*/
 				// SlotGroupCommand m_focusCommand = new SGFocusCommandV2();
 				// 	public SlotGroupCommand FocusCommand{
@@ -470,7 +487,7 @@ namespace SlotSystem{
 				List<Slottable> origSBs = Slottables;
 				Sorter.OrderSBsWithRetainedSize(ref origSBs);
 				foreach(Slot slot in Slots){
-					slot.Sb = origSBs[Slots.IndexOf(slot)];
+					slot.sb = origSBs[Slots.IndexOf(slot)];
 				}
 			}
 		/*	filter	*/
@@ -512,9 +529,12 @@ namespace SlotSystem{
 			public SGFilter Filter{
 				get{return m_filter;}
 				}SGFilter m_filter;
-				public void FilterItems(){
-					m_filter.Execute(this);
+				public void SetFilter(SGFilter filter){
+					m_filter = filter;
 				}
+				// public void FilterItems(){
+				// 	m_filter.Execute(this);
+				// }
 			public bool AcceptsFilter(Slottable pickedSB){
 				if(this.Filter is SGNullFilter) return true;
 				else{
@@ -586,29 +606,22 @@ namespace SlotSystem{
 				SetSelState(SlotGroup.DefocusedState);
 			}
 		/*	methods	*/
-			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int slotCountCumExpandable){
-				m_filter = filter;
+			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount){
+				SetFilter(filter);
 				SetSorter(SlotGroup.ItemIDSorter);
 				SetInventory(inv);
 				this.IsShrinkable = isShrinkable;
-				if(slotCountCumExpandable == 0)
+				if(initSlotsCount == 0)
 					this.IsExpandable = true;
-				else{
+				else
 					this.IsExpandable = false;
-					for(int i = 0; i < slotCountCumExpandable; i++){
-						Slot newSlot = new Slot();
-						newSlot.Position = Vector2.zero;
-						this.Slots.Add(newSlot);
-					}
-				}
-				InitializeState();
+				m_initSlotsCount = initSlotsCount;
+				InitializeItems();			
+				SetSelState(SlotGroup.DeactivatedState);
+				SetActState(SlotGroup.WaitForActionState);
 			}
-				public void InitializeState(){
-					SGSelStateEngine.SetState(SlotGroup.DeactivatedState);
-					SGActStateEngine.SetState(SlotGroup.WaitForActionState);
-				}
 			public void Activate(){
-				InitializeItems();
+				// InitializeItems();
 			}
 			public void Deactivate(){
 				SetSelState(SlotGroup.DeactivatedState);
@@ -667,8 +680,8 @@ namespace SlotSystem{
 			}
 			public Slot GetSlot(InventoryItemInstanceMock itemInst){
 				foreach(Slot slot in this.Slots){
-					if(slot.Sb != null){
-						if(slot.Sb.ItemInst == itemInst)
+					if(slot.sb != null){
+						if(slot.sb.ItemInst == itemInst)
 							return slot;
 					}
 				}
@@ -916,7 +929,7 @@ namespace SlotSystem{
 				// }
 				foreach(Slottable sb in newSBs){
 					if(sb != null){
-						newSlots[sb.newSlotID].Sb = sb;
+						newSlots[sb.newSlotID].sb = sb;
 					}
 				}
 				SetSlots(newSlots);

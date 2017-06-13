@@ -143,12 +143,15 @@ namespace SlotSystem{
 				public virtual SlotGroup sg1{get{return null;}}
 				public virtual SlotGroup sg2{get{return null;}}
 				public virtual List<InventoryItemInstanceMock> moved{get{return null;}}
-				public abstract void Indicate();
+				public virtual void Indicate(){}
 				public virtual void Execute(){
 					sgm.SetActState(SlotGroupManager.PerformingTransactionState);
 				}
-				public abstract void OnComplete();
+				public virtual void OnComplete(){
+					sgm.ResetAndFocus();
+				}
 			}
+			public class EmptyTransaction: AbsSlotSystemTransaction{}
 			public class RevertTransaction: AbsSlotSystemTransaction{
 				Slottable m_pickedSB;
 				SlotGroup m_origSG;
@@ -173,7 +176,7 @@ namespace SlotSystem{
 				public override void OnComplete(){
 					m_origSG.OnCompleteSlotMovementsV2();
 					// sgm.DestroyDraggedIcon();
-					sgm.ClearAndReset();
+					base.OnComplete();
 				}
 			}
 			public class ReorderTransaction: AbsSlotSystemTransaction{
@@ -205,7 +208,7 @@ namespace SlotSystem{
 				public override void OnComplete(){
 					sg1.OnCompleteSlotMovementsV2();
 					// sgm.DestroyDraggedIcon();
-					sgm.ClearAndReset();
+					base.OnComplete();
 				}
 			}
 			public class ReorderInOtherSGTransaction: AbsSlotSystemTransaction{
@@ -242,7 +245,7 @@ namespace SlotSystem{
 					sg1.OnCompleteSlotMovementsV2();
 					sg2.OnCompleteSlotMovementsV2();
 					// sgm.DestroyDraggedIcon();
-					sgm.ClearAndReset();
+					base.OnComplete();
 				}
 			}
 			public class StackTransaction: AbsSlotSystemTransaction{
@@ -276,7 +279,7 @@ namespace SlotSystem{
 				public override void OnComplete(){
 					sg1.OnCompleteSlotMovementsV2();
 					sg2.OnCompleteSlotMovementsV2();
-					sgm.ClearAndReset();
+					base.OnComplete();
 				}
 			}
 			public class SwapTransaction: AbsSlotSystemTransaction{
@@ -343,7 +346,7 @@ namespace SlotSystem{
 					sg1.OnCompleteSlotMovementsV2();
 					sg2.OnCompleteSlotMovementsV2();
 					sgm.UpdateEquipStatesOnAll();
-					sgm.ClearAndReset();
+					base.OnComplete();
 				}
 			}
 			public class FillTransaction: AbsSlotSystemTransaction{
@@ -406,7 +409,7 @@ namespace SlotSystem{
 					sg1.OnCompleteSlotMovementsV2();
 					sg2.OnCompleteSlotMovementsV2();
 					sgm.UpdateEquipStatesOnAll();
-					sgm.ClearAndReset();
+					base.OnComplete();
 				}
 			}
 			public class SortTransaction: AbsSlotSystemTransaction{
@@ -426,7 +429,8 @@ namespace SlotSystem{
 				}
 				public override void OnComplete(){
 					sg1.OnCompleteSlotMovementsV2();
-					sgm.ClearAndReset();
+					sgm.ResetAndFocus();
+					base.OnComplete();
 				}
 			}
 			public class InsertTransaction: AbsSlotSystemTransaction{
@@ -454,7 +458,8 @@ namespace SlotSystem{
 				public override void OnComplete(){
 					sg1.OnCompleteSlotMovementsV2();
 					sg2.OnCompleteSlotMovementsV2();
-					sgm.ClearAndReset();
+					sgm.UpdateEquipStatesOnAll();
+					base.OnComplete();
 				}
 			}
 			/*	dump	*/
@@ -1275,6 +1280,7 @@ namespace SlotSystem{
 								GameObject newSBSG = new GameObject("newSBSG");
 								Slottable newSB = newSBSG.AddComponent<Slottable>();
 								newSB.Initialize(sg.SGM, sg, true, itemInst);
+								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
 							}
 						}
@@ -1367,6 +1373,7 @@ namespace SlotSystem{
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
 							newSB.Initialize(sg.SGM, sg, true, added.ItemInst);
+							newSB.Defocus();
 							newSBs[newSBs.IndexOf(removed)] = newSB;
 						}
 						if(sg.IsAutoSort){
@@ -1410,6 +1417,7 @@ namespace SlotSystem{
 								GameObject newSBGO = new GameObject("newSBGO");
 								Slottable newSB = newSBGO.AddComponent<Slottable>();
 								newSB.Initialize(sg.SGM, sg, true, added.ItemInst);
+								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
 							}
 							if(removed != null){
@@ -1714,40 +1722,54 @@ namespace SlotSystem{
 			}
 			public class SGInitItemsCommand: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
-					sg.FilterItems();//setup Items list
-					sg.CreateSlots();
-					sg.CreateSlottables();
+					List<SlottableItem> items = sg.inventory.Items;
+					sg.Filter.Filter(ref items);
+					/*	Slots	*/
+						List<Slot> newSlots = new List<Slot>();
+						int slotCountToCreate = sg.initSlotsCount == 0? items.Count: sg.initSlotsCount;
+						for(int i = 0; i <slotCountToCreate; i++){
+							Slot newSlot = new Slot();
+							newSlots.Add(newSlot);
+						}
+						sg.SetSlots(newSlots);
+					/*	SBs	*/
+						foreach(SlottableItem item in items){
+							GameObject newSBGO = new GameObject("newSBGO");
+							Slottable newSB = newSBGO.AddComponent<Slottable>();
+							newSB.Initialize(sg.SGM, sg, true, (InventoryItemInstanceMock)item);
+							sg.Slots[items.IndexOf(item)].sb = newSB;
+						}
 					if(sg.IsAutoSort)
 						sg.InstantSort();
 				}
 			}
-			public class ConcCreateSlotsCommand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					List<Slot> newList = new List<Slot>();
-					if(sg.IsExpandable){
-						foreach(SlottableItem item in sg.FilteredItems){
-							Slot slot = new Slot();
-							slot.Position = Vector2.zero;
-							newList.Add(slot);
-						}
-						sg.SetSlots(newList);
-					}else{
-						if(sg.Slots == null)
-							sg.SetSlots(new List<Slot>());
-					}
-				}
-			}
-			public class ConcCreateSbsCommand: SlotGroupCommand{
-				public void Execute(SlotGroup sg){
-					for(int i = 0; i < sg.FilteredItems.Count; i++){
-						GameObject go = new GameObject("SlottablePrefab");
-						Slottable sb = go.AddComponent<Slottable>();
-						InventoryItemInstanceMock item = (InventoryItemInstanceMock)sg.FilteredItems[i];
-						sb.Initialize(sg.SGM, sg, true, item);
-						sg.Slots[i].Sb = sb;
-					}
-				}
-			}
+			// public class ConcCreateSlotsCommand: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		List<Slot> newList = new List<Slot>();
+				// 		if(sg.IsExpandable){
+				// 			foreach(SlottableItem item in sg.FilteredItems){
+				// 				Slot slot = new Slot();
+				// 				slot.Position = Vector2.zero;
+				// 				newList.Add(slot);
+				// 			}
+				// 			sg.SetSlots(newList);
+				// 		}else{
+				// 			if(sg.Slots == null)
+				// 				sg.SetSlots(new List<Slot>());
+				// 		}
+				// 	}
+				// }
+			// public class ConcCreateSbsCommand: SlotGroupCommand{
+				// 	public void Execute(SlotGroup sg){
+				// 		for(int i = 0; i < sg.FilteredItems.Count; i++){
+				// 			GameObject go = new GameObject("SlottablePrefab");
+				// 			Slottable sb = go.AddComponent<Slottable>();
+				// 			InventoryItemInstanceMock item = (InventoryItemInstanceMock)sg.FilteredItems[i];
+				// 			sb.Initialize(sg.SGM, sg, true, item);
+				// 			sg.Slots[i].sb = sb;
+				// 		}
+				// 	}
+				// }
 			/*	dump	*/
 				// public class SGFocusCommandV2: SlotGroupCommand{
 				// 	public void Execute(SlotGroup sg){
@@ -1917,93 +1939,126 @@ namespace SlotSystem{
 				// }
 		/*	filters	*/
 			public interface SGFilter{
-				void Execute(SlotGroup sg);
-				List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList);
+				// void Execute(SlotGroup sg);
+					// List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList);
+				void Filter(ref List<SlottableItem> items);
 			}
 			public class SGNullFilter: SGFilter{
-				public void Execute(SlotGroup sg){
-
-					List<SlottableItem> filteredItems = new List<SlottableItem>();
-					foreach(SlottableItem item in sg.Inventory.Items){
-						filteredItems.Add(item);
-					}
-					sg.SetFilteredItems(filteredItems);
-				}
-				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
-					return prefilteredList;
-				}
+				public void Filter(ref List<SlottableItem> items){}
+				// public void Execute(SlotGroup sg){
+					// 	List<SlottableItem> filteredItems = new List<SlottableItem>();
+					// 	foreach(SlottableItem item in sg.Inventory.Items){
+					// 		filteredItems.Add(item);
+					// 	}
+					// 	sg.SetFilteredItems(filteredItems);
+					// }
+					// public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					// 	return prefilteredList;
+					// }
 			}
 			public class SGBowFilter: SGFilter{
-				public void Execute(SlotGroup sg){
-					List<SlottableItem> filteredItems = new List<SlottableItem>();
-					foreach(SlottableItem item in sg.Inventory.Items){
+				public void Filter(ref List<SlottableItem> items){
+					List<SlottableItem> res = new List<SlottableItem>();
+					foreach(SlottableItem item in items){
 						if(item is BowInstanceMock)
-							filteredItems.Add(item);
+							res.Add(item);
 					}
-					sg.SetFilteredItems(filteredItems);
+					items = res;
 				}
-				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
-					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
-					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
-						if(itemInst is BowInstanceMock)
-							result.Add(itemInst);
-					}
-					return result;
-				}
+				// public void Execute(SlotGroup sg){
+					// 	List<SlottableItem> filteredItems = new List<SlottableItem>();
+					// 	foreach(SlottableItem item in sg.Inventory.Items){
+					// 		if(item is BowInstanceMock)
+					// 			filteredItems.Add(item);
+					// 	}
+					// 	sg.SetFilteredItems(filteredItems);
+					// }
+					// public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					// 	List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					// 	foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+					// 		if(itemInst is BowInstanceMock)
+					// 			result.Add(itemInst);
+					// 	}
+					// 	return result;
+					// }
 			}
 			public class SGWearFilter: SGFilter{
-				public void Execute(SlotGroup sg){
-					List<SlottableItem> filteredItems = new List<SlottableItem>();
-					foreach(SlottableItem item in sg.Inventory.Items){
+				public void Filter(ref List<SlottableItem> items){
+					List<SlottableItem> res = new List<SlottableItem>();
+					foreach(SlottableItem item in items){
 						if(item is WearInstanceMock)
-							filteredItems.Add(item);
+							res.Add(item);
 					}
-					sg.SetFilteredItems(filteredItems);
+					items = res;
 				}
-				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
-					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
-					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
-						if(itemInst is WearInstanceMock)
-							result.Add(itemInst);
-					}
-					return result;
-				}
+				// public void Execute(SlotGroup sg){
+					// 	List<SlottableItem> filteredItems = new List<SlottableItem>();
+					// 	foreach(SlottableItem item in sg.Inventory.Items){
+					// 		if(item is WearInstanceMock)
+					// 			filteredItems.Add(item);
+					// 	}
+					// 	sg.SetFilteredItems(filteredItems);
+					// }
+					// public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					// 	List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					// 	foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+					// 		if(itemInst is WearInstanceMock)
+					// 			result.Add(itemInst);
+					// 	}
+					// 	return result;
+					// }
 			}
 			public class SGCGearsFilter: SGFilter{
-				public void Execute(SlotGroup sg){
-					List<SlottableItem> filteredItems = new List<SlottableItem>();
-					foreach(SlottableItem item in sg.Inventory.Items){
+				public void Filter(ref List<SlottableItem> items){
+					List<SlottableItem> res = new List<SlottableItem>();
+					foreach(SlottableItem item in items){
 						if(item is CarriedGearInstanceMock)
-							filteredItems.Add(item);
+							res.Add(item);
 					}
-					sg.SetFilteredItems(filteredItems);
+					items = res;
 				}
-				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
-					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
-					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
-						if(itemInst is CarriedGearInstanceMock)
-							result.Add(itemInst);
-					}
-					return result;
-				}
+				// public void Execute(SlotGroup sg){
+					// 	List<SlottableItem> filteredItems = new List<SlottableItem>();
+					// 	foreach(SlottableItem item in sg.Inventory.Items){
+					// 		if(item is CarriedGearInstanceMock)
+					// 			filteredItems.Add(item);
+					// 	}
+					// 	sg.SetFilteredItems(filteredItems);
+					// }
+					// public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					// 	List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					// 	foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+					// 		if(itemInst is CarriedGearInstanceMock)
+					// 			result.Add(itemInst);
+					// 	}
+					// 	return result;
+					// }
 			}
 			public class SGPartsFilter: SGFilter{
-				public void Execute(SlotGroup sg){
-					List<SlottableItem> filteredItems = new List<SlottableItem>();
-					foreach(SlottableItem item in sg.Inventory.Items){
+				public void Filter(ref List<SlottableItem> items){
+					List<SlottableItem> res = new List<SlottableItem>();
+					foreach(SlottableItem item in items){
 						if(item is PartsInstanceMock)
-							filteredItems.Add(item);
+							res.Add(item);
 					}
-					sg.SetFilteredItems(filteredItems);
+					items = res;
 				}
-				public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
-					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
-					foreach(InventoryItemInstanceMock itemInst in prefilteredList){
-						if(itemInst is PartsInstanceMock)
-							result.Add(itemInst);
-					}
-					return result;
-				}
+				// public void Execute(SlotGroup sg){
+					// 	List<SlottableItem> filteredItems = new List<SlottableItem>();
+					// 	foreach(SlottableItem item in sg.Inventory.Items){
+					// 		if(item is PartsInstanceMock)
+					// 			filteredItems.Add(item);
+					// 	}
+					// 	sg.SetFilteredItems(filteredItems);
+					// }
+					// public List<InventoryItemInstanceMock> filteredItemInstances(List<InventoryItemInstanceMock> prefilteredList){
+					// 	List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
+					// 	foreach(InventoryItemInstanceMock itemInst in prefilteredList){
+					// 		if(itemInst is PartsInstanceMock)
+					// 			result.Add(itemInst);
+					// 	}
+					// 	return result;
+					// }
 			}
 			
 		/*	sorters	*/
@@ -2786,6 +2841,10 @@ namespace SlotSystem{
 				public class SBUnequippedState: SBEquipState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
+						if(sb.PrevEqpState == null || sb.PrevEqpState == Slottable.UnequippedState){
+							/*	when initialized	*/
+							return;
+						}
 						if(sb.SG.IsPool){
 							if(sb.PrevEqpState != null && sb.PrevEqpState == Slottable.EquippedState){
 								SBProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
@@ -3171,7 +3230,7 @@ namespace SlotSystem{
 	/*	Other Classes	*/
 		public class Slot{
 			Slottable m_sb;
-			public Slottable Sb{
+			public Slottable sb{
 				get{return m_sb;}
 				set{m_sb = value;}
 			}
@@ -3237,8 +3296,8 @@ namespace SlotSystem{
 					if(ele is SlotGroup){
 						SlotGroup sg = (SlotGroup)ele;
 						foreach(Slot slot in sg.Slots){
-							if(slot.Sb != null)
-								if(slot.Sb == sb)
+							if(slot.sb != null)
+								if(slot.sb == sb)
 									return sg;
 						}
 						// return null;
@@ -3327,6 +3386,43 @@ namespace SlotSystem{
 				}
 			}	
 		}
+		public class DraggedIcon{
+			public InventoryItemInstanceMock item{
+				get{return m_item;}
+				}InventoryItemInstanceMock m_item;
+			public IconDestination dest{
+				get{return m_dest;}
+				}IconDestination m_dest;
+				public void SetDestination(SlotGroup sg, Slot slot){
+					IconDestination newDest = new IconDestination(sg, slot);
+					m_dest = newDest;
+				}
+			SlotGroupManager m_sgm;
+			public DraggedIcon(Slottable sb){
+				m_item = sb.ItemInst;
+				m_sgm = SlotGroupManager.CurSGM;
+			}
+			public void CompleteMovement(){
+				m_sgm.AcceptDITAComp(this);
+			}
+		}
+		public class IconDestination{
+			public SlotGroup sg{
+				get{return m_sg;}
+				}SlotGroup m_sg;
+				public void SetSG(SlotGroup sg){
+					m_sg = sg;
+				}
+			public Slot slot{
+				get{return m_slot;}
+				}Slot m_slot;
+				public void SetSlot(Slot slot){
+					m_slot = slot;
+				}
+			public IconDestination(SlotGroup sg, Slot slot){
+				SetSG(sg); SetSlot(slot);
+			}
+		}
 		// public class SlotMovement{
 			// 		Slottable m_sb;
 			// 		public Slottable SB{
@@ -3367,44 +3463,7 @@ namespace SlotSystem{
 
 			// 		}
 			// 	}
-		/*	Dragged Icon	*/
-			public class DraggedIcon{
-				public InventoryItemInstanceMock item{
-					get{return m_item;}
-					}InventoryItemInstanceMock m_item;
-				public IconDestination dest{
-					get{return m_dest;}
-					}IconDestination m_dest;
-					public void SetDestination(SlotGroup sg, Slot slot){
-						IconDestination newDest = new IconDestination(sg, slot);
-						m_dest = newDest;
-					}
-				SlotGroupManager m_sgm;
-				public DraggedIcon(Slottable sb){
-					m_item = sb.ItemInst;
-					m_sgm = SlotGroupManager.CurSGM;
-				}
-				public void CompleteMovement(){
-					m_sgm.AcceptDITAComp(this);
-				}
-			}
-			public class IconDestination{
-				public SlotGroup sg{
-					get{return m_sg;}
-					}SlotGroup m_sg;
-					public void SetSG(SlotGroup sg){
-						m_sg = sg;
-					}
-				public Slot slot{
-					get{return m_slot;}
-					}Slot m_slot;
-					public void SetSlot(Slot slot){
-						m_slot = slot;
-					}
-				public IconDestination(SlotGroup sg, Slot slot){
-					SetSG(sg); SetSlot(slot);
-				}
-			}
+
 		/*	TransactionResult	*/
 			public class TransactionResult{
 				SlotSystemTransaction ta;
@@ -3601,7 +3660,7 @@ namespace SlotSystem{
 					foreach(SlottableItem it in m_items){
 						InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)it;
 						InventoryItemInstanceMock addedInst = (InventoryItemInstanceMock)item;
-						if(invInst == addedInst){
+						if(invInst == addedInst && invInst.IsStackable){
 							invInst.Quantity += addedInst.Quantity;
 							return;
 						}
@@ -3635,11 +3694,17 @@ namespace SlotSystem{
 				}
 			}
 			public class EquipmentSetInventory: Inventory{
+				public EquipmentSetInventory(BowInstanceMock initBow, WearInstanceMock initWear, List<CarriedGearInstanceMock> initCGears ,int initCGCount){
+					m_equippedBow = initBow;
+					m_equippedWear = initWear;
+					m_equippedCGears = initCGears;
+					SetEquippableCGearsCount(initCGCount);
+				}
 				BowInstanceMock m_equippedBow;
 				WearInstanceMock m_equippedWear;
 				List<CarriedGearInstanceMock> m_equippedCGears = new List<CarriedGearInstanceMock>();
 				int m_equippableCGearsCount;
-				public int EquippableCGearsCount{
+				public int equippableCGearsCount{
 					get{return m_equippableCGearsCount;}
 				}
 				public void SetEquippableCGearsCount(int num){
@@ -3855,6 +3920,8 @@ namespace SlotSystem{
 						res = Util.Khaki("SortTA");
 					else if(ta is InsertTransaction)
 						res = Util.Midnight("InsertTA");
+					else if(ta is EmptyTransaction)
+						res = Util.Beni("Empty");
 					return res;
 				}
 				public static string SGMProcessName(SGMProcess proc){
@@ -3891,10 +3958,10 @@ namespace SlotSystem{
 						else
 							actProc = Util.SGMProcessName(sgm.ActionProcess) + " exp? " + (sgm.SelectionProcess.IsExpired?Blue("true"):Red("false"));
 					string ta = Util.TransactionName(sgm.Transaction);
-					string pSBD = "pSBDone: " + (sgm.pickedSBDone?Util.Blue("true"):Util.Red("false"));
-					string tSBD = "tSBDone: " + (sgm.targetSBdone?Util.Blue("true"):Util.Red("false"));
-					string oSGD = "oSGDone: " + (sgm.sg1Done?Util.Blue("true"):Util.Red("false"));
-					string tSGD = "tSGDone: " + (sgm.sg2Done?Util.Blue("true"):Util.Red("false"));
+					string pSBD = "d1Done: " + (sgm.dIcon1Done?Util.Blue("true"):Util.Red("false"));
+					string tSBD = "d2Done: " + (sgm.dIcon2Done?Util.Blue("true"):Util.Red("false"));
+					string oSGD = "sg1Done: " + (sgm.sg1Done?Util.Blue("true"):Util.Red("false"));
+					string tSGD = "sg2Done: " + (sgm.sg2Done?Util.Blue("true"):Util.Red("false"));
 					res = Bold("DebugTarget: ") + Util.Bold("SGM:") +
 							" pSB " + pSB +
 							", hSG " + hSG +
