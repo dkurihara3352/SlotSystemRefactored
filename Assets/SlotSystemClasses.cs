@@ -57,18 +57,18 @@ namespace SlotSystem{
 									b. this means that those elements that are defocused before prepick filtering are not going to be accidentally focused
 							*/
 
-					if(!pickedSB.IsPickable){
+					if(!pickedSB.isPickable){
 						throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
 					}
-					SlotGroup origSG = pickedSB.SG;
+					SlotGroup origSG = pickedSB.sg;
 
 					if(targetSB != null){
-						targetSG = targetSB.SG;
+						targetSG = targetSB.sg;
 					}
 					if(targetSG != null){
-						if(targetSG.IsPool && targetSG != SlotGroupManager.CurSGM.FocusedSGP)
+						if(targetSG.isPool && targetSG != SlotGroupManager.CurSGM.focusedSGP)
 							throw new System.InvalidOperationException("GetTransaction: targetSG is poolSG but not focused");
-						else if(targetSG.IsSGE && !SlotGroupManager.CurSGM.FocusedSGEs.Contains(targetSG))
+						else if(targetSG.isSGE && !SlotGroupManager.CurSGM.focusedSGEs.Contains(targetSG))
 							throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
 					}
 					if(targetSG == null){// meaning selectedSB is also null
@@ -76,20 +76,20 @@ namespace SlotSystem{
 					}else{// hoveredSB could be null
 						if(targetSB == null){// on SG
 							if(targetSG.AcceptsFilter(pickedSB)){
-								if(targetSG != origSG && origSG.IsShrinkable){
-									if(targetSG.HasItemCurrently(pickedSB.ItemInst) && pickedSB.ItemInst.Item.IsStackable)
-										return new StackTransaction(targetSG.GetSB(pickedSB.ItemInst));
+								if(targetSG != origSG && origSG.isShrinkable){
+									if(targetSG.HasItemCurrently(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
+										return new StackTransaction(targetSG.GetSB(pickedSB.itemInst));
 										
-									if(targetSG.HasEmptySlot){
-										if(!targetSG.HasItemCurrently(pickedSB.ItemInst))
+									if(targetSG.hasEmptySlot){
+										if(!targetSG.HasItemCurrently(pickedSB.itemInst))
 											return new FillTransaction(targetSG);
 									}else{
 										if(targetSG.SwappableSBs(pickedSB).Count == 1){
 											Slottable calcedSB = targetSG.SwappableSBs(pickedSB)[0];
-											if(calcedSB.ItemInst != pickedSB.ItemInst)
+											if(calcedSB.itemInst != pickedSB.itemInst)
 												return new SwapTransaction(calcedSB);
 										}else{
-											if(targetSG.IsExpandable)
+											if(targetSG.isExpandable)
 												return new FillTransaction(targetSG);
 										}
 									}
@@ -99,34 +99,36 @@ namespace SlotSystem{
 						}else{// targetSB specified, targetSG == targetSB.SG
 							if(targetSG == origSG){//
 								if(targetSB != pickedSB){
-									if(!targetSG.IsAutoSort)
+									if(!targetSG.isAutoSort)
 										return new ReorderTransaction(targetSB);
 								}
 							}else{
 								if(targetSG.AcceptsFilter(pickedSB)){
 									//swap or stack, else insert
-									if(pickedSB.ItemInst == targetSB.ItemInst){
-										if(targetSG.IsPool && origSG.IsShrinkable)
+									if(pickedSB.itemInst == targetSB.itemInst){
+										if(targetSG.isPool && origSG.isShrinkable)
 											return new FillTransaction(targetSG);
-										if(pickedSB.ItemInst.Item.IsStackable)
+										if(pickedSB.itemInst.Item.IsStackable)
 											return new StackTransaction(targetSB);
 									}else{
-										if(targetSG.HasItemCurrently(pickedSB.ItemInst)){
-											if(targetSG.IsPool){
-												if(origSG.AcceptsFilter(targetSB))
-													return new SwapTransaction(targetSB);
-												if(origSG.IsShrinkable)
-													return new FillTransaction(targetSG);
+										if(targetSG.HasItemCurrently(pickedSB.itemInst)){
+											if(!origSG.HasItemCurrently(targetSB.itemInst)){
+												if(targetSG.isPool){
+													if(origSG.AcceptsFilter(targetSB))
+														return new SwapTransaction(targetSB);
+													if(origSG.isShrinkable)
+														return new FillTransaction(targetSG);
+												}
+												// if(!targetSG.isAutoSort)
+												// 	return new ReorderInOtherSGTransaction(targetSB);
 											}
-											if(!targetSG.IsAutoSort)
-												return new ReorderInOtherSGTransaction(targetSB);
 										}else{
 											if(origSG.AcceptsFilter(targetSB))
 												return new SwapTransaction(targetSB);
-											if(targetSG.HasEmptySlot || targetSG.IsExpandable)
+											if(targetSG.hasEmptySlot || targetSG.isExpandable)
 												return new FillTransaction(targetSG);
-											if(!targetSG.IsAutoSort)
-												return new InsertTransaction(targetSB);
+											// if(!targetSG.isAutoSort)
+											// 	return new InsertTransaction(targetSB);
 										}
 									}
 								}
@@ -157,7 +159,7 @@ namespace SlotSystem{
 				SlotGroup m_origSG;
 				public RevertTransaction(){
 					m_pickedSB = sgm.pickedSB;
-					m_origSG = m_pickedSB.SG;
+					m_origSG = m_pickedSB.sg;
 				}
 				// public override SlotGroup sg1{get{return m_origSG;}}
 				// public override Slottable sb1{get{return m_pickedSB;}}
@@ -170,7 +172,7 @@ namespace SlotSystem{
 					// pickedSB.SetActState(Slottable.RevertingState);
 					// origSG.SetAndRunSlotMovements(removed, added);
 					m_origSG.SetActState(SlotGroup.RevertState);
-					sgm.dIcon1.SetDestination(m_origSG, m_origSG.GetNewSlot(m_pickedSB.ItemInst));
+					sgm.dIcon1.SetDestination(m_origSG, m_origSG.GetNewSlot(m_pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
@@ -186,7 +188,7 @@ namespace SlotSystem{
 				public ReorderTransaction(Slottable selected){
 					m_pickedSB = sgm.pickedSB;
 					m_selectedSB = selected;
-					m_origSG = m_pickedSB.SG;
+					m_origSG = m_pickedSB.sg;
 				}
 				// public override Slottable sb1{get{return m_pickedSB;}}
 				public override Slottable targetSB{get{return m_selectedSB;}}
@@ -202,7 +204,7 @@ namespace SlotSystem{
 					// pickedSB.MoveDraggedIcon(origSG, slot);
 					// // origSG.CheckCompletion();
 					sg1.SetActState(SlotGroup.ReorderState);
-					sgm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.ItemInst));
+					sgm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
@@ -219,8 +221,8 @@ namespace SlotSystem{
 				public ReorderInOtherSGTransaction(Slottable selected){
 					pickedSB = sgm.pickedSB;
 					selectedSB = selected;
-					origSG = pickedSB.SG;
-					selectedSG = selected.SG;
+					origSG = pickedSB.sg;
+					selectedSG = selected.sg;
 				}
 				public override Slottable targetSB{get{return selectedSB;}}
 				public override SlotGroup sg1{get{return origSG;}}
@@ -238,7 +240,7 @@ namespace SlotSystem{
 					// selectedSG.CheckCompletion();
 					sg1.SetActState(SlotGroup.RevertState);
 					sg2.SetActState(SlotGroup.ReorderState);
-					sgm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(pickedSB.ItemInst));
+					sgm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
@@ -256,10 +258,10 @@ namespace SlotSystem{
 				List<InventoryItemInstanceMock> itemCache = new List<InventoryItemInstanceMock>();
 				public StackTransaction(Slottable selected){
 					pickedSB = sgm.pickedSB;
-					origSG = pickedSB.SG;
+					origSG = pickedSB.sg;
 					selectedSB = selected;
-					selectedSG = selectedSB.SG;
-					InventoryItemInstanceMock cache = pickedSB.ItemInst;
+					selectedSG = selectedSB.sg;
+					InventoryItemInstanceMock cache = pickedSB.itemInst;
 					cache.Quantity = pickedSB.pickedAmount;
 					itemCache.Add(cache);
 				}
@@ -273,7 +275,7 @@ namespace SlotSystem{
 					// sgm.ClearAndReset();
 					sg1.SetActState(SlotGroup.RemoveState);
 					sg2.SetActState(SlotGroup.AddState);
-					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.ItemInst));
+					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
@@ -290,8 +292,8 @@ namespace SlotSystem{
 				public SwapTransaction(Slottable selected){
 					this.pickedSB = sgm.pickedSB;
 					this.selectedSB = selected;
-					this.origSG = pickedSB.SG;
-					this.selectedSG = selectedSB.SG;
+					this.origSG = pickedSB.sg;
+					this.selectedSG = selectedSB.sg;
 				}
 				public override Slottable targetSB{get{return selectedSB;}}
 				public override SlotGroup sg1{get{return origSG;}}
@@ -300,10 +302,10 @@ namespace SlotSystem{
 				public override void Execute(){
 					sg1.SetActState(SlotGroup.SwapState);
 					sg2.SetActState(SlotGroup.SwapState);
-					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.ItemInst));
+					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.itemInst));
 					DraggedIcon di2 = new DraggedIcon(targetSB);
 					sgm.SetDIcon2(di2);
-					sgm.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.ItemInst));
+					sgm.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.itemInst));
 					base.Execute();
 				}
 				// public override void Execute(){
@@ -356,7 +358,7 @@ namespace SlotSystem{
 				public FillTransaction(SlotGroup selected){
 					this.pickedSB = sgm.pickedSB;
 					this.selectedSG = selected;
-					this.origSG = pickedSB.SG;
+					this.origSG = pickedSB.sg;
 				}
 				public override SlotGroup sg1{get{return origSG;}}
 				public override SlotGroup sg2{get{return selectedSG;}}
@@ -397,7 +399,7 @@ namespace SlotSystem{
 				public override void Execute(){
 					sg1.SetActState(SlotGroup.FillState);
 					sg2.SetActState(SlotGroup.FillState);
-					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.ItemInst));
+					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
@@ -440,9 +442,9 @@ namespace SlotSystem{
 				SlotGroup m_selectedSG;
 				public InsertTransaction(Slottable sb){
 					m_pickedSB = sgm.pickedSB;
-					m_origSG = m_pickedSB.SG;
+					m_origSG = m_pickedSB.sg;
 					m_selectedSB = sb;
-					m_selectedSG = sb.SG;
+					m_selectedSG = sb.sg;
 				}
 				public override Slottable targetSB{get{return m_selectedSB;}}
 				public override SlotGroup sg1{get{return m_origSG;}}
@@ -451,7 +453,7 @@ namespace SlotSystem{
 				public override void Execute(){
 					sg1.SetActState(SlotGroup.FillState);
 					sg2.SetActState(SlotGroup.FillState);
-					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.ItemInst));
+					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 					base.Execute();
 					// sgm.AcceptSGTAComp(m_pickedSB.SG);
 				}
@@ -819,7 +821,7 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						if(sgm.PrevSelState == SlotGroupManager.FocusedState)
 							sgm.SetAndRunSelProcess(new SGMGreyoutProcess(sgm, sgm.GreyoutCoroutine));
-						sgm.RootPage.Defocus();
+						sgm.rootPage.Defocus();
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
@@ -830,7 +832,7 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						if(sgm.PrevSelState == SlotGroupManager.DefocusedState)
 							sgm.SetAndRunSelProcess(new SGMGreyinProcess(sgm, sgm.GreyinCoroutine));
-						sgm.RootPage.Focus();
+						sgm.rootPage.Focus();
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
@@ -1127,7 +1129,7 @@ namespace SlotSystem{
 				}
 				public abstract class SGSelectionState: SGState{
 					public virtual void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventDataMock){
-						sg.SGM.SetHoveredSG(sg);
+						sg.sgm.SetHoveredSG(sg);
 					}
 					public virtual void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventDataMock){
 
@@ -1241,8 +1243,8 @@ namespace SlotSystem{
 				public class SGReorderState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						Slottable sb1 = sg.SGM.pickedSB;
-						Slottable sb2 = sg.SGM.targetSB;
+						Slottable sb1 = sg.sgm.pickedSB;
+						Slottable sb2 = sg.sgm.targetSB;
 						List<Slottable> newSBs = new List<Slottable>();
 						newSBs.AddRange(sg.slottables);
 						newSBs.Reorder(sb1, sb2);
@@ -1261,7 +1263,7 @@ namespace SlotSystem{
 				public class SGAddState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						List<InventoryItemInstanceMock> cache = sg.SGM.Transaction.moved;
+						List<InventoryItemInstanceMock> cache = sg.sgm.Transaction.moved;
 						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						// Util.Trim(ref newSBs);
@@ -1269,9 +1271,9 @@ namespace SlotSystem{
 							bool found = false;
 							foreach(Slottable sb in newSBs){
 								if(sb!= null){
-									if(sb.ItemInst == itemInst){
+									if(sb.itemInst == itemInst){
 										if(itemInst.Item.IsStackable){
-											sb.ItemInst.Quantity += itemInst.Quantity;
+											sb.itemInst.Quantity += itemInst.Quantity;
 											found = true;
 										}
 									}
@@ -1281,14 +1283,14 @@ namespace SlotSystem{
 								GameObject newSBSG = new GameObject("newSBSG");
 								Slottable newSB = newSBSG.AddComponent<Slottable>();
 								newSB.Initialize(sg, true, itemInst);
-								newSB.SetSGM(sg.SGM);
+								newSB.SetSGM(sg.sgm);
 								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
 							}
 						}
-						if(sg.IsAutoSort)
+						if(sg.isAutoSort)
 							sg.Sorter.TrimAndOrderSBs(ref newSBs);
-						if(!sg.IsExpandable){
+						if(!sg.isExpandable){
 							while(newSBs.Count <origCount){
 								newSBs.Add(null);
 							}
@@ -1308,7 +1310,7 @@ namespace SlotSystem{
 				public class SGRemoveState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						List<InventoryItemInstanceMock> cache = sg.SGM.Transaction.moved;
+						List<InventoryItemInstanceMock> cache = sg.sgm.Transaction.moved;
 						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						// Util.Trim(ref newSBs);
@@ -1317,10 +1319,10 @@ namespace SlotSystem{
 						foreach(InventoryItemInstanceMock itemInst in cache){
 							foreach(Slottable sb in newSBs){
 								if(sb!= null){
-									if(sb.ItemInst == itemInst){
+									if(sb.itemInst == itemInst){
 										if(itemInst.Item.IsStackable){
-											sb.ItemInst.Quantity -= itemInst.Quantity;
-											if(sb.ItemInst.Quantity <= 0)
+											sb.itemInst.Quantity -= itemInst.Quantity;
+											if(sb.itemInst.Quantity <= 0)
 												removedList.Add(sb);
 										}else{
 											removedList.Add(sb);
@@ -1332,15 +1334,15 @@ namespace SlotSystem{
 						foreach(Slottable sb in removedList){
 							newSBs[newSBs.IndexOf(sb)] = null;
 						}
-						if(sg.IsAutoSort){
+						if(sg.isAutoSort){
 							sg.Sorter.TrimAndOrderSBs(ref newSBs);
-							if(!sg.IsExpandable){
+							if(!sg.isExpandable){
 								while(newSBs.Count <origCount){
 									newSBs.Add(null);
 								}
 							}
 						}else{
-							if(sg.IsExpandable)
+							if(sg.isExpandable)
 								Util.Trim(ref newSBs);
 						}
 						sg.SetNewSBs(nonremoved);
@@ -1359,29 +1361,29 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						Slottable added;
-							if(sg.SGM.Transaction.sg1 == sg)
-								added = sg.SGM.Transaction.targetSB;
+							if(sg.sgm.Transaction.sg1 == sg)
+								added = sg.sgm.Transaction.targetSB;
 							else
-								added = sg.SGM.pickedSB;
+								added = sg.sgm.pickedSB;
 						Slottable removed;
-							if(sg.SGM.Transaction.sg1 == sg)
-								removed = sg.SGM.pickedSB;
+							if(sg.sgm.Transaction.sg1 == sg)
+								removed = sg.sgm.pickedSB;
 							else
-								removed = sg.SGM.Transaction.targetSB;
+								removed = sg.sgm.Transaction.targetSB;
 
 						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
-						if(!sg.IsPool){
+						if(!sg.isPool){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							newSB.Initialize(sg, true, added.ItemInst);
-							newSB.SetSGM(sg.SGM);
+							newSB.Initialize(sg, true, added.itemInst);
+							newSB.SetSGM(sg.sgm);
 							newSB.Defocus();
 							newSBs[newSBs.IndexOf(removed)] = newSB;
 						}
-						if(sg.IsAutoSort){
+						if(sg.isAutoSort){
 							sg.Sorter.TrimAndOrderSBs(ref newSBs);
-							if(!sg.IsExpandable){
+							if(!sg.isExpandable){
 								while(newSBs.Count <origCount){
 									newSBs.Add(null);
 								}
@@ -1403,25 +1405,25 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						Slottable added;
-							if(sg.SGM.Transaction.sg1 == sg)
+							if(sg.sgm.Transaction.sg1 == sg)
 								added = null;
 							else
-								added = sg.SGM.pickedSB;
+								added = sg.sgm.pickedSB;
 						Slottable removed;
-							if(sg.SGM.Transaction.sg1 == sg)
-								removed = sg.SGM.pickedSB;
+							if(sg.sgm.Transaction.sg1 == sg)
+								removed = sg.sgm.pickedSB;
 							else
 								removed = null;
 
 						List<Slottable> newSBs = new List<Slottable>();
 						newSBs.AddRange(sg.slottables);
 						int origCount = newSBs.Count;
-						if(!sg.IsPool){
+						if(!sg.isPool){
 							if(added != null){
 								GameObject newSBGO = new GameObject("newSBGO");
 								Slottable newSB = newSBGO.AddComponent<Slottable>();
-								newSB.Initialize(sg, true, added.ItemInst);
-								newSB.SetSGM(sg.SGM);
+								newSB.Initialize(sg, true, added.itemInst);
+								newSB.SetSGM(sg.sgm);
 								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
 							}
@@ -1429,27 +1431,27 @@ namespace SlotSystem{
 								Slottable rem = null;
 								foreach(Slottable sb in newSBs){
 									if(sb != null){
-										if(sb.ItemInst == removed.ItemInst)
+										if(sb.itemInst == removed.itemInst)
 											rem = sb;
 									}
 								}
 								newSBs[newSBs.IndexOf(rem)] = null;
 							}
 						}
-						if(sg.IsAutoSort){
+						if(sg.isAutoSort){
 							sg.Sorter.TrimAndOrderSBs(ref newSBs);
-						}else if(sg.SGM.Transaction is InsertTransaction){
+						}else if(sg.sgm.Transaction is InsertTransaction){
 							Util.Trim(ref newSBs);
 							Slottable newAdded = null;
 							foreach(Slottable sb in newSBs){
-								if(sb.ItemInst == added.ItemInst)
+								if(sb.itemInst == added.itemInst)
 									newAdded = sb;
 							}
-							Slottable targetSB = sg.SGM.targetSB;
+							Slottable targetSB = sg.sgm.targetSB;
 							newSBs.Reorder(newAdded, targetSB);
 							// Util.ReorderSBs(newAdded, targetSB, ref newSBs);
 						}
-						if(!sg.IsExpandable){
+						if(!sg.isExpandable){
 							while(newSBs.Count <origCount){
 								newSBs.Add(null);
 							}
@@ -1472,7 +1474,7 @@ namespace SlotSystem{
 						List<Slottable> newSBs = sg.slottables;
 						int origCount = newSBs.Count;
 						sg.Sorter.TrimAndOrderSBs(ref newSBs);
-						if(!sg.IsExpandable){
+						if(!sg.isExpandable){
 							while(newSBs.Count <origCount){
 								newSBs.Add(null);
 							}
@@ -1607,7 +1609,7 @@ namespace SlotSystem{
 				}
 				public override void Expire(){
 					base.Expire();
-					SG.SGM.AcceptSGTAComp(SG);
+					SG.sgm.AcceptSGTAComp(SG);
 				}
 			}
 			/*	dump	*/
@@ -1743,9 +1745,9 @@ namespace SlotSystem{
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
 							newSB.Initialize(sg, true, (InventoryItemInstanceMock)item);
-							sg.Slots[items.IndexOf(item)].sb = newSB;
+							sg.slots[items.IndexOf(item)].sb = newSB;
 						}
-					if(sg.IsAutoSort)
+					if(sg.isAutoSort)
 						sg.InstantSort();
 				}
 			}
@@ -2135,12 +2137,12 @@ namespace SlotSystem{
 						int indexAtMin = -1;
 						int addedAO;
 						if(addedMax == null) addedAO = -1;
-						else addedAO = ((InventoryItemInstanceMock)addedMax.Item).AcquisitionOrder;
+						else addedAO = ((InventoryItemInstanceMock)addedMax.item).AcquisitionOrder;
 
 						for(int i = 0; i < trimmed.Count; i++){
-							InventoryItemInstanceMock inst = (InventoryItemInstanceMock)trimmed[i].Item;
+							InventoryItemInstanceMock inst = (InventoryItemInstanceMock)trimmed[i].item;
 							if(inst.AcquisitionOrder > addedAO){
-								if(indexAtMin == -1 || inst.AcquisitionOrder < ((InventoryItemInstanceMock)trimmed[indexAtMin].Item).AcquisitionOrder){
+								if(indexAtMin == -1 || inst.AcquisitionOrder < ((InventoryItemInstanceMock)trimmed[indexAtMin].item).AcquisitionOrder){
 									indexAtMin = i;
 								}
 							}
@@ -2272,7 +2274,7 @@ namespace SlotSystem{
 					}
 					public override void Expire(){
 						base.Expire();
-						if(!SB.IsPickedUp){
+						if(!SB.isPickedUp){
 							SB.Tap();
 							SB.Reset();
 							SB.Focus();
@@ -2522,7 +2524,7 @@ namespace SlotSystem{
 				}
 				public abstract class SBSelectionState: SBState{
 					public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
-						sb.SGM.SetHoveredSB(sb);
+						sb.sgm.SetHoveredSB(sb);
 					}
 					public virtual void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					}
@@ -2615,7 +2617,7 @@ namespace SlotSystem{
 						sb.Defocus();
 					}
 					public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){
-						if(sb.IsFocused){
+						if(sb.isFocused){
 							sb.SetSelState(Slottable.SelectedState);
 							sb.SetActState(Slottable.WaitForPickUpState);
 						}
@@ -2674,7 +2676,7 @@ namespace SlotSystem{
 						sb.SetAndRunActionProcess(wfntProcess);
 					}
 					public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){
-						if(!sb.IsPickedUp)
+						if(!sb.isPickedUp)
 							sb.PickUp();
 						else{
 							sb.SetActState(Slottable.PickedUpState);
@@ -2695,13 +2697,13 @@ namespace SlotSystem{
 				public class PickedUpState: SBActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						sb.SGM.SetPickedSB(sb);
-						sb.SGM.SetActState(SlotGroupManager.ProbingState);
+						sb.sgm.SetPickedSB(sb);
+						sb.sgm.SetActState(SlotGroupManager.ProbingState);
 						DraggedIcon di = new DraggedIcon(sb);
-						sb.SGM.SetDIcon1(di);
-						sb.SGM.CreateTransactionResults();
+						sb.sgm.SetDIcon1(di);
+						sb.sgm.CreateTransactionResults();
 						sb.OnHoverEnterMock();
-						sb.SGM.UpdateTransaction();
+						sb.sgm.UpdateTransaction();
 						SBProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
 						sb.SetAndRunActionProcess(pickedUpProcess);
 					}
@@ -2710,7 +2712,7 @@ namespace SlotSystem{
 						sb.Focus();
 					}
 					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
-						if(sb.SGM.HoveredSB == sb && sb.IsStackable)
+						if(sb.sgm.hoveredSB == sb && sb.isStackable)
 							sb.SetActState(Slottable.WaitForNextTouchState);
 						else
 							sb.ExecuteTransaction();
@@ -2833,7 +2835,7 @@ namespace SlotSystem{
 				public class SBEquippedState: SBEquipState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						if(sb.SG.IsPool){
+						if(sb.sg.isPool){
 							if(sb.PrevEqpState != null && sb.PrevEqpState == Slottable.UnequippedState){
 								SBProcess process = new SBEquipProcess(sb, sb.EquipCoroutine);
 								sb.SetAndRunEquipProcess(process);
@@ -2851,7 +2853,7 @@ namespace SlotSystem{
 							/*	when initialized	*/
 							return;
 						}
-						if(sb.SG.IsPool){
+						if(sb.sg.isPool){
 							if(sb.PrevEqpState != null && sb.PrevEqpState == Slottable.EquippedState){
 								SBProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
 								sb.SetAndRunEquipProcess(process);
@@ -3251,7 +3253,7 @@ namespace SlotSystem{
 			void Deactivate();
 			void Focus();
 			void Defocus();
-			SlotGroupManager SGM{get; set;}
+			SlotGroupManager sgm{get; set;}
 			SlotGroup GetSlotGroup(Slottable sb);
 			bool ContainsElement(SlotSystemElement element);
 			
@@ -3288,12 +3290,12 @@ namespace SlotSystem{
 				}
 			}
 			SlotGroupManager m_sgm;
-			public SlotGroupManager SGM{
+			public SlotGroupManager sgm{
 				get{return m_sgm;}
 				set{
 					m_sgm = value;
 					foreach(SlotSystemElement ele in Elements){
-						ele.SGM = value;
+						ele.sgm = value;
 					}
 				}
 			}
@@ -3301,7 +3303,7 @@ namespace SlotSystem{
 				foreach(SlotSystemElement ele in this.Elements){
 					if(ele is SlotGroup){
 						SlotGroup sg = (SlotGroup)ele;
-						foreach(Slot slot in sg.Slots){
+						foreach(Slot slot in sg.slots){
 							if(slot.sb != null)
 								if(slot.sb == sb)
 									return sg;
@@ -3409,7 +3411,7 @@ namespace SlotSystem{
 				}Slottable m_sb;
 			public DraggedIcon(Slottable sb){
 				m_sb = sb;
-				m_item = this.sb.ItemInst;
+				m_item = this.sb.itemInst;
 				m_sgm = SlotGroupManager.CurSGM;
 			}
 			public void CompleteMovement(){
@@ -3892,14 +3894,14 @@ namespace SlotSystem{
 				sbs.Add(added);
 			}
 			public static bool HaveCommonItemFamily(Slottable sb, Slottable other){
-				if(sb.Item is BowInstanceMock)
-					return (other.Item is BowInstanceMock);
-				else if(sb.Item is WearInstanceMock)
-					return (other.Item is WearInstanceMock);
-				else if(sb.Item is CarriedGearInstanceMock)
-					return (other.Item is CarriedGearInstanceMock);
-				else if(sb.Item is PartsInstanceMock)
-					return (other.Item is PartsInstanceMock);
+				if(sb.item is BowInstanceMock)
+					return (other.item is BowInstanceMock);
+				else if(sb.item is WearInstanceMock)
+					return (other.item is WearInstanceMock);
+				else if(sb.item is CarriedGearInstanceMock)
+					return (other.item is CarriedGearInstanceMock);
+				else if(sb.item is PartsInstanceMock)
+					return (other.item is PartsInstanceMock);
 				else
 					return false;
 			}
@@ -3909,10 +3911,10 @@ namespace SlotSystem{
 						2) otherSB.SG accepts pickedSB
 						3) not stackable
 				*/
-				if(pickedSB.SG != otherSB.SG){
-					if(otherSB.SG.AcceptsFilter(pickedSB)){
-						if(!(pickedSB.ItemInst == otherSB.ItemInst && pickedSB.ItemInst.Item.IsStackable))
-						 if(pickedSB.SG.AcceptsFilter(otherSB))
+				if(pickedSB.sg != otherSB.sg){
+					if(otherSB.sg.AcceptsFilter(pickedSB)){
+						if(!(pickedSB.itemInst == otherSB.itemInst && pickedSB.itemInst.Item.IsStackable))
+						 if(pickedSB.sg.AcceptsFilter(otherSB))
 							return true;
 					}
 				}
@@ -3975,8 +3977,8 @@ namespace SlotSystem{
 					string res = "";
 					string pSB = Util.SBofSG(sgm.pickedSB);
 					string tSB = Util.SBofSG(sgm.targetSB);
-					string hSG = Util.SGName(sgm.HoveredSG);
-					string hSB = Util.SBofSG(sgm.HoveredSB);
+					string hSG = Util.SGName(sgm.hoveredSG);
+					string hSB = Util.SBofSG(sgm.hoveredSB);
 					string di1;
 						if(sgm.dIcon1 == null)
 							di1 = "null";
@@ -4030,7 +4032,7 @@ namespace SlotSystem{
 				public static string SGName(SlotGroup sg){
 					string result = "";
 					if(sg != null){
-						if(sg.IsPool){
+						if(sg.isPool){
 							if(sg.Filter is SGNullFilter)
 								result = "sgpAll";
 							else if(sg.Filter is SGBowFilter)
@@ -4042,7 +4044,7 @@ namespace SlotSystem{
 							else if(sg.Filter is SGPartsFilter)
 								result = "sgpParts";
 							result = Red(result);
-						}else if(sg.IsSGE){
+						}else if(sg.isSGE){
 							if(sg.Filter is SGBowFilter)
 								result = "sgBow";
 							else if(sg.Filter is SGWearFilter)
@@ -4128,7 +4130,7 @@ namespace SlotSystem{
 				public static string SBName(Slottable sb){
 					string result = "";
 					if(sb != null){
-						switch(sb.ItemInst.Item.ItemID){
+						switch(sb.itemInst.Item.ItemID){
 							case 0:	result = "defBow"; break;
 							case 1:	result = "crfBow"; break;
 							case 2:	result = "frgBow"; break;
@@ -4159,19 +4161,19 @@ namespace SlotSystem{
 							case 603: result = "mstParts"; break;
 						}
 						List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-						foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.PoolInv.Items){
-							if(itemInst.Item == sb.ItemInst.Item)
+						foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.poolInv.Items){
+							if(itemInst.Item == sb.itemInst.Item)
 								sameItemInsts.Add(itemInst);
 						}
-						int index = sameItemInsts.IndexOf(sb.ItemInst);
+						int index = sameItemInsts.IndexOf(sb.itemInst);
 						result += "_"+index.ToString();
-						if(sb.ItemInst is BowInstanceMock)
+						if(sb.itemInst is BowInstanceMock)
 							result = Forest(result);
-						if(sb.ItemInst is WearInstanceMock)
+						if(sb.itemInst is WearInstanceMock)
 							result = Sangria(result);
-						if(sb.ItemInst is CarriedGearInstanceMock)
+						if(sb.itemInst is CarriedGearInstanceMock)
 							result = Terra(result);
-						if(sb.ItemInst is PartsInstanceMock)
+						if(sb.itemInst is PartsInstanceMock)
 							result = Midnight(result);
 					}
 					return result;
@@ -4179,8 +4181,8 @@ namespace SlotSystem{
 				public static string SBofSG(Slottable sb){
 					string res = "";
 					if(sb != null){
-						res = Util.SBName(sb) + " of " + Util.SGName(sb.SG);
-						if(sb.IsEquipped && sb.SG.IsPool)
+						res = Util.SBName(sb) + " of " + Util.SGName(sb.sg);
+						if(sb.isEquipped && sb.sg.isPool)
 							res = Util.Bold(res);
 					}
 					return res;
@@ -4303,7 +4305,7 @@ namespace SlotSystem{
 				}
 			/*	Debug	*/
 				public static string TADebug(Slottable testSB, SlotGroup tarSG, Slottable tarSB){
-					SlotSystemTransaction ta = testSB.SGM.GetTransaction(testSB, tarSG, tarSB);
+					SlotSystemTransaction ta = testSB.sgm.GetTransaction(testSB, tarSG, tarSB);
 					string taStr = TransactionName(ta);
 					string taTargetSB = Util.SBofSG(ta.targetSB);
 					string taSG1 = Util.SGName(ta.sg1);

@@ -337,54 +337,54 @@ namespace SlotSystem{
 				public bool dIcon2Done{
 				get{return m_dIcon2Done;}
 				}bool m_dIcon2Done = true;
-			public Slottable HoveredSB{
+			public Slottable hoveredSB{
 				get{return m_hoveredSB;}
 				}Slottable m_hoveredSB;
 				public void SetHoveredSB(Slottable sb){
-					if(sb == null || sb != HoveredSB){
-						if(HoveredSB != null)
-							HoveredSB.OnHoverExitMock();
+					if(sb == null || sb != hoveredSB){
+						if(hoveredSB != null)
+							hoveredSB.OnHoverExitMock();
 					}
 					m_hoveredSB = sb;
 				}
-			public SlotGroup HoveredSG{
+			public SlotGroup hoveredSG{
 				get{return m_hoveredSG;}
 				}SlotGroup m_hoveredSG;
 				public void SetHoveredSG(SlotGroup sg){
-					if(sg == null || sg != HoveredSG){
-						if(HoveredSG != null)
-							HoveredSG.OnHoverExitMock();
+					if(sg == null || sg != hoveredSG){
+						if(hoveredSG != null)
+							hoveredSG.OnHoverExitMock();
 					}
 					m_hoveredSG = sg;
 				}
-			public InventoryManagerPage RootPage{
+			public InventoryManagerPage rootPage{
 				get{return m_rootPage;}
 				}InventoryManagerPage m_rootPage;
 				public void SetRootPage(InventoryManagerPage rootPage){
 					m_rootPage = rootPage;
-					m_rootPage.SGM = this;
+					m_rootPage.sgm = this;
 				}
-			public List<SlotGroup> AllSGs{
+			public List<SlotGroup> allSGs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					result.AddRange(AllSGPs);
-					result.AddRange(AllSGEs);
+					result.AddRange(allSGPs);
+					result.AddRange(allSGEs);
 					return result;
 				}
 			}
-			public List<SlotGroup> AllSGPs{
+			public List<SlotGroup> allSGPs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					foreach(SlotSystemElement ele in RootPage.PoolBundle.Elements){
+					foreach(SlotSystemElement ele in rootPage.PoolBundle.Elements){
 						result.Add((SlotGroup)ele);
 					}
 					return result;
 				}
 			}
-			public List<SlotGroup> AllSGEs{
+			public List<SlotGroup> allSGEs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					foreach(SlotSystemElement ele in RootPage.EquipBundle.Elements){
+					foreach(SlotSystemElement ele in rootPage.EquipBundle.Elements){
 						EquipmentSet equiSet = (EquipmentSet)ele;
 						foreach(SlotSystemElement ele2 in equiSet.Elements){
 							SlotGroup sge = (SlotGroup)ele2;
@@ -394,82 +394,82 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public SlotGroup FocusedSGP{
+			public SlotGroup focusedSGP{
 				get{
-					SlotSystemElement focusedEle = RootPage.PoolBundle.GetFocusedBundleElement();
+					SlotSystemElement focusedEle = rootPage.PoolBundle.GetFocusedBundleElement();
 					return (SlotGroup)focusedEle;
 				}
 			}
-			public EquipmentSet FocusedEqSet{
+			public EquipmentSet focusedEqSet{
 				get{
-					return (EquipmentSet)RootPage.EquipBundle.GetFocusedBundleElement();
+					return (EquipmentSet)rootPage.EquipBundle.GetFocusedBundleElement();
 				}
 			}
-			public List<SlotGroup> FocusedSGEs{
+			public List<SlotGroup> focusedSGEs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					EquipmentSet focusedEquipSet = FocusedEqSet;
+					EquipmentSet focusedEquipSet = focusedEqSet;
 					foreach(SlotSystemElement ele in focusedEquipSet.Elements){
 						result.Add((SlotGroup)ele);
 					}
 					return result;
 				}
 			}
-			public List<SlotGroup> FocusedSGs{
+			public List<SlotGroup> focusedSGs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					result.Add(FocusedSGP);
-					result.AddRange(FocusedSGEs);
+					result.Add(focusedSGP);
+					result.AddRange(focusedSGEs);
 					return result;
 				}
 			}
-			public List<EquipmentSet> EquipmentSets{
+			public List<EquipmentSet> equipmentSets{
 				get{
 					List<EquipmentSet> result = new List<EquipmentSet>();
-					foreach(SlotSystemElement ele in RootPage.EquipBundle.Elements){
+					foreach(SlotSystemElement ele in rootPage.EquipBundle.Elements){
 						result.Add((EquipmentSet)ele);
 					}
 					return result;
 				}
 			}
-			public PoolInventory PoolInv{
+			public PoolInventory poolInv{
 				get{
-					return (PoolInventory)FocusedSGP.inventory;
+					return (PoolInventory)focusedSGP.inventory;
 				}
 			}
-			public BowInstanceMock EquippedBowInst{
+			public BowInstanceMock equippedBowInst{
 				get{
-					foreach(SlotGroup sge in FocusedSGEs){
+					foreach(SlotGroup sge in focusedSGEs){
 						if(sge.Filter is SGBowFilter)
-							return (BowInstanceMock)sge.Slots[0].sb.ItemInst;
+							return (BowInstanceMock)sge.slots[0].sb.itemInst;
 					}
 					return null;
 				}
 			}
-			public WearInstanceMock EquippedWearInst{
+			public WearInstanceMock equippedWearInst{
 				get{
-					foreach(SlotGroup sge in FocusedSGEs){
+					foreach(SlotGroup sge in focusedSGEs){
 						if(sge.Filter is SGWearFilter)
-							return (WearInstanceMock)sge.Slots[0].sb.ItemInst;
+							return (WearInstanceMock)sge.slots[0].sb.itemInst;
 					}
 					return null;
 				}
 			}
-			public List<CarriedGearInstanceMock> EquippedCarriedGears{
+			public List<CarriedGearInstanceMock> equippedCarriedGears{
 				get{
 					List<CarriedGearInstanceMock> result = new List<CarriedGearInstanceMock>();
-					foreach(SlotGroup sge in FocusedSGEs){
+					foreach(SlotGroup sge in focusedSGEs){
 						if(sge.Filter is SGCGearsFilter){
 							foreach(Slottable sb in sge.slottables){
 								if(sb != null)
-									result.Add((CarriedGearInstanceMock)sb.ItemInst);
+									result.Add((CarriedGearInstanceMock)sb.itemInst);
 							}
 						}
 					}
 					return result;
 				}
 			}
-			public List<PartsInstanceMock> EquippedParts{
+			public List<PartsInstanceMock> equippedParts{
 				get{return null;}
 			}
 			/*	dump	*/
@@ -494,14 +494,14 @@ namespace SlotSystem{
 			public void Focus(){
 				SetCurSGM();
 				SetSelState(SlotGroupManager.FocusedState);
-				RootPage.Focus();
+				rootPage.Focus();
 			}
 			public void Defocus(){
 				SetSelState(SlotGroupManager.DefocusedState);
-				RootPage.Defocus();
+				rootPage.Defocus();
 			}
 			public SlotGroup GetSG(Slottable sb){
-				return this.RootPage.GetSlotGroup(sb);	
+				return this.rootPage.GetSlotGroup(sb);	
 			}
 			public void Reset(){
 				SetActState(SlotGroupManager.WaitForActionState);
@@ -527,11 +527,11 @@ namespace SlotSystem{
 				m_rootPage.Deactivate();
 			}
 			public void SetFocusedPoolSG(SlotGroup sg){
-				RootPage.PoolBundle.SetFocusedBundleElement(sg);
+				rootPage.PoolBundle.SetFocusedBundleElement(sg);
 				Focus();
 			}
 			public void SetFocusedEquipmentSet(EquipmentSet eSet){
-				RootPage.EquipBundle.SetFocusedBundleElement(eSet);
+				rootPage.EquipBundle.SetFocusedBundleElement(eSet);
 				Focus();
 			}
 			public void UpdateEquipStatesOnAll(){
@@ -539,17 +539,17 @@ namespace SlotSystem{
 					ItemInst of spe is marked the equipped one
 					all sbs compare its iteminst with it and Equip or Unequip according to the result
 				*/
-				foreach(InventoryItemInstanceMock itemInst in PoolInv.Items){
+				foreach(InventoryItemInstanceMock itemInst in poolInv.Items){
 					if(itemInst is BowInstanceMock)
-						itemInst.IsEquipped = itemInst == EquippedBowInst;
+						itemInst.IsEquipped = itemInst == equippedBowInst;
 					else if (itemInst is WearInstanceMock)
-						itemInst.IsEquipped = itemInst == EquippedWearInst;
+						itemInst.IsEquipped = itemInst == equippedWearInst;
 					else if(itemInst is CarriedGearInstanceMock)
-						itemInst.IsEquipped = EquippedCarriedGears != null && EquippedCarriedGears.Contains((CarriedGearInstanceMock)itemInst);
+						itemInst.IsEquipped = equippedCarriedGears != null && equippedCarriedGears.Contains((CarriedGearInstanceMock)itemInst);
 					else if(itemInst is PartsInstanceMock)
-						itemInst.IsEquipped = EquippedParts != null && EquippedParts.Contains((PartsInstanceMock)itemInst);
+						itemInst.IsEquipped = equippedParts != null && equippedParts.Contains((PartsInstanceMock)itemInst);
 				}
-				foreach(SlotGroup sg in AllSGs){
+				foreach(SlotGroup sg in allSGs){
 					foreach(Slottable sb in sg.slottables){
 						if(sb!= null)
 							sb.UpdateEquipState();
@@ -578,7 +578,7 @@ namespace SlotSystem{
 					Perform Transaction update at SimHover looing up the list
 				*/
 				TransactionResults transactionResults = new TransactionResults();
-				foreach(SlotGroup sg in FocusedSGs){
+				foreach(SlotGroup sg in focusedSGs){
 					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, null, sg);
 					TransactionResult tr = new TransactionResult(null, sg, ta);
 					transactionResults.AddTransactionResult(tr);
@@ -601,7 +601,7 @@ namespace SlotSystem{
 				this.TransactionResults = transactionResults;
 			}
 			public void UpdateTransaction(){
-				SlotSystemTransaction ta = TransactionResults.GetTransaction(HoveredSB, HoveredSG);
+				SlotSystemTransaction ta = TransactionResults.GetTransaction(hoveredSB, hoveredSG);
 				SetTargetSB(ta.targetSB);
 				SetSG1(ta.sg1);
 				SetSG2(ta.sg2);

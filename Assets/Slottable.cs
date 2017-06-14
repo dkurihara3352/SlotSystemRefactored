@@ -289,7 +289,7 @@ namespace SlotSystem{
 				// 		m_instantDeactivateCommand.Execute(this);
 				// 	}
 		/*	public fields	*/
-			public bool Delayed{
+			public bool delayed{
 				get{return m_delayed;}
 				set{m_delayed = value;}
 				}bool m_delayed = true;
@@ -297,16 +297,16 @@ namespace SlotSystem{
 				get{return m_pickedAmount;}
 				set{m_pickedAmount = value;}
 				}int m_pickedAmount = 0;
-			public SlottableItem Item{
+			public SlottableItem item{
 				get{return m_item;}
 				}SlottableItem m_item;
 				public void SetItem(SlottableItem item){
 					m_item = item;
 				}
-			public InventoryItemInstanceMock ItemInst{
-					get{return (InventoryItemInstanceMock)Item;}
+			public InventoryItemInstanceMock itemInst{
+					get{return (InventoryItemInstanceMock)item;}
 				}
-			public SlotGroupManager SGM{
+			public SlotGroupManager sgm{
 				get{return m_sgm;}
 				}SlotGroupManager m_sgm;
 				public void SetSGM(SlotGroupManager sgm){
@@ -320,8 +320,8 @@ namespace SlotSystem{
 			// 	}Slot m_destinationSlot;
 			public int slotID{
 				get{
-					if(SG.slottables.Contains(this))
-						return SG.slottables.IndexOf(this);
+					if(sg.slottables.Contains(this))
+						return sg.slottables.IndexOf(this);
 					else
 						return -1;
 				}
@@ -332,10 +332,10 @@ namespace SlotSystem{
 				public void SetNewSlotID(int id){
 					m_newSlotID = id;
 				}
-			public SlotGroup SG{
+			public SlotGroup sg{
 				get{
 					if(m_sg == null){
-						m_sg = SGM.GetSG(this);
+						m_sg = sgm.GetSG(this);
 					}
 					return m_sg;
 				}
@@ -344,36 +344,36 @@ namespace SlotSystem{
 					/*	use this only when creating a new Sb in transaction	*/
 					m_sg = sg;
 				}
-			public bool IsPickable{
+			public bool isPickable{
 				get{
 					bool result = true;
-					if(SG.IsPool){
-						if(SG.IsAutoSort){
-							if(IsEquipped || ItemInst is PartsInstanceMock && !(SG.Filter is SGPartsFilter))
+					if(sg.isPool){
+						if(sg.isAutoSort){
+							if(isEquipped || itemInst is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
 								result = false;
 						}
 					}
 					return result;
 				}
 			}
-			public bool IsFocused{
+			public bool isFocused{
 				get{return CurSelState == Slottable.FocusedState;}
 			}
-			public bool IsPickedUp{
+			public bool isPickedUp{
 				get{
-					return SGM.pickedSB == this;
+					return sgm.pickedSB == this;
 				}
 			}
-			public bool IsEquipped{
-				get{ return ItemInst.IsEquipped;}
+			public bool isEquipped{
+				get{ return itemInst.IsEquipped;}
 				}public void Equip(){
 					SetEqpState(Slottable.EquippedState);
 				}
 				public void Unequip(){
 					SetEqpState(Slottable.UnequippedState);
 				}
-			public bool IsStackable{
-				get{return ItemInst.Item.IsStackable;}
+			public bool isStackable{
+				get{return itemInst.Item.IsStackable;}
 			}
 		/*	Event methods	*/
 			/*	Selection event	*/
@@ -418,7 +418,7 @@ namespace SlotSystem{
 
 			}
 			public int CompareTo(Slottable other){
-				return this.Item.CompareTo(other.Item);
+				return this.item.CompareTo(other.item);
 			}
 			public static bool operator > (Slottable a, Slottable b){
 				return a.CompareTo(b) > 0;
@@ -437,7 +437,7 @@ namespace SlotSystem{
 		/*	methods	*/
 			public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
 				SetSG(sg);
-				Delayed = delayed;
+				this.delayed = delayed;
 				this.SetItem(item);
 				SelStateEngine.SetState(Slottable.DeactivatedState);
 				ActStateEngine.SetState(Slottable.WaitForActionState);
@@ -454,8 +454,8 @@ namespace SlotSystem{
 			}
 			public void Deactivate(){}
 			public void ExecuteTransaction(){
-				SGM.SetActState(SlotGroupManager.PerformingTransactionState);
-				SGM.Transaction.Execute();
+				sgm.SetActState(SlotGroupManager.PerformingTransactionState);
+				sgm.Transaction.Execute();
 			}
 			// public void MoveDraggedIcon(SlotGroup sg, Slot slot){
 				// 	SetDraggedIconDestination(sg, slot);
@@ -476,7 +476,7 @@ namespace SlotSystem{
 					ActionProcess.Expire();
 			}
 			public void UpdateEquipState(){
-				if(ItemInst.IsEquipped) Equip();
+				if(itemInst.IsEquipped) Equip();
 				else Unequip();
 			}
 			public void Reset(){

@@ -200,7 +200,7 @@ namespace SlotSystem{
 					// 	return null;
 					// }
 		/*	public fields	*/
-			public AxisScrollerMock Scroller{
+			public AxisScrollerMock scroller{
 				get{return m_scroller;}
 				set{m_scroller = value;}
 				}AxisScrollerMock m_scroller;
@@ -211,15 +211,15 @@ namespace SlotSystem{
 				public void SetInventory(Inventory inv){
 					m_inventory = inv;
 				}
-			public bool IsShrinkable{
+			public bool isShrinkable{
 				get{return m_isShrinkable;}
 				set{m_isShrinkable = value;}
 				}bool m_isShrinkable;
-			public bool IsExpandable{
+			public bool isExpandable{
 				get{return m_isExpandable;}
 				set{m_isExpandable = value;}
 				}bool m_isExpandable;
-			public List<Slot> Slots{
+			public List<Slot> slots{
 				get{
 					if(m_slots == null)
 						m_slots = new List<Slot>();
@@ -234,7 +234,7 @@ namespace SlotSystem{
 				public void SetNewSlots(List<Slot> newSlots){
 					m_newSlots = newSlots;
 				}
-			public SlotGroupManager SGM{
+			public SlotGroupManager sgm{
 				get{return m_sgm;}
 				set{m_sgm = value;
 					foreach(Slottable sb in slottables){
@@ -243,27 +243,27 @@ namespace SlotSystem{
 					}
 				}
 				}SlotGroupManager m_sgm;
-			public bool IsPool{
+			public bool isPool{
 				get{
-					return SGM.AllSGPs.Contains(this);
+					return sgm.allSGPs.Contains(this);
 				}
 			}
-			public bool IsSGE{
+			public bool isSGE{
 				get{
-					return SGM.AllSGEs.Contains(this);
+					return sgm.allSGEs.Contains(this);
 				}
 			}
-			public bool IsAutoSort{
+			public bool isAutoSort{
 				get{return m_autoSort;}
 				}bool m_autoSort = true;
 				public void ToggleAutoSort(bool on){
 					m_autoSort = on;
-					SGM.Focus();
+					sgm.Focus();
 				}
 			public List<Slottable> slottables{
 				get{
 					List<Slottable> result = new List<Slottable>();
-						foreach(Slot slot in this.Slots){
+						foreach(Slot slot in this.slots){
 							if(slot.sb != null)
 								result.Add(slot.sb);
 							else
@@ -278,56 +278,56 @@ namespace SlotSystem{
 				public void SetNewSBs(List<Slottable> sbs){
 					m_newSBs = sbs;
 				}
-			public List<InventoryItemInstanceMock> ItemInstances{
+			public List<InventoryItemInstanceMock> itemInstances{
 				get{
 					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
 						foreach(Slottable sb in slottables){
 							if(sb != null)
-								result.Add(sb.ItemInst);
+								result.Add(sb.itemInst);
 							else
 								result.Add(null);
 						}
 					return result;
 				}
 			}
-			public List<InventoryItemInstanceMock> ActualItemInsts{
+			public List<InventoryItemInstanceMock> actualItemInsts{
 				get{
 					List<InventoryItemInstanceMock> result = new List<InventoryItemInstanceMock>();
-					foreach(InventoryItemInstanceMock itemInst in ItemInstances){
+					foreach(InventoryItemInstanceMock itemInst in itemInstances){
 						if(itemInst != null)
 							result.Add(itemInst);
 					}
 					return result;
 				}
 			}
-			public bool IsFocused{
+			public bool isFocused{
 				get{return CurSelState == SlotGroup.FocusedState;}
 			}
-			public bool HasEmptySlot{
+			public bool hasEmptySlot{
 				get{
 					bool emptyFound = false;
-					foreach(Slot slot in Slots){
+					foreach(Slot slot in slots){
 						if(slot.sb == null)
 							emptyFound = true;
 					}
 					return emptyFound;
 				}
 			}
-			public int ActualSBsCount{
+			public int actualSBsCount{
 				get{
 					int count = 0;
-					foreach(Slot slot in Slots){
+					foreach(Slot slot in slots){
 						if(slot.sb != null)
 							count ++;
 					}
 					return count;
 				}
 			}
-			public List<Slottable> EquippedSBs{
+			public List<Slottable> equippedSBs{
 				get{
 					List<Slottable> result = new List<Slottable>();
 					foreach(Slottable sb in slottables){
-						if(sb != null && sb.IsEquipped)
+						if(sb != null && sb.isEquipped)
 							result.Add(sb);
 					}
 					return result;
@@ -453,8 +453,8 @@ namespace SlotSystem{
 			public void InstantSort(){
 				List<Slottable> origSBs = slottables;
 				Sorter.OrderSBsWithRetainedSize(ref origSBs);
-				foreach(Slot slot in Slots){
-					slot.sb = origSBs[Slots.IndexOf(slot)];
+				foreach(Slot slot in slots){
+					slot.sb = origSBs[slots.IndexOf(slot)];
 				}
 			}
 		/*	filter	*/
@@ -505,11 +505,11 @@ namespace SlotSystem{
 			public bool AcceptsFilter(Slottable pickedSB){
 				if(this.Filter is SGNullFilter) return true;
 				else{
-					if(pickedSB.Item is BowInstanceMock)
+					if(pickedSB.item is BowInstanceMock)
 						return this.Filter is SGBowFilter;
-					else if(pickedSB.Item is WearInstanceMock)
+					else if(pickedSB.item is WearInstanceMock)
 						return this.Filter is SGWearFilter;
-					else if(pickedSB.Item is CarriedGearInstanceMock)
+					else if(pickedSB.item is CarriedGearInstanceMock)
 						return this.Filter is SGCGearsFilter;
 					else// if(pickedSB.Item is PartsInstanceMock)
 						return this.Filter is SGPartsFilter;
@@ -577,11 +577,11 @@ namespace SlotSystem{
 				SetFilter(filter);
 				SetSorter(SlotGroup.ItemIDSorter);
 				SetInventory(inv);
-				this.IsShrinkable = isShrinkable;
+				this.isShrinkable = isShrinkable;
 				if(initSlotsCount == 0)
-					this.IsExpandable = true;
+					this.isExpandable = true;
 				else
-					this.IsExpandable = false;
+					this.isExpandable = false;
 				m_initSlotsCount = initSlotsCount;
 				InitializeItems();			
 				SetSelState(SlotGroup.DeactivatedState);
@@ -601,14 +601,14 @@ namespace SlotSystem{
 			public Slottable GetSB(InventoryItemInstanceMock itemInst){
 				foreach(Slottable sb in this.slottables){
 					if(sb != null){
-						if(sb.ItemInst == itemInst)
+						if(sb.itemInst == itemInst)
 							return sb;
 					}
 				}
 				if(allTASBs != null){
 					foreach(Slottable sb in allTASBs){
 						if(sb != null){
-							if(sb.ItemInst == itemInst)
+							if(sb.itemInst == itemInst)
 								return sb;
 						}
 					}
@@ -619,7 +619,7 @@ namespace SlotSystem{
 				bool result = false;
 				foreach(Slottable sb in this.slottables){
 					if(sb != null){
-						if(sb.ItemInst == invInst)
+						if(sb.itemInst == invInst)
 							return true;
 					}
 				}
@@ -630,7 +630,7 @@ namespace SlotSystem{
 					if(sb != null){
 						sb.SetActState(Slottable.WaitForActionState);
 						sb.Reset();
-						if(sb.IsPickable)
+						if(sb.isPickable)
 							sb.Focus();
 						else
 							sb.Defocus();
@@ -646,9 +646,9 @@ namespace SlotSystem{
 				}
 			}
 			public Slot GetSlot(InventoryItemInstanceMock itemInst){
-				foreach(Slot slot in this.Slots){
+				foreach(Slot slot in this.slots){
 					if(slot.sb != null){
-						if(slot.sb.ItemInst == itemInst)
+						if(slot.sb.itemInst == itemInst)
 							return slot;
 					}
 				}
@@ -672,7 +672,7 @@ namespace SlotSystem{
 				int index = -3;
 				foreach(Slottable sb in newSBs){
 					if(sb != null){
-						if(sb.ItemInst == itemInst)
+						if(sb.itemInst == itemInst)
 							index = newSBs.IndexOf(sb);
 					}
 				}
