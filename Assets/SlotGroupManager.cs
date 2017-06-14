@@ -38,7 +38,9 @@ namespace SlotSystem{
 			public void AcceptSGTAComp(SlotGroup sg){
 				if(sg2 != null && sg == sg2) m_sg2Done = true;
 				else if(sg1 != null && sg == sg1) m_sg1Done = true;
-				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
+				if(CurActState == SlotGroupManager.PerformingTransactionState){
+					IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
+				}
 			}
 			public void AcceptDITAComp(DraggedIcon di){
 				if(dIcon2 != null && di == dIcon2) m_dIcon2Done = true;
@@ -140,7 +142,7 @@ namespace SlotSystem{
 			public SGMProcess ActionProcess{
 				get{return m_actionProcess;}
 				}SGMProcess m_actionProcess;
-				public void SetAndRunActProcess(SGMProcess process){	
+				public void SetAndRunActProcess(SGMProcess process){
 					if(ActionProcess != null)
 						ActionProcess.Stop();
 					m_actionProcess = process;

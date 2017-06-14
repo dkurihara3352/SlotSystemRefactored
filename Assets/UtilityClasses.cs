@@ -20,10 +20,10 @@ namespace Utility{
 					curState.ExitState(handler);
 					prevState = curState;
 				}
-				if(state != null){
-					state.EnterState(handler);
-				}
 				curState = state;
+				if(curState != null){
+					curState.EnterState(handler);
+				}
 			}else{// used as initialization
 				prevState = state;
 				curState = state;
@@ -44,6 +44,10 @@ namespace Utility{
 		// 		list[n] = value;  
 		// 	}  
 		// }
+		public static void Reorder<T>(this IList<T> list, T ele, T other){
+			list.Remove(ele);
+			list.Insert(list.IndexOf(other) + 1,ele);
+		}
 		public static void Shuffle<T>(this IList<T> list)
 		{  
 			int n = list.Count;  

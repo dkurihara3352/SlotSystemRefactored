@@ -132,7 +132,7 @@ namespace SlotSystem{
 							return m_sortState;
 						}
 						}private static SGActionState m_sortState;
-			/*	process	*/
+		/*	process	*/
 				public SGProcess SelectionProcess{
 					get{return m_selectionProcess;}
 					}SGProcess m_selectionProcess;
@@ -153,51 +153,52 @@ namespace SlotSystem{
 						if(m_actionProcess != null)
 							m_actionProcess.Start();
 					}
-		/*	coroutines	*/
-			public IEnumeratorMock GreyinCoroutine(){
-				return null;
-			}
-			public IEnumeratorMock GreyoutCoroutine(){
-				return null;
-			}
-			public IEnumeratorMock HighlightCoroutine(){
-				return null;
-			}
-			public IEnumeratorMock DehighlightCoroutine(){
-				return null;
-			}
-			public IEnumeratorMock InstantGreyoutCoroutine(){
-				return null;
-			}
-			public IEnumeratorMock InstantGreyinCoroutine(){
-				return null;
-			}
-			public IEnumeratorMock TransactionCoroutine(){
-				bool flag = true;
-				if(allTASBs == null/* as in when testing */)
+			/*	coroutines	*/
+				public IEnumeratorMock GreyinCoroutine(){
 					return null;
-				foreach(Slottable sb in allTASBs){
-					flag &= sb.ActionProcess.IsExpired;
 				}
-				if(flag){
-					ActionProcess.Expire();
+				public IEnumeratorMock GreyoutCoroutine(){
+					return null;
 				}
-				return null;
-			}
-			/*	dump	*/
-				// public IEnumeratorMock UpdateTransactionCoroutine(){
-				// 	return null;
-				// }
-				// public IEnumeratorMock WaitForAllSlotMovementsDone(){
-				// 	bool flag = true;
-				// 	foreach(SlotMovement sm in slotMovements){
-				// 		flag &= sm.SB.CurProcess.IsExpired;
-				// 	}
-				// 	if(flag){
-				// 		CurProcess.Expire();
-				// 	}
-				// 	return null;
-				// }
+				public IEnumeratorMock HighlightCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock DehighlightCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock InstantGreyoutCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock InstantGreyinCoroutine(){
+					return null;
+				}
+				public IEnumeratorMock TransactionCoroutine(){
+					bool flag = true;
+					if(allTASBs == null/* as in when testing */)
+						return null;
+					foreach(Slottable sb in allTASBs){
+						if(sb != null)
+						flag &= sb.ActionProcess.IsExpired;
+					}
+					if(flag){
+						ActionProcess.Expire();
+					}
+					return null;
+				}
+				/*	dump	*/
+					// public IEnumeratorMock UpdateTransactionCoroutine(){
+					// 	return null;
+					// }
+					// public IEnumeratorMock WaitForAllSlotMovementsDone(){
+					// 	bool flag = true;
+					// 	foreach(SlotMovement sm in slotMovements){
+					// 		flag &= sm.SB.CurProcess.IsExpired;
+					// 	}
+					// 	if(flag){
+					// 		CurProcess.Expire();
+					// 	}
+					// 	return null;
+					// }
 		/*	public fields	*/
 			public AxisScrollerMock Scroller{
 				get{return m_scroller;}
@@ -233,9 +234,14 @@ namespace SlotSystem{
 				public void SetNewSlots(List<Slot> newSlots){
 					m_newSlots = newSlots;
 				}
-						public SlotGroupManager SGM{
+			public SlotGroupManager SGM{
 				get{return m_sgm;}
-				set{m_sgm = value;}
+				set{m_sgm = value;
+					foreach(Slottable sb in slottables){
+						if(sb != null)
+							sb.SetSGM(value);
+					}
+				}
 				}SlotGroupManager m_sgm;
 			public bool IsPool{
 				get{
@@ -333,12 +339,14 @@ namespace SlotSystem{
 				public void SetAllTASBs(List<Slottable> sbs){
 					m_allTASBs = sbs;
 				}
-			public bool IsAllTASBsDone{
+			public bool isAllTASBsDone{
 				get{
-					foreach(Slottable sb in allTASBs){
-						if(sb != null){
-							if(sb.ActionProcess.IsRunning)
-								return false;
+					if(allTASBs != null){
+						foreach(Slottable sb in allTASBs){
+							if(sb != null){
+								if(sb.ActionProcess.IsRunning)
+									return false;
+							}
 						}
 					}
 					return true;
@@ -810,13 +818,13 @@ namespace SlotSystem{
 				// 	}
 				// }
 			// public int FindNextEmpty(ref List<Slottable> sbList){
-			// 	foreach(Slottable sb in sbList){
-			// 		if(sb == null)
-			// 			return sbList.IndexOf(sb);
-			// 	}
-			// 	sbList.Add(null);
-			// 	return sbList.Count -1;
-			// }
+				// 	foreach(Slottable sb in sbList){
+				// 		if(sb == null)
+				// 			return sbList.IndexOf(sb);
+				// 	}
+				// 	sbList.Add(null);
+				// 	return sbList.Count -1;
+				// }
 			public void SetSBsActStates(){
 				List<Slottable> moveWithins = new List<Slottable>();
 				List<Slottable> removed = new List<Slottable>();

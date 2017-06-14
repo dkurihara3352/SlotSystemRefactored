@@ -23,37 +23,37 @@ namespace SlotSystem{
 					public void SetSelState(SBSelectionState selState){
 						SelStateEngine.SetState(selState);
 					}
-				// static states
-					public static SBSelectionState DeactivatedState{
-						get{
-							if(Slottable.m_deactivatedState != null)
-								return Slottable.m_deactivatedState;
-							else{
-								Slottable.m_deactivatedState = new SBDeactivatedState();	
-								return Slottable.m_deactivatedState;
-							}
+
+				public static SBSelectionState DeactivatedState{
+					get{
+						if(Slottable.m_deactivatedState != null)
+							return Slottable.m_deactivatedState;
+						else{
+							Slottable.m_deactivatedState = new SBDeactivatedState();	
+							return Slottable.m_deactivatedState;
 						}
-						}static SBSelectionState m_deactivatedState;
-					public static SBSelectionState SelectedState{
-						get{
-							if(Slottable.m_selectedState != null)
-								return Slottable.m_selectedState;
-							else
-								Slottable.m_selectedState = new SBSelectedState();
-								return Slottable.m_selectedState;
+					}
+					}static SBSelectionState m_deactivatedState;
+				public static SBSelectionState SelectedState{
+					get{
+						if(Slottable.m_selectedState != null)
+							return Slottable.m_selectedState;
+						else
+							Slottable.m_selectedState = new SBSelectedState();
+							return Slottable.m_selectedState;
+					}
+					}static SBSelectionState m_selectedState;			
+				public static SBSelectionState DefocusedState{
+					get{
+						if(Slottable.m_defocusedState != null)
+							return Slottable.m_defocusedState;
+						else{
+							Slottable.m_defocusedState = new SBDefocusedState();
+							return Slottable.m_defocusedState;
 						}
-						}static SBSelectionState m_selectedState;			
-					public static SBSelectionState DefocusedState{
-						get{
-							if(Slottable.m_defocusedState != null)
-								return Slottable.m_defocusedState;
-							else{
-								Slottable.m_defocusedState = new SBDefocusedState();
-								return Slottable.m_defocusedState;
-							}
-						}
-						}static SBSelectionState m_defocusedState;
-					public static SBSelectionState FocusedState{
+					}
+					}static SBSelectionState m_defocusedState;
+				public static SBSelectionState FocusedState{
 						get{
 							if(Slottable.m_focusedState != null)
 								return Slottable.m_focusedState;
@@ -80,72 +80,72 @@ namespace SlotSystem{
 					public void SetActState(SBActionState actState){
 						ActStateEngine.SetState(actState);
 					}
-				//	static states
-					public static SBActionState WaitForActionState{
-						get{
-							if(m_waitForActionState != null)
-								return m_waitForActionState;
-							else{
-								m_waitForActionState = new WaitForActionState();
-								return m_waitForActionState;
-							}
+				
+				public static SBActionState WaitForActionState{
+					get{
+						if(m_waitForActionState != null)
+							return m_waitForActionState;
+						else{
+							m_waitForActionState = new WaitForActionState();
+							return m_waitForActionState;
 						}
-						}static SBActionState m_waitForActionState;
-					public static SBActionState WaitForPointerUpState{
-						get{
-							if(m_waitForPointerUpState != null)
-								return m_waitForPointerUpState;
-							else{
-								m_waitForPointerUpState = new WaitForPointerUpState();
-								return m_waitForPointerUpState;
-							}
+					}
+					}static SBActionState m_waitForActionState;
+				public static SBActionState WaitForPointerUpState{
+					get{
+						if(m_waitForPointerUpState != null)
+							return m_waitForPointerUpState;
+						else{
+							m_waitForPointerUpState = new WaitForPointerUpState();
+							return m_waitForPointerUpState;
 						}
-						}static SBActionState m_waitForPointerUpState;
-					public static SBActionState WaitForPickUpState{
-						get{
-							if(Slottable.m_waitForPickUpState != null)
-								return Slottable.m_waitForPickUpState;
-							else{
-								Slottable.m_waitForPickUpState = new WaitForPickUpState();
-								return Slottable.m_waitForPickUpState;
-							}
+					}
+					}static SBActionState m_waitForPointerUpState;
+				public static SBActionState WaitForPickUpState{
+					get{
+						if(Slottable.m_waitForPickUpState != null)
+							return Slottable.m_waitForPickUpState;
+						else{
+							Slottable.m_waitForPickUpState = new WaitForPickUpState();
+							return Slottable.m_waitForPickUpState;
 						}
-						}static SBActionState m_waitForPickUpState;
-					public static SBActionState WaitForNextTouchState{
-						get{
-							if(Slottable.m_waitForNextTouchState != null)
-								return Slottable.m_waitForNextTouchState;
-							else{
-								Slottable.m_waitForNextTouchState = new WaitForNextTouchState();
-								return Slottable.m_waitForNextTouchState;
-							}
+					}
+					}static SBActionState m_waitForPickUpState;
+				public static SBActionState WaitForNextTouchState{
+					get{
+						if(Slottable.m_waitForNextTouchState != null)
+							return Slottable.m_waitForNextTouchState;
+						else{
+							Slottable.m_waitForNextTouchState = new WaitForNextTouchState();
+							return Slottable.m_waitForNextTouchState;
 						}
-						}static SBActionState m_waitForNextTouchState;
-					public static SBActionState PickedUpState{
-						get{
-							if(Slottable.m_pickedUpState != null)
-								return Slottable.m_pickedUpState;
-							else{
-								Slottable.m_pickedUpState = new PickedUpState();
-								return Slottable.m_pickedUpState;
-							}
+					}
+					}static SBActionState m_waitForNextTouchState;
+				public static SBActionState PickedUpState{
+					get{
+						if(Slottable.m_pickedUpState != null)
+							return Slottable.m_pickedUpState;
+						else{
+							Slottable.m_pickedUpState = new PickedUpState();
+							return Slottable.m_pickedUpState;
 						}
-						}static SBActionState m_pickedUpState;
-					public static SBActionState RemovedState{
-						get{
-							if(Slottable.m_removedState == null)
-								Slottable.m_removedState = new SBRemovedState();
-							return Slottable.m_removedState;			
-						}
-						}static SBActionState m_removedState;
-					public static SBActionState AddedState{
-						get{
-							if(Slottable.m_addedState == null)
-								Slottable.m_addedState = new SBAddedState();
-							return Slottable.m_addedState;			
-						}
-						}static SBActionState m_addedState;
-					public static SBActionState MoveWithinState{
+					}
+					}static SBActionState m_pickedUpState;
+				public static SBActionState RemovedState{
+					get{
+						if(Slottable.m_removedState == null)
+							Slottable.m_removedState = new SBRemovedState();
+						return Slottable.m_removedState;			
+					}
+					}static SBActionState m_removedState;
+				public static SBActionState AddedState{
+					get{
+						if(Slottable.m_addedState == null)
+							Slottable.m_addedState = new SBAddedState();
+						return Slottable.m_addedState;			
+					}
+					}static SBActionState m_addedState;
+				public static SBActionState MoveWithinState{
 						get{
 							if(Slottable.m_moveWithinState == null)
 								Slottable.m_moveWithinState = new SBMoveWithinState();
@@ -197,27 +197,27 @@ namespace SlotSystem{
 					public void SetEqpState(SBEquipState actState){
 						EqpStateEngine.SetState(actState);
 					}
-				//	static states
-					public static SBEquipState EquippedState{
-						get{
-							if(m_equippedState != null)
-								return m_equippedState;
-							else{
-								m_equippedState = new SBEquippedState();
-								return m_equippedState;
-							}
+				
+				public static SBEquipState EquippedState{
+					get{
+						if(m_equippedState != null)
+							return m_equippedState;
+						else{
+							m_equippedState = new SBEquippedState();
+							return m_equippedState;
 						}
-						}static SBEquipState m_equippedState;
-					public static SBEquipState UnequippedState{
-						get{
-							if(m_unequippedState != null)
-								return m_unequippedState;
-							else{
-								m_unequippedState = new SBUnequippedState();
-								return m_unequippedState;
-							}
+					}
+					}static SBEquipState m_equippedState;
+				public static SBEquipState UnequippedState{
+					get{
+						if(m_unequippedState != null)
+							return m_unequippedState;
+						else{
+							m_unequippedState = new SBUnequippedState();
+							return m_unequippedState;
 						}
-						}static SBEquipState m_unequippedState;
+					}
+					}static SBEquipState m_unequippedState;
 		/*	processes	*/
 			public SBProcess SelectionProcess{
 				get{return m_selectionProcess;}
@@ -229,7 +229,6 @@ namespace SlotSystem{
 					if(m_selectionProcess != null)
 						m_selectionProcess.Start();
 				}
-			/*	coroutine	*/
 				public IEnumeratorMock GreyoutCoroutine(){return null;}
 				public IEnumeratorMock GreyinCoroutine(){return null;}
 				public IEnumeratorMock HighlightCoroutine(){return null;}
@@ -244,7 +243,6 @@ namespace SlotSystem{
 					if(m_actionProcess != null)
 						m_actionProcess.Start();
 				}
-			/*	coroutine */
 				public IEnumeratorMock WaitForPointerUpCoroutine(){return null;}
 				public IEnumeratorMock WaitForPickUpCoroutine(){return null;}
 				public IEnumeratorMock PickUpCoroutine(){return null;}
@@ -272,7 +270,6 @@ namespace SlotSystem{
 					if(m_equipProcess != null)
 						m_equipProcess.Start();
 				}
-			/*	coroutine	*/
 				public IEnumeratorMock UnequipCoroutine(){return null;}
 				public IEnumeratorMock EquipCoroutine(){return null;}
 		/*	commands	*/
@@ -311,8 +308,10 @@ namespace SlotSystem{
 				}
 			public SlotGroupManager SGM{
 				get{return m_sgm;}
-				set{m_sgm = value;}
 				}SlotGroupManager m_sgm;
+				public void SetSGM(SlotGroupManager sgm){
+					m_sgm = sgm;
+				}
 			// public SlotGroup DestinationSG{
 			// 	get{return m_destinationSG;}
 			// 	}SlotGroup m_destinationSG;
@@ -376,7 +375,6 @@ namespace SlotSystem{
 			public bool IsStackable{
 				get{return ItemInst.Item.IsStackable;}
 			}
-
 		/*	Event methods	*/
 			/*	Selection event	*/
 				public void Focus(){
@@ -437,8 +435,7 @@ namespace SlotSystem{
 			public void InstantUnequip(){}
 			public void InstantHighlight(){}
 		/*	methods	*/
-			public void Initialize(SlotGroupManager sgm, SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
-				this.m_sgm = sgm;
+			public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
 				SetSG(sg);
 				Delayed = delayed;
 				this.SetItem(item);

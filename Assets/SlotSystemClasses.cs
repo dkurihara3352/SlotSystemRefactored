@@ -424,12 +424,12 @@ namespace SlotSystem{
 				public override void Execute(){
 					sg1.SetSorter(sorter);
 					sg1.SetActState(SlotGroup.SortState);
+					// Debug.Log(Util.SGName(sg1) + " isAllTASBs done: " + sg1.IsAllTASBsDone);
 					base.Execute();
 					// selectedSG.SetAndRunSlotMovementsForSort();
 				}
 				public override void OnComplete(){
 					sg1.OnCompleteSlotMovementsV2();
-					sgm.ResetAndFocus();
 					base.OnComplete();
 				}
 			}
@@ -1243,8 +1243,9 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						Slottable sb1 = sg.SGM.pickedSB;
 						Slottable sb2 = sg.SGM.targetSB;
-						List<Slottable> newSBs = sg.slottables;
-						Util.ReorderSBs(sb1, sb2, ref newSBs);
+						List<Slottable> newSBs = new List<Slottable>();
+						newSBs.AddRange(sg.slottables);
+						newSBs.Reorder(sb1, sb2);
 						sg.SetNewSBs(newSBs);
 						sg.CreateNewSlots();
 						sg.SetSBsActStates();
@@ -1279,7 +1280,8 @@ namespace SlotSystem{
 							if(!found){
 								GameObject newSBSG = new GameObject("newSBSG");
 								Slottable newSB = newSBSG.AddComponent<Slottable>();
-								newSB.Initialize(sg.SGM, sg, true, itemInst);
+								newSB.Initialize(sg, true, itemInst);
+								newSB.SetSGM(sg.SGM);
 								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
 							}
@@ -1372,7 +1374,8 @@ namespace SlotSystem{
 						if(!sg.IsPool){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							newSB.Initialize(sg.SGM, sg, true, added.ItemInst);
+							newSB.Initialize(sg, true, added.ItemInst);
+							newSB.SetSGM(sg.SGM);
 							newSB.Defocus();
 							newSBs[newSBs.IndexOf(removed)] = newSB;
 						}
@@ -1410,13 +1413,15 @@ namespace SlotSystem{
 							else
 								removed = null;
 
-						List<Slottable> newSBs = sg.slottables;
+						List<Slottable> newSBs = new List<Slottable>();
+						newSBs.AddRange(sg.slottables);
 						int origCount = newSBs.Count;
 						if(!sg.IsPool){
 							if(added != null){
 								GameObject newSBGO = new GameObject("newSBGO");
 								Slottable newSB = newSBGO.AddComponent<Slottable>();
-								newSB.Initialize(sg.SGM, sg, true, added.ItemInst);
+								newSB.Initialize(sg, true, added.ItemInst);
+								newSB.SetSGM(sg.SGM);
 								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
 							}
@@ -1441,7 +1446,8 @@ namespace SlotSystem{
 									newAdded = sb;
 							}
 							Slottable targetSB = sg.SGM.targetSB;
-							Util.ReorderSBs(newAdded, targetSB, ref newSBs);
+							newSBs.Reorder(newAdded, targetSB);
+							// Util.ReorderSBs(newAdded, targetSB, ref newSBs);
 						}
 						if(!sg.IsExpandable){
 							while(newSBs.Count <origCount){
@@ -1736,7 +1742,7 @@ namespace SlotSystem{
 						foreach(SlottableItem item in items){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							newSB.Initialize(sg.SGM, sg, true, (InventoryItemInstanceMock)item);
+							newSB.Initialize(sg, true, (InventoryItemInstanceMock)item);
 							sg.Slots[items.IndexOf(item)].sb = newSB;
 						}
 					if(sg.IsAutoSort)
@@ -3398,8 +3404,12 @@ namespace SlotSystem{
 					m_dest = newDest;
 				}
 			SlotGroupManager m_sgm;
+			public Slottable sb{
+				get{return m_sb;}
+				}Slottable m_sb;
 			public DraggedIcon(Slottable sb){
-				m_item = sb.ItemInst;
+				m_sb = sb;
+				m_item = this.sb.ItemInst;
 				m_sgm = SlotGroupManager.CurSGM;
 			}
 			public void CompleteMovement(){
@@ -3839,31 +3849,31 @@ namespace SlotSystem{
 			public class PartsInstanceMock: InventoryItemInstanceMock{}
 	/*	utility	*/
 		public static class Util{
-			public static void ReorderSBs(Slottable picked, Slottable hovered, ref List<Slottable> reorderedSBs){
-				List<Slottable> result = new List<Slottable>();
-				foreach(Slottable sb in reorderedSBs){
-					result.Add(sb);
-				}
-				int pickedId = result.IndexOf(picked);
-				int hoveredId = result.IndexOf(hovered);
-				Slottable pickedOrig =  result[pickedId];
-				if(pickedId < hoveredId){
-					for (int i = 0; i < result.Count; i++)
-					{
-						if(i >= pickedId && i < hoveredId){
-							result[i] = result[i + 1];
-						}
-					}
-				}else{
-					for(int i = result.Count - 1; i >= 0; i --){
-						if(i > hoveredId && i <= pickedId){
-							result[i] = result[i - 1];
-						}
-					}
-				}
-				result[hoveredId] = pickedOrig;
-				reorderedSBs = result;
-			}
+			// public static void ReorderSBs(Slottable picked, Slottable hovered, ref List<Slottable> reorderedSBs){
+				// 	List<Slottable> result = new List<Slottable>();
+				// 	foreach(Slottable sb in reorderedSBs){
+				// 		result.Add(sb);
+				// 	}
+				// 	int pickedId = result.IndexOf(picked);
+				// 	int hoveredId = result.IndexOf(hovered);
+				// 	Slottable pickedOrig =  result[pickedId];
+				// 	if(pickedId < hoveredId){
+				// 		for (int i = 0; i < result.Count; i++)
+				// 		{
+				// 			if(i >= pickedId && i < hoveredId){
+				// 				result[i] = result[i + 1];
+				// 			}
+				// 		}
+				// 	}else{
+				// 		for(int i = result.Count - 1; i >= 0; i --){
+				// 			if(i > hoveredId && i <= pickedId){
+				// 				result[i] = result[i - 1];
+				// 			}
+				// 		}
+				// 	}
+				// 	result[hoveredId] = pickedOrig;
+				// 	reorderedSBs = result;
+				// }
 			public static void Trim(ref List<Slottable> sbs){
 				List<Slottable> trimmed = new List<Slottable>();
 				foreach(Slottable sb in sbs){
@@ -3964,10 +3974,22 @@ namespace SlotSystem{
 				public static string SGMDebug(SlotGroupManager sgm){
 					string res = "";
 					string pSB = Util.SBofSG(sgm.pickedSB);
+					string tSB = Util.SBofSG(sgm.targetSB);
 					string hSG = Util.SGName(sgm.HoveredSG);
 					string hSB = Util.SBofSG(sgm.HoveredSB);
-					string tSG = Util.SGName(sgm.sg2);
-					string tSB = Util.SBofSG(sgm.targetSB);
+					string di1;
+						if(sgm.dIcon1 == null)
+							di1 = "null";
+						else
+							di1 = Util.SBofSG(sgm.dIcon1.sb);
+					string di2;
+						if(sgm.dIcon2 == null)
+							di2 = "null";
+						else
+							di2 = Util.SBofSG(sgm.dIcon2.sb);
+					
+					string sg1 = Util.SGName(sgm.sg1);
+					string sg2 = Util.SGName(sgm.sg2);
 					string prevSel = Util.SGMStateName(sgm.PrevSelState);
 					string curSel = Util.SGMStateName(sgm.CurSelState);
 					string selProc;
@@ -3981,24 +4003,27 @@ namespace SlotSystem{
 						if(sgm.ActionProcess == null)
 							actProc = "";
 						else
-							actProc = Util.SGMProcessName(sgm.ActionProcess) + " exp? " + (sgm.SelectionProcess.IsExpired?Blue("true"):Red("false"));
+							actProc = Util.SGMProcessName(sgm.ActionProcess) + " exp? " + (sgm.ActionProcess.IsExpired?Blue("true"):Red("false"));
 					string ta = Util.TransactionName(sgm.Transaction);
-					string pSBD = "d1Done: " + (sgm.dIcon1Done?Util.Blue("true"):Util.Red("false"));
-					string tSBD = "d2Done: " + (sgm.dIcon2Done?Util.Blue("true"):Util.Red("false"));
-					string oSGD = "sg1Done: " + (sgm.sg1Done?Util.Blue("true"):Util.Red("false"));
-					string tSGD = "sg2Done: " + (sgm.sg2Done?Util.Blue("true"):Util.Red("false"));
+					string d1Done = "d1Done: " + (sgm.dIcon1Done?Util.Blue("true"):Util.Red("false"));
+					string d2Done = "d2Done: " + (sgm.dIcon2Done?Util.Blue("true"):Util.Red("false"));
+					string sg1Done = "sg1Done: " + (sgm.sg1Done?Util.Blue("true"):Util.Red("false"));
+					string sg2Done = "sg2Done: " + (sgm.sg2Done?Util.Blue("true"):Util.Red("false"));
 					res = Bold("DebugTarget: ") + Util.Bold("SGM:") +
 							" pSB " + pSB +
+							", tSB " + tSB +
 							", hSG " + hSG +
 							", hSB " + hSB +
-							", tSB " + tSB +
-							" tSG " + tSG + ", " +
+							", di1 " + di1 +
+							", di2 " + di2 +
+							", sg1 " + sg1 +
+							", sg2 " + sg2 + ", " +
 						Util.Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
 							"proc " + selProc + ", " +
 						Util.Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
 							"proc " + actProc + ", " +
 						Util.Bold("TA ") + ta + ", " + 
-						Util.Bold("TAComp ") + pSBD + " " + tSBD + " " + oSGD + " " + tSGD;
+						Util.Bold("TAComp ") + d1Done + " " + d2Done + " " + sg1Done + " " + sg2Done;
 					return res;
 				}
 			/*	SG	*/
@@ -4055,6 +4080,8 @@ namespace SlotSystem{
 						res = Util.Violet("SGAdd");
 					}else if(state is SGRemoveState){
 						res = Util.Khaki("SGRemove");
+					}else if(state is SGSortState){
+						res = Util.Midnight("SGSort");
 					}
 					return res;
 				}
@@ -4141,9 +4168,9 @@ namespace SlotSystem{
 						if(sb.ItemInst is BowInstanceMock)
 							result = Forest(result);
 						if(sb.ItemInst is WearInstanceMock)
-							result = Brown(result);
+							result = Sangria(result);
 						if(sb.ItemInst is CarriedGearInstanceMock)
-							result = Yamabuki(result);
+							result = Terra(result);
 						if(sb.ItemInst is PartsInstanceMock)
 							result = Midnight(result);
 					}
