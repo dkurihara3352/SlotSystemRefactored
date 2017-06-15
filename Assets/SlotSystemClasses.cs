@@ -161,23 +161,14 @@ namespace SlotSystem{
 					m_pickedSB = sgm.pickedSB;
 					m_origSG = m_pickedSB.sg;
 				}
-				// public override SlotGroup sg1{get{return m_origSG;}}
-				// public override Slottable sb1{get{return m_pickedSB;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// sgm.CompleteTransactionOnSG(pickedSB.SG);
-					// SlotGroup sg = sgm.GetSG(pickedSB);
-					// Slot slot = sg.GetSlot(pickedSB);
-					// pickedSB.MoveDraggedIcon(sg, slot);
-					// pickedSB.SetActState(Slottable.RevertingState);
-					// origSG.SetAndRunSlotMovements(removed, added);
 					m_origSG.SetActState(SlotGroup.RevertState);
 					sgm.dIcon1.SetDestination(m_origSG, m_origSG.GetNewSlot(m_pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
 					m_origSG.OnCompleteSlotMovementsV2();
-					// sgm.DestroyDraggedIcon();
 					base.OnComplete();
 				}
 			}
@@ -190,26 +181,16 @@ namespace SlotSystem{
 					m_selectedSB = selected;
 					m_origSG = m_pickedSB.sg;
 				}
-				// public override Slottable sb1{get{return m_pickedSB;}}
 				public override Slottable targetSB{get{return m_selectedSB;}}
 				public override SlotGroup sg1{get{return m_origSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// // sgm.CompleteTransactionOnSB(selectedSB);
-					// origSG.SetAndRunSlotMovementsForReorder(pickedSB, selectedSB);
-					// // origSG.SetActState(SlotGroup.PerformingTransactionState);
-					// // origSG.ActionProcess.Start();
-
-					// Slot slot = origSG.GetSlot(selectedSB);
-					// pickedSB.MoveDraggedIcon(origSG, slot);
-					// // origSG.CheckCompletion();
 					sg1.SetActState(SlotGroup.ReorderState);
 					sgm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
 					sg1.OnCompleteSlotMovementsV2();
-					// sgm.DestroyDraggedIcon();
 					base.OnComplete();
 				}
 			}
@@ -229,15 +210,6 @@ namespace SlotSystem{
 				public override SlotGroup sg2{get{return selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// sgm.AcceptSGTAComp(origSG);
-					// selectedSG.SetAndRunSlotMovementsForReorder(selectedSG.GetSB(pickedSB.ItemInst), selectedSB);
-					// selectedSG.ActionProcess.Start();
-
-					// Slot slot = pickedSB.SG.GetSlot(pickedSB);
-					// pickedSB.MoveDraggedIcon(pickedSB.SG, slot);
-					// pickedSB.SetActState(Slottable.RevertingState);
-
-					// selectedSG.CheckCompletion();
 					sg1.SetActState(SlotGroup.RevertState);
 					sg2.SetActState(SlotGroup.ReorderState);
 					sgm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(pickedSB.itemInst));
@@ -246,7 +218,6 @@ namespace SlotSystem{
 				public override void OnComplete(){
 					sg1.OnCompleteSlotMovementsV2();
 					sg2.OnCompleteSlotMovementsV2();
-					// sgm.DestroyDraggedIcon();
 					base.OnComplete();
 				}
 			}
@@ -271,8 +242,6 @@ namespace SlotSystem{
 				public override List<InventoryItemInstanceMock> moved{get{return itemCache;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					// sgm.AcceptSGTAComp(pickedSB.SG);
-					// sgm.ClearAndReset();
 					sg1.SetActState(SlotGroup.RemoveState);
 					sg2.SetActState(SlotGroup.AddState);
 					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.itemInst));
@@ -308,43 +277,7 @@ namespace SlotSystem{
 					sgm.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.itemInst));
 					base.Execute();
 				}
-				// public override void Execute(){
-					// 	base.Execute();
-					// 	if(!origSG.IsPool){
-					// 		origSG.SetAndRunSlotmovementsForSwap(pickedSB, selectedSB);
-					// 		origSG.ActionProcess.Start();
-					// 	}
-					// 	if(!selectedSG.IsPool){
-					// 		selectedSG.SetAndRunSlotmovementsForSwap(selectedSB, pickedSB);
-					// 		selectedSG.ActionProcess.Start();
-					// 	}
-						
-					// 	Slot selectedSBSlot = selectedSG.GetSlotForAdded(pickedSB);
-					// 	Slot pickedSBSlot = origSG.GetSlotForAdded(selectedSB);
-
-					// 	selectedSB.MoveDraggedIcon(origSG, pickedSBSlot);
-					// 	pickedSB.MoveDraggedIcon(selectedSG, selectedSBSlot);
-						
-					// 	if(origSG.IsPool){
-					// 		pickedSB.SetActState(Slottable.MovingOutState);
-					// 		Slottable swappedDest = origSG.GetSB(selectedSB.ItemInst);
-					// 		swappedDest.SetActState(Slottable.MovingInState);
-					// 	}
-					// 	if(selectedSG.IsPool){
-					// 		selectedSB.SetActState(Slottable.MovingInState);
-					// 		Slottable swappedDest = selectedSG.GetSB(pickedSB.ItemInst);
-					// 		swappedDest.SetActState(Slottable.MovingOutState);
-					// 	}
-
-					// 	origSG.CheckCompletion();
-					// 	selectedSG.CheckCompletion();
-					// }
 				public override void OnComplete(){
-					// sgm.DestroyDraggedIcon();
-					// if(!origSG.IsPool)
-					// 	origSG.OnCompleteSlotMovements();
-					// if(!selectedSG.IsPool)
-					// 	selectedSG.OnCompleteSlotMovements();
 					sg1.OnCompleteSlotMovementsV2();
 					sg2.OnCompleteSlotMovementsV2();
 					sgm.UpdateEquipStatesOnAll();
@@ -1209,22 +1142,22 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGPerformingTransactionState: SGActionState{
-					public override void EnterState(StateHandler sh){
-						base.EnterState(sh);
-						/*	SB movements
-							addition and removal
-							updating index
-						*/
-						if(sg.PrevActState != null && sg.PrevActState == SlotGroup.WaitForActionState){
-							SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
-							sg.SetAndRunActProcess(process);
-						}
-					}
-					public override void ExitState(StateHandler sh){
-						base.ExitState(sh);
-					}
-				}
+				// public class SGPerformingTransactionState: SGActionState{
+					// 	public override void EnterState(StateHandler sh){
+					// 		base.EnterState(sh);
+					// 		/*	SB movements
+					// 			addition and removal
+					// 			updating index
+					// 		*/
+					// 		if(sg.PrevActState != null && sg.PrevActState == SlotGroup.WaitForActionState){
+					// 			SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
+					// 			sg.SetAndRunActProcess(process);
+					// 		}
+					// 	}
+					// 	public override void ExitState(StateHandler sh){
+					// 		base.ExitState(sh);
+					// 	}
+					// }
 				public class SGRevertState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
@@ -1282,7 +1215,8 @@ namespace SlotSystem{
 							if(!found){
 								GameObject newSBSG = new GameObject("newSBSG");
 								Slottable newSB = newSBSG.AddComponent<Slottable>();
-								newSB.Initialize(sg, true, itemInst);
+								// newSB.Initialize(sg, true, itemInst);
+								newSB.Initialize(itemInst);
 								newSB.SetSGM(sg.sgm);
 								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
@@ -1376,7 +1310,8 @@ namespace SlotSystem{
 						if(!sg.isPool){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							newSB.Initialize(sg, true, added.itemInst);
+							// newSB.Initialize(sg, true, added.itemInst);
+							newSB.Initialize(added.itemInst);
 							newSB.SetSGM(sg.sgm);
 							newSB.Defocus();
 							newSBs[newSBs.IndexOf(removed)] = newSB;
@@ -1422,7 +1357,8 @@ namespace SlotSystem{
 							if(added != null){
 								GameObject newSBGO = new GameObject("newSBGO");
 								Slottable newSB = newSBGO.AddComponent<Slottable>();
-								newSB.Initialize(sg, true, added.itemInst);
+								// newSB.Initialize(sg, true, added.itemInst);
+								newSB.Initialize(added.itemInst);
 								newSB.SetSGM(sg.sgm);
 								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
@@ -1744,7 +1680,8 @@ namespace SlotSystem{
 						foreach(SlottableItem item in items){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							newSB.Initialize(sg, true, (InventoryItemInstanceMock)item);
+							// newSB.Initialize(sg, true, (InventoryItemInstanceMock)item);
+							newSB.Initialize((InventoryItemInstanceMock)item);
 							sg.slots[items.IndexOf(item)].sb = newSB;
 						}
 					if(sg.isAutoSort)
@@ -3253,21 +3190,27 @@ namespace SlotSystem{
 			void Deactivate();
 			void Focus();
 			void Defocus();
-			SlotGroupManager sgm{get; set;}
-			SlotGroup GetSlotGroup(Slottable sb);
-			bool ContainsElement(SlotSystemElement element);
-			
+			SlotGroupManager sgm{get;}
+			void SetSGM(SlotGroupManager sgm);
+			SlotSystemElement DirectParent(SlotSystemElement element);
+			bool ContainsInHierarchy(SlotSystemElement ele);
 		}
 		public abstract class AbsSlotSysElement: SlotSystemElement{
-			public virtual List<SlotSystemElement> Elements{
-				get{return null;}
+			public abstract List<SlotSystemElement> Elements{get;}
+			public virtual bool ContainsInHierarchy(SlotSystemElement ele){
+				return DirectParent(ele) != null;
 			}
-			public virtual bool ContainsElement(SlotSystemElement element){
+			public virtual SlotSystemElement DirectParent(SlotSystemElement element){
 				foreach(SlotSystemElement ele in Elements){
 					if(ele == element)
-						return true;
+						return this;
+					else{
+						SlotSystemElement dirPar = ele.DirectParent(element);
+						if(dirPar != null)
+							return dirPar;
+					}
 				}
-				return false;
+				return null;
 			}
 			public virtual void Activate(){
 				foreach(SlotSystemElement ele in Elements){
@@ -3289,36 +3232,15 @@ namespace SlotSystem{
 					ele.Defocus();
 				}
 			}
-			SlotGroupManager m_sgm;
 			public SlotGroupManager sgm{
 				get{return m_sgm;}
-				set{
-					m_sgm = value;
+				}SlotGroupManager m_sgm;
+				public virtual void SetSGM(SlotGroupManager sgm){
+					m_sgm = sgm;
 					foreach(SlotSystemElement ele in Elements){
-						ele.sgm = value;
+						ele.SetSGM(this.sgm);
 					}
 				}
-			}
-			public SlotGroup GetSlotGroup(Slottable sb){
-				foreach(SlotSystemElement ele in this.Elements){
-					if(ele is SlotGroup){
-						SlotGroup sg = (SlotGroup)ele;
-						foreach(Slot slot in sg.slots){
-							if(slot.sb != null)
-								if(slot.sb == sb)
-									return sg;
-						}
-						// return null;
-						continue;
-					}else{
-						if(ele.GetSlotGroup(sb) == null)
-							continue;
-						else
-							return ele.GetSlotGroup(sb);
-					}
-				}
-				return null;
-			}
 		}
 		public class InventoryManagerPage: AbsSlotSysElement{
 			SlotSystemBundle m_poolBundle;
@@ -3340,9 +3262,6 @@ namespace SlotSystem{
 					pageElements.Add(m_equipBundle);
 					return pageElements;
 				}
-			}
-			public override void Focus(){
-				base.Focus();
 			}
 		}	
 		public class EquipmentSet: AbsSlotSysElement{
@@ -3372,7 +3291,7 @@ namespace SlotSystem{
 			}
 			SlotSystemElement m_focusedElement;
 				public void SetFocusedBundleElement(SlotSystemElement element){
-					if(ContainsElement(element))
+					if(DirectParent(element) == this)
 						m_focusedElement = element;
 					else
 						throw new InvalidOperationException("trying to set focsed element that is not one of its members");
@@ -4068,8 +3987,8 @@ namespace SlotSystem{
 						res = Util.Aqua("SGSelected");
 					}else if(state is SGWaitForActionState){
 						res = Util.Sangria("SGWFA");
-					}else if(state is SGPerformingTransactionState){
-						res = Util.Green("SGTransaction");
+					// }else if(state is SGPerformingTransactionState){
+					// 	res = Util.Green("SGTransaction");
 					}else if(state is SGRevertState){
 						res = Util.Sangria("SGRevert");
 					}else if(state is SGReorderState){

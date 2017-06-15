@@ -316,34 +316,42 @@ public class SlottableTest{
 				GameObject sgCGearsGO;
 				SlotGroup sgCGears;
 		/*	items	*/
-			Slottable defBowB_p;
-			Slottable defBowB_e;
+			/*	sbp	*/
 			Slottable defBowA_p;
-			Slottable defBowA_e;
+			Slottable defBowB_p;
 			Slottable crfBowA_p;
-			Slottable crfBowA_e;
-			Slottable defWearB_p;
-			Slottable defWearB_e;
 			Slottable defWearA_p;
-			Slottable defWearA_e;
+			Slottable defWearB_p;
 			Slottable crfWearA_p;
-			Slottable crfWearA_e;
+			Slottable defShieldA_p;
+			Slottable crfShieldA_p;
+			Slottable defMWeaponA_p;
+			Slottable crfMWeaponA_p;
+			Slottable defQuiverA_p;
+			Slottable defPackA_p;
 			Slottable defParts_p;
 			Slottable crfParts_p;
+			
+			Slottable defBowA_p2;
+			Slottable defBowB_p2;
+			Slottable crfBowA_p2;
+			Slottable defWearA_p2;
+			Slottable defWearB_p2;
+			Slottable crfWearA_p2;
+			Slottable defShieldA_p2;
+			Slottable crfShieldA_p2;
+			Slottable defMWeaponA_p2;
+			Slottable crfMWeaponA_p2;
+			Slottable defQuiverA_p2;
+			Slottable defPackA_p2;
 			Slottable defParts_p2;
 			Slottable crfParts_p2;
-			Slottable defShieldA_p;
+			
+			/*	sbe	*/
+			Slottable defBowA_e;
+			Slottable defWearA_e;
 			Slottable defShieldA_e;
-			Slottable defMWeaponA_p;
 			Slottable defMWeaponA_e;
-			Slottable crfShieldA_p;
-			Slottable crfShieldA_e;
-			Slottable crfMWeaponA_p;
-			Slottable crfMWeaponA_e;
-			Slottable defQuiverA_p;
-			Slottable defQuiverA_e;
-			Slottable defPackA_p;
-			Slottable defPackA_e;
 
 	
 		/*	inventories	*/
@@ -526,24 +534,37 @@ public class SlottableTest{
 			defWearA_p = sgpAll.GetSB(defWearA);
 			defWearB_p = sgpAll.GetSB(defWearB);
 			crfWearA_p = sgpAll.GetSB(crfWearA);
-			defParts_p = sgpAll.GetSB(defPartsA);
-			crfParts_p = sgpAll.GetSB(crfPartsA);
-			defBowA_e = sgBow.GetSB(defBowA);
-			defWearA_e = sgWear.GetSB(defWearA);
-			defParts_p2 = sgpParts.GetSB(defPartsA);
-			crfParts_p2 = sgpParts.GetSB(crfPartsA);
 			defShieldA_p = sgpAll.GetSB(defShieldA);
 			crfShieldA_p = sgpAll.GetSB(crfShieldA);
 			defMWeaponA_p =	sgpAll.GetSB(defMWeaponA); 
 			crfMWeaponA_p =	sgpAll.GetSB(crfMWeaponA);
-			defShieldA_e = sgCGears.GetSB(defShieldA);
-			defMWeaponA_e = sgCGears.GetSB(defMWeaponA);
 			defQuiverA_p = sgpAll.GetSB(defQuiverA);
 			defPackA_p = sgpAll.GetSB(defPackA);
+			defParts_p = sgpAll.GetSB(defPartsA);
+			crfParts_p = sgpAll.GetSB(crfPartsA);
+
+			defBowA_p2 = sgpBow.GetSB(defBowA);
+			defBowB_p2 = sgpBow.GetSB(defBowB);
+			crfBowA_p2 = sgpBow.GetSB(crfBowA);
+			defWearA_p2 = sgpWear.GetSB(defWearA);
+			defWearB_p2 = sgpWear.GetSB(defWearB);
+			crfWearA_p2 = sgpWear.GetSB(crfWearA);
+			defShieldA_p2 = sgpCGears.GetSB(defShieldA);
+			crfShieldA_p2 = sgpCGears.GetSB(crfShieldA);
+			defMWeaponA_p2 =	sgpCGears.GetSB(defMWeaponA); 
+			crfMWeaponA_p2 =	sgpCGears.GetSB(crfMWeaponA);
+			defQuiverA_p2 = sgpCGears.GetSB(defQuiverA);
+			defPackA_p2 = sgpCGears.GetSB(defPackA);
+			defParts_p2 = sgpParts.GetSB(defPartsA);
+			crfParts_p2 = sgpParts.GetSB(crfPartsA);
+
+			defBowA_e = sgBow.GetSB(defBowA);
+			defWearA_e = sgWear.GetSB(defWearA);
+			defShieldA_e = sgCGears.GetSB(defShieldA);
+			defMWeaponA_e = sgCGears.GetSB(defMWeaponA);
 		/*	SGM	*/
 			sgmGO = new GameObject("SlotGroupManager");
 			sgm = sgmGO.AddComponent<SlotGroupManager>();
-		/*	InventoryManagement	*/
 			EquipmentSet equipSetA = new EquipmentSet(sgBow, sgWear, sgCGears);
 			SlotSystemBundle equipBundle = new SlotSystemBundle();
 			equipBundle.Elements.Add(equipSetA);
@@ -563,21 +584,21 @@ public class SlottableTest{
 				AE(sgm.rootPage.sgm, sgm);
 
 				AE(sgm.rootPage.Elements.Count, 2);
-				AB(sgm.rootPage.ContainsElement(poolBundle), true);
+				AB(sgm.rootPage.ContainsInHierarchy(poolBundle), true);
 				AE(poolBundle.sgm, sgm);
-				AB(sgm.rootPage.ContainsElement(equipBundle), true);
+				AB(sgm.rootPage.ContainsInHierarchy(equipBundle), true);
 				AE(equipBundle.sgm, sgm);
 
 				AE(poolBundle.Elements.Count, 5);
-				AB(poolBundle.ContainsElement(sgpAll), true);
+				AB(poolBundle.ContainsInHierarchy(sgpAll), true);
 				AE(sgpAll.sgm, sgm);
-				AB(poolBundle.ContainsElement(sgpParts), true);
+				AB(poolBundle.ContainsInHierarchy(sgpParts), true);
 				AE(sgpParts.sgm, sgm);
-				AB(poolBundle.ContainsElement(sgpBow), true);
+				AB(poolBundle.ContainsInHierarchy(sgpBow), true);
 				AE(sgpBow.sgm, sgm);
-				AB(poolBundle.ContainsElement(sgpWear), true);
+				AB(poolBundle.ContainsInHierarchy(sgpWear), true);
 				AE(sgpWear.sgm, sgm);
-				AB(poolBundle.ContainsElement(sgpCGears), true);
+				AB(poolBundle.ContainsInHierarchy(sgpCGears), true);
 				AE(sgpCGears.sgm, sgm);
 				AE(poolBundle.GetFocusedBundleElement(), sgpAll);
 
@@ -586,9 +607,9 @@ public class SlottableTest{
 				AE(equipSetA.sgm, sgm);
 
 				AE(equipSetA.Elements.Count, 3);
-				AB(equipSetA.ContainsElement(sgBow), true);
+				AB(equipSetA.ContainsInHierarchy(sgBow), true);
 				AE(sgBow.sgm, sgm);
-				AE(equipSetA.ContainsElement(sgWear), true);
+				AE(equipSetA.ContainsInHierarchy(sgWear), true);
 				AE(sgWear.sgm, sgm);
 
 				ASSGM(sgm,
@@ -596,7 +617,6 @@ public class SlottableTest{
 					SGMDeactivated, SGMDeactivated, null,
 					SGMWFA, SGMWFA, null,
 					null, true, true, true, true);
-			
 			/*	SGPs	*/
 				/*	sgpAll	*/
 					ASSG(sgpAll,
@@ -608,7 +628,7 @@ public class SlottableTest{
 						14,//slots
 						14,//items
 						14);//sbs
-					AE(sgpAll.equippedSBs.Count, 4);
+					AE(sgpAll.equippedSBs.Count, 0);
 					foreach(Slottable sb in sgpAll.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
@@ -625,7 +645,7 @@ public class SlottableTest{
 						3,//slots
 						3,//items
 						3);//sbs
-					AE(sgpBow.equippedSBs.Count, 1);
+					AE(sgpBow.equippedSBs.Count, 0);
 					foreach(Slottable sb in sgpBow.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
@@ -642,7 +662,7 @@ public class SlottableTest{
 						3,//slots
 						3,//items
 						3);//sbs
-					AE(sgpWear.equippedSBs.Count, 1);
+					AE(sgpWear.equippedSBs.Count, 0);
 					foreach(Slottable sb in sgpWear.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
@@ -659,7 +679,7 @@ public class SlottableTest{
 						6,//slots
 						6,//items
 						6);//sbs
-					AE(sgpCGears.equippedSBs.Count, 2);
+					AE(sgpCGears.equippedSBs.Count, 0);
 					foreach(Slottable sb in sgpCGears.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
@@ -694,12 +714,12 @@ public class SlottableTest{
 						1,//slots
 						1,//items
 						1);//sbs
-					AE(sgBow.equippedSBs.Count, 1);
+					AE(sgBow.equippedSBs.Count, 0);
 					foreach(Slottable sb in sgBow.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.sg, sgBow);
-							AE(sb.isEquipped, true);
+							AE(sb.isEquipped, false);
 						}
 					}
 				/*	sgWear	*/
@@ -712,12 +732,12 @@ public class SlottableTest{
 						1,//slots
 						1,//items
 						1);//sbs
-					AE(sgWear.equippedSBs.Count, 1);
+					AE(sgWear.equippedSBs.Count, 0);
 					foreach(Slottable sb in sgWear.slottables){
 						if(sb != null){
 							ASSB_s(sb, SBDeactivated, SBWFA);
 							AE(sb.sg, sgWear);
-							AE(sb.isEquipped, true);
+							AE(sb.isEquipped, false);
 						}
 					}
 				/*	sgCGears	*/
@@ -730,16 +750,16 @@ public class SlottableTest{
 							4,//slots
 							2,//items
 							2);//sbs
-						AE(sgCGears.equippedSBs.Count, 2);
+						AE(sgCGears.equippedSBs.Count, 0);
 						foreach(Slottable sb in sgCGears.slottables){
 							if(sb != null){
 								ASSB_s(sb, SBDeactivated, SBWFA);
 								AE(sb.sg, sgCGears);
-								AE(sb.isEquipped, true);
+								AE(sb.isEquipped, false);
 							}
 						}
-		sgm.Focus();
-		AssertFocused();
+		// sgm.Focus();
+		// AssertFocused();
 	}
 	[Test]
 	public void TestAll(){
@@ -748,7 +768,7 @@ public class SlottableTest{
 			// TestInsertAll();//	later
 		//	not testable for now
 			// TestPickUpTransitionOnAll(); //revisit after stack
-		//	done
+		// done
 			// CheckShrinkableAndExpandableOnAllSGs();
 			// CheckPickcableOnAllSB();
 			// CheckTransacitonWithSBSpecifiedOnAll();
@@ -765,7 +785,372 @@ public class SlottableTest{
 			// TestReorderOnAll();
 			// TestFillOnAll();
 			// TestSwapOnAll();
+		// TestAddAndRemoveAll();
+		// TestSGGeneric();
+		// TestSlotSystemElement();
+		AssertInitialize();
 	}
+	public void AssertInitialize(){
+		ANull(SlotGroupManager.CurSGM);
+		AssertBundlesPagesAndSGsMembership();
+		AssertSBsMembership();
+		ASSGM(sgm,
+			null, null, null, null, null, null, null, null,
+			SGMDeactivated, SGMDeactivated, null,
+			SGMWFA, SGMWFA, null,
+			null, true, true, true, true);
+		foreach(SlotGroup sg in sgm.allSGs){
+			ASSG(sg,
+				SGDeactivated, SGDeactivated, null,
+				SGWFA, SGWFA, null, false);
+				ASGReset(sg);
+			foreach(Slottable sb in sg.slottables){
+				if(sb != null){
+					
+					ASSB(sb,
+						SBDeactivated, SBDeactivated, null,
+						SBWFA, SBWFA, null, false,
+						null, null, null);
+					ANull(sb.CurEqpState);
+					ANull(sb.PrevEqpState);
+					Debug.Log("curEqp: " + Util.SBStateName(sb.CurEqpState) + ", prevEqp: " + Util.SBStateName(sb.PrevEqpState));
+				}
+			}
+		}
+	}
+	public void AssertBundlesPagesAndSGsMembership(){
+		ANotNull(sgm.rootPage);
+		AE(sgm.allSGs.Count, 8);
+			AB(sgm.allSGs.Contains(sgpAll), true);
+			AB(sgm.allSGs.Contains(sgpBow), true);
+			AB(sgm.allSGs.Contains(sgpWear), true);
+			AB(sgm.allSGs.Contains(sgpCGears), true);
+			AB(sgm.allSGs.Contains(sgpParts), true);
+			AB(sgm.allSGs.Contains(sgBow), true);
+			AB(sgm.allSGs.Contains(sgWear), true);
+			AB(sgm.allSGs.Contains(sgCGears), true);
+		AE(sgm.focusedSGs.Count, 4);
+			AB(sgm.focusedSGs.Contains(sgpAll), true);
+			AB(sgm.focusedSGs.Contains(sgBow), true);
+			AB(sgm.focusedSGs.Contains(sgWear), true);
+			AB(sgm.focusedSGs.Contains(sgCGears), true);
+		ANotNull(sgm.rootPage.PoolBundle);
+		AE(sgm.allSGPs.Count, 5);
+			AB(sgm.allSGPs.Contains(sgpAll), true);
+			AB(sgm.allSGPs.Contains(sgpBow), true);
+			AB(sgm.allSGPs.Contains(sgpWear), true);
+			AB(sgm.allSGPs.Contains(sgpCGears), true);
+			AB(sgm.allSGPs.Contains(sgpParts), true);
+			AE(sgm.rootPage.DirectParent(sgpAll), sgm.rootPage.PoolBundle);
+			AE(sgm.rootPage.DirectParent(sgpBow), sgm.rootPage.PoolBundle);
+			AE(sgm.rootPage.DirectParent(sgpWear), sgm.rootPage.PoolBundle);
+			AE(sgm.rootPage.DirectParent(sgpCGears), sgm.rootPage.PoolBundle);
+			AE(sgm.rootPage.DirectParent(sgpParts), sgm.rootPage.PoolBundle);
+		AB(sgpAll.isPool, true);
+		AB(sgpBow.isPool, true);
+		AB(sgpWear.isPool, true);
+		AB(sgpCGears.isPool, true);
+		AB(sgpParts.isPool, true);
+		AB(sgpAll.isSGE, false);
+		AB(sgpBow.isSGE, false);
+		AB(sgpWear.isSGE, false);
+		AB(sgpCGears.isSGE, false);
+		AB(sgpParts.isSGE, false);
+		AE(sgm.focusedSGP, sgpAll);
+
+		ANotNull(sgm.rootPage.EquipBundle);
+		AE(sgm.allSGEs.Count, 3);
+		AE(sgm.focusedSGEs.Count, 3);
+			AB(sgm.focusedSGEs.Contains(sgBow), true);
+			AB(sgm.focusedSGEs.Contains(sgWear), true);
+			AB(sgm.focusedSGEs.Contains(sgCGears), true);
+			AE(sgm.focusedEqSet, sgm.rootPage.EquipBundle.GetFocusedBundleElement());
+			AE(sgm.rootPage.DirectParent(sgBow), sgm.focusedEqSet);
+			AE(sgm.rootPage.DirectParent(sgWear), sgm.focusedEqSet);
+			AE(sgm.rootPage.DirectParent(sgCGears), sgm.focusedEqSet);
+		AB(sgBow.isPool, false);
+		AB(sgWear.isPool, false);
+		AB(sgCGears.isPool, false);
+		AB(sgBow.isSGE, true);
+		AB(sgWear.isSGE, true);
+		AB(sgCGears.isSGE, true);
+	}
+	public void TestPointFill(){
+		bool isPAS = false;
+		bool isTAS = false;
+		string ASstatus = "isPAS: " + (isPAS?Util.Blue("on"):Util.Red("off")) + ", " +
+					"isTAS: " + (isTAS?Util.Blue("on"):Util.Red("off")) + " ";
+		foreach(Slottable sb in sgCGears.slottables){
+			if(sb != null){
+				Slottable pickedSB = sb;
+				InventoryItemInstanceMock pickedItem = pickedSB.itemInst;
+				sgCGears.ToggleAutoSort(true);
+				sgpAll.ToggleAutoSort(true);
+				isPAS = true;
+				isTAS = true;
+				PickUp(pickedSB, out picked);
+				SimHover(null, sgpAll, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				/*	rev	*/
+				PickUp(sgpAll.GetSB(pickedItem), out picked);
+				SimHover(null, sgCGears, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				pickedSB = sgCGears.GetSB(pickedItem);
+				Debug.Log(ASstatus + "onSG: testSB: " + Util.SBofSG(pickedSB) + ", tarSB: null" +  ", tarSG: " + Util.SGName(sgpAll));
+				
+				// sgCGears.ToggleAutoSort(true);
+				sgpAll.ToggleAutoSort(false);
+				isTAS = false;
+				PickUp(pickedSB, out picked);
+				SimHover(null, sgpAll, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				/*	rev	*/
+				PickUp(sgpAll.GetSB(pickedItem), out picked);
+				SimHover(null, sgCGears, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				pickedSB = sgCGears.GetSB(pickedItem);
+				Debug.Log(ASstatus + "onSG: testSB: " + Util.SBofSG(pickedSB) + ", tarSB: null" +  ", tarSG: " + Util.SGName(sgpAll));
+				
+				sgCGears.ToggleAutoSort(false);
+				sgpAll.ToggleAutoSort(true);
+				isPAS = false;
+				isTAS = true;
+				PickUp(pickedSB, out picked);
+				SimHover(null, sgpAll, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				/*	rev	*/
+				PickUp(sgpAll.GetSB(pickedItem), out picked);
+				SimHover(null, sgCGears, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				pickedSB = sgCGears.GetSB(pickedItem);
+				Debug.Log(ASstatus + "onSG: testSB: " + Util.SBofSG(pickedSB) + ", tarSB: null" +  ", tarSG: " + Util.SGName(sgpAll));
+				
+				sgCGears.ToggleAutoSort(false);
+				sgpAll.ToggleAutoSort(false);
+				isTAS = false;
+				PickUp(pickedSB, out picked);
+				SimHover(null, sgpAll, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				/*	rev	*/
+				PickUp(sgpAll.GetSB(pickedItem), out picked);
+				SimHover(null, sgCGears, eventData);
+				LetGo();
+				if(!sgCGears.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgCGears);
+				if(!sgpAll.isAllTASBsDone)
+					CompleteAllSBActProcesses(sgpAll);
+				sgm.dIcon1.CompleteMovement();
+				AssertFocused();
+				pickedSB = sgCGears.GetSB(pickedItem);
+				Debug.Log(ASstatus + "onSG: testSB: " + Util.SBofSG(pickedSB) + ", tarSB: null" +  ", tarSG: " + Util.SGName(sgpAll));
+				// foreach(Slottable tarSB in sgpAll.slottables){
+				// 	if(tarSB != null){
+				// 		if(sgm.GetTransaction(sb, ))
+				// 	}
+				// }
+			}
+		}
+	}
+	List<Slottable> sbpList{
+		get{
+			List<Slottable> sbs = new List<Slottable>();
+			sbs.Add(defBowA_p);
+			sbs.Add(defBowB_p);
+			sbs.Add(crfBowA_p);
+			sbs.Add(defWearA_p);
+			sbs.Add(defWearB_p);
+			sbs.Add(crfWearA_p);
+			sbs.Add(defShieldA_p);
+			sbs.Add(crfShieldA_p);
+			sbs.Add(defMWeaponA_p);
+			sbs.Add(crfMWeaponA_p);
+			sbs.Add(defParts_p);
+			sbs.Add(crfParts_p);
+			sbs.Add(defQuiverA_p);
+			sbs.Add(defPackA_p);
+			return sbs;
+		}
+	}
+	List<Slottable> sbp2List{
+		get{
+			List<Slottable> sbs = new List<Slottable>();
+			sbs.Add(defBowA_p2);
+			sbs.Add(defBowB_p2);
+			sbs.Add(crfBowA_p2);
+			sbs.Add(defWearA_p2);
+			sbs.Add(defWearB_p2);
+			sbs.Add(crfWearA_p2);
+			sbs.Add(defShieldA_p2);
+			sbs.Add(crfShieldA_p2);
+			sbs.Add(defMWeaponA_p2);
+			sbs.Add(crfMWeaponA_p2);
+			sbs.Add(defQuiverA_p2);
+			sbs.Add(defPackA_p2);
+			sbs.Add(defParts_p2);
+			sbs.Add(crfParts_p2);
+			return sbs;
+		}
+	}
+	List<Slottable> sbeList{
+		get{
+			List<Slottable> sbs = new List<Slottable>();
+			sbs.Add(defBowA_e);
+			sbs.Add(defWearA_e);
+			sbs.Add(defShieldA_e);
+			sbs.Add(defMWeaponA_e);
+			return sbs;
+		}
+	}
+	public void AssertSBsMembership(){
+		foreach(Slottable sbp in sbpList){
+			AE(sgm.GetSG(sbp), sgpAll);
+			AE(sbp.sg, sgpAll);
+			AE(sgm.rootPage.ContainsInHierarchy(sbp), true);
+			AE(sgm.rootPage.PoolBundle.ContainsInHierarchy(sbp), true);
+			AE(sgm.rootPage.EquipBundle.ContainsInHierarchy(sbp), false);
+
+			AE(sgpAll.ContainsInHierarchy(sbp), true);
+			AE(sgpBow.ContainsInHierarchy(sbp), false);
+			AE(sgpWear.ContainsInHierarchy(sbp), false);
+			AE(sgpCGears.ContainsInHierarchy(sbp), false);
+			AE(sgpParts.ContainsInHierarchy(sbp), false);
+		}
+		foreach(Slottable sbp2 in sbp2List){
+			AE(sgm.rootPage.ContainsInHierarchy(sbp2), true);
+			AE(sgm.rootPage.PoolBundle.ContainsInHierarchy(sbp2), true);
+			AE(sgpAll.ContainsInHierarchy(sbp2), false);
+			if(sbp2.itemInst is BowInstanceMock){
+				AE(sgm.GetSG(sbp2), sgpBow);
+				AE(sbp2.sg, sgpBow);
+				AE(sgpBow.ContainsInHierarchy(sbp2), true);
+				AE(sgpWear.ContainsInHierarchy(sbp2), false);
+				AE(sgpCGears.ContainsInHierarchy(sbp2), false);
+				AE(sgpParts.ContainsInHierarchy(sbp2), false);
+			}else if(sbp2.itemInst is WearInstanceMock){
+				AE(sgm.GetSG(sbp2), sgpWear);
+				AE(sbp2.sg, sgpWear);
+				AE(sgpBow.ContainsInHierarchy(sbp2), false);
+				AE(sgpWear.ContainsInHierarchy(sbp2), true);
+				AE(sgpCGears.ContainsInHierarchy(sbp2), false);
+				AE(sgpParts.ContainsInHierarchy(sbp2), false);
+			}else if(sbp2.itemInst is CarriedGearInstanceMock){
+				AE(sgm.GetSG(sbp2), sgpCGears);
+				AE(sbp2.sg, sgpCGears);
+				AE(sgpBow.ContainsInHierarchy(sbp2), false);
+				AE(sgpWear.ContainsInHierarchy(sbp2), false);
+				AE(sgpCGears.ContainsInHierarchy(sbp2), true);
+				AE(sgpParts.ContainsInHierarchy(sbp2), false);
+			}else if(sbp2.itemInst is PartsInstanceMock){
+				AE(sgm.GetSG(sbp2), sgpParts);
+				AE(sbp2.sg, sgpParts);
+				AE(sgpBow.ContainsInHierarchy(sbp2), false);
+				AE(sgpWear.ContainsInHierarchy(sbp2), false);
+				AE(sgpCGears.ContainsInHierarchy(sbp2), false);
+				AE(sgpParts.ContainsInHierarchy(sbp2), true);
+			}
+		}
+		foreach(Slottable sbe in sbeList){
+			AE(sgm.rootPage.ContainsInHierarchy(sbe), true);
+			AE(sgm.rootPage.PoolBundle.ContainsInHierarchy(sbe), false);
+			AE(sgm.rootPage.EquipBundle.ContainsInHierarchy(sbe), true);
+			foreach(EquipmentSet eSet in sgm.equipmentSets){
+				if(eSet == sgm.focusedEqSet)
+					AE(eSet.ContainsInHierarchy(sbe), true);
+				else
+					AE(eSet.ContainsInHierarchy(sbe), false);
+			}
+			if(sbe.itemInst is BowInstanceMock){
+				AE(sgm.GetSG(sbe), sgBow);
+				AE(sbe.sg, sgBow);
+				AE(sgBow.ContainsInHierarchy(sbe), true);
+				AE(sgWear.ContainsInHierarchy(sbe), false);
+				AE(sgCGears.ContainsInHierarchy(sbe), false);
+			}
+			if(sbe.itemInst is WearInstanceMock){
+				AE(sgm.GetSG(sbe), sgWear);
+				AE(sbe.sg, sgWear);
+				AE(sgBow.ContainsInHierarchy(sbe), false);
+				AE(sgWear.ContainsInHierarchy(sbe), true);
+				AE(sgCGears.ContainsInHierarchy(sbe), false);
+			}
+			if(sbe.itemInst is CarriedGearInstanceMock){
+				AE(sgm.GetSG(sbe), sgCGears);
+				AE(sbe.sg, sgCGears);
+				AE(sgBow.ContainsInHierarchy(sbe), false);
+				AE(sgWear.ContainsInHierarchy(sbe), false);
+				AE(sgCGears.ContainsInHierarchy(sbe), true);
+			}
+		}
+		
+	}
+	public void TestSGGeneric(){
+		// AE(sgm.sgBundles.Count, 3);
+		// AE(sgm.genBundles.Count, 1);
+		// AE(sgm.allSGPs.Count, 5);
+		// AE(sgm.allSGEs.Count, 3);
+		// AE(sgm.allSGGs.Count, 2);
+		// AE(sgm.focusedBundles.Count, 2);
+		// AE(sgm.focusedSGGs.Count, 2);
+		// sgm.FocusBundle(genBundle);
+		// AE(sgm.FocusedBundles.Count, 3);
+	}
+	public void TestAddAndRemoveAll(){
+		PerformOnAllSGAfterFocusing(TestAddAndRemove);
+		PrintTestResult(null);
+		}
+		public void TestAddAndRemove(SlotGroup testSG, bool isPAS){
+			List<Slottable> sbs = new List<Slottable>();
+			sbs.AddRange(testSG.slottables);
+				AssertFocused();
+			// sgm.MoveSBs(testSG, null, sbs);
+			// 	ASSGM(sgm,
+			// 		null, null, testSG, null, null, null, null, null,
+			// 		SGMDeactivated, SGMFocused, null,
+			// 		SGMWFA, SGMTransaction, typeof(SGMTransactionProcess),
+			// 		typeof())
+		}
 	public void TestReorderInOtherAll(){
 		PerformOnAllSBs(CrossTestReorderInOther);
 		PrintTestResult(null);
@@ -826,12 +1211,17 @@ public class SlottableTest{
 		}
 		public void CrossTestSwap(Slottable sb, bool isPAS){
 			CrossTestSGs(TestSwap, sb, isPAS);
+			origSGCache = null;
 		}
 		public void TestSwap(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
+			SlotGroup origSG = testSB.sg;
+			if(origSG != null)
+				origSGCache = origSG;
+			else
+				origSG = origSGCache;
+			InventoryItemInstanceMock pickedItem = testSB.itemInst;
+			testSB = origSG.GetSB(pickedItem);
 			if(testSB.isPickable){
-				SlotGroup origSG = testSB.sg;
-				InventoryItemInstanceMock pickedItem = testSB.itemInst;
-				testSB = origSG.GetSB(pickedItem);
 				SlotSystemTransaction ta = sgm.GetTransaction(testSB, tarSG, null);
 				if(ta is SwapTransaction){
 						AssertFocused();
@@ -1200,6 +1590,7 @@ public class SlottableTest{
 				SGMTransaction, SGMWFA, null,
 				null, true, true, true, true);
 		}
+	SlotGroup origSGCache;
 	public void TestDraggedIconOnAll(){
 		PerformOnAllSBs(TestDraggedIcon);
 		}
@@ -1222,150 +1613,31 @@ public class SlottableTest{
 		}
 	/*	Test Transaction on All	*/
 		public void TestFillOnAll(){
-			PerformOnAllSBs(CrossTestFillEquip);
+			PerformOnAllSBs(CrossTestFill);
 			PrintTestResult(null);
-			}public void CrossTestFillEquip(Slottable sb, bool isPAS){
-				CrossTestSGs(TestFillEquip, sb, isPAS);
+			}public void CrossTestFill(Slottable sb, bool isPAS){
+				CrossTestSGs(TestFill, sb, isPAS);
+				origSGCache = null;
 			}
-			public void TestFillEquip(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
+			public void TestFill(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
 				InventoryItemInstanceMock pickedItem = testSB.itemInst;
 				SlotGroup origSG = testSB.sg;
-				testSB = origSG.GetSB(testSB.itemInst);
+				if(origSG != null)
+					origSGCache = origSG;
+				else
+					origSG = origSGCache;
+				testSB = origSG.GetSB(pickedItem);
 				if(testSB.isPickable){
-					if(sgm.GetTransaction(testSB, tarSG, null).GetType() == typeof(FillTransaction)){ 
-						AssertFocused();
-						/*	on SG	*/
-							// Capture(sgm, testSB, tarSG, null, isPAS, isTAS, TestElement.SG);
-								ASSGM(sgm,
-									null, null, null, null, null, null, null, null, 
-									SGMDeactivated, SGMFocused, null,
-									null, SGMWFA, null, 
-									null,
-									true, true, true, true);
-								ASSG(origSG,
-									null, SGFocused, null,
-									null, SGWFA, null, false);
-								ASSB(testSB,
-									null, SBFocused, null,
-									null, SBWFA, null, false,
-									null, null, null);
-							PickUp(testSB, out picked);
-								ASSGM(sgm,
-									testSB, null, null, null, testSB, null, null, testSB, 
-									SGMDeactivated, SGMFocused, null,
-									SGMWFA, SGMProbing, typeof(SGMProbeProcess), 
-									typeof(RevertTransaction),
-									false, true, true, true);
-								ASSG(origSG,
-									SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-									null, SGWFA, null, false);
-								ASSB(testSB,
-									SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-									testSB.isStackable?SBWFNT:SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
-									null, null, null);
-							SimHover(null, tarSG, eventData);
-								ASSGM(sgm,
-									testSB, null, origSG, tarSG, testSB, null, tarSG, null,  
-									SGMDeactivated, SGMFocused, null,
-									SGMWFA, SGMProbing, typeof(SGMProbeProcess), 
-									typeof(FillTransaction),
-									false, true, false, false);
-								ASSG(origSG,
-									SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-									null, SGWFA, null, false);
-								ASSG(tarSG,
-									SGFocused, SGSelected, typeof(SGHighlightProcess),
-									null, SGWFA, null, false);
-								ASSB(testSB,
-									SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-									testSB.isStackable?SBWFNT:SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
-									null, null, null);
-							LetGo();
-								ASSGM(sgm,
-									testSB, null, origSG, tarSG, testSB, null, tarSG, null,  
-									SGMDeactivated, SGMFocused, null,
-									SGMProbing, SGMTransaction, typeof(SGMTransactionProcess), 
-									typeof(FillTransaction),
-									false, true, origSG.isAllTASBsDone?true: false, tarSG.isAllTASBsDone?true: false);
-								ASSG(origSG,
-									SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-									SGWFA, SGFill, typeof(SGTransactionProcess), origSG.isPool? false: true);
-								ASSG(tarSG,
-									SGFocused, SGSelected, typeof(SGHighlightProcess),
-									SGWFA, SGFill, typeof(SGTransactionProcess), tarSG.isPool? false: true);
-								ASBSelState(testSB,
-									SBSelected, SBDefocused, typeof(SBGreyoutProcess));
-								if(testSB.sg.isPool)
-									ASBActState(testSB,
-										testSB.isStackable? SBWFNT: SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), false);
-								else
-									ASBActState(testSB,
-										testSB.isStackable? SBWFNT: SBPickedUp, SBRemove, typeof(SBRemoveProcess), true);
-								if(!tarSG.isPool){
-									Slottable newSB = tarSG.GetSB(pickedItem);
-									ASSB(newSB,
-										SBDeactivated, SBDefocused, null,
-										SBWFA, SBAdd, typeof(SBAddProcess), true,
-										SBUnequipped, SBUnequipped, null);
-								}
-							sgm.dIcon1.CompleteMovement();
-							if(!tarSG.isAllTASBsDone)
-								CompleteAllSBActProcesses(tarSG);
-							if(!origSG.isAllTASBsDone)
-								CompleteAllSBActProcesses(origSG);
-								ASSGM(sgm,
-									null, null, null, null, null, null, null, null, 
-									SGMDeactivated, SGMFocused, null,
-									SGMTransaction, SGMWFA, null, 
-									null, true, true, true, true);
-								ASSG(origSG,
-									SGDefocused, SGFocused, typeof(SGGreyinProcess),
-									SGFill, SGWFA, null, false);
-								ASSG(tarSG,
-									SGSelected, SGFocused, typeof(SGDehighlightProcess),
-									SGFill, SGWFA, null, false);
-								if(origSG.isPool){//else, the sb is gone
-										ASBActState(testSB,
-											SBMoveWithin, SBWFA, null, false);
-									if(!testSB.isPickable)
-										ASBSelState(testSB,
-											SBSelected, SBDefocused, typeof(SBGreyoutProcess));
-									else
-										ASBSelState(testSB,
-											SBDefocused, SBFocused, typeof(SBGreyinProcess));
-								}
-								if(!tarSG.isPool){
-									Slottable added = tarSG.GetSB(pickedItem);
-									ASSB(added,
-										SBDefocused, SBFocused, typeof(SBGreyinProcess),
-										SBAdd, SBWFA, null, false,
-										null, null, null);
-								}
-								AssertFocused();
-						/*	reverse	*/
-							Slottable revPickedSB = tarSG.GetSB(pickedItem);
-							PickUp(revPickedSB, out picked);
-							SimHover(null ,origSG, eventData);
-							PointerUp();
-							if(!origSG.isPool)
-								CompleteAllSBActProcesses(origSG);
-							if(!tarSG.isPool)
-								CompleteAllSBActProcesses(tarSG);
-							sgm.dIcon1.CompleteMovement();
-								AssertFocused();
-					
-					}
-					foreach(Slottable tarSB in tarSG.slottables){
-						testSB = origSG.GetSB(pickedItem);
-						if(tarSB != null){
-							if(sgm.GetTransaction(testSB, null, tarSB).GetType() == typeof(FillTransaction)){
-								// Capture(sgm, testSB, null, tarSB, isPAS, isTAS, TestElement.SGM);
-								AssertFocused();
+					if(sgm.GetTransaction(testSB, tarSG, null).GetType() == typeof(FillTransaction)){
+							AssertFocused();
+							/*	on SG	*/
+								// Capture(sgm, testSB, tarSG, null, isPAS, isTAS, TestElement.SG);
 									ASSGM(sgm,
-										null, null, null, null, null, null, null, null,
+										null, null, null, null, null, null, null, null, 
 										SGMDeactivated, SGMFocused, null,
-										null, SGMWFA, null,
-										null, true, true, true, true);
+										null, SGMWFA, null, 
+										null,
+										true, true, true, true);
 									ASSG(origSG,
 										null, SGFocused, null,
 										null, SGWFA, null, false);
@@ -1387,9 +1659,9 @@ public class SlottableTest{
 										SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 										testSB.isStackable?SBWFNT:SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
 										null, null, null);
-								SimHover(tarSB, null, eventData);
+								SimHover(null, tarSG, eventData);
 									ASSGM(sgm,
-										testSB, null, origSG, tarSG, testSB, null, null, tarSB,  
+										testSB, null, origSG, tarSG, testSB, null, tarSG, null,  
 										SGMDeactivated, SGMFocused, null,
 										SGMWFA, SGMProbing, typeof(SGMProbeProcess), 
 										typeof(FillTransaction),
@@ -1398,172 +1670,189 @@ public class SlottableTest{
 										SGFocused, SGDefocused, typeof(SGGreyoutProcess),
 										null, SGWFA, null, false);
 									ASSG(tarSG,
-										null, SGSelected, typeof(SGHighlightProcess),
+										SGFocused, SGSelected, typeof(SGHighlightProcess),
 										null, SGWFA, null, false);
-									ASSB(tarSB,
-										null, SBDefocused, null,
-										null, SBWFA, null, false,
-										null, null, null);
 									ASSB(testSB,
 										SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 										testSB.isStackable?SBWFNT:SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
 										null, null, null);
 								LetGo();
 									ASSGM(sgm,
-										testSB, null, origSG, tarSG, testSB, null, null, tarSB,  
+										testSB, null, origSG, tarSG, testSB, null, tarSG, null,  
 										SGMDeactivated, SGMFocused, null,
 										SGMProbing, SGMTransaction, typeof(SGMTransactionProcess), 
 										typeof(FillTransaction),
-										false, true, origSG.isAllTASBsDone?true: false, tarSG.isAllTASBsDone?true:false);
+										false, true, origSG.isAllTASBsDone?true: false, tarSG.isAllTASBsDone?true: false);
 									ASSG(origSG,
 										SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-										SGWFA, SGFill, typeof(SGTransactionProcess), origSG.isAllTASBsDone?false:true);
+										SGWFA, SGFill, typeof(SGTransactionProcess), origSG.isPool? false: true);
 									ASSG(tarSG,
-										null, SGSelected, typeof(SGHighlightProcess),
-										SGWFA, SGFill, typeof(SGTransactionProcess), tarSG.isAllTASBsDone?false:true);
-									ASBSelState(tarSB,
-										null, SBDefocused, null);
-										if(tarSG.isPool)
-											ASBActState(tarSB,
-												SBWFA, SBMoveWithin, typeof(SBMoveWithinProcess), tarSB.slotID == tarSB.newSlotID?false: true);
-										else
-											ASBActState(tarSB,
-												SBWFA, SBRemove, typeof(SBRemoveProcess), true);
+										SGFocused, SGSelected, typeof(SGHighlightProcess),
+										SGWFA, SGFill, typeof(SGTransactionProcess), tarSG.isPool? false: true);
 									ASBSelState(testSB,
 										SBSelected, SBDefocused, typeof(SBGreyoutProcess));
-										if(origSG.isPool)
+									if(testSB.sg.isPool)
+										ASBActState(testSB,
+											testSB.isStackable? SBWFNT: SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), false);
+									else
+										ASBActState(testSB,
+											testSB.isStackable? SBWFNT: SBPickedUp, SBRemove, typeof(SBRemoveProcess), true);
+									if(!tarSG.isPool){
+										Slottable newSB = tarSG.GetSB(pickedItem);
+										ASSB(newSB,
+											SBDeactivated, SBDefocused, null,
+											SBWFA, SBAdd, typeof(SBAddProcess), true,
+											SBUnequipped, SBUnequipped, null);
+									}
+								sgm.dIcon1.CompleteMovement();
+								if(!tarSG.isAllTASBsDone)
+									CompleteAllSBActProcesses(tarSG);
+								if(!origSG.isAllTASBsDone)
+									CompleteAllSBActProcesses(origSG);
+									ASSGM(sgm,
+										null, null, null, null, null, null, null, null, 
+										SGMDeactivated, SGMFocused, null,
+										SGMTransaction, SGMWFA, null, 
+										null, true, true, true, true);
+									ASSG(origSG,
+										SGDefocused, SGFocused, typeof(SGGreyinProcess),
+										SGFill, SGWFA, null, false);
+									ASSG(tarSG,
+										SGSelected, SGFocused, typeof(SGDehighlightProcess),
+										SGFill, SGWFA, null, false);
+									if(origSG.isPool){//else, the sb is gone
 											ASBActState(testSB,
-												SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), tarSB.slotID == tarSB.newSlotID? false: true);
+												SBMoveWithin, SBWFA, null, false);
+										if(!testSB.isPickable)
+											ASBSelState(testSB,
+												SBSelected, SBDefocused, typeof(SBGreyoutProcess));
 										else
-											ASBActState(testSB,
-												SBPickedUp, SBRemove, typeof(SBRemoveProcess), true);
-
-								if(!origSG.isAllTASBsDone)
-									CompleteAllSBActProcesses(origSG);
-								if(!tarSG.isAllTASBsDone)
-									CompleteAllSBActProcesses(tarSG);
-								sgm.dIcon1.CompleteMovement();
-								AssertFocused();
-								/*	reverse	*/
-								PickUp(tarSG.GetSB(pickedItem), out picked);
-								SimHover(null, origSG, eventData);
+											ASBSelState(testSB,
+												SBDefocused, SBFocused, typeof(SBGreyinProcess));
+									}
+									if(!tarSG.isPool){
+										Slottable added = tarSG.GetSB(pickedItem);
+										ASSB(added,
+											SBDefocused, SBFocused, typeof(SBGreyinProcess),
+											SBAdd, SBWFA, null, false,
+											null, null, null);
+									}
+									AssertFocused();
+							/*	reverse	*/
+								Slottable revPickedSB = tarSG.GetSB(pickedItem);
+								PickUp(revPickedSB, out picked);
+								SimHover(null ,origSG, eventData);
 								LetGo();
-								if(!origSG.isAllTASBsDone)
+								if(!origSG.isPool)
 									CompleteAllSBActProcesses(origSG);
-								if(!tarSG.isAllTASBsDone)
+								if(!tarSG.isPool)
 									CompleteAllSBActProcesses(tarSG);
 								sgm.dIcon1.CompleteMovement();
-								AssertFocused();
+									AssertFocused();
+					}
+					foreach(Slottable tarSB in tarSG.slottables){
+						testSB = origSG.GetSB(pickedItem);
+						if(tarSB != null){
+							if(sgm.GetTransaction(testSB, null, tarSB).GetType() == typeof(FillTransaction)){
+								/*	OnSB	*/
+									AssertFocused();
+										ASSGM(sgm,
+											null, null, null, null, null, null, null, null,
+											SGMDeactivated, SGMFocused, null,
+											null, SGMWFA, null,
+											null, true, true, true, true);
+										ASSG(origSG,
+											null, SGFocused, null,
+											null, SGWFA, null, false);
+										ASSB(testSB,
+											null, SBFocused, null,
+											null, SBWFA, null, false,
+											null, null, null);
+									PickUp(testSB, out picked);
+										ASSGM(sgm,
+											testSB, null, null, null, testSB, null, null, testSB, 
+											SGMDeactivated, SGMFocused, null,
+											SGMWFA, SGMProbing, typeof(SGMProbeProcess), 
+											typeof(RevertTransaction),
+											false, true, true, true);
+										ASSG(origSG,
+											SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+											null, SGWFA, null, false);
+										ASSB(testSB,
+											SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+											testSB.isStackable?SBWFNT:SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
+											null, null, null);
+									SimHover(tarSB, null, eventData);
+										ASSGM(sgm,
+											testSB, null, origSG, tarSG, testSB, null, null, tarSB,  
+											SGMDeactivated, SGMFocused, null,
+											SGMWFA, SGMProbing, typeof(SGMProbeProcess), 
+											typeof(FillTransaction),
+											false, true, false, false);
+										ASSG(origSG,
+											SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+											null, SGWFA, null, false);
+										ASSG(tarSG,
+											null, SGSelected, typeof(SGHighlightProcess),
+											null, SGWFA, null, false);
+										ASSB(tarSB,
+											null, SBDefocused, null,
+											null, SBWFA, null, false,
+											null, null, null);
+										ASSB(testSB,
+											SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+											testSB.isStackable?SBWFNT:SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
+											null, null, null);
+									LetGo();
+										ASSGM(sgm,
+											testSB, null, origSG, tarSG, testSB, null, null, tarSB,  
+											SGMDeactivated, SGMFocused, null,
+											SGMProbing, SGMTransaction, typeof(SGMTransactionProcess), 
+											typeof(FillTransaction),
+											false, true, origSG.isAllTASBsDone?true: false, tarSG.isAllTASBsDone?true:false);
+										ASSG(origSG,
+											SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+											SGWFA, SGFill, typeof(SGTransactionProcess), origSG.isAllTASBsDone?false:true);
+										ASSG(tarSG,
+											null, SGSelected, typeof(SGHighlightProcess),
+											SGWFA, SGFill, typeof(SGTransactionProcess), tarSG.isAllTASBsDone?false:true);
+										ASBSelState(tarSB,
+											null, SBDefocused, null);
+											if(tarSG.isPool)
+												ASBActState(tarSB,
+													SBWFA, SBMoveWithin, typeof(SBMoveWithinProcess), tarSB.slotID == tarSB.newSlotID?false: true);
+											else
+												ASBActState(tarSB,
+													SBWFA, SBRemove, typeof(SBRemoveProcess), true);
+										ASBSelState(testSB,
+											SBSelected, SBDefocused, typeof(SBGreyoutProcess));
+											if(origSG.isPool)
+												ASBActState(testSB,
+													SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), tarSB.slotID == tarSB.newSlotID? false: true);
+											else
+												ASBActState(testSB,
+													SBPickedUp, SBRemove, typeof(SBRemoveProcess), true);
+
+									if(!origSG.isAllTASBsDone)
+										CompleteAllSBActProcesses(origSG);
+									if(!tarSG.isAllTASBsDone)
+										CompleteAllSBActProcesses(tarSG);
+									sgm.dIcon1.CompleteMovement();
+									AssertFocused();
+								/*	reverse	*/
+									PickUp(tarSG.GetSB(pickedItem), out picked);
+									SimHover(null, origSG, eventData);
+									LetGo();
+									if(!origSG.isAllTASBsDone)
+										CompleteAllSBActProcesses(origSG);
+									if(!tarSG.isAllTASBsDone)
+										CompleteAllSBActProcesses(tarSG);
+									sgm.dIcon1.CompleteMovement();
+									AssertFocused();
 							}
 						}
 					}
 				}
-				// foreach(Slottable sb2 in sg.Slottables){
-					// 	if(sb2 != null){
-					// 		sb = sb.SG.GetSB(sb.ItemInst);
-					// 		if(sb.IsPickable){
-					// 			if(sgm.GetTransaction(sb, null, sb2).GetType() == typeof(FillEquipTransaction)){
-					// 				// Capture(sb.SGM, sb, null, sb2, isPAS, isTAS, TestElement.SGM);
-					// 				SlotGroup sg2 = sb2.SG;
-					// 				AssertFocused();
-					// 					ASSGM(sgm,
-					// 						null, null, null, null, null,
-					// 						SGMDeactivated, SGMFocused, null,
-					// 						null, SGMWFA, null,
-					// 						null, true, true, true, true);
-					// 					ASSG(origSG,
-					// 						null, SGFocused, null,
-					// 						null, SGWFA, null);
-					// 					ASSB(sb,
-					// 						null, SBFocused, null,
-					// 						null, SBWFA, null,
-					// 						null, null, null, false);
-					// 				PickUp(sb, out picked);
-					// 					ASSGM(sgm,
-					// 						sb, null, sb, null, null,
-					// 						SGMDeactivated, SGMFocused, null,
-					// 						SGMWFA, SGMProbing, typeof(SGMProbeProcess),
-					// 						typeof(RevertTransaction), false, true, false, true);
-					// 					ASSG(origSG,
-					// 						SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-					// 						null, SGWFA, null);
-					// 					ASSB(sb,
-					// 						SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-					// 						SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess),
-					// 						null, null, null, false);
-					// 				SimHover(sb2, null, eventData);
-					// 					ASSGM(sgm,
-					// 						sb, null, sb2, sg2, null,
-					// 						SGMDeactivated, SGMFocused, null,
-					// 						SGMWFA, SGMProbing, typeof(SGMProbeProcess),
-					// 						typeof(FillEquipTransaction), false, true, false, false);
-					// 					ASSG(origSG,
-					// 						SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-					// 						null, SGWFA, null);
-					// 					ASSG(sg2,
-					// 						null, SGSelected, null,
-					// 						null, SGWFA, null);
-					// 					ASSB(sb,
-					// 						SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-					// 						SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess),
-					// 						null, null, null, false);
-					// 				LetGo();
-					// 					ASSGM(sgm,
-					// 						sb, null, sb2, sg2, null,
-					// 						SGMDeactivated, SGMFocused, null,
-					// 						SGMProbing, SGMTransaction, typeof(SGMTransactionProcess),
-					// 						typeof(FillEquipTransaction), false, true, origSG.IsSMDone?true: false, sg2.IsSMDone?true:false);
-					// 					if(origSG.IsSMDone){
-					// 						if(origSG.IsPool)
-					// 							ASSG(origSG,
-					// 								SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-					// 								null, SGWFA, null);
-					// 						else
-					// 							ASSG(origSG,
-					// 								SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-					// 								SGWFA, SGTransaction, typeof(SGTransactionProcess));
-					// 					}
-					// 					else
-					// 						ASSG(origSG,
-					// 							SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-					// 							SGWFA, SGTransaction, typeof(SGTransactionProcess));
-					// 					if(sg2.IsSMDone){
-					// 						if(sg2.IsPool)
-					// 							ASSG(sg2,
-					// 								null, SGSelected, null,
-					// 								null, SGWFA, null);
-					// 						else
-					// 							ASSG(sg2,
-					// 								null, SGSelected, null,
-					// 								SGWFA, SGTransaction, typeof(SGTransactionProcess));
-					// 					}
-					// 					else
-					// 						ASSG(sg2,
-					// 							null, SGSelected, null,
-					// 							SGWFA, SGTransaction, typeof(SGTransactionProcess));
-					// 					ASSB(sb,
-					// 						SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-					// 						SBPickedUp, SBMovingOut, typeof(SBMoveOutProcess),
-					// 						null, null, null, false);
-					// 				if(!origSG.IsSMDone)
-					// 					CompleteAllSBActProcesses(origSG);
-					// 				if(!sg2.IsSMDone)
-					// 					CompleteAllSBActProcesses(sg2);
-					// 				sb.ActionProcess.Expire();
-					// 				AssertFocused();
-					// 				/*Reverse*/
-					// 				Slottable revSB = sg2.GetSB(pickedItem);
-					// 				PickUp(revSB, out picked);
-					// 				SimHover(null, origSG, eventData);
-					// 				LetGo();
-					// 				if(!sg2.IsSMDone) CompleteAllSBActProcesses(sg2);
-					// 				if(!origSG.IsSMDone) CompleteAllSBActProcesses(origSG);
-					// 				revSB.ActionProcess.Expire();
-					// 				AssertFocused();
-					// 			}
-					// 		}
-					// 	}
-					// }
 			}
 		public void TestVolSortOnAll(){
 			PerformOnAllSGAfterFocusing(TestVolSort);
@@ -2659,6 +2948,9 @@ public class SlottableTest{
 				AE(sb.newSlotID, -2);
 			}
 		/*	other	*/
+			public void ANotNull(object obj){
+				Assert.That(obj, Is.Not.Null);
+			}
 			public void ANull(object obj){
 				Assert.That(obj, Is.Null);
 			}
@@ -6040,7 +6332,7 @@ public class SlottableTest{
 		// 				AE(sgm.SelectedSGDoneTransaction, false);
 
 		// 				EquipmentSet focusedEquipSet = (EquipmentSet)sgm.RootPage.EquipBundle.GetFocusedBundleElement();
-		// 				AB(focusedEquipSet.ContainsElement(sgCGears), true);
+		// 				AB(focusedEquipSet.Contains(sgCGears), true);
 
 		// 				ASSG(sgCGears, SlotGroup.PerformingTransactionState);
 		// 				AE(sgCGears.PrevState, SlotGroup.FocusedState);
@@ -6831,7 +7123,7 @@ public class SlottableTest{
 		// 			AB(sgCGears.IsExpandable, false);
 
 		// 			AE(((EquipmentSet)sgm.RootPage.EquipBundle.GetFocusedBundleElement()).Elements.Count, 3);
-		// 			AB(sgm.RootPage.EquipBundle.GetFocusedBundleElement().ContainsElement(sgCGears), true);
+		// 			AB(sgm.RootPage.EquipBundle.GetFocusedBundleElement().Contains(sgCGears), true);
 		// 			AE(sgCGears.Slots.Count, 4);
 		// 			AE(sgm.GetEquippedCarriedGears().Count, 2);
 
@@ -6968,7 +7260,7 @@ public class SlottableTest{
 		// 				ASSB(crfMWeaponA_p, Slottable.DefocusedState);
 
 		// 			ASSB(defBowA_e, Slottable.EquippedAndDeselectedState);
-		// 			AB(sgm.RootPage.EquipBundle.GetFocusedBundleElement().ContainsElement(sgWear), true);
+		// 			AB(sgm.RootPage.EquipBundle.GetFocusedBundleElement().Contains(sgWear), true);
 		// 			AB(sgWear.AcceptsFilter(defBowB_p), false);
 		// 			ASSB(defWearA_e, Slottable.EquippedAndDefocusedState);
 		// 			ASSB(defParts_p2, Slottable.DefocusedState);

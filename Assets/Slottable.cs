@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using Utility;
 namespace SlotSystem{
-	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, StateHandler{
+	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, StateHandler, SlotSystemElement{
 		/*	States	*/
 			/*	Selection State	*/
 				SBStateEngine SelStateEngine{
@@ -306,18 +306,7 @@ namespace SlotSystem{
 			public InventoryItemInstanceMock itemInst{
 					get{return (InventoryItemInstanceMock)item;}
 				}
-			public SlotGroupManager sgm{
-				get{return m_sgm;}
-				}SlotGroupManager m_sgm;
-				public void SetSGM(SlotGroupManager sgm){
-					m_sgm = sgm;
-				}
-			// public SlotGroup DestinationSG{
-			// 	get{return m_destinationSG;}
-			// 	}SlotGroup m_destinationSG;
-			// public Slot DestinationSlot{
-			// 	get{return m_destinationSlot;}
-			// 	}Slot m_destinationSlot;
+			
 			public int slotID{
 				get{
 					if(sg.slottables.Contains(this))
@@ -332,18 +321,23 @@ namespace SlotSystem{
 				public void SetNewSlotID(int id){
 					m_newSlotID = id;
 				}
+			// public SlotGroup sg{
+			// 	get{
+			// 		if(m_sg == null){
+			// 			m_sg = sgm.GetSG(this);
+			// 		}
+			// 		return m_sg;
+			// 	}
+			// 	}SlotGroup m_sg;
+			// 	public void SetSG(SlotGroup sg){
+			// 		/*	use this only when creating a new Sb in transaction	*/
+			// 		m_sg = sg;
+			// 	}
 			public SlotGroup sg{
 				get{
-					if(m_sg == null){
-						m_sg = sgm.GetSG(this);
-					}
-					return m_sg;
+					return sgm.GetSG(this);
 				}
-				}SlotGroup m_sg;
-				public void SetSG(SlotGroup sg){
-					/*	use this only when creating a new Sb in transaction	*/
-					m_sg = sg;
-				}
+			}
 			public bool isPickable{
 				get{
 					bool result = true;
@@ -375,20 +369,29 @@ namespace SlotSystem{
 			public bool isStackable{
 				get{return itemInst.Item.IsStackable;}
 			}
+		/*	SlotSystemElement imple	*/
+			public SlotGroupManager sgm{
+				get{return m_sgm;}
+				}SlotGroupManager m_sgm;
+				public void SetSGM(SlotGroupManager sgm){
+					m_sgm = sgm;
+				}
+			public void Activate(){}
+			public void Deactivate(){}
+			public void Focus(){
+				SetSelState(Slottable.FocusedState);
+			}
+			public void Defocus(){
+				SetSelState(Slottable.DefocusedState);
+			}
+			public SlotSystemElement DirectParent(SlotSystemElement element){
+				return null;
+			}
+			public bool ContainsInHierarchy(SlotSystemElement element){
+				return false;
+			}
 		/*	Event methods	*/
 			/*	Selection event	*/
-				public void Focus(){
-					// SetActState(Slottable.WaitForActionState);
-					// if(IsPickable)
-					// 	SetSelState(Slottable.FocusedState);
-					// else
-					// 	SetSelState(Slottable.DefocusedState);
-					SetSelState(Slottable.FocusedState);
-				}
-				public void Defocus(){
-					// SetActState(Slottable.WaitForActionState);
-					SetSelState(Slottable.DefocusedState);
-				}
 				public void OnHoverEnterMock(){
 					PointerEventDataMock eventData = new PointerEventDataMock();
 					CurSelState.OnHoverEnterMock(this, eventData);
@@ -435,14 +438,21 @@ namespace SlotSystem{
 			public void InstantUnequip(){}
 			public void InstantHighlight(){}
 		/*	methods	*/
-			public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
-				SetSG(sg);
-				this.delayed = delayed;
+			public void Initialize(InventoryItemInstanceMock item){
+				this.delayed = true;
 				this.SetItem(item);
 				SelStateEngine.SetState(Slottable.DeactivatedState);
 				ActStateEngine.SetState(Slottable.WaitForActionState);
-				EqpStateEngine.SetState(Slottable.UnequippedState);
+				EqpStateEngine.SetState(null);
 			}
+			// public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
+				// 	SetSG(sg);
+				// 	this.delayed = delayed;
+				// 	this.SetItem(item);
+				// 	SelStateEngine.SetState(Slottable.DeactivatedState);
+				// 	ActStateEngine.SetState(Slottable.WaitForActionState);
+				// 	EqpStateEngine.SetState(Slottable.UnequippedState);
+				// }
 			public void PickUp(){
 				SetActState(Slottable.PickedUpState);
 				m_pickedAmount = 1;
@@ -452,7 +462,6 @@ namespace SlotSystem{
 					m_pickedAmount ++;
 				}
 			}
-			public void Deactivate(){}
 			public void ExecuteTransaction(){
 				sgm.SetActState(SlotGroupManager.PerformingTransactionState);
 				sgm.Transaction.Execute();

@@ -362,7 +362,7 @@ namespace SlotSystem{
 				}InventoryManagerPage m_rootPage;
 				public void SetRootPage(InventoryManagerPage rootPage){
 					m_rootPage = rootPage;
-					m_rootPage.sgm = this;
+					rootPage.SetSGM(this);
 				}
 			public List<SlotGroup> allSGs{
 				get{
@@ -488,7 +488,7 @@ namespace SlotSystem{
 				SetRootPage(invManPage);
 				SelStateEngine.SetState(SlotGroupManager.DeactivatedState);
 				ActStateEngine.SetState(SlotGroupManager.WaitForActionState);
-				UpdateEquipStatesOnAll();
+				// UpdateEquipStatesOnAll();
 				//set all sgs and fields and initialize all sgs here
 			}
 			public void Focus(){
@@ -501,7 +501,7 @@ namespace SlotSystem{
 				rootPage.Defocus();
 			}
 			public SlotGroup GetSG(Slottable sb){
-				return this.rootPage.GetSlotGroup(sb);	
+				return (SlotGroup)rootPage.DirectParent(sb);
 			}
 			public void Reset(){
 				SetActState(SlotGroupManager.WaitForActionState);
@@ -716,5 +716,4 @@ namespace SlotSystem{
 			// 	UpdateTransaction();
 			// }
 	}
-
 }
