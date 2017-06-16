@@ -365,6 +365,23 @@ namespace SlotSystem{
 			public void InitializeItems(){
 				m_initItemsCommand.Execute(this);
 				}SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
+			public void OnActionComplete(){
+				m_onActionCompleteCommand.Execute(this);
+				}SlotGroupCommand m_onActionCompleteCommand;
+				public void SetOnActionCompleteCommand(SlotGroupCommand comm){
+					m_onActionCompleteCommand = comm;
+				}
+			/*	static	commands	*/
+				public static SlotGroupCommand updateEquippedStatusCommand{
+					get{
+						return m_updateEquippedStatusCommand;
+					}
+					}static SlotGroupCommand m_updateEquippedStatusCommand = new SGUpdateEquipStatusCommand();
+				public static SlotGroupCommand emptyCommand{
+					get{
+						return m_emptyCommand;
+					}
+					}static SlotGroupCommand m_emptyCommand = new SGEmptyCommand();
 			// public SlotGroupCommand CreateSlotsCommand{
 				// 	get{return m_createSlotsCommand;}
 				// 	set{m_createSlotsCommand = value;}
@@ -614,10 +631,11 @@ namespace SlotSystem{
 				}
 			}
 		/*	methods	*/
-			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount){
+			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand){
 				SetFilter(filter);
 				SetSorter(SlotGroup.ItemIDSorter);
 				SetInventory(inv);
+				SetOnActionCompleteCommand(onActionCompleteCommand);
 				this.isShrinkable = isShrinkable;
 				if(initSlotsCount == 0)
 					this.isExpandable = true;
@@ -727,6 +745,7 @@ namespace SlotSystem{
 					}
 				}
 				SetSlots(newSlots);
+				OnActionComplete();
 			}
 			public void InstantGreyout(){}
 			public void InstantGreyin(){}

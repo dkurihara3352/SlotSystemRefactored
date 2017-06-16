@@ -458,75 +458,115 @@ public class SlottableTest{
 				initCGears.Add(defShieldA);
 				initCGears.Add(defMWeaponA);
 			equipInv = new EquipmentSetInventory(defBowA, defWearA, initCGears, 4);
-				AE(poolInv.Items.Count, 14);
-				AE(equipInv.Items.Count, 4);
+				AE(poolInv.items.Count, 14);
+				AE(equipInv.items.Count, 4);
 		/*	SGs	*/
 			/*	sgpAll	*/
 				sgpAllGO = new GameObject("PoolSlotGroup");
 				sgpAll = sgpAllGO.AddComponent<SlotGroup>();
-				sgpAll.Initialize(SlotGroup.NullFilter, poolInv, true, 0);
+				sgpAll.Initialize(SlotGroup.NullFilter, poolInv, true, 0, SlotGroup.emptyCommand);
+					ASSG(sgpAll,
+						SGDeactivated, SGDeactivated, null,
+						SGWFA, SGWFA, null, false);
+					AB(sgpAll.isShrinkable, true);
+					AB(sgpAll.isExpandable, true);
 					AssertSGCounts(sgpAll,
-						14,
-						14,
-						14);
+						14,//slots
+						14,//items
+						14);//sbs
+			/*	sgpBow	*/
+				sgpBowGO = new GameObject("sgpBowGO");
+				sgpBow = sgpBowGO.AddComponent<SlotGroup>();
+				sgpBow.Initialize(SlotGroup.BowFilter, poolInv, true, 0, SlotGroup.emptyCommand);
+					ASSG(sgpBow,
+						SGDeactivated, SGDeactivated, null,
+						SGWFA, SGWFA, null, false);
+					AB(sgpBow.isShrinkable, true);
+					AB(sgpBow.isExpandable, true);
+					AssertSGCounts(sgpBow,
+						3,//slots
+						3,//items
+						3);//sbs
+			/*	sgpWear	*/
+				sgpWearGO = new GameObject("sgpWearGO");
+				sgpWear = sgpWearGO.AddComponent<SlotGroup>();
+				sgpWear.Initialize(SlotGroup.WearFilter, poolInv, true, 0, SlotGroup.emptyCommand);
+					ASSG(sgpWear,
+						SGDeactivated, SGDeactivated, null,
+						SGWFA, SGWFA, null, false);
+					AB(sgpWear.isShrinkable, true);
+					AB(sgpWear.isExpandable, true);
+					AssertSGCounts(sgpWear,
+						3,//slots
+						3,//items
+						3);//sbs
+			/*	sgpCGears	*/
+				sgpCGearsGO = new GameObject("sgpCGearsGO");
+				sgpCGears = sgpCGearsGO.AddComponent<SlotGroup>();
+				sgpCGears.Initialize(SlotGroup.CGearsFilter, poolInv, true, 0, SlotGroup.emptyCommand);
+					ASSG(sgpCGears,
+						SGDeactivated, SGDeactivated, null,
+						SGWFA, SGWFA, null, false);
+					AB(sgpCGears.isShrinkable, true);
+					AB(sgpCGears.isExpandable, true);
+					AssertSGCounts(sgpCGears,
+						6,//slots
+						6,//items
+						6);//sbs
+			/*	sgpParts	*/
+				sgpPartsGO = new GameObject("PartsSlotGroupPool");
+				sgpParts = sgpPartsGO.AddComponent<SlotGroup>();
+				sgpParts.Initialize(SlotGroup.PartsFilter, poolInv, true, 0, SlotGroup.emptyCommand);
+					ASSG(sgpParts,
+						SGDeactivated, SGDeactivated, null,
+						SGWFA, SGWFA, null, false);
+					AB(sgpParts.isShrinkable, true);
+					AB(sgpParts.isExpandable, true);
+					AssertSGCounts(sgpParts,
+						2,//slots
+						2,//items
+						2);//sbs
 			/*	sgBow	*/
 				sgBowGO = new GameObject("BowSlotGroup");
 				sgBow = sgBowGO.AddComponent<SlotGroup>();
-				sgBow.Initialize(SlotGroup.BowFilter, equipInv, false, 1);
+				sgBow.Initialize(SlotGroup.BowFilter, equipInv, false, 1, SlotGroup.updateEquippedStatusCommand);
+					ASSG(sgBow,
+						SGDeactivated, SGDeactivated, null,
+						SGWFA, SGWFA, null, false);
+					AB(sgBow.isShrinkable, false);
+					AB(sgBow.isExpandable, false);
 					AssertSGCounts(sgBow,
-						1,
-						1,
-						1);
+						1,//slots
+						1,//items
+						1);//sbs
 			/*	sgWear	*/
 				sgWearGO = new GameObject("WearSlotGroup");
 				sgWear = sgWearGO.AddComponent<SlotGroup>();
-				sgWear.Initialize(SlotGroup.WearFilter, equipInv, false, 1);
+				sgWear.Initialize(SlotGroup.WearFilter, equipInv, false, 1, SlotGroup.updateEquippedStatusCommand);
+					ASSG(sgWear,
+						SGDeactivated, SGDeactivated, null,
+						SGWFA, SGWFA, null, false);
+					AB(sgWear.isShrinkable, false);
+					AB(sgWear.isExpandable, false);
 					AssertSGCounts(sgWear,
-						1,
-						1,
-						1);
+						1,//slots
+						1,//items
+						1);//sbs
 			/*	sgCGears	*/
 				sgCGearsGO = new GameObject("CarriedGearsSG");
 				sgCGears = sgCGearsGO.AddComponent<SlotGroup>();
 				equipInv.SetEquippableCGearsCount(4);
 				int slotCount = equipInv.equippableCGearsCount;
-				sgCGears.Initialize(SlotGroup.CGearsFilter, equipInv, true, slotCount);
-					AssertSGCounts(sgCGears,
-						4,
-						2,
-						2);
-			/*	sgpParts	*/
-				sgpPartsGO = new GameObject("PartsSlotGroupPool");
-				sgpParts = sgpPartsGO.AddComponent<SlotGroup>();
-				sgpParts.Initialize(SlotGroup.PartsFilter, poolInv, true, 0);
-					AssertSGCounts(sgpParts,
-						2,
-						2,
-						2);
-			/*	sgpBow	*/
-				sgpBowGO = new GameObject("sgpBowGO");
-				sgpBow = sgpBowGO.AddComponent<SlotGroup>();
-				sgpBow.Initialize(SlotGroup.BowFilter, poolInv, true, 0);
-					AssertSGCounts(sgpBow,
-						3,
-						3,
-						3);
-			/*	sgpWear	*/
-				sgpWearGO = new GameObject("sgpWearGO");
-				sgpWear = sgpWearGO.AddComponent<SlotGroup>();
-				sgpWear.Initialize(SlotGroup.WearFilter, poolInv, true, 0);
-					AssertSGCounts(sgpWear,
-						3,
-						3,
-						3);
-			/*	sgpCGears	*/
-				sgpCGearsGO = new GameObject("sgpCGearsGO");
-				sgpCGears = sgpCGearsGO.AddComponent<SlotGroup>();
-				sgpCGears.Initialize(SlotGroup.CGearsFilter, poolInv, true, 0);
-					AssertSGCounts(sgpCGears,
-						6,
-						6,
-						6);
+				sgCGears.Initialize(SlotGroup.CGearsFilter, equipInv, true, slotCount, SlotGroup.updateEquippedStatusCommand);
+					ASSG(sgCGears,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AB(sgCGears.isShrinkable, true);
+						AB(sgCGears.isExpandable, false);
+						AssertSGCounts(sgCGears,
+							4,//slots
+							2,//items
+							2);//sbs
 		/*	SBs	*/
 			defBowA_p = sgpAll.GetSB(defBowA);
 			defBowB_p = sgpAll.GetSB(defBowB);
@@ -551,8 +591,8 @@ public class SlottableTest{
 			crfWearA_p2 = sgpWear.GetSB(crfWearA);
 			defShieldA_p2 = sgpCGears.GetSB(defShieldA);
 			crfShieldA_p2 = sgpCGears.GetSB(crfShieldA);
-			defMWeaponA_p2 =	sgpCGears.GetSB(defMWeaponA); 
-			crfMWeaponA_p2 =	sgpCGears.GetSB(crfMWeaponA);
+			defMWeaponA_p2 = sgpCGears.GetSB(defMWeaponA); 
+			crfMWeaponA_p2 = sgpCGears.GetSB(crfMWeaponA);
 			defQuiverA_p2 = sgpCGears.GetSB(defQuiverA);
 			defPackA_p2 = sgpCGears.GetSB(defPackA);
 			defParts_p2 = sgpParts.GetSB(defPartsA);
@@ -578,188 +618,11 @@ public class SlottableTest{
 			poolBundle.SetFocusedBundleElement(sgpAll);
 			InventoryManagerPage invManPage = new InventoryManagerPage(poolBundle, equipBundle);
 		sgm.Initialize(invManPage);
-		/*	Post initialization assertion	*/
-			/*	invManager Assertion */
-				Assert.That(sgm.rootPage, Is.TypeOf(typeof(InventoryManagerPage)));
-				AE(sgm.rootPage.sgm, sgm);
-
-				AE(sgm.rootPage.Elements.Count, 2);
-				AB(sgm.rootPage.ContainsInHierarchy(poolBundle), true);
-				AE(poolBundle.sgm, sgm);
-				AB(sgm.rootPage.ContainsInHierarchy(equipBundle), true);
-				AE(equipBundle.sgm, sgm);
-
-				AE(poolBundle.Elements.Count, 5);
-				AB(poolBundle.ContainsInHierarchy(sgpAll), true);
-				AE(sgpAll.sgm, sgm);
-				AB(poolBundle.ContainsInHierarchy(sgpParts), true);
-				AE(sgpParts.sgm, sgm);
-				AB(poolBundle.ContainsInHierarchy(sgpBow), true);
-				AE(sgpBow.sgm, sgm);
-				AB(poolBundle.ContainsInHierarchy(sgpWear), true);
-				AE(sgpWear.sgm, sgm);
-				AB(poolBundle.ContainsInHierarchy(sgpCGears), true);
-				AE(sgpCGears.sgm, sgm);
-				AE(poolBundle.GetFocusedBundleElement(), sgpAll);
-
-				AE(equipBundle.Elements.Count, 1);
-				AE(equipBundle.GetFocusedBundleElement(), equipSetA);
-				AE(equipSetA.sgm, sgm);
-
-				AE(equipSetA.Elements.Count, 3);
-				AB(equipSetA.ContainsInHierarchy(sgBow), true);
-				AE(sgBow.sgm, sgm);
-				AE(equipSetA.ContainsInHierarchy(sgWear), true);
-				AE(sgWear.sgm, sgm);
-
-				ASSGM(sgm,
-					null, null, null, null, null, null, null, null, 
-					SGMDeactivated, SGMDeactivated, null,
-					SGMWFA, SGMWFA, null,
-					null, true, true, true, true);
-			/*	SGPs	*/
-				/*	sgpAll	*/
-					ASSG(sgpAll,
-						SGDeactivated, SGDeactivated, null,
-						SGWFA, SGWFA, null, false);
-					AB(sgpAll.isShrinkable, true);
-					AB(sgpAll.isExpandable, true);
-					AssertSGCounts(sgpAll,
-						14,//slots
-						14,//items
-						14);//sbs
-					AE(sgpAll.equippedSBs.Count, 0);
-					foreach(Slottable sb in sgpAll.slottables){
-						if(sb != null){
-							ASSB_s(sb, SBDeactivated, SBWFA);
-							AE(sb.sg, sgpAll);
-						}
-					}
-				/*	sgpBow	*/
-					ASSG(sgpBow,
-						SGDeactivated, SGDeactivated, null,
-						SGWFA, SGWFA, null, false);
-					AB(sgpBow.isShrinkable, true);
-					AB(sgpBow.isExpandable, true);
-					AssertSGCounts(sgpBow,
-						3,//slots
-						3,//items
-						3);//sbs
-					AE(sgpBow.equippedSBs.Count, 0);
-					foreach(Slottable sb in sgpBow.slottables){
-						if(sb != null){
-							ASSB_s(sb, SBDeactivated, SBWFA);
-							AE(sb.sg, sgpBow);
-						}
-					}
-				/*	sgpWear	*/
-					ASSG(sgpWear,
-						SGDeactivated, SGDeactivated, null,
-						SGWFA, SGWFA, null, false);
-					AB(sgpWear.isShrinkable, true);
-					AB(sgpWear.isExpandable, true);
-					AssertSGCounts(sgpWear,
-						3,//slots
-						3,//items
-						3);//sbs
-					AE(sgpWear.equippedSBs.Count, 0);
-					foreach(Slottable sb in sgpWear.slottables){
-						if(sb != null){
-							ASSB_s(sb, SBDeactivated, SBWFA);
-							AE(sb.sg, sgpWear);
-						}
-					}
-				/*	sgpCGears	*/
-					ASSG(sgpCGears,
-						SGDeactivated, SGDeactivated, null,
-						SGWFA, SGWFA, null, false);
-					AB(sgpCGears.isShrinkable, true);
-					AB(sgpCGears.isExpandable, true);
-					AssertSGCounts(sgpCGears,
-						6,//slots
-						6,//items
-						6);//sbs
-					AE(sgpCGears.equippedSBs.Count, 0);
-					foreach(Slottable sb in sgpCGears.slottables){
-						if(sb != null){
-							ASSB_s(sb, SBDeactivated, SBWFA);
-							AE(sb.sg, sgpCGears);
-						}
-					}
-				/*	sgpParts	*/
-					ASSG(sgpParts,
-						SGDeactivated, SGDeactivated, null,
-						SGWFA, SGWFA, null, false);
-					AB(sgpParts.isShrinkable, true);
-					AB(sgpParts.isExpandable, true);
-					AssertSGCounts(sgpParts,
-						2,//slots
-						2,//items
-						2);//sbs
-					AE(sgpParts.equippedSBs.Count, 0);
-					foreach(Slottable sb in sgpParts.slottables){
-						if(sb != null){
-							ASSB_s(sb, SBDeactivated, SBWFA);
-							AE(sb.sg, sgpParts);
-						}
-					}
-			/*	SGEs	*/
-				/*	sgBow	*/
-					ASSG(sgBow,
-						SGDeactivated, SGDeactivated, null,
-						SGWFA, SGWFA, null, false);
-					AB(sgBow.isShrinkable, false);
-					AB(sgBow.isExpandable, false);
-					AssertSGCounts(sgBow,
-						1,//slots
-						1,//items
-						1);//sbs
-					AE(sgBow.equippedSBs.Count, 0);
-					foreach(Slottable sb in sgBow.slottables){
-						if(sb != null){
-							ASSB_s(sb, SBDeactivated, SBWFA);
-							AE(sb.sg, sgBow);
-							AE(sb.isEquipped, false);
-						}
-					}
-				/*	sgWear	*/
-					ASSG(sgWear,
-						SGDeactivated, SGDeactivated, null,
-						SGWFA, SGWFA, null, false);
-					AB(sgWear.isShrinkable, false);
-					AB(sgWear.isExpandable, false);
-					AssertSGCounts(sgWear,
-						1,//slots
-						1,//items
-						1);//sbs
-					AE(sgWear.equippedSBs.Count, 0);
-					foreach(Slottable sb in sgWear.slottables){
-						if(sb != null){
-							ASSB_s(sb, SBDeactivated, SBWFA);
-							AE(sb.sg, sgWear);
-							AE(sb.isEquipped, false);
-						}
-					}
-				/*	sgCGears	*/
-						ASSG(sgCGears,
-							SGDeactivated, SGDeactivated, null,
-							SGWFA, SGWFA, null, false);
-						AB(sgCGears.isShrinkable, true);
-						AB(sgCGears.isExpandable, false);
-						AssertSGCounts(sgCGears,
-							4,//slots
-							2,//items
-							2);//sbs
-						AE(sgCGears.equippedSBs.Count, 0);
-						foreach(Slottable sb in sgCGears.slottables){
-							if(sb != null){
-								ASSB_s(sb, SBDeactivated, SBWFA);
-								AE(sb.sg, sgCGears);
-								AE(sb.isEquipped, false);
-							}
-						}
-		// sgm.Focus();
-		// AssertFocused();
+			AssertBundlesPagesAndSGsMembership();
+			AssertSBsMembership();
+			AssertInitialize();
+		sgm.Activate();
+		AssertFocused();
 	}
 	[Test]
 	public void TestAll(){
@@ -785,15 +648,98 @@ public class SlottableTest{
 			// TestReorderOnAll();
 			// TestFillOnAll();
 			// TestSwapOnAll();
+			// TestFillShortcut();
 		// TestAddAndRemoveAll();
 		// TestSGGeneric();
 		// TestSlotSystemElement();
-		AssertInitialize();
+		// AssertInitialize();
+		TestInventoryUpdate();
+	}
+	public void Fill(Slottable testSB, SlotGroup origSG, SlotGroup tarSG, Slottable tarSB){
+		AssertFocused();
+		PickUp(testSB, out picked);
+		if(tarSG != null)
+			SimHover(null, tarSG, eventData);
+		else if(tarSB != null){
+			SimHover(tarSB, null, eventData);
+			tarSG = testSB.sgm.Transaction.sg2;
+		}
+		LetGo();
+		if(!origSG.isAllTASBsDone)
+			CompleteAllSBActProcesses(origSG);
+		if(!tarSG.isAllTASBsDone)
+			CompleteAllSBActProcesses(tarSG);
+		sgm.dIcon1.CompleteMovement();
+		AssertFocused();
+	}
+	public void TestFillShortcut(){
+		PerformOnAllSBs(CrossTestFillShortcut);
+		PrintTestResult(null);
+		}
+		public void CrossTestFillShortcut(Slottable sb, bool isPAS){
+			CrossTestSGs(TestFillShortcut, sb, isPAS);
+			origSGCache = null;
+		}
+		public void TestFillShortcut(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
+			InventoryItemInstanceMock testItem = testSB.itemInst;
+			SlotGroup origSG = testSB.sg;
+			if(origSG != null)
+				origSGCache = origSG;
+			else
+				origSG = origSGCache;
+			testSB = origSG.GetSB(testItem);
+			if(testSB.isPickable){
+				if(sgm.GetTransaction(testSB, tarSG, null).GetType() == typeof(FillTransaction)){
+					Fill(testSB, origSG, tarSG, null);
+					/*	rev */
+					Fill(tarSG.GetSB(testItem), tarSG, origSG, null);
+				}
+				foreach(Slottable tarSB in tarSG.slottables){
+					if(tarSB != null){
+						testSB = origSG.GetSB(testItem);
+						if(sgm.GetTransaction(testSB, null, tarSB).GetType() == typeof(FillTransaction)){
+							Fill(testSB, origSG, null, tarSB);
+							/*	rev */
+							Fill(tarSG.GetSB(testItem), tarSG, origSG, null);
+						}
+					}
+				}
+			}
+		}
+	public void TestInventoryUpdate(){
+		PrintSBs(sgpAll.slottables);
+		PrintItemsArray(sgpAll.inventory.items);
+		PrintSBs(sgCGears.slottables);
+		PrintItemsArray(sgCGears.inventory.items);
+
+		Fill(defQuiverA_p, sgpAll, sgCGears, null);
+		Debug.Log("post ta");
+		PrintSBs(sgpAll.slottables);
+		PrintItemsArray(sgpAll.inventory.items);
+		PrintSBs(sgCGears.slottables);
+		PrintItemsArray(sgCGears.inventory.items);
+
+		Fill(sgCGears.GetSB(defShieldA_p.itemInst), sgCGears, sgpAll, null);
+		Debug.Log("defShieldA_e to sgpAll");
+		PrintSBs(sgpAll.slottables);
+		PrintItemsArray(sgpAll.inventory.items);
+		PrintSBs(sgCGears.slottables);
+		PrintItemsArray(sgCGears.inventory.items);
+	}
+	public void PrintSBs(List<Slottable> sbs){
+		foreach(Slottable sb in sbs){
+			Debug.Log(Util.SBDebug(sb));
+		}
+	}
+	public void AssertEquippedOnAll(){
+		AE(sgm.equippedBowInst, sgBow.slots[0].sb.itemInst);
+		AE(sgm.equippedWearInst, sgWear.slots[0].sb.itemInst);
+		AssertEquipped(sgm.equippedBowInst);
+		AssertEquipped(sgm.equippedWearInst);
+		AECGears(sgm.equippedCarriedGears, sgm.poolInv, sgm.equipInv);
 	}
 	public void AssertInitialize(){
 		ANull(SlotGroupManager.CurSGM);
-		AssertBundlesPagesAndSGsMembership();
-		AssertSBsMembership();
 		ASSGM(sgm,
 			null, null, null, null, null, null, null, null,
 			SGMDeactivated, SGMDeactivated, null,
@@ -806,14 +752,12 @@ public class SlottableTest{
 				ASGReset(sg);
 			foreach(Slottable sb in sg.slottables){
 				if(sb != null){
-					
 					ASSB(sb,
 						SBDeactivated, SBDeactivated, null,
 						SBWFA, SBWFA, null, false,
 						null, null, null);
 					ANull(sb.CurEqpState);
 					ANull(sb.PrevEqpState);
-					Debug.Log("curEqp: " + Util.SBStateName(sb.CurEqpState) + ", prevEqp: " + Util.SBStateName(sb.PrevEqpState));
 				}
 			}
 		}
@@ -991,6 +935,15 @@ public class SlottableTest{
 				// 	}
 				// }
 			}
+		}
+	}
+	List<Slottable> allSBsList{
+		get{
+			List<Slottable> sbs = new List<Slottable>();
+			sbs.AddRange(sbpList);
+			sbs.AddRange(sbp2List);
+			sbs.AddRange(sbeList);
+			return sbs;
 		}
 	}
 	List<Slottable> sbpList{
@@ -1451,7 +1404,7 @@ public class SlottableTest{
 		}
 	public void TestVolSortOnSPGParts(){
 			AssertFocused();
-			PrintSBs(sgpParts.slottables);
+			PrintSBsArray(sgpParts.slottables);
 		sgm.SortSG(sgpParts, SlotGroup.ItemIDSorter);
 
 			// SlotSystemTransaction sortTransaction = new SortTransaction(sgpParts, SlotGroup.ItemIDSorter);
@@ -1466,7 +1419,7 @@ public class SlottableTest{
 			// sgm.SetActState(SlotGroupManager.PerformingTransactionState);
 		// CompleteAllSBActProcesses(sgpParts);
 			AssertSBsSorted(sgpParts, SlotGroup.ItemIDSorter);
-			PrintSBs(sgpParts.slottables);
+			PrintSBsArray(sgpParts.slottables);
 			Debug.Log(Util.SGMDebug(sgm));
 			AssertFocused();
 		
@@ -1487,7 +1440,7 @@ public class SlottableTest{
 			if(sb != null)
 			Debug.Log(Util.SBDebug(sb));
 		}
-		PrintSBs(sgpAll.newSBs);
+		PrintSBsArray(sgpAll.newSBs);
 		sgpAll.OnCompleteSlotMovementsV2();
 		
 		newSBs.Clear();
@@ -1502,7 +1455,7 @@ public class SlottableTest{
 			if(sb != null)
 			Debug.Log(Util.SBDebug(sb));
 		}
-		PrintSBs(sgpAll.newSBs);
+		PrintSBsArray(sgpAll.newSBs);
 		sgpAll.OnCompleteSlotMovementsV2();
 		
 		newSBs.Clear();
@@ -1518,11 +1471,11 @@ public class SlottableTest{
 			if(sb != null)
 			Debug.Log(Util.SBDebug(sb));
 		}
-		PrintSBs(sgpAll.newSBs);
+		PrintSBsArray(sgpAll.newSBs);
 		sgpAll.OnCompleteSlotMovementsV2();
 
 		sgpAll.InstantSort();
-		PrintSBs(sgpAll.slottables);
+		PrintSBsArray(sgpAll.slottables);
 	}
 	public List<Slottable> testSBs{
 		get{
@@ -1544,7 +1497,7 @@ public class SlottableTest{
 			return res;
 		}
 	}
-	public void PrintSBs(List<Slottable> sbs){
+	public void PrintSBsArray(List<Slottable> sbs){
 		foreach(Slottable sb in sbs){
 			if(sb != null)
 				Util.Stack(Util.SBName(sb));
@@ -1554,16 +1507,29 @@ public class SlottableTest{
 		string str = Util.Stacked;
 		Debug.Log("SBs: " + str);
 	}
+	public void PrintItemsArray(List<SlottableItem> items){
+		foreach(SlottableItem item in items){
+			if(item is InventoryItemInstanceMock){
+				InventoryItemInstanceMock itemInst = (InventoryItemInstanceMock)item;
+				if(itemInst != null)
+					Util.Stack(Util.ItemInstName(itemInst));
+				else
+					Util.Stack("null");
+			}
+		}
+		string str = Util.Stacked;
+		Debug.Log("itemInsts: " + str);
+	}
 	public void TestReorderSBsMethod(){
 		List<Slottable> sbs = testSBs;
-		PrintSBs(sbs);
+		PrintSBsArray(sbs);
 		sbs.Shuffle();
-		PrintSBs(sbs);
+		PrintSBsArray(sbs);
 		// Util.ReorderSBs(sbs[0], sbs[3], ref sbs);
 		sbs.Reorder(sbs[0], sbs[3]);
-		PrintSBs(sbs);
+		PrintSBsArray(sbs);
 		sbs.Reorder(sbs[sbs.Count - 1], sbs[0]);
-		PrintSBs(sbs);
+		PrintSBsArray(sbs);
 	}
 	public void TestAcceptSGTACompOnAll(){
 		PerformOnAllSGAfterFocusing(TestAcceptSGTAComp);
@@ -2618,8 +2584,7 @@ public class SlottableTest{
 			if(origSG.isPool)
 				equipped_p = sgpAll.GetSB(pickedSB.itemInst);
 			else
-				equipped_p = sgpAll.GetSB(hoveredSB.itemInst);
-				AssertEquipped(equipped_p);
+				AssertEquipped(hoveredSB.itemInst);
 		}
 		public void SwapCGears(Slottable pickedSB, Slottable hoveredSB){
 			SlotGroup origSG = pickedSB.sg;
@@ -2949,10 +2914,11 @@ public class SlottableTest{
 			}
 		/*	other	*/
 			public void ANotNull(object obj){
-				Assert.That(obj, Is.Not.Null);
+				// Assert.That(obj, Is.Not.Null);
+				AB(obj != null, true);
 			}
 			public void ANull(object obj){
-				Assert.That(obj, Is.Null);
+				AB(obj == null, true);
 			}
 			public void AE(object inspected, object expected){
 				if(expected != null)
@@ -2966,54 +2932,68 @@ public class SlottableTest{
 				else
 					Assert.That(inspectedBool, Is.False);
 			}
-			public void AssertEquipped(Slottable sbInPool){
-				if(sbInPool.itemInst is BowInstanceMock || sbInPool.itemInst is WearInstanceMock){
+			public void AssertEquipped(InventoryItemInstanceMock itemInst){
+				if(itemInst is BowInstanceMock || itemInst is WearInstanceMock){
+					/*	Bow or Wear?	*/
 					bool isBow = false;
-					if(sbInPool.itemInst is BowInstanceMock)
+					if(itemInst is BowInstanceMock)
 						isBow = true;
+					System.Type typeToCheck;
+					InventoryItemInstanceMock sgmEquipped;
+					Slottable sbe;
+					SlotGroup sge;
+					SlotGroup sgp;
+					if(isBow){
+						typeToCheck = typeof(BowInstanceMock);
+						sgmEquipped = sgm.equippedBowInst;
+						sge = sgBow;
+						sgp = sgpBow;
+					}else{
+						typeToCheck = typeof(WearInstanceMock);
+						sgmEquipped = sgm.equippedWearInst;
+						sge = sgWear;
+						sgp = sgpWear;
+					}
 					foreach(Slottable sbp in sgpAll.slottables){
 						if(sbp != null){
-							InventoryItemInstanceMock itemInst = sbp.itemInst;
-							if((isBow && itemInst is BowInstanceMock) || (!isBow && itemInst is WearInstanceMock)){
-								if(sbp == sbInPool){
+							InventoryItemInstanceMock sbpItem = sbp.itemInst;
+							if(sbpItem.GetType() == typeToCheck)
+							{
+								if(sbpItem == itemInst){
 									AB(sbp.isEquipped, true);
-									if(isBow)
-										AE(sgm.equippedBowInst, itemInst);
-									else
-										AE(sgm.equippedWearInst, itemInst);
-									Slottable sbe = isBow?sgBow.GetSB(itemInst): sgWear.GetSB(itemInst);
-									AB(sbe!= null, true);
+									AB(sgpAll.equippedSBs.Contains(sbp), true);
+									AE(sgmEquipped, sbpItem);
+									sbe = sge.GetSB(sbpItem);
+									AB(sbe != null, true);
+									AE(sge.equippedSBs.Count, 1);
+									AB(sge.equippedSBs.Contains(sbe), true);
 									ASSB(sbe,
 										null, SBFocused, null,
 										null, SBWFA, null, false, 
-										SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+										null, SBEquipped, null);
 									if(sgpAll == sgm.focusedSGP){
 										if(sgpAll.isAutoSort){
 											ASSB(sbp,
 												null, SBDefocused, null,
 												null, SBWFA, null, false,
-												SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+												null, SBEquipped, null);
 										}else{
 											ASSB(sbp,
 												null, SBFocused, null,
 												null, SBWFA, null, false, 
-												SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+												null, SBEquipped, null);
 										}
 									}else{
 										ASSB(sbp,
 											null, SBDefocused, null,
 											null, SBWFA, null, false, 
-											SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+											null, SBEquipped, null);
 									}
 								}else{// deemed not the equipped bow/wear
 									AB(sbp.isEquipped, false);
-									if(isBow){
-										AB(sgm.equippedBowInst != (BowInstanceMock)itemInst, true);
-										AB(sgBow.GetSB(itemInst) == null, true);
-									}else{
-										AB(sgm.equippedWearInst != (WearInstanceMock)itemInst, true);
-										AB(sgWear.GetSB(itemInst) == null, true);
-									}
+									AB(sgpAll.equippedSBs.Contains(sbp), false);
+									AB(sgmEquipped != sbpItem, true);
+									ANull(sge.GetSB(sbpItem));
 									if(sgpAll == sgm.focusedSGP){
 										ASSB(sbp,
 											null, SBFocused, null,
@@ -3029,30 +3009,39 @@ public class SlottableTest{
 							}
 						}
 					}
-					SlotGroup sgp = isBow?sgpBow: sgpWear;
 					foreach(Slottable sbp in sgp.slottables){
 						if(sbp != null){
-							if(sbp.itemInst == sbInPool.itemInst){
+							InventoryItemInstanceMock sbpItem = sbp.itemInst;
+							if(sbpItem == itemInst){
 								AB(sbp.isEquipped, true);
+								AB(sgp.equippedSBs.Contains(sbp), true);
+								AE(sgmEquipped, sbpItem);
+								sbe = sge.GetSB(sbpItem);
+								AB(sbe != null, true);
+								AE(sge.equippedSBs.Count, 1);
+								AB(sge.equippedSBs.Contains(sbe), true);
 								if(sgp == sgm.focusedSGP){
 									if(sgp.isAutoSort)
 										ASSB(sbp,
 											null, SBDefocused, null,
 											null, SBWFA, null, false,
-											SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+											null, SBEquipped, null);
 									else
 										ASSB(sbp,
 											null, SBFocused, null,
 											null, SBWFA, null, false,
-											SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+											null, SBEquipped, null);
 								}else{
 									ASSB(sbp,
 										null, SBDefocused, null,
 										null, SBWFA, null, false,
-										SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+										null, SBEquipped, null);
 								}
 							}else{/* deemed not equipped	*/
 								AB(sbp.isEquipped, false);
+									AB(sgp.equippedSBs.Contains(sbp), false);
+									AB(sgmEquipped != sbpItem, true);
+									ANull(sge.GetSB(sbpItem));
 								if(sgp == sgm.focusedSGP)
 									ASSB(sbp,
 										null, SBFocused, null,
@@ -3065,6 +3054,50 @@ public class SlottableTest{
 										null, SBUnequipped, null);
 							}
 						}
+					}
+				}
+			}
+			public void AECGears(List<CarriedGearInstanceMock> items, PoolInventory poolInv, EquipmentSetInventory equipInv){
+				if(items != null){
+					AE(sgm.equippedCarriedGears.Count, items.Count);
+					AE(sgpAll.equippedSBs.Count, items.Count + 2);
+					AE(sgpCGears.equippedSBs.Count, items.Count);
+					AE(sgCGears.equippedSBs.Count, items.Count);
+					foreach(CarriedGearInstanceMock item in items){
+						AB(sgm.equippedCarriedGears.Contains(item), true);
+						AB(sgpAll.equippedSBs.Contains(sgpAll.GetSB(item)), true);
+						ANull(sgpBow.GetSB(item));
+						ANull(sgpWear.GetSB(item));
+						ANull(sgpParts.GetSB(item));
+						AB(sgpCGears.equippedSBs.Contains(sgpCGears.GetSB(item)), true);
+						ANull(sgBow.GetSB(item));
+						ANull(sgWear.GetSB(item));
+						AB(sgCGears.equippedSBs.Contains(sgCGears.GetSB(item)), true);
+					}
+				}
+				foreach(InventoryItemInstanceMock itemInInv in poolInv.items){
+					if(itemInInv is CarriedGearInstanceMock){
+						if(items.Contains((CarriedGearInstanceMock)itemInInv)){
+							AB(itemInInv.isEquipped, true);
+							AB(sgpAll.GetSB(itemInInv).isEquipped, true);
+							AB(sgpCGears.GetSB(itemInInv).isEquipped, true);
+						}else{//deemed not equipped
+							AB(itemInInv.isEquipped, false);
+							AB(sgpAll.GetSB(itemInInv).isEquipped, false);
+							AB(sgpCGears.GetSB(itemInInv).isEquipped, false);
+						}
+					}
+				}
+				foreach(CarriedGearInstanceMock item in items){
+					if(item != null){
+						AE(equipInv.items.Contains(item), true);
+					}
+				}
+				foreach(InventoryItemInstanceMock itemInInv in equipInv.items){
+					if(itemInInv is CarriedGearInstanceMock){
+						AB(itemInInv.isEquipped, true);
+						AE(items.Contains((CarriedGearInstanceMock)itemInInv), true);
+						AB(sgCGears.GetSB(itemInInv).isEquipped, true);
 					}
 				}
 			}
@@ -3145,6 +3178,7 @@ public class SlottableTest{
 				}
 			}
 			public void AssertFocused(){
+				AssertEquippedOnAll();
 				ASSGM(sgm,
 					null, null, null, null, null, null, null, null,
 					null, SGMFocused, null,

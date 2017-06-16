@@ -394,6 +394,44 @@ namespace SlotSystem{
 					return result;
 				}
 			}
+			public SlotGroup focusedSGEBow{
+				get{
+					foreach(SlotGroup sge in focusedSGEs){
+						if(sge.Filter is SGBowFilter)
+							return sge;
+					}
+					return null;
+				}
+			}
+			public SlotGroup focusedSGEWear{
+				get{
+					foreach(SlotGroup sge in focusedSGEs){
+						if(sge.Filter is SGWearFilter)
+							return sge;
+					}
+					return null;
+				}
+			}
+			public SlotGroup focusedSGECGears{
+				get{
+					foreach(SlotGroup sge in focusedSGEs){
+						if(sge.Filter is SGCGearsFilter)
+							return sge;
+					}
+					return null;
+				}
+			}
+			public List<InventoryItemInstanceMock> actualEquippedItems{
+				get{
+					List<InventoryItemInstanceMock> items = new List<InventoryItemInstanceMock>();
+					items.Add(equippedBowInst);
+					items.Add(equippedWearInst);
+					foreach(CarriedGearInstanceMock cgItem in equippedCarriedGears){
+						items.Add(cgItem);
+					}
+					return items;
+				}
+			}
 			public SlotGroup focusedSGP{
 				get{
 					SlotSystemElement focusedEle = rootPage.PoolBundle.GetFocusedBundleElement();
@@ -437,6 +475,11 @@ namespace SlotSystem{
 					return (PoolInventory)focusedSGP.inventory;
 				}
 			}
+			public EquipmentSetInventory equipInv{
+				get{
+					return (EquipmentSetInventory)focusedSGEs[0].inventory;
+				}
+			}
 			public BowInstanceMock equippedBowInst{
 				get{
 					foreach(SlotGroup sge in focusedSGEs){
@@ -470,7 +513,10 @@ namespace SlotSystem{
 				}
 			}
 			public List<PartsInstanceMock> equippedParts{
-				get{return null;}
+				get{
+					List<PartsInstanceMock> items = new List<PartsInstanceMock>();
+					return items;
+				}
 			}
 			/*	dump	*/
 				// List<SlotGroup> m_slotGroups;
@@ -491,8 +537,12 @@ namespace SlotSystem{
 				// UpdateEquipStatesOnAll();
 				//set all sgs and fields and initialize all sgs here
 			}
-			public void Focus(){
+			public void Activate(){
 				SetCurSGM();
+				UpdateEquipStatesOnAll();
+				Focus();
+			}
+			public void Focus(){
 				SetSelState(SlotGroupManager.FocusedState);
 				rootPage.Focus();
 			}
@@ -535,20 +585,37 @@ namespace SlotSystem{
 				Focus();
 			}
 			public void UpdateEquipStatesOnAll(){
-				/*	
-					ItemInst of spe is marked the equipped one
-					all sbs compare its iteminst with it and Equip or Unequip according to the result
-				*/
-				foreach(InventoryItemInstanceMock itemInst in poolInv.Items){
+				// /*	update equip inventory	*/
+					/*	remove	*/
+						List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
+						foreach(InventoryItemInstanceMock itemInInv in equipInv.items){
+							if(!actualEquippedItems.Contains(itemInInv))
+								removed.Add(itemInInv);
+						}
+						foreach(InventoryItemInstanceMock item in removed){
+							equipInv.RemoveItem(item);
+						}
+					/*	add	*/
+						List<InventoryItemInstanceMock> added = new List<InventoryItemInstanceMock>();
+						foreach(InventoryItemInstanceMock itemInAct in actualEquippedItems){
+							if(!equipInv.items.Contains(itemInAct))
+								added.Add(itemInAct);
+						}
+						foreach(InventoryItemInstanceMock item in added){
+							equipInv.AddItem(item);
+						}
+				/*	update all itemInst's isEquipped status	*/
+				foreach(InventoryItemInstanceMock itemInst in poolInv.items){
 					if(itemInst is BowInstanceMock)
-						itemInst.IsEquipped = itemInst == equippedBowInst;
+						itemInst.isEquipped = itemInst == equippedBowInst;
 					else if (itemInst is WearInstanceMock)
-						itemInst.IsEquipped = itemInst == equippedWearInst;
+						itemInst.isEquipped = itemInst == equippedWearInst;
 					else if(itemInst is CarriedGearInstanceMock)
-						itemInst.IsEquipped = equippedCarriedGears != null && equippedCarriedGears.Contains((CarriedGearInstanceMock)itemInst);
+						itemInst.isEquipped = equippedCarriedGears != null && equippedCarriedGears.Contains((CarriedGearInstanceMock)itemInst);
 					else if(itemInst is PartsInstanceMock)
-						itemInst.IsEquipped = equippedParts != null && equippedParts.Contains((PartsInstanceMock)itemInst);
+						itemInst.isEquipped = equippedParts != null && equippedParts.Contains((PartsInstanceMock)itemInst);
 				}
+				/*	set sbs equip states	*/
 				foreach(SlotGroup sg in allSGs){
 					foreach(Slottable sb in sg.slottables){
 						if(sb!= null)

@@ -359,7 +359,7 @@ namespace SlotSystem{
 				}
 			}
 			public bool isEquipped{
-				get{ return itemInst.IsEquipped;}
+				get{ return itemInst.isEquipped;}
 				}public void Equip(){
 					SetEqpState(Slottable.EquippedState);
 				}
@@ -485,7 +485,7 @@ namespace SlotSystem{
 					ActionProcess.Expire();
 			}
 			public void UpdateEquipState(){
-				if(itemInst.IsEquipped) Equip();
+				if(itemInst.isEquipped) Equip();
 				else Unequip();
 			}
 			public void Reset(){
