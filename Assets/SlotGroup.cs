@@ -210,6 +210,7 @@ namespace SlotSystem{
 				Inventory m_inventory;
 				public void SetInventory(Inventory inv){
 					m_inventory = inv;
+					inv.SetSG(this);
 				}
 			public bool isShrinkable{
 				get{return m_isShrinkable;}
@@ -347,6 +348,9 @@ namespace SlotSystem{
 			public int initSlotsCount{
 				get{return m_initSlotsCount;}
 				}int m_initSlotsCount;
+				public void SetInitSlotsCount(int i){
+					m_initSlotsCount = i;
+				}
 			// public bool IsSMDone{
 				// 	get{
 				// 		bool done = true;

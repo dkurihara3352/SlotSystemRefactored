@@ -675,11 +675,25 @@ namespace SlotSystem{
 				SetTransaction(ta);
 			}
 			public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup targetSG, Slottable targetSB){
-            Slottable prevPickedSB = this.pickedSB;
-				SetPickedSB(pickedSB);
-				SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, targetSB, targetSG);
-				SetPickedSB(prevPickedSB);
-				return ta;
+				return AbsSlotSystemTransaction.GetTransaction(pickedSB, targetSB, targetSG);
+			}
+			public void ChangeEquippableCGearsCount(int i, SlotGroup targetSG){
+				if(!targetSG.isExpandable){
+					if(targetSG.CurSelState == SlotGroup.FocusedState ||
+						targetSG.CurSelState == SlotGroup.DefocusedState){
+							// bool isFocused = targetSG.CurSelState == SlotGroup.FocusedState;
+							equipInv.SetEquippableCGearsCount(i);
+							targetSG.InitializeItems();
+							UpdateEquipStatesOnAll();
+							ResetAndFocus();
+							// if(isFocused)
+							// 	targetSG.Focus();
+							// else
+							// 	targetSG.Defocus();
+						}
+				}else{
+					throw new System.InvalidOperationException("SlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
+				}
 			}
 		/*	dump	*/
 			/*	command	methods */

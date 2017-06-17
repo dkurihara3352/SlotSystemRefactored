@@ -61,7 +61,6 @@ namespace SlotSystem{
 						throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
 					}
 					SlotGroup origSG = pickedSB.sg;
-
 					if(targetSB != null){
 						targetSG = targetSB.sg;
 					}
@@ -72,68 +71,68 @@ namespace SlotSystem{
 							throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
 					}
 					if(targetSG == null){// meaning selectedSB is also null
-						return new RevertTransaction();
+						return new RevertTransaction(pickedSB);
 					}else{// hoveredSB could be null
 						if(targetSB == null){// on SG
 							if(targetSG.AcceptsFilter(pickedSB)){
 								if(targetSG != origSG && origSG.isShrinkable){
 									if(targetSG.HasItemCurrently(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
-										return new StackTransaction(targetSG.GetSB(pickedSB.itemInst));
+										return new StackTransaction(pickedSB, targetSG.GetSB(pickedSB.itemInst));
 										
 									if(targetSG.hasEmptySlot){
 										if(!targetSG.HasItemCurrently(pickedSB.itemInst))
-											return new FillTransaction(targetSG);
+											return new FillTransaction(pickedSB, targetSG);
 									}else{
 										if(targetSG.SwappableSBs(pickedSB).Count == 1){
 											Slottable calcedSB = targetSG.SwappableSBs(pickedSB)[0];
 											if(calcedSB.itemInst != pickedSB.itemInst)
-												return new SwapTransaction(calcedSB);
+												return new SwapTransaction(pickedSB, calcedSB);
 										}else{
 											if(targetSG.isExpandable)
-												return new FillTransaction(targetSG);
+												return new FillTransaction(pickedSB, targetSG);
 										}
 									}
 								}
 							}
-							return new RevertTransaction();
+							return new RevertTransaction(pickedSB);
 						}else{// targetSB specified, targetSG == targetSB.SG
 							if(targetSG == origSG){//
 								if(targetSB != pickedSB){
 									if(!targetSG.isAutoSort)
-										return new ReorderTransaction(targetSB);
+										return new ReorderTransaction(pickedSB, targetSB);
 								}
 							}else{
 								if(targetSG.AcceptsFilter(pickedSB)){
 									//swap or stack, else insert
 									if(pickedSB.itemInst == targetSB.itemInst){
 										if(targetSG.isPool && origSG.isShrinkable)
-											return new FillTransaction(targetSG);
+											return new FillTransaction(pickedSB, targetSG);
 										if(pickedSB.itemInst.Item.IsStackable)
-											return new StackTransaction(targetSB);
+											return new StackTransaction(pickedSB, targetSB);
 									}else{
 										if(targetSG.HasItemCurrently(pickedSB.itemInst)){
 											if(!origSG.HasItemCurrently(targetSB.itemInst)){
 												if(targetSG.isPool){
 													if(origSG.AcceptsFilter(targetSB))
-														return new SwapTransaction(targetSB);
+														return new SwapTransaction(pickedSB, targetSB);
 													if(origSG.isShrinkable)
-														return new FillTransaction(targetSG);
+														return new FillTransaction(pickedSB, targetSG);
 												}
 												// if(!targetSG.isAutoSort)
 												// 	return new ReorderInOtherSGTransaction(targetSB);
 											}
 										}else{
 											if(origSG.AcceptsFilter(targetSB))
-												return new SwapTransaction(targetSB);
+												return new SwapTransaction(pickedSB, targetSB);
 											if(targetSG.hasEmptySlot || targetSG.isExpandable)
-												return new FillTransaction(targetSG);
+												return new FillTransaction(pickedSB, targetSG);
 											// if(!targetSG.isAutoSort)
 											// 	return new InsertTransaction(targetSB);
 										}
 									}
 								}
 							}
-							return new RevertTransaction();
+							return new RevertTransaction(pickedSB);
 						}
 					}
 				}
@@ -157,8 +156,8 @@ namespace SlotSystem{
 			public class RevertTransaction: AbsSlotSystemTransaction{
 				Slottable m_pickedSB;
 				SlotGroup m_origSG;
-				public RevertTransaction(){
-					m_pickedSB = sgm.pickedSB;
+				public RevertTransaction(Slottable pickedSB){
+					m_pickedSB = pickedSB;
 					m_origSG = m_pickedSB.sg;
 				}
 				public override void Indicate(){}
@@ -176,8 +175,8 @@ namespace SlotSystem{
 				Slottable m_pickedSB;
 				Slottable m_selectedSB;
 				SlotGroup m_origSG;
-				public ReorderTransaction(Slottable selected){
-					m_pickedSB = sgm.pickedSB;
+				public ReorderTransaction(Slottable pickedSB, Slottable selected){
+					m_pickedSB = pickedSB;
 					m_selectedSB = selected;
 					m_origSG = m_pickedSB.sg;
 				}
@@ -199,8 +198,8 @@ namespace SlotSystem{
 				Slottable selectedSB;
 				SlotGroup origSG;
 				SlotGroup selectedSG;
-				public ReorderInOtherSGTransaction(Slottable selected){
-					pickedSB = sgm.pickedSB;
+				public ReorderInOtherSGTransaction(Slottable pickedSB, Slottable selected){
+					pickedSB = pickedSB;
 					selectedSB = selected;
 					origSG = pickedSB.sg;
 					selectedSG = selected.sg;
@@ -222,29 +221,29 @@ namespace SlotSystem{
 				}
 			}
 			public class StackTransaction: AbsSlotSystemTransaction{
-				Slottable pickedSB;
-				SlotGroup origSG;
-				Slottable selectedSB;
-				SlotGroup selectedSG;
+				Slottable m_pickedSB;
+				SlotGroup m_origSG;
+				Slottable m_selectedSB;
+				SlotGroup m_selectedSG;
 				List<InventoryItemInstanceMock> itemCache = new List<InventoryItemInstanceMock>();
-				public StackTransaction(Slottable selected){
-					pickedSB = sgm.pickedSB;
-					origSG = pickedSB.sg;
-					selectedSB = selected;
-					selectedSG = selectedSB.sg;
+				public StackTransaction(Slottable pickedSB ,Slottable selected){
+					m_pickedSB = pickedSB;
+					m_origSG = pickedSB.sg;
+					m_selectedSB = selected;
+					m_selectedSG = m_selectedSB.sg;
 					InventoryItemInstanceMock cache = pickedSB.itemInst;
 					cache.Quantity = pickedSB.pickedAmount;
 					itemCache.Add(cache);
 				}
-				public override Slottable targetSB{get{return selectedSB;}}
-				public override SlotGroup sg1{get{return origSG;}}
-				public override SlotGroup sg2{get{return selectedSG;}}
+				public override Slottable targetSB{get{return m_selectedSB;}}
+				public override SlotGroup sg1{get{return m_origSG;}}
+				public override SlotGroup sg2{get{return m_selectedSG;}}
 				public override List<InventoryItemInstanceMock> moved{get{return itemCache;}}
 				public override void Indicate(){}
 				public override void Execute(){
 					sg1.SetActState(SlotGroup.RemoveState);
 					sg2.SetActState(SlotGroup.AddState);
-					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.itemInst));
+					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
@@ -254,24 +253,24 @@ namespace SlotSystem{
 				}
 			}
 			public class SwapTransaction: AbsSlotSystemTransaction{
-				Slottable pickedSB;
-				SlotGroup origSG;
-				Slottable selectedSB;
-				SlotGroup selectedSG;
-				public SwapTransaction(Slottable selected){
-					this.pickedSB = sgm.pickedSB;
-					this.selectedSB = selected;
-					this.origSG = pickedSB.sg;
-					this.selectedSG = selectedSB.sg;
+				Slottable m_pickedSB;
+				SlotGroup m_origSG;
+				Slottable m_selectedSB;
+				SlotGroup m_selectedSG;
+				public SwapTransaction(Slottable pickedSB, Slottable selected){
+					this.m_pickedSB = pickedSB;
+					this.m_selectedSB = selected;
+					this.m_origSG = m_pickedSB.sg;
+					this.m_selectedSG = m_selectedSB.sg;
 				}
-				public override Slottable targetSB{get{return selectedSB;}}
-				public override SlotGroup sg1{get{return origSG;}}
-				public override SlotGroup sg2{get{return selectedSG;}}
+				public override Slottable targetSB{get{return m_selectedSB;}}
+				public override SlotGroup sg1{get{return m_origSG;}}
+				public override SlotGroup sg2{get{return m_selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
 					sg1.SetActState(SlotGroup.SwapState);
 					sg2.SetActState(SlotGroup.SwapState);
-					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.itemInst));
+					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 					DraggedIcon di2 = new DraggedIcon(targetSB);
 					sgm.SetDIcon2(di2);
 					sgm.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.itemInst));
@@ -285,21 +284,21 @@ namespace SlotSystem{
 				}
 			}
 			public class FillTransaction: AbsSlotSystemTransaction{
-				Slottable pickedSB;
-				SlotGroup selectedSG;
-				SlotGroup origSG;
-				public FillTransaction(SlotGroup selected){
-					this.pickedSB = sgm.pickedSB;
-					this.selectedSG = selected;
-					this.origSG = pickedSB.sg;
+				Slottable m_pickedSB;
+				SlotGroup m_selectedSG;
+				SlotGroup m_origSG;
+				public FillTransaction(Slottable pickedSB, SlotGroup selected){
+					m_pickedSB = pickedSB;
+					m_selectedSG = selected;
+					m_origSG = m_pickedSB.sg;
 				}
-				public override SlotGroup sg1{get{return origSG;}}
-				public override SlotGroup sg2{get{return selectedSG;}}
+				public override SlotGroup sg1{get{return m_origSG;}}
+				public override SlotGroup sg2{get{return m_selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
 					sg1.SetActState(SlotGroup.FillState);
 					sg2.SetActState(SlotGroup.FillState);
-					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(pickedSB.itemInst));
+					sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 					base.Execute();
 				}
 				public override void OnComplete(){
@@ -310,16 +309,16 @@ namespace SlotSystem{
 				}
 			}
 			public class SortTransaction: AbsSlotSystemTransaction{
-				SlotGroup selectedSG;
-				SGSorter sorter;
+				SlotGroup m_selectedSG;
+				SGSorter m_sorter;
 				public SortTransaction(SlotGroup sg, SGSorter sorter){
-					selectedSG = sg;
-					this.sorter = sorter;
+					m_selectedSG = sg;
+					m_sorter = sorter;
 				}
-				public override SlotGroup sg1{get{return selectedSG;}}
+				public override SlotGroup sg1{get{return m_selectedSG;}}
 				public override void Indicate(){}
 				public override void Execute(){
-					sg1.SetSorter(sorter);
+					sg1.SetSorter(m_sorter);
 					sg1.SetActState(SlotGroup.SortState);
 					base.Execute();
 				}
@@ -333,8 +332,8 @@ namespace SlotSystem{
 				SlotGroup m_origSG;
 				Slottable m_selectedSB;
 				SlotGroup m_selectedSG;
-				public InsertTransaction(Slottable sb){
-					m_pickedSB = sgm.pickedSB;
+				public InsertTransaction(Slottable pickedSB, Slottable sb){
+					m_pickedSB = pickedSB;
 					m_origSG = m_pickedSB.sg;
 					m_selectedSB = sb;
 					m_selectedSG = sb.sg;
@@ -1620,11 +1619,15 @@ namespace SlotSystem{
 						}
 						sg.SetSlots(newSlots);
 					/*	SBs	*/
+						/*	if the number of filtered items exceeds the slot count, remove unfittable items from the inventory	*/
+						while(sg.slots.Count < items.Count){
+							items.RemoveAt(sg.slots.Count);
+						}
 						foreach(SlottableItem item in items){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							// newSB.Initialize(sg, true, (InventoryItemInstanceMock)item);
 							newSB.Initialize((InventoryItemInstanceMock)item);
+							newSB.SetSGM(sg.sgm);
 							sg.slots[items.IndexOf(item)].sb = newSB;
 						}
 					if(sg.isAutoSort)
@@ -3531,9 +3534,16 @@ namespace SlotSystem{
 				List<SlottableItem> items{get;}
 				void AddItem(SlottableItem item);
 				void RemoveItem(SlottableItem item);
+				SlotGroup sg{get;}
+				void SetSG(SlotGroup sg);
 			}
 			public class PoolInventory: Inventory{
 				List<SlottableItem> m_items = new List<SlottableItem>();
+				public SlotGroup sg{get{return m_sg;}}
+					SlotGroup m_sg;
+					public void SetSG(SlotGroup sg){
+						m_sg = sg;
+					}
 				public List<SlottableItem> items{
 					get{return m_items;}
 				}
@@ -3582,6 +3592,11 @@ namespace SlotSystem{
 					m_equippedCGears = initCGears;
 					SetEquippableCGearsCount(initCGCount);
 				}
+				public SlotGroup sg{get{return m_sg;}}
+					SlotGroup m_sg;
+					public void SetSG(SlotGroup sg){
+						m_sg = sg;
+					}
 				BowInstanceMock m_equippedBow;
 				WearInstanceMock m_equippedWear;
 				List<CarriedGearInstanceMock> m_equippedCGears = new List<CarriedGearInstanceMock>();
@@ -3591,6 +3606,8 @@ namespace SlotSystem{
 				}
 				public void SetEquippableCGearsCount(int num){
 					m_equippableCGearsCount = num;
+					if(sg != null && sg.Filter is SGCGearsFilter && !sg.isExpandable)
+					sg.SetInitSlotsCount(num);
 				}
 				
 				public List<SlottableItem> items{
