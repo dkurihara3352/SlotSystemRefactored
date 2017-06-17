@@ -76,13 +76,6 @@ namespace SlotSystem{
 							return m_waitForActionState;
 						}
 						}private static SGActionState m_waitForActionState;
-					// public static SGActionState PerformingTransactionState{
-						// 	get{
-						// 		if(m_performingTransactionState == null)
-						// 			m_performingTransactionState = new SGPerformingTransactionState();
-						// 		return m_performingTransactionState;
-						// 	}
-						// 	}private static SGActionState m_performingTransactionState;
 					public static SGActionState RevertState{
 						get{
 							if(m_revertState == null)
@@ -351,20 +344,6 @@ namespace SlotSystem{
 				public void SetInitSlotsCount(int i){
 					m_initSlotsCount = i;
 				}
-			// public bool IsSMDone{
-				// 	get{
-				// 		bool done = true;
-				// 		if(SlotMovements != null){
-				// 			foreach(SlotMovement sm in SlotMovements){
-				// 				if(sm.SB != SGM.pickedSB && sm.SB != SGM.sg2){
-				// 					if(sm.SB.ActionProcess != null && sm.SB.ActionProcess.IsRunning)
-				// 						return false;
-				// 				}
-				// 			}
-				// 		}
-				// 		return done;
-				// 	}
-				// }
 		/*	commands methods	*/
 			public void InitializeItems(){
 				m_initItemsCommand.Execute(this);
@@ -386,52 +365,6 @@ namespace SlotSystem{
 						return m_emptyCommand;
 					}
 					}static SlotGroupCommand m_emptyCommand = new SGEmptyCommand();
-			// public SlotGroupCommand CreateSlotsCommand{
-				// 	get{return m_createSlotsCommand;}
-				// 	set{m_createSlotsCommand = value;}
-				// 	}SlotGroupCommand m_createSlotsCommand = new ConcCreateSlotsCommand();
-				// 	public void CreateSlots(){
-				// 		m_createSlotsCommand.Execute(this);
-				// 	}
-				// public SlotGroupCommand CreateSbsCommand{
-				// 	get{return m_createSbsCommand;}
-				// 	}SlotGroupCommand m_createSbsCommand = new ConcCreateSbsCommand();
-				// 	public void CreateSlottables(){
-				// 		m_createSbsCommand.Execute(this);
-				// 	}
-			/*	dump	*/
-				// SlotGroupCommand m_focusCommand = new SGFocusCommandV2();
-				// 	public SlotGroupCommand FocusCommand{
-				// 		get{return m_focusCommand;}
-				// 		set{m_focusCommand = value;}
-				// 	}
-				// 	public void Focus(){
-				// 		m_focusCommand.Execute(this);
-				// 	}
-				// SlotGroupCommand m_defocusCommand = new SGDefocusCommandV2();
-				// 	public SlotGroupCommand DefocusCommand{
-				// 		get{return m_defocusCommand;}
-				// 		set{m_defocusCommand = value;}
-				// 	}
-				// 	public void Defocus(){
-				// 		m_defocusCommand.Execute(this);
-				// 	}
-				// SlotGroupCommand m_wakeUpCommand = new SGWakeupCommand();
-				// 	public SlotGroupCommand WakeUpCommand{
-				// 		get{return m_wakeUpCommand;}
-				// 		set{m_wakeUpCommand = value;}
-				// 	}
-				// 	public void WakeUp(){
-				// 		m_wakeUpCommand.Execute(this);
-				// 	}
-				// SlotGroupCommand m_updateSbStateCommand = new UpdateSbStateCommandV2();
-				// 	public SlotGroupCommand UpdateSbStateCommand{
-				// 		get{return m_updateSbStateCommand;}
-				// 		set{m_updateSbStateCommand = value;}
-				// 	}
-				// 	public void UpdateSbState(){
-				// 		m_updateSbStateCommand.Execute(this);
-				// 	}
 		/*	sorter	*/
 			public static SGSorter ItemIDSorter{
 				get{
@@ -455,14 +388,6 @@ namespace SlotSystem{
 				public void SetSorter(SGSorter sorter){
 					m_sorter = sorter;
 				}
-			// List<Slottable> ReorderedSBs;
-			// public List<Slottable> OrderedSbs(){
-				// 	List<Slottable> result = new List<Slottable>();
-				// 	if(SGM.Transaction != null && SGM.Transaction.GetType()== typeof(ReorderTransaction)){
-				// 		return ReorderedSBs;
-				// 	}
-				// 	return Sorter.OrderedSBs(this);
-				// }
 			public void InstantSort(){
 				List<Slottable> origSBs = slottables;
 				Sorter.OrderSBsWithRetainedSize(ref origSBs);
@@ -512,9 +437,6 @@ namespace SlotSystem{
 				public void SetFilter(SGFilter filter){
 					m_filter = filter;
 				}
-				// public void FilterItems(){
-				// 	m_filter.Execute(this);
-				// }
 			public bool AcceptsFilter(Slottable pickedSB){
 				if(this.Filter is SGNullFilter) return true;
 				else{
@@ -537,30 +459,6 @@ namespace SlotSystem{
 				PointerEventDataMock eventData = new PointerEventDataMock();
 				CurSelState.OnHoverExitMock(this, eventData);
 			}
-		/*	SlotMovement	*/
-			// public List<SlotMovement> SlotMovements{
-			// 	get{
-			// 		if(m_slotMovements == null)
-			// 			m_slotMovements = new List<SlotMovement>();
-			// 		return m_slotMovements;
-			// 	}
-			// 	}List<SlotMovement> m_slotMovements;
-			// public void AddSlotMovement(SlotMovement sm){
-			// 	if(m_slotMovements == null)
-			// 		m_slotMovements = new List<SlotMovement>();
-			// 	m_slotMovements.Add(sm);
-			// }
-			// public SlotMovement GetSlotMovement(Slottable sb){
-			// 	foreach(SlotMovement sm in SlotMovements){
-			// 		if(sm.SB == sb)
-			// 			return sm;
-			// 	}
-			// 	return null;
-			// }
-			// public void ExecuteSlotMovements(){
-			// 	foreach(SlotMovement sm in SlotMovements)
-			// 		sm.Execute();
-			// }
 		/*	SlotSystemElement implementation	*/
 			public bool ContainsInHierarchy(SlotSystemElement element){
 				return DirectParent(element) != null;
@@ -624,7 +522,6 @@ namespace SlotSystem{
 				}
 			}
 			public void Activate(){
-				// InitializeItems();
 			}
 			public void Deactivate(){
 				SetSelState(SlotGroup.DeactivatedState);
@@ -770,383 +667,5 @@ namespace SlotSystem{
 				SetNewSBs(null);
 				SetNewSlots(null);
 			}
-		/*	dump	*/
-			// public void UpdateSlots(){
-				// 	while(Slots.Count < newSBs.Count){
-				// 		Slot newSlot = new Slot();
-				// 		Slots.Add(newSlot);
-				// 	}
-				// }
-			// public void SetAndRunSlotMovements(List<InventoryItemInstanceMock> removed, 		List<InventoryItemInstanceMock> added){
-				// 	List<Slottable> newSBsList = new List<Slottable>();
-				// 	/*	remove	and index */
-				// 	foreach(Slottable sb in Slottables){
-				// 		if(removed != null && sb != null && removed.Contains(sb.ItemInst)){
-				// 			if(!IsPool){
-				// 				SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -2);
-				// 			}else{
-				// 				SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -1);
-				// 			}
-				// 		}else
-				// 			newSBsList.Add(sb);
-				// 	}
-				// 	/*	scooch (optional)	*/
-				// 		List<Slottable> temp = new List<Slottable>();
-				// 		foreach(Slottable sb in newSBsList){
-				// 			if(sb != null) temp.Add(sb);
-				// 		}
-				// 		while(temp.Count < newSBsList.Count){
-				// 			temp.Add(null);
-				// 		}
-				// 		newSBsList = temp;
-				// 	/*	add	*/
-				// 		if(added != null){
-				// 			foreach(InventoryItemInstanceMock invInst in added){
-				// 				GameObject newSBGO = new GameObject("newSBGO");
-				// 				Slottable newSB = newSBGO.AddComponent<Slottable>();
-				// 				newSB.Initialize(SGM, this, true, invInst);
-				// 				int index = FindNextEmpty(ref newSBsList);
-				// 				// newSBsList.Add(newSB);
-				// 				newSBsList[index] = newSB;
-				// 			}
-				// 		}
-				// 	/*	sort	*/
-				// 	List<Slottable> newListOrdered = new List<Slottable>();
-				// 	newListOrdered = newSBsList;
-				// 	if(IsAutoSort)
-				// 		// Sorter.OrderSBs(ref newListOrdered);
-				// 		Sorter.OrderSBsWOSpace(ref newListOrdered);
-				// 	/*	index	*/
-				// 	foreach(Slottable sb in newSBsList){
-				// 		if(sb != null){
-				// 			SlotMovement newSM;
-				// 			if(added != null && added.Contains(sb.ItemInst)){
-				// 				if(!IsPool)
-				// 					newSM = new SlotMovement(this, sb, -2, newListOrdered.IndexOf(sb));
-				// 				else
-				// 					newSM = new SlotMovement(this, sb, -1, newListOrdered.IndexOf(sb));
-				// 			}else
-				// 				newSM = new SlotMovement(this, sb, sb.SlotID, newListOrdered.IndexOf(sb));
-				// 		}
-				// 	}
-				// 	ExecuteSlotMovements();
-				// 	SetActState(SlotGroup.PerformingTransactionState);
-				// 	CheckCompletion();
-				// }
-				// // public void SetAndRunSlotMovementsForReorder(Slottable pickedSB, Slottable hoveredSB){
-				// // 	SetReorderedSBs(pickedSB, hoveredSB);
-				// // 	List<Slottable> reorderedSB = this.ReorderedSBs;
-				// // 	foreach(Slottable sb in Slottables){
-				// // 		if(sb != null){
-				// // 			SlotMovement sm = new SlotMovement(this, sb, sb.SlotID, reorderedSB.IndexOf(sb));
-				// // 		}
-				// // 	}
-				// // 	ExecuteSlotMovements();
-				// // 	SetActState(SlotGroup.PerformingTransactionState);
-				// // 	CheckCompletion();
-				// // }
-				// public void SetAndRunSlotMovementsForSort(){
-				// 	List<Slottable> orderedSBs = this.OrderedSbs();
-				// 	foreach(Slottable sb in Slottables){
-				// 		if(sb != null){
-				// 			SlotMovement sm = new SlotMovement(this, sb, sb.SlotID, orderedSBs.IndexOf(sb));
-				// 		}
-				// 	}
-				// 	ExecuteSlotMovements();
-				// 	SetActState(SlotGroup.PerformingTransactionState);
-				// 	CheckCompletion();
-				// }
-				// public void SetAndRunSlotmovementsForSwap(Slottable removed, Slottable added){
-				// 	if(removed != null && added != null){
-				// 		List<Slottable> newSBsList = new List<Slottable>();
-				// 		int removedId = -1;
-				// 		/*	remove	and index */
-				// 		foreach(Slottable sb in Slottables){
-				// 			if(sb != null && sb.ItemInst == removed.ItemInst){
-				// 				removedId = sb.SlotID;
-				// 				newSBsList.Add(null);
-				// 				if(!IsPool){
-				// 					SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -2);
-				// 				}else{
-				// 					SlotMovement newSM = new SlotMovement(this, sb, sb.SlotID, -1);
-				// 				}
-				// 			}else
-				// 				newSBsList.Add(sb);
-				// 		}
-				// 		if(removedId == -1)
-				// 			throw new System.InvalidOperationException("SetAndRunSlotMovementsForSwap: removed sb not contained in the selectedSG");
-				// 		/*	add	*/
-				// 			GameObject newSBGO = new GameObject("newSBGO");
-				// 			Slottable newSB = newSBGO.AddComponent<Slottable>();
-				// 			newSB.Initialize(SGM, this, true, added.ItemInst);
-				// 			newSBsList[removedId] = newSB;
-				// 		/*	sort	*/
-				// 		List<Slottable> newListOrdered = new List<Slottable>();
-				// 		newListOrdered = newSBsList;
-				// 		if(IsAutoSort)
-				// 			Sorter.OrderSBsWOSpace(ref newListOrdered);
-				// 		/*	index	*/
-				// 		foreach(Slottable sb in newSBsList){
-				// 			if(sb != null){
-				// 				SlotMovement newSM;
-				// 				if(sb.ItemInst == added.ItemInst){
-				// 					if(!IsPool)
-				// 						newSM = new SlotMovement(this, sb, -2, newListOrdered.IndexOf(sb));
-				// 					else
-				// 						newSM = new SlotMovement(this, sb, -1, newListOrdered.IndexOf(sb));
-				// 				}else
-				// 					newSM = new SlotMovement(this, sb, sb.SlotID, newListOrdered.IndexOf(sb));
-				// 			}
-				// 		}
-				// 		ExecuteSlotMovements();	
-				// 	}else{
-				// 		throw new System.InvalidOperationException("SetAndRunSlotMovementsForSwap: removed nor added sb not assigned properly");
-				// 	}
-				// }
-				// public int FindNextEmpty(ref List<Slottable> sbList){
-				// 	foreach(Slottable sb in sbList){
-				// 		if(sb == null)
-				// 			return sbList.IndexOf(sb);
-				// 	}
-				// 	sbList.Add(null);
-				// 	return sbList.Count -1;
-				// }
-			// public Slot GetNextEmptySlot(){
-				// 	if(IsExpandable){
-				// 		Slot newSlot = new Slot();
-				// 		Slots.Add(newSlot);
-				// 		return newSlot;
-				// 	}else{
-				// 		foreach(Slot slot in Slots){
-				// 			if(slot.Sb == null)
-				// 				return slot;
-				// 		}
-				// 	}
-				// 	return null;
-				// }
-			// public void CheckCompletion(){
-				// 	CheckSBsSlotMovementCompletion();
-				// 	CheckProcessCompletion();
-				// }
-				// public void CheckSBsSlotMovementCompletion(){
-				// 	foreach(SlotMovement sm in SlotMovements){
-				// 		if(sm.SB.ActionProcess.GetType() == typeof(SBMoveInSGProcess) ||
-				// 		sm.SB.ActionProcess.GetType() == typeof(SBRemoveProcess) ||
-				// 		sm.SB.ActionProcess.GetType() == typeof(SBAddProcess)){
-				// 			int curId; int newId;
-				// 			sm.GetIndex(out curId, out newId);
-				// 			if(curId == newId)
-				// 				sm.SB.ExpireActionProcess();
-				// 		}
-				// 	}
-				// }
-			// public Slot GetSlotForAdded(Slottable sb){
-				// 	Slot slot = null;
-				// 	if(SlotMovements.Count == 0){
-				// 		return GetSlot(GetSB(sb.ItemInst));
-				// 	}else{
-				// 		foreach(SlotMovement sm in SlotMovements){
-				// 			if(sm.SB.ItemInst == sb.ItemInst){
-				// 				int curId; int newId;
-				// 				sm.GetIndex(out curId, out newId);
-				// 				slot = Slots[newId];
-				// 			}
-				// 		}
-				// 		return slot;
-				// 	}
-				// }
-			// public void OnCompleteSlotMovements(){
-			// 	foreach(Slot slot in Slots){
-			// 		slot.Sb = null;
-			// 	}
-			// 	while(Slots.Count < SlotMovements.Count){
-			// 		Slot newSlot = new Slot();
-			// 		newSlot.Position = Vector2.zero;
-			// 		Slots.Add(newSlot);
-			// 	}
-			// 	foreach(SlotMovement sm in SlotMovements){
-			// 		int curId;
-			// 		int newId;
-			// 		sm.GetIndex(out curId, out newId);
-			// 		if(newId == -1 || newId == -2){
-			// 			GameObject go = sm.SB.gameObject;
-			// 			DestroyImmediate(go);
-			// 			DestroyImmediate(sm.SB);
-			// 		}else{
-			// 			Slots[newId].Sb = sm.SB;
-			// 		}
-			// 	}
-			// 	if(IsExpandable){
-			// 		List<Slot> newSlots = new List<Slot>();
-			// 		foreach(Slot slot in Slots){
-			// 			if(slot.Sb != null)
-			// 				newSlots.Add(slot);
-			// 		}
-			// 		Slots = newSlots;
-			// 	}
-			// 	SlotMovements.Clear();
-			// }
-			// public bool IsFillEquippable(Slottable sb){
-			// 	SlotGroup origSG = sb.SG;
-			// 	if(!(HasItem(sb.ItemInst) && !IsPool)){
-			// 		if(origSG.IsShrinkable){
-			// 			if(this != origSG){
-			// 				if(IsFocused){
-			// 					if(AcceptsFilter(sb)){
-			// 						if(IsExpandable){
-			// 							return true;
-			// 						}else{
-			// 							foreach(Slot slot in Slots){
-			// 								if(slot.Sb == null)
-			// 									return true;
-			// 							}
-			// 						}
-			// 					}
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// 	return false;
-			// }
-			// public void CheckTransactionCompletionOnSBs(){
-			// 	bool flag = true;
-			// 	foreach(SlotMovement sm in SlotMovements){
-			// 		Slottable sb = sm.SB;
-			// 		flag |= sb.CurProcess.IsExpired;
-			// 	}
-			// 	if(flag)
-			// 		SGM.CompleteTransactionOnSG(this);
-			// }
-			// public void StateTransit(){
-			// 	foreach(SlotMovement sm in SlotMovements){
-			// 		sm.StateTransit();
-			// 	}
-			// }
-			// public void RemoveSB(Slottable sb){
-			// 	/*	sb-slot relation stays intact until process is completed
-			// 	*/
-			// 	foreach(Slot slot in Slots){
-			// 		if(slot.Sb != null){
-			// 			if(slot.Sb == sb){
-			// 				if(SGM.PickedSB == sb)
-			// 					SGM.SetPickedSB(null);
-			// 				else if(SGM.SelectedSB == sb)
-			// 					SGM.SetSelectedSB(null);
-			// 				slot.Sb = null;
-			// 				DestroyImmediate(sb.gameObject);
-			// 				DestroyImmediate(sb);
-			// 			}
-			// 		}
-			// 	}
-			// }
-			// public void AddSB(ref Slot toSlot){
-			// 	/*	needs to be called after removing, when there's something to remove
-			// 	*/
-			// 	GameObject addedSBGO = new GameObject("newSBGO");
-			// 	Slottable addedSB = addedSBGO.AddComponent<Slottable>();
-			// 	InventoryItemInstanceMock item = null;
-			// 	foreach(InventoryItemInstanceMock it in Inventory.Items){
-			// 		if((Filter is SGBowFilter && it is BowInstanceMock) || (Filter is SGWearFilter && it is WearInstanceMock) || (Filter is SGCarriedGearFilter && it is CarriedGearInstanceMock)){
-			// 			bool found = false;
-			// 			foreach(Slot slot in Slots){
-			// 				if(slot.Sb != null){
-			// 					InventoryItemInstanceMock sbItem = (InventoryItemInstanceMock)slot.Sb.Item;
-			// 					if(sbItem == it)
-			// 						found = true;
-			// 				}
-			// 			}
-			// 			if(!found)
-			// 				item = it;
-			// 		}
-			// 	}
-			// 	if(item == null){
-			// 		throw new System.InvalidOperationException("a slottable with specified inventory item already exist.");
-			// 	}else{
-			// 		addedSB.Initialize(this.SGM, true, item);
-			// 		toSlot.Sb = addedSB;
-			// 	}
-			// }
-			// public void TransactionUpdate(Slottable added, Slottable removed){
-			// 	// if(added == null && removed == null)
-			// 	// 	SetState(SlotGroup.SortingState);
-			// 	// else
-			// 	// 	SetState(SlotGroup.PerformingTransactionState);
-			// 	if(SGM.Transaction.GetType() == typeof(SortTransaction))
-			// 		SetState(SlotGroup.SortingState);
-			// 	else{
-			// 		if(!m_autoSort)
-			// 			SGM.CompleteTransactionOnSG(this);
-			// 		else
-			// 			SetState(SlotGroup.SortingState);
-			// 	}
-				
-			// 	/*	removal
-			// 	*/
-			// 	if(removed != null && GetSlottable(removed.Item) != null){
-			// 		EquipmentSet focusedEquipSet = (EquipmentSet)SGM.RootPage.EquipBundle.GetFocusedBundleElement();
-			// 		if(focusedEquipSet.ContainsElement(this))
-			// 			// Inventory.Items.Remove(removed.Item);
-			// 			Inventory.RemoveItem(removed.Item);
-			// 	}
-			// 	/*	addition
-			// 	*/
-			// 	if(added != null && !Inventory.Items.Contains(added.Item)){
-			// 		Inventory.AddItem(added.Item);
-			// 	}
-			// }
-				
-			// public void TransactionUpdateV2(Slottable added, Slottable removed){
-			// 	/*	add/remove InventoryItem and Slottable
-			// 		do not destroy the removed Slottable yet (it remain in situ)
-			// 		then sort
-			// 		destruction is handled in Sb's removeingProcess's expiration
-
-			// 		if sg is Pool then Inventory addition and removal are exempted
-			// 		so are Slottable addition/removal
-			// 	*/
-			// 	/*	Addition and Removal  */
-			// 		Slot swapSlot = null;
-			// 		if(SGM.GetFocusedPoolSG() != this){
-			// 			/*	remove
-			// 			*/
-			// 			if(removed != null && Inventory.Items.Contains(removed.Item) && GetSlottable(removed.Item) != null){
-			// 				Inventory.RemoveItem(removed.Item);
-			// 				Slot slot = GetSlot(removed);
-			// 				SGM.removedSB = slot.Sb;
-			// 				slot.Sb = null;
-			// 				if(added != null)
-			// 					swapSlot = slot;
-			// 			}
-			// 			/*	add
-			// 			*/
-			// 			if(added != null && !Inventory.Items.Contains(added.Item) && GetSlottable(added.Item) == null){
-			// 				Inventory.AddItem(added.Item);
-			// 				/*	SB	*/
-			// 				GameObject newSBGO = new GameObject("newSBGO");
-			// 				Slottable newSB = newSBGO.AddComponent<Slottable>();
-			// 				InventoryItemInstanceMock item = (InventoryItemInstanceMock)added.Item;
-			// 				/*	slot	*/
-			// 				Slot slot = null;
-			// 				if(removed != null)
-			// 					slot = swapSlot;
-			// 				else
-			// 					slot = GetNextEmptySlot();
-			// 				/*	assemble	*/
-			// 				newSB.Initialize(this.SGM, true, item);
-			// 				slot.Sb = newSB;
-			// 			}
-			// 		}
-			// 	/*	Sorting  */
-							
-			// 		if(SGM.Transaction.GetType() == typeof(SortTransaction) || SGM.Transaction.GetType() == typeof(ReorderTransaction)){
-			// 			SetState(SlotGroup.SortingState);
-			// 		}else{
-			// 			if(!m_autoSort){
-			// 				SGM.CompleteTransactionOnSG(this);
-			// 			}
-			// 			else
-			// 				SetState(SlotGroup.SortingState);
-			// 		}
-			// }
 	}
 }

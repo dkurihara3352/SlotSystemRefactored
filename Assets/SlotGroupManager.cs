@@ -30,11 +30,6 @@ namespace SlotSystem{
 						}
 					}
 				}
-			// public void CompleteTransactionOnSB(Slottable sb){
-				// 	if(pickedSB != null && sb == pickedSB) m_pickedSBDone = true;
-				// 	else if(targetSB != null && sb == targetSB) m_targetSBDone = true;
-				// 	IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
-				// }
 			public void AcceptSGTAComp(SlotGroup sg){
 				if(sg2 != null && sg == sg2) m_sg2Done = true;
 				else if(sg1 != null && sg == sg1) m_sg1Done = true;
@@ -83,30 +78,6 @@ namespace SlotSystem{
 				public void SetActState(SGMActionState state){
 					ActStateEngine.SetState(state);
 				}
-			/*	dump	*/
-				// public void SetState(SGMState sgmState){
-				// 	if(CurState != sgmState){
-				// 		m_prevState = CurState;
-				// 		m_prevState.ExitState(this);
-				// 		m_curState = sgmState;
-				// 		CurState.EnterState(this);
-				// 	}
-				// }
-				// SGMState m_curState;
-				// 	public SGMState CurState{
-				// 		get{
-				// 			if(m_curState == null)
-				// 				m_curState = SlotGroupManager.DeactivatedState;
-				// 			return m_curState;}
-				// 	}
-				// SGMState m_prevState;
-				// 	public SGMState PrevState{
-				// 		get{
-				// 			if(m_prevState == null)
-				// 				m_prevState = SlotGroupManager.DeactivatedState;
-				// 			return m_prevState;
-				// 		}
-				// 	}
 			/*	static states	*/
 				/*	Selection State	*/
 					public static SGMSelectionState DeactivatedState{
@@ -282,8 +253,6 @@ namespace SlotSystem{
 							sg1.SetSelState(SlotGroup.FocusedState);
 					}
 					this.m_sg1 = sg;
-					// if(sg1 != null)
-					// 	sg1.SetSelState(SlotGroup.SelectedState);
 					if(sg1 != null)
 						m_sg1Done = false;
 					else
@@ -518,24 +487,11 @@ namespace SlotSystem{
 					return items;
 				}
 			}
-			/*	dump	*/
-				// List<SlotGroup> m_slotGroups;
-				// public List<SlotGroup> SlotGroups{
-				// 	get{return m_slotGroups;}
-				// }
-				// SlotGroup m_initiallyFocusedSG;
-				// public SlotGroup InitiallyFocusedSG{
-				// 	get{return m_initiallyFocusedSG;}
-				// 	set{m_initiallyFocusedSG = value;}
-				// }
-				/*	methods	*/
 		/*	methods	*/
 			public void Initialize(InventoryManagerPage invManPage){
 				SetRootPage(invManPage);
 				SelStateEngine.SetState(SlotGroupManager.DeactivatedState);
 				ActStateEngine.SetState(SlotGroupManager.WaitForActionState);
-				// UpdateEquipStatesOnAll();
-				//set all sgs and fields and initialize all sgs here
 			}
 			public void Activate(){
 				SetCurSGM();
@@ -624,7 +580,6 @@ namespace SlotSystem{
 				}
 			}
 			public void SortSG(SlotGroup sg, SGSorter sorter){
-				// sg.SetSorter(sorter);
 				SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
 				SetTargetSB(sortTransaction.targetSB);
 				SetSG1(sortTransaction.sg1);
@@ -681,120 +636,14 @@ namespace SlotSystem{
 				if(!targetSG.isExpandable){
 					if(targetSG.CurSelState == SlotGroup.FocusedState ||
 						targetSG.CurSelState == SlotGroup.DefocusedState){
-							// bool isFocused = targetSG.CurSelState == SlotGroup.FocusedState;
 							equipInv.SetEquippableCGearsCount(i);
 							targetSG.InitializeItems();
 							UpdateEquipStatesOnAll();
 							ResetAndFocus();
-							// if(isFocused)
-							// 	targetSG.Focus();
-							// else
-							// 	targetSG.Defocus();
 						}
 				}else{
 					throw new System.InvalidOperationException("SlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
 				}
 			}
-		/*	dump	*/
-			/*	command	methods */
-			// public void SetupCommands(){
-			// 	// m_updateTransactionCommand = new UpdateTransactionCommand();
-			// 	m_postPickFilterCommand = new PostPickFilterCommand();
-			// }
-			// public void UpdateTransaction(){
-			// 	m_updateTransactionCommand.Execute(this);
-			// 	}SGMCommand m_updateTransactionCommand;
-			// 	public SGMCommand UpdateTransactionCommand{
-			// 		get{return m_updateTransactionCommand;}
-			// 	}
-			// SGMCommand m_postPickFilterCommand;
-			// 	public SGMCommand PostPickFilterCommand{
-			// 		get{return m_postPickFilterCommand;}
-			// 	}
-			// 	public void PostPickFilter(){
-			// 		if(m_postPickFilterCommand != null)
-			// 		m_postPickFilterCommand.Execute(this);
-			// 	}
-			// public SlotGroup GetFocusedCGearsSG(){
-			// 	foreach(SlotSystemElement ele in GetFocusedEquipSet().Elements){
-			// 		if(((SlotGroup)ele).Filter is SGCarriedGearFilter)
-			// 			return (SlotGroup)ele;
-			// 	}
-			// 	return null;
-			// }
-			// public List<Slot> GetCGEmptySlots(){
-			// 	List<Slot> result = new List<Slot>();
-			// 	foreach(Slot slot in GetFocusedCGearsSG().Slots){
-			// 		if(slot.Sb == null)
-			// 			result.Add(slot);
-			// 	}
-			// 	return result;
-			// }
-			// Slottable m_removedSb;
-			// public Slottable removedSB{
-			// 	set{
-			// 		m_removedSb = value;
-			// 	}
-			// }
-			// public void DestroyRemovedSB(){
-			// 	if(m_removedSb != null){
-			// 		GameObject go = m_removedSb.gameObject;
-			// 		DestroyImmediate(m_removedSb);
-			// 		DestroyImmediate(go);
-			// 		m_removedSb = null;
-			// 	}
-			// }
-			// public int GetInvInstID(InventoryItemInstanceMock invInst){
-			// 	PoolInventory poolInv = (PoolInventory)GetFocusedPoolSG().Inventory;
-			// 	List<InventoryItemInstanceMock> sameItemList = new List<InventoryItemInstanceMock>();
-			// 	foreach(InventoryItemInstanceMock ii in poolInv.Items){
-			// 		if(ii.Item == invInst.Item)
-			// 			sameItemList.Add(ii);
-			// 	}
-			// 	return sameItemList.IndexOf(invInst);
-			// }
-			// public void SetSG(SlotGroup sg){
-			// 	if(m_slotGroups == null)
-			// 		m_slotGroups = new List<SlotGroup>();
-			// 	m_slotGroups.Add(sg);
-			// 	sg.SGM = this;
-			// }
-			// public void InitializeItems(){
-			// 	foreach(SlotGroup sg in SlotGroups){
-			// 		sg.InitializeItems();
-			// 	}
-			// }
-			// public void SimSBHover(Slottable sb, PointerEventDataMock eventData){
-			// 	if(CurState == SlotGroupManager.m_probingState){
-			// 		if(sb != null){
-			// 			if(SelectedSB != sb){
-			// 				if(SelectedSB != null)
-			// 					SelectedSB.OnHoverExitMock(eventData);
-			// 				sb.OnHoverEnterMock(eventData);
-			// 			}
-			// 		}else{
-			// 			if(SelectedSB != null){
-			// 				SelectedSB.OnHoverExitMock(eventData);
-			// 			}
-			// 		}
-			// 	}
-			// 	UpdateTransaction();
-			// }
-			// public void SimSGHover(SlotGroup sg, PointerEventDataMock eventData){
-			// 	if(CurState == SlotGroupManager.m_probingState){
-			// 		if(sg != null){
-			// 			if(SelectedSG != sg){
-			// 				if(SelectedSG != null)
-			// 					SelectedSG.OnHoverExitMock(eventData);
-			// 				sg.OnHoverEnterMock(eventData);
-			// 			}
-			// 		}else{
-			// 			if(SelectedSG != null){
-			// 				SelectedSG.OnHoverExitMock(eventData);
-			// 			}
-			// 		}
-			// 	}
-			// 	UpdateTransaction();
-			// }
 	}
 }

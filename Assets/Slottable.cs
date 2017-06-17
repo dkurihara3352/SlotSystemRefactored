@@ -152,34 +152,6 @@ namespace SlotSystem{
 							return Slottable.m_moveWithinState;			
 						}
 						}static SBActionState m_moveWithinState;
-					// public static SBActionState MovingInSGState{
-						// 	get{
-						// 		if(Slottable.m_movingInSGState == null)
-						// 			Slottable.m_movingInSGState = new SBMovingInSGState();
-						// 		return Slottable.m_movingInSGState;			
-						// 	}
-						// 	}static SBActionState m_movingInSGState;
-						// public static SBActionState RevertingState{
-						// 	get{
-						// 		if(Slottable.m_revertingState == null)
-						// 			Slottable.m_revertingState = new SBRevertingState();
-						// 		return Slottable.m_revertingState;			
-						// 	}
-						// 	}static SBActionState m_revertingState;
-						// public static SBActionState MovingOutState{
-						// 	get{
-						// 		if(Slottable.m_movingOutState == null)
-						// 			Slottable.m_movingOutState = new SBMovingOutState();
-						// 		return Slottable.m_movingOutState;			
-						// 	}
-						// 	}static SBActionState m_movingOutState;
-						// public static SBActionState MovingInState{
-						// 	get{
-						// 		if(Slottable.m_movingInState == null)
-						// 			Slottable.m_movingInState = new SBMovingInState();
-						// 		return Slottable.m_movingInState;			
-						// 	}
-						// 	}static SBActionState m_movingInState;
 			/*	Equip State	*/
 				SBStateEngine EqpStateEngine{
 					get{
@@ -247,8 +219,6 @@ namespace SlotSystem{
 				public IEnumeratorMock WaitForPickUpCoroutine(){return null;}
 				public IEnumeratorMock PickUpCoroutine(){return null;}
 				public IEnumeratorMock WaitForNextTouchCoroutine(){return null;}
-				// public IEnumeratorMock UnpickCoroutine(){return null;}
-				// public IEnumeratorMock PickUpCoroutine(){return null;}
 				public IEnumeratorMock RemoveCoroutine(){return null;}
 				public IEnumeratorMock AddCorouine(){return null;}
 				public IEnumeratorMock MoveWithinCoroutine(){
@@ -256,10 +226,6 @@ namespace SlotSystem{
 						ExpireActionProcess();
 					return null;
 				}
-				// public IEnumeratorMock MoveInSGCoroutine(){return null;}
-				// public IEnumeratorMock RevertCoroutine(){return null;}
-				// public IEnumeratorMock MoveInCoroutine(){return null;}
-				// public IEnumeratorMock MoveOutCoroutine(){return null;}
 			public SBProcess EquipProcess{
 				get{return m_equipProcess;}
 				}SBProcess m_equipProcess;
@@ -280,14 +246,6 @@ namespace SlotSystem{
 				public void Tap(){
 					m_tapCommand.Execute(this);
 				}
-			/*	dump	*/
-				// static SlottableCommand m_instantDeactivateCommand = new DefInstantDeactivateCommand();
-				// 	public static SlottableCommand InstantDeactivateCommand{
-				// 		get{return m_instantDeactivateCommand;}
-				// 	}
-				// 	public void InstantDeactivate(){
-				// 		m_instantDeactivateCommand.Execute(this);
-				// 	}
 		/*	public fields	*/
 			public bool delayed{
 				get{return m_delayed;}
@@ -321,18 +279,6 @@ namespace SlotSystem{
 				public void SetNewSlotID(int id){
 					m_newSlotID = id;
 				}
-			// public SlotGroup sg{
-			// 	get{
-			// 		if(m_sg == null){
-			// 			m_sg = sgm.GetSG(this);
-			// 		}
-			// 		return m_sg;
-			// 	}
-			// 	}SlotGroup m_sg;
-			// 	public void SetSG(SlotGroup sg){
-			// 		/*	use this only when creating a new Sb in transaction	*/
-			// 		m_sg = sg;
-			// 	}
 			public SlotGroup sg{
 				get{
 					return sgm.GetSG(this);
@@ -418,7 +364,6 @@ namespace SlotSystem{
 				if(!(other is Slottable))
 					throw new InvalidOperationException("CompareTo: no a slottable");
 				return CompareTo((Slottable)other);
-
 			}
 			public int CompareTo(Slottable other){
 				return this.item.CompareTo(other.item);
@@ -445,14 +390,6 @@ namespace SlotSystem{
 				ActStateEngine.SetState(Slottable.WaitForActionState);
 				EqpStateEngine.SetState(null);
 			}
-			// public void Initialize(SlotGroup sg, bool delayed, InventoryItemInstanceMock item){
-				// 	SetSG(sg);
-				// 	this.delayed = delayed;
-				// 	this.SetItem(item);
-				// 	SelStateEngine.SetState(Slottable.DeactivatedState);
-				// 	ActStateEngine.SetState(Slottable.WaitForActionState);
-				// 	EqpStateEngine.SetState(Slottable.UnequippedState);
-				// }
 			public void PickUp(){
 				SetActState(Slottable.PickedUpState);
 				m_pickedAmount = 1;
@@ -466,20 +403,6 @@ namespace SlotSystem{
 				sgm.SetActState(SlotGroupManager.PerformingTransactionState);
 				sgm.Transaction.Execute();
 			}
-			// public void MoveDraggedIcon(SlotGroup sg, Slot slot){
-				// 	SetDraggedIconDestination(sg, slot);
-				// }
-				// public void SetDraggedIconDestination(SlotGroup sg, Slot slot){
-				// 	this.m_destinationSG = sg;
-				// 	this.m_destinationSlot = slot;
-				// }
-				// public void ClearDraggedIconDestination(){
-				// 	this.m_destinationSG = null;
-				// 	this.m_destinationSlot = null;
-				// }
-				// public void GetSlotIndex(out int curID, out int newID){
-				// 	SG.GetSlotMovement(this).GetIndex(out curID, out newID);
-				// }
 			public void ExpireActionProcess(){
 				if(ActionProcess.IsRunning)
 					ActionProcess.Expire();
