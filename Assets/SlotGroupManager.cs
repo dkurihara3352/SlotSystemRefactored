@@ -331,7 +331,7 @@ namespace SlotSystem{
 				}InventoryManagerPage m_rootPage;
 				public void SetRootPage(InventoryManagerPage rootPage){
 					m_rootPage = rootPage;
-					rootPage.SetSGM(this);
+					rootPage.SetSGMRecursively(this);
 				}
 			public List<SlotGroup> allSGs{
 				get{
@@ -344,7 +344,7 @@ namespace SlotSystem{
 			public List<SlotGroup> allSGPs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					foreach(SlotSystemElement ele in rootPage.PoolBundle.Elements){
+					foreach(SlotSystemElement ele in rootPage.PoolBundle){
 						result.Add((SlotGroup)ele);
 					}
 					return result;
@@ -353,9 +353,9 @@ namespace SlotSystem{
 			public List<SlotGroup> allSGEs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					foreach(SlotSystemElement ele in rootPage.EquipBundle.Elements){
+					foreach(SlotSystemElement ele in rootPage.EquipBundle){
 						EquipmentSet equiSet = (EquipmentSet)ele;
-						foreach(SlotSystemElement ele2 in equiSet.Elements){
+						foreach(SlotSystemElement ele2 in equiSet){
 							SlotGroup sge = (SlotGroup)ele2;
 							result.Add(sge);
 						}
@@ -403,20 +403,20 @@ namespace SlotSystem{
 			}
 			public SlotGroup focusedSGP{
 				get{
-					SlotSystemElement focusedEle = rootPage.PoolBundle.GetFocusedBundleElement();
+					SlotSystemElement focusedEle = rootPage.PoolBundle.focusedElement;
 					return (SlotGroup)focusedEle;
 				}
 			}
 			public EquipmentSet focusedEqSet{
 				get{
-					return (EquipmentSet)rootPage.EquipBundle.GetFocusedBundleElement();
+					return (EquipmentSet)rootPage.EquipBundle.focusedElement;
 				}
 			}
 			public List<SlotGroup> focusedSGEs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
 					EquipmentSet focusedEquipSet = focusedEqSet;
-					foreach(SlotSystemElement ele in focusedEquipSet.Elements){
+					foreach(SlotSystemElement ele in focusedEquipSet){
 						result.Add((SlotGroup)ele);
 					}
 					return result;
@@ -433,7 +433,7 @@ namespace SlotSystem{
 			public List<EquipmentSet> equipmentSets{
 				get{
 					List<EquipmentSet> result = new List<EquipmentSet>();
-					foreach(SlotSystemElement ele in rootPage.EquipBundle.Elements){
+					foreach(SlotSystemElement ele in rootPage.EquipBundle){
 						result.Add((EquipmentSet)ele);
 					}
 					return result;
@@ -472,7 +472,7 @@ namespace SlotSystem{
 					List<CarriedGearInstanceMock> result = new List<CarriedGearInstanceMock>();
 					foreach(SlotGroup sge in focusedSGEs){
 						if(sge.Filter is SGCGearsFilter){
-							foreach(Slottable sb in sge.slottables){
+							foreach(Slottable sb in sge){
 								if(sb != null)
 									result.Add((CarriedGearInstanceMock)sb.itemInst);
 							}
@@ -544,24 +544,24 @@ namespace SlotSystem{
 				// /*	update equip inventory	*/
 					/*	remove	*/
 						List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
-						foreach(InventoryItemInstanceMock itemInInv in equipInv.items){
+						foreach(InventoryItemInstanceMock itemInInv in equipInv){
 							if(!actualEquippedItems.Contains(itemInInv))
 								removed.Add(itemInInv);
 						}
 						foreach(InventoryItemInstanceMock item in removed){
-							equipInv.RemoveItem(item);
+							equipInv.Remove(item);
 						}
 					/*	add	*/
 						List<InventoryItemInstanceMock> added = new List<InventoryItemInstanceMock>();
 						foreach(InventoryItemInstanceMock itemInAct in actualEquippedItems){
-							if(!equipInv.items.Contains(itemInAct))
+							if(!equipInv.Contains(itemInAct))
 								added.Add(itemInAct);
 						}
 						foreach(InventoryItemInstanceMock item in added){
-							equipInv.AddItem(item);
+							equipInv.Add(item);
 						}
 				/*	update all itemInst's isEquipped status	*/
-				foreach(InventoryItemInstanceMock itemInst in poolInv.items){
+				foreach(InventoryItemInstanceMock itemInst in poolInv){
 					if(itemInst is BowInstanceMock)
 						itemInst.isEquipped = itemInst == equippedBowInst;
 					else if (itemInst is WearInstanceMock)
@@ -573,7 +573,7 @@ namespace SlotSystem{
 				}
 				/*	set sbs equip states	*/
 				foreach(SlotGroup sg in allSGs){
-					foreach(Slottable sb in sg.slottables){
+					foreach(Slottable sb in sg){
 						if(sb!= null)
 							sb.UpdateEquipState();
 					}
@@ -608,7 +608,7 @@ namespace SlotSystem{
 						sg.DefocusSelf();
 					else
 						sg.FocusSelf();
-					foreach(Slottable sb in sg.slottables){
+					foreach(Slottable sb in sg){
 						if(sb != null){
 							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb, null);
 							TransactionResult tr2 = new TransactionResult(sb, null, ta2);

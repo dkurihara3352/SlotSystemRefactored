@@ -357,6 +357,7 @@ public class SlottableTest{
 		/*	inventories	*/
 		PoolInventory poolInv;
 		EquipmentSetInventory equipInv;
+		GenericInventory genInv;
 		bool picked;
 	[SetUp]
 	public void Setup(){
@@ -438,28 +439,54 @@ public class SlottableTest{
 				PackInstanceMock defPackA = new PackInstanceMock();
 				defPackA.Item = defPack;
 		/*	Inventory	*/
-			poolInv = new PoolInventory();
-				poolInv.AddItem(defBowA);
-				poolInv.AddItem(defBowB);
-				poolInv.AddItem(crfBowA);
-				poolInv.AddItem(defWearA);
-				poolInv.AddItem(defWearB);
-				poolInv.AddItem(crfWearA);
-				poolInv.AddItem(defShieldA);
-				poolInv.AddItem(defMWeaponA);
-				poolInv.AddItem(defPartsA);
-				poolInv.AddItem(defPartsB);
-				poolInv.AddItem(crfPartsA);
-				poolInv.AddItem(crfShieldA);
-				poolInv.AddItem(crfMWeaponA);
-				poolInv.AddItem(defQuiverA);
-				poolInv.AddItem(defPackA);
+			/*	pool inv	*/
+				List<SlottableItem> items = new List<SlottableItem>();
+					items.Add(defBowA);
+					items.Add(defBowB);
+					items.Add(crfBowA);
+					items.Add(defWearA);
+					items.Add(defWearB);
+					items.Add(crfWearA);
+					items.Add(defShieldA);
+					items.Add(defMWeaponA);
+					items.Add(defPartsA);
+					items.Add(defPartsB);
+					items.Add(crfPartsA);
+					items.Add(crfShieldA);
+					items.Add(crfMWeaponA);
+					items.Add(defQuiverA);
+					items.Add(defPackA);
+				poolInv = new PoolInventory();
+					foreach(SlottableItem item in items){
+						poolInv.Add(item);
+					}
+						AE(poolInv.count, 14);
+						int id = 0;
+						foreach(SlottableItem item in poolInv){
+							object.ReferenceEquals(item, items[id]);
+							id ++;
+							AB(poolInv.Contains(item), true);
+						}
+			/*	equip inv	*/
 				List<CarriedGearInstanceMock> initCGears = new List<CarriedGearInstanceMock>();
 				initCGears.Add(defShieldA);
 				initCGears.Add(defMWeaponA);
-			equipInv = new EquipmentSetInventory(defBowA, defWearA, initCGears, 4);
-				AE(poolInv.items.Count, 14);
-				AE(equipInv.items.Count, 4);
+				equipInv = new EquipmentSetInventory(defBowA, defWearA, initCGears, 4);
+					List<SlottableItem> cgItems = new List<SlottableItem>();
+						cgItems.Add(defBowA);
+						cgItems.Add(defWearA);
+						cgItems.Add(defShieldA);
+						cgItems.Add(defMWeaponA);
+					AE(equipInv.count, 4);
+					id = 0;
+					foreach(SlottableItem item in equipInv){
+						object.ReferenceEquals(item, cgItems[id]);
+						id++;
+						AB(equipInv.Contains(item), true);
+					}
+			/*	generic inventory	*/
+				genInv = new GenericInventory();
+					AE(genInv.count, 0);
 		/*	SGs	*/
 			/*	sgpAll	*/
 				sgpAllGO = new GameObject("PoolSlotGroup");
@@ -607,22 +634,25 @@ public class SlottableTest{
 			sgm = sgmGO.AddComponent<SlotGroupManager>();
 			EquipmentSet equipSetA = new EquipmentSet(sgBow, sgWear, sgCGears);
 			SlotSystemBundle equipBundle = new SlotSystemBundle();
-			equipBundle.Elements.Add(equipSetA);
+			equipBundle.Add(equipSetA);
 			equipBundle.SetFocusedBundleElement(equipSetA);
 			SlotSystemBundle poolBundle = new SlotSystemBundle();
-			poolBundle.Elements.Add(sgpAll);
-			poolBundle.Elements.Add(sgpParts);
-			poolBundle.Elements.Add(sgpBow);
-			poolBundle.Elements.Add(sgpWear);
-			poolBundle.Elements.Add(sgpCGears);
+			poolBundle.Add(sgpAll);
+			poolBundle.Add(sgpParts);
+			poolBundle.Add(sgpBow);
+			poolBundle.Add(sgpWear);
+			poolBundle.Add(sgpCGears);
 			poolBundle.SetFocusedBundleElement(sgpAll);
 			InventoryManagerPage invManPage = new InventoryManagerPage(poolBundle, equipBundle);
+				AssertSlotSystemRootElementCorrectlySet(invManPage);
 		sgm.Initialize(invManPage);
+			AssertSlotSystemSGMSetRight(sgm);
 			AssertBundlesPagesAndSGsMembership();
 			AssertSBsMembership();
 			AssertInitialize();
 		sgm.Activate();
 		AssertFocused();
+		AssertInitiallyFocusedBundles();
 	}
 	[Test]
 	public void TestAll(){
@@ -643,7 +673,7 @@ public class SlottableTest{
 			// TestSBStateTransitionOnAll();
 			// TestSGMStateTransition();
 			// TestRevertOnAllSBs();
-			// TestVolSortOnSPGParts();
+			// TestVolSortOnSPGParts();//missing
 			// TestVolSortOnAll();
 			// TestReorderOnAll();
 			// TestFillOnAll();
@@ -653,12 +683,239 @@ public class SlottableTest{
 			// TestCombination();
 			// TestSGCGearsCorrespondence();
 			// AssertInitialize();
-			// TestChangingSGCGearsSlotsCountAgain();
 			// TestSwapShortcut();
 			// TestSGECorrespondence();
 		// TestAddAndRemoveAll();
 		// TestSGGeneric();
-		// TestSlotSystemElement();
+		// PrintSystemHierarchySimple();
+		// PrintSystemHierarchyDetailed();
+		// TestSlotSystemActivateDeactivate();
+	}
+	public void AssertInitiallyFocusedBundles(){
+		sgm.rootPage.PoolBundle.PerformInHierarchy(AssertFocusedSelfAndBelow);
+		sgm.rootPage.EquipBundle.PerformInHierarchy(AssertFocusedSelfAndBelow);
+		foreach(SlotSystemBundle bundle in sgm.rootPage.otherBundles){
+			if(bundle != null)
+				bundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
+		}
+		PrintSystemHierarchyDetailed();
+	}
+	public void TestSlotSystemActivateDeactivate(){
+		sgm.Deactivate();
+			Debug.Log(Util.Bold(Util.Yamabuki("Root deactivated")));
+			PrintSystemHierarchyDetailed();
+		sgm.Activate();
+			Debug.Log(Util.Bold(Util.Yamabuki("Root activated")));
+			AssertFocused();
+			PrintSystemHierarchyDetailed();
+		sgm.rootPage.PoolBundle.Defocus();
+			Debug.Log(Util.Bold(Util.Yamabuki("Pool defocused")));
+			PrintSystemHierarchyDetailed();
+			sgm.rootPage.PoolBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
+		sgm.rootPage.EquipBundle.Defocus();
+			Debug.Log(Util.Bold(Util.Yamabuki("Equip defocused")));
+			PrintSystemHierarchyDetailed();
+			sgm.rootPage.EquipBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
+		sgm.Activate();
+			Debug.Log(Util.Bold(Util.Yamabuki("root activated")));
+			PrintSystemHierarchyDetailed();
+			AssertFocused();
+		// sgm.rootPage.Deactivate();
+		// 	Debug.Log(Util.Bold(Util.Yamabuki("root deactivated")));
+		// 	PrintSystemHierarchyDetailed();
+	}
+	public void AssertFocusedSelfAndBelow(SlotSystemElement ele){
+		if(ele is SlotGroup){
+			SlotGroup sg = (SlotGroup)ele;
+			ASGReset(sg);
+			if(sgm.rootPage.PoolBundle.ContainsInHierarchy(sg)){//	if sgp
+				if(sg == sgm.focusedSGP){
+					ASSG(sg,
+						null, SGFocused, null,
+						null, SGWFA, null, false);
+					foreach(Slottable sb in sg){
+						if(sb != null){
+							AE(sb.sgm, sgm);
+							ASBReset(sb);
+							if(!sg.isAutoSort){
+									ASSB_s(sb, SBFocused, SBWFA);
+							}else{
+								if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
+									ASSB_s(sb, SBDefocused, SBWFA);
+								else
+									if(sb.isEquipped)
+										ASSB_s(sb, SBDefocused, SBWFA);
+									else{
+										ASSB_s(sb, SBFocused, SBWFA);
+									}
+							}
+						}
+					}
+				}else{/*  sg not focused	*/
+					ASSG(sg,
+						null, SGDefocused, null,
+						null, SGWFA, null, false);
+					foreach(Slottable sb in sg){
+						if(sb != null){
+							AE(sb.sgm, sgm);
+							ASBReset(sb);
+							ASSB_s(sb, SBDefocused, SBWFA);
+						}
+					}
+				}
+			}else if(sgm.rootPage.EquipBundle.ContainsInHierarchy(sg)){//	if sge
+				if(sgm.focusedSGEs.Contains(sg)){
+					ASSG(sg,
+						null, SGFocused, null,
+						null, SGWFA, null, false);
+					foreach(Slottable sbe in sg){
+						if(sbe != null){
+							AE(sbe.sgm, sgm);
+							ASBReset(sbe);
+							ASSB_s(sbe, SBFocused, SBWFA);
+						}
+					}
+				}else{
+					ASSG(sg,
+						null, SGFocused, null,
+						null, SGWFA, null, false);
+					foreach(Slottable sbe in sg){
+						if(sbe != null){
+							AE(sbe.sgm, sgm);
+							ASBReset(sbe);
+							ASSB_s(sbe, SBDefocused, SBWFA);
+						}
+					}
+				}
+			}
+		}else if(ele is Slottable){
+			Slottable sb = (Slottable)ele;
+			SlotGroup sg = sb.sg;
+			ASBReset(sb);
+			if(sgm.rootPage.PoolBundle.ContainsInHierarchy(sg)){
+				if(sg == sgm.focusedSGP){
+					if(!sg.isAutoSort){
+						ASSB_s(sb, SBFocused, SBWFA);
+					}else{
+						if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
+							ASSB_s(sb, SBDefocused, SBWFA);
+						else
+							if(sb.isEquipped)
+								ASSB_s(sb, SBDefocused, SBWFA);
+							else{
+								ASSB_s(sb, SBFocused, SBWFA);
+							}
+					}
+				}else{
+					ASSB_s(sb, SBDefocused, SBWFA);
+				}
+			}else if(sgm.rootPage.EquipBundle.ContainsInHierarchy(sg)){
+				if(sgm.focusedSGEs.Contains(sg)){
+					ASSB_s(sb, SBFocused, SBWFA);
+				}else{
+					ASSB_s(sb, SBDefocused, SBWFA);
+				}
+			}
+		}
+	}
+	public void AssertDefocusedSelfAndBelow(SlotSystemElement ele){
+		if(ele is SlotGroup){
+			ASGSelState((SlotGroup)ele, null, SGDefocused, null);
+		}else if(ele is Slottable){
+			ASBSelState((Slottable)ele, null, SBDefocused, null);
+		}
+	}
+	public void AssertSlotSystemSGMSetRight(SlotGroupManager sgm){
+		AE(sgm.rootPage.sgm, sgm);
+		AE(sgm.rootPage.PoolBundle.sgm, sgm);
+			foreach(SlotSystemElement ele in sgm.rootPage.PoolBundle){
+				SlotGroup sg = (SlotGroup)ele;
+				AE(sg.sgm, sgm);
+				foreach(Slottable sb in sg){
+					if(sb != null)
+						AE(sb.sgm, sgm);
+				}
+			}
+		AE(sgm.rootPage.EquipBundle.sgm, sgm);
+			foreach(SlotSystemElement ele in sgm.rootPage.EquipBundle){
+				EquipmentSet eSet = (EquipmentSet)ele;
+				AE(eSet.sgm, sgm);
+				foreach(SlotSystemElement ele2 in eSet){
+					SlotGroup sg = (SlotGroup)ele2;
+					AE(sg.sgm, sgm);
+					foreach(Slottable sb in sg){
+						if(sb != null)
+							AE(sb.sgm, sgm);
+					}
+				}
+			}
+	}
+	public void AssertSlotSystemRootElementCorrectlySet(InventoryManagerPage invManPage){
+		AE(invManPage.rootElement, invManPage);
+		AE(invManPage.PoolBundle.rootElement, invManPage);
+			foreach(SlotSystemElement ele in invManPage.PoolBundle){
+				SlotGroup sg = (SlotGroup)ele;
+				AE(sg.rootElement, invManPage);
+				foreach(Slottable sb in sg){
+					if(sb != null)
+						AE(sb.rootElement, invManPage);
+				}
+			}
+		AE(invManPage.EquipBundle.rootElement, invManPage);
+			foreach(SlotSystemElement ele in invManPage.EquipBundle){
+				EquipmentSet eSet = (EquipmentSet)ele;
+				AE(eSet.rootElement, invManPage);
+				foreach(SlotSystemElement ele2 in eSet){
+					SlotGroup sg = (SlotGroup)ele2;
+					AE(sg.rootElement, invManPage);
+					foreach(Slottable sb in sg){
+						if(sb != null)
+							AE(sb.rootElement, invManPage);
+					}
+				}
+			}
+	}
+	public string Indent(int level){
+		string res = "";
+		for(int i = 0; i < level; i++){
+			res += "	" ;
+		}
+		return res;
+	}
+	public void PrintElementSimple(SlotSystemElement ele){
+		string str = Indent(ele.level);
+		if(ele is InventoryManagerPage)
+			str += Util.Bold("RootPage");
+		else if(ele is SlotSystemBundle)
+			str += Util.Bold("Bundle");
+		else if(ele is EquipmentSet)
+			str += Util.Bold("EquipmentSet");
+		else if(ele is SlotGroup)
+			str += Util.SGName((SlotGroup)ele);
+		else if(ele is Slottable)
+			str += Util.SBofSG((Slottable)ele);
+		Debug.Log(str);
+	}
+	public void PrintElementInDetail(SlotSystemElement ele){
+		string str = Indent(ele.level);
+		if(ele is InventoryManagerPage)
+			str += Util.Bold("RootPage");
+		else if(ele is SlotSystemBundle)
+			str += Util.Bold("Bundle");
+		else if(ele is EquipmentSet)
+			str += Util.Bold("EquipmentSet");
+		else if(ele is SlotGroup)
+			str += Util.SGDebug((SlotGroup)ele);
+		else if(ele is Slottable)
+			str += Util.SBDebug((Slottable)ele);
+		Debug.Log(str);
+	}
+	public void PrintSystemHierarchyDetailed(){
+		sgm.rootPage.PerformInHierarchy(PrintElementInDetail);
+	}
+	public void PrintSystemHierarchySimple(){
+		sgm.rootPage.PerformInHierarchy(PrintElementSimple);
+
 	}
 	/*	SGs testing	*/
 		public void TestSGECorrespondence(){
@@ -721,15 +978,15 @@ public class SlottableTest{
 					AssertFocused();
 					Swap(sb, sgp, sge, null);
 					// Fill(sb, sgp, sge, null);//make this swap
-					Print(sge.slottables[0]);
-					PrintItemsArray(equipInv.items);
+					Print((Slottable)sge[0]);
+					PrintItemsArray(equipInv);
 					AssertFocused();
 					/*	reverse	*/
 					Swap(sge.GetSB(testItem), sge, null, sgp.GetSB(swapItem));
 					// Fill(sge.GetSB(testItem), sge, sgp, null);//swap
 					AssertFocused();
 				}
-				foreach(Slottable sbe in sge.slottables){
+				foreach(Slottable sbe in sge){
 					if(sbe != null){
 						foreach(Slottable sbp in transactableSBs(sgp, null, sbe, typeof(SwapTransaction))){
 							InventoryItemInstanceMock testItem = sbp.itemInst;
@@ -737,8 +994,8 @@ public class SlottableTest{
 							Slottable testSbe = sge.GetSB(swapItem);
 								AssertFocused();
 							Swap(sbp, sgp, null, testSbe);
-								Print(sge.slottables[0]);
-								PrintItemsArray(equipInv.items);
+								Print((Slottable)sge[0]);
+								PrintItemsArray(equipInv);
 							/*	reverse	*/
 							Swap(sge.GetSB(testItem), sge, null, sgp.GetSB(swapItem));
 								AssertFocused();
@@ -776,7 +1033,7 @@ public class SlottableTest{
 						AssertSGCounts(sgCGears, newSlotCount, 0, 0);
 						AssertFocused();
 						// PrintSBsArray(sgCGears.slottables);
-						foreach(List<Slottable> sbsCombo in possibleSBsCombos(newSlotCount, transactableSBs(sgp, sgCGears, null, typeof(FillTransaction)))){
+						foreach(IEnumerable<Slottable> sbsCombo in possibleSBsCombos(newSlotCount, transactableSBs(sgp, sgCGears, null, typeof(FillTransaction)))){
 							foreach(Slottable sb in sbsCombo){
 								Fill(sb, sgp, sgCGears, null);
 							}
@@ -797,7 +1054,7 @@ public class SlottableTest{
 									Fill(sb, sgp, sgCGears, null);
 								}
 							/*	empty the slots	*/
-								foreach(Slottable sb in sgCGears.slottables){
+								foreach(Slottable sb in sgCGears){
 									if(sb != null)
 										Fill(sb, sgCGears, sgp, null);
 								}
@@ -809,12 +1066,12 @@ public class SlottableTest{
 						sgm.ChangeEquippableCGearsCount(newSlotCount, sgCGears);
 						AssertSGCounts(sgCGears, newSlotCount, 0, 0);
 						AssertFocused();
-						foreach(List<Slottable> sbsCombo in possibleSBsCombos(newSlotCount, transactableSBs(sgp, sgCGears, null, typeof(FillTransaction)))){
+						foreach(IEnumerable<Slottable> sbsCombo in possibleSBsCombos(newSlotCount, transactableSBs(sgp, sgCGears, null, typeof(FillTransaction)))){
 							foreach(Slottable sb in sbsCombo){
 								Fill(sb, sgp, sgCGears, null);
 							}
 							AE(transactableSBs(sgp, sgCGears, null, typeof(FillTransaction)).Count, 0);
-							foreach(Slottable sb in sgCGears.slottables){
+							foreach(Slottable sb in sgCGears){
 								if(sb != null)
 									Fill(sb, sgCGears, sgp, null);
 							}
@@ -920,8 +1177,7 @@ public class SlottableTest{
 			PrintTestResult(null);
 			}
 			public void TestAddAndRemove(SlotGroup testSG, bool isPAS){
-				List<Slottable> sbs = new List<Slottable>();
-				sbs.AddRange(testSG.slottables);
+				List<Slottable> sbs = testSG.toList;
 					AssertFocused();
 				// sgm.MoveSBs(testSG, null, sbs);
 				// 	ASSGM(sgm,
@@ -934,6 +1190,7 @@ public class SlottableTest{
 	/*	setup	*/
 		public void AssertInitialize(){
 			// ANull(SlotGroupManager.CurSGM);
+			Print(sgm);
 			ASSGM(sgm,
 				null, null, null, null, null, null, null, null,
 				SGMDeactivated, SGMDeactivated, null,
@@ -944,7 +1201,7 @@ public class SlottableTest{
 					SGDeactivated, SGDeactivated, null,
 					SGWFA, SGWFA, null, false);
 					ASGReset(sg);
-				foreach(Slottable sb in sg.slottables){
+				foreach(Slottable sb in sg){
 					if(sb != null){
 						ASSB(sb,
 							SBDeactivated, SBDeactivated, null,
@@ -1002,7 +1259,7 @@ public class SlottableTest{
 				AB(sgm.focusedSGEs.Contains(sgBow), true);
 				AB(sgm.focusedSGEs.Contains(sgWear), true);
 				AB(sgm.focusedSGEs.Contains(sgCGears), true);
-				AE(sgm.focusedEqSet, sgm.rootPage.EquipBundle.GetFocusedBundleElement());
+				AE(sgm.focusedEqSet, sgm.rootPage.EquipBundle.focusedElement);
 				AE(sgm.rootPage.DirectParent(sgBow), sgm.focusedEqSet);
 				AE(sgm.rootPage.DirectParent(sgWear), sgm.focusedEqSet);
 				AE(sgm.rootPage.DirectParent(sgCGears), sgm.focusedEqSet);
@@ -1222,7 +1479,7 @@ public class SlottableTest{
 					sgm.dIcon2.CompleteMovement();
 						AssertFocused();
 				}
-				foreach(Slottable tarSB in tarSG.slottables){
+				foreach(Slottable tarSB in tarSG){
 					if(tarSB != null){
 						testSB = origSG.GetSB(pickedItem);
 						SlotSystemTransaction ta2 = sgm.GetTransaction(testSB, null, tarSB);
@@ -1339,7 +1596,6 @@ public class SlottableTest{
 				}
 			}
 		}
-	
 	/*	Test Transaction on All	*/
 		public void TestFillOnAll(){
 			PerformOnAllSBs(CrossTestFill);
@@ -1431,7 +1687,7 @@ public class SlottableTest{
 										ASSB(newSB,
 											SBDeactivated, SBDefocused, null,
 											SBWFA, SBAdd, typeof(SBAddProcess), true,
-											SBUnequipped, SBUnequipped, null);
+											null, null, null);
 									}
 								sgm.dIcon1.CompleteMovement();
 								if(!tarSG.isAllTASBsDone)
@@ -1479,7 +1735,7 @@ public class SlottableTest{
 								sgm.dIcon1.CompleteMovement();
 									AssertFocused();
 					}
-					foreach(Slottable tarSB in tarSG.slottables){
+					foreach(Slottable tarSB in tarSG){
 						testSB = origSG.GetSB(pickedItem);
 						if(tarSB != null){
 							if(sgm.GetTransaction(testSB, null, tarSB).GetType() == typeof(FillTransaction)){
@@ -1635,7 +1891,7 @@ public class SlottableTest{
 			public void TestReorder(SlotGroup targetSG, Slottable testSB, bool isPAS, bool isTAS){
 				if(testSB.isPickable){
 					SlotGroup origSG = testSB.sg;
-					foreach(Slottable targetSB in targetSG.slottables){
+					foreach(Slottable targetSB in targetSG){
 						if(sgm.GetTransaction(testSB, null, targetSB).GetType() == typeof(ReorderTransaction)){
 							Capture(testSB.sgm, testSB, null, targetSB, isPAS, isTAS, TestElement.SB);
 							// Print(testSB.SGM, testSB, null, targetSB, isPAS, isTAS, TestElement.SB);
@@ -1761,7 +2017,7 @@ public class SlottableTest{
 						sgm.dIcon1.CompleteMovement();
 						// Print(sg.SGM, pickedSB, sg, null, isPAS, isTAS, TestElement.SGM);
 						AssertFocused();
-						foreach(Slottable sb in sg.slottables){
+						foreach(Slottable sb in sg){
 							if(sb != null){
 								if(sgm.GetTransaction(pickedSB, null, sb).GetType() == typeof(RevertTransaction)){
 									// Capture(sgm, pickedSB, null, sb, isPAS, isTAS, TestElement.SGM);
@@ -1836,7 +2092,7 @@ public class SlottableTest{
 			sgpAll.SetSBsActStates();
 			foreach(Slottable sb in sgpAll.allTASBs){
 				if(sb != null)
-				Debug.Log(Util.SBDebug(sb));
+				Debug.Log(Util.SBName(sb));
 			}
 			PrintSBsArray(sgpAll.newSBs);
 			sgpAll.OnCompleteSlotMovementsV2();
@@ -1851,7 +2107,7 @@ public class SlottableTest{
 			sgpAll.SetSBsActStates();
 			foreach(Slottable sb in sgpAll.allTASBs){
 				if(sb != null)
-				Debug.Log(Util.SBDebug(sb));
+				Debug.Log(Util.SBName(sb));
 			}
 			PrintSBsArray(sgpAll.newSBs);
 			sgpAll.OnCompleteSlotMovementsV2();
@@ -1867,13 +2123,14 @@ public class SlottableTest{
 			sgpAll.SetSBsActStates();
 			foreach(Slottable sb in sgpAll.allTASBs){
 				if(sb != null)
-				Debug.Log(Util.SBDebug(sb));
+				Debug.Log(Util.SBName(sb));
 			}
 			PrintSBsArray(sgpAll.newSBs);
 			sgpAll.OnCompleteSlotMovementsV2();
 
 			sgpAll.InstantSort();
-			PrintSBsArray(sgpAll.slottables);
+			
+			PrintSBsArray(sgpAll.toList);
 		}
 		public void TestReorderSBsMethod(){
 			List<Slottable> sbs = testSBs;
@@ -2074,7 +2331,7 @@ public class SlottableTest{
 				/*	Equip State	*/
 				if(sb.sg.isPool){
 					if(sb.isEquipped){
-							ASBEqpState(sb, SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+							ASBEqpState(sb, SBEquipped, SBEquipped, null);
 						sb.SetEqpState(SBUnequipped);
 							ASBEqpState(sb, SBEquipped, SBUnequipped, typeof(SBUnequipProcess));
 						sb.SetEqpState(SBEquipped);
@@ -2092,7 +2349,7 @@ public class SlottableTest{
 							ASBEqpState(sb, SBEquipped, SBUnequipped, typeof(SBUnequipProcess));
 					}
 				}else{
-						ASBEqpState(sb, SBUnequipped, SBEquipped, null);
+						// ASBEqpState(sb, SBUnequipped, SBEquipped, null);
 					sb.SetEqpState(SBUnequipped);
 						ASBEqpState(sb, SBEquipped, SBUnequipped, null);
 					sb.SetEqpState(SBEquipped);
@@ -2225,7 +2482,7 @@ public class SlottableTest{
 			}
 			public void CrossCheckTransactionWithSB(SlotGroup sg, Slottable pickedSB, bool isPickedAS, bool isTargetAS){
 				if(pickedSB.isPickable){
-					foreach(Slottable sb in sg.slottables){
+					foreach(Slottable sb in sg){
 						if(sb != null){
 							Capture(sb.sgm, pickedSB, sg, sb, isPickedAS, isTargetAS, TestElement.TA);
 						}
@@ -2266,10 +2523,10 @@ public class SlottableTest{
 					}
 				}
 	/*	thorough testing utility	*/
-		public List<List<Slottable>> possibleSBsCombos(int subsetCount, List<Slottable> sbs){
-			List<List<Slottable>> result = new List<List<Slottable>>();
-			foreach(List<Slottable> combo in ListMethods.Combinations<Slottable>(subsetCount, sbs)){
-				List<List<Slottable>> perms = ListMethods.Permutations<Slottable>(combo);
+		public List<IEnumerable<Slottable>> possibleSBsCombos(int subsetCount, List<Slottable> sbs){
+			List<IEnumerable<Slottable>> result = new List<IEnumerable<Slottable>>();
+			foreach(/*List<Slottable>*/IEnumerable<Slottable> combo in ListMethods.Combinations<Slottable>(subsetCount, sbs)){
+				List<IEnumerable<Slottable>> perms = ListMethods.Permutations<Slottable>(combo);
 				result.AddRange(perms);
 			}
 			return result;
@@ -2280,8 +2537,8 @@ public class SlottableTest{
 				sbs.Add(defShieldA_p);
 				sbs.Add(defQuiverA_p);
 				sbs.Add(defParts_p);
-				List<List<Slottable>> sbsPerms = ListMethods.Permutations<Slottable>(sbs);
-				foreach(List<Slottable> sbList in sbsPerms){
+				List<IEnumerable<Slottable>> sbsPerms = ListMethods.Permutations<Slottable>(sbs);
+				foreach(IEnumerable<Slottable> sbList in sbsPerms){
 					PrintSBsArray(sbList);
 				}
 			}
@@ -2293,13 +2550,13 @@ public class SlottableTest{
 				sbs.Add(defMWeaponA_p);
 				sbs.Add(defParts_p);
 				
-				List<List<Slottable>> possibleCombos = possibleSBsCombos(4, sbs);
-				foreach(List<Slottable> combo in possibleCombos)
+				List<IEnumerable<Slottable>> possibleCombos = possibleSBsCombos(4, sbs);
+				foreach(IEnumerable<Slottable> combo in possibleCombos)
 					PrintSBsArray(combo);
 			}
 		public List<Slottable> transactableSBs(SlotGroup origSG, SlotGroup tarSG, Slottable tarSB, System.Type ta){
 			List<Slottable> result = new List<Slottable>();
-			foreach(Slottable sb in origSG.slottables){
+			foreach(Slottable sb in origSG){
 				if(sb != null && sb.isPickable){
 					if(sgm.GetTransaction(sb, tarSG, tarSB).GetType() == ta){
 						result.Add(sb);
@@ -2312,13 +2569,13 @@ public class SlottableTest{
 			foreach(SlotGroup sgp in sgm.allSGPs){
 				sgm.SetFocusedPoolSG(sgp);
 				sgp.ToggleAutoSort(true);
-				foreach(Slottable sb in sgp.slottables){
+				foreach(Slottable sb in sgp){
 					if(sb != null){
 						act(sb, true);
 					}
 				}
 				sgp.ToggleAutoSort(false);
-				foreach(Slottable sb in sgp.slottables){
+				foreach(Slottable sb in sgp){
 					if(sb != null){
 						act(sb, false);
 					}
@@ -2328,13 +2585,13 @@ public class SlottableTest{
 				sgm.SetFocusedEquipmentSet(eSet);
 				foreach(SlotGroup sge in sgm.focusedSGEs){
 					sge.ToggleAutoSort(true);
-					foreach(Slottable sb in sge.slottables){
+					foreach(Slottable sb in sge){
 						if(sb != null){
 							act(sb, true);
 						}
 					}
 					sge.ToggleAutoSort(false);
-					foreach(Slottable sb in sge.slottables){
+					foreach(Slottable sb in sge){
 						if(sb != null){
 							act(sb, false);
 						}
@@ -2395,7 +2652,7 @@ public class SlottableTest{
 		}
 	/*	actions	*/
 		public void ClearSGCGearsTo(SlotGroup sgp){
-			foreach(Slottable sb in sgCGears.slottables){
+			foreach(Slottable sb in sgCGears){
 				if(sb != null){
 					Fill(sb, sgCGears, sgp, null);
 				}
@@ -2448,7 +2705,7 @@ public class SlottableTest{
 						// Capture(sgm, testSB, tarSG, null, isPAS, isTAS, TestElement.SG);
 					}
 				}
-				foreach(Slottable tarSB in tarSG.slottables){
+				foreach(Slottable tarSB in tarSG){
 					if(tarSB != null){
 						testSB = origSG.GetSB(testItem);
 						if(testSB.isPickable){
@@ -2503,7 +2760,7 @@ public class SlottableTest{
 						/*	rev */
 						Fill(tarSG.GetSB(testItem), tarSG, origSG, null);
 					}
-					foreach(Slottable tarSB in tarSG.slottables){
+					foreach(Slottable tarSB in tarSG){
 						if(tarSB != null){
 							testSB = origSG.GetSB(testItem);
 							if(sgm.GetTransaction(testSB, null, tarSB).GetType() == typeof(FillTransaction)){
@@ -2735,11 +2992,11 @@ public class SlottableTest{
 				AE(sg.actualSBsCount, sbsC);
 			}
 			public void AssertSBsSorted(SlotGroup sg, SGSorter sorter){
-				List<Slottable> sbs = sg.slottables;
+				List<Slottable> sbs = sg.toList;
 				sorter.OrderSBsWithRetainedSize(ref sbs);
-				AE(sbs.Count, sg.slottables.Count);
-				for(int i = 0; i < sg.slottables.Count; i++){
-					AE(sg.slottables[i], sbs[i]);
+				AE(sbs.Count, sg.Count);
+				for(int i = 0; i < sg.Count; i++){
+					AE((Slottable)sg[i], sbs[i]);
 				}
 			}
 			public void ASSG(SlotGroup sg, SGSelectionState prevSel, SGSelectionState curSel, System.Type selProcT, SGActionState prevAct, SGActionState curAct, System.Type actProcT, bool isRunning){
@@ -2845,7 +3102,7 @@ public class SlottableTest{
 						sge = sgWear;
 						sgp = sgpWear;
 					}
-					foreach(Slottable sbp in sgpAll.slottables){
+					foreach(Slottable sbp in sgpAll){
 						if(sbp != null){
 							InventoryItemInstanceMock sbpItem = sbp.itemInst;
 							if(sbpItem.GetType() == typeToCheck)
@@ -2900,7 +3157,7 @@ public class SlottableTest{
 							}
 						}
 					}
-					foreach(Slottable sbp in sgp.slottables){
+					foreach(Slottable sbp in sgp){
 						if(sbp != null){
 							InventoryItemInstanceMock sbpItem = sbp.itemInst;
 							if(sbpItem == itemInst){
@@ -2966,7 +3223,7 @@ public class SlottableTest{
 						AB(sgCGears.equippedSBs.Contains(sgCGears.GetSB(item)), true);
 					}
 				}
-				foreach(InventoryItemInstanceMock itemInInv in poolInv.items){
+				foreach(InventoryItemInstanceMock itemInInv in poolInv){
 					if(itemInInv is CarriedGearInstanceMock){
 						if(items.Contains((CarriedGearInstanceMock)itemInInv)){
 							AB(itemInInv.isEquipped, true);
@@ -2981,10 +3238,10 @@ public class SlottableTest{
 				}
 				foreach(CarriedGearInstanceMock item in items){
 					if(item != null){
-						AE(equipInv.items.Contains(item), true);
+						AE(equipInv.Contains(item), true);
 					}
 				}
-				foreach(InventoryItemInstanceMock itemInInv in equipInv.items){
+				foreach(InventoryItemInstanceMock itemInInv in equipInv){
 					if(itemInInv is CarriedGearInstanceMock){
 						AB(itemInInv.isEquipped, true);
 						AE(items.Contains((CarriedGearInstanceMock)itemInInv), true);
@@ -3027,7 +3284,7 @@ public class SlottableTest{
 				}
 				foreach(SlotGroup sgp in sgm.allSGPs){
 					if(sgp.Filter is SGNullFilter || sgp.Filter is SGCGearsFilter){
-						foreach(Slottable sbp in sgp.slottables){
+						foreach(Slottable sbp in sgp){
 							if(sbp != null){
 								if(sbp.itemInst is CarriedGearInstanceMock){
 									if(checkedList.Contains((CarriedGearInstanceMock)sbp.itemInst)){
@@ -3081,7 +3338,7 @@ public class SlottableTest{
 						ASSG(sgp,
 							null, SGFocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sb in sgp.slottables){
+						foreach(Slottable sb in sgp){
 							if(sb != null){
 								AE(sb.sgm, sgm);
 								ASBReset(sb);
@@ -3103,7 +3360,7 @@ public class SlottableTest{
 						ASSG(sgp,
 							null, SGDefocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sb in sgp.slottables){
+						foreach(Slottable sb in sgp){
 							if(sb != null){
 								AE(sb.sgm, sgm);
 								ASBReset(sb);
@@ -3118,7 +3375,7 @@ public class SlottableTest{
 						ASSG(sge,
 							null, SGFocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sbe in sge.slottables){
+						foreach(Slottable sbe in sge){
 							if(sbe != null){
 								AE(sbe.sgm, sgm);
 								ASBReset(sbe);
@@ -3129,7 +3386,7 @@ public class SlottableTest{
 						ASSG(sge,
 							null, SGFocused, null,
 							null, SGWFA, null, false);
-						foreach(Slottable sbe in sge.slottables){
+						foreach(Slottable sbe in sge){
 							if(sbe != null){
 								AE(sbe.sgm, sgm);
 								ASBReset(sbe);
@@ -3141,7 +3398,7 @@ public class SlottableTest{
 			}
 	/*	shortcut	*/
 		/*	Debug	*/
-			public void PrintSBsArray(List<Slottable> sbs){
+			public void PrintSBsArray(IEnumerable<Slottable> sbs){
 				foreach(Slottable sb in sbs){
 					if(sb != null)
 						Util.Stack(Util.SBName(sb));
@@ -3151,7 +3408,7 @@ public class SlottableTest{
 				string str = Util.Stacked;
 				Debug.Log("SBs: " + str);
 			}
-			public void PrintItemsArray(List<SlottableItem> items){
+			public void PrintItemsArray(IEnumerable<SlottableItem> items){
 				foreach(SlottableItem item in items){
 					if(item is InventoryItemInstanceMock){
 						InventoryItemInstanceMock itemInst = (InventoryItemInstanceMock)item;

@@ -267,8 +267,8 @@ namespace SlotSystem{
 			
 			public int slotID{
 				get{
-					if(sg.slottables.Contains(this))
-						return sg.slottables.IndexOf(this);
+					if(sg.Contains(this))
+						return sg.IndexOf(this);
 					else
 						return -1;
 				}
@@ -316,8 +316,18 @@ namespace SlotSystem{
 				get{return itemInst.Item.IsStackable;}
 			}
 		/*	SlotSystemElement imple	*/
+			public IEnumerator<SlotSystemElement> GetEnumerator(){
+				yield return null;
+				}IEnumerator IEnumerable.GetEnumerator(){
+					return GetEnumerator();
+				}
+			public SlotSystemElement this[int i]{get{return null;}}
+			public bool Contains(SlotSystemElement element){
+				return false;
+			}
 			public SlotGroupManager sgm{
 				get{return m_sgm;}
+				set{m_sgm = value;}
 				}SlotGroupManager m_sgm;
 				public void SetSGM(SlotGroupManager sgm){
 					m_sgm = sgm;
@@ -336,6 +346,16 @@ namespace SlotSystem{
 			public bool ContainsInHierarchy(SlotSystemElement element){
 				return false;
 			}
+			public void PerformInHierarchy(System.Action<SlotSystemElement> act){
+				act(this);
+			}
+			public int level{
+				get{return sg.level +1;}
+			}
+			public SlotSystemElement rootElement{
+				get{return m_rootElement;}
+				set{m_rootElement = value;}
+				}SlotSystemElement m_rootElement;
 		/*	Event methods	*/
 			/*	Selection event	*/
 				public void OnHoverEnterMock(){

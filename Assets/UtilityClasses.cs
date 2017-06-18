@@ -44,6 +44,17 @@ namespace Utility{
 			}
 			return result;
 		}
+		// public static IEnumerable<IEnumerable<T>> Combinations<T>(int n, List<T> set){
+		// 	foreach(var intCombo in Combinations(n, set.Count)){	
+		// 		yield return ComboElement(intCombo, set);
+		// 	}
+			
+		// }
+		// public static IEnumerable<T> ComboElement<T>(int[] intCombo, List<T> set){
+		// 	foreach(int i in intCombo){
+		// 		yield return set[i -1];
+		// 	}
+		// }
 		public static IEnumerable<int[]> Combinations(int m, int n){
 			int[] result = new int[m];
 			Stack<int> stack = new Stack<int>();
@@ -61,30 +72,33 @@ namespace Utility{
 				}
 			}
 		}
-		public static List<List<T>> Permutations<T>(List<T> elements){
-			List<List<T>> res = new List<List<T>>();
-			Generate(elements.Count, ref elements, ref res);
+		public static List<IEnumerable<T>> Permutations<T>(IEnumerable<T> elements){
+			List<IEnumerable<T>> res = new List<IEnumerable<T>>();
+			int count = 0;
+			foreach(var ele in elements)
+				count ++;
+			Generate(count, ref elements, ref res);
 			return res;
 		}
-			public static void Generate<T>(int n, ref List<T> list, ref List<List<T>> result){
+			public static void Generate<T>(int n, ref IEnumerable<T> ie, ref List<IEnumerable<T>> result){
 				if(n == 1){
-					result.Add(list);
+					result.Add(ie);
 				}
 				else{
 					for(int i = 0; i < n -1; i++){
-						Generate(n -1, ref list, ref result);
+						Generate(n -1, ref ie, ref result);
 						int resid = n%2;
 						if(resid == 0){
-							list = SwappedList(list, i, n-1);
+							ie = SwappedList(ie, i, n-1);
 						}else{
-							list = SwappedList(list, 0, n-1);
+							ie = SwappedList(ie, 0, n-1);
 						}
 					}
-					Generate(n-1, ref list, ref result);
+					Generate(n-1, ref ie, ref result);
 				}
 			}
-			public static List<T> SwappedList<T>(List<T> list, int a, int b){
-				List<T> result = new List<T>(list);
+			public static IEnumerable<T> SwappedList<T>(IEnumerable<T> ie, int a, int b){
+				List<T> result = new List<T>(ie);
 				T temp = result[a];
 				result[a] = result[b];
 				result[b] = temp;

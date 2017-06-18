@@ -632,7 +632,7 @@ namespace SlotSystem{
 				public class SGRevertState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						sg.SetNewSBs(sg.slottables);
+						sg.SetNewSBs(sg.toList);
 						sg.CreateNewSlots();
 						sg.SetSBsActStates();
 						if(sg.PrevActState != null && sg.PrevActState == SlotGroup.WaitForActionState){
@@ -650,7 +650,7 @@ namespace SlotSystem{
 						Slottable sb1 = sg.sgm.pickedSB;
 						Slottable sb2 = sg.sgm.targetSB;
 						List<Slottable> newSBs = new List<Slottable>();
-						newSBs.AddRange(sg.slottables);
+						newSBs.AddRange(sg.toList);
 						newSBs.Reorder(sb1, sb2);
 						sg.SetNewSBs(newSBs);
 						sg.CreateNewSlots();
@@ -668,7 +668,7 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						List<InventoryItemInstanceMock> cache = sg.sgm.Transaction.moved;
-						List<Slottable> newSBs = sg.slottables;
+						List<Slottable> newSBs = sg.toList;
 						int origCount = newSBs.Count;
 						// Util.Trim(ref newSBs);
 						foreach(InventoryItemInstanceMock itemInst in cache){
@@ -716,7 +716,7 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						List<InventoryItemInstanceMock> cache = sg.sgm.Transaction.moved;
-						List<Slottable> newSBs = sg.slottables;
+						List<Slottable> newSBs = sg.toList;
 						int origCount = newSBs.Count;
 						// Util.Trim(ref newSBs);
 						List<Slottable> removedList = new List<Slottable>();
@@ -776,7 +776,7 @@ namespace SlotSystem{
 							else
 								removed = sg.sgm.Transaction.targetSB;
 
-						List<Slottable> newSBs = sg.slottables;
+						List<Slottable> newSBs = sg.toList;
 						int origCount = newSBs.Count;
 						if(!sg.isPool){
 							GameObject newSBGO = new GameObject("newSBGO");
@@ -822,7 +822,7 @@ namespace SlotSystem{
 								removed = null;
 
 						List<Slottable> newSBs = new List<Slottable>();
-						newSBs.AddRange(sg.slottables);
+						newSBs.AddRange(sg.toList);
 						int origCount = newSBs.Count;
 						if(!sg.isPool){
 							if(added != null){
@@ -878,7 +878,7 @@ namespace SlotSystem{
 				public class SGSortState: SGActionState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						List<Slottable> newSBs = sg.slottables;
+						List<Slottable> newSBs = sg.toList;
 						int origCount = newSBs.Count;
 						sg.Sorter.TrimAndOrderSBs(ref newSBs);
 						if(!sg.isExpandable){
@@ -1097,7 +1097,7 @@ namespace SlotSystem{
 			}
 			public class SGInitItemsCommand: SlotGroupCommand{
 				public void Execute(SlotGroup sg){
-					List<SlottableItem> items = sg.inventory.items;
+					List<SlottableItem> items = new List<SlottableItem>(sg.inventory);
 					sg.Filter.Filter(ref items);
 					/*	Slots	*/
 						List<Slot> newSlots = new List<Slot>();
@@ -1806,23 +1806,40 @@ namespace SlotSystem{
 			}
 		}
 		/*	SlotSystemElements	*/
-			public interface SlotSystemElement{
+			public interface SlotSystemElement: IEnumerable<SlotSystemElement>{
 				void Activate();
 				void Deactivate();
 				void Focus();
 				void Defocus();
-				SlotGroupManager sgm{get;}
-				void SetSGM(SlotGroupManager sgm);
+				SlotGroupManager sgm{get;set;}
 				SlotSystemElement DirectParent(SlotSystemElement element);
 				bool ContainsInHierarchy(SlotSystemElement ele);
+				void PerformInHierarchy(System.Action<SlotSystemElement> act);
+				SlotSystemElement rootElement{get;set;}
+				int level{get;}
+				bool Contains(SlotSystemElement element);
+				SlotSystemElement this[int i]{get;}
 			}
 			public abstract class AbsSlotSysElement: SlotSystemElement{
-				public abstract List<SlotSystemElement> Elements{get;}
+				// public abstract List<SlotSystemElement> Elements{get;}
+				protected abstract List<SlotSystemElement> elements{get;}
+				public IEnumerator<SlotSystemElement> GetEnumerator(){
+					foreach(SlotSystemElement ele in elements)
+						yield return ele;
+					}IEnumerator IEnumerable.GetEnumerator(){
+						return GetEnumerator();
+					}
+				public bool Contains(SlotSystemElement element){
+					return elements.Contains(element);
+				}
+				public SlotSystemElement this[int i]{
+					get{return elements[i];}
+				}
 				public virtual bool ContainsInHierarchy(SlotSystemElement ele){
 					return DirectParent(ele) != null;
 				}
 				public virtual SlotSystemElement DirectParent(SlotSystemElement element){
-					foreach(SlotSystemElement ele in Elements){
+					foreach(SlotSystemElement ele in this){
 						if(ele == element)
 							return this;
 						else{
@@ -1834,55 +1851,90 @@ namespace SlotSystem{
 					return null;
 				}
 				public virtual void Activate(){
-					foreach(SlotSystemElement ele in Elements){
+					foreach(SlotSystemElement ele in this){
 						ele.Activate();
 					}
 				}
 				public virtual void Deactivate(){
-					foreach(SlotSystemElement ele in Elements){
+					foreach(SlotSystemElement ele in this){
 						ele.Deactivate();
 					}
 				}
 				public virtual void Focus(){
-					foreach(SlotSystemElement ele in Elements){
+					foreach(SlotSystemElement ele in this){
 						ele.Focus();
 					}
 				}
 				public virtual void Defocus(){
-					foreach(SlotSystemElement ele in Elements){
+					foreach(SlotSystemElement ele in this){
 						ele.Defocus();
 					}
 				}
 				public SlotGroupManager sgm{
 					get{return m_sgm;}
+					set{m_sgm = value;}
 					}SlotGroupManager m_sgm;
-					public virtual void SetSGM(SlotGroupManager sgm){
-						m_sgm = sgm;
-						foreach(SlotSystemElement ele in Elements){
-							ele.SetSGM(this.sgm);
-						}
+				public void PerformInHierarchy(System.Action<SlotSystemElement> act){
+					act(this);
+					foreach(SlotSystemElement ele in this){
+						ele.PerformInHierarchy(act);
 					}
+				}
+				public int level{
+					get{
+						if(rootElement == this)
+							return 0;
+						else
+							return rootElement.DirectParent(this).level + 1;
+					}
+				}
+				public virtual SlotSystemElement rootElement{
+					get{return m_rootElement;}
+					set{m_rootElement = value;}
+					}
+					SlotSystemElement m_rootElement;
 			}
 			public class InventoryManagerPage: AbsSlotSysElement{
-				SlotSystemBundle m_poolBundle;
 				public SlotSystemBundle PoolBundle{
 					get{return m_poolBundle;}
-				}
-				SlotSystemBundle m_equipBundle;
+					}SlotSystemBundle m_poolBundle;
 				public SlotSystemBundle EquipBundle{
 					get{return m_equipBundle;}
-				}
+					}SlotSystemBundle m_equipBundle;
+				public List<SlotSystemBundle> otherBundles{
+					get{
+						if(m_otherBundles == null)
+							m_otherBundles = new List<SlotSystemBundle>();
+						return m_otherBundles;
+						}
+					}List<SlotSystemBundle> m_otherBundles;
+
 				public InventoryManagerPage(SlotSystemBundle poolBundle, SlotSystemBundle equipBundle){
 					this.m_poolBundle = poolBundle;
 					this.m_equipBundle = equipBundle;
+					PerformInHierarchy(SetRoot);
 				}
-				public override List<SlotSystemElement> Elements{
+				protected override List<SlotSystemElement> elements{
 					get{
 						List<SlotSystemElement> pageElements = new List<SlotSystemElement>();
 						pageElements.Add(m_poolBundle);
 						pageElements.Add(m_equipBundle);
 						return pageElements;
 					}
+				}
+				void SetRoot(SlotSystemElement ele){
+					ele.rootElement = this;
+				}
+				public override SlotSystemElement rootElement{
+					get{return this;}
+					set{}
+				}
+				public void SetSGMRecursively(SlotGroupManager sgm){
+					this.sgm = sgm;
+					PerformInHierarchy(SetSGM);
+				}
+				public void SetSGM(SlotSystemElement ele){
+					ele.sgm = this.sgm;
 				}
 			}	
 			public class EquipmentSet: AbsSlotSysElement{
@@ -1895,7 +1947,7 @@ namespace SlotSystem{
 					m_wearSG = wearSG;
 					m_cGearsSG = cGearsSG;
 				}
-				public override List<SlotSystemElement> Elements{
+				protected override List<SlotSystemElement> elements{
 					get{
 						m_pageElements = new List<SlotSystemElement>();
 						m_pageElements.Add(m_bowSG);
@@ -1907,29 +1959,34 @@ namespace SlotSystem{
 			}
 			public class SlotSystemBundle: AbsSlotSysElement{
 				List<SlotSystemElement> m_elements = new List<SlotSystemElement>();
-				public override List<SlotSystemElement> Elements{
+				protected override List<SlotSystemElement> elements{
 					get{return m_elements;}
 				}
-				SlotSystemElement m_focusedElement;
+				public void Add(SlotSystemElement element){
+					elements.Add(element);
+				}
+				public void Remove(SlotSystemElement element){
+					elements.Remove(element);
+				}
+				public SlotSystemElement focusedElement{
+					get{return m_focusedElement;}
+					}SlotSystemElement m_focusedElement;
 					public void SetFocusedBundleElement(SlotSystemElement element){
 						if(DirectParent(element) == this)
 							m_focusedElement = element;
 						else
 							throw new InvalidOperationException("trying to set focsed element that is not one of its members");
 					}
-					public SlotSystemElement GetFocusedBundleElement(){
-						return m_focusedElement;
-					}
 				public override void Focus(){
 					if(m_focusedElement != null)
 						m_focusedElement.Focus();
-					foreach(SlotSystemElement ele in Elements){
+					foreach(SlotSystemElement ele in this){
 						if(ele != m_focusedElement)
 						ele.Defocus();
 					}
 				}
 				public override void Defocus(){
-					foreach(SlotSystemElement ele in Elements){
+					foreach(SlotSystemElement ele in this){
 						ele.Defocus();
 					}
 				}	
@@ -2101,24 +2158,75 @@ namespace SlotSystem{
 				}
 			}
 		/*	Inventories	*/
-			public interface Inventory{
-				List<SlottableItem> items{get;}
-				void AddItem(SlottableItem item);
-				void RemoveItem(SlottableItem item);
+			public interface Inventory: IEnumerable<SlottableItem>{
+				// List<SlottableItem> items{get;}
+				void Add(SlottableItem item);
+				void Remove(SlottableItem item);
 				SlotGroup sg{get;}
 				void SetSG(SlotGroup sg);
+				SlottableItem this[int i]{get;}
+				int count{get;}
+				bool Contains(SlottableItem item);
+			}
+			public class GenericInventory: Inventory{
+				public IEnumerator<SlottableItem> GetEnumerator(){
+					foreach(SlottableItem item in items){
+						yield return item;
+					}
+					}IEnumerator IEnumerable.GetEnumerator(){
+						return GetEnumerator();
+					}
+
+				public int count{
+					get{return items.Count;}
+				}
+				public bool Contains(SlottableItem item){
+					return items.Contains(item);
+				}
+				public SlottableItem this[int i]{
+					get{return items[i];}
+				}
+				List<SlottableItem> items = new List<SlottableItem>();
+				public void Add(SlottableItem item){
+					items.Add(item);
+				}
+				public void Remove(SlottableItem item){
+					items.Remove(item);
+				}
+				public SlotGroup sg{
+					get{return m_sg;}
+					}SlotGroup m_sg;
+					public void SetSG(SlotGroup sg){
+						m_sg = sg;
+					}
 			}
 			public class PoolInventory: Inventory{
+				public IEnumerator<SlottableItem> GetEnumerator(){
+					foreach(SlottableItem item in m_items){
+						yield return item;
+					}
+					}IEnumerator IEnumerable.GetEnumerator(){
+						return GetEnumerator();
+					}
+				public bool Contains(SlottableItem item){
+					return m_items.Contains(item);
+				}
+				public int count{
+					get{return m_items.Count;}
+				}
+				public SlottableItem this[int i]{
+					get{return m_items[i];}
+				}
 				List<SlottableItem> m_items = new List<SlottableItem>();
 				public SlotGroup sg{get{return m_sg;}}
 					SlotGroup m_sg;
 					public void SetSG(SlotGroup sg){
 						m_sg = sg;
 					}
-				public List<SlottableItem> items{
-					get{return m_items;}
-				}
-				public void AddItem(SlottableItem item){
+				// public List<SlottableItem> items{
+				// 	get{return m_items;}
+				// }
+				public void Add(SlottableItem item){
 					// m_items.Add(item);
 					foreach(SlottableItem it in m_items){
 						InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)it;
@@ -2131,9 +2239,9 @@ namespace SlotSystem{
 					m_items.Add(item);
 					IndexItems();
 				}
-				public void RemoveItem(SlottableItem item){
+				public void Remove(SlottableItem item){
 					SlottableItem itemToRemove = null;
-					foreach(SlottableItem it in items){
+					foreach(SlottableItem it in m_items){
 						InventoryItemInstanceMock checkedInst = (InventoryItemInstanceMock)it;
 						InventoryItemInstanceMock removedInst = (InventoryItemInstanceMock)item;
 						if(checkedInst == removedInst){
@@ -2147,7 +2255,7 @@ namespace SlotSystem{
 						}
 					}
 					if(itemToRemove != null)
-						items.Remove(itemToRemove);
+						m_items.Remove(itemToRemove);
 					IndexItems();
 				}
 				void IndexItems(){
@@ -2157,11 +2265,31 @@ namespace SlotSystem{
 				}
 			}
 			public class EquipmentSetInventory: Inventory{
+				public IEnumerator<SlottableItem> GetEnumerator(){
+					foreach(SlottableItem item in m_items){
+						yield return item;
+					}
+					}IEnumerator IEnumerable.GetEnumerator(){
+						return GetEnumerator();
+					}
 				public EquipmentSetInventory(BowInstanceMock initBow, WearInstanceMock initWear, List<CarriedGearInstanceMock> initCGears ,int initCGCount){
 					m_equippedBow = initBow;
 					m_equippedWear = initWear;
 					m_equippedCGears = initCGears;
 					SetEquippableCGearsCount(initCGCount);
+				}
+				public bool Contains(SlottableItem item){
+					foreach(SlottableItem it in this){
+						if(it == item)
+							return true;
+					}
+					return false;
+				}
+				public int count{
+					get{return m_items.Count;}
+				}
+				public SlottableItem this[int i]{
+					get{return m_items[i];}
 				}
 				public SlotGroup sg{get{return m_sg;}}
 					SlotGroup m_sg;
@@ -2171,17 +2299,16 @@ namespace SlotSystem{
 				BowInstanceMock m_equippedBow;
 				WearInstanceMock m_equippedWear;
 				List<CarriedGearInstanceMock> m_equippedCGears = new List<CarriedGearInstanceMock>();
-				int m_equippableCGearsCount;
 				public int equippableCGearsCount{
 					get{return m_equippableCGearsCount;}
-				}
+					}int m_equippableCGearsCount;
 				public void SetEquippableCGearsCount(int num){
 					m_equippableCGearsCount = num;
 					if(sg != null && sg.Filter is SGCGearsFilter && !sg.isExpandable)
 					sg.SetInitSlotsCount(num);
 				}
 				
-				public List<SlottableItem> items{
+				List<SlottableItem> m_items{
 					get{
 						List<SlottableItem> result = new List<SlottableItem>();
 						if(m_equippedBow != null)
@@ -2196,7 +2323,7 @@ namespace SlotSystem{
 						return result;
 					}
 				}
-				public void AddItem(SlottableItem item){
+				public void Add(SlottableItem item){
 					if(item != null){
 						if(item is BowInstanceMock){
 							BowInstanceMock bowInst = (BowInstanceMock)item;
@@ -2214,7 +2341,7 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void RemoveItem(SlottableItem removedItem){
+				public void Remove(SlottableItem removedItem){
 					if(removedItem != null){
 						if(removedItem is BowInstanceMock){
 							if((BowInstanceMock)removedItem == m_equippedBow)
@@ -2490,11 +2617,11 @@ namespace SlotSystem{
 				public static string SGStateName(SGState state){
 					string res = "";
 					if(state is SGDeactivatedState){
-						res = Util.Sangria("SGDeactivated");
+						res = Util.Red("SGDeactivated");
 					}else if(state is SGDefocusedState){
-						res = Util.Terra("SGDefocused");
+						res = Util.Green("SGDefocused");
 					}else if(state is SGFocusedState){
-						res = Util.Green("SGFocused");
+						res = Util.Blue("SGFocused");
 					}else if(state is SGSelectedState){
 						res = Util.Aqua("SGSelected");
 					}else if(state is SGWaitForActionState){
@@ -2592,7 +2719,7 @@ namespace SlotSystem{
 							case 603: result = "mstParts"; break;
 						}
 						List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-						foreach(InventoryItemInstanceMock iInst in SlotGroupManager.CurSGM.poolInv.items){
+						foreach(InventoryItemInstanceMock iInst in SlotGroupManager.CurSGM.poolInv){
 							if(iInst.Item == itemInst.Item)
 								sameItemInsts.Add(iInst);
 						}
@@ -2643,7 +2770,7 @@ namespace SlotSystem{
 							case 603: result = "mstParts"; break;
 						}
 						List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-						foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.poolInv.items){
+						foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.poolInv){
 							if(itemInst.Item == sb.itemInst.Item)
 								sameItemInsts.Add(itemInst);
 						}

@@ -246,7 +246,7 @@ namespace SlotSystem{
 					m_autoSort = on;
 					sgm.Focus();
 				}
-			public List<Slottable> slottables{
+			List<Slottable> slottables{
 				get{
 					List<Slottable> result = new List<Slottable>();
 						foreach(Slot slot in this.slots){
@@ -460,6 +460,28 @@ namespace SlotSystem{
 				CurSelState.OnHoverExitMock(this, eventData);
 			}
 		/*	SlotSystemElement implementation	*/
+			public List<Slottable> toList{get{return slottables;}}
+			public IEnumerator<SlotSystemElement> GetEnumerator(){
+				foreach(Slottable sb in slottables){
+					yield return sb;
+				}
+				}IEnumerator IEnumerable.GetEnumerator(){
+					return GetEnumerator();
+				}
+			public SlotSystemElement this[int i]{
+				get{return slottables[i];}
+			}
+			public int Count{
+				get{return slottables.Count;}
+			}
+			public int IndexOf(Slottable sb){
+				return slottables.IndexOf(sb);
+			}
+			public bool Contains(SlotSystemElement element){
+				if(element is Slottable)
+					return slottables.Contains((Slottable)element);
+				return false;
+			}
 			public bool ContainsInHierarchy(SlotSystemElement element){
 				return DirectParent(element) != null;
 			}
@@ -477,14 +499,8 @@ namespace SlotSystem{
 			}
 			public SlotGroupManager sgm{
 				get{return m_sgm;}
+				set{m_sgm = value;}
 				}SlotGroupManager m_sgm;
-				public void SetSGM(SlotGroupManager sgm){
-					m_sgm = sgm;
-					foreach(Slottable sb in slottables){
-						if(sb != null)
-							sb.SetSGM(sgm);
-					}
-				}
 			public void Focus(){
 				SetSelState(SlotGroup.FocusedState);
 				FocusSBs();
@@ -515,10 +531,11 @@ namespace SlotSystem{
 			}
 			public void DefocusSBs(){
 				foreach(Slottable sb in slottables){
-					if(sb != null)
+					if(sb != null){
 						sb.SetActState(Slottable.WaitForActionState);
 						sb.Reset();
 						sb.Defocus();
+					}
 				}
 			}
 			public void Activate(){
@@ -531,6 +548,20 @@ namespace SlotSystem{
 					}
 				}
 			}
+			public void PerformInHierarchy(System.Action<SlotSystemElement> act){
+				act(this);
+				foreach(Slottable sb in slottables){
+					if(sb != null)
+						sb.PerformInHierarchy(act);
+				}
+			}
+			public int level{
+				get{return rootElement.DirectParent(this).level + 1;}
+			}
+			public SlotSystemElement rootElement{
+				get{return m_rootElement;}
+				set{m_rootElement = value;}
+				}SlotSystemElement m_rootElement;
 		/*	methods	*/
 			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand){
 				SetFilter(filter);
