@@ -266,13 +266,11 @@ namespace SlotSystem{
 				}
 			
 			public int slotID{
-				get{
-					if(sg.Contains(this))
-						return sg.IndexOf(this);
-					else
-						return -1;
+				get{return m_slotID;}
+				}int m_slotID = -1;
+				public void SetSlotID(int i){
+					m_slotID = i;
 				}
-			}
 			public int newSlotID{
 				get{return m_newSlotID;}
 				}int m_newSlotID = -2;
@@ -348,6 +346,9 @@ namespace SlotSystem{
 			}
 			public void PerformInHierarchy(System.Action<SlotSystemElement> act){
 				act(this);
+			}
+			public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+				act(this, obj);
 			}
 			public int level{
 				get{return sg.level +1;}

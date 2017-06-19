@@ -167,9 +167,7 @@ namespace SlotSystem{
 				}
 				public IEnumeratorMock TransactionCoroutine(){
 					bool flag = true;
-					if(allTASBs == null/* as in when testing */)
-						return null;
-					foreach(Slottable sb in allTASBs){
+					foreach(Slottable sb in this){
 						if(sb != null)
 						flag &= sb.ActionProcess.IsExpired;
 					}
@@ -248,16 +246,20 @@ namespace SlotSystem{
 				}
 			List<Slottable> slottables{
 				get{
-					List<Slottable> result = new List<Slottable>();
-						foreach(Slot slot in this.slots){
-							if(slot.sb != null)
-								result.Add(slot.sb);
-							else
-								result.Add(null);
-						}
-					return result;
+					// List<Slottable> result = new List<Slottable>();
+					// 	foreach(Slot slot in this.slots){
+					// 		if(slot.sb != null)
+					// 			result.Add(slot.sb);
+					// 		else
+					// 			result.Add(null);
+					// 	}
+					// return result;
+					return m_slottables;
 				}
-			}
+				}List<Slottable> m_slottables;
+				public void SetSBs(List<Slottable> sbs){
+					m_slottables = sbs;
+				}
 			public List<Slottable> newSBs{
 				get{return m_newSBs;}
 				}List<Slottable> m_newSBs;
@@ -286,8 +288,10 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public bool isFocused{
-				get{return CurSelState == SlotGroup.FocusedState;}
+			public bool isFocusedInBundle{
+				get{
+					return (sgm.focusedSGP == this || sgm.focusedSGEs.Contains(this));
+				}
 			}
 			public bool hasEmptySlot{
 				get{
@@ -327,14 +331,14 @@ namespace SlotSystem{
 				}
 			public bool isAllTASBsDone{
 				get{
-					if(allTASBs != null){
-						foreach(Slottable sb in allTASBs){
+					// if(allTASBs != null){
+					// }
+						foreach(Slottable sb in this){
 							if(sb != null){
 								if(sb.ActionProcess.IsRunning)
 									return false;
 							}
 						}
-					}
 					return true;
 				}
 			}
@@ -351,9 +355,10 @@ namespace SlotSystem{
 			public void OnActionComplete(){
 				m_onActionCompleteCommand.Execute(this);
 				}SlotGroupCommand m_onActionCompleteCommand;
-				public void SetOnActionCompleteCommand(SlotGroupCommand comm){
-					m_onActionCompleteCommand = comm;
-				}
+			public void OnActionExecute(){
+				m_onActionExecuteCommand.Execute(this);
+				}SlotGroupCommand m_onActionExecuteCommand;
+
 			/*	static	commands	*/
 				public static SlotGroupCommand updateEquippedStatusCommand{
 					get{
@@ -365,6 +370,11 @@ namespace SlotSystem{
 						return m_emptyCommand;
 					}
 					}static SlotGroupCommand m_emptyCommand = new SGEmptyCommand();
+				public static SlotGroupCommand updateEquipAtExecutionCommand{
+					get{
+						return m_updateEquipAtExecutionCommand;
+					}
+					}static SlotGroupCommand m_updateEquipAtExecutionCommand = new SGUpdateEquipAtExecutionCommand();
 		/*	sorter	*/
 			public static SGSorter ItemIDSorter{
 				get{
@@ -389,10 +399,10 @@ namespace SlotSystem{
 					m_sorter = sorter;
 				}
 			public void InstantSort(){
-				List<Slottable> origSBs = slottables;
-				Sorter.OrderSBsWithRetainedSize(ref origSBs);
+				List<Slottable> orderedSbs = slottables;
+				Sorter.OrderSBsWithRetainedSize(ref orderedSbs);
 				foreach(Slot slot in slots){
-					slot.sb = origSBs[slots.IndexOf(slot)];
+					slot.sb = orderedSbs[slots.IndexOf(slot)];
 				}
 			}
 		/*	filter	*/
@@ -555,6 +565,13 @@ namespace SlotSystem{
 						sb.PerformInHierarchy(act);
 				}
 			}
+			public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+				act(this, obj);
+				foreach(Slottable sb in slottables){
+					if(sb != null)
+						sb.PerformInHierarchy(act, obj);
+				}
+			}
 			public int level{
 				get{return rootElement.DirectParent(this).level + 1;}
 			}
@@ -563,11 +580,12 @@ namespace SlotSystem{
 				set{m_rootElement = value;}
 				}SlotSystemElement m_rootElement;
 		/*	methods	*/
-			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand){
+			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
 				SetFilter(filter);
 				SetSorter(SlotGroup.ItemIDSorter);
 				SetInventory(inv);
-				SetOnActionCompleteCommand(onActionCompleteCommand);
+				m_onActionCompleteCommand = onActionCompleteCommand;
+				m_onActionExecuteCommand = onActionExecuteCommand;
 				this.isShrinkable = isShrinkable;
 				if(initSlotsCount == 0)
 					this.isExpandable = true;
@@ -614,6 +632,50 @@ namespace SlotSystem{
 				}
 				return null;
 			}
+			public void UpdateSBs(List<Slottable> newSBs){
+				/*	Create and set new Slots	*/
+					List<Slot> newSlots = new List<Slot>();
+					for(int i = 0; i < newSBs.Count; i++){
+						Slot newSlot = new Slot();
+						newSlots.Add(newSlot);
+					}
+					SetNewSlots(newSlots);
+				/*	Set SBs act states	*/
+				List<Slottable> moveWithins = new List<Slottable>();
+				List<Slottable> removed = new List<Slottable>();
+				List<Slottable> added = new List<Slottable>();
+				foreach(Slottable sb in slottables){
+					if(sb != null){
+						if(newSBs.Contains(sb))
+							moveWithins.Add(sb);
+						else
+							removed.Add(sb);
+					}
+				}
+				foreach(Slottable sb in newSBs){
+					if(sb != null){
+						if(!slottables.Contains(sb))
+							added.Add(sb);
+					}
+				}
+				foreach(Slottable sb in moveWithins){
+					sb.SetNewSlotID(newSBs.IndexOf(sb));
+					sb.SetActState(Slottable.MoveWithinState);
+				}
+				foreach(Slottable sb in removed){
+					sb.SetNewSlotID(-1);
+					sb.SetActState(Slottable.RemovedState);
+				}
+				foreach(Slottable sb in added){
+					sb.SetNewSlotID(newSBs.IndexOf(sb));
+					sb.SetActState(Slottable.AddedState);
+				}
+				List<Slottable> allSBs = new List<Slottable>();
+				allSBs.AddRange(slottables);
+				allSBs.AddRange(added);
+				// SetAllTASBs(allSBs);
+				SetSBs(allSBs);
+			}
 			public void CreateNewSlots(){
 				List<Slot> newSlots = new List<Slot>();
 				for(int i = 0; i < newSBs.Count; i++){
@@ -624,10 +686,10 @@ namespace SlotSystem{
 			}
 			public Slot GetNewSlot(InventoryItemInstanceMock itemInst){
 				int index = -3;
-				foreach(Slottable sb in newSBs){
+				foreach(Slottable sb in this){
 					if(sb != null){
 						if(sb.itemInst == itemInst)
-							index = newSBs.IndexOf(sb);
+							index = sb.newSlotID;
 					}
 				}
 				return newSlots[index];
@@ -669,6 +731,32 @@ namespace SlotSystem{
 			}
 			public void CheckProcessCompletion(){
 				ActionProcess.Check();
+			}
+			public void OnCompleteSlotMovementsV3(){
+				foreach(Slottable sb in this){
+					if(sb != null){
+						if(sb.newSlotID == -1){
+							GameObject sbGO = sb.gameObject;
+							DestroyImmediate(sbGO);
+							DestroyImmediate(sb);
+						}else{
+							newSlots[sb.newSlotID].sb = sb;
+						}
+					}
+				}
+				SetSlots(newSlots);
+				SyncSBsToSlots();
+			}
+			public void SyncSBsToSlots(){
+				List<Slottable> newSBs = new List<Slottable>();
+				foreach(Slot slot in slots){
+					newSBs.Add(slot.sb);
+				}
+				SetSBs(newSBs);
+				foreach(Slottable sb in this){
+					if(sb != null)
+					sb.SetSlotID(newSBs.IndexOf(sb));
+				}
 			}
 			public void OnCompleteSlotMovementsV2(){
 				foreach(Slottable sb in newSBs){

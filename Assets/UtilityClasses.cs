@@ -106,8 +106,10 @@ namespace Utility{
 			}
 		private static System.Random rng = new System.Random();
 		public static void Reorder<T>(this IList<T> list, T ele, T other){
+			bool toRight = list.IndexOf(ele) < list.IndexOf(other);
 			list.Remove(ele);
-			list.Insert(list.IndexOf(other) + 1,ele);
+			int insertedIndex = toRight?list.IndexOf(other) + 1:list.IndexOf(other);
+			list.Insert(insertedIndex, ele);
 		}
 		public static void Shuffle<T>(this IList<T> list)
 		{  

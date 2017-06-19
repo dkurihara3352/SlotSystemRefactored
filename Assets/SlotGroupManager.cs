@@ -645,5 +645,49 @@ namespace SlotSystem{
 					throw new System.InvalidOperationException("SlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
 				}
 			}
+			public void MarkEquippedInPool(InventoryItemInstanceMock item, bool equipped){
+				foreach(InventoryItemInstanceMock itemInInv in poolInv){
+					if(itemInInv == item)
+						itemInInv.isEquipped = equipped;
+				}
+			}
+			public void SetEquippedOnAllSBs(InventoryItemInstanceMock item, bool equipped){
+				if(equipped)
+					rootPage.PerformInHierarchy(Equip, item);
+				else
+					rootPage.PerformInHierarchy(Unequip, item);
+			}
+			public void Equip(SlotSystemElement ele, object obj){
+				if(ele is Slottable){
+					InventoryItemInstanceMock item = (InventoryItemInstanceMock)obj;
+					Slottable sb = (Slottable)ele;
+					/*	assume all sbs are properly set in slottables, not int newSBs	*/
+					if(sb.itemInst == item){
+						if(sb.sg.isFocusedInBundle){/*	focused sgp or sge	*/
+							if(sb.newSlotID != -1)/*	not being removed	*/
+								sb.SetEqpState(Slottable.EquippedState);
+						}else if(sb.sg.isPool){/*	defocused sgp	*/
+							sb.SetEqpState(null);
+							sb.SetEqpState(Slottable.EquippedState);
+						}
+					}
+				}
+			}
+			public void Unequip(SlotSystemElement ele, object obj){
+				if(ele is Slottable){
+					InventoryItemInstanceMock item = (InventoryItemInstanceMock)obj;
+					Slottable sb = (Slottable)ele;
+					/*	assume all sbs are properly set in slottables, not int newSBs	*/
+					if(sb.itemInst == item){
+						if(sb.sg.isFocusedInBundle){
+							if(sb.slotID != -1)/*	not being added	*/
+								sb.SetEqpState(Slottable.UnequippedState);
+						}else if(sb.sg.isPool){/*	defocused sgp	*/
+							sb.SetEqpState(null);
+							sb.SetEqpState(Slottable.UnequippedState);
+						}
+					}
+				}
+			}
 	}
 }
