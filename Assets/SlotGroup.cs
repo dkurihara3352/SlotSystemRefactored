@@ -229,12 +229,23 @@ namespace SlotSystem{
 			
 			public bool isPool{
 				get{
-					return sgm.allSGPs.Contains(this);
+					// return sgm.allSGPs.Contains(this);
+					return ((InventoryManagerPage)rootElement).poolBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGE{
 				get{
-					return sgm.allSGEs.Contains(this);
+					// return sgm.allSGEs.Contains(this);
+					return ((InventoryManagerPage)rootElement).equipBundle.ContainsInHierarchy(this);
+				}
+			}
+			public bool isSGG{
+				get{
+					foreach(SlotSystemBundle gBundle in ((InventoryManagerPage)rootElement).otherBundles){
+						if(gBundle.ContainsInHierarchy(this))
+							return true;
+					}
+					return false;
 				}
 			}
 			public bool isAutoSort{
@@ -470,6 +481,17 @@ namespace SlotSystem{
 				CurSelState.OnHoverExitMock(this, eventData);
 			}
 		/*	SlotSystemElement implementation	*/
+			public string eName{
+				get{
+					string res = m_eName;
+					if(sgm != null){
+						if(isPool) res = Util.Red(res);
+						if(isSGE) res = Util.Blue(res);
+						if(isSGG) res = Util.Green(res);
+					}
+					return res;
+					}
+				}string m_eName;
 			public List<Slottable> toList{get{return slottables;}}
 			public IEnumerator<SlotSystemElement> GetEnumerator(){
 				foreach(Slottable sb in slottables){
@@ -493,9 +515,9 @@ namespace SlotSystem{
 				return false;
 			}
 			public bool ContainsInHierarchy(SlotSystemElement element){
-				return DirectParent(element) != null;
+				return FindParentInHierarchy(element) != null;
 			}
-			public SlotSystemElement DirectParent(SlotSystemElement element){
+			public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
 				if(element is Slottable){
 					Slottable tarSB = (Slottable)element;
 					foreach(Slottable sb in slottables){
@@ -506,6 +528,20 @@ namespace SlotSystem{
 					}
 				}
 				return null;
+			}
+			public SlotSystemElement parent{
+				get{return m_parent;}
+				set{m_parent = value;}
+				}SlotSystemElement m_parent;
+			public SlotSystemBundle immediateBundle{
+				get{
+					if(parent == null)
+						return null;
+					if(parent is SlotSystemBundle)
+						return (SlotSystemBundle)parent;
+					else
+						return parent.immediateBundle;
+				}
 			}
 			public SlotGroupManager sgm{
 				get{return m_sgm;}
@@ -560,7 +596,7 @@ namespace SlotSystem{
 			}
 			public void PerformInHierarchy(System.Action<SlotSystemElement> act){
 				act(this);
-				foreach(Slottable sb in slottables){
+				foreach(Slottable sb in this){
 					if(sb != null)
 						sb.PerformInHierarchy(act);
 				}
@@ -572,15 +608,26 @@ namespace SlotSystem{
 						sb.PerformInHierarchy(act, obj);
 				}
 			}
+			public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
+				act(this, list);
+				foreach(Slottable sb in slottables){
+					if(sb != null)
+						sb.PerformInHierarchy<T>(act, list);
+				}
+			}
 			public int level{
-				get{return rootElement.DirectParent(this).level + 1;}
+				get{
+					if(parent == null) return 0;
+					return parent.level + 1;
+				}
 			}
 			public SlotSystemElement rootElement{
 				get{return m_rootElement;}
 				set{m_rootElement = value;}
 				}SlotSystemElement m_rootElement;
 		/*	methods	*/
-			public void Initialize(SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
+			public void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
+				m_eName = name;
 				SetFilter(filter);
 				SetSorter(SlotGroup.ItemIDSorter);
 				SetInventory(inv);

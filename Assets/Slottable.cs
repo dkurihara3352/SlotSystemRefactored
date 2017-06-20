@@ -314,6 +314,21 @@ namespace SlotSystem{
 				get{return itemInst.Item.IsStackable;}
 			}
 		/*	SlotSystemElement imple	*/
+			public string eName{
+				// get{return Util.SBName(this);}
+				get{return "sb";}
+			}
+			public SlotSystemElement parent{
+				get{return m_parent;}
+				set{m_parent = value;}
+				}SlotSystemElement m_parent;
+			public SlotSystemBundle immediateBundle{
+				get{
+					if(parent == null)
+						return null;
+					return parent.immediateBundle;
+				}
+			}
 			public IEnumerator<SlotSystemElement> GetEnumerator(){
 				yield return null;
 				}IEnumerator IEnumerable.GetEnumerator(){
@@ -338,7 +353,7 @@ namespace SlotSystem{
 			public void Defocus(){
 				SetSelState(Slottable.DefocusedState);
 			}
-			public SlotSystemElement DirectParent(SlotSystemElement element){
+			public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
 				return null;
 			}
 			public bool ContainsInHierarchy(SlotSystemElement element){
@@ -348,6 +363,9 @@ namespace SlotSystem{
 				act(this);
 			}
 			public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+				act(this, obj);
+			}
+			public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> obj){
 				act(this, obj);
 			}
 			public int level{

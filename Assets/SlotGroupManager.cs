@@ -338,30 +338,36 @@ namespace SlotSystem{
 					List<SlotGroup> result = new List<SlotGroup>();
 					result.AddRange(allSGPs);
 					result.AddRange(allSGEs);
+					result.AddRange(allSGGs);
 					return result;
 				}
 			}
 			public List<SlotGroup> allSGPs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					foreach(SlotSystemElement ele in rootPage.PoolBundle){
-						result.Add((SlotGroup)ele);
-					}
+					rootPage.poolBundle.PerformInHierarchy(AddInSGList, result);
 					return result;
 				}
 			}
 			public List<SlotGroup> allSGEs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
-					foreach(SlotSystemElement ele in rootPage.EquipBundle){
-						EquipmentSet equiSet = (EquipmentSet)ele;
-						foreach(SlotSystemElement ele2 in equiSet){
-							SlotGroup sge = (SlotGroup)ele2;
-							result.Add(sge);
-						}
+					rootPage.equipBundle.PerformInHierarchy(AddInSGList, result);
+					return result;
+				}
+			}
+			public List<SlotGroup> allSGGs{
+				get{
+					List<SlotGroup> result = new List<SlotGroup>();
+					foreach(SlotSystemBundle gBun in rootPage.otherBundles){
+						gBun.PerformInHierarchy(AddInSGList, result);
 					}
 					return result;
 				}
+			}
+			public void AddInSGList(SlotSystemElement ele, IList<SlotGroup> sgs){
+				if(ele is SlotGroup)
+				sgs.Add((SlotGroup)ele);
 			}
 			public SlotGroup focusedSGEBow{
 				get{
@@ -403,13 +409,13 @@ namespace SlotSystem{
 			}
 			public SlotGroup focusedSGP{
 				get{
-					SlotSystemElement focusedEle = rootPage.PoolBundle.focusedElement;
+					SlotSystemElement focusedEle = rootPage.poolBundle.focusedElement;
 					return (SlotGroup)focusedEle;
 				}
 			}
 			public EquipmentSet focusedEqSet{
 				get{
-					return (EquipmentSet)rootPage.EquipBundle.focusedElement;
+					return (EquipmentSet)rootPage.equipBundle.focusedElement;
 				}
 			}
 			public List<SlotGroup> focusedSGEs{
@@ -422,18 +428,43 @@ namespace SlotSystem{
 					return result;
 				}
 			}
+			public List<SlotGroup> focusedSGGs{
+				get{
+					List<SlotGroup> res = new List<SlotGroup>();
+					foreach(SlotSystemBundle gBundle in rootPage.otherBundles){
+						gBundle.PerformInHierarchy(AddFocusedSGTo, res);
+					}
+					return res;
+				}
+			}
+			public void AddFocusedSGTo(SlotSystemElement ele, IList<SlotGroup> list){
+				if(ele is SlotGroup){
+					SlotGroup sg = (SlotGroup)ele;
+					bool done = false;
+					SlotSystemElement tested = sg;
+					while(!done){
+						if(!tested.immediateBundle.focusedElement.ContainsInHierarchy(tested))
+							return;
+						tested = tested.immediateBundle;
+						if(tested == null)
+							break;
+					}
+					list.Add(sg);
+				}
+			}
 			public List<SlotGroup> focusedSGs{
 				get{
 					List<SlotGroup> result = new List<SlotGroup>();
 					result.Add(focusedSGP);
 					result.AddRange(focusedSGEs);
+					result.AddRange(focusedSGGs);
 					return result;
 				}
 			}
 			public List<EquipmentSet> equipmentSets{
 				get{
 					List<EquipmentSet> result = new List<EquipmentSet>();
-					foreach(SlotSystemElement ele in rootPage.EquipBundle){
+					foreach(SlotSystemElement ele in rootPage.equipBundle){
 						result.Add((EquipmentSet)ele);
 					}
 					return result;
@@ -507,7 +538,8 @@ namespace SlotSystem{
 				rootPage.Defocus();
 			}
 			public SlotGroup GetSG(Slottable sb){
-				return (SlotGroup)rootPage.DirectParent(sb);
+				// return (SlotGroup)rootPage.FindParent(sb);
+				return (SlotGroup)sb.parent;
 			}
 			public void Reset(){
 				SetActState(SlotGroupManager.WaitForActionState);
@@ -533,11 +565,11 @@ namespace SlotSystem{
 				m_rootPage.Deactivate();
 			}
 			public void SetFocusedPoolSG(SlotGroup sg){
-				rootPage.PoolBundle.SetFocusedBundleElement(sg);
+				rootPage.poolBundle.SetFocusedBundleElement(sg);
 				Focus();
 			}
 			public void SetFocusedEquipmentSet(EquipmentSet eSet){
-				rootPage.EquipBundle.SetFocusedBundleElement(eSet);
+				rootPage.equipBundle.SetFocusedBundleElement(eSet);
 				Focus();
 			}
 			public void UpdateEquipStatesOnAll(){

@@ -1851,23 +1851,27 @@ namespace SlotSystem{
 		}
 		/*	SlotSystemElements	*/
 			public interface SlotSystemElement: IEnumerable<SlotSystemElement>{
+				string eName{get;}
 				void Activate();
 				void Deactivate();
 				void Focus();
 				void Defocus();
+				SlotSystemBundle immediateBundle{get;}
+				SlotSystemElement parent{get;set;}
 				SlotGroupManager sgm{get;set;}
-				SlotSystemElement DirectParent(SlotSystemElement element);
+				// SlotSystemElement FindParentInHierarchy(SlotSystemElement element);
 				bool ContainsInHierarchy(SlotSystemElement ele);
 				void PerformInHierarchy(System.Action<SlotSystemElement> act);
 				void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj);
+				void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list);
 				SlotSystemElement rootElement{get;set;}
 				int level{get;}
 				bool Contains(SlotSystemElement element);
 				SlotSystemElement this[int i]{get;}
 			}
 			public abstract class AbsSlotSysElement: SlotSystemElement{
-				// public abstract List<SlotSystemElement> Elements{get;}
-				protected abstract List<SlotSystemElement> elements{get;}
+				public string eName{get{return m_eName;}}protected string m_eName;
+				protected abstract IEnumerable<SlotSystemElement> elements{get;}
 				public IEnumerator<SlotSystemElement> GetEnumerator(){
 					foreach(SlotSystemElement ele in elements)
 						yield return ele;
@@ -1875,26 +1879,58 @@ namespace SlotSystem{
 						return GetEnumerator();
 					}
 				public bool Contains(SlotSystemElement element){
-					return elements.Contains(element);
+					foreach(SlotSystemElement ele in elements){
+						if(ele != null && ele == element)
+							return true;
+					}
+					return false;
 				}
 				public SlotSystemElement this[int i]{
-					get{return elements[i];}
+					get{
+						int id = 0;
+						foreach(var ele in elements){
+							if(id++ == i)
+								return ele;	
+						}
+						throw new System.InvalidOperationException("AbsSlotSysElement.indexer: argument out of range");
+					}
+				}
+				public SlotSystemElement parent{
+					get{return m_parent;}
+					set{m_parent = value;}
+					}SlotSystemElement m_parent;
+				public virtual SlotSystemBundle immediateBundle{
+					get{
+						if(parent == null)
+							return null;
+						if(parent is SlotSystemBundle)
+							return (SlotSystemBundle)parent;
+						else
+							return parent.immediateBundle;
+					}
 				}
 				public virtual bool ContainsInHierarchy(SlotSystemElement ele){
-					return DirectParent(ele) != null;
-				}
-				public virtual SlotSystemElement DirectParent(SlotSystemElement element){
-					foreach(SlotSystemElement ele in this){
-						if(ele == element)
-							return this;
-						else{
-							SlotSystemElement dirPar = ele.DirectParent(element);
-							if(dirPar != null)
-								return dirPar;
-						}
+					SlotSystemElement testEle = ele.parent;
+					while(true){
+						if(testEle == null)
+							return false;
+						if(testEle == this)
+							return true;
+						testEle = testEle.parent;
 					}
-					return null;
 				}
+				// public virtual SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
+					// foreach(SlotSystemElement ele in this){
+					// 	if(ele == element)
+					// 		return this;
+					// 	else{
+					// 		SlotSystemElement dirPar = ele.FindParentInHierarchy(element);
+					// 		if(dirPar != null)
+					// 			return dirPar;
+					// 	}
+					// }
+					// return null;
+					// }
 				public virtual void Activate(){
 					foreach(SlotSystemElement ele in this){
 						ele.Activate();
@@ -1931,12 +1967,18 @@ namespace SlotSystem{
 						ele.PerformInHierarchy(act, obj);
 					}
 				}
+				public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
+					act(this, list);
+					foreach(SlotSystemElement ele in this){
+						ele.PerformInHierarchy<T>(act, list);
+					}
+				}
 				public int level{
 					get{
-						if(rootElement == this)
+						if(parent == null)
 							return 0;
 						else
-							return rootElement.DirectParent(this).level + 1;
+							return parent.level + 1;
 					}
 				}
 				public virtual SlotSystemElement rootElement{
@@ -1946,35 +1988,62 @@ namespace SlotSystem{
 					SlotSystemElement m_rootElement;
 			}
 			public class InventoryManagerPage: AbsSlotSysElement{
-				public SlotSystemBundle PoolBundle{
+				public override SlotSystemBundle immediateBundle{
+					get{return null;}
+				}
+				public SlotSystemBundle poolBundle{
 					get{return m_poolBundle;}
 					}SlotSystemBundle m_poolBundle;
-				public SlotSystemBundle EquipBundle{
+				public SlotSystemBundle equipBundle{
 					get{return m_equipBundle;}
 					}SlotSystemBundle m_equipBundle;
-				public List<SlotSystemBundle> otherBundles{
+				public IEnumerable<SlotSystemBundle> otherBundles{
 					get{
 						if(m_otherBundles == null)
-							m_otherBundles = new List<SlotSystemBundle>();
-						return m_otherBundles;
-						}
-					}List<SlotSystemBundle> m_otherBundles;
+							m_otherBundles = new SlotSystemBundle[]{};
+						return m_otherBundles;}
+					}IEnumerable<SlotSystemBundle> m_otherBundles;
 
-				public InventoryManagerPage(SlotSystemBundle poolBundle, SlotSystemBundle equipBundle){
+				public InventoryManagerPage(SlotSystemBundle poolBundle, SlotSystemBundle equipBundle, IEnumerable<SlotSystemBundle> gBundles){
+					m_eName = Util.Bold("invManPage");
 					this.m_poolBundle = poolBundle;
 					this.m_equipBundle = equipBundle;
+					m_otherBundles = gBundles;
 					PerformInHierarchy(SetRoot);
+					PerformInHierarchy(SetParent);
 				}
-				protected override List<SlotSystemElement> elements{
+				protected override IEnumerable<SlotSystemElement> elements{
 					get{
-						List<SlotSystemElement> pageElements = new List<SlotSystemElement>();
-						pageElements.Add(m_poolBundle);
-						pageElements.Add(m_equipBundle);
-						return pageElements;
+						yield return poolBundle;
+						yield return equipBundle;
+						foreach(var ele in otherBundles)
+							yield return ele;
+					}
+				}
+				public SlotSystemElement foundParent;
+				// public SlotSystemElement FindParent(SlotSystemElement ele){
+				// 	foundParent = null;
+				// 	PerformInHierarchy(CheckAndReportParent, ele);
+				// 	return foundParent;
+				// }
+				void CheckAndReportParent(SlotSystemElement ele, object obj){
+					SlotSystemElement tarEle = (SlotSystemElement)obj;
+					foreach(SlotSystemElement e in ele){
+						if(e == tarEle)
+							this.foundParent = e;
 					}
 				}
 				void SetRoot(SlotSystemElement ele){
 					ele.rootElement = this;
+				}
+				void SetParent(SlotSystemElement ele){
+					if(!(ele is Slottable))
+					foreach(SlotSystemElement e in ele){
+						if(e != null)
+						e.parent = ele;
+					}
+					// if(ele != this)
+					// ele.parent = this.FindParent(ele);
 				}
 				public override SlotSystemElement rootElement{
 					get{return this;}
@@ -1985,53 +2054,58 @@ namespace SlotSystem{
 					PerformInHierarchy(SetSGM);
 				}
 				public void SetSGM(SlotSystemElement ele){
+					if(ele != this)
 					ele.sgm = this.sgm;
 				}
 			}
 			public class GenericPage: AbsSlotSysElement{
-				protected override List<SlotSystemElement> elements{
+				protected override IEnumerable<SlotSystemElement> elements{
 					get{return m_elements;}
-				}List<SlotSystemElement> m_elements;
+					}IEnumerable<SlotSystemElement> m_elements;
+				public GenericPage(IEnumerable<SlotSystemElement> elements){
+					m_eName = Util.Bold("genPage");
+					m_elements = elements;
+				}
 			}
 			public class EquipmentSet: AbsSlotSysElement{
 				SlotGroup m_bowSG;
 				SlotGroup m_wearSG;
 				SlotGroup m_cGearsSG;
-				List<SlotSystemElement> m_pageElements;
 				public EquipmentSet(SlotGroup bowSG, SlotGroup wearSG, SlotGroup cGearsSG){
+					m_eName = Util.Bold("eSet");
 					m_bowSG = bowSG;
 					m_wearSG = wearSG;
 					m_cGearsSG = cGearsSG;
 				}
-				protected override List<SlotSystemElement> elements{
+				protected override IEnumerable<SlotSystemElement> elements{
 					get{
-						m_pageElements = new List<SlotSystemElement>();
-						m_pageElements.Add(m_bowSG);
-						m_pageElements.Add(m_wearSG);
-						m_pageElements.Add(m_cGearsSG);
-						return m_pageElements;
+						yield return m_bowSG;
+						yield return m_wearSG;
+						yield return m_cGearsSG;
+						// m_pageElements = new List<SlotSystemElement>();
+						// m_pageElements.Add(m_bowSG);
+						// m_pageElements.Add(m_wearSG);
+						// m_pageElements.Add(m_cGearsSG);
+						// return m_pageElements;
 					}
 				}
 			}
 			public class SlotSystemBundle: AbsSlotSysElement{
-				List<SlotSystemElement> m_elements = new List<SlotSystemElement>();
-				protected override List<SlotSystemElement> elements{
+				protected override IEnumerable<SlotSystemElement> elements{
 					get{return m_elements;}
-				}
-				public void Add(SlotSystemElement element){
-					elements.Add(element);
-				}
-				public void Remove(SlotSystemElement element){
-					elements.Remove(element);
+					}IEnumerable<SlotSystemElement> m_elements;
+				public SlotSystemBundle(string name, IEnumerable<SlotSystemElement> elements){
+					m_eName = Util.Bold(name);
+					m_elements = elements;
 				}
 				public SlotSystemElement focusedElement{
 					get{return m_focusedElement;}
 					}SlotSystemElement m_focusedElement;
 					public void SetFocusedBundleElement(SlotSystemElement element){
-						if(DirectParent(element) == this)
+						if(this.Contains(element))
 							m_focusedElement = element;
 						else
-							throw new InvalidOperationException("trying to set focsed element that is not one of its members");
+							throw new InvalidOperationException("SlotSystemBundle.SetFocusedBundleElement: trying to set focsed element that is not one of its members");
 					}
 				public override void Focus(){
 					if(m_focusedElement != null)
@@ -2591,7 +2665,7 @@ namespace SlotSystem{
 					string res = "";
 					string pSB = Util.SBofSG(sgm.pickedSB);
 					string tSB = Util.SBofSG(sgm.targetSB);
-					string hSG = Util.SGName(sgm.hoveredSG);
+					string hSG = sgm.hoveredSG.eName;
 					string hSB = Util.SBofSG(sgm.hoveredSB);
 					string di1;
 						if(sgm.dIcon1 == null)
@@ -2604,8 +2678,8 @@ namespace SlotSystem{
 						else
 							di2 = Util.SBofSG(sgm.dIcon2.sb);
 					
-					string sg1 = Util.SGName(sgm.sg1);
-					string sg2 = Util.SGName(sgm.sg2);
+					string sg1 = sgm.sg1.eName;
+					string sg2 = sgm.sg2.eName;
 					string prevSel = Util.SGMStateName(sgm.PrevSelState);
 					string curSel = Util.SGMStateName(sgm.CurSelState);
 					string selProc;
@@ -2643,33 +2717,34 @@ namespace SlotSystem{
 					return res;
 				}
 			/*	SG	*/
-				public static string SGName(SlotGroup sg){
-					string result = "";
-					if(sg != null){
-						if(sg.isPool){
-							if(sg.Filter is SGNullFilter)
-								result = "sgpAll";
-							else if(sg.Filter is SGBowFilter)
-								result = "sgpBow";
-							else if(sg.Filter is SGWearFilter)
-								result = "sgpWear";
-							else if(sg.Filter is SGCGearsFilter)
-								result = "sgpCGears";
-							else if(sg.Filter is SGPartsFilter)
-								result = "sgpParts";
-							result = Red(result);
-						}else if(sg.isSGE){
-							if(sg.Filter is SGBowFilter)
-								result = "sgBow";
-							else if(sg.Filter is SGWearFilter)
-								result = "sgWear";
-							else if(sg.Filter is SGCGearsFilter)
-								result = "sgCGears";
-							result = Blue(result);
-						}
-					}
-					return result;
-				}
+				// public static string SGName(SlotGroup sg){
+					// 	string result = "";
+					// 	if(sg != null){
+					// 		if(sg.isPool){
+					// 			if(sg.Filter is SGNullFilter)
+					// 				result = "sgpAll";
+					// 			else if(sg.Filter is SGBowFilter)
+					// 				result = "sgpBow";
+					// 			else if(sg.Filter is SGWearFilter)
+					// 				result = "sgpWear";
+					// 			else if(sg.Filter is SGCGearsFilter)
+					// 				result = "sgpCGears";
+					// 			else if(sg.Filter is SGPartsFilter)
+					// 				result = "sgpParts";
+					// 			result = Red(result);
+					// 		}else if(sg.isSGE){
+					// 			if(sg.Filter is SGBowFilter)
+					// 				result = "sgBow";
+					// 			else if(sg.Filter is SGWearFilter)
+					// 				result = "sgWear";
+					// 			else if(sg.Filter is SGCGearsFilter)
+					// 				result = "sgCGears";
+					// 			result = Blue(result);
+					// 		}else if(sg.isSGG){
+					// 		}
+					// 	}
+					// 	return result;
+					// }
 				public static string SGStateName(SGState state){
 					string res = "";
 					if(state is SGDeactivatedState){
@@ -2717,7 +2792,6 @@ namespace SlotSystem{
 				}
 				public static string SGDebug(SlotGroup sg){
 					string res = "";
-					string sgName = SGName(sg);
 					string prevSel = SGStateName(sg.PrevSelState);
 					string curSel = SGStateName(sg.CurSelState);
 					string selProc;
@@ -2733,7 +2807,7 @@ namespace SlotSystem{
 						else
 							actProc = SGProcessName(sg.ActionProcess) + " exp? " + (sg.ActionProcess.IsExpired?Blue("true"):Red("false"));
 					res = Bold("DebugTarget: ") + 
-						sgName + " " +
+						sg.eName + " " +
 						Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
 							" proc, " + selProc + ", " +
 						Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
@@ -2793,38 +2867,9 @@ namespace SlotSystem{
 					return result;
 				}
 				public static string SBName(Slottable sb){
-					string result = "";
+					string result = "null";
 					if(sb != null){
-						switch(sb.itemInst.Item.ItemID){
-							case 0:	result = "defBow"; break;
-							case 1:	result = "crfBow"; break;
-							case 2:	result = "frgBow"; break;
-							case 3:	result = "mstBow"; break;
-							case 100: result = "defWear"; break;
-							case 101: result = "crfWear"; break;
-							case 102: result = "frgWear"; break;
-							case 103: result = "mstWear"; break;
-							case 200: result = "defShield"; break;
-							case 201: result = "crfShield"; break;
-							case 202: result = "frgShield"; break;
-							case 203: result = "mstShield"; break;
-							case 300: result = "defMWeapon"; break;
-							case 301: result = "crfMWeapon"; break;
-							case 302: result = "frgMWeapon"; break;
-							case 303: result = "mstMWeapon"; break;
-							case 400: result = "defQuiver"; break;
-							case 401: result = "crfQuiver"; break;
-							case 402: result = "frgQuiver"; break;
-							case 403: result = "mstQuiver"; break;
-							case 500: result = "defPack"; break;
-							case 501: result = "crfPack"; break;
-							case 502: result = "frgPack"; break;
-							case 503: result = "mstPack"; break;
-							case 600: result = "defParts"; break;
-							case 601: result = "crfParts"; break;
-							case 602: result = "frgParts"; break;
-							case 603: result = "mstParts"; break;
-						}
+						result = ItemInstName(sb.itemInst);
 						List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
 						foreach(InventoryItemInstanceMock itemInst in SlotGroupManager.CurSGM.poolInv){
 							if(itemInst.Item == sb.itemInst.Item)
@@ -2846,7 +2891,7 @@ namespace SlotSystem{
 				public static string SBofSG(Slottable sb){
 					string res = "";
 					if(sb != null){
-						res = Util.SBName(sb) + " of " + Util.SGName(sb.sg);
+						res = Util.SBName(sb) + " of " + sb.sg.eName;
 						if(sb.isEquipped && sb.sg.isPool)
 							res = Util.Bold(res);
 					}
@@ -2977,8 +3022,8 @@ namespace SlotSystem{
 					SlotSystemTransaction ta = testSB.sgm.GetTransaction(testSB, tarSG, tarSB);
 					string taStr = TransactionName(ta);
 					string taTargetSB = Util.SBofSG(ta.targetSB);
-					string taSG1 = Util.SGName(ta.sg1);
-					string taSG2 = Util.SGName(ta.sg2);
+					string taSG1 = ta.sg1.eName;
+					string taSG2 = ta.sg2.eName;
 					return "DebugTarget: " + taStr + " " +
 						"targetSB: " + taTargetSB + ", " + 
 						"sg1: " + taSG1 + ", " +
