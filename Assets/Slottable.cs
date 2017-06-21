@@ -7,23 +7,41 @@ namespace SlotSystem{
 	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, StateHandler, SlotSystemElement{
 		/*	States	*/
 			/*	Selection State	*/
-				SBStateEngine SelStateEngine{
+				SSEStateEngine SelStateEngine{
 					get{
 						if(m_selStateEngine == null)
-							m_selStateEngine = new SBStateEngine(this);
+							m_selStateEngine = new SSEStateEngine(this);
 						return m_selStateEngine;
 					}
-					}SBStateEngine m_selStateEngine;
-					public SBSelectionState CurSelState{
-						get{return (SBSelectionState)SelStateEngine.curState;}
+					}SSEStateEngine m_selStateEngine;
+					public SSEState curSelState{
+						get{return (SSEState)SelStateEngine.curState;}
 					}
-					public SBSelectionState PrevSelState{
-						get{return (SBSelectionState)SelStateEngine.prevState;}
+					public SSEState prevSelState{
+						get{return (SSEState)SelStateEngine.prevState;}
 					}
-					public void SetSelState(SBSelectionState selState){
-						SelStateEngine.SetState(selState);
+					public void SetSelState(SSEState selState){
+						if(selState is SBSelectionState)
+							SelStateEngine.SetState(selState);
+						else
+							throw new System.InvalidOperationException("Slottable.SetSelState: something other than SBSelectionState is beint attempted to be assigned");
 					}
-
+				// SBStateEngine SelStateEngine{
+					// 	get{
+					// 		if(m_selStateEngine == null)
+					// 			m_selStateEngine = new SBStateEngine(this);
+					// 		return m_selStateEngine;
+					// 	}
+					// 	}SBStateEngine m_selStateEngine;
+					// 	public SBSelectionState curSelState{
+					// 		get{return (SBSelectionState)SelStateEngine.curState;}
+					// 	}
+					// 	public SBSelectionState prevSelState{
+					// 		get{return (SBSelectionState)SelStateEngine.prevState;}
+					// 	}
+					// 	public void SetSelState(SBSelectionState selState){
+					// 		SelStateEngine.SetState(selState);
+					// 	}
 				public static SBSelectionState DeactivatedState{
 					get{
 						if(Slottable.m_deactivatedState != null)
@@ -64,22 +82,41 @@ namespace SlotSystem{
 						}
 						}static SBSelectionState m_focusedState;
 			/*	Action State	*/
-				SBStateEngine ActStateEngine{
+				SSEStateEngine ActStateEngine{
 					get{
 						if(m_actStateEngine == null)
-							m_actStateEngine = new SBStateEngine(this);
+							m_actStateEngine = new SSEStateEngine(this);
 						return m_actStateEngine;
 					}
-					}SBStateEngine m_actStateEngine;
-					public SBActionState CurActState{
-						get{return (SBActionState)ActStateEngine.curState;}
+					}SSEStateEngine m_actStateEngine;
+					public SSEState curActState{
+						get{return (SSEState)ActStateEngine.curState;}
 					}
-					public SBActionState PrevActState{
-						get{return (SBActionState)ActStateEngine.prevState;}
+					public SSEState prevActState{
+						get{return (SSEState)ActStateEngine.prevState;}
 					}
-					public void SetActState(SBActionState actState){
-						ActStateEngine.SetState(actState);
+					public void SetActState(SSEState actState){
+						if(actState is SBActionState)
+							ActStateEngine.SetState(actState);
+						else
+							throw new System.InvalidOperationException("Slottable.SetActState: something other than SBActionState is being attempted to be assigned");
 					}
+				// SBStateEngine ActStateEngine{
+				// 	get{
+				// 		if(m_actStateEngine == null)
+				// 			m_actStateEngine = new SBStateEngine(this);
+				// 		return m_actStateEngine;
+				// 	}
+				// 	}SBStateEngine m_actStateEngine;
+				// 	public SBActionState CurActState{
+				// 		get{return (SBActionState)ActStateEngine.curState;}
+				// 	}
+				// 	public SBActionState PrevActState{
+				// 		get{return (SBActionState)ActStateEngine.prevState;}
+				// 	}
+				// 	public void SetActState(SBActionState actState){
+				// 		ActStateEngine.SetState(actState);
+				// 	}
 				
 				public static SBActionState WaitForActionState{
 					get{
@@ -191,29 +228,34 @@ namespace SlotSystem{
 					}
 					}static SBEquipState m_unequippedState;
 		/*	processes	*/
-			public SBProcess SelectionProcess{
-				get{return m_selectionProcess;}
-				}SBProcess m_selectionProcess;
-				public void SetAndRunSelectionProcess(SBProcess process){
-					if(m_selectionProcess != null)
-						m_selectionProcess.Stop();
-					m_selectionProcess = process;
-					if(m_selectionProcess != null)
-						m_selectionProcess.Start();
+			public SSEProcessEngine selProcEngine{
+				get{
+					if(m_processEngine == null)
+						m_processEngine = new SSEProcessEngine();
+					return m_processEngine;
+				}
+				}SSEProcessEngine m_processEngine;
+			public SBSelProcess selProcess{
+				get{return (SBSelProcess)selProcEngine.process;}
+				}
+				public void SetAndRunSelectionProcess(SBSelProcess process){
+					selProcEngine.SetAndRunProcess(process);
 				}
 				public IEnumeratorMock GreyoutCoroutine(){return null;}
 				public IEnumeratorMock GreyinCoroutine(){return null;}
 				public IEnumeratorMock HighlightCoroutine(){return null;}
 				public IEnumeratorMock DehighlightCoroutine(){return null;}
-			public SBProcess ActionProcess{
-				get{return m_actionProcess;}
-				}SBProcess m_actionProcess;
-				public void SetAndRunActionProcess(SBProcess process){
-					if(m_actionProcess != null)
-						m_actionProcess.Stop();
-					m_actionProcess = process;
-					if(m_actionProcess != null)
-						m_actionProcess.Start();
+			public SSEProcessEngine actProcEngine{
+				get{
+					if(m_actProcEngine == null)
+						m_actProcEngine = new SSEProcessEngine();
+					return m_actProcEngine;}
+				}SSEProcessEngine m_actProcEngine;
+			public SBActProcess actProcess{
+				get{return (SBActProcess)actProcEngine.process;}
+				}
+				public void SetAndRunActionProcess(SBActProcess process){
+					actProcEngine.SetAndRunProcess(process);
 				}
 				public IEnumeratorMock WaitForPointerUpCoroutine(){return null;}
 				public IEnumeratorMock WaitForPickUpCoroutine(){return null;}
@@ -226,15 +268,18 @@ namespace SlotSystem{
 						ExpireActionProcess();
 					return null;
 				}
-			public SBProcess EquipProcess{
-				get{return m_equipProcess;}
-				}SBProcess m_equipProcess;
-				public void SetAndRunEquipProcess(SBProcess process){
-					if(m_equipProcess != null)
-						m_equipProcess.Stop();
-					m_equipProcess = process;
-					if(m_equipProcess != null)
-						m_equipProcess.Start();
+			public SSEProcessEngine eqpProcEngine{
+				get{
+					if(m_eqpProcEngine == null)
+						m_eqpProcEngine = new SSEProcessEngine();
+					return m_eqpProcEngine;
+				}
+				}SSEProcessEngine m_eqpProcEngine;
+			public SBEqpProcess eqpProcess{
+				get{return (SBEqpProcess)eqpProcEngine.process;}
+				}
+				public void SetAndRunEquipProcess(SBEqpProcess process){
+					eqpProcEngine.SetAndRunProcess(process);
 				}
 				public IEnumeratorMock UnequipCoroutine(){return null;}
 				public IEnumeratorMock EquipCoroutine(){return null;}
@@ -295,7 +340,7 @@ namespace SlotSystem{
 				}
 			}
 			public bool isFocused{
-				get{return CurSelState == Slottable.FocusedState;}
+				get{return curSelState == Slottable.FocusedState;}
 			}
 			public bool isPickedUp{
 				get{
@@ -315,13 +360,18 @@ namespace SlotSystem{
 			}
 		/*	SlotSystemElement imple	*/
 			public string eName{
-				// get{return Util.SBName(this);}
-				get{return "sb";}
+				get{return Util.SBName(this);}
 			}
 			public SlotSystemElement parent{
-				get{return m_parent;}
-				set{m_parent = value;}
-				}SlotSystemElement m_parent;
+				get{
+					return ((InventoryManagerPage)rootElement).FindParent(this);
+				}
+				set{}
+			}
+			// public SlotSystemElement parent{
+			// 	get{return m_parent;}
+			// 	set{m_parent = value;}
+			// 	}SlotSystemElement m_parent;
 			public SlotSystemBundle immediateBundle{
 				get{
 					if(parent == null)
@@ -379,24 +429,24 @@ namespace SlotSystem{
 			/*	Selection event	*/
 				public void OnHoverEnterMock(){
 					PointerEventDataMock eventData = new PointerEventDataMock();
-					CurSelState.OnHoverEnterMock(this, eventData);
+					((SBSelectionState)curSelState).OnHoverEnterMock(this, eventData);
 				}
 				public void OnHoverExitMock(){
 					PointerEventDataMock eventData = new PointerEventDataMock();
-					CurSelState.OnHoverExitMock(this, eventData);
+					((SBSelectionState)curSelState).OnHoverExitMock(this, eventData);
 				}
 			/*	Action Event	*/
 				public void OnPointerDownMock(PointerEventDataMock eventDataMock){
-					CurActState.OnPointerDownMock(this, eventDataMock);
+					((SBActionState)curActState).OnPointerDownMock(this, eventDataMock);
 				}
 				public void OnPointerUpMock(PointerEventDataMock eventDataMock){
-					CurActState.OnPointerUpMock(this, eventDataMock);
+					((SBActionState)curActState).OnPointerUpMock(this, eventDataMock);
 				}
 				public void OnDeselectedMock(PointerEventDataMock eventDataMock){
-					CurActState.OnDeselectedMock(this, eventDataMock);
+					((SBActionState)curActState).OnDeselectedMock(this, eventDataMock);
 				}
 				public void OnEndDragMock(PointerEventDataMock eventDataMock){
-					CurActState.OnEndDragMock(this, eventDataMock);
+					((SBActionState)curActState).OnEndDragMock(this, eventDataMock);
 				}
 		/*	Interface implementation	*/
 			int IComparable.CompareTo(object other){
@@ -443,8 +493,8 @@ namespace SlotSystem{
 				sgm.Transaction.Execute();
 			}
 			public void ExpireActionProcess(){
-				if(ActionProcess.IsRunning)
-					ActionProcess.Expire();
+				if(actProcess.isRunning)
+					actProcess.Expire();
 			}
 			public void UpdateEquipState(){
 				if(itemInst.isEquipped) Equip();

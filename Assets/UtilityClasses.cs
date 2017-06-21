@@ -5,28 +5,37 @@ using UnityEngine;
 namespace Utility{
 	public class UtilityClasses{
 	}
-	public interface StateHandler{}
+	public interface StateHandler{
+	}
 	public interface SwitchableState{
 		void EnterState(StateHandler handler);
 		void ExitState(StateHandler handler);
 	}
 	public abstract class SwitchableStateEngine{
 		protected StateHandler handler;
-		public SwitchableState prevState;
-		public SwitchableState curState;
+		virtual public SwitchableState prevState{
+			get{
+				return m_prevState;
+			}
+			}SwitchableState m_prevState;
+		virtual public SwitchableState curState{
+			get{
+				return m_curState;
+			}
+			}SwitchableState m_curState;
 		protected void SetState(SwitchableState state){
 			if(curState != null){
 				if(curState != state){
 					curState.ExitState(handler);
-					prevState = curState;
+					m_prevState = curState;
 				}
-				curState = state;
+				m_curState = state;
 				if(curState != null){
 					curState.EnterState(handler);
 				}
 			}else{// used as initialization
-				prevState = state;
-				curState = state;
+				m_prevState = state;
+				m_curState = state;
 				if(state != null)
 					state.EnterState(handler);
 			}

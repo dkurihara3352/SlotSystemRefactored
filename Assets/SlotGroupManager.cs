@@ -446,7 +446,7 @@ namespace SlotSystem{
 						if(!tested.immediateBundle.focusedElement.ContainsInHierarchy(tested))
 							return;
 						tested = tested.immediateBundle;
-						if(tested == null)
+						if(tested.immediateBundle == null)
 							break;
 					}
 					list.Add(sg);
@@ -666,8 +666,8 @@ namespace SlotSystem{
 			}
 			public void ChangeEquippableCGearsCount(int i, SlotGroup targetSG){
 				if(!targetSG.isExpandable){
-					if(targetSG.CurSelState == SlotGroup.FocusedState ||
-						targetSG.CurSelState == SlotGroup.DefocusedState){
+					if(targetSG.curSelState == SlotGroup.FocusedState ||
+						targetSG.curSelState == SlotGroup.DefocusedState){
 							equipInv.SetEquippableCGearsCount(i);
 							targetSG.InitializeItems();
 							UpdateEquipStatesOnAll();

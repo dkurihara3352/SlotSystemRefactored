@@ -6,37 +6,43 @@ namespace SlotSystem{
 	public class SlotGroup : MonoBehaviour, SlotSystemElement, StateHandler{
 		/*	states	*/
 			/*	Engines	*/
-				SGStateEngine SGSelStateEngine{
+				SSEStateEngine SGSelStateEngine{
 					get{
 						if(m_sgSelStateEngine == null)
-							m_sgSelStateEngine = new SGStateEngine(this);
+							m_sgSelStateEngine = new SSEStateEngine(this);
 						return m_sgSelStateEngine;
 					}	
-					}SGStateEngine m_sgSelStateEngine;
-					public SGSelectionState CurSelState{
-						get{return (SGSelectionState)SGSelStateEngine.curState;}
+					}SSEStateEngine m_sgSelStateEngine;
+					public SSEState curSelState{
+						get{return (SSEState)SGSelStateEngine.curState;}
 					}
-					public SGSelectionState PrevSelState{
-						get{return (SGSelectionState)SGSelStateEngine.prevState;}
+					public SSEState prevSelState{
+						get{return (SSEState)SGSelStateEngine.prevState;}
 					}
-					public void SetSelState(SGSelectionState state){
-						SGSelStateEngine.SetState(state);
+					public void SetSelState(SSEState state){
+						if(state is SGSelectionState)
+							SGSelStateEngine.SetState(state);
+						else
+							throw new System.InvalidOperationException("SlotGroup.SetSelState: somthing other than SGSelectionState is trying to be assinged");
 					}
-				SGStateEngine SGActStateEngine{
+				SSEStateEngine SGActStateEngine{
 					get{
 						if(m_sgActStateEngine == null)
-							m_sgActStateEngine = new SGStateEngine(this);
+							m_sgActStateEngine = new SSEStateEngine(this);
 						return m_sgActStateEngine;
 					}	
-					}SGStateEngine m_sgActStateEngine;
-					public SGActionState CurActState{
-						get{return (SGActionState)SGActStateEngine.curState;}
+					}SSEStateEngine m_sgActStateEngine;
+					public SSEState curActState{
+						get{return (SSEState)SGActStateEngine.curState;}
 					}
-					public SGActionState PrevActState{
-						get{return (SGActionState)SGActStateEngine.prevState;}
+					public SSEState prevActState{
+						get{return (SSEState)SGActStateEngine.prevState;}
 					}
-					public void SetActState(SGActionState state){
-						SGActStateEngine.SetState(state);
+					public void SetActState(SSEState state){
+						if(state is SGActionState)
+							SGActStateEngine.SetState(state);
+						else
+							throw new System.InvalidOperationException("SlotGroup.SetActState: somthing other than SGActionState is trying to be assinged");
 					}
 			/*	static states	*/
 				/*	Selection states	*/
@@ -126,70 +132,61 @@ namespace SlotSystem{
 						}
 						}private static SGActionState m_sortState;
 		/*	process	*/
-				public SGProcess SelectionProcess{
-					get{return m_selectionProcess;}
-					}SGProcess m_selectionProcess;
-					public void SetAndRunSelProcess(SGProcess process){
-						if(m_selectionProcess != null)
-							m_selectionProcess.Stop();
-						m_selectionProcess = process;
-						if(m_selectionProcess != null)
-							m_selectionProcess.Start();
+				public SSEProcessEngine selProcEngine{
+					get{
+						if(m_selProcEngine == null)
+							m_selProcEngine = new SSEProcessEngine();
+						return m_selProcEngine;
 					}
-				public SGProcess ActionProcess{
-					get{return m_actionProcess;}
-					}SGProcess m_actionProcess;
-					public void SetAndRunActProcess(SGProcess process){
-						if(m_actionProcess != null)
-							m_actionProcess.Stop();
-						m_actionProcess = process;
-						if(m_actionProcess != null)
-							m_actionProcess.Start();
+					}SSEProcessEngine m_selProcEngine;
+					public SGSelProcess selProcess{
+						get{return (SGSelProcess)selProcEngine.process;}
 					}
-			/*	coroutines	*/
-				public IEnumeratorMock GreyinCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock GreyoutCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock HighlightCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock DehighlightCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock InstantGreyoutCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock InstantGreyinCoroutine(){
-					return null;
-				}
-				public IEnumeratorMock TransactionCoroutine(){
-					bool flag = true;
-					foreach(Slottable sb in this){
-						if(sb != null)
-						flag &= sb.ActionProcess.IsExpired;
+					public void SetAndRunSelProcess(SGSelProcess process){
+						selProcEngine.SetAndRunProcess(process);
 					}
-					if(flag){
-						ActionProcess.Expire();
+					public IEnumeratorMock GreyinCoroutine(){
+						return null;
 					}
-					return null;
-				}
-				/*	dump	*/
-					// public IEnumeratorMock UpdateTransactionCoroutine(){
-					// 	return null;
-					// }
-					// public IEnumeratorMock WaitForAllSlotMovementsDone(){
-					// 	bool flag = true;
-					// 	foreach(SlotMovement sm in slotMovements){
-					// 		flag &= sm.SB.CurProcess.IsExpired;
-					// 	}
-					// 	if(flag){
-					// 		CurProcess.Expire();
-					// 	}
-					// 	return null;
-					// }
+					public IEnumeratorMock GreyoutCoroutine(){
+						return null;
+					}
+					public IEnumeratorMock HighlightCoroutine(){
+						return null;
+					}
+					public IEnumeratorMock DehighlightCoroutine(){
+						return null;
+					}
+					public IEnumeratorMock InstantGreyoutCoroutine(){
+						return null;
+					}
+					public IEnumeratorMock InstantGreyinCoroutine(){
+						return null;
+					}
+				public SSEProcessEngine actProcEngine{
+					get{
+						if(m_actProcEngine == null)
+							m_actProcEngine = new SSEProcessEngine();
+						return m_actProcEngine;
+					}
+					}SSEProcessEngine m_actProcEngine;
+					public SGActProcess actProcess{
+						get{return (SGActProcess)actProcEngine.process;}
+					}
+					public void SetAndRunActProcess(SGActProcess process){
+						actProcEngine.SetAndRunProcess(process);
+					}
+					public IEnumeratorMock TransactionCoroutine(){
+						bool flag = true;
+						foreach(Slottable sb in this){
+							if(sb != null)
+							flag &= !sb.actProcess.isRunning;
+						}
+						if(flag){
+							actProcess.Expire();
+						}
+						return null;
+					}
 		/*	public fields	*/
 			public AxisScrollerMock scroller{
 				get{return m_scroller;}
@@ -346,7 +343,7 @@ namespace SlotSystem{
 					// }
 						foreach(Slottable sb in this){
 							if(sb != null){
-								if(sb.ActionProcess.IsRunning)
+								if(sb.actProcess.isRunning)
 									return false;
 							}
 						}
@@ -474,11 +471,11 @@ namespace SlotSystem{
 		/*	events	*/
 			public void OnHoverEnterMock(){
 				PointerEventDataMock eventData = new PointerEventDataMock();
-				CurSelState.OnHoverEnterMock(this, eventData);
+				((SGSelectionState)curSelState).OnHoverEnterMock(this, eventData);
 			}
 			public void OnHoverExitMock(){
 				PointerEventDataMock eventData = new PointerEventDataMock();
-				CurSelState.OnHoverExitMock(this, eventData);
+				((SGSelectionState)curSelState).OnHoverExitMock(this, eventData);
 			}
 		/*	SlotSystemElement implementation	*/
 			public string eName{
@@ -777,7 +774,7 @@ namespace SlotSystem{
 				SetAllTASBs(allSBs);
 			}
 			public void CheckProcessCompletion(){
-				ActionProcess.Check();
+				TransactionCoroutine();
 			}
 			public void OnCompleteSlotMovementsV3(){
 				foreach(Slottable sb in this){
