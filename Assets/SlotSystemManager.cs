@@ -4,17 +4,79 @@ using UnityEngine;
 namespace SlotSystem{
 
 	public class SlotSystemManager : AbsSlotSystemElement{
-			// public override SSEState curSelState{
-			// 	get{return (SGMSelState)selStateEngine.curState;}
-			// }
-			// public override SSEState prevSelState{
-			// 	get{return (SGMSelState)selStateEngine.prevState;}
-			// }
-			// public override void SetSelState(SSEState state){
-			// 	if(state == null || state is SGMSelState)
-			// 		selStateEngine.SetState(state);
-			// 	else throw new System.InvalidOperationException("SlotSystemManager.SetSelState: argument is not of type SGMSelState");
-			// }
+		/*	States	*/
+			/*	Selection state	*/
+				public override SSEState curSelState{
+					get{return (SSMSelState)selStateEngine.curState;}
+				}
+				public override SSEState prevSelState{
+					get{return (SSMSelState)selStateEngine.prevState;}
+				}
+				public override void SetSelState(SSEState state){
+					if(state == null || state is SSMSelState)
+						selStateEngine.SetState(state);
+					else throw new System.InvalidOperationException("SlotSystemManager.SetSelState: argument is not of type SSMSelState");
+				}
+				public static SSMSelState ssmDeactivatedState{
+					get{
+						if(m_ssmDeactivatedState == null)
+							m_ssmDeactivatedState = new SSMDeactivatedState();
+						return m_ssmDeactivatedState;
+					}
+					}static SSMSelState m_ssmDeactivatedState;
+				public static SSMSelState ssmDefocusedState{
+					get{
+						if(m_ssmDefocusedState == null)
+							m_ssmDefocusedState = new SSMDefocusedState();
+						return m_ssmDefocusedState;
+					}
+					}static SSMSelState m_ssmDefocusedState;
+				public static SSMSelState ssmFocusedState{
+					get{
+						if(m_ssmFocusedState == null)
+							m_ssmFocusedState = new SSMFocusedState();
+						return m_ssmFocusedState;
+					}
+					}static SSMSelState m_ssmFocusedState;
+				
+			/*	Action state	*/
+				public override SSEState curActState{
+					get{return (SSMSelState)actStateEngine.curState;}
+				}
+				public override SSEState prevActState{
+					get{return (SSMSelState)actStateEngine.prevState;}
+				}
+				public override void SetActState(SSEState state){
+					if(state == null || state is SSMSelState)
+						actStateEngine.SetState(state);
+					else throw new System.InvalidOperationException("SlotSystemManager.SetActState: argument is not of type SSMSelState");
+				}
+				public static SSMActState ssmWaitForActionState{
+					get{
+						if(m_ssmWaitForActionState == null)
+							m_ssmWaitForActionState = new SSMWaitForActionState();
+						return m_ssmWaitForActionState;
+					}
+					}static SSMActState m_ssmWaitForActionState;
+				public static SSMActState ssmProbingState{
+					get{
+						if(m_ssmProbingState == null)
+							m_ssmProbingState = new SSMProbingState();
+						return m_ssmProbingState;
+					}
+					}static SSMActState m_ssmProbingState;
+				public static SSMActState ssmTransactionState{
+					get{
+						if(m_ssmTransactionState == null)
+							m_ssmTransactionState = new SSMTransactionState();
+						return m_ssmTransactionState;
+					}
+					}static SSMActState m_ssmTransactionState;
+				
+
+		/*	process	*/
+			/*	Selection Process	*/
+			/*	Action Process	*/
 		/* public fields	*/
 			public override SlotSystemBundle immediateBundle{
 				get{return null;}

@@ -6,13 +6,6 @@ namespace SlotSystem{
 	public class SlotGroup : AbsSlotSystemElement{
 		/*	states	*/
 			/*	Engines	*/
-				// SSEStateEngine SGSelStateEngine{
-					// 	get{
-					// 		if(m_sgSelStateEngine == null)
-					// 			m_sgSelStateEngine = new SSEStateEngine(this);
-					// 		return m_sgSelStateEngine;
-					// 	}	
-					// 	}SSEStateEngine m_sgSelStateEngine;
 				/*	Selection State	*/
 					public override SSEState curSelState{
 						get{return (SGSelState)selStateEngine.curState;}
@@ -26,41 +19,35 @@ namespace SlotSystem{
 						else
 							throw new System.InvalidOperationException("SlotGroup.SetSelState: somthing other than SGSelectionState is trying to be assinged");
 					}
-					public static SGSelState DeactivatedState{
+					public static SGSelState sgDeactivatedState{
 						get{
-							if(SlotGroup.m_deactivatedState == null)
-								m_deactivatedState = new SGDeactivatedState();
-							return m_deactivatedState;
+							if(SlotGroup.m_sgDeactivatedState == null)
+								m_sgDeactivatedState = new SGDeactivatedState();
+							return m_sgDeactivatedState;
 						}
-						}private static SGSelState m_deactivatedState;
-					public static SGSelState DefocusedState{
+						}private static SGSelState m_sgDeactivatedState;
+					public static SGSelState sgDefocusedState{
 						get{
-							if(SlotGroup.m_defocusedState == null)
-								m_defocusedState = new SGDefocusedState();
-							return m_defocusedState;
+							if(SlotGroup.m_sgDefocusedState == null)
+								m_sgDefocusedState = new SGDefocusedState();
+							return m_sgDefocusedState;
 						}
-						}private static SGSelState m_defocusedState;
-					public static SGSelState FocusedState{
+						}private static SGSelState m_sgDefocusedState;
+					public static SGSelState sgFocusedState{
 						get{
-							if(SlotGroup.m_focusedState == null)
-								m_focusedState = new SGFocusedState();
-							return m_focusedState;
+							if(SlotGroup.m_sgFocusedState == null)
+								m_sgFocusedState = new SGFocusedState();
+							return m_sgFocusedState;
 						}
-						}private static SGSelState m_focusedState;
-					public static SGSelState SelectedState{
+						}private static SGSelState m_sgFocusedState;
+					public static SGSelState sgSelectedState{
 						get{
-							if(m_selectedState == null)
-								m_selectedState = new SGSelectedState();
-							return m_selectedState;
+							if(m_sgSelectedState == null)
+								m_sgSelectedState = new SGSelectedState();
+							return m_sgSelectedState;
 						}
-						}private static SGSelState m_selectedState;
-				// SSEStateEngine SGActStateEngine{
-					// 	get{
-					// 		if(m_sgActStateEngine == null)
-					// 			m_sgActStateEngine = new SSEStateEngine(this);
-					// 		return m_sgActStateEngine;
-					// 	}	
-					// 	}SSEStateEngine m_sgActStateEngine;
+						}private static SGSelState m_sgSelectedState;
+				
 				/*	Action State	*/
 					public override SSEState curActState{
 						get{return (SGActState)actStateEngine.curState;}
@@ -74,56 +61,56 @@ namespace SlotSystem{
 						else
 							throw new System.InvalidOperationException("SlotGroup.SetActState: somthing other than SGActionState is trying to be assinged");
 					}
-					public static SGActState WaitForActionState{
+					public static SGActState sgWaitForActionState{
 						get{
-							if(m_waitForActionState == null)
-								m_waitForActionState = new SGWaitForActionState();
-							return m_waitForActionState;
+							if(m_sgWaitForActionState == null)
+								m_sgWaitForActionState = new SGWaitForActionState();
+							return m_sgWaitForActionState;
 						}
-						}private static SGActState m_waitForActionState;
-					public static SGActState RevertState{
+						}private static SGActState m_sgWaitForActionState;
+					public static SGActState revertState{
 						get{
 							if(m_revertState == null)
 								m_revertState = new SGRevertState();
 							return m_revertState;
 						}
 						}private static SGActState m_revertState;
-					public static SGActState ReorderState{
+					public static SGActState reorderState{
 						get{
 							if(m_reorderState == null)
 								m_reorderState = new SGReorderState();
 							return m_reorderState;
 						}
 						}private static SGActState m_reorderState;
-					public static SGActState AddState{
+					public static SGActState addState{
 						get{
 							if(m_addState == null)
 								m_addState = new SGAddState();
 							return m_addState;
 						}
 						}private static SGActState m_addState;
-					public static SGActState RemoveState{
+					public static SGActState removeState{
 						get{
 							if(m_removeState == null)
 								m_removeState = new SGRemoveState();
 							return m_removeState;
 						}
 						}private static SGActState m_removeState;
-					public static SGActState SwapState{
+					public static SGActState swapState{
 						get{
 							if(m_swapState == null)
 								m_swapState = new SGSwapState();
 							return m_swapState;
 						}
 						}private static SGActState m_swapState;
-					public static SGActState FillState{
+					public static SGActState fillState{
 						get{
 							if(m_fillState == null)
 								m_fillState = new SGFillState();
 							return m_fillState;
 						}
 						}private static SGActState m_fillState;
-					public static SGActState SortState{
+					public static SGActState sortState{
 						get{
 							if(m_sortState == null)
 								m_sortState = new SGSortState();
@@ -531,12 +518,12 @@ namespace SlotSystem{
 				// 	return null;
 				// }
 				public override void Focus(){
-					SetSelState(SlotGroup.FocusedState);
+					SetSelState(SlotGroup.sgFocusedState);
 					FocusSBs();
 					Reset();
 				}
 				public void FocusSelf(){
-					SetSelState(SlotGroup.FocusedState);
+					SetSelState(SlotGroup.sgFocusedState);
 				}
 				public void FocusSBs(){
 					foreach(Slottable sb in slottables){
@@ -551,12 +538,12 @@ namespace SlotSystem{
 					}
 				}
 				public override void Defocus(){
-					SetSelState(SlotGroup.DefocusedState);
+					SetSelState(SlotGroup.sgDefocusedState);
 					DefocusSBs();
 					Reset();
 				}
 				public void DefocusSelf(){
-					SetSelState(SlotGroup.DefocusedState);
+					SetSelState(SlotGroup.sgDefocusedState);
 				}
 				public void DefocusSBs(){
 					foreach(Slottable sb in slottables){
@@ -568,7 +555,7 @@ namespace SlotSystem{
 					}
 				}
 				public override void Deactivate(){
-					SetSelState(SlotGroup.DeactivatedState);
+					SetSelState(SlotGroup.sgDeactivatedState);
 					foreach(Slottable sb in slottables){
 						if(sb != null){
 							sb.Deactivate();
@@ -611,8 +598,8 @@ namespace SlotSystem{
 					this.isExpandable = false;
 				m_initSlotsCount = initSlotsCount;
 				InitializeItems();			
-				SetSelState(SlotGroup.DeactivatedState);
-				SetActState(SlotGroup.WaitForActionState);
+				SetSelState(SlotGroup.sgDeactivatedState);
+				SetActState(SlotGroup.sgWaitForActionState);
 			}
 			public Slottable GetSB(InventoryItemInstanceMock itemInst){
 				foreach(Slottable sb in slottables){
@@ -787,7 +774,7 @@ namespace SlotSystem{
 				return result;
 			}
 			public void Reset(){
-				SetActState(SlotGroup.WaitForActionState);
+				SetActState(SlotGroup.sgWaitForActionState);
 				SetAllTASBs(null);
 				SetNewSBs(null);
 				SetNewSlots(null);
