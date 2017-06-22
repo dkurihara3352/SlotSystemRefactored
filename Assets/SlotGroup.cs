@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace SlotSystem{
-	public class SlotGroup : MonoBehaviour, SlotSystemElement{
+	public class SlotGroup : AbsSlotSystemElement{
 		/*	states	*/
 			/*	Engines	*/
-				SSEStateEngine SGSelStateEngine{
-					get{
-						if(m_sgSelStateEngine == null)
-							m_sgSelStateEngine = new SSEStateEngine(this);
-						return m_sgSelStateEngine;
-					}	
-					}SSEStateEngine m_sgSelStateEngine;
-					public SSEState curSelState{
-						get{return (SGSelState)SGSelStateEngine.curState;}
+				// SSEStateEngine SGSelStateEngine{
+					// 	get{
+					// 		if(m_sgSelStateEngine == null)
+					// 			m_sgSelStateEngine = new SSEStateEngine(this);
+					// 		return m_sgSelStateEngine;
+					// 	}	
+					// 	}SSEStateEngine m_sgSelStateEngine;
+				/*	Selection State	*/
+					public override SSEState curSelState{
+						get{return (SGSelState)selStateEngine.curState;}
 					}
-					public SSEState prevSelState{
-						get{return (SGSelState)SGSelStateEngine.prevState;}
+					public override SSEState prevSelState{
+						get{return (SGSelState)selStateEngine.prevState;}
 					}
-					public void SetSelState(SSEState state){
+					public override void SetSelState(SSEState state){
 						if(state == null || state is SGSelState)
-							SGSelStateEngine.SetState(state);
+							selStateEngine.SetState(state);
 						else
 							throw new System.InvalidOperationException("SlotGroup.SetSelState: somthing other than SGSelectionState is trying to be assinged");
 					}
@@ -53,22 +54,23 @@ namespace SlotSystem{
 							return m_selectedState;
 						}
 						}private static SGSelState m_selectedState;
-				SSEStateEngine SGActStateEngine{
-					get{
-						if(m_sgActStateEngine == null)
-							m_sgActStateEngine = new SSEStateEngine(this);
-						return m_sgActStateEngine;
-					}	
-					}SSEStateEngine m_sgActStateEngine;
-					public SSEState curActState{
-						get{return (SGActState)SGActStateEngine.curState;}
+				// SSEStateEngine SGActStateEngine{
+					// 	get{
+					// 		if(m_sgActStateEngine == null)
+					// 			m_sgActStateEngine = new SSEStateEngine(this);
+					// 		return m_sgActStateEngine;
+					// 	}	
+					// 	}SSEStateEngine m_sgActStateEngine;
+				/*	Action State	*/
+					public override SSEState curActState{
+						get{return (SGActState)actStateEngine.curState;}
 					}
-					public SSEState prevActState{
-						get{return (SGActState)SGActStateEngine.prevState;}
+					public override SSEState prevActState{
+						get{return (SGActState)actStateEngine.prevState;}
 					}
-					public void SetActState(SSEState state){
+					public override void SetActState(SSEState state){
 						if(state == null || state is SGActState)
-							SGActStateEngine.SetState(state);
+							actStateEngine.SetState(state);
 						else
 							throw new System.InvalidOperationException("SlotGroup.SetActState: somthing other than SGActionState is trying to be assinged");
 					}
@@ -131,51 +133,53 @@ namespace SlotSystem{
 
 			
 			/*	process	*/
-				public SSEProcessEngine selProcEngine{
-					get{
-						if(m_selProcEngine == null)
-							m_selProcEngine = new SSEProcessEngine();
-						return m_selProcEngine;
-					}
-					}SSEProcessEngine m_selProcEngine;
-					public SSEProcess selProcess{
+				/*	Selection Process	*/
+					// public SSEProcessEngine selProcEngine{
+						// 	get{
+						// 		if(m_selProcEngine == null)
+						// 			m_selProcEngine = new SSEProcessEngine();
+						// 		return m_selProcEngine;
+						// 	}
+						// 	}SSEProcessEngine m_selProcEngine;
+					public override SSEProcess selProcess{
 						get{return (SGSelProcess)selProcEngine.process;}
 					}
-					public void SetAndRunSelProcess(SSEProcess process){
+					public override void SetAndRunSelProcess(SSEProcess process){
 						if(process == null || process is SGSelProcess)
 							selProcEngine.SetAndRunProcess(process);
 						else throw new System.InvalidOperationException("SlotGroup.SetAndrunSelProcess: argument is not of type SGSelProcess");
 					}
-					public IEnumeratorMock greyinCoroutine(){
+					public override IEnumeratorMock greyinCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock greyoutCoroutine(){
+					public override IEnumeratorMock greyoutCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock highlightCoroutine(){
+					public override IEnumeratorMock highlightCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock dehighlightCoroutine(){
+					public override IEnumeratorMock dehighlightCoroutine(){
 						return null;
 					}
-				public SSEProcessEngine actProcEngine{
-					get{
-						if(m_actProcEngine == null)
-							m_actProcEngine = new SSEProcessEngine();
-						return m_actProcEngine;
-					}
-					}SSEProcessEngine m_actProcEngine;
-					public SSEProcess actProcess{
+				/*	Action Process	*/
+					// public SSEProcessEngine actProcEngine{
+						// 	get{
+						// 		if(m_actProcEngine == null)
+						// 			m_actProcEngine = new SSEProcessEngine();
+						// 		return m_actProcEngine;
+						// 	}
+						// 	}SSEProcessEngine m_actProcEngine;
+					public override SSEProcess actProcess{
 						get{return (SGActProcess)actProcEngine.process;}
 					}
-					public void SetAndRunActProcess(SSEProcess process){
+					public override void SetAndRunActProcess(SSEProcess process){
 						if(process == null || process is SGActProcess)
 							actProcEngine.SetAndRunProcess(process);
 						else throw new System.InvalidOperationException("SlotGroup.SetAndRunActProcess: argument is not of type SGActProcess");
 					}
 					public IEnumeratorMock TransactionCoroutine(){
 						bool flag = true;
-						foreach(Slottable sb in this){
+						foreach(Slottable sb in slottables){
 							if(sb != null)
 							flag &= !sb.actProcess.isRunning;
 						}
@@ -338,7 +342,7 @@ namespace SlotSystem{
 				get{
 					// if(allTASBs != null){
 					// }
-						foreach(Slottable sb in this){
+						foreach(Slottable sb in slottables){
 							if(sb != null){
 								if(sb.actProcess.isRunning)
 									return false;
@@ -476,13 +480,20 @@ namespace SlotSystem{
 			}
 		/*	SlotSystemElement implementation	*/
 			/* fields	*/
-				public SlotSystemElement this[int i]{
+				public override SlotSystemElement this[int i]{
 					get{return slottables[i];}
+				}
+				protected override IEnumerable<SlotSystemElement> elements{
+					get{
+						foreach(Slottable sb in slottables){
+							yield return (SlotSystemElement)sb;
+						}
+					}
 				}
 				public int Count{
 					get{return slottables.Count;}
 				}
-				public string eName{
+				public override string eName{
 					get{
 						string res = m_eName;
 						if(sgm != null){
@@ -491,71 +502,35 @@ namespace SlotSystem{
 							if(isSGG) res = Util.Green(res);
 						}
 						return res;
-						}
-					}string m_eName;
+					}
+				}
 				public List<Slottable> toList{get{return slottables;}}
-				public SlotSystemElement parent{
-					get{return m_parent;}
-					set{m_parent = value;}
-					}SlotSystemElement m_parent;
-				public SlotSystemBundle immediateBundle{
-					get{
-						if(parent == null)
-							return null;
-						if(parent is SlotSystemBundle)
-							return (SlotSystemBundle)parent;
-						else
-							return parent.immediateBundle;
-					}
-				}
-				public SlotGroupManager sgm{
-					get{return m_sgm;}
-					set{m_sgm = value;}
-					}SlotGroupManager m_sgm;
-
-				public int level{
-					get{
-						if(parent == null) return 0;
-						return parent.level + 1;
-					}
-				}
-				public SlotSystemElement rootElement{
-					get{return m_rootElement;}
-					set{m_rootElement = value;}
-					}SlotSystemElement m_rootElement;
 
 			/*	methods	*/
-				public IEnumerator<SlotSystemElement> GetEnumerator(){
-					foreach(Slottable sb in slottables){
-						yield return sb;
-					}
-					}IEnumerator IEnumerable.GetEnumerator(){
-						return GetEnumerator();
-					}
 				public int IndexOf(Slottable sb){
 					return slottables.IndexOf(sb);
 				}
-				public bool Contains(SlotSystemElement element){
+				public override bool Contains(SlotSystemElement element){
 					if(element is Slottable)
 						return slottables.Contains((Slottable)element);
 					return false;
 				}
-				public bool ContainsInHierarchy(SlotSystemElement element){
-					return FindParentInHierarchy(element) != null;
-				}
-				public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
-					if(element is Slottable){
-						Slottable tarSB = (Slottable)element;
-						foreach(Slottable sb in slottables){
-							if(sb != null){
-								if(sb == tarSB)
-									return this;
-							}
-						}
-					}
-					return null;
-				}
-				public void Focus(){
+				// public bool ContainsInHierarchy(SlotSystemElement element){
+				// 	return FindParentInHierarchy(element) != null;
+				// }
+				// public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
+				// 	if(element is Slottable){
+				// 		Slottable tarSB = (Slottable)element;
+				// 		foreach(Slottable sb in slottables){
+				// 			if(sb != null){
+				// 				if(sb == tarSB)
+				// 					return this;
+				// 			}
+				// 		}
+				// 	}
+				// 	return null;
+				// }
+				public override void Focus(){
 					SetSelState(SlotGroup.FocusedState);
 					FocusSBs();
 					Reset();
@@ -575,7 +550,7 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void Defocus(){
+				public override void Defocus(){
 					SetSelState(SlotGroup.DefocusedState);
 					DefocusSBs();
 					Reset();
@@ -592,40 +567,35 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void Activate(){
-				}
-				public void Deactivate(){
+				public override void Deactivate(){
 					SetSelState(SlotGroup.DeactivatedState);
 					foreach(Slottable sb in slottables){
 						if(sb != null){
-							sb.SetSelState(Slottable.DeactivatedState);
+							sb.Deactivate();
 						}
 					}
 				}
-				public void PerformInHierarchy(System.Action<SlotSystemElement> act){
+				public override void PerformInHierarchy(System.Action<SlotSystemElement> act){
 					act(this);
-					foreach(Slottable sb in this){
+					foreach(Slottable sb in slottables){
 						if(sb != null)
 							sb.PerformInHierarchy(act);
 					}
 				}
-				public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+				public override void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
 					act(this, obj);
 					foreach(Slottable sb in slottables){
 						if(sb != null)
 							sb.PerformInHierarchy(act, obj);
 					}
 				}
-				public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
+				public override void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
 					act(this, list);
 					foreach(Slottable sb in slottables){
 						if(sb != null)
 							sb.PerformInHierarchy<T>(act, list);
 					}
 				}
-				public void InstantGreyout(){}
-				public void InstantGreyin(){}
-				public void InstantHighlight(){}
 		/*	methods	*/
 			public void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
 				m_eName = name;
@@ -645,7 +615,7 @@ namespace SlotSystem{
 				SetActState(SlotGroup.WaitForActionState);
 			}
 			public Slottable GetSB(InventoryItemInstanceMock itemInst){
-				foreach(Slottable sb in this.slottables){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(sb.itemInst == itemInst)
 							return sb;
@@ -663,7 +633,7 @@ namespace SlotSystem{
 			}
 			public bool HasItem(InventoryItemInstanceMock invInst){
 				bool result = false;
-				foreach(Slottable sb in this.slottables){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(sb.itemInst == invInst)
 							return true;
@@ -734,7 +704,7 @@ namespace SlotSystem{
 			}
 			public Slot GetNewSlot(InventoryItemInstanceMock itemInst){
 				int index = -3;
-				foreach(Slottable sb in this){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(sb.itemInst == itemInst)
 							index = sb.newSlotID;
@@ -781,7 +751,7 @@ namespace SlotSystem{
 				TransactionCoroutine();
 			}
 			public void OnCompleteSlotMovements(){
-				foreach(Slottable sb in this){
+				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(sb.newSlotID == -1){
 							GameObject sbGO = sb.gameObject;
@@ -801,7 +771,7 @@ namespace SlotSystem{
 					newSBs.Add(slot.sb);
 				}
 				SetSBs(newSBs);
-				foreach(Slottable sb in this){
+				foreach(Slottable sb in slottables){
 					if(sb != null)
 					sb.SetSlotID(newSBs.IndexOf(sb));
 				}

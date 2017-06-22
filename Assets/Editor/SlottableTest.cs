@@ -1077,47 +1077,6 @@ public class SlottableTest{
 			}
 		}
 	}
-	// public void AssertSlotSystemRootElementCorrectlySet(InventoryManagerPage invManPage){
-		// 	AE(invManPage.rootElement, invManPage);
-		// 	AE(invManPage.poolBundle.rootElement, invManPage);
-		// 		foreach(SlotSystemElement ele in invManPage.poolBundle){
-		// 			SlotGroup sg = (SlotGroup)ele;
-		// 			AE(sg.rootElement, invManPage);
-		// 			foreach(Slottable sb in sg){
-		// 				if(sb != null)
-		// 					AE(sb.rootElement, invManPage);
-		// 			}
-		// 		}
-		// 	AE(invManPage.equipBundle.rootElement, invManPage);
-		// 		foreach(SlotSystemElement ele in invManPage.equipBundle){
-		// 			EquipmentSet eSet = (EquipmentSet)ele;
-		// 			AE(eSet.rootElement, invManPage);
-		// 			foreach(SlotSystemElement ele2 in eSet){
-		// 				SlotGroup sg = (SlotGroup)ele2;
-		// 				AE(sg.rootElement, invManPage);
-		// 				foreach(Slottable sb in sg){
-		// 					if(sb != null)
-		// 						AE(sb.rootElement, invManPage);
-		// 				}
-		// 			}
-		// 		}
-		// 	foreach(SlotSystemBundle gBundle in invManPage.otherBundles){
-		// 		AE(gBundle.rootElement, invManPage);
-		// 		foreach(var ele in gBundle){
-		// 			if(ele is GenericPage){
-		// 				foreach(var e in ele){
-		// 					SlotGroup sg = (SlotGroup)e;
-		// 					AE(sg.rootElement, invManPage);
-		// 					Debug.Log(sg.eName + "'s root is set correctly");
-		// 				}
-		// 			}else if(ele is SlotGroup){
-		// 					SlotGroup sg = (SlotGroup)ele;
-		// 					AE(sg.rootElement, invManPage);
-		// 					Debug.Log(sg.eName + "'s root is set correctly");
-		// 			}
-		// 		}
-		// 	}
-		// }
 	public string Indent(int level){
 		string res = "";
 		for(int i = 0; i < level; i++){
@@ -2857,7 +2816,7 @@ public class SlottableTest{
 					SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 					null, SBPickedUp, null, false,
 					null, null, null);
-					Print(pickedSB);
+					// Print(pickedSB);
 					// Debug.Log(pickedSB.rootElement.eName);
 					// Debug.Log(((InventoryManagerPage)pickedSB.rootElement).FindParent(pickedSB).eName);
 			pickedSB.OnPointerUpMock(eventData);

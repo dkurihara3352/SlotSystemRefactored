@@ -12,10 +12,10 @@ namespace SlotSystem{
 					return m_selStateEngine;
 				}
 				}SSEStateEngine m_selStateEngine;
-				public SSEState prevSelState{
+				public virtual SSEState prevSelState{
 					get{return (SSESelState)selStateEngine.prevState;}
 				}
-				public SSEState curSelState{
+				public virtual SSEState curSelState{
 					get{return (SSEState)selStateEngine.curState;}
 				}
 				public virtual void SetSelState(SSEState state){
@@ -59,10 +59,10 @@ namespace SlotSystem{
 					return m_actStateEngine;
 				}
 				}SSEStateEngine m_actStateEngine;
-				public SSEState prevActState{
+				public virtual SSEState prevActState{
 					get{return (SSEActState)actStateEngine.prevState;}
 				}
-				public SSEState curActState{
+				public virtual SSEState curActState{
 					get{return (SSEActState)actStateEngine.curState;}
 				}
 				public virtual void SetActState(SSEState state){
@@ -86,25 +86,25 @@ namespace SlotSystem{
 					return m_selProcEngine;
 				}
 				}SSEProcessEngine m_selProcEngine;
-				public SSEProcess selProcess{
+				public virtual SSEProcess selProcess{
 					get{return (SSESelProcess)selProcEngine.process;}
 				}
-				public void SetAndRunSelProcess(SSEProcess process){
+				public virtual void SetAndRunSelProcess(SSEProcess process){
 					if(process == null||process is SSESelProcess)
 						selProcEngine.SetAndRunProcess(process);
 					else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
 				}
 				/*	coroutine	*/
-					public IEnumeratorMock greyoutCoroutine(){
+					public virtual IEnumeratorMock greyoutCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock greyinCoroutine(){
+					public virtual IEnumeratorMock greyinCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock highlightCoroutine(){
+					public virtual IEnumeratorMock highlightCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock dehighlightCoroutine(){
+					public virtual IEnumeratorMock dehighlightCoroutine(){
 						return null;
 					}
 			public SSEProcessEngine actProcEngine{
@@ -114,16 +114,16 @@ namespace SlotSystem{
 					return m_actProcEngine;
 				}
 				}SSEProcessEngine m_actProcEngine;
-				public SSEProcess actProcess{
+				public virtual SSEProcess actProcess{
 					get{return (SSEActProcess)actProcEngine.process;}
 				}
-				public void SetAndRunActProcess(SSEProcess process){
+				public virtual void SetAndRunActProcess(SSEProcess process){
 					if(process == null || process is SSEActProcess)
 						actProcEngine.SetAndRunProcess(process);
 					else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");
 				}
 		/*	public fields	*/
-			public SlotSystemElement this[int i]{
+			public virtual SlotSystemElement this[int i]{
 				get{
 					int id = 0;
 					foreach(var ele in elements){
@@ -133,9 +133,9 @@ namespace SlotSystem{
 					throw new System.InvalidOperationException("AbsSlotSysElement.indexer: argument out of range");
 				}
 			}
-			public string eName{get{return m_eName;}}protected string m_eName;
+			public virtual string eName{get{return m_eName;}}protected string m_eName;
 			protected abstract IEnumerable<SlotSystemElement> elements{get;}
-			public SlotSystemElement parent{
+			public virtual SlotSystemElement parent{
 				get{return m_parent;}
 				set{m_parent = value;}
 				}SlotSystemElement m_parent;
@@ -152,14 +152,13 @@ namespace SlotSystem{
 			public SlotGroupManager sgm{
 				get{return m_sgm;}
 				set{m_sgm = value;}
-				}SlotGroupManager m_sgm;
+				}protected SlotGroupManager m_sgm;
 
-			public int level{
+			public virtual int level{
 				get{
 					if(parent == null)
 						return 0;
-					else
-						return parent.level + 1;
+					return parent.level + 1;
 				}
 			}
 			public virtual SlotSystemElement rootElement{
@@ -172,7 +171,7 @@ namespace SlotSystem{
 				SetSelState(AbsSlotSystemElement.deactivatedState);
 				SetActState(AbsSlotSystemElement.waitForActionState);
 			}
-			public IEnumerator<SlotSystemElement> GetEnumerator(){
+			public virtual IEnumerator<SlotSystemElement> GetEnumerator(){
 				foreach(SlotSystemElement ele in elements)
 					yield return ele;
 				}IEnumerator IEnumerable.GetEnumerator(){
@@ -211,25 +210,25 @@ namespace SlotSystem{
 					ele.Defocus();
 				}
 			}
-			public void PerformInHierarchy(System.Action<SlotSystemElement> act){
+			public virtual void PerformInHierarchy(System.Action<SlotSystemElement> act){
 				act(this);
 				foreach(SlotSystemElement ele in this){
 					ele.PerformInHierarchy(act);
 				}
 			}
-			public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+			public virtual void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
 				act(this, obj);
 				foreach(SlotSystemElement ele in this){
 					ele.PerformInHierarchy(act, obj);
 				}
 			}
-			public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
+			public virtual void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
 				act(this, list);
 				foreach(SlotSystemElement ele in this){
 					ele.PerformInHierarchy<T>(act, list);
 				}
 			}
-			public bool Contains(SlotSystemElement element){
+			public virtual bool Contains(SlotSystemElement element){
 				foreach(SlotSystemElement ele in elements){
 					if(ele != null && ele == element)
 						return true;

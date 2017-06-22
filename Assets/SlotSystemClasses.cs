@@ -531,7 +531,7 @@ namespace SlotSystem{
 				}
 				public override void Expire(){
 					base.Expire();
-					SGM.OnAllTransactionComplete();
+					SGM.Transaction.OnComplete();
 				}
 			}
 	/*	SlotGroup Classes	*/
@@ -915,7 +915,7 @@ namespace SlotSystem{
 						sg.sgm.AcceptSGTAComp(sg);
 					}
 				}
-			/*	commands	*/
+		/*	commands	*/
 			public interface SlotGroupCommand{
 				void Execute(SlotGroup Sg);
 			}
@@ -1766,6 +1766,43 @@ namespace SlotSystem{
 				int level{get;}
 				bool Contains(SlotSystemElement element);
 				SlotSystemElement this[int i]{get;}
+			}
+			public interface SlotSystemManagerInterface{
+				List<SlotGroup> allSGs{get;}
+				List<SlotGroup> focusedSGs{get;}
+				List<SlotGroup> allSGPs{get;}
+				List<SlotGroup> allSGEs{get;}
+				List<SlotGroup> allSGGs{get;}
+				List<EquipmentSet> equipmentSets{get;}
+				List<InventoryItemInstanceMock> allEquippedItems{get;}
+				SlotSystemElement focusedEleInPoolBundle{get;}
+				SlotSystemElement focusedEleInEquipBundle{get;}
+				List<SlotSystemElement> focusedElesInAllGenBundles{get;}
+				PoolInventory poolInv{get;}
+				EquipmentSetInventory equipInv{get;}
+				GenericInventory genInv{get;}
+				BowInstanceMock equippedBow{get;}
+				WearInstanceMock equippedWear{get;}
+				List<CarriedGearInstanceMock> equippedCGears{get;}
+				SlotGroup GetSG(Slottable sb);
+				void FindAndFocusRecursively(SlotSystemElement ele);
+			}
+			public interface TransactionManager{
+				SlotSystemTransaction transaction{get;}
+				void AcceptSGTAComp(SlotGroup sg);
+				void AcceptDITAComp(DraggedIcon di);
+				Slottable pickedSB{get;}
+				Slottable targetSB{get;}
+				SlotGroup sg1{get;}
+				SlotGroup sg2{get;}
+				DraggedIcon dIcon1{get;}
+				DraggedIcon dIcon2{get;}
+				Slottable hoveredSB{get;}
+				SlotGroup hoveredSG{get;}
+				TransactionResults transactionResults{get;}
+				void CreateTransactionResults();
+				void UpdateTransaction();
+				SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup hovSG, Slottable hovSB);
 			}
 		/*	TransactionResult	*/
 			public class TransactionResult{

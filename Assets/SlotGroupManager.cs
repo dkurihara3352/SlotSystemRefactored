@@ -42,9 +42,6 @@ namespace SlotSystem{
 				else if(dIcon1 != null && di == dIcon1) m_dIcon1Done = true;
 				IEnumeratorMock tryInvoke = ((AbsSGMProcess)ActionProcess).CoroutineMock();
 			}
-			public void OnAllTransactionComplete(){
-				Transaction.OnComplete();
-			}
 		/*	states	*/
 			/*	Selection states	*/
 				SGMStateEngine SelStateEngine{
@@ -287,34 +284,7 @@ namespace SlotSystem{
 					if(ele is SlotGroup)
 					sgs.Add((SlotGroup)ele);
 				}
-				public SlotGroup focusedSGEBow{
-					get{
-						foreach(SlotGroup sge in focusedSGEs){
-							if(sge.Filter is SGBowFilter)
-								return sge;
-						}
-						return null;
-					}
-				}
-				public SlotGroup focusedSGEWear{
-					get{
-						foreach(SlotGroup sge in focusedSGEs){
-							if(sge.Filter is SGWearFilter)
-								return sge;
-						}
-						return null;
-					}
-				}
-				public SlotGroup focusedSGECGears{
-					get{
-						foreach(SlotGroup sge in focusedSGEs){
-							if(sge.Filter is SGCGearsFilter)
-								return sge;
-						}
-						return null;
-					}
-				}
-				public List<InventoryItemInstanceMock> actualEquippedItems{
+				public List<InventoryItemInstanceMock> allEquippedItems{
 					get{
 						List<InventoryItemInstanceMock> items = new List<InventoryItemInstanceMock>();
 						items.Add(equippedBowInst);
@@ -438,52 +408,6 @@ namespace SlotSystem{
 				}
 		/*	methods	*/
 			/*	Transaction methods	*/
-				public void UpdateEquipStatesOnAll(){
-					/*	update equip inventory	*/
-						/*	remove	*/
-							List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
-							foreach(InventoryItemInstanceMock itemInInv in equipInv){
-								if(!actualEquippedItems.Contains(itemInInv))
-									removed.Add(itemInInv);
-							}
-							foreach(InventoryItemInstanceMock item in removed){
-								equipInv.Remove(item);
-							}
-						/*	add	*/
-							List<InventoryItemInstanceMock> added = new List<InventoryItemInstanceMock>();
-							foreach(InventoryItemInstanceMock itemInAct in actualEquippedItems){
-								if(!equipInv.Contains(itemInAct))
-									added.Add(itemInAct);
-							}
-							foreach(InventoryItemInstanceMock item in added){
-								equipInv.Add(item);
-							}
-					/*	update all itemInst's isEquipped status	*/
-					foreach(InventoryItemInstanceMock itemInst in poolInv){
-						if(itemInst is BowInstanceMock)
-							itemInst.isEquipped = itemInst == equippedBowInst;
-						else if (itemInst is WearInstanceMock)
-							itemInst.isEquipped = itemInst == equippedWearInst;
-						else if(itemInst is CarriedGearInstanceMock)
-							itemInst.isEquipped = equippedCarriedGears != null && equippedCarriedGears.Contains((CarriedGearInstanceMock)itemInst);
-						else if(itemInst is PartsInstanceMock)
-							itemInst.isEquipped = equippedParts != null && equippedParts.Contains((PartsInstanceMock)itemInst);
-					}
-					/*	set sbs equip states	*/
-					foreach(SlotGroup sg in allSGs){
-						foreach(Slottable sb in sg){
-							if(sb!= null)
-								sb.UpdateEquipState();
-						}
-					}
-				}
-				public void SortSG(SlotGroup sg, SGSorter sorter){
-					SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
-					SetTargetSB(sortTransaction.targetSB);
-					SetSG1(sortTransaction.sg1);
-					SetTransaction(sortTransaction);
-					Transaction.Execute();
-				}
 				public TransactionResults TransactionResults{
 					get{return m_transactionResults;}
 					set{
@@ -529,6 +453,108 @@ namespace SlotSystem{
 				}
 				public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup targetSG, Slottable targetSB){
 					return AbsSlotSystemTransaction.GetTransaction(pickedSB, targetSB, targetSG);
+				}
+			/*	SlotSystem and Hierarchy	*/
+				public void Initialize(InventoryManagerPage invManPage){
+					SetRootPage(invManPage);
+					SelStateEngine.SetState(SlotGroupManager.DeactivatedState);
+					ActStateEngine.SetState(SlotGroupManager.WaitForActionState);
+				}
+				public void Activate(){
+					SetCurSGM();
+					UpdateEquipStatesOnAll();
+					Focus();
+				}
+				public void Focus(){
+					SetSelState(SlotGroupManager.FocusedState);
+					rootPage.Focus();
+				}
+				public void Defocus(){
+					SetSelState(SlotGroupManager.DefocusedState);
+					rootPage.Defocus();
+				}
+				public SlotGroup GetSG(Slottable sb){
+					// return (SlotGroup)rootPage.FindParent(sb);
+					return (SlotGroup)sb.parent;
+				}
+				public void Deactivate(){
+					SetSelState(SlotGroupManager.DeactivatedState);
+					m_rootPage.Deactivate();
+				}
+				public void SetFocusedPoolSG(SlotGroup sg){
+					rootPage.poolBundle.SetFocusedBundleElement(sg);
+					Focus();
+				}
+				public void SetFocusedEquipmentSet(EquipmentSet eSet){
+					rootPage.equipBundle.SetFocusedBundleElement(eSet);
+					Focus();
+				}
+			/*	Resetting	*/
+				public void Reset(){
+					SetActState(SlotGroupManager.WaitForActionState);
+					ClearFields();
+				}
+				public void ResetAndFocus(){
+					Reset();
+					Focus();
+				}
+				public void ClearFields(){
+					SetPickedSB(null);
+					SetTargetSB(null);
+					SetSG1(null);
+					SetSG2(null);
+					SetHoveredSB(null);
+					SetHoveredSG(null);
+					SetDIcon1(null);
+					SetDIcon2(null);
+					SetTransaction(null);
+				}
+			/*	other	*/
+				public void UpdateEquipStatesOnAll(){
+					/*	update equip inventory	*/
+						/*	remove	*/
+							List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
+							foreach(InventoryItemInstanceMock itemInInv in equipInv){
+								if(!allEquippedItems.Contains(itemInInv))
+									removed.Add(itemInInv);
+							}
+							foreach(InventoryItemInstanceMock item in removed){
+								equipInv.Remove(item);
+							}
+						/*	add	*/
+							List<InventoryItemInstanceMock> added = new List<InventoryItemInstanceMock>();
+							foreach(InventoryItemInstanceMock itemInAct in allEquippedItems){
+								if(!equipInv.Contains(itemInAct))
+									added.Add(itemInAct);
+							}
+							foreach(InventoryItemInstanceMock item in added){
+								equipInv.Add(item);
+							}
+					/*	update all itemInst's isEquipped status	*/
+					foreach(InventoryItemInstanceMock itemInst in poolInv){
+						if(itemInst is BowInstanceMock)
+							itemInst.isEquipped = itemInst == equippedBowInst;
+						else if (itemInst is WearInstanceMock)
+							itemInst.isEquipped = itemInst == equippedWearInst;
+						else if(itemInst is CarriedGearInstanceMock)
+							itemInst.isEquipped = equippedCarriedGears != null && equippedCarriedGears.Contains((CarriedGearInstanceMock)itemInst);
+						else if(itemInst is PartsInstanceMock)
+							itemInst.isEquipped = equippedParts != null && equippedParts.Contains((PartsInstanceMock)itemInst);
+					}
+					/*	set sbs equip states	*/
+					foreach(SlotGroup sg in allSGs){
+						foreach(Slottable sb in sg){
+							if(sb!= null)
+								sb.UpdateEquipState();
+						}
+					}
+				}
+				public void SortSG(SlotGroup sg, SGSorter sorter){
+					SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
+					SetTargetSB(sortTransaction.targetSB);
+					SetSG1(sortTransaction.sg1);
+					SetTransaction(sortTransaction);
+					Transaction.Execute();
 				}
 				public void ChangeEquippableCGearsCount(int i, SlotGroup targetSG){
 					if(!targetSG.isExpandable){
@@ -586,60 +612,6 @@ namespace SlotSystem{
 							}
 						}
 					}
-				}
-			/*	SlotSystem and Hierarchy	*/
-				public void Initialize(InventoryManagerPage invManPage){
-					SetRootPage(invManPage);
-					SelStateEngine.SetState(SlotGroupManager.DeactivatedState);
-					ActStateEngine.SetState(SlotGroupManager.WaitForActionState);
-				}
-				public void Activate(){
-					SetCurSGM();
-					UpdateEquipStatesOnAll();
-					Focus();
-				}
-				public void Focus(){
-					SetSelState(SlotGroupManager.FocusedState);
-					rootPage.Focus();
-				}
-				public void Defocus(){
-					SetSelState(SlotGroupManager.DefocusedState);
-					rootPage.Defocus();
-				}
-				public SlotGroup GetSG(Slottable sb){
-					// return (SlotGroup)rootPage.FindParent(sb);
-					return (SlotGroup)sb.parent;
-				}
-				public void Reset(){
-					SetActState(SlotGroupManager.WaitForActionState);
-					ClearFields();
-				}
-				public void ResetAndFocus(){
-					Reset();
-					Focus();
-				}
-				public void ClearFields(){
-					SetPickedSB(null);
-					SetTargetSB(null);
-					SetSG1(null);
-					SetSG2(null);
-					SetHoveredSB(null);
-					SetHoveredSG(null);
-					SetDIcon1(null);
-					SetDIcon2(null);
-					SetTransaction(null);
-				}
-				public void Deactivate(){
-					SetSelState(SlotGroupManager.DeactivatedState);
-					m_rootPage.Deactivate();
-				}
-				public void SetFocusedPoolSG(SlotGroup sg){
-					rootPage.poolBundle.SetFocusedBundleElement(sg);
-					Focus();
-				}
-				public void SetFocusedEquipmentSet(EquipmentSet eSet){
-					rootPage.equipBundle.SetFocusedBundleElement(eSet);
-					Focus();
 				}
 	}
 }
