@@ -78,11 +78,11 @@ namespace SlotSystem{
 						if(targetSB == null){// on SG
 							if(targetSG.AcceptsFilter(pickedSB)){
 								if(targetSG != origSG && origSG.isShrinkable){
-									if(targetSG.HasItemCurrently(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
+									if(targetSG.HasItem(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
 										return new StackTransaction(pickedSB, targetSG.GetSB(pickedSB.itemInst));
 										
 									if(targetSG.hasEmptySlot){
-										if(!targetSG.HasItemCurrently(pickedSB.itemInst))
+										if(!targetSG.HasItem(pickedSB.itemInst))
 											return new FillTransaction(pickedSB, targetSG);
 									}else{
 										if(targetSG.SwappableSBs(pickedSB).Count == 1){
@@ -112,8 +112,8 @@ namespace SlotSystem{
 										if(pickedSB.itemInst.Item.IsStackable)
 											return new StackTransaction(pickedSB, targetSB);
 									}else{
-										if(targetSG.HasItemCurrently(pickedSB.itemInst)){
-											if(!origSG.HasItemCurrently(targetSB.itemInst)){
+										if(targetSG.HasItem(pickedSB.itemInst)){
+											if(!origSG.HasItem(targetSB.itemInst)){
 												if(targetSG.isPool){
 													if(origSG.AcceptsFilter(targetSB))
 														return new SwapTransaction(pickedSB, targetSB);
@@ -169,7 +169,7 @@ namespace SlotSystem{
 					base.Execute();
 				}
 				public override void OnComplete(){
-					m_origSG.OnCompleteSlotMovementsV3();
+					m_origSG.OnCompleteSlotMovements();
 					base.OnComplete();
 				}
 			}
@@ -192,7 +192,7 @@ namespace SlotSystem{
 					base.Execute();
 				}
 				public override void OnComplete(){
-					sg1.OnCompleteSlotMovementsV3();
+					sg1.OnCompleteSlotMovements();
 					base.OnComplete();
 				}
 			}
@@ -250,8 +250,8 @@ namespace SlotSystem{
 					base.Execute();
 				}
 				public override void OnComplete(){
-					sg1.OnCompleteSlotMovementsV2();
-					sg2.OnCompleteSlotMovementsV2();
+					sg1.OnCompleteSlotMovements();
+					sg2.OnCompleteSlotMovements();
 					base.OnComplete();
 				}
 			}
@@ -282,8 +282,8 @@ namespace SlotSystem{
 					base.Execute();
 				}
 				public override void OnComplete(){
-					sg1.OnCompleteSlotMovementsV3();
-					sg2.OnCompleteSlotMovementsV3();
+					sg1.OnCompleteSlotMovements();
+					sg2.OnCompleteSlotMovements();
 					base.OnComplete();
 				}
 			}
@@ -308,8 +308,8 @@ namespace SlotSystem{
 					base.Execute();
 				}
 				public override void OnComplete(){
-					sg1.OnCompleteSlotMovementsV3();
-					sg2.OnCompleteSlotMovementsV3();
+					sg1.OnCompleteSlotMovements();
+					sg2.OnCompleteSlotMovements();
 					base.OnComplete();
 				}
 			}
@@ -329,7 +329,7 @@ namespace SlotSystem{
 					base.Execute();
 				}
 				public override void OnComplete(){
-					sg1.OnCompleteSlotMovementsV3();
+					sg1.OnCompleteSlotMovements();
 					base.OnComplete();
 				}
 			}
@@ -1235,14 +1235,6 @@ namespace SlotSystem{
 				}
 		/*	states	*/
 			/*	superclasses	*/
-				// public class SBStateEngine: SwitchableStateEngine{
-					// 	public SBStateEngine(Slottable sb){
-					// 		this.handler = sb;
-					// 	}
-					// 	public void SetState(SBState sbState){
-					// 		base.SetState(sbState);
-					// 	}
-					// }
 				public abstract class SBState: SSEState{
 					protected Slottable sb{
 						get{
@@ -1257,25 +1249,12 @@ namespace SlotSystem{
 					public virtual void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					}
 				}
-				// public abstract class SBSelectionState: SBState{
-					// 	public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
-					// 		sb.sgm.SetHoveredSB(sb);
-					// 	}
-					// 	public virtual void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
-					// 	}
-					// }
 				public abstract class SBActState: SBState{
 					public abstract void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock);
 					public abstract void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock);
 					public abstract void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock);
 					public abstract void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
 				}
-				// public abstract class SBActionState: SBState{
-					// 	public abstract void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock);
-					// 	public abstract void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock);
-					// 	public abstract void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock);
-					// 	public abstract void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
-					// }
 				public abstract class SBEqpState: SBState{}
 			/*	SB Selection States	*/
 				public class SBDeactivatedState: SBSelState{
@@ -1787,264 +1766,6 @@ namespace SlotSystem{
 				int level{get;}
 				bool Contains(SlotSystemElement element);
 				SlotSystemElement this[int i]{get;}
-			}
-			public abstract class AbsSlotSysElement: SlotSystemElement{
-				public SSEState curSelState{get{return null;}}
-				public SSEState prevSelState{get{return null;}}
-				public SSEState curActState{get{return null;}}
-				public SSEState prevActState{get{return null;}}
-				public SSEProcess selProcess{get{return null;}}
-				public void SetAndRunSelProcess(SSEProcess process){}
-				public SSEProcess actProcess{get{return null;}}
-				public void SetAndRunActProcess(SSEProcess process){}
-				public IEnumeratorMock greyoutCoroutine(){return null;}
-				public IEnumeratorMock greyinCoroutine(){return null;}
-				public IEnumeratorMock highlightCoroutine(){return null;}
-				public IEnumeratorMock dehighlightCoroutine(){return null;}
-				public void InstantGreyin(){}
-				public void InstantGreyout(){}
-				public void InstantHighlight(){}
-				
-				public string eName{get{return m_eName;}}protected string m_eName;
-				protected abstract IEnumerable<SlotSystemElement> elements{get;}
-				public IEnumerator<SlotSystemElement> GetEnumerator(){
-					foreach(SlotSystemElement ele in elements)
-						yield return ele;
-					}IEnumerator IEnumerable.GetEnumerator(){
-						return GetEnumerator();
-					}
-				public bool Contains(SlotSystemElement element){
-					foreach(SlotSystemElement ele in elements){
-						if(ele != null && ele == element)
-							return true;
-					}
-					return false;
-				}
-				public SlotSystemElement this[int i]{
-					get{
-						int id = 0;
-						foreach(var ele in elements){
-							if(id++ == i)
-								return ele;	
-						}
-						throw new System.InvalidOperationException("AbsSlotSysElement.indexer: argument out of range");
-					}
-				}
-				public SlotSystemElement parent{
-					get{return m_parent;}
-					set{m_parent = value;}
-					}SlotSystemElement m_parent;
-				public virtual SlotSystemBundle immediateBundle{
-					get{
-						if(parent == null)
-							return null;
-						if(parent is SlotSystemBundle)
-							return (SlotSystemBundle)parent;
-						else
-							return parent.immediateBundle;
-					}
-				}
-				public virtual bool ContainsInHierarchy(SlotSystemElement ele){
-					SlotSystemElement testEle = ele.parent;
-					while(true){
-						if(testEle == null)
-							return false;
-						if(testEle == this)
-							return true;
-						testEle = testEle.parent;
-					}
-				}
-				public virtual void Activate(){
-					foreach(SlotSystemElement ele in this){
-						ele.Activate();
-					}
-				}
-				public virtual void Deactivate(){
-					foreach(SlotSystemElement ele in this){
-						ele.Deactivate();
-					}
-				}
-				public virtual void Focus(){
-					foreach(SlotSystemElement ele in this){
-						ele.Focus();
-					}
-				}
-				public virtual void Defocus(){
-					foreach(SlotSystemElement ele in this){
-						ele.Defocus();
-					}
-				}
-				public SlotGroupManager sgm{
-					get{return m_sgm;}
-					set{m_sgm = value;}
-					}SlotGroupManager m_sgm;
-				public void PerformInHierarchy(System.Action<SlotSystemElement> act){
-					act(this);
-					foreach(SlotSystemElement ele in this){
-						ele.PerformInHierarchy(act);
-					}
-				}
-				public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
-					act(this, obj);
-					foreach(SlotSystemElement ele in this){
-						ele.PerformInHierarchy(act, obj);
-					}
-				}
-				public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
-					act(this, list);
-					foreach(SlotSystemElement ele in this){
-						ele.PerformInHierarchy<T>(act, list);
-					}
-				}
-				public int level{
-					get{
-						if(parent == null)
-							return 0;
-						else
-							return parent.level + 1;
-					}
-				}
-				public virtual SlotSystemElement rootElement{
-					get{return m_rootElement;}
-					set{m_rootElement = value;}
-					}
-					SlotSystemElement m_rootElement;
-			}
-			public class InventoryManagerPage: AbsSlotSysElement{
-				public override SlotSystemBundle immediateBundle{
-					get{return null;}
-				}
-				public SlotSystemBundle poolBundle{
-					get{return m_poolBundle;}
-					}SlotSystemBundle m_poolBundle;
-				public SlotSystemBundle equipBundle{
-					get{return m_equipBundle;}
-					}SlotSystemBundle m_equipBundle;
-				public IEnumerable<SlotSystemBundle> otherBundles{
-					get{
-						if(m_otherBundles == null)
-							m_otherBundles = new SlotSystemBundle[]{};
-						return m_otherBundles;}
-					}IEnumerable<SlotSystemBundle> m_otherBundles;
-
-				public InventoryManagerPage(SlotSystemBundle poolBundle, SlotSystemBundle equipBundle, IEnumerable<SlotSystemBundle> gBundles){
-					m_eName = Util.Bold("invManPage");
-					this.m_poolBundle = poolBundle;
-					this.m_equipBundle = equipBundle;
-					m_otherBundles = gBundles;
-					PerformInHierarchy(SetRoot);
-					PerformInHierarchy(SetParent);
-				}
-				protected override IEnumerable<SlotSystemElement> elements{
-					get{
-						yield return poolBundle;
-						yield return equipBundle;
-						foreach(var ele in otherBundles)
-							yield return ele;
-					}
-				}
-				public SlotSystemElement foundParent;
-				public SlotSystemElement FindParent(SlotSystemElement ele){
-					foundParent = null;
-					PerformInHierarchy(CheckAndReportParent, ele);
-					return foundParent;
-				}
-				void CheckAndReportParent(SlotSystemElement ele, object obj){
-					if(!(ele is Slottable)){
-						SlotSystemElement tarEle = (SlotSystemElement)obj;
-						foreach(SlotSystemElement e in ele){
-							if(e == tarEle)
-								this.foundParent = ele;
-						}
-					}
-				}
-				void SetRoot(SlotSystemElement ele){
-					ele.rootElement = this;
-				}
-				void SetParent(SlotSystemElement ele){
-					if(!((ele is Slottable) || (ele is SlotGroup)))
-					foreach(SlotSystemElement e in ele){
-						if(e != null)
-						e.parent = ele;
-					}
-					// if(ele != this)
-					// ele.parent = this.FindParent(ele);
-				}
-				public override SlotSystemElement rootElement{
-					get{return this;}
-					set{}
-				}
-				public void SetSGMRecursively(SlotGroupManager sgm){
-					this.sgm = sgm;
-					PerformInHierarchy(SetSGM);
-				}
-				public void SetSGM(SlotSystemElement ele){
-					if(ele != this)
-					ele.sgm = this.sgm;
-				}
-			}
-			public class GenericPage: AbsSlotSysElement{
-				protected override IEnumerable<SlotSystemElement> elements{
-					get{return m_elements;}
-					}IEnumerable<SlotSystemElement> m_elements;
-				public GenericPage(IEnumerable<SlotSystemElement> elements){
-					m_eName = Util.Bold("genPage");
-					m_elements = elements;
-				}
-			}
-			public class EquipmentSet: AbsSlotSysElement{
-				SlotGroup m_bowSG;
-				SlotGroup m_wearSG;
-				SlotGroup m_cGearsSG;
-				public EquipmentSet(SlotGroup bowSG, SlotGroup wearSG, SlotGroup cGearsSG){
-					m_eName = Util.Bold("eSet");
-					m_bowSG = bowSG;
-					m_wearSG = wearSG;
-					m_cGearsSG = cGearsSG;
-				}
-				protected override IEnumerable<SlotSystemElement> elements{
-					get{
-						yield return m_bowSG;
-						yield return m_wearSG;
-						yield return m_cGearsSG;
-						// m_pageElements = new List<SlotSystemElement>();
-						// m_pageElements.Add(m_bowSG);
-						// m_pageElements.Add(m_wearSG);
-						// m_pageElements.Add(m_cGearsSG);
-						// return m_pageElements;
-					}
-				}
-			}
-			public class SlotSystemBundle: AbsSlotSysElement{
-				protected override IEnumerable<SlotSystemElement> elements{
-					get{return m_elements;}
-					}IEnumerable<SlotSystemElement> m_elements;
-				public SlotSystemBundle(string name, IEnumerable<SlotSystemElement> elements){
-					m_eName = Util.Bold(name);
-					m_elements = elements;
-				}
-				public SlotSystemElement focusedElement{
-					get{return m_focusedElement;}
-					}SlotSystemElement m_focusedElement;
-					public void SetFocusedBundleElement(SlotSystemElement element){
-						if(this.Contains(element))
-							m_focusedElement = element;
-						else
-							throw new InvalidOperationException("SlotSystemBundle.SetFocusedBundleElement: trying to set focsed element that is not one of its members");
-					}
-				public override void Focus(){
-					if(m_focusedElement != null)
-						m_focusedElement.Focus();
-					foreach(SlotSystemElement ele in this){
-						if(ele != m_focusedElement)
-						ele.Defocus();
-					}
-				}
-				public override void Defocus(){
-					foreach(SlotSystemElement ele in this){
-						ele.Defocus();
-					}
-				}	
 			}
 		/*	TransactionResult	*/
 			public class TransactionResult{
@@ -2559,7 +2280,8 @@ namespace SlotSystem{
 					return res;
 				}
 				public static string SSEStateName(SSEState state){
-						string res = "";
+					string res = "";
+
 					if(state is SSEDeactivatedState){
 						res = Util.Red("SSEDeactivated");
 					}else if(state is SSEDefocusedState){

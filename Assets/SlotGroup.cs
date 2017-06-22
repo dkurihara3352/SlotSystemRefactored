@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace SlotSystem{
-	public class SlotGroup : MonoBehaviour, SlotSystemElement, StateHandler{
+	public class SlotGroup : MonoBehaviour, SlotSystemElement{
 		/*	states	*/
 			/*	Engines	*/
 				SSEStateEngine SGSelStateEngine{
@@ -129,10 +129,8 @@ namespace SlotSystem{
 						}
 						}private static SGActState m_sortState;
 
-			/*	static states	*/
-				/*	Selection states	*/
-				/*	Action States	*/
-				/*	process	*/
+			
+			/*	process	*/
 				public SSEProcessEngine selProcEngine{
 					get{
 						if(m_selProcEngine == null)
@@ -226,18 +224,18 @@ namespace SlotSystem{
 			public bool isPool{
 				get{
 					// return sgm.allSGPs.Contains(this);
-					return ((InventoryManagerPageMB)rootElement).poolBundle.ContainsInHierarchy(this);
+					return ((InventoryManagerPage)rootElement).poolBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGE{
 				get{
 					// return sgm.allSGEs.Contains(this);
-					return ((InventoryManagerPageMB)rootElement).equipBundle.ContainsInHierarchy(this);
+					return ((InventoryManagerPage)rootElement).equipBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGG{
 				get{
-					foreach(SlotSystemBundle gBundle in ((InventoryManagerPageMB)rootElement).otherBundles){
+					foreach(SlotSystemBundle gBundle in ((InventoryManagerPage)rootElement).otherBundles){
 						if(gBundle.ContainsInHierarchy(this))
 							return true;
 					}
@@ -625,6 +623,9 @@ namespace SlotSystem{
 							sb.PerformInHierarchy<T>(act, list);
 					}
 				}
+				public void InstantGreyout(){}
+				public void InstantGreyin(){}
+				public void InstantHighlight(){}
 		/*	methods	*/
 			public void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
 				m_eName = name;
@@ -660,7 +661,7 @@ namespace SlotSystem{
 				}
 				return null;
 			}
-			public bool HasItemCurrently(InventoryItemInstanceMock invInst){
+			public bool HasItem(InventoryItemInstanceMock invInst){
 				bool result = false;
 				foreach(Slottable sb in this.slottables){
 					if(sb != null){
@@ -670,15 +671,15 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public Slot GetSlot(InventoryItemInstanceMock itemInst){
-				foreach(Slot slot in this.slots){
-					if(slot.sb != null){
-						if(slot.sb.itemInst == itemInst)
-							return slot;
-					}
-				}
-				return null;
-			}
+			// public Slot GetSlot(InventoryItemInstanceMock itemInst){
+				// 	foreach(Slot slot in this.slots){
+				// 		if(slot.sb != null){
+				// 			if(slot.sb.itemInst == itemInst)
+				// 				return slot;
+				// 		}
+				// 	}
+				// 	return null;
+				// }
 			public void UpdateSBs(List<Slottable> newSBs){
 				/*	Create and set new Slots	*/
 					List<Slot> newSlots = new List<Slot>();
@@ -779,7 +780,7 @@ namespace SlotSystem{
 			public void CheckProcessCompletion(){
 				TransactionCoroutine();
 			}
-			public void OnCompleteSlotMovementsV3(){
+			public void OnCompleteSlotMovements(){
 				foreach(Slottable sb in this){
 					if(sb != null){
 						if(sb.newSlotID == -1){
@@ -805,18 +806,6 @@ namespace SlotSystem{
 					sb.SetSlotID(newSBs.IndexOf(sb));
 				}
 			}
-			public void OnCompleteSlotMovementsV2(){
-				foreach(Slottable sb in newSBs){
-					if(sb != null){
-						newSlots[sb.newSlotID].sb = sb;
-					}
-				}
-				SetSlots(newSlots);
-				OnActionComplete();
-			}
-			public void InstantGreyout(){}
-			public void InstantGreyin(){}
-			public void InstantHighlight(){}
 			public List<Slottable> SwappableSBs(Slottable pickedSB){
 				List<Slottable> result = new List<Slottable>();
 				foreach(Slottable sb in slottables){

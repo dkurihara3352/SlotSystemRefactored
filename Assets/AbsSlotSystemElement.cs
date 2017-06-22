@@ -168,6 +168,10 @@ namespace SlotSystem{
 				}
 				SlotSystemElement m_rootElement;
 		/*	methods	*/
+			public void Initialize(){
+				SetSelState(AbsSlotSystemElement.deactivatedState);
+				SetActState(AbsSlotSystemElement.waitForActionState);
+			}
 			public IEnumerator<SlotSystemElement> GetEnumerator(){
 				foreach(SlotSystemElement ele in elements)
 					yield return ele;

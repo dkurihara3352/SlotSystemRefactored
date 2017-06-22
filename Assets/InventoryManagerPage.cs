@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public class InventoryManagerPageMB : AbsSlotSystemElement{
+	public class InventoryManagerPage : AbsSlotSystemElement{
 		/* public fields	*/
 			public override SlotSystemBundle immediateBundle{
 				get{return null;}
@@ -29,6 +29,10 @@ namespace SlotSystem{
 						yield return ele;
 				}
 			}
+			public override SlotSystemElement rootElement{
+				get{return this;}
+				set{}
+			}
 		/*	methods	*/
 			public void Initialize(SlotSystemBundle poolBundle, SlotSystemBundle equipBundle, IEnumerable<SlotSystemBundle> gBundles){
 				m_eName = Util.Bold("invManPage");
@@ -37,8 +41,7 @@ namespace SlotSystem{
 				m_otherBundles = gBundles;
 				PerformInHierarchy(SetRoot);
 				PerformInHierarchy(SetParent);
-				SetSelState(AbsSlotSystemElement.deactivatedState);
-				SetActState(AbsSlotSystemElement.waitForActionState);
+				base.Initialize();
 			}
 			public SlotSystemElement FindParent(SlotSystemElement ele){
 				foundParent = null;
@@ -65,10 +68,6 @@ namespace SlotSystem{
 				}
 				// if(ele != this)
 				// ele.parent = this.FindParent(ele);
-			}
-			public override SlotSystemElement rootElement{
-				get{return this;}
-				set{}
 			}
 			public void SetSGMRecursively(SlotGroupManager sgm){
 				this.sgm = sgm;

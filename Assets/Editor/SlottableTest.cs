@@ -12,161 +12,6 @@ public class SlottableTest{
 		public SlotGroup testTargetSG;
 		public Slottable testTargetSB;
 		public string Val;
-		// public SlotSystemTestResult(bool isPAS, bool isTAS, Slottable pickedSB, SlotGroup hoveredSG,  int i){
-			// 	this.testTargetSG = hoveredSG; this.testingSB = pickedSB;
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.tAS = "tAS: " + (isTAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.hoveredName = " on " + Util.SGName(hoveredSG);
-			// 		if(hoveredSG.IsPool)
-			// 			hoveredName = Util.Red(hoveredName);
-			// 		else
-			// 			hoveredName = Util.Blue(hoveredName);
-
-			// 	this.pickedSBName = Util.SBName(pickedSB) + " of " + Util.SGName(pickedSB.SG);
-			// 		if(pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Red(pickedSBName);
-			// 		else
-			// 			pickedSBName = Util.Blue(pickedSBName);
-			// 	this.Val = i.ToString();
-			// }
-			// public SlotSystemTestResult(bool isPAS, bool isTAS, Slottable pickedSB, SlotGroup hoveredSG, SlotSystemTransaction ta){
-			// 	this.testTargetSG = hoveredSG; this.testingSB = pickedSB;
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.tAS = "tAS: " + (isTAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.hoveredName = " on " + Util.SGName(hoveredSG);
-			// 		if(hoveredSG.IsPool)
-			// 			hoveredName = Util.Red(hoveredName);
-			// 		else
-			// 			hoveredName = Util.Blue(hoveredName);
-
-			// 	this.pickedSBName = Util.SBName(pickedSB) + " of " + Util.SGName(pickedSB.SG);
-			// 		if(pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Red(pickedSBName);
-			// 		else
-			// 			pickedSBName = Util.Blue(pickedSBName);
-			// 		if(pickedSB.IsEquipped && pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Bold(pickedSBName);
-			// 	this.Val = ta.GetType().ToString();
-			// 	if(ta.GetType() == typeof(FillEquipTransaction))
-			// 		Val = Util.Terra(Val);
-			// 	if(ta.GetType() == typeof(SwapTransaction))
-			// 		Val = Util.Aqua(Val);
-			// 	if(ta.GetType() == typeof(StackTransaction))
-			// 		Val = Util.Forest(Val);
-			// 	if(ta.GetType() == typeof(ReorderTransaction))
-			// 		Val = Util.Berry(Val);
-			// 	if(ta.GetType() == typeof(InsertTransaction))
-			// 		Val = Util.Violet(Val);
-			// }
-			// public SlotSystemTestResult(bool isPAS, bool isTAS, Slottable pickedSB, SlotGroup sg, Slottable hoveredSB, SlotSystemTransaction ta){
-			// 	this.testTargetSG = sg; this.testingSB = pickedSB; this.testTargetSB = hoveredSB;
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.tAS = "tAS: " + (isTAS?Util.Blue("on "):Util.Red("off "));
-
-			// 	this.hoveredName = Util.SGName(sg);
-			// 	string hoveredSBStr = Util.SBName(hoveredSB);
-			// 		if(hoveredSB.SG.IsPool && hoveredSB.IsEquipped)
-			// 			hoveredSBStr = Util.Bold(hoveredSBStr);
-			// 	hoveredName = " on " + hoveredSBStr + " of " + hoveredName;
-			// 		if(sg.IsPool)
-			// 			hoveredName = Util.Red(hoveredName);
-			// 		else
-			// 			hoveredName = Util.Blue(hoveredName);
-
-			// 	this.pickedSBName = Util.SBName(pickedSB) + " of " + Util.SGName(pickedSB.SG);
-			// 		if(pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Red(pickedSBName);
-			// 		else
-			// 			pickedSBName = Util.Blue(pickedSBName);
-			// 		if(pickedSB.IsEquipped && pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Bold(pickedSBName);
-			// 	this.Val = ta.GetType().ToString();
-			// 	if(ta.GetType() == typeof(FillEquipTransaction))
-			// 		Val = Util.Terra(Val);
-			// 	if(ta.GetType() == typeof(SwapTransaction))
-			// 		Val = Util.Aqua(Val);
-			// 	if(ta.GetType() == typeof(StackTransaction))
-			// 		Val = Util.Forest(Val);
-			// 	if(ta.GetType() == typeof(ReorderTransaction))
-			// 		Val = Util.Berry(Val);
-			// 	if(ta.GetType() == typeof(InsertTransaction))
-			// 		Val = Util.Violet(Val);
-			// 	if(ta.GetType() == typeof(ReorderInOtherSGTransaction))
-			// 		Val = Util.Khaki(Val);
-			// }
-			// public SlotSystemTestResult(bool isPAS, Slottable pickedSB, bool test){
-			// 	this.testingSB = pickedSB;
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.pickedSBName = Util.SBName(pickedSB) + " of " + Util.SGName(pickedSB.SG);
-			// 		if(pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Red(pickedSBName);
-			// 		else
-			// 			pickedSBName = Util.Blue(pickedSBName);
-			// 		if(pickedSB.IsEquipped && pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Bold(pickedSBName);
-			// 	this.Val = " isPickable: " + test.ToString();
-			// 		if(test) Val = Util.Blue(Val); else Val = Util.Red(Val);
-			// }
-			// public SlotSystemTestResult(bool isPAS, Slottable pickedSB, SBState state){
-			// 	this.testingSB = pickedSB;
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.pickedSBName = Util.SBName(pickedSB) + " of " + Util.SGName(pickedSB.SG);
-			// 		if(pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Red(pickedSBName);
-			// 		else
-			// 			pickedSBName = Util.Blue(pickedSBName);
-			// 		if(pickedSB.IsEquipped && pickedSB.SG.IsPool)
-			// 			pickedSBName = Util.Bold(pickedSBName);
-			// 	this.Val = state.GetType().ToString();
-			// 		if(state is SBFocusedState)
-			// 			Val = Util.Terra(Val);
-			// 		if(state is SBDefocusedState)
-			// 			Val = Util.Ciel(Val);
-			// 		if(state is WaitForPointerUpState)
-			// 			Val = Util.Aqua(Val);
-			// }
-			// public SlotSystemTestResult(bool isPAS, Slottable pickedSB, SBSelectionState curSelSt, SBSelectionState prevSelSt, SBProcess selProcess ,SBActionState curActSt, SBActionState prevActSt, SBProcess actProcess){
-			// 	this.testingSB = pickedSB;
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.pickedSBName = Util.SBofSG(pickedSB);
-
-			// 	string curSelStStr = Util.SBStateName(curSelSt);
-			// 	string prevSelStStr = Util.SBStateName(prevSelSt);
-			// 	string selProcStr;
-			// 	if(selProcess == null) selProcStr = "null";
-			// 	else selProcStr = Util.SBProcessName(selProcess);
-			// 	string curActStStr = Util.SBStateName(curActSt);
-			// 	string prevActStStr = Util.SBStateName(prevActSt);
-			// 	string actProcStr;
-			// 	if(actProcess == null) actProcStr = "null";
-			// 	else actProcStr = Util.SBProcessName(actProcess);
-				
-			// 	this.Val = Util.Bold("Sel: ") + prevSelStStr + " to " + curSelStStr + ", Process: " + selProcStr + Util.Bold(" Act: ") + prevActStStr + " to " + curActStStr + ", Process: " + actProcStr;
-			// }
-			// public SlotSystemTestResult(bool isPAS, Slottable pickedSB, SGMSelectionState prevSel, SGMSelectionState curSel, SGMProcess selProc, SGMActionState prevAct, SGMActionState curAct, SGMProcess actProc, SlotSystemTransaction ta, bool pSBDone, bool sSBDone, bool oSGDone, bool sSGDone){
-			// 	this.testingSB = pickedSB;
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-			// 	this.pickedSBName = Util.SBofSG(pickedSB);
-
-			// 	this.Val = Util.SBofSG(pickedSB) + 
-			// 		" SGM: Sel from " + Util.SGMStateName(prevSel) + " to " + Util.SGMStateName(curSel) +  ", proc " + Util.SGMProcessName(selProc) + 
-			// 		" Act from " + Util.SGMStateName(prevAct) + " to " + Util.SGMStateName(curAct) +
-			// 		", proc " + Util.SGMProcessName(actProc) +
-			// 		", TA " + Util.TransactionName(ta) + 
-			// 		", TAComp: " + 
-			// 		pSBDone.ToString() + ", " + 
-			// 		sSBDone.ToString() + ", " + 
-			// 		oSGDone.ToString() + ", " + 
-			// 		sSGDone.ToString();
-			// }
-			// public SlotSystemTestResult(bool isPAS, SlotGroup sg, SGSelectionState prevSel, SGSelectionState curSel, SGProcess selProc, SGActionState prevAct, SGActionState curAct, SGProcess actProc){
-			// 	this.testTargetSG = sg;
-			// 	this.hoveredName = Util.SGName(sg);
-			// 	this.pAS = "pAS: " + (isPAS?Util.Blue("on "):Util.Red("off "));
-				
-			// 	this.Val = Util.SGName(sg)+ " Sel from " + Util.SGStateName(prevSel) + " to "+ Util.SGStateName(curSel) + ", proc " + Util.SGProcessName(selProc)+", Act from " + Util.SGStateName(prevAct) + " to " + Util.SGStateName(curAct) + ", proc " + Util.SGProcessName(actProc);
-
-			// }
 		public SlotSystemTestResult(bool isPAS, Slottable testSB, bool isPickable){
 			this.testingSB = testSB;
 			this.isPAS = isPAS;
@@ -674,28 +519,37 @@ public class SlottableTest{
 			sgmGO = new GameObject("SlotGroupManager");
 			sgm = sgmGO.AddComponent<SlotGroupManager>();
 			/*	equip bundle	*/
-				EquipmentSet equipSetA = new EquipmentSet(sgeBow, sgeWear, sgeCGears);
+				GameObject eSetGO = new GameObject("eSetGO");
+				EquipmentSet equipSetA = eSetGO.AddComponent<EquipmentSet>();
+				equipSetA.Initialize(sgeBow, sgeWear, sgeCGears);
 				IEnumerable<SlotSystemElement> eBunEles = new SlotSystemElement[]{equipSetA};
-				SlotSystemBundle equipBundle = new SlotSystemBundle("eBundle", eBunEles);
+				GameObject eBunGO = new GameObject("eBunGO");
+				SlotSystemBundle equipBundle = eBunGO.AddComponent<SlotSystemBundle>();
+				equipBundle.Initialize("eBundle", eBunEles);
 				equipBundle.SetFocusedBundleElement(equipSetA);
 			/*	pool bundle	*/
 				IEnumerable<SlotSystemElement> pBunEles = new SlotSystemElement[]{sgpAll, sgpBow, sgpWear, sgpCGears, sgpParts};
-				SlotSystemBundle poolBundle = new SlotSystemBundle("pBundle", pBunEles);
+				GameObject pBunGO = new GameObject("pBunGO");
+				SlotSystemBundle poolBundle = pBunGO.AddComponent<SlotSystemBundle>();
+				poolBundle.Initialize("pBundle", pBunEles);
 				poolBundle.SetFocusedBundleElement(sgpAll);
-			/*	generic bundle	*/
+			/*	generic page	*/
 				IEnumerable<SlotSystemElement> gPageElements = new SlotSystemElement[]{sggA, sggB};
-				GenericPage genPageA = new GenericPage(gPageElements);
-				IEnumerable<SlotSystemElement> gBungdleElements = new SlotSystemElement[]{genPageA, sggC};
-				SlotSystemBundle genBundle = new SlotSystemBundle("gBundleA", gBungdleElements);
-				IEnumerable<SlotSystemBundle> gBundles = new SlotSystemBundle[]{genBundle};
-				genBundle.SetFocusedBundleElement(genPageA);
-			InventoryManagerPage invManPage = new InventoryManagerPage(poolBundle, equipBundle, gBundles);
-			/*	MB ver	*/
+				GameObject gPageGO = new GameObject("gPageGO");
+				GenericPage gPageA = gPageGO.AddComponent<GenericPage>();
+				gPageA.Initialize(gPageElements);
+			/*	generic bundle	*/
+				IEnumerable<SlotSystemElement> gBungdleElements = new SlotSystemElement[]{gPageA, sggC};
+				GameObject gBunGO = new GameObject("gBunGO");
+				SlotSystemBundle gBundle = gBunGO.AddComponent<SlotSystemBundle>();
+				gBundle.Initialize("gBundle", gBungdleElements);
+				gBundle.SetFocusedBundleElement(gPageA);
+				IEnumerable<SlotSystemBundle> gBundles = new SlotSystemBundle[]{gBundle};
+			/*	InventoryManager	*/
 				GameObject impGO = new GameObject("InventoryManagerPage");
-				InventoryManagerPageMB invManPageMB = impGO.AddComponent<InventoryManagerPageMB>();
+				InventoryManagerPage invManPageMB = impGO.AddComponent<InventoryManagerPage>();
 				invManPageMB.Initialize(poolBundle, equipBundle, gBundles);
 
-				// AssertSlotSystemRootElementCorrectlySet(invManPage);
 				AssertSlotSystemRootElementCorrectlySet(invManPageMB);
 		sgm.Initialize(invManPageMB);
 			AssertSlotSystemSGMSetRight(sgm);
@@ -709,9 +563,9 @@ public class SlottableTest{
 		AssertFocused();
 		// sgm.rootPage.PerformInHierarchy(PrintParent);
 		// AssertInitiallyFocusedBundles();
-		invManPageMB.Defocus();
-		invManPageMB.Focus();
-		PrintSystemHierarchyDetailed(sgm.rootPage);
+		// invManPageMB.Defocus();
+		// invManPageMB.Focus();
+		// PrintSystemHierarchyDetailed(sgm.rootPage);
 	}
 	[Test]
 	public void TestAll(){
@@ -743,11 +597,11 @@ public class SlottableTest{
 			// TestSGECorrespondence();
 			// TestSlotSystemActivateDeactivate();
 			/*	TAs	*/
-				// TestVolSortOnAll();
-				// TestRevertOnAllSBs();
-				// TestReorderOnAll();
-				// TestFillOnAll();
-				// TestSwapOnAll();
+				TestVolSortOnAll();
+				TestRevertOnAllSBs();
+				TestReorderOnAll();
+				TestFillOnAll();
+				TestSwapOnAll();
 		// TestAddAndRemoveAll();
 		// TestSGGeneric();
 	}
@@ -1182,47 +1036,6 @@ public class SlottableTest{
 			}
 		}		
 	}
-	public void AssertSlotSystemRootElementCorrectlySet(InventoryManagerPageMB invManPage){
-		AE(invManPage.rootElement, invManPage);
-		AE(invManPage.poolBundle.rootElement, invManPage);
-			foreach(SlotSystemElement ele in invManPage.poolBundle){
-				SlotGroup sg = (SlotGroup)ele;
-				AE(sg.rootElement, invManPage);
-				foreach(Slottable sb in sg){
-					if(sb != null)
-						AE(sb.rootElement, invManPage);
-				}
-			}
-		AE(invManPage.equipBundle.rootElement, invManPage);
-			foreach(SlotSystemElement ele in invManPage.equipBundle){
-				EquipmentSet eSet = (EquipmentSet)ele;
-				AE(eSet.rootElement, invManPage);
-				foreach(SlotSystemElement ele2 in eSet){
-					SlotGroup sg = (SlotGroup)ele2;
-					AE(sg.rootElement, invManPage);
-					foreach(Slottable sb in sg){
-						if(sb != null)
-							AE(sb.rootElement, invManPage);
-					}
-				}
-			}
-		foreach(SlotSystemBundle gBundle in invManPage.otherBundles){
-			AE(gBundle.rootElement, invManPage);
-			foreach(var ele in gBundle){
-				if(ele is GenericPage){
-					foreach(var e in ele){
-						SlotGroup sg = (SlotGroup)e;
-						AE(sg.rootElement, invManPage);
-						Debug.Log(sg.eName + "'s root is set correctly");
-					}
-				}else if(ele is SlotGroup){
-						SlotGroup sg = (SlotGroup)ele;
-						AE(sg.rootElement, invManPage);
-						Debug.Log(sg.eName + "'s root is set correctly");
-				}
-			}
-		}
-	}
 	public void AssertSlotSystemRootElementCorrectlySet(InventoryManagerPage invManPage){
 		AE(invManPage.rootElement, invManPage);
 		AE(invManPage.poolBundle.rootElement, invManPage);
@@ -1264,6 +1077,47 @@ public class SlottableTest{
 			}
 		}
 	}
+	// public void AssertSlotSystemRootElementCorrectlySet(InventoryManagerPage invManPage){
+		// 	AE(invManPage.rootElement, invManPage);
+		// 	AE(invManPage.poolBundle.rootElement, invManPage);
+		// 		foreach(SlotSystemElement ele in invManPage.poolBundle){
+		// 			SlotGroup sg = (SlotGroup)ele;
+		// 			AE(sg.rootElement, invManPage);
+		// 			foreach(Slottable sb in sg){
+		// 				if(sb != null)
+		// 					AE(sb.rootElement, invManPage);
+		// 			}
+		// 		}
+		// 	AE(invManPage.equipBundle.rootElement, invManPage);
+		// 		foreach(SlotSystemElement ele in invManPage.equipBundle){
+		// 			EquipmentSet eSet = (EquipmentSet)ele;
+		// 			AE(eSet.rootElement, invManPage);
+		// 			foreach(SlotSystemElement ele2 in eSet){
+		// 				SlotGroup sg = (SlotGroup)ele2;
+		// 				AE(sg.rootElement, invManPage);
+		// 				foreach(Slottable sb in sg){
+		// 					if(sb != null)
+		// 						AE(sb.rootElement, invManPage);
+		// 				}
+		// 			}
+		// 		}
+		// 	foreach(SlotSystemBundle gBundle in invManPage.otherBundles){
+		// 		AE(gBundle.rootElement, invManPage);
+		// 		foreach(var ele in gBundle){
+		// 			if(ele is GenericPage){
+		// 				foreach(var e in ele){
+		// 					SlotGroup sg = (SlotGroup)e;
+		// 					AE(sg.rootElement, invManPage);
+		// 					Debug.Log(sg.eName + "'s root is set correctly");
+		// 				}
+		// 			}else if(ele is SlotGroup){
+		// 					SlotGroup sg = (SlotGroup)ele;
+		// 					AE(sg.rootElement, invManPage);
+		// 					Debug.Log(sg.eName + "'s root is set correctly");
+		// 			}
+		// 		}
+		// 	}
+		// }
 	public string Indent(int level){
 		string res = "";
 		for(int i = 0; i < level; i++){
@@ -1279,9 +1133,9 @@ public class SlottableTest{
 		string eleName = ele.eName;
 		if(ele is SlotGroup)
 			eleName = Util.SGDebug((SlotGroup)ele);
-		if(ele is Slottable)
+		else if(ele is Slottable)
 			eleName = Util.SBDebug((Slottable)ele);
-		if(ele is InventoryManagerPageMB)
+		else if(ele is InventoryManagerPage || ele is SlotSystemBundle || ele is EquipmentSet || ele is GenericPage)
 			eleName = Util.SSEDebug(ele);
 		Debug.Log(Indent(ele.level) + eleName);
 	}
@@ -2098,60 +1952,6 @@ public class SlottableTest{
 			AssertEquipped(sgm.equippedBowInst);
 			AssertEquipped(sgm.equippedWearInst);
 			AECGears(sgm.equippedCarriedGears, sgm.poolInv, sgm.equipInv);
-		}
-		public void TestSGActionStateSequence(){
-			List<Slot> slots = new List<Slot>();
-			sgpAll.SetSlots(slots);
-
-			List<Slottable> newSBs = new List<Slottable>();
-			newSBs.Add(defBowA_p);
-			newSBs.Add(defWearA_p);
-			newSBs.Add(null);
-			newSBs.Add(defShieldA_p);
-			sgpAll.SetNewSBs(newSBs);
-			sgpAll.CreateNewSlots();
-			sgpAll.SetSBsActStates();
-			foreach(Slottable sb in sgpAll.allTASBs){
-				if(sb != null)
-				Debug.Log(Util.SBName(sb));
-			}
-			PrintSBsArray(sgpAll.newSBs);
-			sgpAll.OnCompleteSlotMovementsV2();
-			
-			newSBs.Clear();
-			newSBs.Add(null);
-			newSBs.Add(defWearA_p);
-			newSBs.Add(defShieldA_p);
-			newSBs.Add(defBowA_p);
-			sgpAll.SetNewSBs(newSBs);
-			sgpAll.CreateNewSlots();
-			sgpAll.SetSBsActStates();
-			foreach(Slottable sb in sgpAll.allTASBs){
-				if(sb != null)
-				Debug.Log(Util.SBName(sb));
-			}
-			PrintSBsArray(sgpAll.newSBs);
-			sgpAll.OnCompleteSlotMovementsV2();
-			
-			newSBs.Clear();
-			newSBs.Add(defShieldA_p);
-			newSBs.Add(defWearA_p);
-			newSBs.Add(null);
-			newSBs.Add(null);
-			newSBs.Add(crfMWeaponA_p);
-			sgpAll.SetNewSBs(newSBs);
-			sgpAll.CreateNewSlots();
-			sgpAll.SetSBsActStates();
-			foreach(Slottable sb in sgpAll.allTASBs){
-				if(sb != null)
-				Debug.Log(Util.SBName(sb));
-			}
-			PrintSBsArray(sgpAll.newSBs);
-			sgpAll.OnCompleteSlotMovementsV2();
-
-			sgpAll.InstantSort();
-			
-			PrintSBsArray(sgpAll.toList);
 		}
 		public void TestReorderSBsMethod(){
 			List<Slottable> sbs = testSBs;
@@ -3058,8 +2858,8 @@ public class SlottableTest{
 					null, SBPickedUp, null, false,
 					null, null, null);
 					Print(pickedSB);
-					Debug.Log(pickedSB.rootElement.eName);
-					Debug.Log(((InventoryManagerPage)pickedSB.rootElement).FindParent(pickedSB).eName);
+					// Debug.Log(pickedSB.rootElement.eName);
+					// Debug.Log(((InventoryManagerPage)pickedSB.rootElement).FindParent(pickedSB).eName);
 			pickedSB.OnPointerUpMock(eventData);
 			if(sgm.pickedSB.curActState == Slottable.WaitForNextTouchState){
 				ASGMActState(sgm, SGMWFA, SGMProbing, typeof(SGMProbeProcess));

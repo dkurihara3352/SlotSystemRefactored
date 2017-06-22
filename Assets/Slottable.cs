@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using Utility;
 namespace SlotSystem{
-	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, StateHandler, SlotSystemElement{
+	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, SlotSystemElement{
 		/*	States	*/
 			/*	Selection State	*/
 				SSEStateEngine selStateEngine{
@@ -197,45 +197,47 @@ namespace SlotSystem{
 					}
 					}static SBEqpState m_unequippedState;
 		/*	processes	*/
-			public SSEProcessEngine selProcEngine{
-				get{
-					if(m_processEngine == null)
-						m_processEngine = new SSEProcessEngine();
-					return m_processEngine;
-				}
-				}SSEProcessEngine m_processEngine;
-				public SSEProcess selProcess{
-					get{return (SBSelProcess)selProcEngine.process;}
-				}
-				public SBSelProcess sbSelProcess{
-					get{return (SBSelProcess)selProcess;}
-				}
-				public void SetAndRunSelProcess(SSEProcess process){
-					if(process ==null || process is SBSelProcess)
-						selProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("Slottable.SetAndRunSelProcess: argument is not of type SBSelProcess");
-				}
+			/*	Selection Process	*/
+				public SSEProcessEngine selProcEngine{
+					get{
+						if(m_processEngine == null)
+							m_processEngine = new SSEProcessEngine();
+						return m_processEngine;
+					}
+					}SSEProcessEngine m_processEngine;
+					public SSEProcess selProcess{
+						get{return (SBSelProcess)selProcEngine.process;}
+					}
+					public SBSelProcess sbSelProcess{
+						get{return (SBSelProcess)selProcess;}
+					}
+					public void SetAndRunSelProcess(SSEProcess process){
+						if(process ==null || process is SBSelProcess)
+							selProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("Slottable.SetAndRunSelProcess: argument is not of type SBSelProcess");
+					}
 				public IEnumeratorMock greyoutCoroutine(){return null;}
 				public IEnumeratorMock greyinCoroutine(){return null;}
 				public IEnumeratorMock highlightCoroutine(){return null;}
 				public IEnumeratorMock dehighlightCoroutine(){return null;}
-			public SSEProcessEngine actProcEngine{
-				get{
-					if(m_actProcEngine == null)
-						m_actProcEngine = new SSEProcessEngine();
-					return m_actProcEngine;}
-				}SSEProcessEngine m_actProcEngine;
-				public SSEProcess actProcess{
-					get{return (SBActProcess)actProcEngine.process;}
-				}
-				public SBActProcess sbActProcess{
-					get{return (SBActProcess)actProcess;}
-				}
-				public void SetAndRunActProcess(SSEProcess process){
-					if(process == null || process is SBActProcess)
-						actProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("Slottable.SetAndRunActProcess: argument is not of type SBActProcess");
-				}
+			/*	Action Process	*/
+				public SSEProcessEngine actProcEngine{
+					get{
+						if(m_actProcEngine == null)
+							m_actProcEngine = new SSEProcessEngine();
+						return m_actProcEngine;}
+					}SSEProcessEngine m_actProcEngine;
+					public SSEProcess actProcess{
+						get{return (SBActProcess)actProcEngine.process;}
+					}
+					public SBActProcess sbActProcess{
+						get{return (SBActProcess)actProcess;}
+					}
+					public void SetAndRunActProcess(SSEProcess process){
+						if(process == null || process is SBActProcess)
+							actProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("Slottable.SetAndRunActProcess: argument is not of type SBActProcess");
+					}
 				public IEnumeratorMock WaitForPointerUpCoroutine(){return null;}
 				public IEnumeratorMock WaitForPickUpCoroutine(){return null;}
 				public IEnumeratorMock PickUpCoroutine(){return null;}
@@ -247,26 +249,26 @@ namespace SlotSystem{
 						ExpireActionProcess();
 					return null;
 				}
-			public SSEProcessEngine eqpProcEngine{
-				get{
-					if(m_eqpProcEngine == null)
-						m_eqpProcEngine = new SSEProcessEngine();
-					return m_eqpProcEngine;
-				}
-				}SSEProcessEngine m_eqpProcEngine;
-			public SBEqpProcess eqpProcess{
-				get{return (SBEqpProcess)eqpProcEngine.process;}
-				}
-				public void SetAndRunEquipProcess(SBEqpProcess process){
-					eqpProcEngine.SetAndRunProcess(process);
-				}
+			/*	Equip Process	*/
+				public SSEProcessEngine eqpProcEngine{
+					get{
+						if(m_eqpProcEngine == null)
+							m_eqpProcEngine = new SSEProcessEngine();
+						return m_eqpProcEngine;
+					}
+					}SSEProcessEngine m_eqpProcEngine;
+					public SBEqpProcess eqpProcess{
+						get{return (SBEqpProcess)eqpProcEngine.process;}
+					}
+					public void SetAndRunEquipProcess(SBEqpProcess process){
+						eqpProcEngine.SetAndRunProcess(process);
+					}
 				public IEnumeratorMock UnequipCoroutine(){return null;}
 				public IEnumeratorMock EquipCoroutine(){return null;}
 		/*	commands	*/
-			static SlottableCommand m_tapCommand = new SBTapCommand();
-				static public SlottableCommand TapCommand{
-					get{return m_tapCommand;}
-				}
+			static public SlottableCommand TapCommand{
+				get{return m_tapCommand;}
+				}static SlottableCommand m_tapCommand = new SBTapCommand();
 				public void Tap(){
 					m_tapCommand.Execute(this);
 				}
@@ -338,72 +340,73 @@ namespace SlotSystem{
 				get{return itemInst.Item.IsStackable;}
 			}
 		/*	SlotSystemElement imple	*/
-			public string eName{
-				get{return Util.SBName(this);}
-			}
-			public SlotSystemElement parent{
-				get{
-					return ((InventoryManagerPageMB)rootElement).FindParent(this);
+			/*	fields	*/
+				public SlotSystemElement this[int i]{get{return null;}}
+				public string eName{
+					get{return Util.SBName(this);}
 				}
-				set{}
-			}
-			// public SlotSystemElement parent{
-			// 	get{return m_parent;}
-			// 	set{m_parent = value;}
-			// 	}SlotSystemElement m_parent;
-			public SlotSystemBundle immediateBundle{
-				get{
-					if(parent == null)
-						return null;
-					return parent.immediateBundle;
+				public SlotSystemElement parent{
+					get{
+						return ((InventoryManagerPage)rootElement).FindParent(this);
+					}
+					set{}
 				}
-			}
-			public IEnumerator<SlotSystemElement> GetEnumerator(){
-				yield return null;
-				}IEnumerator IEnumerable.GetEnumerator(){
-					return GetEnumerator();
+				public SlotSystemBundle immediateBundle{
+					get{
+						if(parent == null)
+							return null;
+						return parent.immediateBundle;
+					}
 				}
-			public SlotSystemElement this[int i]{get{return null;}}
-			public bool Contains(SlotSystemElement element){
-				return false;
-			}
-			public SlotGroupManager sgm{
-				get{return m_sgm;}
-				set{m_sgm = value;}
-				}SlotGroupManager m_sgm;
-				public void SetSGM(SlotGroupManager sgm){
-					m_sgm = sgm;
+				public SlotGroupManager sgm{
+					get{return m_sgm;}
+					set{m_sgm = value;}
+					}SlotGroupManager m_sgm;
+					public void SetSGM(SlotGroupManager sgm){
+						m_sgm = sgm;
+					}
+				public int level{
+					get{return sg.level +1;}
 				}
-			public void Activate(){}
-			public void Deactivate(){}
-			public void Focus(){
-				SetSelState(Slottable.FocusedState);
-			}
-			public void Defocus(){
-				SetSelState(Slottable.DefocusedState);
-			}
-			public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
-				return null;
-			}
-			public bool ContainsInHierarchy(SlotSystemElement element){
-				return false;
-			}
-			public void PerformInHierarchy(System.Action<SlotSystemElement> act){
-				act(this);
-			}
-			public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
-				act(this, obj);
-			}
-			public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> obj){
-				act(this, obj);
-			}
-			public int level{
-				get{return sg.level +1;}
-			}
-			public SlotSystemElement rootElement{
-				get{return m_rootElement;}
-				set{m_rootElement = value;}
-				}SlotSystemElement m_rootElement;
+				public SlotSystemElement rootElement{
+					get{return m_rootElement;}
+					set{m_rootElement = value;}
+					}SlotSystemElement m_rootElement;
+			/*	methods	*/
+				public IEnumerator<SlotSystemElement> GetEnumerator(){
+					yield return null;
+					}IEnumerator IEnumerable.GetEnumerator(){
+						return GetEnumerator();
+					}
+				public bool Contains(SlotSystemElement element){
+					return false;
+				}
+				public void Activate(){}
+				public void Deactivate(){}
+				public void Focus(){
+					SetSelState(Slottable.FocusedState);
+				}
+				public void Defocus(){
+					SetSelState(Slottable.DefocusedState);
+				}
+				public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
+					return null;
+				}
+				public bool ContainsInHierarchy(SlotSystemElement element){
+					return false;
+				}
+				public void PerformInHierarchy(System.Action<SlotSystemElement> act){
+					act(this);
+				}
+				public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+					act(this, obj);
+				}
+				public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> obj){
+					act(this, obj);
+				}
+				public void InstantGreyout(){}
+				public void InstantGreyin(){}
+				public void InstantHighlight(){}
 		/*	Event methods	*/
 			/*	Selection event	*/
 				public void OnHoverEnterMock(){
@@ -427,7 +430,7 @@ namespace SlotSystem{
 				public void OnEndDragMock(PointerEventDataMock eventDataMock){
 					((SBActState)curActState).OnEndDragMock(this, eventDataMock);
 				}
-		/*	Interface implementation	*/
+		/*	othr Interface implementation	*/
 			int IComparable.CompareTo(object other){
 				if(!(other is Slottable))
 					throw new InvalidOperationException("CompareTo: no a slottable");
@@ -442,14 +445,6 @@ namespace SlotSystem{
 			public static bool operator < (Slottable a, Slottable b){
 				return a.CompareTo(b) < 0;
 			}
-		/*	InstantActions	*/
-			public void InstantGreyout(){}
-			public void InstantEquipAndGreyout(){}
-			public void InstantGreyin(){}
-			public void InstantEquipAndGreyin(){}
-			public void InstantEquip(){}
-			public void InstantUnequip(){}
-			public void InstantHighlight(){}
 		/*	methods	*/
 			public void Initialize(InventoryItemInstanceMock item){
 				this.delayed = true;
@@ -480,12 +475,9 @@ namespace SlotSystem{
 				else Unequip();
 			}
 			public void Reset(){
-				ResetAction();
+				SetActState(Slottable.WaitForActionState);
 				pickedAmount = 0;
 				SetNewSlotID(-2);
-			}
-			public void ResetAction(){
-				SetActState(Slottable.WaitForActionState);
 			}
 	}
 
