@@ -537,28 +537,14 @@ namespace SlotSystem{
 	/*	SlotGroup Classes	*/
 		/*	states	*/
 			/*	superclasses	*/
-				public class SGStateEngine: SwitchableStateEngine{
-					public SGStateEngine(SlotGroup sg){
-						this.handler = sg;
-					}
-					public void SetState(SGState sgState){
-						base.SetState(sgState);
-					}
-				}
 				public abstract class SGState: SSEState{
 					protected SlotGroup sg{
 						get{
 							return (SlotGroup)sse;
 						}
 					}
-					// public override void EnterState(StateHandler handler){
-					// 	sg = (SlotGroup)handler;
-					// }
-					// public override void ExitState(StateHandler handler){
-					// 	sg = (SlotGroup)handler;
-					// }
 				}
-				public abstract class SGSelectionState: SGState{
+				public abstract class SGSelState: SGState{
 					public virtual void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventDataMock){
 						sg.sgm.SetHoveredSG(sg);
 					}
@@ -566,10 +552,9 @@ namespace SlotSystem{
 
 					}
 				}
-				public abstract class SGActionState: SGState{
-				}
+				public abstract class SGActState: SGState{}
 			/*	Selection States	*/
-				public class SGDeactivatedState : SGSelectionState{
+				public class SGDeactivatedState : SGSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						sg.SetAndRunSelProcess(null);
@@ -578,7 +563,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGDefocusedState: SGSelectionState{
+				public class SGDefocusedState: SGSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SGSelProcess process = null;
@@ -586,16 +571,16 @@ namespace SlotSystem{
 							process = null;
 							sg.InstantGreyout();
 						}else if(sg.prevSelState == SlotGroup.FocusedState)
-							process = new SGGreyoutProcess(sg, sg.GreyoutCoroutine);
+							process = new SGGreyoutProcess(sg, sg.greyoutCoroutine);
 						else if(sg.prevSelState == SlotGroup.SelectedState)
-							process = new SGDehighlightProcess(sg, sg.GreyoutCoroutine);
+							process = new SGDehighlightProcess(sg, sg.greyoutCoroutine);
 						sg.SetAndRunSelProcess(process);
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
 				}
-				public class SGFocusedState: SGSelectionState{
+				public class SGFocusedState: SGSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SGSelProcess process = null;
@@ -604,9 +589,9 @@ namespace SlotSystem{
 							sg.InstantGreyin();
 						}
 						else if(sg.prevSelState == SlotGroup.DefocusedState)
-							process = new SGGreyinProcess(sg, sg.GreyinCoroutine);
+							process = new SGGreyinProcess(sg, sg.greyinCoroutine);
 						else if(sg.prevSelState == SlotGroup.SelectedState)
-							process = new SGDehighlightProcess(sg, sg.DehighlightCoroutine);
+							process = new SGDehighlightProcess(sg, sg.dehighlightCoroutine);
 						sg.SetAndRunSelProcess(process);
 					}
 					
@@ -614,16 +599,16 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGSelectedState: SGSelectionState{
+				public class SGSelectedState: SGSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SGSelProcess process = null;
 						if(sg.prevSelState == SlotGroup.DeactivatedState){
 							sg.InstantHighlight();
 						}else if(sg.prevSelState == SlotGroup.DefocusedState)
-							process = new SGHighlightProcess(sg, sg.HighlightCoroutine);
+							process = new SGHighlightProcess(sg, sg.highlightCoroutine);
 						else if(sg.prevSelState == SlotGroup.FocusedState)
-							process = new SGHighlightProcess(sg, sg.HighlightCoroutine);
+							process = new SGHighlightProcess(sg, sg.highlightCoroutine);
 						sg.SetAndRunSelProcess(process);
 					}
 					public override void ExitState(StateHandler sh){
@@ -631,7 +616,7 @@ namespace SlotSystem{
 					}
 				}
 			/*	Action State	*/
-				public class SGWaitForActionState: SGActionState{
+				public class SGWaitForActionState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						sg.SetAndRunActProcess(null);
@@ -640,7 +625,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGRevertState: SGActionState{
+				public class SGRevertState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						sg.UpdateSBs(new List<Slottable>(sg.toList));
@@ -653,7 +638,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGReorderState: SGActionState{
+				public class SGReorderState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						Slottable sb1 = sg.sgm.pickedSB;
@@ -670,7 +655,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGAddState: SGActionState{
+				public class SGAddState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						List<InventoryItemInstanceMock> cache = sg.sgm.Transaction.moved;
@@ -717,7 +702,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGRemoveState: SGActionState{
+				public class SGRemoveState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						List<InventoryItemInstanceMock> cache = sg.sgm.Transaction.moved;
@@ -766,7 +751,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGSwapState: SGActionState{
+				public class SGSwapState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						Slottable added;
@@ -809,7 +794,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGFillState: SGActionState{
+				public class SGFillState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						Slottable added;
@@ -865,7 +850,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SGSortState: SGActionState{
+				public class SGSortState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						List<Slottable> newSBs = new List<Slottable>(sg.toList);
@@ -1141,11 +1126,11 @@ namespace SlotSystem{
 			}
 	/*	Slottable Classses	*/
 		/*	process	*/
-			public abstract class SBProcess: AbsSSEProcess{
-				public Slottable sb{
-					get{return (Slottable)sse;}
+				public abstract class SBProcess: AbsSSEProcess{
+					public Slottable sb{
+						get{return (Slottable)sse;}
+					}
 				}
-			}
 			/*	Selecttion process	*/
 				public abstract class SBSelProcess: SBProcess{}
 				public class SBGreyoutProcess: SBSelProcess{
@@ -1250,28 +1235,22 @@ namespace SlotSystem{
 				}
 		/*	states	*/
 			/*	superclasses	*/
-				public class SBStateEngine: SwitchableStateEngine{
-					public SBStateEngine(Slottable sb){
-						this.handler = sb;
-					}
-					public void SetState(SBState sbState){
-						base.SetState(sbState);
-					}
-				}
+				// public class SBStateEngine: SwitchableStateEngine{
+					// 	public SBStateEngine(Slottable sb){
+					// 		this.handler = sb;
+					// 	}
+					// 	public void SetState(SBState sbState){
+					// 		base.SetState(sbState);
+					// 	}
+					// }
 				public abstract class SBState: SSEState{
 					protected Slottable sb{
 						get{
 							return (Slottable)sse;
 						}
 					}
-					// public virtual void EnterState(StateHandler handler){
-					// 	sb = (Slottable)handler;
-					// }
-					// public virtual void ExitState(StateHandler handler){
-					// 	sb = (Slottable)handler;
-					// }
 				}
-				public abstract class SBSelectionState: SBState{
+				public abstract class SBSelState: SBState{
 					public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
 						sb.sgm.SetHoveredSB(sb);
 					}
@@ -1279,38 +1258,36 @@ namespace SlotSystem{
 					}
 				}
 				// public abstract class SBSelectionState: SBState{
-				// 	public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
-				// 		sb.sgm.SetHoveredSB(sb);
-				// 	}
-				// 	public virtual void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
-				// 	}
-				// }
-				public abstract class SBActionState: SBState{
+					// 	public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
+					// 		sb.sgm.SetHoveredSB(sb);
+					// 	}
+					// 	public virtual void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
+					// 	}
+					// }
+				public abstract class SBActState: SBState{
 					public abstract void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock);
 					public abstract void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock);
 					public abstract void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock);
 					public abstract void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
 				}
 				// public abstract class SBActionState: SBState{
-				// 	public abstract void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock);
-				// 	public abstract void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock);
-				// 	public abstract void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock);
-				// 	public abstract void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
-				// }
-				public abstract class SBEquipState: SBState{
-
-				}
+					// 	public abstract void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock);
+					// 	public abstract void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock);
+					// 	public abstract void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock);
+					// 	public abstract void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
+					// }
+				public abstract class SBEqpState: SBState{}
 			/*	SB Selection States	*/
-				public class SBDeactivatedState: SBSelectionState{
+				public class SBDeactivatedState: SBSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						sb.SetAndRunSelectionProcess(null);
+						sb.SetAndRunSelProcess(null);
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
 				}
-				public class SBDefocusedState: SBSelectionState{
+				public class SBDefocusedState: SBSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBSelProcess process = null;
@@ -1318,56 +1295,56 @@ namespace SlotSystem{
 							sb.InstantGreyout();
 							process = null;
 						}else if(sb.prevSelState == Slottable.FocusedState){
-							process = new SBGreyoutProcess(sb, sb.GreyoutCoroutine);
+							process = new SBGreyoutProcess(sb, sb.greyoutCoroutine);
 						}else if(sb.prevSelState == Slottable.SelectedState){
-							process = new SBGreyoutProcess(sb, sb.GreyoutCoroutine);
+							process = new SBGreyoutProcess(sb, sb.greyoutCoroutine);
 						}
-						sb.SetAndRunSelectionProcess(process);
+						sb.SetAndRunSelProcess(process);
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
 				}
-				public class SBFocusedState: SBSelectionState{
+				public class SBFocusedState: SBSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBSelProcess process = null;
 						if(sb.prevSelState == Slottable.DeactivatedState){
 							sb.InstantGreyin();
 						}else if(sb.prevSelState == Slottable.DefocusedState){
-							process = new SBGreyinProcess(sb, sb.GreyinCoroutine);
+							process = new SBGreyinProcess(sb, sb.greyinCoroutine);
 						}else if(sb.prevSelState == Slottable.SelectedState){
-							process = new SBDehighlightProcess(sb, sb.DehighlightCoroutine);
+							process = new SBDehighlightProcess(sb, sb.dehighlightCoroutine);
 						}
-						sb.SetAndRunSelectionProcess(process);
+						sb.SetAndRunSelProcess(process);
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
 				}
-				public class SBSelectedState: SBSelectionState{
+				public class SBSelectedState: SBSelState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBSelProcess process = null;
 						if(sb.prevSelState == Slottable.DeactivatedState){
 							sb.InstantHighlight();
 						}else if(sb.prevSelState == Slottable.DefocusedState){
-							process = new SBHighlightProcess(sb, sb.HighlightCoroutine);
+							process = new SBHighlightProcess(sb, sb.highlightCoroutine);
 						}else if(sb.prevSelState == Slottable.FocusedState){
-							process = new SBHighlightProcess(sb, sb.HighlightCoroutine);
+							process = new SBHighlightProcess(sb, sb.highlightCoroutine);
 						}
-						sb.SetAndRunSelectionProcess(process);
+						sb.SetAndRunSelProcess(process);
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
 				}
 			/*	SB Action States	*/
-				public class WaitForActionState: SBActionState{
+				public class WaitForActionState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBActProcess process = null;
-						sb.SetAndRunActionProcess(process);
+						sb.SetAndRunActProcess(process);
 					}
 					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
 						sb.Tap();
@@ -1391,11 +1368,11 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class WaitForPointerUpState: SBActionState{
+				public class WaitForPointerUpState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBActProcess wfPtuProcess = new WaitForPointerUpProcess(sb, sb.WaitForPointerUpCoroutine);
-						sb.SetAndRunActionProcess(wfPtuProcess);
+						sb.SetAndRunActProcess(wfPtuProcess);
 					}
 					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
 						sb.Tap();
@@ -1412,11 +1389,11 @@ namespace SlotSystem{
 					}
 					public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				}
-				public class WaitForPickUpState: SBActionState{
+				public class WaitForPickUpState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBActProcess wfpuProcess = new WaitForPickUpProcess(sb, sb.WaitForPickUpCoroutine);
-						sb.SetAndRunActionProcess(wfpuProcess);
+						sb.SetAndRunActProcess(wfpuProcess);
 					}
 					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
 						sb.SetActState(Slottable.WaitForNextTouchState);
@@ -1431,11 +1408,11 @@ namespace SlotSystem{
 					public override void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 					public override void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
 				}
-				public class WaitForNextTouchState: SBActionState{
+				public class WaitForNextTouchState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.WaitForNextTouchCoroutine);
-						sb.SetAndRunActionProcess(wfntProcess);
+						sb.SetAndRunActProcess(wfntProcess);
 					}
 					public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){
 						if(!sb.isPickedUp)
@@ -1456,7 +1433,7 @@ namespace SlotSystem{
 						public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
 						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				}
-				public class PickedUpState: SBActionState{
+				public class PickedUpState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						sb.sgm.SetPickedSB(sb);
@@ -1467,7 +1444,7 @@ namespace SlotSystem{
 						sb.OnHoverEnterMock();
 						sb.sgm.UpdateTransaction();
 						SBActProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
-						sb.SetAndRunActionProcess(pickedUpProcess);
+						sb.SetAndRunActProcess(pickedUpProcess);
 					}
 					public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){
 						sb.Reset();
@@ -1488,11 +1465,11 @@ namespace SlotSystem{
 						}
 						public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				}
-				public class SBRemovedState: SBActionState{
+				public class SBRemovedState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBRemoveProcess process = new SBRemoveProcess(sb, sb.RemoveCoroutine);
-						sb.SetAndRunActionProcess(process);
+						sb.SetAndRunActProcess(process);
 					}
 					/*	*/
 						public override void ExitState(StateHandler sh){
@@ -1503,11 +1480,11 @@ namespace SlotSystem{
 						public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				}
-				public class SBAddedState: SBActionState{
+				public class SBAddedState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBAddProcess process = new SBAddProcess(sb, sb.AddCorouine);
-						sb.SetAndRunActionProcess(process);
+						sb.SetAndRunActProcess(process);
 					}
 					/*	*/
 						public override void ExitState(StateHandler sh){
@@ -1518,11 +1495,11 @@ namespace SlotSystem{
 						public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
 						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				}
-				public class SBMoveWithinState: SBActionState{
+				public class SBMoveWithinState: SBActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						SBMoveWithinProcess process = new SBMoveWithinProcess(sb, sb.MoveWithinCoroutine);
-						sb.SetAndRunActionProcess(process);
+						sb.SetAndRunActProcess(process);
 					}
 					/*	*/
 						public override void ExitState(StateHandler sh){
@@ -1534,7 +1511,7 @@ namespace SlotSystem{
 						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
 				}
 			/*	SB Equip states	*/
-				public class SBEquippedState: SBEquipState{
+				public class SBEquippedState: SBEqpState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						if(sb.sg.isPool){
@@ -1548,7 +1525,7 @@ namespace SlotSystem{
 						base.ExitState(sh);
 					}
 				}
-				public class SBUnequippedState: SBEquipState{
+				public class SBUnequippedState: SBEqpState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						if(sb.PrevEqpState == null || sb.PrevEqpState == Slottable.UnequippedState){
@@ -1630,48 +1607,11 @@ namespace SlotSystem{
 			}
 		}
 		/*	SlotSystemElements	*/
-			
 			/*	states	*/
 				/*	superstates	*/
-					// public class SSEStateEngine: SwitchableStateEngine{
-					// 	public SSEStateEngine(SlotSystemElement sse){
-					// 		this.handler = sse;
-					// 	}
-					// 	public void SetState(SSEState state){
-					// 		base.SetState(state);
-					// 	}
-					// }
-					public class SSESelStateEngine: SwitchableStateEngine{
-						public SSESelStateEngine(SlotSystemElement sse){
+					public class SSEStateEngine: SwitchableStateEngine{
+						public SSEStateEngine(SlotSystemElement sse){
 							this.handler = sse;
-						}
-						public new SSESelState curState{
-							get{
-								return (SSESelState)base.curState;
-							}
-						}
-						public new SSESelState prevState{
-							get{
-								return (SSESelState)base.prevState;
-							}
-						}
-						public void SetState(SSEState state){
-							base.SetState(state);
-						}
-					}
-					public class SSEActStateEngine: SwitchableStateEngine{
-						public SSEActStateEngine(SlotSystemElement sse){
-							this.handler = sse;
-						}
-						public new SSEActState curState{
-							get{
-								return (SSEActState)base.curState;
-							}
-						}
-						public new SSEActState prevState{
-							get{
-								return (SSEActState)base.prevState;
-							}
 						}
 						public void SetState(SSEState state){
 							base.SetState(state);
@@ -1695,74 +1635,142 @@ namespace SlotSystem{
 					public class SSEDefocusedState: SSESelState{
 						public override void EnterState(StateHandler sh){
 							base.EnterState(sh);
-							SSESelProcess process = null;
-							if(sse.prevSelState == AbsSlotSystemElement.DeactivatedState){
+							SSEProcess process = null;
+							if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
 							process = null;
 							sse.InstantGreyout();
-							}else if(sse.prevSelState == SlotGroup.FocusedState)
-								process = new SSEGreyoutProcess(sse, AbsSlotSystemElement.GreyoutCoroutine);
-							else if(sse.prevSelState == SlotGroup.SelectedState)
-								process = new SSEHighlightProcess(sse, AbsSlotSystemElement.GreyoutCoroutine);
+							}else if(sse.prevSelState == AbsSlotSystemElement.focusedState)
+								process = new SSEGreyoutProcess(sse, sse.greyoutCoroutine);
+							else if(sse.prevSelState == AbsSlotSystemElement.selectedState)
+								process = new SSEHighlightProcess(sse, sse.greyoutCoroutine);
+							sse.SetAndRunSelProcess(process);
+						}
+					}
+					public class SSEFocusedState: SSESelState{
+						public override void EnterState(StateHandler sh){
+							base.EnterState(sh);
+							SSEProcess process = null;
+							if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
+								process = null;
+								sse.InstantGreyin();
+							}
+							else if(sse.prevSelState == AbsSlotSystemElement.defocusedState)
+								process = new SSEGreyinProcess(sse, sse.greyinCoroutine);
+							else if(sse.prevSelState == AbsSlotSystemElement.selectedState)
+								process = new SSEDehighlightProcess(sse, sse.dehighlightCoroutine);
+							sse.SetAndRunSelProcess(process);
+						}
+					}
+					public class SSESelectedState: SSESelState{
+						public override void EnterState(StateHandler sh){
+							base.EnterState(sh);
+							SSEProcess process = null;
+							if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
+								sse.InstantHighlight();
+							}else if(sse.prevSelState == AbsSlotSystemElement.defocusedState)
+								process = new SSEHighlightProcess(sse, sse.highlightCoroutine);
+							else if(sse.prevSelState == AbsSlotSystemElement.focusedState)
+								process = new SSEHighlightProcess(sse, sse.highlightCoroutine);
 							sse.SetAndRunSelProcess(process);
 						}
 					}
 				/*	act state	*/
 					public abstract class SSEActState: SSEState{}
+					public class SSEWaitForActionState: SSEActState{
+						public override void EnterState(StateHandler sh){
+							base.EnterState(sh);
+							sse.SetAndRunActProcess(null);
+						}
+					}
 			/*	process	*/
-				public class SSEProcessEngine{
-					public SSEProcess process{
-						get{return m_process;}
-						}SSEProcess m_process;
-					public void SetAndRunProcess(SSEProcess process){
-						if(process != null)
-							process.Stop();
-						m_process = process;
-						if(process != null)
-							process.Start();
+				/*	superclasses	*/
+					public class SSEProcessEngine{
+						public SSEProcess process{
+							get{return m_process;}
+							}SSEProcess m_process;
+						public void SetAndRunProcess(SSEProcess process){
+							if(process != null)
+								process.Stop();
+							m_process = process;
+							if(process != null)
+								process.Start();
+						}
 					}
-				}
-				public interface SSEProcess{
-					bool isRunning{get;}
-					System.Func<IEnumeratorMock> coroutineMock{set;}
-					void Start();
-					void Stop();
-					void Expire();
-				}
-				public class AbsSSEProcess: SSEProcess{
-					public bool isRunning{
-						get{return m_isRunning;}
-						} bool m_isRunning;
-					public System.Func<IEnumeratorMock> coroutineMock{
-						set{m_coroutineMock = value;}
-						}System.Func<IEnumeratorMock> m_coroutineMock;
-					protected SlotSystemElement sse{
-						get{return m_sse;}
-						set{m_sse = value;}
-						} SlotSystemElement m_sse;
-					public virtual void Start(){
-						m_isRunning = true;
-						m_coroutineMock();
+					public interface SSEProcess{
+						bool isRunning{get;}
+						System.Func<IEnumeratorMock> coroutineMock{set;}
+						void Start();
+						void Stop();
+						void Expire();
 					}
-					public virtual void Stop(){
-						if(isRunning)
-							m_isRunning = false;
+					public class AbsSSEProcess: SSEProcess{
+						public bool isRunning{
+							get{return m_isRunning;}
+							} bool m_isRunning;
+						public System.Func<IEnumeratorMock> coroutineMock{
+							set{m_coroutineMock = value;}
+							}System.Func<IEnumeratorMock> m_coroutineMock;
+						protected SlotSystemElement sse{
+							get{return m_sse;}
+							set{m_sse = value;}
+							} SlotSystemElement m_sse;
+						public virtual void Start(){
+							m_isRunning = true;
+							m_coroutineMock();
+						}
+						public virtual void Stop(){
+							if(isRunning)
+								m_isRunning = false;
+						}
+						public virtual void Expire(){
+							if(isRunning)
+								m_isRunning = false;
+						}
 					}
-					public virtual void Expire(){
-						if(isRunning)
-							m_isRunning = false;
-					}
-				}
-				public abstract class SSESelProcess: AbsSSEProcess{}
-				public abstract class SSEActProcess: AbsSSEProcess{}
+				/*	sel process	*/
+					public abstract class SSESelProcess: AbsSSEProcess{}
+						public class SSEGreyoutProcess: SSESelProcess{
+							public SSEGreyoutProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+								this.sse = sse;
+								this.coroutineMock = coroutineMock;
+							}
+						}
+						public class SSEGreyinProcess: SSESelProcess{
+							public SSEGreyinProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+								this.sse = sse;
+								this.coroutineMock = coroutineMock;
+							}
+						}
+						public class SSEHighlightProcess: SSESelProcess{
+							public SSEHighlightProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+								this.sse = sse;
+								this.coroutineMock = coroutineMock;
+							}
+						}
+						public class SSEDehighlightProcess: SSESelProcess{
+							public SSEDehighlightProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+								this.sse = sse;
+								this.coroutineMock = coroutineMock;
+							}
+						}
+				/*	act process	*/
+					public abstract class SSEActProcess: AbsSSEProcess{}
 			public interface SlotSystemElement: IEnumerable<SlotSystemElement>, StateHandler{
-				SSESelState curSelState{get;}
-				SSESelState prevSelState{get;}
-				SSEActState curActState{get;}
-				SSEActState prevActState{get;}
-				void SetAndRunSelProcess(SSESelProcess process);
-				void SetAndRunActProcess(SSEActProcess process);
-				SSESelProcess selProcess{get;}
-				SSEActProcess actProcess{get;}
+				SSEState curSelState{get;}
+				SSEState prevSelState{get;}
+				SSEState curActState{get;}
+				SSEState prevActState{get;}
+				void SetAndRunSelProcess(SSEProcess process);
+				void SetAndRunActProcess(SSEProcess process);
+				SSEProcess selProcess{get;}
+				SSEProcess actProcess{get;}
+				IEnumeratorMock greyoutCoroutine();
+				IEnumeratorMock greyinCoroutine();
+				IEnumeratorMock highlightCoroutine();
+				IEnumeratorMock dehighlightCoroutine();
+				void InstantGreyin();
+				void InstantGreyout();
+				void InstantHighlight();
 				string eName{get;}
 				void Activate();
 				void Deactivate();
@@ -1785,10 +1793,17 @@ namespace SlotSystem{
 				public SSEState prevSelState{get{return null;}}
 				public SSEState curActState{get{return null;}}
 				public SSEState prevActState{get{return null;}}
-				public SSESelProcess selProcess{get{return null;}}
-				public void SetAndRunSelProcess(SSESelProcess process){}
-				public SSEActProcess actProcess{get{return null;}}
-				public void SetAndRunActProcess(SSEActProcess process){}
+				public SSEProcess selProcess{get{return null;}}
+				public void SetAndRunSelProcess(SSEProcess process){}
+				public SSEProcess actProcess{get{return null;}}
+				public void SetAndRunActProcess(SSEProcess process){}
+				public IEnumeratorMock greyoutCoroutine(){return null;}
+				public IEnumeratorMock greyinCoroutine(){return null;}
+				public IEnumeratorMock highlightCoroutine(){return null;}
+				public IEnumeratorMock dehighlightCoroutine(){return null;}
+				public void InstantGreyin(){}
+				public void InstantGreyout(){}
+				public void InstantHighlight(){}
 				
 				public string eName{get{return m_eName;}}protected string m_eName;
 				protected abstract IEnumerable<SlotSystemElement> elements{get;}
@@ -2518,6 +2533,58 @@ namespace SlotSystem{
 				}
 				return false;
 			}
+			/*	SSE	*/
+				public static string SSEDebug(SlotSystemElement sse){
+					string res = "";
+					string prevSel = SSEStateName(sse.prevSelState);
+					string curSel = SSEStateName(sse.curSelState);
+					string selProc;
+						if(sse.selProcess == null)
+							selProc = "";
+						else
+							selProc = SSEProcessName(sse.selProcess) + " running? " + (sse.selProcess.isRunning?Blue("true"):Red("false"));
+					string prevAct = SSEStateName(sse.prevActState);
+					string curAct = SSEStateName(sse.curActState);
+					string actProc;
+						if(sse.actProcess == null)
+							actProc = "";
+						else
+							actProc = SSEProcessName(sse.actProcess) + " running? " + (sse.actProcess.isRunning?Blue("true"):Red("false"));
+					res = Bold("DebugTarget: ") + 
+						sse.eName + " " +
+						Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
+							" proc, " + selProc + ", " +
+						Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
+							" proc, " + actProc;
+					return res;
+				}
+				public static string SSEStateName(SSEState state){
+						string res = "";
+					if(state is SSEDeactivatedState){
+						res = Util.Red("SSEDeactivated");
+					}else if(state is SSEDefocusedState){
+						res = Util.Green("SSEDefocused");
+					}else if(state is SSEFocusedState){
+						res = Util.Blue("SSEFocused");
+					}else if(state is SSESelectedState){
+						res = Util.Aqua("SSESelected");
+					}else if(state is SSEWaitForActionState){
+						res = Util.Sangria("SSEWFA");
+					}
+					return res;
+				}
+				public static string SSEProcessName(SSEProcess process){
+					string res = "";
+					if(process is SSEGreyinProcess)
+						res = Util.Red("Greyin");
+					else if(process is SSEGreyoutProcess)
+						res = Util.Blue("Greyout");
+					else if(process is SSEHighlightProcess)
+						res = Util.Green("Highlight");
+					else if(process is SSEDehighlightProcess)
+						res = Util.Brown("Dehighlight");
+					return res;
+				}
 			/*	SGM	*/
 				public static string SGMStateName(SGMState state){
 					string res = "";
@@ -2702,20 +2769,20 @@ namespace SlotSystem{
 				}
 				public static string SGDebug(SlotGroup sg){
 					string res = "";
-					string prevSel = SGStateName((SGSelectionState)sg.prevSelState);
-					string curSel = SGStateName((SGSelectionState)sg.curSelState);
+					string prevSel = SGStateName((SGSelState)sg.prevSelState);
+					string curSel = SGStateName((SGSelState)sg.curSelState);
 					string selProc;
 						if(sg.selProcess == null)
 							selProc = "";
 						else
-							selProc = SGProcessName(sg.selProcess) + " running? " + (sg.selProcess.isRunning?Blue("true"):Red("false"));
-					string prevAct = SGStateName((SGActionState)sg.prevActState);
-					string curAct = SGStateName((SGActionState)sg.curActState);
+							selProc = SGProcessName((SGSelProcess)sg.selProcess) + " running? " + (sg.selProcess.isRunning?Blue("true"):Red("false"));
+					string prevAct = SGStateName((SGActState)sg.prevActState);
+					string curAct = SGStateName((SGActState)sg.curActState);
 					string actProc;
 						if(sg.actProcess == null)
 							actProc = "";
 						else
-							actProc = SGProcessName(sg.actProcess) + " running? " + (sg.actProcess.isRunning?Blue("true"):Red("false"));
+							actProc = SGProcessName((SGActProcess)sg.actProcess) + " running? " + (sg.actProcess.isRunning?Blue("true"):Red("false"));
 					res = Bold("DebugTarget: ") + 
 						sg.eName + " " +
 						Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
@@ -2809,7 +2876,7 @@ namespace SlotSystem{
 				}
 				public static string SBStateName(SBState state){
 					string result = "";
-					if(state is SBSelectionState){
+					if(state is SBSelState){
 						if(state is SBDeactivatedState)
 							result = Red("Deactivated");
 						else if(state is SBFocusedState)
@@ -2818,7 +2885,7 @@ namespace SlotSystem{
 							result = Green("Defocused");
 						else if(state is SBSelectedState)
 							result = Ciel("Selected");
-					}else if(state is SBActionState){
+					}else if(state is SBActState){
 						if(state is WaitForActionState)
 							result = Aqua("WFAction");
 						else if(state is WaitForPointerUpState)
@@ -2843,7 +2910,7 @@ namespace SlotSystem{
 						// 	result = Sangria("MovingOut");
 						// else if(state is SBMovingInState)
 						// 	result = Yamabuki("MovingIn");
-					}else if(state is SBEquipState){
+					}else if(state is SBEqpState){
 						if(state is SBEquippedState)
 							result = Red("Equipped");
 						else if(state is SBUnequippedState)
@@ -2887,22 +2954,22 @@ namespace SlotSystem{
 						res = "null";
 					else{	
 						string sbName = SBofSG(sb);
-						string prevSel = SBStateName((SBSelectionState)sb.prevSelState);
-						string curSel = SBStateName((SBSelectionState)sb.curSelState);
+						string prevSel = SBStateName((SBSelState)sb.prevSelState);
+						string curSel = SBStateName((SBSelState)sb.curSelState);
 						string selProc;
 							if(sb.selProcess == null)
 								selProc = "";
 							else
 								selProc = SBProcessName((SBSelProcess)sb.selProcess) + " running? " + (sb.selProcess.isRunning?Blue("true"):Red("false"));
-						string prevAct = SBStateName((SBActionState)sb.prevActState);
-						string curAct = SBStateName((SBActionState)sb.curActState);
+						string prevAct = SBStateName((SBActState)sb.prevActState);
+						string curAct = SBStateName((SBActState)sb.curActState);
 						string actProc;
 							if(sb.actProcess == null)
 								actProc = "";
 							else
 								actProc = SBProcessName((SBActProcess)sb.actProcess) + " running? " + (sb.actProcess.isRunning?Blue("true"):Red("false"));
-						string prevEqp = SBStateName(sb.PrevEqpState);
-						string curEqp = SBStateName(sb.CurEqpState);
+						string prevEqp = SBStateName((SBEqpState)sb.PrevEqpState);
+						string curEqp = SBStateName((SBEqpState)sb.CurEqpState);
 						string eqpProc;
 							if(sb.eqpProcess == null)
 								eqpProc = "";

@@ -691,13 +691,13 @@ public class SlottableTest{
 				genBundle.SetFocusedBundleElement(genPageA);
 			InventoryManagerPage invManPage = new InventoryManagerPage(poolBundle, equipBundle, gBundles);
 			/*	MB ver	*/
-				// GameObject impGO = new GameObject("InventoryManagerPage");
-				// InventoryManagerPageMB invManPageMB = impGO.AddComponent<InventoryManagerPageMB>();
-				// invManPageMB.Initialize(poolBundle, equipBundle, gBundles);
+				GameObject impGO = new GameObject("InventoryManagerPage");
+				InventoryManagerPageMB invManPageMB = impGO.AddComponent<InventoryManagerPageMB>();
+				invManPageMB.Initialize(poolBundle, equipBundle, gBundles);
 
-				AssertSlotSystemRootElementCorrectlySet(invManPage);
-				// AssertSlotSystemRootElementCorrectlySet(invManPageMB);
-		sgm.Initialize(invManPage);
+				// AssertSlotSystemRootElementCorrectlySet(invManPage);
+				AssertSlotSystemRootElementCorrectlySet(invManPageMB);
+		sgm.Initialize(invManPageMB);
 			AssertSlotSystemSGMSetRight(sgm);
 			AssertParenthood();
 			AssertImmediateBundle();
@@ -709,6 +709,8 @@ public class SlottableTest{
 		AssertFocused();
 		// sgm.rootPage.PerformInHierarchy(PrintParent);
 		// AssertInitiallyFocusedBundles();
+		invManPageMB.Defocus();
+		invManPageMB.Focus();
 		PrintSystemHierarchyDetailed(sgm.rootPage);
 	}
 	[Test]
@@ -1279,6 +1281,8 @@ public class SlottableTest{
 			eleName = Util.SGDebug((SlotGroup)ele);
 		if(ele is Slottable)
 			eleName = Util.SBDebug((Slottable)ele);
+		if(ele is InventoryManagerPageMB)
+			eleName = Util.SSEDebug(ele);
 		Debug.Log(Indent(ele.level) + eleName);
 	}
 	public void PrintSystemHierarchyDetailed(SlotSystemElement ele){
@@ -3199,7 +3203,7 @@ public class SlottableTest{
 				// 	ASGMActState(sgm, prevAct, curAct, actProcT);
 				// }
 		/*	SG	*/
-			public void ASGSelState(SlotGroup sg, SGSelectionState prev, SGSelectionState cur, System.Type procT){
+			public void ASGSelState(SlotGroup sg, SGSelState prev, SGSelState cur, System.Type procT){
 				AE(sg.curSelState, cur);
 				if(prev != null){
 					AE(sg.prevSelState, prev);
@@ -3209,7 +3213,7 @@ public class SlottableTest{
 						ANull(sg.selProcess);
 				}
 			}
-			public void ASGActState(SlotGroup sg, SGActionState prev, SGActionState cur, System.Type procT, bool isRunning){
+			public void ASGActState(SlotGroup sg, SGActState prev, SGActState cur, System.Type procT, bool isRunning){
 				AE(sg.curActState, cur);
 				if(prev != null){
 					AE(sg.prevActState, prev);
@@ -3234,7 +3238,7 @@ public class SlottableTest{
 					AE((Slottable)sg[i], sbs[i]);
 				}
 			}
-			public void ASSG(SlotGroup sg, SGSelectionState prevSel, SGSelectionState curSel, System.Type selProcT, SGActionState prevAct, SGActionState curAct, System.Type actProcT, bool isRunning){
+			public void ASSG(SlotGroup sg, SGSelState prevSel, SGSelState curSel, System.Type selProcT, SGActState prevAct, SGActState curAct, System.Type actProcT, bool isRunning){
 				ASGSelState(sg, prevSel, curSel, selProcT);
 				ASGActState(sg, prevAct, curAct, actProcT, isRunning);
 			}
@@ -3246,19 +3250,19 @@ public class SlottableTest{
 			}
 		/*	SB	*/
 			public void ASSB(Slottable sb,
-			SBSelectionState prevSel, SBSelectionState curSel , System.Type selProcT,
-			SBActionState prevAct, SBActionState curAct, System.Type actProcT, bool isRunning,
-			SBEquipState prevEqp, SBEquipState curEqp, System.Type eqpProcT){
+			SBSelState prevSel, SBSelState curSel , System.Type selProcT,
+			SBActState prevAct, SBActState curAct, System.Type actProcT, bool isRunning,
+			SBEqpState prevEqp, SBEqpState curEqp, System.Type eqpProcT){
 				ASBSelState(sb, prevSel, curSel, selProcT);
 				ASBActState(sb, prevAct, curAct, actProcT, isRunning);
 				if(curEqp != null)
 					ASBEqpState(sb, prevEqp, curEqp, eqpProcT);
 			}
-			public void ASSB_s(Slottable sb, SBSelectionState selState, SBActionState actState){
+			public void ASSB_s(Slottable sb, SBSelState selState, SBActState actState){
 				AE(sb.curSelState, selState);
 				AE(sb.curActState, actState);
 			}
-			public void ASBSelState(Slottable sb, SBSelectionState prev, SBSelectionState cur, System.Type procT){
+			public void ASBSelState(Slottable sb, SBSelState prev, SBSelState cur, System.Type procT){
 				if(prev != null){
 					AE(sb.prevSelState, prev);
 					if(procT != null)
@@ -3268,7 +3272,7 @@ public class SlottableTest{
 				}
 				AE(sb.curSelState, cur);
 			}
-			public void ASBActState(Slottable sb, SBActionState prev, SBActionState cur, System.Type procT, bool isRunning){
+			public void ASBActState(Slottable sb, SBActState prev, SBActState cur, System.Type procT, bool isRunning){
 				if(prev != null){
 					AE(sb.prevActState, prev);
 					if(procT != null){
@@ -3280,7 +3284,7 @@ public class SlottableTest{
 				}
 				AE(sb.curActState, cur);
 			}
-			public void ASBEqpState(Slottable sb, SBEquipState prev, SBEquipState cur, System.Type procT){
+			public void ASBEqpState(Slottable sb, SBEqpState prev, SBEqpState cur, System.Type procT){
 				if(prev != null){
 					AE(sb.PrevEqpState, prev);
 					if(procT != null)
@@ -3726,80 +3730,80 @@ public class SlottableTest{
 				get{return SlotGroupManager.PerformingTransactionState;}
 			}
 		/*	SG	*/
-			SGSelectionState SGFocused{
+			SGSelState SGFocused{
 				get{return SlotGroup.FocusedState;}
 			}
-			SGSelectionState SGDefocused{
+			SGSelState SGDefocused{
 				get{return SlotGroup.DefocusedState;}
 			}
-			SGSelectionState SGDeactivated{
+			SGSelState SGDeactivated{
 				get{return SlotGroup.DeactivatedState;}
 			}
-			SGSelectionState SGSelected{
+			SGSelState SGSelected{
 				get{return SlotGroup.SelectedState;}
 			}
-			SGActionState SGWFA{
+			SGActState SGWFA{
 				get{return SlotGroup.WaitForActionState;}
 			}
-			SGActionState SGRevert{
+			SGActState SGRevert{
 				get{return SlotGroup.RevertState;}
 			}
-			SGActionState SGReorder{
+			SGActState SGReorder{
 				get{return SlotGroup.ReorderState;}
 			}
-			SGActionState SGFill{
+			SGActState SGFill{
 				get{return SlotGroup.FillState;}
 			}
-			SGActionState SGSwap{
+			SGActState SGSwap{
 				get{return SlotGroup.SwapState;}
 			}
-			SGActionState SGAdd{
+			SGActState SGAdd{
 				get{return SlotGroup.AddState;}
 			}
-			SGActionState SGRemove{
+			SGActState SGRemove{
 				get{return SlotGroup.RemoveState;}
 			}
 		/*	SB states shortcut	*/
-			SBSelectionState SBFocused{
+			SBSelState SBFocused{
 				get{return Slottable.FocusedState;}
 			}
-			SBSelectionState SBDefocused{
+			SBSelState SBDefocused{
 				get{return Slottable.DefocusedState;}
 			}
-			SBSelectionState SBDeactivated{
+			SBSelState SBDeactivated{
 				get{return Slottable.DeactivatedState;}
 			}
-			SBSelectionState SBSelected{
+			SBSelState SBSelected{
 				get{return Slottable.SelectedState;}
 			}
-			SBActionState SBWFA{
+			SBActState SBWFA{
 				get{return Slottable.WaitForActionState;}
 			}
-			SBActionState SBWFPickUp{
+			SBActState SBWFPickUp{
 				get{return Slottable.WaitForPickUpState;}
 			}
-			SBActionState SBWFPointerUp{
+			SBActState SBWFPointerUp{
 				get{return Slottable.WaitForPointerUpState;}
 			}
-			SBActionState SBPickedUp{
+			SBActState SBPickedUp{
 				get{return Slottable.PickedUpState;}
 			}
-			SBActionState SBWFNT{
+			SBActState SBWFNT{
 				get{return Slottable.WaitForNextTouchState;}
 			}
-			SBActionState SBAdd{
+			SBActState SBAdd{
 				get{return Slottable.AddedState;}
 			}
-			SBActionState SBRemove{
+			SBActState SBRemove{
 				get{return Slottable.RemovedState;}
 			}
-			SBActionState SBMoveWithin{
+			SBActState SBMoveWithin{
 				get{return Slottable.MoveWithinState;}
 			}
-			SBEquipState SBEquipped{
+			SBEqpState SBEquipped{
 				get{return Slottable.EquippedState;}
 			}
-			SBEquipState SBUnequipped{
+			SBEqpState SBUnequipped{
 				get{return Slottable.UnequippedState;}
 			}
 

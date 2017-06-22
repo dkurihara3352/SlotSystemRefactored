@@ -326,10 +326,10 @@ namespace SlotSystem{
 					}
 					m_hoveredSG = sg;
 				}
-			public InventoryManagerPage rootPage{
+			public InventoryManagerPageMB rootPage{
 				get{return m_rootPage;}
-				}InventoryManagerPage m_rootPage;
-				public void SetRootPage(InventoryManagerPage rootPage){
+				}InventoryManagerPageMB m_rootPage;
+				public void SetRootPage(InventoryManagerPageMB rootPage){
 					m_rootPage = rootPage;
 					rootPage.SetSGMRecursively(this);
 				}
@@ -519,7 +519,7 @@ namespace SlotSystem{
 				}
 			}
 		/*	methods	*/
-			public void Initialize(InventoryManagerPage invManPage){
+			public void Initialize(InventoryManagerPageMB invManPage){
 				SetRootPage(invManPage);
 				SelStateEngine.SetState(SlotGroupManager.DeactivatedState);
 				ActStateEngine.SetState(SlotGroupManager.WaitForActionState);

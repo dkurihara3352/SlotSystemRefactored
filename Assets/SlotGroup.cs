@@ -14,17 +14,45 @@ namespace SlotSystem{
 					}	
 					}SSEStateEngine m_sgSelStateEngine;
 					public SSEState curSelState{
-						get{return (SSEState)SGSelStateEngine.curState;}
+						get{return (SGSelState)SGSelStateEngine.curState;}
 					}
 					public SSEState prevSelState{
-						get{return (SSEState)SGSelStateEngine.prevState;}
+						get{return (SGSelState)SGSelStateEngine.prevState;}
 					}
 					public void SetSelState(SSEState state){
-						if(state is SGSelectionState)
+						if(state == null || state is SGSelState)
 							SGSelStateEngine.SetState(state);
 						else
 							throw new System.InvalidOperationException("SlotGroup.SetSelState: somthing other than SGSelectionState is trying to be assinged");
 					}
+					public static SGSelState DeactivatedState{
+						get{
+							if(SlotGroup.m_deactivatedState == null)
+								m_deactivatedState = new SGDeactivatedState();
+							return m_deactivatedState;
+						}
+						}private static SGSelState m_deactivatedState;
+					public static SGSelState DefocusedState{
+						get{
+							if(SlotGroup.m_defocusedState == null)
+								m_defocusedState = new SGDefocusedState();
+							return m_defocusedState;
+						}
+						}private static SGSelState m_defocusedState;
+					public static SGSelState FocusedState{
+						get{
+							if(SlotGroup.m_focusedState == null)
+								m_focusedState = new SGFocusedState();
+							return m_focusedState;
+						}
+						}private static SGSelState m_focusedState;
+					public static SGSelState SelectedState{
+						get{
+							if(m_selectedState == null)
+								m_selectedState = new SGSelectedState();
+							return m_selectedState;
+						}
+						}private static SGSelState m_selectedState;
 				SSEStateEngine SGActStateEngine{
 					get{
 						if(m_sgActStateEngine == null)
@@ -33,105 +61,78 @@ namespace SlotSystem{
 					}	
 					}SSEStateEngine m_sgActStateEngine;
 					public SSEState curActState{
-						get{return (SSEState)SGActStateEngine.curState;}
+						get{return (SGActState)SGActStateEngine.curState;}
 					}
 					public SSEState prevActState{
-						get{return (SSEState)SGActStateEngine.prevState;}
+						get{return (SGActState)SGActStateEngine.prevState;}
 					}
 					public void SetActState(SSEState state){
-						if(state is SGActionState)
+						if(state == null || state is SGActState)
 							SGActStateEngine.SetState(state);
 						else
 							throw new System.InvalidOperationException("SlotGroup.SetActState: somthing other than SGActionState is trying to be assinged");
 					}
-			/*	static states	*/
-				/*	Selection states	*/
-					public static SGSelectionState DeactivatedState{
-						get{
-							if(SlotGroup.m_deactivatedState == null)
-								m_deactivatedState = new SGDeactivatedState();
-							return m_deactivatedState;
-						}
-						}private static SGSelectionState m_deactivatedState;
-					public static SGSelectionState DefocusedState{
-						get{
-							if(SlotGroup.m_defocusedState == null)
-								m_defocusedState = new SGDefocusedState();
-							return m_defocusedState;
-						}
-						}private static SGSelectionState m_defocusedState;
-					public static SGSelectionState FocusedState{
-						get{
-							if(SlotGroup.m_focusedState == null)
-								m_focusedState = new SGFocusedState();
-							return m_focusedState;
-						}
-						}private static SGSelectionState m_focusedState;
-					public static SGSelectionState SelectedState{
-						get{
-							if(m_selectedState == null)
-								m_selectedState = new SGSelectedState();
-							return m_selectedState;
-						}
-						}private static SGSelectionState m_selectedState;
-				/*	Action States	*/
-					public static SGActionState WaitForActionState{
+					public static SGActState WaitForActionState{
 						get{
 							if(m_waitForActionState == null)
 								m_waitForActionState = new SGWaitForActionState();
 							return m_waitForActionState;
 						}
-						}private static SGActionState m_waitForActionState;
-					public static SGActionState RevertState{
+						}private static SGActState m_waitForActionState;
+					public static SGActState RevertState{
 						get{
 							if(m_revertState == null)
 								m_revertState = new SGRevertState();
 							return m_revertState;
 						}
-						}private static SGActionState m_revertState;
-					public static SGActionState ReorderState{
+						}private static SGActState m_revertState;
+					public static SGActState ReorderState{
 						get{
 							if(m_reorderState == null)
 								m_reorderState = new SGReorderState();
 							return m_reorderState;
 						}
-						}private static SGActionState m_reorderState;
-					public static SGActionState AddState{
+						}private static SGActState m_reorderState;
+					public static SGActState AddState{
 						get{
 							if(m_addState == null)
 								m_addState = new SGAddState();
 							return m_addState;
 						}
-						}private static SGActionState m_addState;
-					public static SGActionState RemoveState{
+						}private static SGActState m_addState;
+					public static SGActState RemoveState{
 						get{
 							if(m_removeState == null)
 								m_removeState = new SGRemoveState();
 							return m_removeState;
 						}
-						}private static SGActionState m_removeState;
-					public static SGActionState SwapState{
+						}private static SGActState m_removeState;
+					public static SGActState SwapState{
 						get{
 							if(m_swapState == null)
 								m_swapState = new SGSwapState();
 							return m_swapState;
 						}
-						}private static SGActionState m_swapState;
-					public static SGActionState FillState{
+						}private static SGActState m_swapState;
+					public static SGActState FillState{
 						get{
 							if(m_fillState == null)
 								m_fillState = new SGFillState();
 							return m_fillState;
 						}
-						}private static SGActionState m_fillState;
-					public static SGActionState SortState{
+						}private static SGActState m_fillState;
+					public static SGActState SortState{
 						get{
 							if(m_sortState == null)
 								m_sortState = new SGSortState();
 							return m_sortState;
 						}
-						}private static SGActionState m_sortState;
-		/*	process	*/
+						}private static SGActState m_sortState;
+
+			/*	static states	*/
+				/*	Selection states	*/
+				/*	Action States	*/
+				/*	process	*/
 				public SSEProcessEngine selProcEngine{
 					get{
 						if(m_selProcEngine == null)
@@ -139,28 +140,24 @@ namespace SlotSystem{
 						return m_selProcEngine;
 					}
 					}SSEProcessEngine m_selProcEngine;
-					public SGSelProcess selProcess{
+					public SSEProcess selProcess{
 						get{return (SGSelProcess)selProcEngine.process;}
 					}
-					public void SetAndRunSelProcess(SGSelProcess process){
-						selProcEngine.SetAndRunProcess(process);
+					public void SetAndRunSelProcess(SSEProcess process){
+						if(process == null || process is SGSelProcess)
+							selProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("SlotGroup.SetAndrunSelProcess: argument is not of type SGSelProcess");
 					}
-					public IEnumeratorMock GreyinCoroutine(){
+					public IEnumeratorMock greyinCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock GreyoutCoroutine(){
+					public IEnumeratorMock greyoutCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock HighlightCoroutine(){
+					public IEnumeratorMock highlightCoroutine(){
 						return null;
 					}
-					public IEnumeratorMock DehighlightCoroutine(){
-						return null;
-					}
-					public IEnumeratorMock InstantGreyoutCoroutine(){
-						return null;
-					}
-					public IEnumeratorMock InstantGreyinCoroutine(){
+					public IEnumeratorMock dehighlightCoroutine(){
 						return null;
 					}
 				public SSEProcessEngine actProcEngine{
@@ -170,11 +167,13 @@ namespace SlotSystem{
 						return m_actProcEngine;
 					}
 					}SSEProcessEngine m_actProcEngine;
-					public SGActProcess actProcess{
+					public SSEProcess actProcess{
 						get{return (SGActProcess)actProcEngine.process;}
 					}
-					public void SetAndRunActProcess(SGActProcess process){
-						actProcEngine.SetAndRunProcess(process);
+					public void SetAndRunActProcess(SSEProcess process){
+						if(process == null || process is SGActProcess)
+							actProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("SlotGroup.SetAndRunActProcess: argument is not of type SGActProcess");
 					}
 					public IEnumeratorMock TransactionCoroutine(){
 						bool flag = true;
@@ -227,18 +226,18 @@ namespace SlotSystem{
 			public bool isPool{
 				get{
 					// return sgm.allSGPs.Contains(this);
-					return ((InventoryManagerPage)rootElement).poolBundle.ContainsInHierarchy(this);
+					return ((InventoryManagerPageMB)rootElement).poolBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGE{
 				get{
 					// return sgm.allSGEs.Contains(this);
-					return ((InventoryManagerPage)rootElement).equipBundle.ContainsInHierarchy(this);
+					return ((InventoryManagerPageMB)rootElement).equipBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGG{
 				get{
-					foreach(SlotSystemBundle gBundle in ((InventoryManagerPage)rootElement).otherBundles){
+					foreach(SlotSystemBundle gBundle in ((InventoryManagerPageMB)rootElement).otherBundles){
 						if(gBundle.ContainsInHierarchy(this))
 							return true;
 					}
@@ -471,157 +470,161 @@ namespace SlotSystem{
 		/*	events	*/
 			public void OnHoverEnterMock(){
 				PointerEventDataMock eventData = new PointerEventDataMock();
-				((SGSelectionState)curSelState).OnHoverEnterMock(this, eventData);
+				((SGSelState)curSelState).OnHoverEnterMock(this, eventData);
 			}
 			public void OnHoverExitMock(){
 				PointerEventDataMock eventData = new PointerEventDataMock();
-				((SGSelectionState)curSelState).OnHoverExitMock(this, eventData);
+				((SGSelState)curSelState).OnHoverExitMock(this, eventData);
 			}
 		/*	SlotSystemElement implementation	*/
-			public string eName{
-				get{
-					string res = m_eName;
-					if(sgm != null){
-						if(isPool) res = Util.Red(res);
-						if(isSGE) res = Util.Blue(res);
-						if(isSGG) res = Util.Green(res);
-					}
-					return res;
-					}
-				}string m_eName;
-			public List<Slottable> toList{get{return slottables;}}
-			public IEnumerator<SlotSystemElement> GetEnumerator(){
-				foreach(Slottable sb in slottables){
-					yield return sb;
+			/* fields	*/
+				public SlotSystemElement this[int i]{
+					get{return slottables[i];}
 				}
-				}IEnumerator IEnumerable.GetEnumerator(){
-					return GetEnumerator();
+				public int Count{
+					get{return slottables.Count;}
 				}
-			public SlotSystemElement this[int i]{
-				get{return slottables[i];}
-			}
-			public int Count{
-				get{return slottables.Count;}
-			}
-			public int IndexOf(Slottable sb){
-				return slottables.IndexOf(sb);
-			}
-			public bool Contains(SlotSystemElement element){
-				if(element is Slottable)
-					return slottables.Contains((Slottable)element);
-				return false;
-			}
-			public bool ContainsInHierarchy(SlotSystemElement element){
-				return FindParentInHierarchy(element) != null;
-			}
-			public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
-				if(element is Slottable){
-					Slottable tarSB = (Slottable)element;
+				public string eName{
+					get{
+						string res = m_eName;
+						if(sgm != null){
+							if(isPool) res = Util.Red(res);
+							if(isSGE) res = Util.Blue(res);
+							if(isSGG) res = Util.Green(res);
+						}
+						return res;
+						}
+					}string m_eName;
+				public List<Slottable> toList{get{return slottables;}}
+				public SlotSystemElement parent{
+					get{return m_parent;}
+					set{m_parent = value;}
+					}SlotSystemElement m_parent;
+				public SlotSystemBundle immediateBundle{
+					get{
+						if(parent == null)
+							return null;
+						if(parent is SlotSystemBundle)
+							return (SlotSystemBundle)parent;
+						else
+							return parent.immediateBundle;
+					}
+				}
+				public SlotGroupManager sgm{
+					get{return m_sgm;}
+					set{m_sgm = value;}
+					}SlotGroupManager m_sgm;
+
+				public int level{
+					get{
+						if(parent == null) return 0;
+						return parent.level + 1;
+					}
+				}
+				public SlotSystemElement rootElement{
+					get{return m_rootElement;}
+					set{m_rootElement = value;}
+					}SlotSystemElement m_rootElement;
+
+			/*	methods	*/
+				public IEnumerator<SlotSystemElement> GetEnumerator(){
+					foreach(Slottable sb in slottables){
+						yield return sb;
+					}
+					}IEnumerator IEnumerable.GetEnumerator(){
+						return GetEnumerator();
+					}
+				public int IndexOf(Slottable sb){
+					return slottables.IndexOf(sb);
+				}
+				public bool Contains(SlotSystemElement element){
+					if(element is Slottable)
+						return slottables.Contains((Slottable)element);
+					return false;
+				}
+				public bool ContainsInHierarchy(SlotSystemElement element){
+					return FindParentInHierarchy(element) != null;
+				}
+				public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
+					if(element is Slottable){
+						Slottable tarSB = (Slottable)element;
+						foreach(Slottable sb in slottables){
+							if(sb != null){
+								if(sb == tarSB)
+									return this;
+							}
+						}
+					}
+					return null;
+				}
+				public void Focus(){
+					SetSelState(SlotGroup.FocusedState);
+					FocusSBs();
+					Reset();
+				}
+				public void FocusSelf(){
+					SetSelState(SlotGroup.FocusedState);
+				}
+				public void FocusSBs(){
 					foreach(Slottable sb in slottables){
 						if(sb != null){
-							if(sb == tarSB)
-								return this;
+							sb.SetActState(Slottable.WaitForActionState);
+							sb.Reset();
+							if(sb.isPickable)
+								sb.Focus();
+							else
+								sb.Defocus();
 						}
 					}
 				}
-				return null;
-			}
-			public SlotSystemElement parent{
-				get{return m_parent;}
-				set{m_parent = value;}
-				}SlotSystemElement m_parent;
-			public SlotSystemBundle immediateBundle{
-				get{
-					if(parent == null)
-						return null;
-					if(parent is SlotSystemBundle)
-						return (SlotSystemBundle)parent;
-					else
-						return parent.immediateBundle;
+				public void Defocus(){
+					SetSelState(SlotGroup.DefocusedState);
+					DefocusSBs();
+					Reset();
 				}
-			}
-			public SlotGroupManager sgm{
-				get{return m_sgm;}
-				set{m_sgm = value;}
-				}SlotGroupManager m_sgm;
-			public void Focus(){
-				SetSelState(SlotGroup.FocusedState);
-				FocusSBs();
-				Reset();
-			}
-			public void FocusSelf(){
-				SetSelState(SlotGroup.FocusedState);
-			}
-			public void FocusSBs(){
-				foreach(Slottable sb in slottables){
-					if(sb != null){
-						sb.SetActState(Slottable.WaitForActionState);
-						sb.Reset();
-						if(sb.isPickable)
-							sb.Focus();
-						else
+				public void DefocusSelf(){
+					SetSelState(SlotGroup.DefocusedState);
+				}
+				public void DefocusSBs(){
+					foreach(Slottable sb in slottables){
+						if(sb != null){
+							sb.SetActState(Slottable.WaitForActionState);
+							sb.Reset();
 							sb.Defocus();
+						}
 					}
 				}
-			}
-			public void Defocus(){
-				SetSelState(SlotGroup.DefocusedState);
-				DefocusSBs();
-				Reset();
-			}
-			public void DefocusSelf(){
-				SetSelState(SlotGroup.DefocusedState);
-			}
-			public void DefocusSBs(){
-				foreach(Slottable sb in slottables){
-					if(sb != null){
-						sb.SetActState(Slottable.WaitForActionState);
-						sb.Reset();
-						sb.Defocus();
+				public void Activate(){
+				}
+				public void Deactivate(){
+					SetSelState(SlotGroup.DeactivatedState);
+					foreach(Slottable sb in slottables){
+						if(sb != null){
+							sb.SetSelState(Slottable.DeactivatedState);
+						}
 					}
 				}
-			}
-			public void Activate(){
-			}
-			public void Deactivate(){
-				SetSelState(SlotGroup.DeactivatedState);
-				foreach(Slottable sb in slottables){
-					if(sb != null){
-						sb.SetSelState(Slottable.DeactivatedState);
+				public void PerformInHierarchy(System.Action<SlotSystemElement> act){
+					act(this);
+					foreach(Slottable sb in this){
+						if(sb != null)
+							sb.PerformInHierarchy(act);
 					}
 				}
-			}
-			public void PerformInHierarchy(System.Action<SlotSystemElement> act){
-				act(this);
-				foreach(Slottable sb in this){
-					if(sb != null)
-						sb.PerformInHierarchy(act);
+				public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+					act(this, obj);
+					foreach(Slottable sb in slottables){
+						if(sb != null)
+							sb.PerformInHierarchy(act, obj);
+					}
 				}
-			}
-			public void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
-				act(this, obj);
-				foreach(Slottable sb in slottables){
-					if(sb != null)
-						sb.PerformInHierarchy(act, obj);
+				public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
+					act(this, list);
+					foreach(Slottable sb in slottables){
+						if(sb != null)
+							sb.PerformInHierarchy<T>(act, list);
+					}
 				}
-			}
-			public void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
-				act(this, list);
-				foreach(Slottable sb in slottables){
-					if(sb != null)
-						sb.PerformInHierarchy<T>(act, list);
-				}
-			}
-			public int level{
-				get{
-					if(parent == null) return 0;
-					return parent.level + 1;
-				}
-			}
-			public SlotSystemElement rootElement{
-				get{return m_rootElement;}
-				set{m_rootElement = value;}
-				}SlotSystemElement m_rootElement;
 		/*	methods	*/
 			public void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
 				m_eName = name;

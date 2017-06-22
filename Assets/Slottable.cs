@@ -7,7 +7,7 @@ namespace SlotSystem{
 	public class Slottable : MonoBehaviour, IComparable<Slottable>, IComparable, StateHandler, SlotSystemElement{
 		/*	States	*/
 			/*	Selection State	*/
-				SSEStateEngine SelStateEngine{
+				SSEStateEngine selStateEngine{
 					get{
 						if(m_selStateEngine == null)
 							m_selStateEngine = new SSEStateEngine(this);
@@ -15,34 +15,18 @@ namespace SlotSystem{
 					}
 					}SSEStateEngine m_selStateEngine;
 					public SSEState curSelState{
-						get{return (SSEState)SelStateEngine.curState;}
+						get{return (SBSelState)selStateEngine.curState;}
 					}
 					public SSEState prevSelState{
-						get{return (SSEState)SelStateEngine.prevState;}
+						get{return (SBSelState)selStateEngine.prevState;}
 					}
-					public void SetSelState(SSEState selState){
-						if(selState is SBSelectionState)
-							SelStateEngine.SetState(selState);
+					public void SetSelState(SSEState state){
+						if(state == null || state is SBSelState)
+							selStateEngine.SetState(state);
 						else
 							throw new System.InvalidOperationException("Slottable.SetSelState: something other than SBSelectionState is beint attempted to be assigned");
 					}
-				// SBStateEngine SelStateEngine{
-					// 	get{
-					// 		if(m_selStateEngine == null)
-					// 			m_selStateEngine = new SBStateEngine(this);
-					// 		return m_selStateEngine;
-					// 	}
-					// 	}SBStateEngine m_selStateEngine;
-					// 	public SBSelectionState curSelState{
-					// 		get{return (SBSelectionState)SelStateEngine.curState;}
-					// 	}
-					// 	public SBSelectionState prevSelState{
-					// 		get{return (SBSelectionState)SelStateEngine.prevState;}
-					// 	}
-					// 	public void SetSelState(SBSelectionState selState){
-					// 		SelStateEngine.SetState(selState);
-					// 	}
-				public static SBSelectionState DeactivatedState{
+				public static SBSelState DeactivatedState{
 					get{
 						if(Slottable.m_deactivatedState != null)
 							return Slottable.m_deactivatedState;
@@ -51,8 +35,8 @@ namespace SlotSystem{
 							return Slottable.m_deactivatedState;
 						}
 					}
-					}static SBSelectionState m_deactivatedState;
-				public static SBSelectionState SelectedState{
+					}static SBSelState m_deactivatedState;
+				public static SBSelState SelectedState{
 					get{
 						if(Slottable.m_selectedState != null)
 							return Slottable.m_selectedState;
@@ -60,8 +44,8 @@ namespace SlotSystem{
 							Slottable.m_selectedState = new SBSelectedState();
 							return Slottable.m_selectedState;
 					}
-					}static SBSelectionState m_selectedState;			
-				public static SBSelectionState DefocusedState{
+					}static SBSelState m_selectedState;			
+				public static SBSelState DefocusedState{
 					get{
 						if(Slottable.m_defocusedState != null)
 							return Slottable.m_defocusedState;
@@ -70,8 +54,8 @@ namespace SlotSystem{
 							return Slottable.m_defocusedState;
 						}
 					}
-					}static SBSelectionState m_defocusedState;
-				public static SBSelectionState FocusedState{
+					}static SBSelState m_defocusedState;
+				public static SBSelState FocusedState{
 						get{
 							if(Slottable.m_focusedState != null)
 								return Slottable.m_focusedState;
@@ -80,7 +64,7 @@ namespace SlotSystem{
 								return Slottable.m_focusedState;
 							}
 						}
-						}static SBSelectionState m_focusedState;
+						}static SBSelState m_focusedState;
 			/*	Action State	*/
 				SSEStateEngine ActStateEngine{
 					get{
@@ -90,35 +74,18 @@ namespace SlotSystem{
 					}
 					}SSEStateEngine m_actStateEngine;
 					public SSEState curActState{
-						get{return (SSEState)ActStateEngine.curState;}
+						get{return (SBActState)ActStateEngine.curState;}
 					}
 					public SSEState prevActState{
-						get{return (SSEState)ActStateEngine.prevState;}
+						get{return (SBActState)ActStateEngine.prevState;}
 					}
-					public void SetActState(SSEState actState){
-						if(actState is SBActionState)
-							ActStateEngine.SetState(actState);
+					public void SetActState(SSEState state){
+						if(state == null || state is SBActState)
+							ActStateEngine.SetState(state);
 						else
 							throw new System.InvalidOperationException("Slottable.SetActState: something other than SBActionState is being attempted to be assigned");
 					}
-				// SBStateEngine ActStateEngine{
-				// 	get{
-				// 		if(m_actStateEngine == null)
-				// 			m_actStateEngine = new SBStateEngine(this);
-				// 		return m_actStateEngine;
-				// 	}
-				// 	}SBStateEngine m_actStateEngine;
-				// 	public SBActionState CurActState{
-				// 		get{return (SBActionState)ActStateEngine.curState;}
-				// 	}
-				// 	public SBActionState PrevActState{
-				// 		get{return (SBActionState)ActStateEngine.prevState;}
-				// 	}
-				// 	public void SetActState(SBActionState actState){
-				// 		ActStateEngine.SetState(actState);
-				// 	}
-				
-				public static SBActionState WaitForActionState{
+				public static SBActState WaitForActionState{
 					get{
 						if(m_waitForActionState != null)
 							return m_waitForActionState;
@@ -127,8 +94,8 @@ namespace SlotSystem{
 							return m_waitForActionState;
 						}
 					}
-					}static SBActionState m_waitForActionState;
-				public static SBActionState WaitForPointerUpState{
+					}static SBActState m_waitForActionState;
+				public static SBActState WaitForPointerUpState{
 					get{
 						if(m_waitForPointerUpState != null)
 							return m_waitForPointerUpState;
@@ -137,8 +104,8 @@ namespace SlotSystem{
 							return m_waitForPointerUpState;
 						}
 					}
-					}static SBActionState m_waitForPointerUpState;
-				public static SBActionState WaitForPickUpState{
+					}static SBActState m_waitForPointerUpState;
+				public static SBActState WaitForPickUpState{
 					get{
 						if(Slottable.m_waitForPickUpState != null)
 							return Slottable.m_waitForPickUpState;
@@ -147,8 +114,8 @@ namespace SlotSystem{
 							return Slottable.m_waitForPickUpState;
 						}
 					}
-					}static SBActionState m_waitForPickUpState;
-				public static SBActionState WaitForNextTouchState{
+					}static SBActState m_waitForPickUpState;
+				public static SBActState WaitForNextTouchState{
 					get{
 						if(Slottable.m_waitForNextTouchState != null)
 							return Slottable.m_waitForNextTouchState;
@@ -157,8 +124,8 @@ namespace SlotSystem{
 							return Slottable.m_waitForNextTouchState;
 						}
 					}
-					}static SBActionState m_waitForNextTouchState;
-				public static SBActionState PickedUpState{
+					}static SBActState m_waitForNextTouchState;
+				public static SBActState PickedUpState{
 					get{
 						if(Slottable.m_pickedUpState != null)
 							return Slottable.m_pickedUpState;
@@ -167,47 +134,49 @@ namespace SlotSystem{
 							return Slottable.m_pickedUpState;
 						}
 					}
-					}static SBActionState m_pickedUpState;
-				public static SBActionState RemovedState{
+					}static SBActState m_pickedUpState;
+				public static SBActState RemovedState{
 					get{
 						if(Slottable.m_removedState == null)
 							Slottable.m_removedState = new SBRemovedState();
 						return Slottable.m_removedState;			
 					}
-					}static SBActionState m_removedState;
-				public static SBActionState AddedState{
+					}static SBActState m_removedState;
+				public static SBActState AddedState{
 					get{
 						if(Slottable.m_addedState == null)
 							Slottable.m_addedState = new SBAddedState();
 						return Slottable.m_addedState;			
 					}
-					}static SBActionState m_addedState;
-				public static SBActionState MoveWithinState{
+					}static SBActState m_addedState;
+				public static SBActState MoveWithinState{
 						get{
 							if(Slottable.m_moveWithinState == null)
 								Slottable.m_moveWithinState = new SBMoveWithinState();
 							return Slottable.m_moveWithinState;			
 						}
-						}static SBActionState m_moveWithinState;
+						}static SBActState m_moveWithinState;
 			/*	Equip State	*/
-				SBStateEngine EqpStateEngine{
+				SSEStateEngine EqpStateEngine{
 					get{
 						if(m_eqpStateEngine == null)
-							m_eqpStateEngine = new SBStateEngine(this);
+							m_eqpStateEngine = new SSEStateEngine(this);
 						return m_eqpStateEngine;
 					}
-					}SBStateEngine m_eqpStateEngine;
-					public SBEquipState CurEqpState{
-						get{return (SBEquipState)EqpStateEngine.curState;}
+					}SSEStateEngine m_eqpStateEngine;
+					public SSEState CurEqpState{
+						get{return (SBEqpState)EqpStateEngine.curState;}
 					}
-					public SBEquipState PrevEqpState{
-						get{return (SBEquipState)EqpStateEngine.prevState;}
+					public SSEState PrevEqpState{
+						get{return (SBEqpState)EqpStateEngine.prevState;}
 					}
-					public void SetEqpState(SBEquipState actState){
-						EqpStateEngine.SetState(actState);
+					public void SetEqpState(SSEState state){
+						if(state == null || state is SBEqpState)
+							EqpStateEngine.SetState(state);
+						else
+							throw new System.InvalidOperationException("Slottable.SetEqpState: something other than SBEqpState is trying to be assinged");
 					}
-				
-				public static SBEquipState EquippedState{
+				public static SBEqpState EquippedState{
 					get{
 						if(m_equippedState != null)
 							return m_equippedState;
@@ -216,8 +185,8 @@ namespace SlotSystem{
 							return m_equippedState;
 						}
 					}
-					}static SBEquipState m_equippedState;
-				public static SBEquipState UnequippedState{
+					}static SBEqpState m_equippedState;
+				public static SBEqpState UnequippedState{
 					get{
 						if(m_unequippedState != null)
 							return m_unequippedState;
@@ -226,7 +195,7 @@ namespace SlotSystem{
 							return m_unequippedState;
 						}
 					}
-					}static SBEquipState m_unequippedState;
+					}static SBEqpState m_unequippedState;
 		/*	processes	*/
 			public SSEProcessEngine selProcEngine{
 				get{
@@ -235,27 +204,37 @@ namespace SlotSystem{
 					return m_processEngine;
 				}
 				}SSEProcessEngine m_processEngine;
-			public SBSelProcess selProcess{
-				get{return (SBSelProcess)selProcEngine.process;}
+				public SSEProcess selProcess{
+					get{return (SBSelProcess)selProcEngine.process;}
 				}
-				public void SetAndRunSelectionProcess(SBSelProcess process){
-					selProcEngine.SetAndRunProcess(process);
+				public SBSelProcess sbSelProcess{
+					get{return (SBSelProcess)selProcess;}
 				}
-				public IEnumeratorMock GreyoutCoroutine(){return null;}
-				public IEnumeratorMock GreyinCoroutine(){return null;}
-				public IEnumeratorMock HighlightCoroutine(){return null;}
-				public IEnumeratorMock DehighlightCoroutine(){return null;}
+				public void SetAndRunSelProcess(SSEProcess process){
+					if(process ==null || process is SBSelProcess)
+						selProcEngine.SetAndRunProcess(process);
+					else throw new System.InvalidOperationException("Slottable.SetAndRunSelProcess: argument is not of type SBSelProcess");
+				}
+				public IEnumeratorMock greyoutCoroutine(){return null;}
+				public IEnumeratorMock greyinCoroutine(){return null;}
+				public IEnumeratorMock highlightCoroutine(){return null;}
+				public IEnumeratorMock dehighlightCoroutine(){return null;}
 			public SSEProcessEngine actProcEngine{
 				get{
 					if(m_actProcEngine == null)
 						m_actProcEngine = new SSEProcessEngine();
 					return m_actProcEngine;}
 				}SSEProcessEngine m_actProcEngine;
-			public SBActProcess actProcess{
-				get{return (SBActProcess)actProcEngine.process;}
+				public SSEProcess actProcess{
+					get{return (SBActProcess)actProcEngine.process;}
 				}
-				public void SetAndRunActionProcess(SBActProcess process){
-					actProcEngine.SetAndRunProcess(process);
+				public SBActProcess sbActProcess{
+					get{return (SBActProcess)actProcess;}
+				}
+				public void SetAndRunActProcess(SSEProcess process){
+					if(process == null || process is SBActProcess)
+						actProcEngine.SetAndRunProcess(process);
+					else throw new System.InvalidOperationException("Slottable.SetAndRunActProcess: argument is not of type SBActProcess");
 				}
 				public IEnumeratorMock WaitForPointerUpCoroutine(){return null;}
 				public IEnumeratorMock WaitForPickUpCoroutine(){return null;}
@@ -364,7 +343,7 @@ namespace SlotSystem{
 			}
 			public SlotSystemElement parent{
 				get{
-					return ((InventoryManagerPage)rootElement).FindParent(this);
+					return ((InventoryManagerPageMB)rootElement).FindParent(this);
 				}
 				set{}
 			}
@@ -429,24 +408,24 @@ namespace SlotSystem{
 			/*	Selection event	*/
 				public void OnHoverEnterMock(){
 					PointerEventDataMock eventData = new PointerEventDataMock();
-					((SBSelectionState)curSelState).OnHoverEnterMock(this, eventData);
+					((SBSelState)curSelState).OnHoverEnterMock(this, eventData);
 				}
 				public void OnHoverExitMock(){
 					PointerEventDataMock eventData = new PointerEventDataMock();
-					((SBSelectionState)curSelState).OnHoverExitMock(this, eventData);
+					((SBSelState)curSelState).OnHoverExitMock(this, eventData);
 				}
 			/*	Action Event	*/
 				public void OnPointerDownMock(PointerEventDataMock eventDataMock){
-					((SBActionState)curActState).OnPointerDownMock(this, eventDataMock);
+					((SBActState)curActState).OnPointerDownMock(this, eventDataMock);
 				}
 				public void OnPointerUpMock(PointerEventDataMock eventDataMock){
-					((SBActionState)curActState).OnPointerUpMock(this, eventDataMock);
+					((SBActState)curActState).OnPointerUpMock(this, eventDataMock);
 				}
 				public void OnDeselectedMock(PointerEventDataMock eventDataMock){
-					((SBActionState)curActState).OnDeselectedMock(this, eventDataMock);
+					((SBActState)curActState).OnDeselectedMock(this, eventDataMock);
 				}
 				public void OnEndDragMock(PointerEventDataMock eventDataMock){
-					((SBActionState)curActState).OnEndDragMock(this, eventDataMock);
+					((SBActState)curActState).OnEndDragMock(this, eventDataMock);
 				}
 		/*	Interface implementation	*/
 			int IComparable.CompareTo(object other){
@@ -475,7 +454,7 @@ namespace SlotSystem{
 			public void Initialize(InventoryItemInstanceMock item){
 				this.delayed = true;
 				this.SetItem(item);
-				SelStateEngine.SetState(Slottable.DeactivatedState);
+				selStateEngine.SetState(Slottable.DeactivatedState);
 				ActStateEngine.SetState(Slottable.WaitForActionState);
 				EqpStateEngine.SetState(null);
 			}
