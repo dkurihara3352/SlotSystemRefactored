@@ -215,18 +215,18 @@ namespace SlotSystem{
 			public bool isPool{
 				get{
 					// return sgm.allSGPs.Contains(this);
-					return ((InventoryManagerPage)rootElement).poolBundle.ContainsInHierarchy(this);
+					return ssm.poolBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGE{
 				get{
 					// return sgm.allSGEs.Contains(this);
-					return ((InventoryManagerPage)rootElement).equipBundle.ContainsInHierarchy(this);
+					return ssm.equipBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGG{
 				get{
-					foreach(SlotSystemBundle gBundle in ((InventoryManagerPage)rootElement).otherBundles){
+					foreach(SlotSystemBundle gBundle in ssm.otherBundles){
 						if(gBundle.ContainsInHierarchy(this))
 							return true;
 					}
@@ -238,18 +238,10 @@ namespace SlotSystem{
 				}bool m_autoSort = true;
 				public void ToggleAutoSort(bool on){
 					m_autoSort = on;
-					sgm.Focus();
+					ssm.Focus();
 				}
 			List<Slottable> slottables{
 				get{
-					// List<Slottable> result = new List<Slottable>();
-					// 	foreach(Slot slot in this.slots){
-					// 		if(slot.sb != null)
-					// 			result.Add(slot.sb);
-					// 		else
-					// 			result.Add(null);
-					// 	}
-					// return result;
 					return m_slottables;
 				}
 				}List<Slottable> m_slottables;
@@ -286,7 +278,7 @@ namespace SlotSystem{
 			}
 			public bool isFocusedInBundle{
 				get{
-					return (sgm.focusedSGP == this || sgm.focusedSGEs.Contains(this));
+					return (ssm.focusedSGP == this || ssm.focusedSGEs.Contains(this));
 				}
 			}
 			public bool hasEmptySlot{
@@ -327,14 +319,12 @@ namespace SlotSystem{
 				}
 			public bool isAllTASBsDone{
 				get{
-					// if(allTASBs != null){
-					// }
-						foreach(Slottable sb in slottables){
-							if(sb != null){
-								if(sb.actProcess.isRunning)
-									return false;
-							}
+					foreach(Slottable sb in slottables){
+						if(sb != null){
+							if(sb.actProcess.isRunning)
+								return false;
 						}
+					}
 					return true;
 				}
 			}
@@ -483,7 +473,7 @@ namespace SlotSystem{
 				public override string eName{
 					get{
 						string res = m_eName;
-						if(sgm != null){
+						if(ssm != null){
 							if(isPool) res = Util.Red(res);
 							if(isSGE) res = Util.Blue(res);
 							if(isSGG) res = Util.Green(res);
@@ -502,21 +492,6 @@ namespace SlotSystem{
 						return slottables.Contains((Slottable)element);
 					return false;
 				}
-				// public bool ContainsInHierarchy(SlotSystemElement element){
-				// 	return FindParentInHierarchy(element) != null;
-				// }
-				// public SlotSystemElement FindParentInHierarchy(SlotSystemElement element){
-				// 	if(element is Slottable){
-				// 		Slottable tarSB = (Slottable)element;
-				// 		foreach(Slottable sb in slottables){
-				// 			if(sb != null){
-				// 				if(sb == tarSB)
-				// 					return this;
-				// 			}
-				// 		}
-				// 	}
-				// 	return null;
-				// }
 				public override void Focus(){
 					SetSelState(SlotGroup.sgFocusedState);
 					FocusSBs();
@@ -528,7 +503,7 @@ namespace SlotSystem{
 				public void FocusSBs(){
 					foreach(Slottable sb in slottables){
 						if(sb != null){
-							sb.SetActState(Slottable.WaitForActionState);
+							sb.SetActState(Slottable.sbWaitForActionState);
 							sb.Reset();
 							if(sb.isPickable)
 								sb.Focus();
@@ -548,7 +523,7 @@ namespace SlotSystem{
 				public void DefocusSBs(){
 					foreach(Slottable sb in slottables){
 						if(sb != null){
-							sb.SetActState(Slottable.WaitForActionState);
+							sb.SetActState(Slottable.sbWaitForActionState);
 							sb.Reset();
 							sb.Defocus();
 						}
@@ -628,15 +603,6 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			// public Slot GetSlot(InventoryItemInstanceMock itemInst){
-				// 	foreach(Slot slot in this.slots){
-				// 		if(slot.sb != null){
-				// 			if(slot.sb.itemInst == itemInst)
-				// 				return slot;
-				// 		}
-				// 	}
-				// 	return null;
-				// }
 			public void UpdateSBs(List<Slottable> newSBs){
 				/*	Create and set new Slots	*/
 					List<Slot> newSlots = new List<Slot>();
@@ -665,20 +631,19 @@ namespace SlotSystem{
 				}
 				foreach(Slottable sb in moveWithins){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
-					sb.SetActState(Slottable.MoveWithinState);
+					sb.SetActState(Slottable.moveWithinState);
 				}
 				foreach(Slottable sb in removed){
 					sb.SetNewSlotID(-1);
-					sb.SetActState(Slottable.RemovedState);
+					sb.SetActState(Slottable.removedState);
 				}
 				foreach(Slottable sb in added){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
-					sb.SetActState(Slottable.AddedState);
+					sb.SetActState(Slottable.addedState);
 				}
 				List<Slottable> allSBs = new List<Slottable>();
 				allSBs.AddRange(slottables);
 				allSBs.AddRange(added);
-				// SetAllTASBs(allSBs);
 				SetSBs(allSBs);
 			}
 			public void CreateNewSlots(){
@@ -719,15 +684,15 @@ namespace SlotSystem{
 				}
 				foreach(Slottable sb in moveWithins){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
-					sb.SetActState(Slottable.MoveWithinState);
+					sb.SetActState(Slottable.moveWithinState);
 				}
 				foreach(Slottable sb in removed){
 					sb.SetNewSlotID(-1);
-					sb.SetActState(Slottable.RemovedState);
+					sb.SetActState(Slottable.removedState);
 				}
 				foreach(Slottable sb in added){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
-					sb.SetActState(Slottable.AddedState);
+					sb.SetActState(Slottable.addedState);
 				}
 				List<Slottable> allSBs = new List<Slottable>();
 				allSBs.AddRange(slottables);

@@ -241,9 +241,9 @@ namespace SlotSystem{
 						m_hoveredSG = sg;
 					}
 			/*	Hierarcy Management	*/
-				public InventoryManagerPage rootPage{
-					get{return m_rootPage;}
-					}InventoryManagerPage m_rootPage;
+				// public InventoryManagerPage rootPage{
+				// 	get{return m_rootPage;}
+				// 	}InventoryManagerPage m_rootPage;
 					public void SetRootPage(InventoryManagerPage rootPage){
 						m_rootPage = rootPage;
 						rootPage.SetSGMRecursively(this);

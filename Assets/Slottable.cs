@@ -257,7 +257,6 @@ namespace SlotSystem{
 			public InventoryItemInstanceMock itemInst{
 					get{return (InventoryItemInstanceMock)item;}
 				}
-			
 			public int slotID{
 				get{return m_slotID;}
 				}int m_slotID = -1;
@@ -272,7 +271,8 @@ namespace SlotSystem{
 				}
 			public SlotGroup sg{
 				get{
-					return sgm.GetSG(this);
+					// return ssm.GetSG(this);
+					return (SlotGroup)parent;
 				}
 			}
 			public bool isPickable{
@@ -292,7 +292,7 @@ namespace SlotSystem{
 			}
 			public bool isPickedUp{
 				get{
-					return sgm.pickedSB == this;
+					return ssm.pickedSB == this;
 				}
 			}
 			public bool isEquipped{
@@ -317,7 +317,7 @@ namespace SlotSystem{
 				}
 				public override SlotSystemElement parent{
 					get{
-						return ((InventoryManagerPage)rootElement).FindParent(this);
+						return ssm.FindParent(this);
 					}
 					set{}
 				}
@@ -328,9 +328,12 @@ namespace SlotSystem{
 						return parent.immediateBundle;
 					}
 				}
-				public void SetSGM(SlotGroupManager sgm){
-					m_sgm = sgm;
+				public void SetSSM(SlotSystemManager ssm){
+					this.ssm = ssm;
 				}
+				// public void SetSGM(SlotGroupManager sgm){
+				// 	m_sgm = sgm;
+				// }
 				public override int level{
 					get{return sg.level +1;}
 				}
@@ -419,8 +422,8 @@ namespace SlotSystem{
 				}
 			}
 			public void ExecuteTransaction(){
-				sgm.SetActState(SlotGroupManager.PerformingTransactionState);
-				sgm.Transaction.Execute();
+				ssm.SetActState(SlotSystemManager.ssmTransactionState);
+				ssm.transaction.Execute();
 			}
 			public void ExpireActionProcess(){
 				if(actProcess.isRunning)
