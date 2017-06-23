@@ -48,7 +48,7 @@ namespace SlotSystem{
 						}
 					}
 					}static SBSelState m_sbDefocusedState;
-				public static SBSelState FocusedState{
+				public static SBSelState sbFocusedState{
 						get{
 							if(Slottable.m_sbFocusedState != null)
 								return Slottable.m_sbFocusedState;
@@ -288,7 +288,7 @@ namespace SlotSystem{
 				}
 			}
 			public bool isFocused{
-				get{return curSelState == Slottable.FocusedState;}
+				get{return curSelState == Slottable.sbFocusedState;}
 			}
 			public bool isPickedUp{
 				get{
@@ -346,7 +346,7 @@ namespace SlotSystem{
 					SetSelState(Slottable.deactivatedState);
 				}
 				public override void Focus(){
-					SetSelState(Slottable.FocusedState);
+					SetSelState(Slottable.sbFocusedState);
 				}
 				public override void Defocus(){
 					SetSelState(Slottable.sbDefocusedState);

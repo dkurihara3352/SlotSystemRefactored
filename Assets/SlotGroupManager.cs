@@ -152,11 +152,11 @@ namespace SlotSystem{
 					public void SetTargetSB(Slottable sb){
 						if(sb == null || sb != targetSB){
 							if(targetSB != null)
-								targetSB.SetSelState(Slottable.FocusedState);
+								targetSB.SetSelState(Slottable.sbFocusedState);
 						}
 						this.m_targetSB = sb;
 						if(targetSB != null)
-							targetSB.SetSelState(Slottable.SelectedState);
+							targetSB.SetSelState(Slottable.sbSelectedState);
 					}
 				public SlotGroup sg1{
 					get{return m_sg1;}
@@ -164,7 +164,7 @@ namespace SlotSystem{
 					public void SetSG1(SlotGroup sg){
 						if(sg == null || sg != sg1){
 							if(sg1 != null)
-								sg1.SetSelState(SlotGroup.FocusedState);
+								sg1.SetSelState(SlotGroup.sgFocusedState);
 						}
 						this.m_sg1 = sg;
 						if(sg1 != null)
@@ -181,11 +181,11 @@ namespace SlotSystem{
 					public void SetSG2(SlotGroup sg){
 						if(sg == null || sg != sg2){
 							if(sg2 != null)
-								sg2.SetSelState(SlotGroup.FocusedState);
+								sg2.SetSelState(SlotGroup.sgFocusedState);
 						}
 						this.m_sg2 = sg;
 						if(sg2 != null)
-							sg2.SetSelState(SlotGroup.SelectedState);
+							sg2.SetSelState(SlotGroup.sgSelectedState);
 						if(sg2 != null)
 							m_sg2Done = false;
 						else
@@ -558,8 +558,8 @@ namespace SlotSystem{
 				}
 				public void ChangeEquippableCGearsCount(int i, SlotGroup targetSG){
 					if(!targetSG.isExpandable){
-						if(targetSG.curSelState == SlotGroup.FocusedState ||
-							targetSG.curSelState == SlotGroup.DefocusedState){
+						if(targetSG.curSelState == SlotGroup.sgFocusedState ||
+							targetSG.curSelState == SlotGroup.sgDefocusedState){
 								equipInv.SetEquippableCGearsCount(i);
 								targetSG.InitializeItems();
 								UpdateEquipStatesOnAll();
@@ -589,10 +589,10 @@ namespace SlotSystem{
 						if(sb.itemInst == item){
 							if(sb.sg.isFocusedInBundle){/*	focused sgp or sge	*/
 								if(sb.newSlotID != -1)/*	not being removed	*/
-									sb.SetEqpState(Slottable.EquippedState);
+									sb.SetEqpState(Slottable.equippedState);
 							}else if(sb.sg.isPool){/*	defocused sgp	*/
 								sb.SetEqpState(null);
-								sb.SetEqpState(Slottable.EquippedState);
+								sb.SetEqpState(Slottable.equippedState);
 							}
 						}
 					}
@@ -605,10 +605,10 @@ namespace SlotSystem{
 						if(sb.itemInst == item){
 							if(sb.sg.isFocusedInBundle){
 								if(sb.slotID != -1)/*	not being added	*/
-									sb.SetEqpState(Slottable.UnequippedState);
+									sb.SetEqpState(Slottable.unequippedState);
 							}else if(sb.sg.isPool){/*	defocused sgp	*/
 								sb.SetEqpState(null);
-								sb.SetEqpState(Slottable.UnequippedState);
+								sb.SetEqpState(Slottable.unequippedState);
 							}
 						}
 					}

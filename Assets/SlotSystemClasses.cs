@@ -39,7 +39,7 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						if(ssm.prevSelState == SlotSystemManager.ssmFocusedState)
 							ssm.SetAndRunSelProcess(new SSMGreyoutProcess(ssm, ssm.greyoutCoroutine));
-						ssm.rootPage.Defocus();
+						ssm.rootElement.Defocus();
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
@@ -50,7 +50,7 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						if(ssm.prevSelState == SlotSystemManager.ssmDefocusedState)
 							ssm.SetAndRunSelProcess(new SSMGreyinProcess(ssm, ssm.greyinCoroutine));
-						ssm.rootPage.Focus();
+						ssm.rootElement.Focus();
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
@@ -86,6 +86,45 @@ namespace SlotSystem{
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
+					}
+				}
+		/*	process	*/
+			/*	superclasses	*/
+				public abstract class SSMProcess: AbsSSEProcess{
+					protected SlotSystemManager ssm{
+						get{return (SlotSystemManager)sse;}
+					}
+				}
+			/*	Selection Process	*/
+				public class SSMSelProcess: SSMProcess{}
+				public class SSMGreyinProcess: SSMSelProcess{
+					public SSMGreyinProcess(SlotSystemManager ssm, System.Func<IEnumeratorMock> coroutineMock){
+						this.sse = ssm;
+						this.coroutineMock = coroutineMock;
+					}
+				}
+				public class SSMGreyoutProcess: SSMSelProcess{
+					public SSMGreyoutProcess(SlotSystemManager ssm, System.Func<IEnumeratorMock> coroutineMock){
+						this.sse = ssm;
+						this.coroutineMock = coroutineMock;
+					}
+				}
+			/*	Action Process	*/
+				public class SSMActProcess: SSMProcess{}
+				public class SSMProbeProcess: SSMActProcess{
+					public SSMProbeProcess(SlotSystemManager ssm, System.Func<IEnumeratorMock> coroutineMock){
+						this.sse = ssm;
+						this.coroutineMock = coroutineMock;
+					}
+				}
+				public class SSMTransactionProcess: SSMActProcess{
+					public SSMTransactionProcess(SlotSystemManager ssm){
+						this.sse = ssm;
+						this.coroutineMock = ssm.transactionCoroutine;
+					}
+					public override void Expire(){
+						base.Expire();
+						ssm.transaction.OnComplete();
 					}
 				}
 	/*	SGM classes	*/
@@ -575,17 +614,11 @@ namespace SlotSystem{
 					this.SGM = sgm;
 					this.CoroutineMock = coroutineMock;
 				}
-				public override void Expire(){
-					base.Expire();
-				}
 			}
 			public class SGMGreyoutProcess: AbsSGMProcess{
 				public SGMGreyoutProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
 					this.SGM = sgm;
 					this.CoroutineMock = coroutineMock;
-				}
-				public override void Expire(){
-					base.Expire();
 				}
 			}
 			public class SGMProbeProcess: AbsSGMProcess{
@@ -593,17 +626,11 @@ namespace SlotSystem{
 					this.SGM = sgm;
 					this.CoroutineMock = coroutineMock;
 				}
-				public override void Expire(){
-					base.Expire();
-				}
 			}
 			public class SGMTransactionProcess: AbsSGMProcess{
 				public SGMTransactionProcess(SlotGroupManager sgm){
 					this.SGM = sgm;
 					this.CoroutineMock = sgm.WaitForTransactionDone;
-				}
-				public override void Start(){
-					base.Start();
 				}
 				public override void Expire(){
 					base.Expire();

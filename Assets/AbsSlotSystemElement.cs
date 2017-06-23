@@ -79,49 +79,50 @@ namespace SlotSystem{
 						}
 						}static SSEActState m_waitForActionState;
 		/*	process	*/
-			public SSEProcessEngine selProcEngine{
-				get{
-					if(m_selProcEngine == null)
-						m_selProcEngine = new SSEProcessEngine();
-					return m_selProcEngine;
-				}
-				}SSEProcessEngine m_selProcEngine;
-				public virtual SSEProcess selProcess{
-					get{return (SSESelProcess)selProcEngine.process;}
-				}
-				public virtual void SetAndRunSelProcess(SSEProcess process){
-					if(process == null||process is SSESelProcess)
-						selProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
-				}
-				/*	coroutine	*/
-					public virtual IEnumeratorMock greyoutCoroutine(){
-						return null;
+			/*	Selection Processs	*/
+				public SSEProcessEngine selProcEngine{
+					get{
+						if(m_selProcEngine == null)
+							m_selProcEngine = new SSEProcessEngine();
+						return m_selProcEngine;
 					}
-					public virtual IEnumeratorMock greyinCoroutine(){
-						return null;
+					}SSEProcessEngine m_selProcEngine;
+					public virtual SSEProcess selProcess{
+						get{return (SSESelProcess)selProcEngine.process;}
 					}
-					public virtual IEnumeratorMock highlightCoroutine(){
-						return null;
+					public virtual void SetAndRunSelProcess(SSEProcess process){
+						if(process == null||process is SSESelProcess)
+							selProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
 					}
-					public virtual IEnumeratorMock dehighlightCoroutine(){
-						return null;
+				public virtual IEnumeratorMock greyoutCoroutine(){
+					return null;
+				}
+				public virtual IEnumeratorMock greyinCoroutine(){
+					return null;
+				}
+				public virtual IEnumeratorMock highlightCoroutine(){
+					return null;
+				}
+				public virtual IEnumeratorMock dehighlightCoroutine(){
+					return null;
+				}
+			/*	Action Process	*/
+				public SSEProcessEngine actProcEngine{
+					get{
+						if(m_actProcEngine == null)
+							m_actProcEngine = new SSEProcessEngine();
+						return m_actProcEngine;
 					}
-			public SSEProcessEngine actProcEngine{
-				get{
-					if(m_actProcEngine == null)
-						m_actProcEngine = new SSEProcessEngine();
-					return m_actProcEngine;
-				}
-				}SSEProcessEngine m_actProcEngine;
-				public virtual SSEProcess actProcess{
-					get{return (SSEActProcess)actProcEngine.process;}
-				}
-				public virtual void SetAndRunActProcess(SSEProcess process){
-					if(process == null || process is SSEActProcess)
-						actProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");
-				}
+					}SSEProcessEngine m_actProcEngine;
+					public virtual SSEProcess actProcess{
+						get{return (SSEActProcess)actProcEngine.process;}
+					}
+					public virtual void SetAndRunActProcess(SSEProcess process){
+						if(process == null || process is SSEActProcess)
+							actProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");
+					}
 		/*	public fields	*/
 			public virtual SlotSystemElement this[int i]{
 				get{
