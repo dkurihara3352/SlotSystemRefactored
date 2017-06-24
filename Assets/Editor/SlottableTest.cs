@@ -611,36 +611,51 @@ public class SlottableTest{
 			ssmGO = new GameObject("ssmGO");
 			ssm = ssmGO.AddComponent<SlotSystemManager>();
 			/*	equip bundle	*/
+				/*	page elements	*/
+					SlotSystemPageElement sgeBowPE = new SlotSystemPageElement(sgeBow, true);
+					SlotSystemPageElement sgeWearPE = new SlotSystemPageElement(sgeWear, true);
+					SlotSystemPageElement sgeCGearsPE = new SlotSystemPageElement(sgeCGears, true);
 				GameObject eSetGO = new GameObject("eSetGO");
 				EquipmentSet equipSetA = eSetGO.AddComponent<EquipmentSet>();
-				equipSetA.Initialize(sgeBow, sgeWear, sgeCGears);
+				equipSetA.Initialize(sgeBowPE, sgeWearPE, sgeCGearsPE);
 				IEnumerable<SlotSystemElement> eBunEles = new SlotSystemElement[]{equipSetA};
 				GameObject eBunGO = new GameObject("eBunGO");
 				SlotSystemBundle equipBundle = eBunGO.AddComponent<SlotSystemBundle>();
 				equipBundle.Initialize("eBundle", eBunEles);
 				equipBundle.SetFocusedBundleElement(equipSetA);
+				SlotSystemPageElement equipBundlePE = new SlotSystemPageElement(equipBundle, true);
 			/*	pool bundle	*/
 				IEnumerable<SlotSystemElement> pBunEles = new SlotSystemElement[]{sgpAll, sgpBow, sgpWear, sgpCGears, sgpParts};
 				GameObject pBunGO = new GameObject("pBunGO");
 				SlotSystemBundle poolBundle = pBunGO.AddComponent<SlotSystemBundle>();
 				poolBundle.Initialize("pBundle", pBunEles);
 				poolBundle.SetFocusedBundleElement(sgpAll);
+				SlotSystemPageElement poolBundlePE = new SlotSystemPageElement(poolBundle, true);
 			/*	generic pages	*/
 				/*	gPag_11	*/
-					IEnumerable<SlotSystemElement> gPagEles_11 = new SlotSystemElement[]{sgg_111, sgg_112};
+					// IEnumerable<SlotSystemElement> gPagEles_11 = new SlotSystemElement[]{sgg_111, sgg_112};
+						SlotSystemPageElement sgg_111PE = new SlotSystemPageElement(sgg_111, true);
+						SlotSystemPageElement sgg_112PE = new SlotSystemPageElement(sgg_112, false);
+					IEnumerable<SlotSystemPageElement> gPageEles_11 = new SlotSystemPageElement[]{sgg_111PE, sgg_112PE};
 					GameObject gPageGO_11 = new GameObject("gPageGO_11");
 					GenericPage gPage_11 = gPageGO_11.AddComponent<GenericPage>();
-					gPage_11.Initialize("gPage_11", gPagEles_11);
+					gPage_11.Initialize("gPage_11", gPageEles_11);
 				/*	gPag_251	*/
-					IEnumerable<SlotSystemElement> gPagEles_251 = new SlotSystemElement[]{sgg_2511, sgg_2512};
+					// IEnumerable<SlotSystemElement> gPagEles_251 = new SlotSystemElement[]{sgg_2511, sgg_2512};
+						SlotSystemPageElement sgg_2511PE = new SlotSystemPageElement(sgg_2511, true);
+						SlotSystemPageElement sgg_2512PE = new SlotSystemPageElement(sgg_2512, false);
+					IEnumerable<SlotSystemPageElement> gPageEles_251 = new SlotSystemPageElement[]{sgg_2511PE, sgg_2512PE};
 					GameObject gPageGO_251 = new GameObject("gPageGO_251");
 					GenericPage gPage_251 = gPageGO_251.AddComponent<GenericPage>();
-					gPage_251.Initialize("gPage_251", gPagEles_251);
+					gPage_251.Initialize("gPage_251", gPageEles_251);
 				/*	gPag_252	*/
-					IEnumerable<SlotSystemElement> gPagEles_252 = new SlotSystemElement[]{sgg_2521, sgg_2522};
+					// IEnumerable<SlotSystemElement> gPagEles_252 = new SlotSystemElement[]{sgg_2521, sgg_2522};
+						SlotSystemPageElement sgg_2521PE = new SlotSystemPageElement(sgg_2521, false);
+						SlotSystemPageElement sgg_2522PE = new SlotSystemPageElement(sgg_2522, true);
+					IEnumerable<SlotSystemPageElement> gPageEles_252 = new SlotSystemPageElement[]{sgg_2521PE, sgg_2522PE};
 					GameObject gPageGO_252 = new GameObject("gPageGO_252");
 					GenericPage gPage_252 = gPageGO_252.AddComponent<GenericPage>();
-					gPage_252.Initialize("gPage_252", gPagEles_252);
+					gPage_252.Initialize("gPage_252", gPageEles_252);
 				
 			/*	generic bundle	*/
 				/*	gBun_1	*/
@@ -663,8 +678,11 @@ public class SlottableTest{
 					gBundle_2.SetFocusedBundleElement(sgg_21);
 			/*	generic Bundles	*/
 				IEnumerable<SlotSystemBundle> gBundles = new SlotSystemBundle[]{gBundle_1, gBundle_2};
+				SlotSystemPageElement gBundle_1PE = new SlotSystemPageElement(gBundle_1, true);
+				SlotSystemPageElement gBundle_2PE = new SlotSystemPageElement(gBundle_2, false);
+				IEnumerable<SlotSystemPageElement> gBundlesPE = new SlotSystemPageElement[]{gBundle_1PE, gBundle_2PE};
 			
-		ssm.Initialize(poolBundle, equipBundle, gBundles);
+		ssm.Initialize(poolBundlePE, equipBundlePE, gBundlesPE);
 			AssertSlotSystemSSMSetRight(ssm);
 			AssertParenthood();
 			AssertImmediateBundle();
@@ -673,28 +691,13 @@ public class SlottableTest{
 			AssertSBsMembership();
 			AssertInitialize();
 		ssm.Activate();
-		AssertFocused();
-		// PrintSystemHierarchyDetailed(ssm);
+		// AssertFocused();
+		// AssertFocusInBundle(gBundle_25);
+		ssm.TogglePageElementFocus(gBundle_2, true);
+		ssm.TogglePageElementFocus(gBundle_2, false);
+		ssm.TogglePageElementFocus(gBundle_1, false);
+		PrintSystemHierarchyDetailed(ssm);
 		// AssertInitiallyFocusedBundles();
-	}
-	public void PrintHierarchySimple(SlotSystemElement ele){
-		ele.PerformInHierarchy(PrintElementsReallySimply);
-	}
-	public void PrintElementsReallySimply(SlotSystemElement ele){
-		string res = "";
-		if(ele is SlotSystemManager)
-			res = "SSM";
-		else if(ele is SlotSystemBundle)
-			res = "Bundle";
-		else if(ele is EquipmentSet)
-			res = "eSet";
-		else if(ele is GenericPage)
-			res = "gPage";
-		else if(ele is SlotGroup)
-			res = "SG";
-		else if(ele is Slottable)
-			res = "SB";
-		Debug.Log(res);
 	}
 	[Test]
 	public void TestAll(){
@@ -722,89 +725,120 @@ public class SlottableTest{
 			// TestSlotSystemActivateDeactivate();
 			// TestFindAndFocusElement();
 			/*	TAs	*/
-				TestVolSortOnAll();
-				TestRevertOnAllSBs();
-				TestReorderOnAll();
-				TestFillOnAll();
-				TestSwapOnAll();
+				// TestVolSortOnAll();
+				// TestRevertOnAllSBs();
+				// TestReorderOnAll();
+				// TestFillOnAll();
+				// TestSwapOnAll();
 		// TestAddAndRemoveAll();
 		// TestSGGeneric();
 	}
-	public void TestFindAndFocusElement(){
-		ssm.PerformInHierarchy(AssertFocusInBundle);
-	}
-		public void AssertFocusInBundle(SlotSystemElement target){
-			ssm.FindAndFocusInBundle(target);
-			SlotSystemBundle rootBundle = null;
-			rootBundle = target.immediateBundle;
-			if(rootBundle != null){
-				while(true){
-					if(rootBundle.immediateBundle == null)
-						break;
-					rootBundle = rootBundle.immediateBundle;
-				}
-					rootBundle.PerformInHierarchy(AssertDefocusedIfNotContainInHierarchy, target);
-			}
+	/*	SlotSystem testing*/
+		public void PrintHierarchySimple(SlotSystemElement ele){
+			ele.PerformInHierarchy(PrintElementsReallySimply);
 		}
-			public void AssertDefocusedIfNotContainInHierarchy(SlotSystemElement ele, object obj){
-				if(!(ele is SlotGroup || ele is Slottable)){
-					SlotSystemElement target = (SlotSystemElement)obj;
-					foreach(SlotSystemElement e in ele){
-						if(!(ele.ContainsInHierarchy(target) || ele == target))
-							AssertDefocusedSelfAndBelow(ele);
+		public void PrintElementsReallySimply(SlotSystemElement ele){
+			string res = "";
+			if(ele is SlotSystemManager)
+				res = "SSM";
+			else if(ele is SlotSystemBundle)
+				res = "Bundle";
+			else if(ele is EquipmentSet)
+				res = "eSet";
+			else if(ele is GenericPage)
+				res = "gPage";
+			else if(ele is SlotGroup)
+				res = "SG";
+			else if(ele is Slottable)
+				res = "SB";
+			Debug.Log(res);
+		}
+		public void TestFindAndFocusElement(){
+			ssm.PerformInHierarchy(AssertFocusInBundle);
+		}
+			public void AssertFocusInBundle(SlotSystemElement target){
+				ssm.FindAndFocusInBundle(target);
+				SlotSystemBundle rootBundle = null;
+				rootBundle = target.immediateBundle;
+				if(rootBundle != null){
+					while(true){
+						if(rootBundle.immediateBundle == null)
+							break;
+						rootBundle = rootBundle.immediateBundle;
+					}
+						rootBundle.PerformInHierarchy(AssertDefocusedIfNotContainInHierarchy, target);
+				}
+			}
+				public void AssertDefocusedIfNotContainInHierarchy(SlotSystemElement ele, object obj){
+					if(!(ele is SlotGroup || ele is Slottable)){
+						SlotSystemElement target = (SlotSystemElement)obj;
+						foreach(SlotSystemElement e in ele){
+							if(!(ele.ContainsInHierarchy(target) || ele == target))
+								AssertDefocusedSelfAndBelow(ele);
+						}
 					}
 				}
-			}
-	public void AssertContainInHierarchy(){
-		SlotSystemBundle pBun = ssm.poolBundle;
-		ANotNull(pBun);
-		List<SlotSystemElement> positives = new List<SlotSystemElement>();
-		positives.Add(ssm);
-		AssertCIHonAllAndNotInOther(positives, pBun);
-		positives.Add(pBun);
-		foreach(SlotSystemElement ele in pBun){
-			SlotGroup sg = (SlotGroup)ele;
-			AssertCIHonAllAndNotInOther(positives, sg);
-			positives.Add(sg);
-			foreach(Slottable sb in sg){
-				AssertCIHonAllAndNotInOther(positives, sb);
-			}
-			positives.Remove(sg);
-		}
-		positives.Remove(pBun);
-		SlotSystemBundle eBun = ssm.equipBundle;
-		ANotNull(eBun);
-		AssertCIHonAllAndNotInOther(positives, eBun);
-		positives.Add(eBun);
-		foreach(EquipmentSet eSet in eBun){
-			AssertCIHonAllAndNotInOther(positives, eSet);
-			positives.Add(eSet);
-			foreach(SlotSystemElement ele in eSet){
+		public void AssertContainInHierarchy(){
+			SlotSystemBundle pBun = ssm.poolBundle;
+			ANotNull(pBun);
+			List<SlotSystemElement> positives = new List<SlotSystemElement>();
+			positives.Add(ssm);
+			AssertCIHonAllAndNotInOther(positives, pBun);
+			positives.Add(pBun);
+			foreach(SlotSystemElement ele in pBun){
 				SlotGroup sg = (SlotGroup)ele;
 				AssertCIHonAllAndNotInOther(positives, sg);
 				positives.Add(sg);
 				foreach(Slottable sb in sg){
-					if(sb!= null)
 					AssertCIHonAllAndNotInOther(positives, sb);
 				}
 				positives.Remove(sg);
 			}
-			positives.Remove(eSet);
-		}
-		positives.Remove(eBun);
-		SlotSystemBundle gBun;
-		foreach(SlotSystemBundle gB in ssm.otherBundles){
-			gBun = gB;
-			ANotNull(gBun);
-			AssertCIHonAllAndNotInOther(positives, gBun);
-			positives.Add(gBun);
-			foreach(SlotSystemElement ele in gBun){
-				if(ele is GenericPage){
-					GenericPage gPage = (GenericPage)ele;
-					AssertCIHonAllAndNotInOther(positives, gPage);
-					positives.Add(gPage);
-					foreach(SlotSystemElement ele2 in gPage){
-						SlotGroup sg = (SlotGroup)ele2;
+			positives.Remove(pBun);
+			SlotSystemBundle eBun = ssm.equipBundle;
+			ANotNull(eBun);
+			AssertCIHonAllAndNotInOther(positives, eBun);
+			positives.Add(eBun);
+			foreach(EquipmentSet eSet in eBun){
+				AssertCIHonAllAndNotInOther(positives, eSet);
+				positives.Add(eSet);
+				foreach(SlotSystemElement ele in eSet){
+					SlotGroup sg = (SlotGroup)ele;
+					AssertCIHonAllAndNotInOther(positives, sg);
+					positives.Add(sg);
+					foreach(Slottable sb in sg){
+						if(sb!= null)
+						AssertCIHonAllAndNotInOther(positives, sb);
+					}
+					positives.Remove(sg);
+				}
+				positives.Remove(eSet);
+			}
+			positives.Remove(eBun);
+			SlotSystemBundle gBun;
+			foreach(SlotSystemBundle gB in ssm.otherBundles){
+				gBun = gB;
+				ANotNull(gBun);
+				AssertCIHonAllAndNotInOther(positives, gBun);
+				positives.Add(gBun);
+				foreach(SlotSystemElement ele in gBun){
+					if(ele is GenericPage){
+						GenericPage gPage = (GenericPage)ele;
+						AssertCIHonAllAndNotInOther(positives, gPage);
+						positives.Add(gPage);
+						foreach(SlotSystemElement ele2 in gPage){
+							SlotGroup sg = (SlotGroup)ele2;
+							AssertCIHonAllAndNotInOther(positives, sg);
+							positives.Add(sg);
+							foreach(Slottable sb in sg){
+								if(sb!= null)
+									AssertCIHonAllAndNotInOther(positives, sb);
+							}
+							positives.Remove(sg);
+						}
+						positives.Remove(gPage);
+					}else if(ele is SlotGroup){
+						SlotGroup sg = (SlotGroup)ele;
 						AssertCIHonAllAndNotInOther(positives, sg);
 						positives.Add(sg);
 						foreach(Slottable sb in sg){
@@ -813,62 +847,26 @@ public class SlottableTest{
 						}
 						positives.Remove(sg);
 					}
-					positives.Remove(gPage);
-				}else if(ele is SlotGroup){
-					SlotGroup sg = (SlotGroup)ele;
-					AssertCIHonAllAndNotInOther(positives, sg);
-					positives.Add(sg);
-					foreach(Slottable sb in sg){
-						if(sb!= null)
-							AssertCIHonAllAndNotInOther(positives, sb);
-					}
-					positives.Remove(sg);
 				}
+				positives.Remove(gBun);
 			}
-			positives.Remove(gBun);
 		}
-	}
-		public void AssertCIHonAllAndNotInOther(IList<SlotSystemElement> positives, SlotSystemElement target){
-			CheckCIH(ssm, positives, target);
-			SlotSystemBundle pBun = ssm.poolBundle;
-			CheckCIH(pBun, positives, target);
-			foreach(SlotSystemElement ele in pBun){
-				SlotGroup sg = (SlotGroup)ele;
-				CheckCIH(sg, positives, target);
-				foreach(Slottable sb in sg){
-					CheckCIH(sb, positives, target);
-				}
-			}
-			SlotSystemBundle eBun = ssm.equipBundle;
-			CheckCIH(eBun, positives, target);
-			foreach(EquipmentSet eSet in eBun){
-				CheckCIH(eSet, positives, target);
-				foreach(SlotSystemElement ele in eSet){
+			public void AssertCIHonAllAndNotInOther(IList<SlotSystemElement> positives, SlotSystemElement target){
+				CheckCIH(ssm, positives, target);
+				SlotSystemBundle pBun = ssm.poolBundle;
+				CheckCIH(pBun, positives, target);
+				foreach(SlotSystemElement ele in pBun){
 					SlotGroup sg = (SlotGroup)ele;
 					CheckCIH(sg, positives, target);
 					foreach(Slottable sb in sg){
-						if(sb!= null)
-							CheckCIH(sb, positives, target);
+						CheckCIH(sb, positives, target);
 					}
 				}
-			}
-			SlotSystemBundle gBun;
-			foreach(SlotSystemBundle gB in ssm.otherBundles){
-				gBun = gB;
-				CheckCIH(gBun, positives, target);
-				foreach(SlotSystemElement ele in gBun){
-					if(ele is GenericPage){
-						GenericPage gPage = (GenericPage)ele;
-						CheckCIH(gPage, positives, target);
-						foreach(SlotSystemElement ele2 in gPage){
-							SlotGroup sg = (SlotGroup)ele2;
-							CheckCIH(sg, positives, target);
-							foreach(Slottable sb in sg){
-								if(sb!= null)
-									CheckCIH(sb, positives, target);
-							}
-						}
-					}else if(ele is SlotGroup){
+				SlotSystemBundle eBun = ssm.equipBundle;
+				CheckCIH(eBun, positives, target);
+				foreach(EquipmentSet eSet in eBun){
+					CheckCIH(eSet, positives, target);
+					foreach(SlotSystemElement ele in eSet){
 						SlotGroup sg = (SlotGroup)ele;
 						CheckCIH(sg, positives, target);
 						foreach(Slottable sb in sg){
@@ -877,505 +875,363 @@ public class SlottableTest{
 						}
 					}
 				}
+				SlotSystemBundle gBun;
+				foreach(SlotSystemBundle gB in ssm.otherBundles){
+					gBun = gB;
+					CheckCIH(gBun, positives, target);
+					foreach(SlotSystemElement ele in gBun){
+						if(ele is GenericPage){
+							GenericPage gPage = (GenericPage)ele;
+							CheckCIH(gPage, positives, target);
+							foreach(SlotSystemElement ele2 in gPage){
+								SlotGroup sg = (SlotGroup)ele2;
+								CheckCIH(sg, positives, target);
+								foreach(Slottable sb in sg){
+									if(sb!= null)
+										CheckCIH(sb, positives, target);
+								}
+							}
+						}else if(ele is SlotGroup){
+							SlotGroup sg = (SlotGroup)ele;
+							CheckCIH(sg, positives, target);
+							foreach(Slottable sb in sg){
+								if(sb!= null)
+									CheckCIH(sb, positives, target);
+							}
+						}
+					}
+				}
 			}
-		}
-		public void CheckCIH(SlotSystemElement subject, IList<SlotSystemElement> positives, SlotSystemElement target){
-			if(positives.Contains(subject))
-				AB(subject.ContainsInHierarchy(target), true);
-			else
-				AB(subject.ContainsInHierarchy(target), false);
-		}
-		public void PrintCIH(SlotSystemElement ele){
-			Debug.Log(Util.Bold("Target: ") + ele.eName);
-			ssm.PerformInHierarchy(CheckAndPrintCIH, ele);
-		}
-			public void CheckAndPrintCIH(SlotSystemElement ele, object obj){
-				SlotSystemElement target = (SlotSystemElement)obj;
-				string res = Indent(ele.level) + ele.eName;
-				if(ele.ContainsInHierarchy(target))
-					res += Util.Blue(": Contains");
+			public void CheckCIH(SlotSystemElement subject, IList<SlotSystemElement> positives, SlotSystemElement target){
+				if(positives.Contains(subject))
+					AB(subject.ContainsInHierarchy(target), true);
 				else
-					res += Util.Red(": NOT Contains");
-				Debug.Log(res);
+					AB(subject.ContainsInHierarchy(target), false);
 			}
-	public void AssertParenthood(){
-		SlotSystemBundle pBun = ssm.poolBundle;
-		SlotSystemBundle eBun = ssm.equipBundle;
-		SlotSystemBundle gBun;
-		ANotNull(pBun);
-		ANotNull(eBun);
-		ANull(ssm.parent);
-		AE(pBun.parent, ssm);
-		foreach(SlotSystemElement ele in pBun){
-			SlotGroup sg = (SlotGroup)ele;
-			AE(sg.parent, pBun);
-			foreach(Slottable sb in sg){
-				AE(sb.parent, sg);
+			public void PrintCIH(SlotSystemElement ele){
+				Debug.Log(Util.Bold("Target: ") + ele.eName);
+				ssm.PerformInHierarchy(CheckAndPrintCIH, ele);
 			}
-		}
-		AE(eBun.parent, ssm);
-		foreach(EquipmentSet eSet in eBun){
-			AE(eSet.parent, eBun);
-			foreach(SlotSystemElement ele in eSet){
+				public void CheckAndPrintCIH(SlotSystemElement ele, object obj){
+					SlotSystemElement target = (SlotSystemElement)obj;
+					string res = Indent(ele.level) + ele.eName;
+					if(ele.ContainsInHierarchy(target))
+						res += Util.Blue(": Contains");
+					else
+						res += Util.Red(": NOT Contains");
+					Debug.Log(res);
+				}
+		public void AssertParenthood(){
+			SlotSystemBundle pBun = ssm.poolBundle;
+			SlotSystemBundle eBun = ssm.equipBundle;
+			SlotSystemBundle gBun;
+			ANotNull(pBun);
+			ANotNull(eBun);
+			ANull(ssm.parent);
+			AE(pBun.parent, ssm);
+			foreach(SlotSystemElement ele in pBun){
 				SlotGroup sg = (SlotGroup)ele;
-				AE(sg.parent, eSet);
+				AE(sg.parent, pBun);
 				foreach(Slottable sb in sg){
-					if(sb!= null)
 					AE(sb.parent, sg);
 				}
 			}
-		}
-		foreach(SlotSystemBundle gB in ssm.otherBundles){
-			gBun = gB;
-			AE(gBun.parent, ssm);
-			foreach(SlotSystemElement ele in gBun){
-				if(ele is GenericPage){
-					GenericPage gPage = (GenericPage)ele;
-					AE(gPage.parent, gBun);
-					foreach(SlotSystemElement ele2 in gPage){
-						SlotGroup sg = (SlotGroup)ele2;
-						AE(sg.parent, gPage);
-						foreach(Slottable sb in sg){
-							if(sb!= null)
-							AE(sb.parent, sg);
-						}
-					}
-				}else if(ele is SlotGroup){
+			AE(eBun.parent, ssm);
+			foreach(EquipmentSet eSet in eBun){
+				AE(eSet.parent, eBun);
+				foreach(SlotSystemElement ele in eSet){
 					SlotGroup sg = (SlotGroup)ele;
-					AE(sg.parent, gBun);
+					AE(sg.parent, eSet);
 					foreach(Slottable sb in sg){
 						if(sb!= null)
 						AE(sb.parent, sg);
 					}
 				}
 			}
-		}
-	}
-	public void AssertImmediateBundle(){
-		SlotSystemBundle pBun = ssm.poolBundle;
-		SlotSystemBundle eBun = ssm.equipBundle;
-		SlotSystemBundle gBun;
-		ANotNull(pBun);
-		ANotNull(eBun);
-		ANull(ssm.immediateBundle);
-		ANull(pBun.immediateBundle);
-		foreach(SlotSystemElement ele in pBun){
-			SlotGroup sg = (SlotGroup)ele;
-			AE(sg.immediateBundle, pBun);
-			foreach(Slottable sb in sg){
-				AE(sb.immediateBundle, pBun);
-			}
-		}
-		ANull(eBun.immediateBundle);
-		foreach(EquipmentSet eSet in eBun){
-			AE(eSet.immediateBundle, eBun);
-			foreach(SlotSystemElement ele in eSet){
-				SlotGroup sg = (SlotGroup)ele;
-				AE(sg.immediateBundle, eBun);
-				foreach(Slottable sb in sg){
-					if(sb!= null)
-					AE(sb.immediateBundle, eBun);
+			foreach(SlotSystemBundle gB in ssm.otherBundles){
+				gBun = gB;
+				AE(gBun.parent, ssm);
+				foreach(SlotSystemElement ele in gBun){
+					if(ele is GenericPage){
+						GenericPage gPage = (GenericPage)ele;
+						AE(gPage.parent, gBun);
+						foreach(SlotSystemElement ele2 in gPage){
+							SlotGroup sg = (SlotGroup)ele2;
+							AE(sg.parent, gPage);
+							foreach(Slottable sb in sg){
+								if(sb!= null)
+								AE(sb.parent, sg);
+							}
+						}
+					}else if(ele is SlotGroup){
+						SlotGroup sg = (SlotGroup)ele;
+						AE(sg.parent, gBun);
+						foreach(Slottable sb in sg){
+							if(sb!= null)
+							AE(sb.parent, sg);
+						}
+					}
 				}
 			}
 		}
-		foreach(SlotSystemBundle gB in ssm.otherBundles){
-			gBun = gB;
-			ANull(gBun.immediateBundle);
-			foreach(SlotSystemElement ele in gBun){
-				if(ele is GenericPage){
-					GenericPage gPage = (GenericPage)ele;
-					AE(gPage.immediateBundle, gBun);
-					foreach(SlotSystemElement ele2 in gPage){
-						SlotGroup sg = (SlotGroup)ele2;
+		public void AssertImmediateBundle(){
+			SlotSystemBundle pBun = ssm.poolBundle;
+			SlotSystemBundle eBun = ssm.equipBundle;
+			SlotSystemBundle gBun;
+			ANotNull(pBun);
+			ANotNull(eBun);
+			ANull(ssm.immediateBundle);
+			ANull(pBun.immediateBundle);
+			foreach(SlotSystemElement ele in pBun){
+				SlotGroup sg = (SlotGroup)ele;
+				AE(sg.immediateBundle, pBun);
+				foreach(Slottable sb in sg){
+					AE(sb.immediateBundle, pBun);
+				}
+			}
+			ANull(eBun.immediateBundle);
+			foreach(EquipmentSet eSet in eBun){
+				AE(eSet.immediateBundle, eBun);
+				foreach(SlotSystemElement ele in eSet){
+					SlotGroup sg = (SlotGroup)ele;
+					AE(sg.immediateBundle, eBun);
+					foreach(Slottable sb in sg){
+						if(sb!= null)
+						AE(sb.immediateBundle, eBun);
+					}
+				}
+			}
+			foreach(SlotSystemBundle gB in ssm.otherBundles){
+				gBun = gB;
+				ANull(gBun.immediateBundle);
+				foreach(SlotSystemElement ele in gBun){
+					if(ele is GenericPage){
+						GenericPage gPage = (GenericPage)ele;
+						AE(gPage.immediateBundle, gBun);
+						foreach(SlotSystemElement ele2 in gPage){
+							SlotGroup sg = (SlotGroup)ele2;
+							AE(sg.immediateBundle, gBun);
+							foreach(Slottable sb in sg){
+								if(sb!= null)
+								AE(sb.immediateBundle, gBun);
+							}
+						}
+					}else if(ele is SlotGroup){
+						SlotGroup sg = (SlotGroup)ele;
 						AE(sg.immediateBundle, gBun);
 						foreach(Slottable sb in sg){
 							if(sb!= null)
 							AE(sb.immediateBundle, gBun);
 						}
 					}
-				}else if(ele is SlotGroup){
-					SlotGroup sg = (SlotGroup)ele;
-					AE(sg.immediateBundle, gBun);
-					foreach(Slottable sb in sg){
-						if(sb!= null)
-						AE(sb.immediateBundle, gBun);
-					}
 				}
 			}
 		}
-	}
-	public void PrintParent(SlotSystemElement ele){
-		string parentName = ele.parent == null?"null":ele.parent.eName;
-		Debug.Log(Indent(ele.level) + ele.eName + "'s parent is " + parentName);
-		
-	}
-	public void AssertInitiallyFocusedBundles(){
-		ssm.poolBundle.PerformInHierarchy(AssertFocusedSelfAndBelow);
-		ssm.equipBundle.PerformInHierarchy(AssertFocusedSelfAndBelow);
-		foreach(SlotSystemBundle bundle in ssm.otherBundles){
-			if(bundle != null)
-				bundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
+		public void PrintParent(SlotSystemElement ele){
+			string parentName = ele.parent == null?"null":ele.parent.eName;
+			Debug.Log(Indent(ele.level) + ele.eName + "'s parent is " + parentName);
+			
 		}
-		PrintSystemHierarchyDetailed(ssm);
-	}
-	public void TestSlotSystemActivateDeactivate(){
-		ssm.Deactivate();
-			Debug.Log(Util.Bold(Util.Yamabuki("Root deactivated")));
+		public void AssertInitiallyFocusedBundles(){
+			ssm.poolBundle.PerformInHierarchy(AssertFocusedSelfAndBelow);
+			ssm.equipBundle.PerformInHierarchy(AssertFocusedSelfAndBelow);
+			foreach(SlotSystemBundle bundle in ssm.otherBundles){
+				if(bundle != null)
+					bundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
+			}
 			PrintSystemHierarchyDetailed(ssm);
-		ssm.Activate();
-			Debug.Log(Util.Bold(Util.Yamabuki("Root activated")));
-			AssertFocused();
-			PrintSystemHierarchyDetailed(ssm);
-		ssm.poolBundle.Defocus();
-			Debug.Log(Util.Bold(Util.Yamabuki("Pool defocused")));
-			PrintSystemHierarchyDetailed(ssm);
-			ssm.poolBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
-		ssm.equipBundle.Defocus();
-			Debug.Log(Util.Bold(Util.Yamabuki("Equip defocused")));
-			PrintSystemHierarchyDetailed(ssm);
-			ssm.equipBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
-		ssm.Activate();
-			Debug.Log(Util.Bold(Util.Yamabuki("root activated")));
-			PrintSystemHierarchyDetailed(ssm);
-			AssertFocused();
-	}
-	public void AssertFocusedSelfAndBelow(SlotSystemElement ele){
-		if(ele is SlotGroup){
-			SlotGroup sg = (SlotGroup)ele;
-			ASGReset(sg);
-			if(ssm.poolBundle.ContainsInHierarchy(sg)){//	if sgp
-				if(sg == ssm.focusedSGP){
-					ASSG(sg,
-						null, SGFocused, null,
-						null, SGWFA, null, false);
-					foreach(Slottable sb in sg){
-						if(sb != null){
-							AE(sb.ssm, ssm);
-							ASBReset(sb);
-							if(!sg.isAutoSort){
-									ASSB_s(sb, SBFocused, SBWFA);
-							}else{
-								if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
-									ASSB_s(sb, SBDefocused, SBWFA);
-								else
-									if(sb.isEquipped)
-										ASSB_s(sb, SBDefocused, SBWFA);
-									else{
+		}
+		public void TestSlotSystemActivateDeactivate(){
+			ssm.Deactivate();
+				Debug.Log(Util.Bold(Util.Yamabuki("Root deactivated")));
+				PrintSystemHierarchyDetailed(ssm);
+			ssm.Activate();
+				Debug.Log(Util.Bold(Util.Yamabuki("Root activated")));
+				AssertFocused();
+				PrintSystemHierarchyDetailed(ssm);
+			ssm.poolBundle.Defocus();
+				Debug.Log(Util.Bold(Util.Yamabuki("Pool defocused")));
+				PrintSystemHierarchyDetailed(ssm);
+				ssm.poolBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
+			ssm.equipBundle.Defocus();
+				Debug.Log(Util.Bold(Util.Yamabuki("Equip defocused")));
+				PrintSystemHierarchyDetailed(ssm);
+				ssm.equipBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
+			ssm.Activate();
+				Debug.Log(Util.Bold(Util.Yamabuki("root activated")));
+				PrintSystemHierarchyDetailed(ssm);
+				AssertFocused();
+		}
+		public void AssertFocusedSelfAndBelow(SlotSystemElement ele){
+			if(ele is SlotGroup){
+				SlotGroup sg = (SlotGroup)ele;
+				ASGReset(sg);
+				if(ssm.poolBundle.ContainsInHierarchy(sg)){//	if sgp
+					if(sg == ssm.focusedSGP){
+						ASSG(sg,
+							null, SGFocused, null,
+							null, SGWFA, null, false);
+						foreach(Slottable sb in sg){
+							if(sb != null){
+								AE(sb.ssm, ssm);
+								ASBReset(sb);
+								if(!sg.isAutoSort){
 										ASSB_s(sb, SBFocused, SBWFA);
-									}
+								}else{
+									if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
+										ASSB_s(sb, SBDefocused, SBWFA);
+									else
+										if(sb.isEquipped)
+											ASSB_s(sb, SBDefocused, SBWFA);
+										else{
+											ASSB_s(sb, SBFocused, SBWFA);
+										}
+								}
+							}
+						}
+					}else{/*  sg not focused	*/
+						ASSG(sg,
+							null, SGDefocused, null,
+							null, SGWFA, null, false);
+						foreach(Slottable sb in sg){
+							if(sb != null){
+								AE(sb.ssm, ssm);
+								ASBReset(sb);
+								ASSB_s(sb, SBDefocused, SBWFA);
 							}
 						}
 					}
-				}else{/*  sg not focused	*/
-					ASSG(sg,
-						null, SGDefocused, null,
-						null, SGWFA, null, false);
-					foreach(Slottable sb in sg){
-						if(sb != null){
-							AE(sb.ssm, ssm);
-							ASBReset(sb);
-							ASSB_s(sb, SBDefocused, SBWFA);
+				}else if(ssm.equipBundle.ContainsInHierarchy(sg)){//	if sge
+					if(ssm.focusedSGEs.Contains(sg)){
+						ASSG(sg,
+							null, SGFocused, null,
+							null, SGWFA, null, false);
+						foreach(Slottable sbe in sg){
+							if(sbe != null){
+								AE(sbe.ssm, ssm);
+								ASBReset(sbe);
+								ASSB_s(sbe, SBFocused, SBWFA);
+							}
+						}
+					}else{
+						ASSG(sg,
+							null, SGFocused, null,
+							null, SGWFA, null, false);
+						foreach(Slottable sbe in sg){
+							if(sbe != null){
+								AE(sbe.ssm, ssm);
+								ASBReset(sbe);
+								ASSB_s(sbe, SBDefocused, SBWFA);
+							}
 						}
 					}
 				}
-			}else if(ssm.equipBundle.ContainsInHierarchy(sg)){//	if sge
-				if(ssm.focusedSGEs.Contains(sg)){
-					ASSG(sg,
-						null, SGFocused, null,
-						null, SGWFA, null, false);
-					foreach(Slottable sbe in sg){
-						if(sbe != null){
-							AE(sbe.ssm, ssm);
-							ASBReset(sbe);
-							ASSB_s(sbe, SBFocused, SBWFA);
+			}else if(ele is Slottable){
+				Slottable sb = (Slottable)ele;
+				SlotGroup sg = sb.sg;
+				ASBReset(sb);
+				if(ssm.poolBundle.ContainsInHierarchy(sg)){
+					if(sg == ssm.focusedSGP){
+						if(!sg.isAutoSort){
+							ASSB_s(sb, SBFocused, SBWFA);
+						}else{
+							if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
+								ASSB_s(sb, SBDefocused, SBWFA);
+							else
+								if(sb.isEquipped)
+									ASSB_s(sb, SBDefocused, SBWFA);
+								else{
+									ASSB_s(sb, SBFocused, SBWFA);
+								}
 						}
+					}else{
+						ASSB_s(sb, SBDefocused, SBWFA);
 					}
-				}else{
-					ASSG(sg,
-						null, SGFocused, null,
-						null, SGWFA, null, false);
-					foreach(Slottable sbe in sg){
-						if(sbe != null){
-							AE(sbe.ssm, ssm);
-							ASBReset(sbe);
-							ASSB_s(sbe, SBDefocused, SBWFA);
-						}
-					}
-				}
-			}
-		}else if(ele is Slottable){
-			Slottable sb = (Slottable)ele;
-			SlotGroup sg = sb.sg;
-			ASBReset(sb);
-			if(ssm.poolBundle.ContainsInHierarchy(sg)){
-				if(sg == ssm.focusedSGP){
-					if(!sg.isAutoSort){
+				}else if(ssm.equipBundle.ContainsInHierarchy(sg)){
+					if(ssm.focusedSGEs.Contains(sg)){
 						ASSB_s(sb, SBFocused, SBWFA);
 					}else{
-						if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
-							ASSB_s(sb, SBDefocused, SBWFA);
-						else
-							if(sb.isEquipped)
-								ASSB_s(sb, SBDefocused, SBWFA);
-							else{
-								ASSB_s(sb, SBFocused, SBWFA);
-							}
+						ASSB_s(sb, SBDefocused, SBWFA);
 					}
-				}else{
-					ASSB_s(sb, SBDefocused, SBWFA);
-				}
-			}else if(ssm.equipBundle.ContainsInHierarchy(sg)){
-				if(ssm.focusedSGEs.Contains(sg)){
-					ASSB_s(sb, SBFocused, SBWFA);
-				}else{
-					ASSB_s(sb, SBDefocused, SBWFA);
 				}
 			}
 		}
-	}
-	public void AssertDefocusedSelfAndBelow(SlotSystemElement ele){
-		if(ele is SlotGroup){
-			ASGSelState((SlotGroup)ele, null, SGDefocused, null);
-		}else if(ele is Slottable){
-			ASBSelState((Slottable)ele, null, SBDefocused, null);
-		}
-	}
-	public void AssertSlotSystemSSMSetRight(SlotSystemManager ssm){
-		AE(ssm.ssm, ssm);
-		AE(ssm.poolBundle.ssm, ssm);
-			foreach(SlotSystemElement ele in ssm.poolBundle){
-				SlotGroup sg = (SlotGroup)ele;
-				AE(sg.ssm, ssm);
-				foreach(Slottable sb in sg){
-					if(sb != null)
-						AE(sb.ssm, ssm);
-				}
+		public void AssertDefocusedSelfAndBelow(SlotSystemElement ele){
+			if(ele is SlotGroup){
+				ASGSelState((SlotGroup)ele, null, SGDefocused, null);
+			}else if(ele is Slottable){
+				ASBSelState((Slottable)ele, null, SBDefocused, null);
 			}
-		AE(ssm.equipBundle.ssm, ssm);
-			foreach(SlotSystemElement ele in ssm.equipBundle){
-				EquipmentSet eSet = (EquipmentSet)ele;
-				AE(eSet.ssm, ssm);
-				foreach(SlotSystemElement ele2 in eSet){
-					SlotGroup sg = (SlotGroup)ele2;
+		}
+		public void AssertSlotSystemSSMSetRight(SlotSystemManager ssm){
+			AE(ssm.ssm, ssm);
+			AE(ssm.poolBundle.ssm, ssm);
+				foreach(SlotSystemElement ele in ssm.poolBundle){
+					SlotGroup sg = (SlotGroup)ele;
 					AE(sg.ssm, ssm);
 					foreach(Slottable sb in sg){
 						if(sb != null)
 							AE(sb.ssm, ssm);
 					}
 				}
-			}
-		foreach(SlotSystemBundle gBundle in ssm.otherBundles){
-			AE(gBundle.ssm, ssm);
-			foreach(var ele in gBundle){
-				if(ele is GenericPage){
-					GenericPage gPage = (GenericPage)ele;
-					AE(ele.ssm, ssm);
-					foreach(var e in gPage){
-						SlotGroup sg = (SlotGroup)e;
+			AE(ssm.equipBundle.ssm, ssm);
+				foreach(SlotSystemElement ele in ssm.equipBundle){
+					EquipmentSet eSet = (EquipmentSet)ele;
+					AE(eSet.ssm, ssm);
+					foreach(SlotSystemElement ele2 in eSet){
+						SlotGroup sg = (SlotGroup)ele2;
 						AE(sg.ssm, ssm);
+						foreach(Slottable sb in sg){
+							if(sb != null)
+								AE(sb.ssm, ssm);
+						}
 					}
-				}else if(ele is SlotGroup){
-						SlotGroup sg = (SlotGroup)ele;
-						AE(sg.ssm, ssm);
 				}
-			}
-		}		
-	}
-	public string Indent(int level){
-		string res = "";
-		for(int i = 0; i < level; i++){
-			res += "	" ;
+			foreach(SlotSystemBundle gBundle in ssm.otherBundles){
+				AE(gBundle.ssm, ssm);
+				foreach(var ele in gBundle){
+					if(ele is GenericPage){
+						GenericPage gPage = (GenericPage)ele;
+						AE(ele.ssm, ssm);
+						foreach(var e in gPage){
+							SlotGroup sg = (SlotGroup)e;
+							AE(sg.ssm, ssm);
+						}
+					}else if(ele is SlotGroup){
+							SlotGroup sg = (SlotGroup)ele;
+							AE(sg.ssm, ssm);
+					}
+				}
+			}		
 		}
-		return res;
-	}
-	public void PrintElementSimple(SlotSystemElement ele){
-		string eleName = ele.eName;
-		Debug.Log(Indent(ele.level) + eleName);
-	}
-	public void PrintElementInDetail(SlotSystemElement ele){
-		string eleName = ele.eName;
-		if(ele is SlotGroup)
-			eleName = Util.SGDebug((SlotGroup)ele);
-		else if(ele is Slottable)
-			eleName = Util.SBDebug((Slottable)ele);
-		else
-			eleName = Util.SSEDebug(ele);
-		Debug.Log(Indent(ele.level) + eleName);
-	}
-	public void PrintSystemHierarchyDetailed(SlotSystemElement ele){
-		ele.PerformInHierarchy(PrintElementInDetail);
-	}
-	public void PrintSystemHierarchySimple(SlotSystemElement ele){
-		ele.PerformInHierarchy(PrintElementSimple);
+		public string Indent(int level){
+			string res = "";
+			for(int i = 0; i < level; i++){
+				res += "	" ;
+			}
+			return res;
+		}
+		public void PrintElementSimple(SlotSystemElement ele){
+			string eleName = ele.eName;
+			Debug.Log(Indent(ele.level) + eleName);
+		}
+		public void PrintElementInDetail(SlotSystemElement ele){
+			string eleName = ele.eName;
+			if(ele is SlotGroup)
+				eleName = Util.SGDebug((SlotGroup)ele);
+			else if(ele is Slottable)
+				eleName = Util.SBDebug((Slottable)ele);
+			else
+				eleName = Util.SSEDebug(ele);
+			Debug.Log(Indent(ele.level) + eleName);
+		}
+		public void PrintSystemHierarchyDetailed(SlotSystemElement ele){
+			ele.PerformInHierarchy(PrintElementInDetail);
+		}
+		public void PrintSystemHierarchySimple(SlotSystemElement ele){
+			ele.PerformInHierarchy(PrintElementSimple);
 
-	}
-	public void Reorder(Slottable testSB, Slottable hovSB){
-		if(testSB.isPickable){
-			SlotSystemTransaction ta = ssm.GetTransaction(testSB, null, hovSB);
-			if(ta.GetType() == typeof(ReorderTransaction)){
-				SlotGroup origSG = testSB.sg;
-					AssertFocused();
-					AE(hovSB, ta.targetSB);
-				PickUp(testSB, out picked);
-					ASSSM(ssm,
-						testSB, null, null, null, testSB, null, null, testSB, 
-						SSMDeactivated, SSMFocused, null,
-						SSMWFA, SSMProbing, typeof(SSMProbeProcess),
-						typeof(RevertTransaction), false, true, true, true);
-					ASSG(origSG,
-						SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-						null, SGWFA, null, false);
-					ASSB(testSB,
-						SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-						SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
-						null, null, null);
-					ASSB(hovSB,
-						null, SBFocused, null,
-						null, SBWFA, null, true,
-						null, null, null);
-				SimHover(hovSB, null, eventData);
-					ASSSM(ssm,
-						testSB, hovSB, origSG, null, testSB, null, null, hovSB, 
-						SSMDeactivated, SSMFocused, null,
-						SSMWFA, SSMProbing, typeof(SSMProbeProcess),
-						typeof(ReorderTransaction), false, true, false, true);
-					ASSG(origSG,
-						SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-						null, SGWFA, null, false);
-					ASSB(testSB,
-						SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-						SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
-						null, null, null);
-					ASSB(hovSB,
-						SBFocused, SBSelected, typeof(SBHighlightProcess),
-						null, SBWFA, null, true,
-						null, null, null);
-				LetGo();
-					ASSSM(ssm,
-						testSB, hovSB, origSG, null, testSB, null, null, hovSB, 
-						SSMDeactivated, SSMFocused, null,
-						SSMProbing, SSMTransaction, typeof(SSMTransactionProcess),
-						typeof(ReorderTransaction), false, true, false, true);
-					ASSG(origSG,
-						SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-						SGWFA, SGReorder, typeof(SGTransactionProcess), true);
-					ASSB(testSB,
-						SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-						SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), true,
-						null, null, null);
-					ASSB(hovSB,
-						SBFocused, SBSelected, typeof(SBHighlightProcess),
-						SBWFA, SBMoveWithin, typeof(SBMoveWithinProcess), true,
-						null, null, null);
-				CompleteAllSBActProcesses(origSG);
-					ASSSM(ssm,
-						testSB, hovSB, origSG, null, testSB, null, null, hovSB, 
-						SSMDeactivated, SSMFocused, null,
-						SSMProbing, SSMTransaction, typeof(SSMTransactionProcess),
-						typeof(ReorderTransaction), false, true, true, true);
-				ssm.dIcon1.CompleteMovement();
-					AssertFocused();
-			}else
-				throw new System.InvalidOperationException("SlottableTest.Reorder: given argumant comination does not yield Reorder Transaction");
-		}else
-			throw new System.InvalidOperationException("SlottableTest.Reorder: testSB not pickable");
-	}
-	public void Revert(Slottable testSB, SlotGroup hovSG, Slottable hovSB){
-		if(testSB.isPickable){
-			SlotSystemTransaction ta = ssm.GetTransaction(testSB, hovSG, hovSB);
-			if(ta.GetType() == typeof(RevertTransaction)){
-				SlotGroup origSG = testSB.sg;
-				bool isOnSG = hovSG != null && hovSB ==null;
-				bool isOnSB = hovSB != null && hovSG == null;
-				if(isOnSG || isOnSB){
-					SlotGroup targetSG = origSG;
-					/* there's no sg1 in ta, Revert is kinda special in this respect */
-						AssertFocused();
-						ASSSM(testSB.ssm,
-							null, null, null, null, null, null, null, null, 
-							SSMDeactivated, SSMFocused, null,
-							null, SSMWFA, null,
-							null, true, true, true, true);
-					PickUp(testSB, out picked);
-						ASSSM(testSB.ssm,
-							testSB, null, null, null, testSB, null, null, testSB,
-							SSMDeactivated, SSMFocused, null,
-							SSMWFA, SSMProbing, typeof(SSMProbeProcess),
-							typeof(RevertTransaction), false, true, true, true);
-						ASSB(testSB,
-							SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-							SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
-							null, null, null);
-						ASSG(targetSG,
-							null, SGDefocused, null,
-							null, SGWFA, null, false);
-						if(isOnSG && hovSG != origSG)
-						ASSG(hovSG,
-							null, SGDefocused, null,
-							null, SGWFA, null, false);
-						if(isOnSB && hovSB != testSB)
-						ASSB(hovSB,
-							null, SBDefocused, null,
-							null, SBWFA, null, false,
-							null, null, null);
-					if(isOnSG)
-						SimHover(null, hovSG, eventData);
-					else
-						SimHover(hovSB, null, eventData);
-
-						ASSSM(testSB.ssm,
-							testSB, null, null, null, testSB, null, isOnSG?hovSG:null, isOnSG?null:hovSB, 
-							SSMDeactivated, SSMFocused, null,
-							SSMWFA, SSMProbing, typeof(SSMProbeProcess),
-							typeof(RevertTransaction), false, true, true, true);
-						ASSG(targetSG,
-							null, SGDefocused, null,
-							null, SGWFA, null, false);
-						ASSB(testSB,
-							SBSelected, SBDefocused, typeof(SBGreyoutProcess),
-							SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
-							null, null, null);
-						if(isOnSG && hovSG != origSG)
-						ASSG(hovSG,
-							null, SGDefocused, null,
-							null, SGWFA, null, false);
-						if(isOnSB && hovSB != testSB)
-						ASSB(hovSB,
-							null, SBDefocused, null,
-							null, SBWFA, null, false,
-							null, null, null);
-					LetGo();
-						ASSSM(testSB.ssm,
-							testSB, null, null, null, testSB, null, isOnSG?hovSG:null, isOnSG?null:hovSB, 
-							SSMDeactivated, SSMFocused, null,
-							SSMProbing, SSMTransaction, typeof(SSMTransactionProcess),
-							typeof(RevertTransaction), false, true, true, true);
-						ASSG(targetSG,
-							SGFocused, SGDefocused, typeof(SGGreyoutProcess),
-							SGWFA, SGRevert, typeof(SGTransactionProcess), false);
-						ASBSelState(testSB, SBSelected, SBDefocused, typeof(SBGreyoutProcess));
-						if(isOnSB && testSB.isStackable && testSB == hovSB){
-							ASBActState(testSB, SBWFNT, SBMoveWithin, typeof(SBMoveWithinProcess), testSB.actProcess.isRunning);
-						}else
-							ASBActState(testSB, SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), testSB.actProcess.isRunning);
-						if(isOnSG && hovSG != origSG)
-						ASSG(hovSG,
-							null, SGDefocused, null,
-							null, SGWFA, null, false);
-						if(isOnSB && hovSB != testSB && hovSB.sg == origSG)
-						ASSB(hovSB,
-							null, SBDefocused, null,
-							SBWFA, SBMoveWithin, typeof(SBMoveWithinProcess), hovSB.actProcess.isRunning,
-							null, null, null);
-					ssm.dIcon1.CompleteMovement();
-						AssertFocused();
-				}else
-					throw new System.InvalidOperationException("SlottableTest.Revert: tarSG and tarSB not set correctly (either both are present or are missing)");
-			}else
-				throw new System.InvalidOperationException("SlottableTest.Revert: given combination of arguments does not result in Revert Transaction");
-		}else
-			throw new System.InvalidOperationException("SlottableTest.Revert: testSB not pickable");
-	}
+		}
 	/*	SGs testing	*/
 		public void TestSGECorrespondence(){
 			ssm.SetFocusedPoolSG(sgpAll);
@@ -2959,6 +2815,173 @@ public class SlottableTest{
 			ssm.SetHoveredSB(hovSB); ssm.SetHoveredSG(hovSG);
 			ssm.CreateTransactionResults();
 			ssm.UpdateTransaction();
+		}
+		public void Reorder(Slottable testSB, Slottable hovSB){
+			if(testSB.isPickable){
+				SlotSystemTransaction ta = ssm.GetTransaction(testSB, null, hovSB);
+				if(ta.GetType() == typeof(ReorderTransaction)){
+					SlotGroup origSG = testSB.sg;
+						AssertFocused();
+						AE(hovSB, ta.targetSB);
+					PickUp(testSB, out picked);
+						ASSSM(ssm,
+							testSB, null, null, null, testSB, null, null, testSB, 
+							SSMDeactivated, SSMFocused, null,
+							SSMWFA, SSMProbing, typeof(SSMProbeProcess),
+							typeof(RevertTransaction), false, true, true, true);
+						ASSG(origSG,
+							SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+							null, SGWFA, null, false);
+						ASSB(testSB,
+							SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+							SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
+							null, null, null);
+						ASSB(hovSB,
+							null, SBFocused, null,
+							null, SBWFA, null, true,
+							null, null, null);
+					SimHover(hovSB, null, eventData);
+						ASSSM(ssm,
+							testSB, hovSB, origSG, null, testSB, null, null, hovSB, 
+							SSMDeactivated, SSMFocused, null,
+							SSMWFA, SSMProbing, typeof(SSMProbeProcess),
+							typeof(ReorderTransaction), false, true, false, true);
+						ASSG(origSG,
+							SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+							null, SGWFA, null, false);
+						ASSB(testSB,
+							SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+							SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
+							null, null, null);
+						ASSB(hovSB,
+							SBFocused, SBSelected, typeof(SBHighlightProcess),
+							null, SBWFA, null, true,
+							null, null, null);
+					LetGo();
+						ASSSM(ssm,
+							testSB, hovSB, origSG, null, testSB, null, null, hovSB, 
+							SSMDeactivated, SSMFocused, null,
+							SSMProbing, SSMTransaction, typeof(SSMTransactionProcess),
+							typeof(ReorderTransaction), false, true, false, true);
+						ASSG(origSG,
+							SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+							SGWFA, SGReorder, typeof(SGTransactionProcess), true);
+						ASSB(testSB,
+							SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+							SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), true,
+							null, null, null);
+						ASSB(hovSB,
+							SBFocused, SBSelected, typeof(SBHighlightProcess),
+							SBWFA, SBMoveWithin, typeof(SBMoveWithinProcess), true,
+							null, null, null);
+					CompleteAllSBActProcesses(origSG);
+						ASSSM(ssm,
+							testSB, hovSB, origSG, null, testSB, null, null, hovSB, 
+							SSMDeactivated, SSMFocused, null,
+							SSMProbing, SSMTransaction, typeof(SSMTransactionProcess),
+							typeof(ReorderTransaction), false, true, true, true);
+					ssm.dIcon1.CompleteMovement();
+						AssertFocused();
+				}else
+					throw new System.InvalidOperationException("SlottableTest.Reorder: given argumant comination does not yield Reorder Transaction");
+			}else
+				throw new System.InvalidOperationException("SlottableTest.Reorder: testSB not pickable");
+		}
+		public void Revert(Slottable testSB, SlotGroup hovSG, Slottable hovSB){
+			if(testSB.isPickable){
+				SlotSystemTransaction ta = ssm.GetTransaction(testSB, hovSG, hovSB);
+				if(ta.GetType() == typeof(RevertTransaction)){
+					SlotGroup origSG = testSB.sg;
+					bool isOnSG = hovSG != null && hovSB ==null;
+					bool isOnSB = hovSB != null && hovSG == null;
+					if(isOnSG || isOnSB){
+						SlotGroup targetSG = origSG;
+						/* there's no sg1 in ta, Revert is kinda special in this respect */
+							AssertFocused();
+							ASSSM(testSB.ssm,
+								null, null, null, null, null, null, null, null, 
+								SSMDeactivated, SSMFocused, null,
+								null, SSMWFA, null,
+								null, true, true, true, true);
+						PickUp(testSB, out picked);
+							ASSSM(testSB.ssm,
+								testSB, null, null, null, testSB, null, null, testSB,
+								SSMDeactivated, SSMFocused, null,
+								SSMWFA, SSMProbing, typeof(SSMProbeProcess),
+								typeof(RevertTransaction), false, true, true, true);
+							ASSB(testSB,
+								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+								SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
+								null, null, null);
+							ASSG(targetSG,
+								null, SGDefocused, null,
+								null, SGWFA, null, false);
+							if(isOnSG && hovSG != origSG)
+							ASSG(hovSG,
+								null, SGDefocused, null,
+								null, SGWFA, null, false);
+							if(isOnSB && hovSB != testSB)
+							ASSB(hovSB,
+								null, SBDefocused, null,
+								null, SBWFA, null, false,
+								null, null, null);
+						if(isOnSG)
+							SimHover(null, hovSG, eventData);
+						else
+							SimHover(hovSB, null, eventData);
+
+							ASSSM(testSB.ssm,
+								testSB, null, null, null, testSB, null, isOnSG?hovSG:null, isOnSG?null:hovSB, 
+								SSMDeactivated, SSMFocused, null,
+								SSMWFA, SSMProbing, typeof(SSMProbeProcess),
+								typeof(RevertTransaction), false, true, true, true);
+							ASSG(targetSG,
+								null, SGDefocused, null,
+								null, SGWFA, null, false);
+							ASSB(testSB,
+								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
+								SBWFPickUp, SBPickedUp, typeof(SBPickedUpProcess), true,
+								null, null, null);
+							if(isOnSG && hovSG != origSG)
+							ASSG(hovSG,
+								null, SGDefocused, null,
+								null, SGWFA, null, false);
+							if(isOnSB && hovSB != testSB)
+							ASSB(hovSB,
+								null, SBDefocused, null,
+								null, SBWFA, null, false,
+								null, null, null);
+						LetGo();
+							ASSSM(testSB.ssm,
+								testSB, null, null, null, testSB, null, isOnSG?hovSG:null, isOnSG?null:hovSB, 
+								SSMDeactivated, SSMFocused, null,
+								SSMProbing, SSMTransaction, typeof(SSMTransactionProcess),
+								typeof(RevertTransaction), false, true, true, true);
+							ASSG(targetSG,
+								SGFocused, SGDefocused, typeof(SGGreyoutProcess),
+								SGWFA, SGRevert, typeof(SGTransactionProcess), false);
+							ASBSelState(testSB, SBSelected, SBDefocused, typeof(SBGreyoutProcess));
+							if(isOnSB && testSB.isStackable && testSB == hovSB){
+								ASBActState(testSB, SBWFNT, SBMoveWithin, typeof(SBMoveWithinProcess), testSB.actProcess.isRunning);
+							}else
+								ASBActState(testSB, SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), testSB.actProcess.isRunning);
+							if(isOnSG && hovSG != origSG)
+							ASSG(hovSG,
+								null, SGDefocused, null,
+								null, SGWFA, null, false);
+							if(isOnSB && hovSB != testSB && hovSB.sg == origSG)
+							ASSB(hovSB,
+								null, SBDefocused, null,
+								SBWFA, SBMoveWithin, typeof(SBMoveWithinProcess), hovSB.actProcess.isRunning,
+								null, null, null);
+						ssm.dIcon1.CompleteMovement();
+							AssertFocused();
+					}else
+						throw new System.InvalidOperationException("SlottableTest.Revert: tarSG and tarSB not set correctly (either both are present or are missing)");
+				}else
+					throw new System.InvalidOperationException("SlottableTest.Revert: given combination of arguments does not result in Revert Transaction");
+			}else
+				throw new System.InvalidOperationException("SlottableTest.Revert: testSB not pickable");
 		}
 	/*	Assertions	*/
 		/*	SSM	*/

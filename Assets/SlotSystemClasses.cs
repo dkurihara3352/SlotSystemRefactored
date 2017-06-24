@@ -1647,25 +1647,21 @@ namespace SlotSystem{
 				bool Contains(SlotSystemElement element);
 				SlotSystemElement this[int i]{get;}
 			}
-			public interface SlotSystemManagerInterface{
-				List<SlotGroup> allSGs{get;}
-				List<SlotGroup> focusedSGs{get;}
-				List<SlotGroup> allSGPs{get;}
-				List<SlotGroup> allSGEs{get;}
-				List<SlotGroup> allSGGs{get;}
-				List<EquipmentSet> equipmentSets{get;}
-				List<InventoryItemInstanceMock> allEquippedItems{get;}
-				SlotSystemElement focusedEleInPoolBundle{get;}
-				SlotSystemElement focusedEleInEquipBundle{get;}
-				List<SlotSystemElement> focusedElesInAllGenBundles{get;}
-				PoolInventory poolInv{get;}
-				EquipmentSetInventory equipInv{get;}
-				GenericInventory genInv{get;}
-				BowInstanceMock equippedBow{get;}
-				WearInstanceMock equippedWear{get;}
-				List<CarriedGearInstanceMock> equippedCGears{get;}
-				SlotGroup GetSG(Slottable sb);
-				void FindAndFocusRecursively(SlotSystemElement ele);
+			public class SlotSystemPageElement{
+				public SlotSystemElement element{
+					get{return m_element;}
+					}SlotSystemElement m_element;
+				public bool isFocusedOnActivate{
+					get{return m_isFocusedOnActivate;}
+					}bool m_isFocusedOnActivate;
+				public bool isFocusToggleOn{
+					get{return m_isFocusToggleOn;}
+					set{m_isFocusToggleOn = value;}
+					}bool m_isFocusToggleOn;
+				public SlotSystemPageElement(SlotSystemElement element, bool isFocusedOnActivate){
+					m_element = element;
+					m_isFocusedOnActivate = isFocusedOnActivate;
+				}
 			}
 			public interface TransactionManager{
 				SlotSystemTransaction transaction{get;}

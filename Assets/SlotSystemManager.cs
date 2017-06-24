@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
 
-	public class SlotSystemManager : AbsSlotSystemElement, TransactionManager{
+	public class SlotSystemManager : SlotSystemPage, TransactionManager{
 		public static SlotSystemManager curSSM;
 			public void SetCurSSM(){
 				if(curSSM != null){
@@ -438,11 +438,22 @@ namespace SlotSystem{
 					}
 				}
 			/*	methods	*/
-				public void Initialize(SlotSystemBundle poolBundle, SlotSystemBundle equipBundle, IEnumerable<SlotSystemBundle> gBundles){
+				public void Initialize(SlotSystemPageElement pBundPageEle, SlotSystemPageElement eBundPageEle , IEnumerable<SlotSystemPageElement> gBundPageEles){
 					m_eName = Util.Bold("SSM");
-					this.m_poolBundle = poolBundle;
-					this.m_equipBundle = equipBundle;
-					m_otherBundles = gBundles;
+					this.m_poolBundle = (SlotSystemBundle)pBundPageEle.element;
+					this.m_equipBundle = (SlotSystemBundle)eBundPageEle.element;
+					List<SlotSystemBundle> gBunds = new List<SlotSystemBundle>();
+					foreach(SlotSystemPageElement pageEle in gBundPageEles){
+						gBunds.Add((SlotSystemBundle)pageEle.element);
+					}
+					List<SlotSystemPageElement> pageEles = new List<SlotSystemPageElement>();
+					pageEles.Add(pBundPageEle);
+					pageEles.Add(eBundPageEle);
+					foreach(SlotSystemPageElement pageEle in gBundPageEles){
+						pageEles.Add(pageEle);
+					}
+					m_pageElements = pageEles;
+					m_otherBundles = gBunds;
 					PerformInHierarchy(SetSSM);
 					PerformInHierarchy(SetParent);
 					SetSelState(SlotSystemManager.ssmDeactivatedState);
@@ -479,9 +490,10 @@ namespace SlotSystem{
 				}
 				public override void Focus(){
 					SetSelState(SlotSystemManager.ssmFocusedState);
-					foreach(SlotSystemElement ele in this){
-						ele.Focus();
-					}
+					// foreach(SlotSystemElement ele in this){
+					// 	ele.Focus();
+					// }
+					PageFocus();
 				}
 				public override void Defocus(){
 					SetSelState(SlotSystemManager.ssmDefocusedState);

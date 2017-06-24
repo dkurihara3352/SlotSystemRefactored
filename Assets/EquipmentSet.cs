@@ -2,15 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public class EquipmentSet : AbsSlotSystemElement{
+	public class EquipmentSet : SlotSystemPage{
 		SlotGroup m_bowSG;
 		SlotGroup m_wearSG;
 		SlotGroup m_cGearsSG;
-		public void Initialize(SlotGroup bowSG, SlotGroup wearSG, SlotGroup cGearsSG){
+		public void Initialize(SlotSystemPageElement bowSGPE, SlotSystemPageElement wearSGPE, SlotSystemPageElement cGearsSGPE){
 			m_eName = Util.Bold("eSet");
-			m_bowSG = bowSG;
-			m_wearSG = wearSG;
-			m_cGearsSG = cGearsSG;
+			m_bowSG = (SlotGroup)bowSGPE.element;
+			m_wearSG = (SlotGroup)wearSGPE.element;
+			m_cGearsSG = (SlotGroup)cGearsSGPE.element;
+			// List<SlotSystemPageElement> pageEles = new List<SlotSystemPageElement>();
+			IEnumerable<SlotSystemPageElement> pageEles = new SlotSystemPageElement[]{
+				bowSGPE, wearSGPE, cGearsSGPE
+			};
+			m_pageElements = pageEles;
 			base.Initialize();
 		}
 		protected override IEnumerable<SlotSystemElement> elements{
@@ -19,6 +24,10 @@ namespace SlotSystem{
 				yield return m_wearSG;
 				yield return m_cGearsSG;
 			}
+		}
+		public override void Focus(){
+			SetSelState(AbsSlotSystemElement.focusedState);
+			PageFocus();
 		}
 	}
 }
