@@ -116,18 +116,9 @@ namespace SlotSystem{
 								m_sortState = new SGSortState();
 							return m_sortState;
 						}
-						}private static SGActState m_sortState;
-
-			
+						}private static SGActState m_sortState;			
 			/*	process	*/
 				/*	Selection Process	*/
-					// public SSEProcessEngine selProcEngine{
-						// 	get{
-						// 		if(m_selProcEngine == null)
-						// 			m_selProcEngine = new SSEProcessEngine();
-						// 		return m_selProcEngine;
-						// 	}
-						// 	}SSEProcessEngine m_selProcEngine;
 					public override SSEProcess selProcess{
 						get{return (SGSelProcess)selProcEngine.process;}
 					}
@@ -149,13 +140,6 @@ namespace SlotSystem{
 						return null;
 					}
 				/*	Action Process	*/
-					// public SSEProcessEngine actProcEngine{
-						// 	get{
-						// 		if(m_actProcEngine == null)
-						// 			m_actProcEngine = new SSEProcessEngine();
-						// 		return m_actProcEngine;
-						// 	}
-						// 	}SSEProcessEngine m_actProcEngine;
 					public override SSEProcess actProcess{
 						get{return (SGActProcess)actProcEngine.process;}
 					}
@@ -214,13 +198,11 @@ namespace SlotSystem{
 			
 			public bool isPool{
 				get{
-					// return sgm.allSGPs.Contains(this);
 					return ssm.poolBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGE{
 				get{
-					// return sgm.allSGEs.Contains(this);
 					return ssm.equipBundle.ContainsInHierarchy(this);
 				}
 			}
@@ -442,7 +424,7 @@ namespace SlotSystem{
 						return this.Filter is SGWearFilter;
 					else if(pickedSB.item is CarriedGearInstanceMock)
 						return this.Filter is SGCGearsFilter;
-					else// if(pickedSB.Item is PartsInstanceMock)
+					else
 						return this.Filter is SGPartsFilter;
 				}
 			}

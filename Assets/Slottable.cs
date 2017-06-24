@@ -17,7 +17,7 @@ namespace SlotSystem{
 					if(state == null || state is SBSelState)
 						selStateEngine.SetState(state);
 					else
-						throw new System.InvalidOperationException("Slottable.SetSelState: something other than SBSelectionState is beint attempted to be assigned");
+						throw new System.InvalidOperationException("Slottable.SetSelState: something other than SBSelState is beint attempted to be assigned");
 				}
 				public static SBSelState sbDeactivatedState{
 					get{
@@ -271,7 +271,6 @@ namespace SlotSystem{
 				}
 			public SlotGroup sg{
 				get{
-					// return ssm.GetSG(this);
 					return (SlotGroup)parent;
 				}
 			}
@@ -331,9 +330,6 @@ namespace SlotSystem{
 				public void SetSSM(SlotSystemManager ssm){
 					this.ssm = ssm;
 				}
-				// public void SetSGM(SlotGroupManager sgm){
-				// 	m_sgm = sgm;
-				// }
 				public override int level{
 					get{return sg.level +1;}
 				}
@@ -346,7 +342,7 @@ namespace SlotSystem{
 				}
 				public override void Activate(){}
 				public override void Deactivate(){
-					SetSelState(Slottable.deactivatedState);
+					SetSelState(Slottable.sbDeactivatedState);
 				}
 				public override void Focus(){
 					SetSelState(Slottable.sbFocusedState);

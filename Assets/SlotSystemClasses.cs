@@ -39,7 +39,6 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						if(ssm.prevSelState == SlotSystemManager.ssmFocusedState)
 							ssm.SetAndRunSelProcess(new SSMGreyoutProcess(ssm, ssm.greyoutCoroutine));
-						ssm.Defocus();
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
@@ -50,7 +49,6 @@ namespace SlotSystem{
 						base.EnterState(sh);
 						if(ssm.prevSelState == SlotSystemManager.ssmDefocusedState)
 							ssm.SetAndRunSelProcess(new SSMGreyinProcess(ssm, ssm.greyinCoroutine));
-						ssm.Focus();
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
@@ -127,7 +125,7 @@ namespace SlotSystem{
 						ssm.transaction.OnComplete();
 					}
 				}
-	/*	SGM classes	*/
+	/*	Transaction classes	*/
 		/*	transaction	*/
 			public interface SlotSystemTransaction{
 				Slottable targetSB{get;}
@@ -235,16 +233,12 @@ namespace SlotSystem{
 													if(origSG.isShrinkable)
 														return new FillTransaction(pickedSB, targetSG);
 												}
-												// if(!targetSG.isAutoSort)
-												// 	return new ReorderInOtherSGTransaction(targetSB);
 											}
 										}else{
 											if(origSG.AcceptsFilter(targetSB))
 												return new SwapTransaction(pickedSB, targetSB);
 											if(targetSG.hasEmptySlot || targetSG.isExpandable)
 												return new FillTransaction(pickedSB, targetSG);
-											// if(!targetSG.isAutoSort)
-											// 	return new InsertTransaction(targetSB);
 										}
 									}
 								}
@@ -253,7 +247,6 @@ namespace SlotSystem{
 						}
 					}
 				}
-				// protected SlotGroupManager sgm = SlotGroupManager.CurSGM;
 				protected SlotSystemManager ssm = SlotSystemManager.curSSM;
 				protected List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
 				protected List<InventoryItemInstanceMock> added = new List<InventoryItemInstanceMock>();
@@ -312,33 +305,6 @@ namespace SlotSystem{
 					base.OnComplete();
 				}
 			}
-			// public class ReorderInOtherSGTransaction: AbsSlotSystemTransaction{
-				// 	Slottable m_pickedSB;
-				// 	Slottable m_selectedSB;
-				// 	SlotGroup m_origSG;
-				// 	SlotGroup m_selectedSG;
-				// 	public ReorderInOtherSGTransaction(Slottable pickedSB, Slottable selected){
-				// 		m_pickedSB = pickedSB;
-				// 		m_selectedSB = selected;
-				// 		m_origSG = pickedSB.sg;
-				// 		m_selectedSG = selected.sg;
-				// 	}
-				// 	public override Slottable targetSB{get{return m_selectedSB;}}
-				// 	public override SlotGroup sg1{get{return m_origSG;}}
-				// 	public override SlotGroup sg2{get{return m_selectedSG;}}
-				// 	public override void Indicate(){}
-				// 	public override void Execute(){
-				// 		sg1.SetActState(SlotGroup.RevertState);
-				// 		sg2.SetActState(SlotGroup.ReorderState);
-				// 		sgm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.itemInst));
-				// 		base.Execute();
-				// 	}
-				// 	public override void OnComplete(){
-				// 		sg1.OnCompleteSlotMovementsV2();
-				// 		sg2.OnCompleteSlotMovementsV2();
-				// 		base.OnComplete();
-				// 	}
-				// }
 			public class StackTransaction: AbsSlotSystemTransaction{
 				Slottable m_pickedSB;
 				SlotGroup m_origSG;
@@ -449,195 +415,6 @@ namespace SlotSystem{
 					base.OnComplete();
 				}
 			}
-			// public class InsertTransaction: AbsSlotSystemTransaction{
-				// 	Slottable m_pickedSB;
-				// 	SlotGroup m_origSG;
-				// 	Slottable m_selectedSB;
-				// 	SlotGroup m_selectedSG;
-				// 	public InsertTransaction(Slottable pickedSB, Slottable sb){
-				// 		m_pickedSB = pickedSB;
-				// 		m_origSG = m_pickedSB.sg;
-				// 		m_selectedSB = sb;
-				// 		m_selectedSG = sb.sg;
-				// 	}
-				// 	public override Slottable targetSB{get{return m_selectedSB;}}
-				// 	public override SlotGroup sg1{get{return m_origSG;}}
-				// 	public override SlotGroup sg2{get{return m_origSG;}}
-				// 	public override void Indicate(){}
-				// 	public override void Execute(){
-				// 		sg1.SetActState(SlotGroup.FillState);
-				// 		sg2.SetActState(SlotGroup.FillState);
-				// 		sgm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
-				// 		base.Execute();
-				// 	}
-				// 	public override void OnComplete(){
-				// 		sg1.OnCompleteSlotMovementsV2();
-				// 		sg2.OnCompleteSlotMovementsV2();
-				// 		sgm.UpdateEquipStatesOnAll();
-				// 		base.OnComplete();
-				// 	}
-				// }
-		// /*	commands	*/
-			// 	public interface SGMCommand{
-			// 		void Execute(SlotGroupManager sgm);
-			// 	}
-			// /*	state	*/
-			// 	/*	superclass */
-			// 		public class SGMStateEngine: SwitchableStateEngine{
-			// 			public SGMStateEngine(SlotGroupManager sgm){
-			// 				this.handler = sgm;
-			// 			}
-			// 			public void SetState(SGMState sgmState){
-			// 				base.SetState(sgmState);
-			// 			}
-			// 		}
-			// 		public abstract class SGMState: SwitchableState{
-			// 			protected SlotGroupManager sgm;
-			// 			public virtual void EnterState(StateHandler handler){
-			// 				sgm = (SlotGroupManager)handler;
-			// 			}
-			// 			public virtual void ExitState(StateHandler handler){
-			// 				sgm = (SlotGroupManager)handler;
-			// 			}
-			// 		}
-			// 		public abstract class SGMSelectionState: SGMState{
-			// 		}
-			// 		public abstract class SGMActionState: SGMState{
-			// 		}
-			// 	/*	Selection state	*/
-			// 		public class SGMDeactivatedState: SGMSelectionState{
-			// 			public override void EnterState(StateHandler sh){
-			// 				base.EnterState(sh);
-			// 				sgm.SetAndRunSelProcess(null);
-			// 				sgm.SetActState(SlotGroupManager.WaitForActionState);
-			// 			}
-			// 			public override void ExitState(StateHandler sh){
-			// 				base.ExitState(sh);
-			// 			}
-			// 		}
-			// 		public class SGMDefocusedState: SGMSelectionState{
-			// 			public override void EnterState(StateHandler sh){
-			// 				base.EnterState(sh);
-			// 				if(sgm.PrevSelState == SlotGroupManager.FocusedState)
-			// 					sgm.SetAndRunSelProcess(new SGMGreyoutProcess(sgm, sgm.GreyoutCoroutine));
-			// 				sgm.rootPage.Defocus();
-			// 			}
-			// 			public override void ExitState(StateHandler sh){
-			// 				base.ExitState(sh);
-			// 			}
-			// 		}
-			// 		public class SGMFocusedState: SGMSelectionState{
-			// 			public override void EnterState(StateHandler sh){
-			// 				base.EnterState(sh);
-			// 				if(sgm.PrevSelState == SlotGroupManager.DefocusedState)
-			// 					sgm.SetAndRunSelProcess(new SGMGreyinProcess(sgm, sgm.GreyinCoroutine));
-			// 				sgm.rootPage.Focus();
-			// 			}
-			// 			public override void ExitState(StateHandler sh){
-			// 				base.ExitState(sh);
-			// 			}
-			// 		}
-			// 	/*	Action state	*/
-			// 		public class SGMWaitForActionState: SGMActionState{
-			// 			public override void EnterState(StateHandler sh){
-			// 				base.EnterState(sh);
-			// 				sgm.SetAndRunActProcess(null);
-			// 			}
-			// 			public override void ExitState(StateHandler sh){
-			// 				base.ExitState(sh);
-			// 			}
-			// 		}
-			// 		public class SGMProbingState: SGMActionState{
-			// 			public override void EnterState(StateHandler sh){
-			// 				base.EnterState(sh);
-			// 				if(sgm.PrevActState == SlotGroupManager.WaitForActionState)
-			// 					sgm.SetAndRunActProcess(new SGMProbeProcess(sgm, sgm.ProbeCoroutine));
-			// 				else
-			// 					throw new System.InvalidOperationException("SGMProbingState: Entering from an invalid state");
-			// 			}
-			// 			public override void ExitState(StateHandler sh){
-			// 				base.ExitState(sh);
-			// 			}
-			// 		}
-			// 		public class SGMPerformingTransactionState: SGMActionState{
-			// 			public override void EnterState(StateHandler sh){
-			// 				base.EnterState(sh);
-			// 				sgm.SetAndRunActProcess(new SGMTransactionProcess(sgm));
-			// 			}
-			// 			public override void ExitState(StateHandler sh){
-			// 				base.ExitState(sh);
-			// 			}
-			// 		}
-			// /*	process	*/
-			// 	public interface SGMProcess{
-			// 		bool IsRunning{get;}
-			// 		bool IsExpired{get;}
-			// 		System.Func<IEnumeratorMock> CoroutineMock{set;}
-			// 		SlotGroupManager SGM{set;}
-			// 		void Start();
-			// 		void Stop();
-			// 		void Expire();
-			// 	}
-			// 	public abstract class AbsSGMProcess: SGMProcess{
-			// 		public System.Func<IEnumeratorMock> CoroutineMock{
-			// 			get{return m_coroutineMock;}
-			// 			set{m_coroutineMock = value;}
-			// 			}System.Func<IEnumeratorMock> m_coroutineMock;
-			// 		public SlotGroupManager SGM{
-			// 			get{return m_sgm;}
-			// 			set{m_sgm = value;}
-			// 			}SlotGroupManager m_sgm;
-			// 		public bool IsRunning{get{return m_isRunning;}
-			// 			}bool m_isRunning;
-			// 		public bool IsExpired{get{return m_isExpired;}
-			// 			}bool m_isExpired;
-			// 		public virtual void Start(){
-			// 			m_isRunning = true;
-			// 			m_isExpired = false;
-			// 			m_coroutineMock();
-			// 		}
-			// 		public void Stop(){
-			// 			//call StopCoroutine(m_coroutine);
-			// 			if(m_isRunning){
-			// 				m_isRunning = false;
-			// 				m_isExpired = false;
-			// 			}
-			// 		}
-			// 		public virtual void Expire(){
-			// 			if(m_isRunning){
-			// 				m_isRunning = false;
-			// 				m_isExpired = true;
-			// 			}
-			// 		}
-			// 	}
-			// 	public class SGMGreyinProcess: AbsSGMProcess{
-			// 		public SGMGreyinProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
-			// 			this.SGM = sgm;
-			// 			this.CoroutineMock = coroutineMock;
-			// 		}
-			// 	}
-			// 	public class SGMGreyoutProcess: AbsSGMProcess{
-			// 		public SGMGreyoutProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
-			// 			this.SGM = sgm;
-			// 			this.CoroutineMock = coroutineMock;
-			// 		}
-			// 	}
-			// 	public class SGMProbeProcess: AbsSGMProcess{
-			// 		public SGMProbeProcess(SlotGroupManager sgm, System.Func<IEnumeratorMock> coroutineMock){
-			// 			this.SGM = sgm;
-			// 			this.CoroutineMock = coroutineMock;
-			// 		}
-			// 	}
-			// 	public class SGMTransactionProcess: AbsSGMProcess{
-			// 		public SGMTransactionProcess(SlotGroupManager sgm){
-			// 			this.SGM = sgm;
-			// 			this.CoroutineMock = sgm.WaitForTransactionDone;
-			// 		}
-			// 		public override void Expire(){
-			// 			base.Expire();
-			// 			SGM.Transaction.OnComplete();
-			// 		}
-			// 	}
 	/*	SlotGroup Classes	*/
 		/*	states	*/
 			/*	superclasses	*/
@@ -875,7 +652,6 @@ namespace SlotSystem{
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
 							newSB.Initialize(added.itemInst);
 							newSB.SetSSM(sg.ssm);
-							// newSB.rootElement = sg.rootElement;
 							newSB.SetEqpState(Slottable.unequippedState);
 							newSB.Defocus();
 							newSBs[newSBs.IndexOf(removed)] = newSB;
@@ -920,7 +696,6 @@ namespace SlotSystem{
 								Slottable newSB = newSBGO.AddComponent<Slottable>();
 								newSB.Initialize(added.itemInst);
 								newSB.SetSSM(sg.ssm);
-								// newSB.rootElement = sg.rootElement;
 								newSB.Defocus();
 								newSB.SetEqpState(Slottable.unequippedState);
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
@@ -2077,7 +1852,6 @@ namespace SlotSystem{
 			}
 		/*	Inventories	*/
 			public interface Inventory: IEnumerable<SlottableItem>{
-				// List<SlottableItem> items{get;}
 				void Add(SlottableItem item);
 				void Remove(SlottableItem item);
 				SlotGroup sg{get;}
@@ -2141,11 +1915,7 @@ namespace SlotSystem{
 					public void SetSG(SlotGroup sg){
 						m_sg = sg;
 					}
-				// public List<SlottableItem> items{
-				// 	get{return m_items;}
-				// }
 				public void Add(SlottableItem item){
-					// m_items.Add(item);
 					foreach(SlottableItem it in m_items){
 						InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)it;
 						InventoryItemInstanceMock addedInst = (InventoryItemInstanceMock)item;
@@ -2472,20 +2242,14 @@ namespace SlotSystem{
 						res = Util.Red("RevertTA");
 					else if(ta is ReorderTransaction)
 						res = Util.Blue("ReorderTA");
-					// else if(ta is ReorderInOtherSGTransaction)
-					// 	res = Util.Green("ReorderInOtherSGTA");
 					else if(ta is StackTransaction)
 						res = Util.Aqua("StackTA");
 					else if(ta is SwapTransaction)
 						res = Util.Terra("SwapTA");
 					else if(ta is FillTransaction)
 						res = Util.Forest("FillTA");
-					// else if(ta is FillTransaction)
-					// 	res = Util.Berry("FillEquipTA");
 					else if(ta is SortTransaction)
 						res = Util.Khaki("SortTA");
-					// else if(ta is InsertTransaction)
-					// 	res = Util.Midnight("InsertTA");
 					else if(ta is EmptyTransaction)
 						res = Util.Beni("Empty");
 					return res;
@@ -2557,143 +2321,7 @@ namespace SlotSystem{
 						Util.Bold("TAComp ") + d1Done + " " + d2Done + " " + sg1Done + " " + sg2Done;
 					return res;
 				}
-			/*	SGM	*/
-				// public static string SGMStateName(SGMState state){
-				// 	string res = "";
-				// 	if(state is SGMDeactivatedState)
-				// 		res = Util.Red("Deactivated");
-				// 	else if(state is SGMDefocusedState)
-				// 		res = Util.Blue("Defocused");
-				// 	else if(state is SGMFocusedState)
-				// 		res = Util.Green("Focused");
-				// 	else if(state is SGMWaitForActionState)
-				// 		res = Util.Green("WaitForAction");
-				// 	else if(state is SGMProbingState)
-				// 		res = Util.Ciel("Probing");
-				// 	else if(state is SGMPerformingTransactionState)
-				// 		res = Util.Terra("PerformingTransaction");
-				// 	return res;
-				// }
-				// public static string TransactionName(SlotSystemTransaction ta){
-				// 	string res = "";
-				// 	if(ta is RevertTransaction)
-				// 		res = Util.Red("RevertTA");
-				// 	else if(ta is ReorderTransaction)
-				// 		res = Util.Blue("ReorderTA");
-				// 	// else if(ta is ReorderInOtherSGTransaction)
-				// 	// 	res = Util.Green("ReorderInOtherSGTA");
-				// 	else if(ta is StackTransaction)
-				// 		res = Util.Aqua("StackTA");
-				// 	else if(ta is SwapTransaction)
-				// 		res = Util.Terra("SwapTA");
-				// 	else if(ta is FillTransaction)
-				// 		res = Util.Forest("FillTA");
-				// 	// else if(ta is FillTransaction)
-				// 	// 	res = Util.Berry("FillEquipTA");
-				// 	else if(ta is SortTransaction)
-				// 		res = Util.Khaki("SortTA");
-				// 	// else if(ta is InsertTransaction)
-				// 	// 	res = Util.Midnight("InsertTA");
-				// 	else if(ta is EmptyTransaction)
-				// 		res = Util.Beni("Empty");
-				// 	return res;
-				// }
-				// public static string SGMProcessName(SGMProcess proc){
-				// 	string res = "";
-				// 	if(proc is SGMGreyinProcess)
-				// 		res = Util.Red("Greyin");
-				// 	else if(proc is SGMGreyoutProcess)
-				// 		res = Util.Red("Greyout");
-				// 	else if(proc is SGMProbeProcess)
-				// 		res = Util.Red("Probe");
-				// 	else if(proc is SGMTransactionProcess)
-				// 		res = Util.Blue("Transaction");
-				// 	return res;
-				// }
-				// public static string SGMDebug(SlotGroupManager sgm){
-				// 	string res = "";
-				// 	string pSB = Util.SBofSG(sgm.pickedSB);
-				// 	string tSB = Util.SBofSG(sgm.targetSB);
-				// 	string hSG = sgm.hoveredSG.eName;
-				// 	string hSB = Util.SBofSG(sgm.hoveredSB);
-				// 	string di1;
-				// 		if(sgm.dIcon1 == null)
-				// 			di1 = "null";
-				// 		else
-				// 			di1 = Util.SBofSG(sgm.dIcon1.sb);
-				// 	string di2;
-				// 		if(sgm.dIcon2 == null)
-				// 			di2 = "null";
-				// 		else
-				// 			di2 = Util.SBofSG(sgm.dIcon2.sb);
-					
-				// 	string sg1 = sgm.sg1.eName;
-				// 	string sg2 = sgm.sg2.eName;
-				// 	string prevSel = Util.SGMStateName(sgm.PrevSelState);
-				// 	string curSel = Util.SGMStateName(sgm.CurSelState);
-				// 	string selProc;
-				// 		if(sgm.SelectionProcess == null)
-				// 			selProc = "";
-				// 		else
-				// 			selProc = Util.SGMProcessName(sgm.SelectionProcess) + " exp? " + (sgm.SelectionProcess.IsExpired?Blue("true"):Red("false"));
-				// 	string prevAct = Util.SGMStateName(sgm.PrevActState);
-				// 	string curAct = Util.SGMStateName(sgm.CurActState);
-				// 	string actProc;
-				// 		if(sgm.ActionProcess == null)
-				// 			actProc = "";
-				// 		else
-				// 			actProc = Util.SGMProcessName(sgm.ActionProcess) + " exp? " + (sgm.ActionProcess.IsExpired?Blue("true"):Red("false"));
-				// 	string ta = Util.TransactionName(sgm.Transaction);
-				// 	string d1Done = "d1Done: " + (sgm.dIcon1Done?Util.Blue("true"):Util.Red("false"));
-				// 	string d2Done = "d2Done: " + (sgm.dIcon2Done?Util.Blue("true"):Util.Red("false"));
-				// 	string sg1Done = "sg1Done: " + (sgm.sg1Done?Util.Blue("true"):Util.Red("false"));
-				// 	string sg2Done = "sg2Done: " + (sgm.sg2Done?Util.Blue("true"):Util.Red("false"));
-				// 	res = Bold("DebugTarget: ") + Util.Bold("SGM:") +
-				// 			" pSB " + pSB +
-				// 			", tSB " + tSB +
-				// 			", hSG " + hSG +
-				// 			", hSB " + hSB +
-				// 			", di1 " + di1 +
-				// 			", di2 " + di2 +
-				// 			", sg1 " + sg1 +
-				// 			", sg2 " + sg2 + ", " +
-				// 		Util.Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
-				// 			"proc " + selProc + ", " +
-				// 		Util.Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
-				// 			"proc " + actProc + ", " +
-				// 		Util.Bold("TA ") + ta + ", " + 
-				// 		Util.Bold("TAComp ") + d1Done + " " + d2Done + " " + sg1Done + " " + sg2Done;
-				// 	return res;
-				// }
 			/*	SG	*/
-				// public static string SGName(SlotGroup sg){
-					// 	string result = "";
-					// 	if(sg != null){
-					// 		if(sg.isPool){
-					// 			if(sg.Filter is SGNullFilter)
-					// 				result = "sgpAll";
-					// 			else if(sg.Filter is SGBowFilter)
-					// 				result = "sgpBow";
-					// 			else if(sg.Filter is SGWearFilter)
-					// 				result = "sgpWear";
-					// 			else if(sg.Filter is SGCGearsFilter)
-					// 				result = "sgpCGears";
-					// 			else if(sg.Filter is SGPartsFilter)
-					// 				result = "sgpParts";
-					// 			result = Red(result);
-					// 		}else if(sg.isSGE){
-					// 			if(sg.Filter is SGBowFilter)
-					// 				result = "sgBow";
-					// 			else if(sg.Filter is SGWearFilter)
-					// 				result = "sgWear";
-					// 			else if(sg.Filter is SGCGearsFilter)
-					// 				result = "sgCGears";
-					// 			result = Blue(result);
-					// 		}else if(sg.isSGG){
-					// 		}
-					// 	}
-					// 	return result;
-					// }
 				public static string SGStateName(SGState state){
 					string res = "";
 					if(state is SGDeactivatedState){
@@ -2706,8 +2334,6 @@ namespace SlotSystem{
 						res = Util.Aqua("SGSelected");
 					}else if(state is SGWaitForActionState){
 						res = Util.Sangria("SGWFA");
-					// }else if(state is SGPerformingTransactionState){
-					// 	res = Util.Green("SGTransaction");
 					}else if(state is SGRevertState){
 						res = Util.Sangria("SGRevert");
 					}else if(state is SGReorderState){
@@ -2797,21 +2423,6 @@ namespace SlotSystem{
 							case 602: result = "frgParts"; break;
 							case 603: result = "mstParts"; break;
 						}
-						// List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-						// foreach(InventoryItemInstanceMock iInst in SlotGroupManager.CurSGM.poolInv){
-						// 	if(iInst.Item == itemInst.Item)
-						// 		sameItemInsts.Add(iInst);
-						// }
-						// int index = sameItemInsts.IndexOf(itemInst);
-						// result += "_"+index.ToString();
-						// if(itemInst is BowInstanceMock)
-						// 	result = Forest(result);
-						// if(itemInst is WearInstanceMock)
-						// 	result = Sangria(result);
-						// if(itemInst is CarriedGearInstanceMock)
-						// 	result = Terra(result);
-						// if(itemInst is PartsInstanceMock)
-						// 	result = Midnight(result);
 					}
 					return result;
 				}
@@ -2819,21 +2430,23 @@ namespace SlotSystem{
 					string result = "null";
 					if(sb != null){
 						result = ItemInstName(sb.itemInst);
-						List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-						foreach(InventoryItemInstanceMock itemInst in SlotSystemManager.curSSM.poolInv){
-							if(itemInst.Item == sb.itemInst.Item)
-								sameItemInsts.Add(itemInst);
+						if(SlotSystemManager.curSSM != null){
+							List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
+							foreach(InventoryItemInstanceMock itemInst in SlotSystemManager.curSSM.poolInv){
+								if(itemInst.Item == sb.itemInst.Item)
+									sameItemInsts.Add(itemInst);
+							}
+							int index = sameItemInsts.IndexOf(sb.itemInst);
+							result += "_"+index.ToString();
+							if(sb.itemInst is BowInstanceMock)
+								result = Forest(result);
+							if(sb.itemInst is WearInstanceMock)
+								result = Sangria(result);
+							if(sb.itemInst is CarriedGearInstanceMock)
+								result = Terra(result);
+							if(sb.itemInst is PartsInstanceMock)
+								result = Midnight(result);
 						}
-						int index = sameItemInsts.IndexOf(sb.itemInst);
-						result += "_"+index.ToString();
-						if(sb.itemInst is BowInstanceMock)
-							result = Forest(result);
-						if(sb.itemInst is WearInstanceMock)
-							result = Sangria(result);
-						if(sb.itemInst is CarriedGearInstanceMock)
-							result = Terra(result);
-						if(sb.itemInst is PartsInstanceMock)
-							result = Midnight(result);
 					}
 					return result;
 				}
@@ -2874,14 +2487,6 @@ namespace SlotSystem{
 							result = Khaki("Added");
 						else if(state is SBMoveWithinState)
 							result = Midnight("MoveWithin");
-						// else if(state is SBMovingInSGState)
-						// 	result = Midnight("MovingInSG");
-						// else if(state is SBRevertingState)
-						// 	result = Beni("Reverting");
-						// else if(state is SBMovingOutState)
-						// 	result = Sangria("MovingOut");
-						// else if(state is SBMovingInState)
-						// 	result = Yamabuki("MovingIn");
 					}else if(state is SBEqpState){
 						if(state is SBEquippedState)
 							result = Red("Equipped");

@@ -150,10 +150,6 @@ namespace SlotSystem{
 						return parent.immediateBundle;
 				}
 			}
-			// public SlotGroupManager sgm{
-				// 	get{return m_sgm;}
-				// 	set{m_sgm = value;}
-				// 	}protected SlotGroupManager m_sgm;
 			public SlotSystemManager ssm{
 				get{return m_ssm;}
 				set{m_ssm = value;}
@@ -165,11 +161,6 @@ namespace SlotSystem{
 					return parent.level + 1;
 				}
 			}
-			// public virtual SlotSystemElement rootElement{
-				// 	get{return m_rootElement;}
-				// 	set{m_rootElement = value;}
-				// 	}
-				// 	SlotSystemElement m_rootElement;
 		/*	methods	*/
 			public void Initialize(){
 				SetSelState(AbsSlotSystemElement.deactivatedState);

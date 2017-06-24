@@ -5,7 +5,7 @@ namespace SlotSystem{
 
 	public class SlotSystemManager : AbsSlotSystemElement, TransactionManager{
 		public static SlotSystemManager curSSM;
-			void SetCurSSM(){
+			public void SetCurSSM(){
 				if(curSSM != null){
 					if(curSSM != this){
 						curSSM.Defocus();
@@ -339,10 +339,10 @@ namespace SlotSystem{
 					
 				/*	Action state	*/
 					public override SSEState curActState{
-						get{return (SSMSelState)actStateEngine.curState;}
+						get{return (SSMActState)actStateEngine.curState;}
 					}
 					public override SSEState prevActState{
-						get{return (SSMSelState)actStateEngine.prevState;}
+						get{return (SSMActState)actStateEngine.prevState;}
 					}
 					public override void SetActState(SSEState state){
 						if(state == null || state is SSMActState)
@@ -437,20 +437,14 @@ namespace SlotSystem{
 							yield return ele;
 					}
 				}
-				// public override SlotSystemElement rootElement{
-					// 	get{return this;}
-					// 	set{}
-					// }
 			/*	methods	*/
 				public void Initialize(SlotSystemBundle poolBundle, SlotSystemBundle equipBundle, IEnumerable<SlotSystemBundle> gBundles){
-					m_eName = Util.Bold("invManPage");
+					m_eName = Util.Bold("SSM");
 					this.m_poolBundle = poolBundle;
 					this.m_equipBundle = equipBundle;
 					m_otherBundles = gBundles;
-					// PerformInHierarchy(SetRoot);
 					PerformInHierarchy(SetSSM);
 					PerformInHierarchy(SetParent);
-					// base.Initialize();
 					SetSelState(SlotSystemManager.ssmDeactivatedState);
 					SetActState(SlotSystemManager.ssmWaitForActionState);
 				}
@@ -468,9 +462,6 @@ namespace SlotSystem{
 						}
 					}
 				}
-				// void SetRoot(SlotSystemElement ele){
-				// 	ele.rootElement = this;
-				// }
 				void SetSSM(SlotSystemElement ele){
 					ele.ssm = this;
 				}
@@ -480,24 +471,29 @@ namespace SlotSystem{
 						if(e != null)
 						e.parent = ele;
 					}
-					// if(ele != this)
-					// ele.parent = this.FindParent(ele);
 				}
-				// public void SetSGMRecursively(SlotGroupManager sgm){
-				// 	this.sgm = sgm;
-				// 	PerformInHierarchy(SetSGM);
-				// }
-				// public void SetSSMRecursively(SlotSystemManager ssm){
-				// 	this.SetSSM = 
-				// }
-				// public void SetSGM(SlotSystemElement ele){
-				// 	if(ele != this)
-				// 	ele.sgm = this.sgm;
-				// }
 				public override void Activate(){
-					// SetCurSGM();
+					SetCurSSM();
 					UpdateEquipStatesOnAll();
 					Focus();
+				}
+				public override void Focus(){
+					SetSelState(SlotSystemManager.ssmFocusedState);
+					foreach(SlotSystemElement ele in this){
+						ele.Focus();
+					}
+				}
+				public override void Defocus(){
+					SetSelState(SlotSystemManager.ssmDefocusedState);
+					foreach(SlotSystemElement ele in this){
+						ele.Defocus();
+					}
+				}
+				public override void Deactivate(){
+					SetSelState(SlotSystemManager.ssmDeactivatedState);
+					foreach(SlotSystemElement ele in this){
+						ele.Deactivate();
+					}
 				}
 				public void SetFocusedPoolSG(SlotGroup sg){
 					poolBundle.SetFocusedBundleElement(sg);
@@ -523,7 +519,6 @@ namespace SlotSystem{
 				if(sg2 != null && sg == sg2) m_sg2Done = true;
 				else if(sg1 != null && sg == sg1) m_sg1Done = true;
 				if(curActState == SlotSystemManager.ssmTransactionState){
-					// IEnumeratorMock tryInvoke = ((SSMActProcess)actProcess).coroutineMock();
 					transactionCoroutine();
 				}
 			}
@@ -531,7 +526,6 @@ namespace SlotSystem{
 				if(dIcon2 != null && di == dIcon2) m_dIcon2Done = true;
 				else if(dIcon1 != null && di == dIcon1) m_dIcon1Done = true;
 				if(curActState == SlotSystemManager.ssmTransactionState){
-					// IEnumeratorMock tryInvoke = ((SSMActProcess)actProcess).coroutineMock();
 					transactionCoroutine();
 				}
 			}
