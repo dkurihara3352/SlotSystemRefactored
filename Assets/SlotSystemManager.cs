@@ -102,7 +102,7 @@ namespace SlotSystem{
 						bool done = false;
 						SlotSystemElement tested = sg;
 						while(!done){
-							if(!tested.immediateBundle.focusedElement.ContainsInHierarchy(tested))
+							if(tested.immediateBundle.focusedElement != tested && !tested.immediateBundle.focusedElement.ContainsInHierarchy(tested))
 								return;
 							tested = tested.immediateBundle;
 							if(tested.immediateBundle == null)
@@ -503,6 +503,28 @@ namespace SlotSystem{
 					equipBundle.SetFocusedBundleElement(eSet);
 					Focus();
 				}
+				public void FindAndFocusInBundle(SlotSystemElement ele){
+					PerformInHierarchy(FocusInBundle, ele);
+				}
+					public void FocusInBundle(SlotSystemElement inspected, object target){
+						SlotSystemElement targetEle = (SlotSystemElement)target;
+						if(inspected == targetEle){
+							SlotSystemElement tested = inspected;
+							while(true){
+								SlotSystemBundle immBundle = tested.immediateBundle;
+								if(immBundle == null)
+									break;
+								SlotSystemElement containingEle = null;
+								foreach(SlotSystemElement e in immBundle){
+									if(e.ContainsInHierarchy(tested) || e == tested)
+										containingEle = e;
+								}
+								immBundle.SetFocusedBundleElement(containingEle);
+								tested = tested.immediateBundle;
+							}
+							this.Focus();
+						}
+					}
 		/*	Transaction Manager	*/
 			public SlotSystemTransaction transaction{
 				get{return m_transaction;}

@@ -163,12 +163,28 @@ public class SlottableTest{
 				GameObject sgCGearsGO;
 				SlotGroup sgeCGears;
 			/*	generic	*/
-				GameObject sgGenAGO;
-				SlotGroup sggA;
-				GameObject sgGenBGO;
-				SlotGroup sggB;
-				GameObject sgGenCGO;
-				SlotGroup sggC;
+				GameObject sggGO_12;
+				SlotGroup sgg_12;
+				GameObject sggGO_111;
+				SlotGroup sgg_111;
+				GameObject sggGO_112;
+				SlotGroup sgg_112;
+				GameObject sggGO_21;
+				SlotGroup sgg_21;
+				GameObject sggGO_22;
+				SlotGroup sgg_22;
+				GameObject sggGO_23;
+				SlotGroup sgg_23;
+				GameObject sggGO_24;
+				SlotGroup sgg_24;
+				GameObject sggGO_2511;
+				SlotGroup sgg_2511;
+				GameObject sggGO_2512;
+				SlotGroup sgg_2512;
+				GameObject sggGO_2521;
+				SlotGroup sgg_2521;
+				GameObject sggGO_2522;
+				SlotGroup sgg_2522;
 		/*	items	*/
 			/*	sbp	*/
 			Slottable defBowA_p;
@@ -446,36 +462,116 @@ public class SlottableTest{
 							2,//items
 							2);//sbs
 			/*	sgGen	*/
-				/*	sgGenA	*/
-					sgGenAGO = new GameObject("sgGenAGO");
-					sggA = sgGenAGO.AddComponent<SlotGroup>();
-					sggA.Initialize("sggA", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
-						ASSG(sggA,
+				/*	sgg_12	*/
+					sggGO_12 = new GameObject("sggGO_12");
+					sgg_12 = sggGO_12.AddComponent<SlotGroup>();
+					sgg_12.Initialize("sgg_12", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_12,
 							SGDeactivated, SGDeactivated, null,
 							SGWFA, SGWFA, null, false);
-						AE(sggA.isShrinkable, true);
-						AE(sggA.isExpandable, true);
-						AssertSGCounts(sggA, 0, 0, 0);
-				/*	sgGenB	*/
-					sgGenBGO = new GameObject("sgGenBGO");
-					sggB = sgGenBGO.AddComponent<SlotGroup>();
-					sggB.Initialize("sggB", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
-						ASSG(sggB,
+						AE(sgg_12.isShrinkable, true);
+						AE(sgg_12.isExpandable, true);
+						AssertSGCounts(sgg_12, 0, 0, 0);
+				/*	sgg_111	*/
+					sggGO_111 = new GameObject("sggGO_111");
+					sgg_111 = sggGO_111.AddComponent<SlotGroup>();
+					sgg_111.Initialize("sgg_111", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_111,
 							SGDeactivated, SGDeactivated, null,
 							SGWFA, SGWFA, null, false);
-						AE(sggB.isShrinkable, true);
-						AE(sggB.isExpandable, true);
-						AssertSGCounts(sggB, 0, 0, 0);
-				/*	sgGenC	*/
-					sgGenCGO = new GameObject("sgGenCGO");
-					sggC = sgGenCGO.AddComponent<SlotGroup>();
-					sggC.Initialize("sggC", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
-						ASSG(sggC,
+						AE(sgg_111.isShrinkable, true);
+						AE(sgg_111.isExpandable, true);
+						AssertSGCounts(sgg_111, 0, 0, 0);
+				/*	sgg_112	*/
+					sggGO_112 = new GameObject("sggGO_112");
+					sgg_112 = sggGO_112.AddComponent<SlotGroup>();
+					sgg_112.Initialize("sgg_112", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_112,
 							SGDeactivated, SGDeactivated, null,
 							SGWFA, SGWFA, null, false);
-						AE(sggC.isShrinkable, true);
-						AE(sggC.isExpandable, true);
-						AssertSGCounts(sggC, 0, 0, 0);
+						AE(sgg_112.isShrinkable, true);
+						AE(sgg_112.isExpandable, true);
+						AssertSGCounts(sgg_112, 0, 0, 0);
+				/*	sgg_21	*/
+					sggGO_21 = new GameObject("sggGO_21");
+					sgg_21 = sggGO_21.AddComponent<SlotGroup>();
+					sgg_21.Initialize("sgg_21", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_21,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_21.isShrinkable, true);
+						AE(sgg_21.isExpandable, true);
+						AssertSGCounts(sgg_21, 0, 0, 0);
+				/*	sgg_22	*/
+					sggGO_22 = new GameObject("sggGO_22");
+					sgg_22 = sggGO_22.AddComponent<SlotGroup>();
+					sgg_22.Initialize("sgg_22", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_22,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_22.isShrinkable, true);
+						AE(sgg_22.isExpandable, true);
+						AssertSGCounts(sgg_22, 0, 0, 0);
+				/*	sgg_23	*/
+					sggGO_23 = new GameObject("sggGO_23");
+					sgg_23 = sggGO_23.AddComponent<SlotGroup>();
+					sgg_23.Initialize("sgg_23", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_23,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_23.isShrinkable, true);
+						AE(sgg_23.isExpandable, true);
+						AssertSGCounts(sgg_23, 0, 0, 0);
+				/*	sgg_24	*/
+					sggGO_24 = new GameObject("sgg_24GO");
+					sgg_24 = sggGO_24.AddComponent<SlotGroup>();
+					sgg_24.Initialize("sgg_24", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_24,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_24.isShrinkable, true);
+						AE(sgg_24.isExpandable, true);
+						AssertSGCounts(sgg_24, 0, 0, 0);
+				/*	sgg_2511	*/
+					sggGO_2511 = new GameObject("sgg_2511GO");
+					sgg_2511 = sggGO_2511.AddComponent<SlotGroup>();
+					sgg_2511.Initialize("sgg_2511", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_2511,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_2511.isShrinkable, true);
+						AE(sgg_2511.isExpandable, true);
+						AssertSGCounts(sgg_2511, 0, 0, 0);
+				/*	sgg_2512	*/
+					sggGO_2512 = new GameObject("sgg_2512GO");
+					sgg_2512 = sggGO_2512.AddComponent<SlotGroup>();
+					sgg_2512.Initialize("sgg_2512", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_2512,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_2512.isShrinkable, true);
+						AE(sgg_2512.isExpandable, true);
+						AssertSGCounts(sgg_2512, 0, 0, 0);
+				/*	sgg_2521	*/
+					sggGO_2521 = new GameObject("sgg_2521GO");
+					sgg_2521 = sggGO_2521.AddComponent<SlotGroup>();
+					sgg_2521.Initialize("sgg_2521", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_2521,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_2521.isShrinkable, true);
+						AE(sgg_2521.isExpandable, true);
+						AssertSGCounts(sgg_2521, 0, 0, 0);
+				/*	sgg_2522	*/
+					sggGO_2522 = new GameObject("sgg_2522GO");
+					sgg_2522 = sggGO_2522.AddComponent<SlotGroup>();
+					sgg_2522.Initialize("sgg_2522", SlotGroup.NullFilter, genInv, true, 0, SlotGroup.emptyCommand, SlotGroup.emptyCommand);
+						ASSG(sgg_2522,
+							SGDeactivated, SGDeactivated, null,
+							SGWFA, SGWFA, null, false);
+						AE(sgg_2522.isShrinkable, true);
+						AE(sgg_2522.isExpandable, true);
+						AssertSGCounts(sgg_2522, 0, 0, 0);
 		/*	SBs	*/
 			defBowA_p = sgpAll.GetSB(defBowA);
 			defBowB_p = sgpAll.GetSB(defBowB);
@@ -529,18 +625,44 @@ public class SlottableTest{
 				SlotSystemBundle poolBundle = pBunGO.AddComponent<SlotSystemBundle>();
 				poolBundle.Initialize("pBundle", pBunEles);
 				poolBundle.SetFocusedBundleElement(sgpAll);
-			/*	generic page	*/
-				IEnumerable<SlotSystemElement> gPageElements = new SlotSystemElement[]{sggA, sggB};
-				GameObject gPageGO = new GameObject("gPageGO");
-				GenericPage gPageA = gPageGO.AddComponent<GenericPage>();
-				gPageA.Initialize(gPageElements);
+			/*	generic pages	*/
+				/*	gPag_11	*/
+					IEnumerable<SlotSystemElement> gPagEles_11 = new SlotSystemElement[]{sgg_111, sgg_112};
+					GameObject gPageGO_11 = new GameObject("gPageGO_11");
+					GenericPage gPage_11 = gPageGO_11.AddComponent<GenericPage>();
+					gPage_11.Initialize("gPage_11", gPagEles_11);
+				/*	gPag_251	*/
+					IEnumerable<SlotSystemElement> gPagEles_251 = new SlotSystemElement[]{sgg_2511, sgg_2512};
+					GameObject gPageGO_251 = new GameObject("gPageGO_251");
+					GenericPage gPage_251 = gPageGO_251.AddComponent<GenericPage>();
+					gPage_251.Initialize("gPage_251", gPagEles_251);
+				/*	gPag_252	*/
+					IEnumerable<SlotSystemElement> gPagEles_252 = new SlotSystemElement[]{sgg_2521, sgg_2522};
+					GameObject gPageGO_252 = new GameObject("gPageGO_252");
+					GenericPage gPage_252 = gPageGO_252.AddComponent<GenericPage>();
+					gPage_252.Initialize("gPage_252", gPagEles_252);
+				
 			/*	generic bundle	*/
-				IEnumerable<SlotSystemElement> gBungdleElements = new SlotSystemElement[]{gPageA, sggC};
-				GameObject gBunGO = new GameObject("gBunGO");
-				SlotSystemBundle gBundle = gBunGO.AddComponent<SlotSystemBundle>();
-				gBundle.Initialize("gBundle", gBungdleElements);
-				gBundle.SetFocusedBundleElement(gPageA);
-				IEnumerable<SlotSystemBundle> gBundles = new SlotSystemBundle[]{gBundle};
+				/*	gBun_1	*/
+					IEnumerable<SlotSystemElement> gBunEles_1 = new SlotSystemElement[]{gPage_11, sgg_12};
+					GameObject gBunGO_1 = new GameObject("gBunGO_1");
+					SlotSystemBundle gBundle_1 = gBunGO_1.AddComponent<SlotSystemBundle>();
+					gBundle_1.Initialize("gBundle_1", gBunEles_1);
+					gBundle_1.SetFocusedBundleElement(gPage_11);
+				/*	gBun_25	*/
+					IEnumerable<SlotSystemElement> gBunEles_25 = new SlotSystemElement[]{gPage_251, gPage_252};
+					GameObject gBunGO_25 = new GameObject("gBunGO_25");
+					SlotSystemBundle gBundle_25 = gBunGO_25.AddComponent<SlotSystemBundle>();
+					gBundle_25.Initialize("gBundle_25", gBunEles_25);
+					gBundle_25.SetFocusedBundleElement(gPage_251);
+				/*	gBun_2	*/
+					IEnumerable<SlotSystemElement> gBunEles_2 = new SlotSystemElement[]{sgg_21, sgg_22, sgg_23, sgg_24, gBundle_25};
+					GameObject gBunGO_2 = new GameObject("gBunGO_2");
+					SlotSystemBundle gBundle_2 = gBunGO_2.AddComponent<SlotSystemBundle>();
+					gBundle_2.Initialize("gBundle_2", gBunEles_2);
+					gBundle_2.SetFocusedBundleElement(sgg_21);
+			/*	generic Bundles	*/
+				IEnumerable<SlotSystemBundle> gBundles = new SlotSystemBundle[]{gBundle_1, gBundle_2};
 			
 		ssm.Initialize(poolBundle, equipBundle, gBundles);
 			AssertSlotSystemSSMSetRight(ssm);
@@ -552,6 +674,7 @@ public class SlottableTest{
 			AssertInitialize();
 		ssm.Activate();
 		AssertFocused();
+		// PrintSystemHierarchyDetailed(ssm);
 		// AssertInitiallyFocusedBundles();
 	}
 	public void PrintHierarchySimple(SlotSystemElement ele){
@@ -577,11 +700,6 @@ public class SlottableTest{
 	public void TestAll(){
 		// PrintSystemHierarchySimple(sgm.rootPage);
 		// PrintSystemHierarchyDetailed(sgm.rootPage);
-		//	not gonna use on the second thought
-			// TestReorderInOtherAll();
-			// TestInsertAll();//	later
-		//	not testable for now
-			// TestPickUpTransitionOnAll(); //revisit after stack
 		// done
 			// CheckShrinkableAndExpandableOnAllSGs();
 			// CheckPickcableOnAllSB();
@@ -602,6 +720,7 @@ public class SlottableTest{
 			// AssertInitialize();
 			// TestSGECorrespondence();
 			// TestSlotSystemActivateDeactivate();
+			// TestFindAndFocusElement();
 			/*	TAs	*/
 				TestVolSortOnAll();
 				TestRevertOnAllSBs();
@@ -611,6 +730,31 @@ public class SlottableTest{
 		// TestAddAndRemoveAll();
 		// TestSGGeneric();
 	}
+	public void TestFindAndFocusElement(){
+		ssm.PerformInHierarchy(AssertFocusInBundle);
+	}
+		public void AssertFocusInBundle(SlotSystemElement target){
+			ssm.FindAndFocusInBundle(target);
+			SlotSystemBundle rootBundle = null;
+			rootBundle = target.immediateBundle;
+			if(rootBundle != null){
+				while(true){
+					if(rootBundle.immediateBundle == null)
+						break;
+					rootBundle = rootBundle.immediateBundle;
+				}
+					rootBundle.PerformInHierarchy(AssertDefocusedIfNotContainInHierarchy, target);
+			}
+		}
+			public void AssertDefocusedIfNotContainInHierarchy(SlotSystemElement ele, object obj){
+				if(!(ele is SlotGroup || ele is Slottable)){
+					SlotSystemElement target = (SlotSystemElement)obj;
+					foreach(SlotSystemElement e in ele){
+						if(!(ele.ContainsInHierarchy(target) || ele == target))
+							AssertDefocusedSelfAndBelow(ele);
+					}
+				}
+			}
 	public void AssertContainInHierarchy(){
 		SlotSystemBundle pBun = ssm.poolBundle;
 		ANotNull(pBun);
@@ -1525,7 +1669,7 @@ public class SlottableTest{
 		}
 		public void AssertBundlesPagesAndSGsMembership(){
 			ANotNull(ssm);
-			AE(ssm.allSGs.Count, 11);
+			AE(ssm.allSGs.Count, 19);
 				AB(ssm.allSGs.Contains(sgpAll), true);
 				AB(ssm.allSGs.Contains(sgpBow), true);
 				AB(ssm.allSGs.Contains(sgpWear), true);
@@ -1534,16 +1678,25 @@ public class SlottableTest{
 				AB(ssm.allSGs.Contains(sgeBow), true);
 				AB(ssm.allSGs.Contains(sgeWear), true);
 				AB(ssm.allSGs.Contains(sgeCGears), true);
-				AB(ssm.allSGs.Contains(sggA), true);
-				AB(ssm.allSGs.Contains(sggB), true);
-				AB(ssm.allSGs.Contains(sggC), true);
-			AE(ssm.focusedSGs.Count, 6);
+				AB(ssm.allSGs.Contains(sgg_12), true);
+				AB(ssm.allSGs.Contains(sgg_111), true);
+				AB(ssm.allSGs.Contains(sgg_112), true);
+				AB(ssm.allSGs.Contains(sgg_21), true);
+				AB(ssm.allSGs.Contains(sgg_22), true);
+				AB(ssm.allSGs.Contains(sgg_23), true);
+				AB(ssm.allSGs.Contains(sgg_24), true);
+				AB(ssm.allSGs.Contains(sgg_2511), true);
+				AB(ssm.allSGs.Contains(sgg_2512), true);
+				AB(ssm.allSGs.Contains(sgg_2521), true);
+				AB(ssm.allSGs.Contains(sgg_2522), true);
+			AE(ssm.focusedSGs.Count, 7);
 				AB(ssm.focusedSGs.Contains(sgpAll), true);
 				AB(ssm.focusedSGs.Contains(sgeBow), true);
 				AB(ssm.focusedSGs.Contains(sgeWear), true);
 				AB(ssm.focusedSGs.Contains(sgeCGears), true);
-				AB(ssm.focusedSGs.Contains(sggA), true);
-				AB(ssm.focusedSGs.Contains(sggB), true);
+				AB(ssm.focusedSGs.Contains(sgg_111), true);
+				AB(ssm.focusedSGs.Contains(sgg_112), true);
+				AB(ssm.focusedSGs.Contains(sgg_21), true);
 			/*	pool	*/
 			ANotNull(ssm.poolBundle);
 			AE(ssm.allSGPs.Count, 5);
@@ -1594,26 +1747,67 @@ public class SlottableTest{
 			AB(sgeWear.isSGG, false);
 			AB(sgeCGears.isSGG, false);
 			/*	generic	*/
-			ANotNull(ssm.otherBundles);
-			AE(ssm.allSGGs.Count, 3);
-				AB(ssm.allSGGs.Contains(sggA), true);
-				AB(ssm.allSGGs.Contains(sggB), true);
-				AB(ssm.allSGGs.Contains(sggC), true);
-			AE(ssm.focusedSGGs.Count, 2);
-				AB(ssm.focusedSGGs.Contains(sggA), true);
-				AB(ssm.focusedSGGs.Contains(sggB), true);
-			AE(sggA.parent.GetType(), typeof(GenericPage));
-			AE(sggB.parent.GetType(), typeof(GenericPage));
-			AE(sggC.parent, new List<SlotSystemBundle>(ssm.otherBundles)[0]);
-			AB(sggA.isPool, false);
-			AB(sggB.isPool, false);
-			AB(sggC.isPool, false);
-			AB(sggA.isSGE, false);
-			AB(sggB.isSGE, false);
-			AB(sggC.isSGE, false);
-			AB(sggA.isSGG, true);
-			AB(sggB.isSGG, true);
-			AB(sggC.isSGG, true);
+				ANotNull(ssm.otherBundles);
+				AE(ssm.allSGGs.Count, 11);
+					AB(ssm.allSGGs.Contains(sgg_111), true);
+					AB(ssm.allSGGs.Contains(sgg_112), true);
+					AB(ssm.allSGGs.Contains(sgg_12), true);
+					AB(ssm.allSGGs.Contains(sgg_21), true);
+					AB(ssm.allSGGs.Contains(sgg_22), true);
+					AB(ssm.allSGGs.Contains(sgg_23), true);
+					AB(ssm.allSGGs.Contains(sgg_24), true);
+					AB(ssm.allSGGs.Contains(sgg_2511), true);
+					AB(ssm.allSGGs.Contains(sgg_2512), true);
+					AB(ssm.allSGGs.Contains(sgg_2521), true);
+					AB(ssm.allSGGs.Contains(sgg_2522), true);
+				AE(ssm.focusedSGGs.Count, 3);
+					AB(ssm.focusedSGGs.Contains(sgg_111), true);
+					AB(ssm.focusedSGGs.Contains(sgg_112), true);
+					AB(ssm.focusedSGGs.Contains(sgg_21), true);
+				AE(sgg_111.parent.eName, Util.Bold("gPage_11"));
+				AE(sgg_112.parent.eName, Util.Bold("gPage_11"));
+				AE(sgg_12.parent.eName, Util.Bold("gBundle_1"));
+				AE(sgg_21.parent.eName, Util.Bold("gBundle_2"));
+				AE(sgg_22.parent.eName, Util.Bold("gBundle_2"));
+				AE(sgg_23.parent.eName, Util.Bold("gBundle_2"));
+				AE(sgg_24.parent.eName, Util.Bold("gBundle_2"));
+				AE(sgg_2511.parent.eName, Util.Bold("gPage_251"));
+				AE(sgg_2512.parent.eName, Util.Bold("gPage_251"));
+				AE(sgg_2521.parent.eName, Util.Bold("gPage_252"));
+				AE(sgg_2522.parent.eName, Util.Bold("gPage_252"));
+				AB(sgg_111.isPool, false);
+				AB(sgg_112.isPool, false);
+				AB(sgg_12.isPool, false);
+				AB(sgg_21.isPool, false);
+				AB(sgg_22.isPool, false);
+				AB(sgg_23.isPool, false);
+				AB(sgg_24.isPool, false);
+				AB(sgg_2511.isPool, false);
+				AB(sgg_2512.isPool, false);
+				AB(sgg_2521.isPool, false);
+				AB(sgg_2522.isPool, false);
+				AB(sgg_111.isSGE, false);
+				AB(sgg_112.isSGE, false);
+				AB(sgg_12.isSGE, false);
+				AB(sgg_21.isSGE, false);
+				AB(sgg_22.isSGE, false);
+				AB(sgg_23.isSGE, false);
+				AB(sgg_24.isSGE, false);
+				AB(sgg_2511.isSGE, false);
+				AB(sgg_2512.isSGE, false);
+				AB(sgg_2521.isSGE, false);
+				AB(sgg_2522.isSGE, false);
+				AB(sgg_111.isSGG, true);
+				AB(sgg_112.isSGG, true);
+				AB(sgg_12.isSGG, true);
+				AB(sgg_21.isSGG, true);
+				AB(sgg_22.isSGG, true);
+				AB(sgg_23.isSGG, true);
+				AB(sgg_24.isSGG, true);
+				AB(sgg_2511.isSGG, true);
+				AB(sgg_2512.isSGG, true);
+				AB(sgg_2521.isSGG, true);
+				AB(sgg_2522.isSGG, true);
 		}
 		public void AssertSBsMembership(){
 			foreach(Slottable sbp in sbpList){
@@ -1695,7 +1889,7 @@ public class SlottableTest{
 			PrintTestResult(null);
 			}
 			public void CrossTestSwap(Slottable sb, bool isPAS){
-				CrossTestSGs(TestSwap, sb, isPAS);
+				CrossTestSGPAndSGE(TestSwap, sb, isPAS);
 				origSGCache = null;
 			}
 			public void TestSwap(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
@@ -1732,7 +1926,7 @@ public class SlottableTest{
 			PerformOnAllSBs(CrossTestFill);
 			PrintTestResult(null);
 			}public void CrossTestFill(Slottable sb, bool isPAS){
-				CrossTestSGs(TestFill, sb, isPAS);
+				CrossTestSGPAndSGE(TestFill, sb, isPAS);
 				origSGCache = null;
 			}
 			public void TestFill(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
@@ -1811,7 +2005,7 @@ public class SlottableTest{
 			PrintTestResult(null);
 			}
 			public void CrossTestReorder(Slottable testSB, bool isPAS){
-				CrossTestSGs(TestReorder, testSB ,isPAS);
+				CrossTestSGPAndSGE(TestReorder, testSB ,isPAS);
 			}
 			public void TestReorder(SlotGroup targetSG, Slottable testSB, bool isPAS, bool isTAS){
 				if(testSB.isPickable){
@@ -1833,7 +2027,7 @@ public class SlottableTest{
 			PrintTestResult(null);
 			}
 			public void CrossTestRevert(Slottable pickedSB, bool isPAS){
-				CrossTestSGs(TestRevert, pickedSB, isPAS);
+				CrossTestSGPAndSGE(TestRevert, pickedSB, isPAS);
 			}
 			public void TestRevert(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
 				if(testSB.isPickable){
@@ -2195,7 +2389,7 @@ public class SlottableTest{
 			PerformOnAllSBs(CheckTransactionWithSB);
 			PrintTestResult(null);
 			}public void CheckTransactionWithSB(Slottable sb, bool isPickedAS){
-				CrossTestSGs(CrossCheckTransactionWithSB, sb, isPickedAS);
+				CrossTestSGPAndSGE(CrossCheckTransactionWithSB, sb, isPickedAS);
 			}
 			public void CrossCheckTransactionWithSB(SlotGroup sg, Slottable pickedSB, bool isPickedAS, bool isTargetAS){
 				if(pickedSB.isPickable){
@@ -2221,7 +2415,7 @@ public class SlottableTest{
 			PerformOnAllSBs(CrossCheckSwappable);
 			PrintTestResult(0.ToString());
 			}public void CrossCheckSwappable(Slottable sb, bool isPickedAS){
-				CrossTestSGs(CheckSwappable, sb, isPickedAS);
+				CrossTestSGPAndSGE(CheckSwappable, sb, isPickedAS);
 			}
 			public void CheckSwappable(SlotGroup sg, Slottable sb, bool isPickedAS ,bool isTargetAS){
 				int count = sg.SwappableSBs(sb).Count;
@@ -2232,7 +2426,7 @@ public class SlottableTest{
 				PerformOnAllSBs(CrossCheckTransaction);
 				PrintTestResult(null);
 				}public void CrossCheckTransaction(Slottable sb, bool isPickedAS){
-					CrossTestSGs(CheckTransaction, sb, isPickedAS);
+					CrossTestSGPAndSGE(CheckTransaction, sb, isPickedAS);
 				}
 				public void CheckTransaction(SlotGroup sg, Slottable sb, bool isPAS ,bool isTAS){
 					if(sb.isPickable){
@@ -2283,58 +2477,30 @@ public class SlottableTest{
 			return result;
 		}
 		public void PerformOnAllSBs(System.Action<Slottable, bool> act){
-			foreach(SlotGroup sgp in ssm.allSGPs){
-				ssm.SetFocusedPoolSG(sgp);
-				sgp.ToggleAutoSort(true);
-				foreach(Slottable sb in sgp){
-					if(sb != null){
+			foreach(SlotGroup sg in ssm.allSGs){
+				ssm.FindAndFocusInBundle(sg);
+				sg.ToggleAutoSort(true);
+				foreach(Slottable sb in sg.toList){
+					if(sb != null)
 						act(sb, true);
-					}
 				}
-				sgp.ToggleAutoSort(false);
-				foreach(Slottable sb in sgp){
-					if(sb != null){
+				sg.ToggleAutoSort(false);
+				foreach(Slottable sb in sg.toList){
+					if(sb != null)
 						act(sb, false);
-					}
-				}
-			}
-			foreach(EquipmentSet eSet in ssm.equipmentSets){
-				ssm.SetFocusedEquipmentSet(eSet);
-				foreach(SlotGroup sge in ssm.focusedSGEs){
-					sge.ToggleAutoSort(true);
-					foreach(Slottable sb in sge){
-						if(sb != null){
-							act(sb, true);
-						}
-					}
-					sge.ToggleAutoSort(false);
-					foreach(Slottable sb in sge){
-						if(sb != null){
-							act(sb, false);
-						}
-					}
 				}
 			}
 		}
 		public void PerformOnAllSGAfterFocusing(System.Action<SlotGroup, bool> act){
-			foreach(SlotGroup sgp in ssm.allSGPs){
-				ssm.SetFocusedPoolSG(sgp);
-				sgp.ToggleAutoSort(true);
-				act(sgp, true);
-				sgp.ToggleAutoSort(false);
-				act(sgp, false);
-			}
-			foreach(EquipmentSet eSet in ssm.equipmentSets){
-				ssm.SetFocusedEquipmentSet(eSet);
-				foreach(SlotGroup sge in ssm.focusedSGEs){
-					sge.ToggleAutoSort(true);
-					act(sge, true);
-					sge.ToggleAutoSort(false);
-					act(sge, false);
-				}
+			foreach(SlotGroup sg in ssm.allSGs){
+				ssm.FindAndFocusInBundle(sg);
+				sg.ToggleAutoSort(true);
+				act(sg, true);
+				sg.ToggleAutoSort(false);
+				act(sg, false);
 			}
 		}
-		public void CrossTestSGs(System.Action<SlotGroup, Slottable, bool, bool> act, Slottable sb, bool isPickedAS){
+		public void CrossTestSGPAndSGE(System.Action<SlotGroup, Slottable, bool, bool> act, Slottable sb, bool isPickedAS){
 			if(sb.sg.isPool){
 				act(sb.sg, sb, isPickedAS, isPickedAS);
 				foreach(EquipmentSet eSet in ssm.equipmentSets){
@@ -2506,7 +2672,7 @@ public class SlottableTest{
 			PrintTestResult(null);
 			}
 			public void CrossTestSwapShortcut(Slottable sb, bool isPAS){
-				CrossTestSGs(TestSwapShortcut, sb, isPAS);
+				CrossTestSGPAndSGE(TestSwapShortcut, sb, isPAS);
 				origSGCache = null;
 			}
 			public void TestSwapShortcut(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
@@ -2674,7 +2840,7 @@ public class SlottableTest{
 				PrintTestResult(null);
 			}
 			public void CrossTestFillShortcut(Slottable sb, bool isPAS){
-				CrossTestSGs(TestFillShortcut, sb, isPAS);
+				CrossTestSGPAndSGE(TestFillShortcut, sb, isPAS);
 				origSGCache = null;
 			}
 			public void TestFillShortcut(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
