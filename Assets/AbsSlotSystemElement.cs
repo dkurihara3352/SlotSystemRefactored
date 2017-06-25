@@ -161,6 +161,48 @@ namespace SlotSystem{
 					return parent.level + 1;
 				}
 			}
+			public bool isBundleElement{
+				get{
+					return parent is SlotSystemBundle;
+				}
+			}
+			public bool isPageElement{
+				get{
+					return parent is SlotSystemPage;
+				}
+			}
+			public bool isToggledOn{
+				get{
+					if(isPageElement){
+						SlotSystemPage page = (SlotSystemPage)parent;
+						return page.GetPageElement(this).isFocusToggleOn;
+					}
+					return false;
+				}
+			}
+			public virtual bool isFocused{
+				get{return curSelState == AbsSlotSystemElement.focusedState;}
+			}
+			public virtual bool isDefocused{
+				get{return curSelState == AbsSlotSystemElement.defocusedState;}
+			}
+			public virtual bool isDeactivated{
+				get{return curSelState == AbsSlotSystemElement.deactivatedState;}
+			}
+			public bool isFocusedInHierarchy{
+				get{
+					SlotSystemElement inspected = this;
+					while(true){
+						if(inspected　== null)
+							break;
+						if(inspected.isFocused)
+							inspected = inspected.parent;
+						else
+							return false;
+					}
+					return true;
+				}
+			}
 		/*	methods	*/
 			public void Initialize(){
 				SetSelState(AbsSlotSystemElement.deactivatedState);
@@ -229,6 +271,14 @@ namespace SlotSystem{
 						return true;
 				}
 				return false;
+			}
+			public void ToggleOnPageElement(){
+				if(isPageElement){
+					SlotSystemPage page = (SlotSystemPage)parent;
+					SlotSystemPageElement pageEle = page.GetPageElement(this);
+					if(!pageEle.isFocusToggleOn)
+						pageEle.isFocusToggleOn = true;
+				}
 			}
 			public void InstantGreyout(){}
 			public void InstantGreyin(){}

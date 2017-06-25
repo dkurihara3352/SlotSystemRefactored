@@ -316,6 +316,16 @@ namespace SlotSystem{
 				public void SetInitSlotsCount(int i){
 					m_initSlotsCount = i;
 				}
+		//
+			public override bool isFocused{
+				get{return curSelState == SlotGroup.sgFocusedState;}
+			}
+			public override bool isDefocused{
+				get{return curSelState == SlotGroup.sgDefocusedState;}
+			}
+			public override bool isDeactivated{
+				get{return curSelState == SlotGroup.sgDeactivatedState;}
+			}
 		/*	commands methods	*/
 			public void InitializeItems(){
 				m_initItemsCommand.Execute(this);

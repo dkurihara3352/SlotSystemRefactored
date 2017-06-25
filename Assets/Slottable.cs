@@ -286,8 +286,14 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public bool isFocused{
+			public override bool isFocused{
 				get{return curSelState == Slottable.sbFocusedState;}
+			}
+			public override bool isDefocused{
+				get{return curSelState == Slottable.sbDefocusedState;}
+			}
+			public override bool isDeactivated{
+				get{return curSelState == Slottable.sbDeactivatedState;}
 			}
 			public bool isPickedUp{
 				get{

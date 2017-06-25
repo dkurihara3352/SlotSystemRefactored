@@ -1630,6 +1630,13 @@ namespace SlotSystem{
 				void InstantGreyout();
 				void InstantHighlight();
 				string eName{get;}
+				bool isBundleElement{get;}
+				bool isPageElement{get;}
+				bool isToggledOn{get;}
+				bool isFocused{get;}
+				bool isDefocused{get;}
+				bool isDeactivated{get;}
+				bool isFocusedInHierarchy{get;}
 				void Activate();
 				void Deactivate();
 				void Focus();
@@ -1646,6 +1653,7 @@ namespace SlotSystem{
 				int level{get;}
 				bool Contains(SlotSystemElement element);
 				SlotSystemElement this[int i]{get;}
+				void ToggleOnPageElement();
 			}
 			public class SlotSystemPageElement{
 				public SlotSystemElement element{
@@ -1658,9 +1666,10 @@ namespace SlotSystem{
 					get{return m_isFocusToggleOn;}
 					set{m_isFocusToggleOn = value;}
 					}bool m_isFocusToggleOn;
-				public SlotSystemPageElement(SlotSystemElement element, bool isFocusedOnActivate){
+				public SlotSystemPageElement(SlotSystemElement element, bool isFocusToggleOn){
 					m_element = element;
-					m_isFocusedOnActivate = isFocusedOnActivate;
+					m_isFocusToggleOn = isFocusToggleOn;
+					m_isFocusedOnActivate = isFocusToggleOn;				
 				}
 			}
 			public interface TransactionManager{
@@ -2165,21 +2174,21 @@ namespace SlotSystem{
 			/*	SSE	*/
 				public static string SSEDebug(SlotSystemElement sse){
 					string res = "";
-					string prevSel = SSEStateName(sse.prevSelState);
+					string prevSel = SSEStateNamePlain(sse.prevSelState);
 					string curSel = SSEStateName(sse.curSelState);
 					string selProc;
 						if(sse.selProcess == null)
 							selProc = "";
 						else
 							selProc = SSEProcessName(sse.selProcess) + " running? " + (sse.selProcess.isRunning?Blue("true"):Red("false"));
-					string prevAct = SSEStateName(sse.prevActState);
+					string prevAct = SSEStateNamePlain(sse.prevActState);
 					string curAct = SSEStateName(sse.curActState);
 					string actProc;
 						if(sse.actProcess == null)
 							actProc = "";
 						else
-							actProc = SSEProcessName(sse.actProcess) + " running? " + (sse.actProcess.isRunning?Blue("true"):Red("false"));
-					res = Bold("DebugTarget: ") + 
+							actProc = SSEProcessName(sse.actProcess) + " running " + (sse.actProcess.isRunning?Blue("true"):Red("false"));
+					res =
 						sse.eName + " " +
 						Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
 							" proc, " + selProc + ", " +
@@ -2203,14 +2212,30 @@ namespace SlotSystem{
 					}
 					return res;
 				}
+				public static string SSEStateNamePlain(SSEState state){
+					string res = "";
+
+					if(state is SSEDeactivatedState){
+						res = "SSEDeactivated";
+					}else if(state is SSEDefocusedState){
+						res = "SSEDefocused";
+					}else if(state is SSEFocusedState){
+						res = "SSEFocused";
+					}else if(state is SSESelectedState){
+						res = "SSESelected";
+					}else if(state is SSEWaitForActionState){
+						res = "SSEWFA";
+					}
+					return res;
+				}
 				public static string SSEProcessName(SSEProcess process){
 					string res = "";
 					if(process is SSEGreyinProcess)
-						res = Util.Red("Greyin");
+						res = Util.Blue("Greyin");
 					else if(process is SSEGreyoutProcess)
-						res = Util.Blue("Greyout");
+						res = Util.Green("Greyout");
 					else if(process is SSEHighlightProcess)
-						res = Util.Green("Highlight");
+						res = Util.Red("Highlight");
 					else if(process is SSEDehighlightProcess)
 						res = Util.Brown("Dehighlight");
 					return res;
@@ -2230,6 +2255,22 @@ namespace SlotSystem{
 						res = Util.Ciel("Probing");
 					else if(state is SSMTransactionState)
 						res = Util.Terra("Transaction");
+					return res;
+				}
+				public static string SSMStateNamePlain(SSMState state){
+					string res = "";
+					if(state is SSMDeactivatedState)
+						res = "Deactivated";
+					else if(state is SSMDefocusedState)
+						res = "Defocused";
+					else if(state is SSMFocusedState)
+						res = "Focused";
+					else if(state is SSMWaitForActionState)
+						res = "WaitForAction";
+					else if(state is SSMProbingState)
+						res = "Probing";
+					else if(state is SSMTransactionState)
+						res = "Transaction";
 					return res;
 				}
 				public static string TransactionName(SlotSystemTransaction ta){
@@ -2266,7 +2307,9 @@ namespace SlotSystem{
 					string res = "";
 					string pSB = Util.SBofSG(ssm.pickedSB);
 					string tSB = Util.SBofSG(ssm.targetSB);
-					string hSG = ssm.hoveredSG.eName;
+					string hSG = "";
+						if(ssm.hoveredSG == null) hSG = "null";
+						else hSG = ssm.hoveredSG.eName;
 					string hSB = Util.SBofSG(ssm.hoveredSB);
 					string di1;
 						if(ssm.dIcon1 == null)
@@ -2279,16 +2322,16 @@ namespace SlotSystem{
 						else
 							di2 = Util.SBofSG(ssm.dIcon2.sb);
 					
-					string sg1 = ssm.sg1.eName;
-					string sg2 = ssm.sg2.eName;
-					string prevSel = Util.SSMStateName((SSMSelState)ssm.prevSelState);
+					string sg1 = ssm.sg1 == null?"null":ssm.sg1.eName;
+					string sg2 = ssm.sg2 == null?"null":ssm.sg2.eName;
+					string prevSel = Util.SSMStateNamePlain((SSMSelState)ssm.prevSelState);
 					string curSel = Util.SSMStateName((SSMSelState)ssm.curSelState);
 					string selProc;
 						if(ssm.selProcess == null)
 							selProc = "";
 						else
 							selProc = Util.SSMProcessName((SSMSelProcess)ssm.selProcess) + " running? " + (ssm.selProcess.isRunning?Blue("true"):Red("false"));
-					string prevAct = Util.SSMStateName((SSMActState)ssm.prevActState);
+					string prevAct = Util.SSMStateNamePlain((SSMActState)ssm.prevActState);
 					string curAct = Util.SSMStateName((SSMActState)ssm.curActState);
 					string actProc;
 						if((SSMActProcess)ssm.actProcess == null)
@@ -2300,7 +2343,7 @@ namespace SlotSystem{
 					string d2Done = "d2Done: " + (ssm.dIcon2Done?Util.Blue("true"):Util.Red("false"));
 					string sg1Done = "sg1Done: " + (ssm.sg1Done?Util.Blue("true"):Util.Red("false"));
 					string sg2Done = "sg2Done: " + (ssm.sg2Done?Util.Blue("true"):Util.Red("false"));
-					res = Bold("DebugTarget: ") + Util.Bold("SSM:") +
+					res = Util.Bold("SSM:") +
 							" pSB " + pSB +
 							", tSB " + tSB +
 							", hSG " + hSG +
@@ -2347,14 +2390,43 @@ namespace SlotSystem{
 					}
 					return res;
 				}
+				public static string SGStateNamePlain(SGState state){
+					string res = "";
+					if(state is SGDeactivatedState){
+						res = "SGDeactivated";
+					}else if(state is SGDefocusedState){
+						res = "SGDefocused";
+					}else if(state is SGFocusedState){
+						res = "SGFocused";
+					}else if(state is SGSelectedState){
+						res = "SGSelected";
+					}else if(state is SGWaitForActionState){
+						res = "SGWFA";
+					}else if(state is SGRevertState){
+						res = "SGRevert";
+					}else if(state is SGReorderState){
+						res = "SGReorder";
+					}else if(state is SGFillState){
+						res = "SGFill";
+					}else if(state is SGSwapState){
+						res = "SGSwap";
+					}else if(state is SGAddState){
+						res = "SGAdd";
+					}else if(state is SGRemoveState){
+						res = "SGRemove";
+					}else if(state is SGSortState){
+						res = "SGSort";
+					}
+					return res;
+				}
 				public static string SGProcessName(SGProcess proc){
 					string res = "";
 					if(proc is SGGreyinProcess)
-						res = Util.Red("Greyin");
+						res = Util.Blue("Greyin");
 					else if(proc is SGGreyoutProcess)
-						res = Util.Blue("Greyout");
+						res = Util.Green("Greyout");
 					else if(proc is SGHighlightProcess)
-						res = Util.Green("Highlight");
+						res = Util.Red("Highlight");
 					else if(proc is SGDehighlightProcess)
 						res = Util.Brown("Dehighlight");
 					else if(proc is SGTransactionProcess)
@@ -2363,21 +2435,21 @@ namespace SlotSystem{
 				}
 				public static string SGDebug(SlotGroup sg){
 					string res = "";
-					string prevSel = SGStateName((SGSelState)sg.prevSelState);
+					string prevSel = SGStateNamePlain((SGSelState)sg.prevSelState);
 					string curSel = SGStateName((SGSelState)sg.curSelState);
 					string selProc;
 						if(sg.selProcess == null)
 							selProc = "";
 						else
 							selProc = SGProcessName((SGSelProcess)sg.selProcess) + " running? " + (sg.selProcess.isRunning?Blue("true"):Red("false"));
-					string prevAct = SGStateName((SGActState)sg.prevActState);
+					string prevAct = SGStateNamePlain((SGActState)sg.prevActState);
 					string curAct = SGStateName((SGActState)sg.curActState);
 					string actProc;
 						if(sg.actProcess == null)
 							actProc = "";
 						else
 							actProc = SGProcessName((SGActProcess)sg.actProcess) + " running? " + (sg.actProcess.isRunning?Blue("true"):Red("false"));
-					res = Bold("DebugTarget: ") + 
+					res =  
 						sg.eName + " " +
 						Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
 							" proc, " + selProc + ", " +
@@ -2491,14 +2563,50 @@ namespace SlotSystem{
 					}
 					return result;
 				}
+				public static string SBStateNamePlain(SBState state){
+					string result = "";
+					if(state is SBSelState){
+						if(state is SBDeactivatedState)
+							result = "Deactivated";
+						else if(state is SBFocusedState)
+							result = "Focused";
+						else if(state is SBDefocusedState)
+							result = "Defocused";
+						else if(state is SBSelectedState)
+							result = "Selected";
+					}else if(state is SBActState){
+						if(state is WaitForActionState)
+							result = "WFAction";
+						else if(state is WaitForPointerUpState)
+							result = "WFPointerUp";
+						else if(state is WaitForPickUpState)
+							result = "WFPickUp";
+						else if(state is WaitForNextTouchState)
+							result = "WFNextTouch";
+						else if(state is PickedUpState)
+							result = "PickedUp";
+						else if(state is SBRemovedState)
+							result = "Removed";
+						else if(state is SBAddedState)
+							result = "Added";
+						else if(state is SBMoveWithinState)
+							result = "MoveWithin";
+					}else if(state is SBEqpState){
+						if(state is SBEquippedState)
+							result = "Equipped";
+						else if(state is SBUnequippedState)
+							result = "Unequipped";
+					}
+					return result;
+				}
 				public static string SBProcessName(SBProcess process){
 					string res = "";
 					if(process is SBGreyoutProcess)
-						res = Red("Greyout");
+						res = Green("Greyout");
 					else if(process is SBGreyinProcess)
 						res = Blue("Greyin");
 					else if(process is SBHighlightProcess)
-						res = Green("Highlight");
+						res = Red("Highlight");
 					else if(process is SBDehighlightProcess)
 						res = Ciel("Dehighlight");
 					else if(process is WaitForPointerUpProcess)
@@ -2527,28 +2635,28 @@ namespace SlotSystem{
 						res = "null";
 					else{	
 						string sbName = SBofSG(sb);
-						string prevSel = SBStateName((SBSelState)sb.prevSelState);
+						string prevSel = SBStateNamePlain((SBSelState)sb.prevSelState);
 						string curSel = SBStateName((SBSelState)sb.curSelState);
 						string selProc;
 							if(sb.selProcess == null)
 								selProc = "";
 							else
 								selProc = SBProcessName((SBSelProcess)sb.selProcess) + " running? " + (sb.selProcess.isRunning?Blue("true"):Red("false"));
-						string prevAct = SBStateName((SBActState)sb.prevActState);
+						string prevAct = SBStateNamePlain((SBActState)sb.prevActState);
 						string curAct = SBStateName((SBActState)sb.curActState);
 						string actProc;
 							if(sb.actProcess == null)
 								actProc = "";
 							else
 								actProc = SBProcessName((SBActProcess)sb.actProcess) + " running? " + (sb.actProcess.isRunning?Blue("true"):Red("false"));
-						string prevEqp = SBStateName((SBEqpState)sb.PrevEqpState);
+						string prevEqp = SBStateNamePlain((SBEqpState)sb.PrevEqpState);
 						string curEqp = SBStateName((SBEqpState)sb.CurEqpState);
 						string eqpProc;
 							if(sb.eqpProcess == null)
 								eqpProc = "";
 							else
 								eqpProc = SBProcessName((SBEqpProcess)sb.eqpProcess) + " running? " + (sb.eqpProcess.isRunning?Blue("true"):Red("false"));
-						res = Bold("DebugTarget: ") + sbName + ": " +
+						res = sbName + ": " +
 							Bold("Sel ") + " from " + prevSel + " to " + curSel + " proc " + selProc + ", " + 
 							Bold("Act ") + " from " + prevAct + " to " + curAct + " proc " + actProc + ", " + 
 							Bold("Eqp ") + " from " + prevEqp + " to " + curEqp + " proc " + eqpProc + ", " +

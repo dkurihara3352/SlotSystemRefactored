@@ -691,16 +691,12 @@ public class SlottableTest{
 			AssertSBsMembership();
 			AssertInitialize();
 		ssm.Activate();
-		// AssertFocused();
-		// AssertFocusInBundle(gBundle_25);
-		ssm.TogglePageElementFocus(gBundle_2, true);
-		ssm.TogglePageElementFocus(gBundle_2, false);
-		ssm.TogglePageElementFocus(gBundle_1, false);
+		AssertFocused();
 		PrintSystemHierarchyDetailed(ssm);
-		// AssertInitiallyFocusedBundles();
 	}
 	[Test]
 	public void TestAll(){
+		// TestPointFocusAll();
 		// PrintSystemHierarchySimple(sgm.rootPage);
 		// PrintSystemHierarchyDetailed(sgm.rootPage);
 		// done
@@ -733,6 +729,13 @@ public class SlottableTest{
 		// TestAddAndRemoveAll();
 		// TestSGGeneric();
 	}
+	public void TestPointFocusAll(){
+		ssm.PerformInHierarchy(TestPointFocus);
+		}
+		public void TestPointFocus(SlotSystemElement element){
+			ssm.PointFocus(element);
+			AssertFocused();
+		}
 	/*	SlotSystem testing*/
 		public void PrintHierarchySimple(SlotSystemElement ele){
 			ele.PerformInHierarchy(PrintElementsReallySimply);
@@ -1157,12 +1160,16 @@ public class SlottableTest{
 			}
 		}
 		public void AssertDefocusedSelfAndBelow(SlotSystemElement ele){
-			if(ele is SlotGroup){
-				ASGSelState((SlotGroup)ele, null, SGDefocused, null);
-			}else if(ele is Slottable){
-				ASBSelState((Slottable)ele, null, SBDefocused, null);
-			}
+			// if(ele is SlotGroup){
+			// 	ASGSelState((SlotGroup)ele, null, SGDefocused, null);
+			// }else if(ele is Slottable){
+			// 	ASBSelState((Slottable)ele, null, SBDefocused, null);
+			// }
+			ele.PerformInHierarchy(AssertDefocusedDown);
 		}
+			public void AssertDefocusedDown(SlotSystemElement element){
+				AB(element.isDefocused, true);
+			}
 		public void AssertSlotSystemSSMSetRight(SlotSystemManager ssm){
 			AE(ssm.ssm, ssm);
 			AE(ssm.poolBundle.ssm, ssm);
@@ -1221,6 +1228,8 @@ public class SlottableTest{
 				eleName = Util.SGDebug((SlotGroup)ele);
 			else if(ele is Slottable)
 				eleName = Util.SBDebug((Slottable)ele);
+			else if(ele is SlotSystemManager)
+				eleName = Util.SSMDebug((SlotSystemManager)ele);
 			else
 				eleName = Util.SSEDebug(ele);
 			Debug.Log(Indent(ele.level) + eleName);
@@ -3413,22 +3422,77 @@ public class SlottableTest{
 				}
 			}
 			public void AssertFocused(){
-				AssertEquippedOnAll();
-				ASSSM(ssm,
-					null, null, null, null, null, null, null, null,
-					null, SSMFocused, null,
-					null, SSMWFA, null,
-					null, true, true, true, true);
-				foreach(SlotGroup sgp in ssm.allSGPs){
-					ASGReset(sgp);
-					if(sgp == ssm.focusedSGP){
-						ASSG(sgp,
-							null, SGFocused, null,
-							null, SGWFA, null, false);
-						foreach(Slottable sb in sgp){
-							if(sb != null){
-								AE(sb.ssm, ssm);
-								ASBReset(sb);
+				/*	if bundle element
+						AssertFocusedInBundle
+					if page element
+						AssertPageElements
+				*/
+				if(ssm.equipBundle.isToggledOn)
+					AssertEquippedOnAll();
+				ssm.PerformInHierarchy(AssertFocusedInner);
+			}
+				public void AssertFocusedInner(SlotSystemElement element){
+					if(element is SlotSystemManager){
+						ASSSM((SlotSystemManager)element,
+							null, null, null, null, null, null, null, null,
+							null, SSMFocused, null,
+							null, SSMWFA, null,
+							null, true, true, true, true);
+					}else if(element.isPageElement){
+						if(element is SlotGroup)
+							ASGReset((SlotGroup)element);
+						SlotSystemPage parentPage = (SlotSystemPage)element.parent;
+						if(parentPage.isFocusedInHierarchy){
+							SlotSystemPageElement pageElement = parentPage.GetPageElement(element);
+							if(pageElement.isFocusToggleOn){
+								/*	deemed focused	*/
+								AB(element.isFocused, true);
+								if(element is SlotGroup)
+									ASSG((SlotGroup)element,
+										null, SGFocused, null,
+										null, SGWFA, null, false);
+							}else{
+								/*	deemed defocused */
+								AB(element.isDefocused, true);
+								if(element is SlotGroup)
+									ASSG((SlotGroup)element,
+										null, SGDefocused, null,
+										null, SGWFA, null, false);
+							}
+						}else{
+							AssertDefocusedSelfAndBelow(parentPage);
+						}
+					}
+					if(element.isBundleElement){
+						if(element is SlotGroup)
+							ASGReset((SlotGroup)element);
+						SlotSystemBundle parentBundle = (SlotSystemBundle)element.parent;
+						if(parentBundle.isFocusedInHierarchy){
+							if(parentBundle.focusedElement == element){
+								/*	deemed focused	*/
+								AB(element.isFocused, true);
+								if(element is SlotGroup)
+									ASSG((SlotGroup)element,
+										null, SGFocused, null,
+										null, SGWFA, null, false);
+							}else{
+								AB(element.isDefocused, true);
+								/*	defocused	*/
+								if(element is SlotGroup)
+									ASSG((SlotGroup)element,
+										null, SGDefocused, null,
+										null, SGWFA, null, false);
+							}
+						}else{
+							AssertDefocusedSelfAndBelow(parentBundle);
+						}
+					}
+					if(element is Slottable){
+						Slottable sb = (Slottable)element;
+						ASBReset(sb);
+						if(element.isFocusedInHierarchy){
+							if(sb.sg.isPool){
+								SlotGroup sgp = sb.sg;
 								if(!sgp.isAutoSort){
 										ASSB_s(sb, SBFocused, SBWFA);
 								}else{
@@ -3441,48 +3505,86 @@ public class SlottableTest{
 											ASSB_s(sb, SBFocused, SBWFA);
 										}
 								}
+							}else if(sb.sg.isSGE){
+								ASSB_s(sb, SBFocused, SBWFA);
 							}
-						}
-					}else{/*  sgp not focused	*/
-						ASSG(sgp,
-							null, SGDefocused, null,
-							null, SGWFA, null, false);
-						foreach(Slottable sb in sgp){
-							if(sb != null){
-								AE(sb.ssm, ssm);
-								ASBReset(sb);
-								ASSB_s(sb, SBDefocused, SBWFA);
-							}
+						}else{
+							/*	defocused no matter what	*/
+							ASSB_s(sb, SBDefocused, SBWFA);
 						}
 					}
 				}
-				foreach(SlotGroup sge in ssm.allSGEs){
-					ASGReset(sge);
-					if(ssm.focusedSGEs.Contains(sge)){
-						ASSG(sge,
-							null, SGFocused, null,
-							null, SGWFA, null, false);
-						foreach(Slottable sbe in sge){
-							if(sbe != null){
-								AE(sbe.ssm, ssm);
-								ASBReset(sbe);
-								ASSB_s(sbe, SBFocused, SBWFA);
-							}
-						}
-					}else{
-						ASSG(sge,
-							null, SGFocused, null,
-							null, SGWFA, null, false);
-						foreach(Slottable sbe in sge){
-							if(sbe != null){
-								AE(sbe.ssm, ssm);
-								ASBReset(sbe);
-								ASSB_s(sbe, SBDefocused, SBWFA);
-							}
-						}
-					}
-				}
-			}
+			// public void AssertFocused(){
+			// 	AssertEquippedOnAll();
+			// 	ASSSM(ssm,
+			// 		null, null, null, null, null, null, null, null,
+			// 		null, SSMFocused, null,
+			// 		null, SSMWFA, null,
+			// 		null, true, true, true, true);
+			// 	foreach(SlotGroup sgp in ssm.allSGPs){
+			// 		ASGReset(sgp);
+			// 		if(sgp == ssm.focusedSGP){
+			// 			ASSG(sgp,
+			// 				null, SGFocused, null,
+			// 				null, SGWFA, null, false);
+			// 			foreach(Slottable sb in sgp){
+			// 				if(sb != null){
+			// 					AE(sb.ssm, ssm);
+			// 					ASBReset(sb);
+			// 					if(!sgp.isAutoSort){
+			// 							ASSB_s(sb, SBFocused, SBWFA);
+			// 					}else{
+			// 						if(sb.item is PartsInstanceMock && !(sgp.Filter is SGPartsFilter))
+			// 							ASSB_s(sb, SBDefocused, SBWFA);
+			// 						else
+			// 							if(sb.isEquipped)
+			// 								ASSB_s(sb, SBDefocused, SBWFA);
+			// 							else{
+			// 								ASSB_s(sb, SBFocused, SBWFA);
+			// 							}
+			// 					}
+			// 				}
+			// 			}
+			// 		}else{/*  sgp not focused	*/
+			// 			ASSG(sgp,
+			// 				null, SGDefocused, null,
+			// 				null, SGWFA, null, false);
+			// 			foreach(Slottable sb in sgp){
+			// 				if(sb != null){
+			// 					AE(sb.ssm, ssm);
+			// 					ASBReset(sb);
+			// 					ASSB_s(sb, SBDefocused, SBWFA);
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// 	foreach(SlotGroup sge in ssm.allSGEs){
+			// 		ASGReset(sge);
+			// 		if(ssm.focusedSGEs.Contains(sge)){
+			// 			ASSG(sge,
+			// 				null, SGFocused, null,
+			// 				null, SGWFA, null, false);
+			// 			foreach(Slottable sbe in sge){
+			// 				if(sbe != null){
+			// 					AE(sbe.ssm, ssm);
+			// 					ASBReset(sbe);
+			// 					ASSB_s(sbe, SBFocused, SBWFA);
+			// 				}
+			// 			}
+			// 		}else{
+			// 			ASSG(sge,
+			// 				null, SGFocused, null,
+			// 				null, SGWFA, null, false);
+			// 			foreach(Slottable sbe in sge){
+			// 				if(sbe != null){
+			// 					AE(sbe.ssm, ssm);
+			// 					ASBReset(sbe);
+			// 					ASSB_s(sbe, SBDefocused, SBWFA);
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// }
 	/*	shortcut	*/
 		/*	Debug	*/
 			public void PrintSBsArray(IEnumerable<Slottable> sbs){

@@ -301,6 +301,26 @@ namespace SlotSystem{
 						}
 					}
 				}
+				public void PointFocus(SlotSystemElement ele){
+					/*	focus the given element and all those above it to the root
+							if any element in the course is page element and is not toggled on, toggle it on and focus
+							if any elemen in the course is bundle element and is not the focused element in the bundle, make it the focused element and focus it
+					*/
+					FindAndFocusInBundle(ele);
+					if(ele.isPageElement){
+						SlotSystemPage page = (SlotSystemPage)ele.parent;
+						SlotSystemPageElement pageEle = page.GetPageElement(ele);
+						if(!pageEle.isFocusToggleOn)
+							page.TogglePageElementFocus(ele, true);
+					}
+					if(ele.isBundleElement){
+						SlotSystemBundle bundle = (SlotSystemBundle)ele.parent;
+						if(bundle.focusedElement != ele){
+							bundle.SetFocusedBundleElement(ele);
+							bundle.Focus();
+						}
+					}
+				}
 		/*	SlotSystemElement	*/
 			/*	States	*/
 				/*	Selection state	*/
@@ -437,6 +457,15 @@ namespace SlotSystem{
 							yield return ele;
 					}
 				}
+				public override bool isFocused{
+					get{return curSelState == SlotSystemManager.ssmFocusedState;}
+				}
+				public override bool isDefocused{
+					get{return curSelState == SlotSystemManager.ssmDefocusedState;}
+				}
+				public override bool isDeactivated{
+					get{return curSelState == SlotSystemManager.ssmDeactivatedState;}
+				}
 			/*	methods	*/
 				public void Initialize(SlotSystemPageElement pBundPageEle, SlotSystemPageElement eBundPageEle , IEnumerable<SlotSystemPageElement> gBundPageEles){
 					m_eName = Util.Bold("SSM");
@@ -506,6 +535,7 @@ namespace SlotSystem{
 					foreach(SlotSystemElement ele in this){
 						ele.Deactivate();
 					}
+					ToggleBack();
 				}
 				public void SetFocusedPoolSG(SlotGroup sg){
 					poolBundle.SetFocusedBundleElement(sg);
@@ -532,6 +562,8 @@ namespace SlotSystem{
 										containingEle = e;
 								}
 								immBundle.SetFocusedBundleElement(containingEle);
+								if(immBundle.isPageElement && !immBundle.isToggledOn)
+									immBundle.ToggleOnPageElement();
 								tested = tested.immediateBundle;
 							}
 							this.Focus();

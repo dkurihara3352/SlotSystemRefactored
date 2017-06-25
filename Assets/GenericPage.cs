@@ -19,5 +19,9 @@ namespace SlotSystem{
 			SetSelState(AbsSlotSystemElement.focusedState);
 			PageFocus();
 		}
+		public override void Deactivate(){
+			base.Deactivate();
+			ToggleBack();
+		}
 	}
 }
