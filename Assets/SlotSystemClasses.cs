@@ -172,19 +172,25 @@ namespace SlotSystem{
 									b. this means that those elements that are defocused before prepick filtering are not going to be accidentally focused
 							*/
 
-					if(!pickedSB.isPickable){
-						throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
-					}
+					// if(!pickedSB.isPickable){
+					// 	throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
+					// }
+					// if(!pickedSB.isFocused){
+					// 	throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a focused state");
+					// }
+					// if(!pickedSB.sg.isFocusedInHierarchy){
+					// 	throw new System.InvalidOperationException("AbsSlotSystemTransaction.GetTransaction: testSB's sg in not focused in the hierarchy");
+					// }
 					SlotGroup origSG = pickedSB.sg;
 					if(targetSB != null){
 						targetSG = targetSB.sg;
 					}
-					if(targetSG != null){
-						if(targetSG.isPool && targetSG != SlotSystemManager.curSSM.focusedSGP)
-							throw new System.InvalidOperationException("GetTransaction: targetSG is poolSG but not focused");
-						else if(targetSG.isSGE && !SlotSystemManager.curSSM.focusedSGEs.Contains(targetSG))
-							throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
-					}
+					// if(targetSG != null){
+					// 	if(targetSG.isPool && targetSG != SlotSystemManager.curSSM.focusedSGP)
+					// 		throw new System.InvalidOperationException("GetTransaction: targetSG is poolSG but not focused");
+					// 	else if(targetSG.isSGE && !SlotSystemManager.curSSM.focusedSGEs.Contains(targetSG))
+					// 		throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
+					// }
 					if(targetSG == null){// meaning selectedSB is also null
 						return new RevertTransaction(pickedSB);
 					}else{// hoveredSB could be null
@@ -198,13 +204,14 @@ namespace SlotSystem{
 										if(!targetSG.HasItem(pickedSB.itemInst))
 											return new FillTransaction(pickedSB, targetSG);
 									}else{
-										if(targetSG.SwappableSBs(pickedSB).Count == 1){
-											Slottable calcedSB = targetSG.SwappableSBs(pickedSB)[0];
-											if(calcedSB.itemInst != pickedSB.itemInst)
-												return new SwapTransaction(pickedSB, calcedSB);
+										if(targetSG.isExpandable){
+											return new FillTransaction(pickedSB, targetSG);
 										}else{
-											if(targetSG.isExpandable)
-												return new FillTransaction(pickedSB, targetSG);
+											if(targetSG.SwappableSBs(pickedSB).Count == 1){
+												Slottable calcedSB = targetSG.SwappableSBs(pickedSB)[0];
+												if(calcedSB.itemInst != pickedSB.itemInst)
+													return new SwapTransaction(pickedSB, calcedSB);
+											}
 										}
 									}
 								}
@@ -871,6 +878,7 @@ namespace SlotSystem{
 					}
 				}
 			}
+			
 		/*	filters	*/
 			public interface SGFilter{
 				void Filter(ref List<SlottableItem> items);
@@ -1373,7 +1381,7 @@ namespace SlotSystem{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
 						if(sb.sg.isPool){
-							if(sb.PrevEqpState != null && sb.PrevEqpState == Slottable.unequippedState){
+							if(sb.prevEqpState != null && sb.prevEqpState == Slottable.unequippedState){
 								SBEqpProcess process = new SBEquipProcess(sb, sb.EquipCoroutine);
 								sb.SetAndRunEquipProcess(process);
 							}
@@ -1386,12 +1394,12 @@ namespace SlotSystem{
 				public class SBUnequippedState: SBEqpState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						if(sb.PrevEqpState == null || sb.PrevEqpState == Slottable.unequippedState){
+						if(sb.prevEqpState == null || sb.prevEqpState == Slottable.unequippedState){
 							/*	when initialized	*/
 							return;
 						}
 						if(sb.sg.isPool){
-							if(sb.PrevEqpState != null && sb.PrevEqpState == Slottable.equippedState){
+							if(sb.prevEqpState != null && sb.prevEqpState == Slottable.equippedState){
 								SBEqpProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
 								sb.SetAndRunEquipProcess(process);
 							}
@@ -2649,8 +2657,8 @@ namespace SlotSystem{
 								actProc = "";
 							else
 								actProc = SBProcessName((SBActProcess)sb.actProcess) + " running? " + (sb.actProcess.isRunning?Blue("true"):Red("false"));
-						string prevEqp = SBStateNamePlain((SBEqpState)sb.PrevEqpState);
-						string curEqp = SBStateName((SBEqpState)sb.CurEqpState);
+						string prevEqp = SBStateNamePlain((SBEqpState)sb.prevEqpState);
+						string curEqp = SBStateName((SBEqpState)sb.curEqpState);
 						string eqpProc;
 							if(sb.eqpProcess == null)
 								eqpProc = "";
@@ -2670,8 +2678,8 @@ namespace SlotSystem{
 					SlotSystemTransaction ta = testSB.ssm.GetTransaction(testSB, tarSG, tarSB);
 					string taStr = TransactionName(ta);
 					string taTargetSB = Util.SBofSG(ta.targetSB);
-					string taSG1 = ta.sg1.eName;
-					string taSG2 = ta.sg2.eName;
+					string taSG1 = ta.sg1==null?"null":ta.sg1.eName;
+					string taSG2 = ta.sg2 == null? "null": ta.sg2.eName;
 					return "DebugTarget: " + taStr + " " +
 						"targetSB: " + taTargetSB + ", " + 
 						"sg1: " + taSG1 + ", " +

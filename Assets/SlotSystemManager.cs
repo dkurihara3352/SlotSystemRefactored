@@ -68,13 +68,18 @@ namespace SlotSystem{
 				}
 				public SlotGroup focusedSGP{
 					get{
-						SlotSystemElement focusedEle = poolBundle.focusedElement;
-						return (SlotGroup)focusedEle;
+						if(poolBundle.isToggledOn){
+							SlotSystemElement focusedEle = poolBundle.focusedElement;
+							return (SlotGroup)focusedEle;
+						}
+						return null;
 					}
 				}
 				public EquipmentSet focusedEqSet{
 					get{
-						return (EquipmentSet)equipBundle.focusedElement;
+						if(equipBundle.isToggledOn)
+							return (EquipmentSet)equipBundle.focusedElement;
+						return null;
 					}
 				}
 				public List<SlotGroup> focusedSGEs{
@@ -99,16 +104,30 @@ namespace SlotSystem{
 				public void AddFocusedSGTo(SlotSystemElement ele, IList<SlotGroup> list){
 					if(ele is SlotGroup){
 						SlotGroup sg = (SlotGroup)ele;
-						bool done = false;
-						SlotSystemElement tested = sg;
-						while(!done){
-							if(tested.immediateBundle.focusedElement != tested && !tested.immediateBundle.focusedElement.ContainsInHierarchy(tested))
-								return;
-							tested = tested.immediateBundle;
-							if(tested.immediateBundle == null)
+						SlotSystemElement inspected = sg;
+						bool isF = true;
+						while(true){
+							if(inspected.parent == null)
 								break;
+							if((inspected.isPageElement && !inspected.isToggledOn)||(inspected.isBundleElement && inspected != ((SlotSystemBundle)inspected.parent).focusedElement)){
+							// if((inspected.isPageElement && inspected.isToggledOn) ||(inspected.isBundleElement && inspected == ((SlotSystemBundle)inspected.parent).focusedElement)){
+								isF = false;
+								break;
+							}else{
+								inspected = inspected.parent;
+							}
 						}
-						list.Add(sg);
+						// bool done = false;	
+						// SlotSystemElement tested = sg;
+						// while(!done){
+						// 	if(tested.immediateBundle.focusedElement != tested && !tested.immediateBundle.focusedElement.ContainsInHierarchy(tested))
+						// 		return;
+						// 	tested = tested.immediateBundle;
+						// 	if(tested.immediateBundle == null)
+						// 		break;
+						// }
+						if(isF)
+							list.Add(sg);
 					}
 				}
 				public List<SlotGroup> focusedSGs{
@@ -177,7 +196,17 @@ namespace SlotSystem{
 						return items;
 					}
 				}
-
+				public List<Slottable> allSBs{
+					get{
+						List<Slottable> res = new List<Slottable>();
+						PerformInHierarchy(AddSBToRes, res);
+						return res;
+					}
+				}
+					public void AddSBToRes(SlotSystemElement ele, IList<Slottable> list){
+						if(ele is Slottable)
+							list.Add((Slottable)ele);
+					}
 			/*	methods	*/
 				public void Reset(){
 					SetActState(SlotSystemManager.ssmWaitForActionState);
@@ -320,6 +349,20 @@ namespace SlotSystem{
 							bundle.Focus();
 						}
 					}
+				}
+				public void PrePickFilter(Slottable sb, out bool isFilteredIn){
+					bool res = false;
+					foreach(SlotGroup targetSG in ssm.focusedSGs){
+						if(ssm.GetTransaction(sb, targetSG, null).GetType() != typeof(RevertTransaction)){
+							res = true; break;
+						}
+						foreach(Slottable targetSB in targetSG){
+							if(ssm.GetTransaction(sb, null, targetSB).GetType() != typeof(RevertTransaction)){
+								res = true; break;
+							}
+						}
+					}
+					isFilteredIn = res;
 				}
 		/*	SlotSystemElement	*/
 			/*	States	*/
@@ -547,7 +590,7 @@ namespace SlotSystem{
 				}
 				public void FindAndFocusInBundle(SlotSystemElement ele){
 					PerformInHierarchy(FocusInBundle, ele);
-				}
+					}
 					public void FocusInBundle(SlotSystemElement inspected, object target){
 						SlotSystemElement targetEle = (SlotSystemElement)target;
 						if(inspected == targetEle){

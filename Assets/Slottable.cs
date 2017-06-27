@@ -150,10 +150,10 @@ namespace SlotSystem{
 						return m_eqpStateEngine;
 					}
 					}SSEStateEngine m_eqpStateEngine;
-					public SSEState CurEqpState{
+					public SSEState curEqpState{
 						get{return (SBEqpState)EqpStateEngine.curState;}
 					}
-					public SSEState PrevEqpState{
+					public SSEState prevEqpState{
 						get{return (SBEqpState)EqpStateEngine.prevState;}
 					}
 					public void SetEqpState(SSEState state){
@@ -274,18 +274,18 @@ namespace SlotSystem{
 					return (SlotGroup)parent;
 				}
 			}
-			public bool isPickable{
-				get{
-					bool result = true;
-					if(sg.isPool){
-						if(sg.isAutoSort){
-							if(isEquipped || itemInst is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
-								result = false;
-						}
-					}
-					return result;
-				}
-			}
+			// public bool isPickable{
+			// 	get{
+			// 		bool result = true;
+			// 		if(sg.isPool){
+			// 			if(sg.isAutoSort){
+			// 				if(isEquipped || itemInst is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
+			// 					result = false;
+			// 			}
+			// 		}
+			// 		return result;
+			// 	}
+			// }
 			public override bool isFocused{
 				get{return curSelState == Slottable.sbFocusedState;}
 			}
@@ -310,6 +310,16 @@ namespace SlotSystem{
 				}
 			public bool isStackable{
 				get{return itemInst.Item.IsStackable;}
+			}
+			public bool passesPrePickFilter{
+				get{
+					// if(sg.isFocusedInHierarchy){
+					// }
+						bool isFilteredIn = false;
+						ssm.PrePickFilter(this, out isFilteredIn);
+						return isFilteredIn;
+					// return false;
+				}
 			}
 		/*	SlotSystemElement imple	*/
 			/*	fields	*/

@@ -497,7 +497,12 @@ namespace SlotSystem{
 						if(sb != null){
 							sb.SetActState(Slottable.sbWaitForActionState);
 							sb.Reset();
-							if(sb.isPickable)
+							// if(sb.isPickable)
+							// 	sb.Focus();
+							// else
+							// 	sb.Defocus();
+							// sb.Focus();
+							if(sb.passesPrePickFilter)
 								sb.Focus();
 							else
 								sb.Defocus();
