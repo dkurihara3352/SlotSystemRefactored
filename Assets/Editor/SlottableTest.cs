@@ -13,18 +13,16 @@ public class SlottableTest{
 		public Slottable tarSB;
 		public bool HasSameFields(SlotSystemTestResult other){
 			bool flag = true;
-			if(testSB == null)
-				flag &= other.testSB == null;
-			else
-				flag &= this.testSB == other.testSB;
-			if(tarSG == null)
-				flag &= other.tarSG == null;
-			else
+			if(testSB != null && other.testSB != null)
+				flag &= Util.SBsShareSGAndItem(this.testSB, other.testSB);
+				else if(!(testSB == null && other.testSB == null)) return false;
+			if(tarSG != null && other.tarSG != null)
 				flag &= this.tarSG == other.tarSG;
-			if(tarSB == null)
-				flag &= other.tarSB == null;
-			else
-				flag &= this.tarSB == other.tarSB;
+				else if(!(tarSG == null && other.tarSG == null)) return false;
+			if(tarSB != null && other.tarSB != null)
+				flag &= Util.SBsShareSGAndItem(this.tarSB, other.tarSB);
+				else if(!(tarSB == null && other.tarSB == null)) return false;
+			
 			return flag;
 		}
 		public abstract bool HasSameValue(SlotSystemTestResult other);
@@ -75,30 +73,24 @@ public class SlottableTest{
 					if(!HasSameFields(other)) return false;
 					bool flag = true;
 					SSETestResult otherSSERes = (SSETestResult)other;
-					if(this.curSelState == null)
-						flag &= otherSSERes.curSelState == null;
-						else
-							flag &= this.curSelState == otherSSERes.curSelState;
-					if(this.prevSelState == null)
-						flag &= otherSSERes.prevSelState == null;
-						else
-							flag &= this.prevSelState == otherSSERes.prevSelState;
-					if(this.selProcess == null)
-						flag &= otherSSERes.selProcess == null;
-						else
-							flag &= this.selProcess == otherSSERes.selProcess;
-					if(this.curActState == null)
-						flag &= otherSSERes.curActState == null;
-						else
-							flag &= this.curActState == otherSSERes.curActState;
-					if(this.prevActState == null)
-						flag &= otherSSERes.prevActState == null;
-						else
-							flag &= this.prevActState == otherSSERes.prevActState;
-					if(this.actProcess == null)
-						flag &= otherSSERes.actProcess == null;
-						else
-							flag &= this.actProcess == otherSSERes.actProcess;
+					if(this.curSelState != null && otherSSERes.curSelState != null)
+						flag &= this.curSelState == otherSSERes.curSelState;
+						else if(!(this.curSelState == null && otherSSERes.curSelState == null)) return false;
+					if(this.prevSelState != null && otherSSERes.prevSelState != null)
+						flag &= this.prevSelState == otherSSERes.prevSelState;
+						else if(!(this.prevSelState == null && otherSSERes.prevSelState == null)) return false;
+					if(this.selProcess != null && otherSSERes.selProcess != null)
+						flag &= this.selProcess.GetType() == otherSSERes.selProcess.GetType();
+						else if(!(this.selProcess == null && otherSSERes.selProcess == null)) return false;
+					if(this.curActState != null && otherSSERes.curActState != null)
+						flag &= this.curActState == otherSSERes.curActState;
+						else if(!(this.curActState == null && otherSSERes.curActState == null)) return false;
+					if(this.prevActState != null && otherSSERes.prevActState != null)
+						flag &= this.prevActState == otherSSERes.prevActState;
+						else if(!(this.prevActState == null && otherSSERes.prevActState == null)) return false;
+					if(this.actProcess != null && otherSSERes.actProcess != null)
+						flag &= this.actProcess.GetType() == otherSSERes.actProcess.GetType();
+						else if(!(this.actProcess == null && otherSSERes.actProcess == null)) return false;
 					flag &= this.isActProcessRunning == otherSSERes.isActProcessRunning;
 					return flag;
 				}else{
@@ -204,68 +196,53 @@ public class SlottableTest{
 					if(!HasSameFields(other)) return false;
 					bool flag = true;
 					SSMTestResult otherSSMRes = (SSMTestResult)other;
-					if(this.curSelState == null)
-						flag &= otherSSMRes.curSelState == null;
-						else
-							flag &= this.curSelState == otherSSMRes.curSelState;
-					if(this.prevSelState == null)
-						flag &= otherSSMRes.prevSelState == null;
-						else
-							flag &= this.prevSelState == otherSSMRes.prevSelState;
-					if(this.selProcess == null)
-						flag &= otherSSMRes.selProcess == null;
-						else
-							flag &= this.selProcess == otherSSMRes.selProcess;
-					if(this.curActState == null)
-						flag &= otherSSMRes.curActState == null;
-						else
-							flag &= this.curActState == otherSSMRes.curActState;
-					if(this.prevActState == null)
-						flag &= otherSSMRes.prevActState == null;
-						else
-							flag &= this.prevActState == otherSSMRes.prevActState;
-					if(this.actProcess == null)
-						flag &= otherSSMRes.actProcess == null;
-						else
-							flag &= this.actProcess == otherSSMRes.actProcess;
+					if(this.curSelState != null && otherSSMRes.curSelState != null)
+						flag &= this.curSelState == otherSSMRes.curSelState;
+						else if(!(this.curSelState == null && otherSSMRes.curSelState == null)) return false;
+					if(this.prevSelState != null && otherSSMRes.prevSelState != null)
+						flag &= this.prevSelState == otherSSMRes.prevSelState;
+						else if(!(this.prevSelState == null && otherSSMRes.prevSelState == null)) return false;
+					if(this.selProcess != null && otherSSMRes.selProcess != null)
+						flag &= this.selProcess.GetType() == otherSSMRes.selProcess.GetType();
+						else if(!(this.selProcess == null && otherSSMRes.selProcess == null)) return false;
+					if(this.curActState != null && otherSSMRes.curActState != null)
+						flag &= this.curActState == otherSSMRes.curActState;
+						else if(!(this.curActState == null && otherSSMRes.curActState == null)) return false;
+					if(this.prevActState != null && otherSSMRes.prevActState != null)
+						flag &= this.prevActState == otherSSMRes.prevActState;
+						else if(!(this.prevActState == null && otherSSMRes.prevActState == null)) return false;
+					if(this.actProcess != null && otherSSMRes.actProcess != null)
+						flag &= this.actProcess.GetType() == otherSSMRes.actProcess.GetType();
+						else if(!(this.actProcess == null && otherSSMRes.actProcess == null)) return false;
 					flag &= this.isActProcessRunning == otherSSMRes.isActProcessRunning;
-						if(!flag) return false;
-					if(this.ta == null)
-						flag &= otherSSMRes.ta == null;
-						else
-							flag &= this.ta == otherSSMRes.ta;
-					if(this.pickedSB == null)
-						flag &= otherSSMRes.pickedSB == null;
-						else
-							flag &= this.pickedSB == otherSSMRes.pickedSB;
-					if(this.targetSB == null)
-						flag &= otherSSMRes.targetSB == null;
-						else
-							flag &= this.targetSB == otherSSMRes.targetSB;
-					if(this.hoveredSG == null)
-						flag &= otherSSMRes.hoveredSG == null;
-						else
-							flag &= this.hoveredSG == otherSSMRes.hoveredSG;
-					if(this.hoveredSB == null)
-						flag &= otherSSMRes.hoveredSB == null;
-						else
-							flag &= this.hoveredSB == otherSSMRes.hoveredSB;
-					if(this.di1SB == null)
-						flag &= otherSSMRes.di1SB == null;
-						else
-							flag &= this.di1SB == otherSSMRes.di1SB;
-					if(this.di2SB == null)
-						flag &= otherSSMRes.di2SB == null;
-						else
-							flag &= this.di2SB == otherSSMRes.di2SB;
-					if(this.sg1 == null)
-						flag &= otherSSMRes.sg1 == null;
-						else
-							flag &= this.sg1 == otherSSMRes.sg1;
-					if(this.sg2 == null)
-						flag &= otherSSMRes.sg2 == null;
-						else
-							flag &= this.sg2 == otherSSMRes.sg2;
+					
+					if(this.ta != null && otherSSMRes.ta != null)
+						flag &= this.ta.GetType() == otherSSMRes.ta.GetType();
+						else if(!(this.ta == null && otherSSMRes.ta == null)) return false;
+					if(this.pickedSB != null && otherSSMRes.pickedSB != null)
+						flag &= Util.SBsShareSGAndItem(this.pickedSB, otherSSMRes.pickedSB);
+						else if(!(this.pickedSB == null && otherSSMRes.pickedSB == null)) return false;
+					if(this.targetSB != null && otherSSMRes.targetSB != null)
+						flag &= Util.SBsShareSGAndItem(this.targetSB, otherSSMRes.targetSB);
+						else if(!(this.targetSB == null && otherSSMRes.targetSB == null)) return false;
+					if(this.hoveredSG != null && otherSSMRes.hoveredSG != null)
+						flag &= this.hoveredSG == otherSSMRes.hoveredSG;
+						else if(!(this.hoveredSG == null && otherSSMRes.hoveredSG == null)) return false;
+					if(this.hoveredSB != null && otherSSMRes.hoveredSB != null)
+						flag &= Util.SBsShareSGAndItem(this.hoveredSB, otherSSMRes.hoveredSB);
+						else if(!(this.hoveredSB == null && otherSSMRes.hoveredSG == null)) return false;
+					if(this.di1SB != null && otherSSMRes.di1SB != null)
+						flag &= Util.SBsShareSGAndItem(this.di1SB, otherSSMRes.di1SB);
+						else if(!(this.di1SB == null && otherSSMRes.hoveredSG == null)) return false;
+					if(this.di2SB != null && otherSSMRes.di2SB != null)
+						flag &= Util.SBsShareSGAndItem(this.di2SB, otherSSMRes.di2SB);
+						else if(!(this.di2SB == null && otherSSMRes.hoveredSG == null)) return false;
+					if(this.sg1 != null && otherSSMRes.sg1 != null)
+						flag &= this.sg1 == otherSSMRes.sg1;
+						else if(!(this.sg1 == null && otherSSMRes.hoveredSG == null)) return false;
+					if(this.sg2 != null && otherSSMRes.sg2 != null)
+						flag &= this.sg2 == otherSSMRes.sg2;
+						else if(!(this.sg2 == null && otherSSMRes.hoveredSG == null)) return false;
 					flag &= this.di1Done == otherSSMRes.di1Done;
 					flag &= this.di2Done == otherSSMRes.di2Done;
 					flag &= this.sg1Done == otherSSMRes.sg1Done;
@@ -318,30 +295,24 @@ public class SlottableTest{
 					if(!HasSameFields(other)) return false;
 					bool flag = true;
 					SGTestResult otherSGRes = (SGTestResult)other;
-					if(this.curSelState == null)
-						flag &= otherSGRes.curSelState == null;
-						else
-							flag &= this.curSelState == otherSGRes.curSelState;
-					if(this.prevSelState == null)
-						flag &= otherSGRes.prevSelState == null;
-						else
-							flag &= this.prevSelState == otherSGRes.prevSelState;
-					if(this.selProcess == null)
-						flag &= otherSGRes.selProcess == null;
-						else
-							flag &= this.selProcess == otherSGRes.selProcess;
-					if(this.curActState == null)
-						flag &= otherSGRes.curActState == null;
-						else
-							flag &= this.curActState == otherSGRes.curActState;
-					if(this.prevActState == null)
-						flag &= otherSGRes.prevActState == null;
-						else
-							flag &= this.prevActState == otherSGRes.prevActState;
-					if(this.actProcess == null)
-						flag &= otherSGRes.actProcess == null;
-						else
-							flag &= this.actProcess == otherSGRes.actProcess;
+					if(this.curSelState != null && otherSGRes.curSelState != null)
+						flag &= this.curSelState == otherSGRes.curSelState;
+						else if(!(this.curSelState == null && otherSGRes.curSelState == null)) return false;
+					if(this.prevSelState != null && otherSGRes.prevSelState != null)
+						flag &= this.prevSelState == otherSGRes.prevSelState;
+						else if(!(this.prevSelState == null && otherSGRes.prevSelState == null)) return false;
+					if(this.selProcess != null && otherSGRes.selProcess != null)
+						flag &= this.selProcess.GetType() == otherSGRes.selProcess.GetType();
+						else if(!(this.selProcess == null && otherSGRes.selProcess == null)) return false;
+					if(this.curActState != null && otherSGRes.curActState != null)
+						flag &= this.curActState == otherSGRes.curActState;
+						else if(!(this.curActState == null && otherSGRes.curActState == null)) return false;
+					if(this.prevActState != null && otherSGRes.prevActState != null)
+						flag &= this.prevActState == otherSGRes.prevActState;
+						else if(!(this.prevActState == null && otherSGRes.prevActState == null)) return false;
+					if(this.actProcess != null && otherSGRes.actProcess != null)
+						flag &= this.actProcess.GetType() == otherSGRes.actProcess.GetType();
+						else if(!(this.actProcess == null && otherSGRes.actProcess == null)) return false;
 					flag &= this.isActProcessRunning == otherSGRes.isActProcessRunning;
 					return flag;
 				}else{
@@ -410,42 +381,33 @@ public class SlottableTest{
 					if(!HasSameFields(other)) return false;
 					bool flag = true;
 					SBTestResult otherSBRes = (SBTestResult)other;
-					if(this.curSelState == null)
-						flag &= otherSBRes.curSelState == null;
-						else
-							flag &= this.curSelState == otherSBRes.curSelState;
-					if(this.prevSelState == null)
-						flag &= otherSBRes.prevSelState == null;
-						else
-							flag &= this.prevSelState == otherSBRes.prevSelState;
-					if(this.selProcess == null)
-						flag &= otherSBRes.selProcess == null;
-						else
-							flag &= this.selProcess == otherSBRes.selProcess;
-					if(this.curActState == null)
-						flag &= otherSBRes.curActState == null;
-						else
-							flag &= this.curActState == otherSBRes.curActState;
-					if(this.prevActState == null)
-						flag &= otherSBRes.prevActState == null;
-						else
-							flag &= this.prevActState == otherSBRes.prevActState;
-					if(this.actProcess == null)
-						flag &= otherSBRes.actProcess == null;
-						else
-							flag &= this.actProcess == otherSBRes.actProcess;
-					if(this.curEqpState == null)
-						flag &= otherSBRes.curEqpState == null;
-						else
-							flag &= this.curEqpState == otherSBRes.curEqpState;
-					if(this.prevEqpState == null)
-						flag &= otherSBRes.prevEqpState == null;
-						else
-							flag &= this.prevEqpState == otherSBRes.prevEqpState;
-					if(this.eqpProcess == null)
-						flag &= otherSBRes.eqpProcess == null;
-						else
-							flag &= this.eqpProcess == otherSBRes.eqpProcess;
+					if(this.curSelState != null && otherSBRes.curSelState != null)
+						flag &= this.curSelState == otherSBRes.curSelState;
+						else if(!(this.curSelState == null && otherSBRes.curSelState == null)) return false;
+					if(this.prevSelState != null && otherSBRes.prevSelState != null)
+						flag &= this.prevSelState == otherSBRes.prevSelState;
+						else if(!(this.prevSelState == null && otherSBRes.prevSelState == null)) return false;
+					if(this.selProcess != null && otherSBRes.selProcess != null)
+						flag &= this.selProcess.GetType() == otherSBRes.selProcess.GetType();
+						else if(!(this.selProcess == null && otherSBRes.selProcess == null)) return false;
+					if(this.curActState != null && otherSBRes.curActState != null)
+						flag &= this.curActState == otherSBRes.curActState;
+						else if(!(this.curActState == null && otherSBRes.curActState == null)) return false;
+					if(this.prevActState != null && otherSBRes.prevActState != null)
+						flag &= this.prevActState == otherSBRes.prevActState;
+						else if(!(this.prevActState == null && otherSBRes.prevActState == null)) return false;
+					if(this.actProcess != null && otherSBRes.actProcess != null)
+						flag &= this.actProcess.GetType() == otherSBRes.actProcess.GetType();
+						else if(!(this.actProcess == null && otherSBRes.actProcess == null)) return false;
+					if(this.curEqpState != null && otherSBRes.curEqpState != null)
+						flag &= this.curEqpState == otherSBRes.curEqpState;
+						else if(!(this.curEqpState == null && otherSBRes.curEqpState == null)) return false;
+					if(this.prevEqpState != null && otherSBRes.prevEqpState != null)
+						flag &= this.prevEqpState == otherSBRes.prevEqpState;
+						else if(!(this.prevEqpState == null && otherSBRes.prevEqpState == null)) return false;
+					if(this.eqpProcess != null && otherSBRes.eqpProcess != null)
+						flag &= this.eqpProcess.GetType() == otherSBRes.eqpProcess.GetType();
+						else if(!(this.eqpProcess == null && otherSBRes.eqpProcess == null)) return false;
 					flag &= this.isActProcessRunning == otherSBRes.isActProcessRunning;
 					return flag;
 				}else{

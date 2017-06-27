@@ -2135,6 +2135,12 @@ namespace SlotSystem{
 			public class PartsInstanceMock: InventoryItemInstanceMock{}
 	/*	utility	*/
 		public static class Util{
+			public static bool SBsShareSGAndItem(Slottable sbA, Slottable sbB){
+				bool flag = true;
+				flag &= sbA.sg == sbB.sg;
+				flag &= sbA.itemInst == sbB.itemInst;
+				return flag;
+			}
 			public static void Trim(ref List<Slottable> sbs){
 				List<Slottable> trimmed = new List<Slottable>();
 				foreach(Slottable sb in sbs){
