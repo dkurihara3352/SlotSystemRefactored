@@ -562,9 +562,6 @@ namespace SlotSystem{
 				}
 				public override void Focus(){
 					SetSelState(SlotSystemManager.ssmFocusedState);
-					// foreach(SlotSystemElement ele in this){
-					// 	ele.Focus();
-					// }
 					PageFocus();
 				}
 				public override void Defocus(){
@@ -579,14 +576,6 @@ namespace SlotSystem{
 						ele.Deactivate();
 					}
 					ToggleBack();
-				}
-				public void SetFocusedPoolSG(SlotGroup sg){
-					poolBundle.SetFocusedBundleElement(sg);
-					Focus();
-				}
-				public void SetFocusedEquipmentSet(EquipmentSet eSet){
-					equipBundle.SetFocusedBundleElement(eSet);
-					Focus();
 				}
 				public void FindAndFocusInBundle(SlotSystemElement ele){
 					PerformInHierarchy(FocusInBundle, ele);
@@ -745,13 +734,35 @@ namespace SlotSystem{
 					m_transactionResults = value;
 				}
 				}TransactionResults m_transactionResults;
+			public Dictionary<SlotSystemElement, SlotSystemTransaction> transactionResultsV2;
+			public void CreateTransactionResultsV2(){
+				// TransactionResults transactionResults = new TransactionResults();
+				Dictionary<SlotSystemElement, SlotSystemTransaction> result = new Dictionary<SlotSystemElement, SlotSystemTransaction>();
+				foreach(SlotGroup sg in focusedSGs){
+					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, null, sg);
+					// TransactionResult tr = new TransactionResult(null, sg, ta);
+					// transactionResults.AddTransactionResult(tr);
+					result.Add(sg, ta);
+					if(ta is RevertTransaction)
+						sg.DefocusSelf();
+					else
+						sg.FocusSelf();
+					foreach(Slottable sb in sg){
+						if(sb != null){
+							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb, null);
+							// TransactionResult tr2 = new TransactionResult(sb, null, ta2);
+							// transactionResults.AddTransactionResult(tr2);
+							result.Add(sb, ta);
+							if(ta2 is RevertTransaction || ta2 is FillTransaction)
+								sb.Defocus();
+							else
+								sb.Focus();
+						}
+					}
+				}
+				this.transactionResultsV2 = result;
+			}
 			public void CreateTransactionResults(){
-				/*	Create TransactionResult class instance with Transaction and SelectedSG, SelectedSB
-					and store them in a list for lookup
-					Filter all sbs and sgs according to the transaction result
-					make sure to initialize with RevertTransaction with orig sg and pickedSB
-					Perform Transaction update at SimHover looing up the list
-				*/
 				TransactionResults transactionResults = new TransactionResults();
 				foreach(SlotGroup sg in focusedSGs){
 					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, null, sg);
@@ -776,11 +787,16 @@ namespace SlotSystem{
 				this.transactionResults = transactionResults;
 			}
 			public void UpdateTransaction(){
-				SlotSystemTransaction ta = transactionResults.GetTransaction(hoveredSB, hoveredSG);
-				SetTargetSB(ta.targetSB);
-				SetSG1(ta.sg1);
-				SetSG2(ta.sg2);
-				SetTransaction(ta);
+
+				// SlotSystemTransaction ta = transactionResults.GetTransaction(hoveredSB, hoveredSG);
+				SlotSystemElement key = (hoveredSB == null? (SlotSystemElement)hoveredSG: (SlotSystemElement)hoveredSB);
+				SlotSystemTransaction ta = null;
+				if(transactionResultsV2.TryGetValue(key, out ta)){
+					SetTargetSB(ta.targetSB);
+					SetSG1(ta.sg1);
+					SetSG2(ta.sg2);
+					SetTransaction(ta);
+				}
 			}
 			public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup targetSG, Slottable targetSB){
 				return AbsSlotSystemTransaction.GetTransaction(pickedSB, targetSB, targetSG);

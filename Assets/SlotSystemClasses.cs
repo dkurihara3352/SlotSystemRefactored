@@ -172,25 +172,11 @@ namespace SlotSystem{
 									b. this means that those elements that are defocused before prepick filtering are not going to be accidentally focused
 							*/
 
-					// if(!pickedSB.isPickable){
-					// 	throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a pickable state");
-					// }
-					// if(!pickedSB.isFocused){
-					// 	throw new System.InvalidOperationException("GetTransaction: pickedSB is NOT in a focused state");
-					// }
-					// if(!pickedSB.sg.isFocusedInHierarchy){
-					// 	throw new System.InvalidOperationException("AbsSlotSystemTransaction.GetTransaction: testSB's sg in not focused in the hierarchy");
-					// }
+					
 					SlotGroup origSG = pickedSB.sg;
 					if(targetSB != null){
 						targetSG = targetSB.sg;
 					}
-					// if(targetSG != null){
-					// 	if(targetSG.isPool && targetSG != SlotSystemManager.curSSM.focusedSGP)
-					// 		throw new System.InvalidOperationException("GetTransaction: targetSG is poolSG but not focused");
-					// 	else if(targetSG.isSGE && !SlotSystemManager.curSSM.focusedSGEs.Contains(targetSG))
-					// 		throw new System.InvalidOperationException("GetTransaction: targetSG is SGE but does not belong to the focused EquipmentSet");
-					// }
 					if(targetSG == null){// meaning selectedSB is also null
 						return new RevertTransaction(pickedSB);
 					}else{// hoveredSB could be null
@@ -245,6 +231,7 @@ namespace SlotSystem{
 											if(origSG.AcceptsFilter(targetSB))
 												return new SwapTransaction(pickedSB, targetSB);
 											if(targetSG.hasEmptySlot || targetSG.isExpandable)
+												if(origSG.isShrinkable)
 												return new FillTransaction(pickedSB, targetSG);
 										}
 									}
@@ -271,11 +258,15 @@ namespace SlotSystem{
 			}
 			public class EmptyTransaction: AbsSlotSystemTransaction{}
 			public class RevertTransaction: AbsSlotSystemTransaction{
-				Slottable m_pickedSB;
-				SlotGroup m_origSG;
+				public Slottable m_pickedSB;
+				public SlotGroup m_origSG;
 				public RevertTransaction(Slottable pickedSB){
 					m_pickedSB = pickedSB;
 					m_origSG = m_pickedSB.sg;
+				}
+				public RevertTransaction(RevertTransaction orig){
+					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
+					this.m_origSG = Util.CloneSG(orig.m_origSG);
 				}
 				public override void Indicate(){}
 				public override void Execute(){
@@ -290,13 +281,18 @@ namespace SlotSystem{
 				}
 			}
 			public class ReorderTransaction: AbsSlotSystemTransaction{
-				Slottable m_pickedSB;
-				Slottable m_selectedSB;
-				SlotGroup m_origSG;
+				public Slottable m_pickedSB;
+				public Slottable m_selectedSB;
+				public SlotGroup m_origSG;
 				public ReorderTransaction(Slottable pickedSB, Slottable selected){
 					m_pickedSB = pickedSB;
 					m_selectedSB = selected;
 					m_origSG = m_pickedSB.sg;
+				}
+				public ReorderTransaction(ReorderTransaction orig){
+					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
+					this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
+					this.m_origSG = Util.CloneSG(orig.m_origSG);
 				}
 				public override Slottable targetSB{get{return m_selectedSB;}}
 				public override SlotGroup sg1{get{return m_origSG;}}
@@ -313,11 +309,11 @@ namespace SlotSystem{
 				}
 			}
 			public class StackTransaction: AbsSlotSystemTransaction{
-				Slottable m_pickedSB;
-				SlotGroup m_origSG;
-				Slottable m_selectedSB;
-				SlotGroup m_selectedSG;
-				List<InventoryItemInstanceMock> itemCache = new List<InventoryItemInstanceMock>();
+				public Slottable m_pickedSB;
+				public SlotGroup m_origSG;
+				public Slottable m_selectedSB;
+				public SlotGroup m_selectedSG;
+				public List<InventoryItemInstanceMock> itemCache = new List<InventoryItemInstanceMock>();
 				public StackTransaction(Slottable pickedSB ,Slottable selected){
 					m_pickedSB = pickedSB;
 					m_origSG = pickedSB.sg;
@@ -326,6 +322,15 @@ namespace SlotSystem{
 					InventoryItemInstanceMock cache = pickedSB.itemInst;
 					cache.Quantity = pickedSB.pickedAmount;
 					itemCache.Add(cache);
+				}
+				public StackTransaction(StackTransaction orig){
+					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
+					this.m_origSG = Util.CloneSG(orig.m_origSG);
+					this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
+					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
+					InventoryItemInstanceMock item = this.m_pickedSB.itemInst;
+					item.Quantity = orig.m_pickedSB.pickedAmount;
+					itemCache.Add(item);
 				}
 				public override Slottable targetSB{get{return m_selectedSB;}}
 				public override SlotGroup sg1{get{return m_origSG;}}
@@ -345,15 +350,21 @@ namespace SlotSystem{
 				}
 			}
 			public class SwapTransaction: AbsSlotSystemTransaction{
-				Slottable m_pickedSB;
-				SlotGroup m_origSG;
-				Slottable m_selectedSB;
-				SlotGroup m_selectedSG;
+				public Slottable m_pickedSB;
+				public SlotGroup m_origSG;
+				public Slottable m_selectedSB;
+				public SlotGroup m_selectedSG;
 				public SwapTransaction(Slottable pickedSB, Slottable selected){
 					m_pickedSB = pickedSB;
 					m_selectedSB = selected;
 					m_origSG = m_pickedSB.sg;
 					m_selectedSG = m_selectedSB.sg;
+				}
+				public SwapTransaction(SwapTransaction orig){
+					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
+					this.m_origSG = Util.CloneSG(orig.m_origSG);
+					this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
+					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
 				}
 				public override Slottable targetSB{get{return m_selectedSB;}}
 				public override SlotGroup sg1{get{return m_origSG;}}
@@ -377,13 +388,18 @@ namespace SlotSystem{
 				}
 			}
 			public class FillTransaction: AbsSlotSystemTransaction{
-				Slottable m_pickedSB;
-				SlotGroup m_selectedSG;
-				SlotGroup m_origSG;
+				public Slottable m_pickedSB;
+				public SlotGroup m_selectedSG;
+				public SlotGroup m_origSG;
 				public FillTransaction(Slottable pickedSB, SlotGroup selected){
 					m_pickedSB = pickedSB;
 					m_selectedSG = selected;
 					m_origSG = m_pickedSB.sg;
+				}
+				public FillTransaction(FillTransaction orig){
+					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
+					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
+					this.m_origSG = Util.CloneSG(orig.m_origSG);
 				}
 				public override SlotGroup sg1{get{return m_origSG;}}
 				public override SlotGroup sg2{get{return m_selectedSG;}}
@@ -403,11 +419,15 @@ namespace SlotSystem{
 				}
 			}
 			public class SortTransaction: AbsSlotSystemTransaction{
-				SlotGroup m_selectedSG;
-				SGSorter m_sorter;
+				public SlotGroup m_selectedSG;
+				public SGSorter m_sorter;
 				public SortTransaction(SlotGroup sg, SGSorter sorter){
 					m_selectedSG = sg;
 					m_sorter = sorter;
+				}
+				public SortTransaction(SortTransaction orig){
+					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
+					this.m_sorter = orig.m_sorter;
 				}
 				public override SlotGroup sg1{get{return m_selectedSG;}}
 				public override void Indicate(){}
@@ -1306,7 +1326,7 @@ namespace SlotSystem{
 						sb.ssm.SetActState(SlotSystemManager.ssmProbingState);
 						DraggedIcon di = new DraggedIcon(sb);
 						sb.ssm.SetDIcon1(di);
-						sb.ssm.CreateTransactionResults();
+						sb.ssm.CreateTransactionResultsV2();
 						sb.OnHoverEnterMock();
 						sb.ssm.UpdateTransaction();
 						SBActProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
@@ -2135,6 +2155,43 @@ namespace SlotSystem{
 			public class PartsInstanceMock: InventoryItemInstanceMock{}
 	/*	utility	*/
 		public static class Util{
+			public static SlotSystemTransaction CloneTA(SlotSystemTransaction orig){
+				SlotSystemTransaction cloneTA = null;
+				if(orig is RevertTransaction)
+					cloneTA = new RevertTransaction((RevertTransaction)orig);
+				if(orig is ReorderTransaction)
+					cloneTA = new ReorderTransaction((ReorderTransaction)orig);
+				if(orig is StackTransaction)
+					cloneTA = new StackTransaction((StackTransaction)orig);
+				if(orig is SwapTransaction)
+					cloneTA = new SwapTransaction((SwapTransaction)orig);
+				if(orig is FillTransaction)
+					cloneTA = new FillTransaction((FillTransaction)orig);
+				if(orig is SortTransaction)
+					cloneTA = new SortTransaction((SortTransaction)orig);
+				return cloneTA;
+			}
+			public static Slottable CloneSB(Slottable orig){
+				if(orig != null){
+					GameObject cloneGO = new GameObject("cloneGO");
+					SBClone clone = cloneGO.AddComponent<SBClone>();
+					clone.Initialize(orig);
+					return clone;
+				}
+				return null;
+			}
+			public static SlotGroup CloneSG(SlotGroup orig){
+				if(orig != null){
+					GameObject cloneSGGO = new GameObject("cloneSGGO");
+					SGClone cloneSG = cloneSGGO.AddComponent<SGClone>();
+					cloneSG.Initialize(orig);
+					return cloneSG;
+				}
+				return null;
+			}
+			public static bool SGsShareName(SlotGroup sgA, SlotGroup sgB){
+				return sgA.eName == sgB.eName;
+			}
 			public static bool SBsShareSGAndItem(Slottable sbA, Slottable sbB){
 				bool flag = true;
 				flag &= sbA.sg == sbB.sg;

@@ -274,18 +274,6 @@ namespace SlotSystem{
 					return (SlotGroup)parent;
 				}
 			}
-			// public bool isPickable{
-			// 	get{
-			// 		bool result = true;
-			// 		if(sg.isPool){
-			// 			if(sg.isAutoSort){
-			// 				if(isEquipped || itemInst is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
-			// 					result = false;
-			// 			}
-			// 		}
-			// 		return result;
-			// 	}
-			// }
 			public override bool isFocused{
 				get{return curSelState == Slottable.sbFocusedState;}
 			}
@@ -450,6 +438,25 @@ namespace SlotSystem{
 				pickedAmount = 0;
 				SetNewSlotID(-2);
 			}
+	}
+	public class SBClone: Slottable{
+		public override SlotSystemElement parent{
+			get{return m_parent;}
+		}SlotSystemElement m_parent;
+		public void Initialize(Slottable orig){
+			this.delayed = orig.delayed;
+			this.SetItem(orig.itemInst);
+			m_parent = orig.sg;
+			SetSSM(orig.ssm);
+			SetSelState(orig.prevSelState);
+			SetSelState(orig.curSelState);
+			SetActState(orig.prevActState);
+			SetActState(orig.curActState);
+			SetEqpState(orig.prevEqpState);
+			SetEqpState(orig.curEqpState);
+			SetSlotID(orig.slotID);
+			SetNewSlotID(orig.newSlotID);
+		}
 	}
 
 }
