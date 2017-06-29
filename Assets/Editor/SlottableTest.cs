@@ -1054,11 +1054,11 @@ public class SlottableTest{
 		// CheckTransactionOnAllSG();
 		// TestAllTACheck();
 		/*	TAs	*/
-		TestVolSortOnAll();
-		TestRevertOnAll();
-		TestReorderOnAll();
-		TestFillOnAll();
-		TestSwapOnAll();
+		// TestVolSortOnAll();
+		// TestRevertOnAll();
+		// TestReorderOnAll();
+		// TestFillOnAll();
+		// TestSwapOnAll();
 		// TestSwapSelectively(sgpAll, sgeBow);
 		// TestFillSelectively(sgpAll, sgg_111);
 
@@ -1069,6 +1069,32 @@ public class SlottableTest{
 		// TestCreateTransactionRevised();
 		
 	}
+	/*	working	*/
+		public void TestSGGeneric(){
+			// AE(sgm.sgBundles.Count, 3);
+			// AE(sgm.genBundles.Count, 1);
+			// AE(sgm.allSGPs.Count, 5);
+			// AE(sgm.allSGEs.Count, 3);
+			// AE(sgm.allSGGs.Count, 2);
+			// AE(sgm.focusedBundles.Count, 2);
+			// AE(sgm.focusedSGGs.Count, 2);
+			// sgm.FocusBundle(genBundle);
+			// AE(sgm.FocusedBundles.Count, 3);
+		}
+		public void TestAddAndRemoveAll(){
+			PerformOnAllSGAfterFocusing(TestAddAndRemove);
+			PrintTestResult();
+			}
+			public void TestAddAndRemove(SlotGroup testSG, bool isPAS){
+				List<Slottable> sbs = testSG.toList;
+					AssertFocused();
+				// sgm.MoveSBs(testSG, null, sbs);
+				// 	ASSGM(sgm,
+				// 		null, null, testSG, null, null, null, null, null,
+				// 		SGMDeactivated, SGMFocused, null,
+				// 		SGMWFA, SGMTransaction, typeof(SGMTransactionProcess),
+				// 		typeof())
+			}
 	/*	ssm features test */
 		public void TestSSMPointFocusAll(){
 			PerformOnAllSGAfterFocusing(TestSSMPointFocusAll);
@@ -1121,16 +1147,7 @@ public class SlottableTest{
 					}
 				}
 			}
-		public void TestCrossTestSG(){
-			PerformOnAllSBs(CrossTestCrossTest);
-			PrintTestResult();
-			}
-			public void CrossTestCrossTest(Slottable sb, bool isPAS){
-				CrossTestSG(TestCrossTest, sb, isPAS);
-			}
-			public void TestCrossTest(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
-				Capture(ssm, testSB, tarSG, isPAS, isTAS, TestElement.SG);
-			}
+		
 	/*	SlotSystem testing*/
 		public void TestFindAndFocusElement(){
 			ssm.PerformInHierarchy(AssertFocusInBundle);
@@ -1830,33 +1847,6 @@ public class SlottableTest{
 			}
 		}
 		SlotGroup origSGCache;
-	/*	working	*/
-		public void TestSGGeneric(){
-			// AE(sgm.sgBundles.Count, 3);
-			// AE(sgm.genBundles.Count, 1);
-			// AE(sgm.allSGPs.Count, 5);
-			// AE(sgm.allSGEs.Count, 3);
-			// AE(sgm.allSGGs.Count, 2);
-			// AE(sgm.focusedBundles.Count, 2);
-			// AE(sgm.focusedSGGs.Count, 2);
-			// sgm.FocusBundle(genBundle);
-			// AE(sgm.FocusedBundles.Count, 3);
-		}
-		public void TestAddAndRemoveAll(){
-			PerformOnAllSGAfterFocusing(TestAddAndRemove);
-			PrintTestResult();
-			}
-			public void TestAddAndRemove(SlotGroup testSG, bool isPAS){
-				List<Slottable> sbs = testSG.toList;
-					AssertFocused();
-				// sgm.MoveSBs(testSG, null, sbs);
-				// 	ASSGM(sgm,
-				// 		null, null, testSG, null, null, null, null, null,
-				// 		SGMDeactivated, SGMFocused, null,
-				// 		SGMWFA, SGMTransaction, typeof(SGMTransactionProcess),
-				// 		typeof())
-			}
-
 	/*	setup	*/
 		public void AssertInitialize(){
 			ASSSM(ssm,
@@ -2746,6 +2736,16 @@ public class SlottableTest{
 				}
 			}
 		}
+		public void TestCrossTestSG(){
+			PerformOnAllSBs(CrossTestCrossTest);
+			PrintTestResult();
+			}
+			public void CrossTestCrossTest(Slottable sb, bool isPAS){
+				CrossTestSG(TestCrossTest, sb, isPAS);
+			}
+			public void TestCrossTest(SlotGroup tarSG, Slottable testSB, bool isPAS, bool isTAS){
+				Capture(ssm, testSB, tarSG, isPAS, isTAS, TestElement.SG);
+			}
 		public void CrossTestSGSelectively(System.Action<SlotGroup, Slottable, bool, bool> act, Slottable sb, bool isPAS, SlotGroup tarSG){
 			if(sb.sg.isPool){
 				if(sb.sg == tarSG)
