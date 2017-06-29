@@ -11,7 +11,6 @@ namespace SlotSystem{
 			m_bowSG = (SlotGroup)bowSGPE.element;
 			m_wearSG = (SlotGroup)wearSGPE.element;
 			m_cGearsSG = (SlotGroup)cGearsSGPE.element;
-			// List<SlotSystemPageElement> pageEles = new List<SlotSystemPageElement>();
 			IEnumerable<SlotSystemPageElement> pageEles = new SlotSystemPageElement[]{
 				bowSGPE, wearSGPE, cGearsSGPE
 			};

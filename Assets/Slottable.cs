@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Utility;
+
 namespace SlotSystem{
 	public class Slottable : AbsSlotSystemElement, IComparable<Slottable>, IComparable{
 		/*	States	*/
@@ -301,12 +302,9 @@ namespace SlotSystem{
 			}
 			public bool passesPrePickFilter{
 				get{
-					// if(sg.isFocusedInHierarchy){
-					// }
-						bool isFilteredIn = false;
-						ssm.PrePickFilter(this, out isFilteredIn);
-						return isFilteredIn;
-					// return false;
+					bool isFilteredIn = false;
+					ssm.PrePickFilter(this, out isFilteredIn);
+					return isFilteredIn;
 				}
 			}
 		/*	SlotSystemElement imple	*/
@@ -458,5 +456,4 @@ namespace SlotSystem{
 			SetNewSlotID(orig.newSlotID);
 		}
 	}
-
 }

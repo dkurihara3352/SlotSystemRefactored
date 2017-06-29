@@ -110,22 +110,12 @@ namespace SlotSystem{
 							if(inspected.parent == null)
 								break;
 							if((inspected.isPageElement && !inspected.isToggledOn)||(inspected.isBundleElement && inspected != ((SlotSystemBundle)inspected.parent).focusedElement)){
-							// if((inspected.isPageElement && inspected.isToggledOn) ||(inspected.isBundleElement && inspected == ((SlotSystemBundle)inspected.parent).focusedElement)){
 								isF = false;
 								break;
 							}else{
 								inspected = inspected.parent;
 							}
 						}
-						// bool done = false;	
-						// SlotSystemElement tested = sg;
-						// while(!done){
-						// 	if(tested.immediateBundle.focusedElement != tested && !tested.immediateBundle.focusedElement.ContainsInHierarchy(tested))
-						// 		return;
-						// 	tested = tested.immediateBundle;
-						// 	if(tested.immediateBundle == null)
-						// 		break;
-						// }
 						if(isF)
 							list.Add(sg);
 					}
@@ -221,8 +211,7 @@ namespace SlotSystem{
 					SetTargetSB(null);
 					SetSG1(null);
 					SetSG2(null);
-					SetHoveredSB(null);
-					SetHoveredSG(null);
+					SetHovered(null);
 					SetDIcon1(null);
 					SetDIcon2(null);
 					SetTransaction(null);
@@ -353,11 +342,11 @@ namespace SlotSystem{
 				public void PrePickFilter(Slottable sb, out bool isFilteredIn){
 					bool res = false;
 					foreach(SlotGroup targetSG in ssm.focusedSGs){
-						if(ssm.GetTransaction(sb, targetSG, null).GetType() != typeof(RevertTransaction)){
+						if(ssm.GetTransaction(sb, targetSG).GetType() != typeof(RevertTransaction)){
 							res = true; break;
 						}
 						foreach(Slottable targetSB in targetSG){
-							if(ssm.GetTransaction(sb, null, targetSB).GetType() != typeof(RevertTransaction)){
+							if(ssm.GetTransaction(sb, targetSB).GetType() != typeof(RevertTransaction)){
 								res = true; break;
 							}
 						}
@@ -651,7 +640,7 @@ namespace SlotSystem{
 				public void SetSG1(SlotGroup sg){
 					if(sg == null || sg != sg1){
 						if(sg1 != null)
-							sg1.SetSelState(SlotGroup.sgFocusedState);
+							ReferToTAAndUpdateSelState(sg1);
 					}
 					this.m_sg1 = sg;
 					if(sg1 != null)
@@ -668,7 +657,7 @@ namespace SlotSystem{
 				public void SetSG2(SlotGroup sg){
 					if(sg == null || sg != sg2){
 						if(sg2 != null)
-							sg2.SetSelState(SlotGroup.sgFocusedState);
+							ReferToTAAndUpdateSelState(sg2);
 					}
 					this.m_sg2 = sg;
 					if(sg2 != null)
@@ -707,41 +696,25 @@ namespace SlotSystem{
 				public bool dIcon2Done{
 				get{return m_dIcon2Done;}
 				}bool m_dIcon2Done = true;
-			public Slottable hoveredSB{
-				get{return m_hoveredSB;}
-				}Slottable m_hoveredSB;
-				public void SetHoveredSB(Slottable sb){
-					if(sb == null || sb != hoveredSB){
-						if(hoveredSB != null)
-							hoveredSB.OnHoverExitMock();
+			public SlotSystemElement hovered{
+				get{return m_hovered;}
+				}SlotSystemElement m_hovered;
+				public void SetHovered(SlotSystemElement ele){
+					if(ele == null || ele != hovered){
+						if(hovered != null){
+							if(hovered is Slottable)
+								((Slottable)hovered).OnHoverExitMock();
+							else if(hovered is SlotGroup)
+								((SlotGroup)hovered).OnHoverExitMock();
+						}
+						m_hovered = ele;
 					}
-					m_hoveredSB = sb;
 				}
-			public SlotGroup hoveredSG{
-				get{return m_hoveredSG;}
-				}SlotGroup m_hoveredSG;
-				public void SetHoveredSG(SlotGroup sg){
-					if(sg == null || sg != hoveredSG){
-						if(hoveredSG != null)
-							hoveredSG.OnHoverExitMock();
-					}
-					m_hoveredSG = sg;
-				}
-
-			public TransactionResults transactionResults{
-				get{return m_transactionResults;}
-				set{
-					m_transactionResults = value;
-				}
-				}TransactionResults m_transactionResults;
 			public Dictionary<SlotSystemElement, SlotSystemTransaction> transactionResultsV2;
 			public void CreateTransactionResultsV2(){
-				// TransactionResults transactionResults = new TransactionResults();
 				Dictionary<SlotSystemElement, SlotSystemTransaction> result = new Dictionary<SlotSystemElement, SlotSystemTransaction>();
 				foreach(SlotGroup sg in focusedSGs){
-					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, null, sg);
-					// TransactionResult tr = new TransactionResult(null, sg, ta);
-					// transactionResults.AddTransactionResult(tr);
+					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, sg);
 					result.Add(sg, ta);
 					if(ta is RevertTransaction)
 						sg.DefocusSelf();
@@ -749,10 +722,8 @@ namespace SlotSystem{
 						sg.FocusSelf();
 					foreach(Slottable sb in sg){
 						if(sb != null){
-							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb, null);
-							// TransactionResult tr2 = new TransactionResult(sb, null, ta2);
-							// transactionResults.AddTransactionResult(tr2);
-							result.Add(sb, ta);
+							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb);
+							result.Add(sb, ta2);
 							if(ta2 is RevertTransaction || ta2 is FillTransaction)
 								sb.Defocus();
 							else
@@ -762,44 +733,29 @@ namespace SlotSystem{
 				}
 				this.transactionResultsV2 = result;
 			}
-			public void CreateTransactionResults(){
-				TransactionResults transactionResults = new TransactionResults();
-				foreach(SlotGroup sg in focusedSGs){
-					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, null, sg);
-					TransactionResult tr = new TransactionResult(null, sg, ta);
-					transactionResults.AddTransactionResult(tr);
-					if(ta is RevertTransaction)
-						sg.DefocusSelf();
-					else
-						sg.FocusSelf();
-					foreach(Slottable sb in sg){
-						if(sb != null){
-							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb, null);
-							TransactionResult tr2 = new TransactionResult(sb, null, ta2);
-							transactionResults.AddTransactionResult(tr2);
-							if(ta2 is RevertTransaction || ta2 is FillTransaction)
-								sb.Defocus();
-							else
-								sb.Focus();
-						}
-					}
-				}
-				this.transactionResults = transactionResults;
-			}
 			public void UpdateTransaction(){
-
-				// SlotSystemTransaction ta = transactionResults.GetTransaction(hoveredSB, hoveredSG);
-				SlotSystemElement key = (hoveredSB == null? (SlotSystemElement)hoveredSG: (SlotSystemElement)hoveredSB);
 				SlotSystemTransaction ta = null;
-				if(transactionResultsV2.TryGetValue(key, out ta)){
+				if(transactionResultsV2.TryGetValue(hovered, out ta)){
 					SetTargetSB(ta.targetSB);
 					SetSG1(ta.sg1);
 					SetSG2(ta.sg2);
 					SetTransaction(ta);
 				}
 			}
-			public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup targetSG, Slottable targetSB){
-				return AbsSlotSystemTransaction.GetTransaction(pickedSB, targetSB, targetSG);
+			public void ReferToTAAndUpdateSelState(SlotGroup sg){
+				if(transactionResultsV2 != null){
+					SlotSystemTransaction ta = null;
+					if(transactionResultsV2.TryGetValue(sg, out ta)){
+						if(ta is RevertTransaction)
+							sg.SetSelState(SlotGroup.sgDefocusedState);
+						else
+							sg.SetSelState(SlotGroup.sgFocusedState);
+					}
+				}else
+					sg.SetSelState(SlotGroup.sgFocusedState);
+			}
+			public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered){
+				return AbsSlotSystemTransaction.GetTransaction(pickedSB, hovered);
 			}
 	}
 }

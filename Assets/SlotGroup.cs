@@ -293,12 +293,6 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public List<Slottable> allTASBs{
-				get{return m_allTASBs;}
-				}List<Slottable> m_allTASBs;
-				public void SetAllTASBs(List<Slottable> sbs){
-					m_allTASBs = sbs;
-				}
 			public virtual bool isAllTASBsDone{
 				get{
 					foreach(Slottable sb in slottables){
@@ -498,11 +492,6 @@ namespace SlotSystem{
 						if(sb != null){
 							sb.SetActState(Slottable.sbWaitForActionState);
 							sb.Reset();
-							// if(sb.isPickable)
-							// 	sb.Focus();
-							// else
-							// 	sb.Defocus();
-							// sb.Focus();
 							if(sb.passesPrePickFilter)
 								sb.Focus();
 							else
@@ -684,10 +673,6 @@ namespace SlotSystem{
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
 					sb.SetActState(Slottable.addedState);
 				}
-				List<Slottable> allSBs = new List<Slottable>();
-				allSBs.AddRange(slottables);
-				allSBs.AddRange(added);
-				SetAllTASBs(allSBs);
 			}
 			public void CheckProcessCompletion(){
 				TransactionCoroutine();
@@ -730,7 +715,6 @@ namespace SlotSystem{
 			}
 			public void Reset(){
 				SetActState(SlotGroup.sgWaitForActionState);
-				SetAllTASBs(null);
 				SetNewSBs(null);
 				SetNewSlots(null);
 			}
@@ -819,18 +803,6 @@ namespace SlotSystem{
 					equippedSBsClone.Add(cloneSB);
 				}
 				m_equippedSBs = equippedSBsClone;
-			/**/
-			List<Slottable> allTASBsClone = new List<Slottable>();
-				if(orig.allTASBs != null)
-				foreach(Slottable sb in orig.allTASBs){
-					if(sb == null)
-						allTASBsClone.Add(null);
-					else{
-						Slottable sbClone = Util.CloneSB(sb);
-						allTASBsClone.Add(sbClone);
-					}
-				}
-				SetAllTASBs(allTASBsClone);
 			m_isAllTASBsDone = orig.isAllTASBsDone;
 			SetInitSlotsCount(orig.initSlotsCount);
 			this.m_isFocused = orig.isFocused;

@@ -137,64 +137,25 @@ namespace SlotSystem{
 				void OnComplete();
 			}
 			public abstract class AbsSlotSystemTransaction: SlotSystemTransaction{
-				public static SlotSystemTransaction GetTransaction(Slottable pickedSB, Slottable targetSB, SlotGroup targetSG){
-					/*	notes	*/
-						/*	On Second Thought ...	*/
-							/*	no more Insert and ReorderInOther transactions, as they unnecessarily complicates behaviout withou adding anything of value
-							*/
-						/*	Postpick Filter evaluation	*/
-							/*	based on the possible outcome Transaction output if the PickedSB is picked 	and put under the cursor
-								Defocus if the result is Revert , Focus otherwise
-								SBs and SGs are evaluated independently
-									SGs -> set hoveredSB null and evaluate
-									SBs -> set hoveredSG null and evaluate
-							*/
-						/*	Transaction cache and retrieval	*/
-							/*	When a SB is picked, a list of TransacionCache is created
-									Transaction cache contains 1)Transaction to be performed when executed, 2) SB and/or SG that needs to be under cursor at the time of execution
-								Probing is performed only on Focused (postpick filtered) SBs and SGs
-							*/
-						/*	SGM selection fields evaluation	*/
-							/*	also is based upon this returned value, not directly what is under cursor
-								Transaction feeds what sb and sg are selected
-									Revert:		sSB null,		sSG targetSG(orig)
-									Fill:		sSB null,		sSG targetSG(non orig)
-									Swap:		sSB targetSB/calced,	sSG targetSG(non orig)
-									Reorder:	sSB targetSB,	sSG targetSG(orig)
-									Insert:		sSB targetSB,	sSG targetSG(non orig)
-									(Sort):		sSB null, 		sSG (specified)
-									Stack:		sSB targetSB/calced,	sSG targetSG(non orig)
-							*/
-						/*	Precondition	*/
-							/*	1)	pickedSB.IsPickable
-								2)	the states of the rest is unknown
-								3)	a. this method is performed upon All SBs and SGs in Focused SGP and Focused SGEs, not ones in defocused (although the state of target SB or SG is not necessarily focused due to prepick filtering)
-									b. this means that those elements that are defocused before prepick filtering are not going to be accidentally focused
-							*/
-
-					
+				public static SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered){
 					SlotGroup origSG = pickedSB.sg;
-					if(targetSB != null){
-						targetSG = targetSB.sg;
-					}
-					if(targetSG == null){// meaning selectedSB is also null
-						return new RevertTransaction(pickedSB);
-					}else{// hoveredSB could be null
-						if(targetSB == null){// on SG
-							if(targetSG.AcceptsFilter(pickedSB)){
-								if(targetSG != origSG && origSG.isShrinkable){
-									if(targetSG.HasItem(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
-										return new StackTransaction(pickedSB, targetSG.GetSB(pickedSB.itemInst));
+					if(hovered != null){
+						if(hovered is SlotGroup){
+							SlotGroup hovSG = (SlotGroup)hovered;
+							if(hovSG.AcceptsFilter(pickedSB)){
+								if(hovSG != origSG && origSG.isShrinkable){
+									if(hovSG.HasItem(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
+										return new StackTransaction(pickedSB, hovSG.GetSB(pickedSB.itemInst));
 										
-									if(targetSG.hasEmptySlot){
-										if(!targetSG.HasItem(pickedSB.itemInst))
-											return new FillTransaction(pickedSB, targetSG);
+									if(hovSG.hasEmptySlot){
+										if(!hovSG.HasItem(pickedSB.itemInst))
+											return new FillTransaction(pickedSB, hovSG);
 									}else{
-										if(targetSG.isExpandable){
-											return new FillTransaction(pickedSB, targetSG);
+										if(hovSG.isExpandable){
+											return new FillTransaction(pickedSB, hovSG);
 										}else{
-											if(targetSG.SwappableSBs(pickedSB).Count == 1){
-												Slottable calcedSB = targetSG.SwappableSBs(pickedSB)[0];
+											if(hovSG.SwappableSBs(pickedSB).Count == 1){
+												Slottable calcedSB = hovSG.SwappableSBs(pickedSB)[0];
 												if(calcedSB.itemInst != pickedSB.itemInst)
 													return new SwapTransaction(pickedSB, calcedSB);
 											}
@@ -203,43 +164,47 @@ namespace SlotSystem{
 								}
 							}
 							return new RevertTransaction(pickedSB);
-						}else{// targetSB specified, targetSG == targetSB.SG
-							if(targetSG == origSG){//
-								if(targetSB != pickedSB){
-									if(!targetSG.isAutoSort)
-										return new ReorderTransaction(pickedSB, targetSB);
+						}else if(hovered is Slottable){
+							Slottable hovSB = (Slottable)hovered;
+							SlotGroup hovSBSG = hovSB.sg;
+							if(hovSBSG == origSG){
+								if(hovSB != pickedSB){
+									if(!hovSBSG.isAutoSort)
+										return new ReorderTransaction(pickedSB, hovSB);
 								}
 							}else{
-								if(targetSG.AcceptsFilter(pickedSB)){
+								if(hovSBSG.AcceptsFilter(pickedSB)){
 									//swap or stack, else insert
-									if(pickedSB.itemInst == targetSB.itemInst){
-										if(targetSG.isPool && origSG.isShrinkable)
-											return new FillTransaction(pickedSB, targetSG);
+									if(pickedSB.itemInst == hovSB.itemInst){
+										if(hovSBSG.isPool && origSG.isShrinkable)
+											return new FillTransaction(pickedSB, hovSBSG);
 										if(pickedSB.itemInst.Item.IsStackable)
-											return new StackTransaction(pickedSB, targetSB);
+											return new StackTransaction(pickedSB, hovSB);
 									}else{
-										if(targetSG.HasItem(pickedSB.itemInst)){
-											if(!origSG.HasItem(targetSB.itemInst)){
-												if(targetSG.isPool){
-													if(origSG.AcceptsFilter(targetSB))
-														return new SwapTransaction(pickedSB, targetSB);
+										if(hovSBSG.HasItem(pickedSB.itemInst)){
+											if(!origSG.HasItem(hovSB.itemInst)){
+												if(hovSBSG.isPool){
+													if(origSG.AcceptsFilter(hovSB))
+														return new SwapTransaction(pickedSB, hovSB);
 													if(origSG.isShrinkable)
-														return new FillTransaction(pickedSB, targetSG);
+														return new FillTransaction(pickedSB, hovSBSG);
 												}
 											}
 										}else{
-											if(origSG.AcceptsFilter(targetSB))
-												return new SwapTransaction(pickedSB, targetSB);
-											if(targetSG.hasEmptySlot || targetSG.isExpandable)
+											if(origSG.AcceptsFilter(hovSB))
+												return new SwapTransaction(pickedSB, hovSB);
+											if(hovSBSG.hasEmptySlot || hovSBSG.isExpandable)
 												if(origSG.isShrinkable)
-												return new FillTransaction(pickedSB, targetSG);
+												return new FillTransaction(pickedSB, hovSBSG);
 										}
 									}
 								}
 							}
 							return new RevertTransaction(pickedSB);
-						}
+						}else
+							throw new System.InvalidOperationException("AbsSlotSystemTransaction.GetTransaction: hovered is neither SG nor SB");
 					}
+					return new RevertTransaction(pickedSB);
 				}
 				protected SlotSystemManager ssm = SlotSystemManager.curSSM;
 				protected List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
@@ -454,7 +419,8 @@ namespace SlotSystem{
 				}
 				public abstract class SGSelState: SGState{
 					public virtual void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventDataMock){
-						sg.ssm.SetHoveredSG(sg);
+						// sg.ssm.SetHoveredSG(sg);
+						sg.ssm.SetHovered(sg);
 					}
 					public virtual void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventDataMock){
 
@@ -586,7 +552,6 @@ namespace SlotSystem{
 								Slottable newSB = newSBSG.AddComponent<Slottable>();
 								newSB.Initialize(itemInst);
 								newSB.SetSSM(sg.ssm);
-								// newSB.rootElement = sg.rootElement;
 								newSB.Defocus();
 								Util.AddInEmptyOrConcat(ref newSBs, newSB);
 							}
@@ -1151,7 +1116,8 @@ namespace SlotSystem{
 				}
 				public abstract class SBSelState: SBState{
 					public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
-						sb.ssm.SetHoveredSB(sb);
+						// sb.ssm.SetHoveredSB(sb);
+						sb.ssm.SetHovered(sb);
 					}
 					public virtual void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
 					}
@@ -1337,7 +1303,7 @@ namespace SlotSystem{
 						sb.Focus();
 					}
 					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
-						if(sb.ssm.hoveredSB == sb && sb.isStackable)
+						if(sb.ssm.hovered == (SlotSystemElement)sb && sb.isStackable)
 							sb.SetActState(Slottable.waitForNextTouchState);
 						else
 							sb.ExecuteTransaction();
@@ -1671,13 +1637,11 @@ namespace SlotSystem{
 				void Defocus();
 				SlotSystemBundle immediateBundle{get;}
 				SlotSystemElement parent{get;set;}
-				// SlotGroupManager sgm{get;set;}
 				SlotSystemManager ssm{get;set;}
 				bool ContainsInHierarchy(SlotSystemElement ele);
 				void PerformInHierarchy(System.Action<SlotSystemElement> act);
 				void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj);
 				void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list);
-				// SlotSystemElement rootElement{get;set;}
 				int level{get;}
 				bool Contains(SlotSystemElement element);
 				SlotSystemElement this[int i]{get;}
@@ -1710,12 +1674,9 @@ namespace SlotSystem{
 				SlotGroup sg2{get;}
 				DraggedIcon dIcon1{get;}
 				DraggedIcon dIcon2{get;}
-				Slottable hoveredSB{get;}
-				SlotGroup hoveredSG{get;}
-				TransactionResults transactionResults{get;}
-				void CreateTransactionResults();
+				SlotSystemElement hovered{get;}
 				void UpdateTransaction();
-				SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotGroup hovSG, Slottable hovSB);
+				SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered);
 			}
 		/*	TransactionResult	*/
 			public class TransactionResult{
@@ -2189,9 +2150,6 @@ namespace SlotSystem{
 				}
 				return null;
 			}
-			public static bool SGsShareName(SlotGroup sgA, SlotGroup sgB){
-				return sgA.eName == sgB.eName;
-			}
 			public static bool SBsShareSGAndItem(Slottable sbA, Slottable sbB){
 				bool flag = true;
 				flag &= sbA.sg == sbB.sg;
@@ -2378,10 +2336,11 @@ namespace SlotSystem{
 					string res = "";
 					string pSB = Util.SBofSG(ssm.pickedSB);
 					string tSB = Util.SBofSG(ssm.targetSB);
-					string hSG = "";
-						if(ssm.hoveredSG == null) hSG = "null";
-						else hSG = ssm.hoveredSG.eName;
-					string hSB = Util.SBofSG(ssm.hoveredSB);
+					string hovered = "";
+						if(ssm.hovered is Slottable)
+							hovered = SBofSG((Slottable)ssm.hovered);
+						else if(ssm.hovered is SlotGroup)
+							hovered = ssm.hovered.eName;
 					string di1;
 						if(ssm.dIcon1 == null)
 							di1 = "null";
@@ -2417,8 +2376,7 @@ namespace SlotSystem{
 					res = Util.Bold("SSM:") +
 							" pSB " + pSB +
 							", tSB " + tSB +
-							", hSG " + hSG +
-							", hSB " + hSB +
+							", hovered " + hovered +
 							", di1 " + di1 +
 							", di2 " + di2 +
 							", sg1 " + sg1 +
@@ -2737,8 +2695,19 @@ namespace SlotSystem{
 					return res;
 				}
 			/*	Debug	*/
-				public static string TADebug(Slottable testSB, SlotGroup tarSG, Slottable tarSB){
-					SlotSystemTransaction ta = testSB.ssm.GetTransaction(testSB, tarSG, tarSB);
+				public static string TADebug(Slottable testSB, SlotSystemElement hovered){
+					SlotSystemTransaction ta = testSB.ssm.GetTransaction(testSB, hovered);
+					string taStr = TransactionName(ta);
+					string taTargetSB = Util.SBofSG(ta.targetSB);
+					string taSG1 = ta.sg1==null?"null":ta.sg1.eName;
+					string taSG2 = ta.sg2 == null? "null": ta.sg2.eName;
+					return "DebugTarget: " + taStr + " " +
+						"targetSB: " + taTargetSB + ", " + 
+						"sg1: " + taSG1 + ", " +
+						"sg2: " + taSG2
+						;
+				}
+				public static string TADebug(SlotSystemTransaction ta){
 					string taStr = TransactionName(ta);
 					string taTargetSB = Util.SBofSG(ta.targetSB);
 					string taSG1 = ta.sg1==null?"null":ta.sg1.eName;
