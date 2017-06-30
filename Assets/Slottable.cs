@@ -144,7 +144,7 @@ namespace SlotSystem{
 						}
 						}static SBActState m_moveWithinState;
 			/*	Equip State	*/
-				SSEStateEngine EqpStateEngine{
+				SSEStateEngine eqpStateEngine{
 					get{
 						if(m_eqpStateEngine == null)
 							m_eqpStateEngine = new SSEStateEngine(this);
@@ -152,14 +152,14 @@ namespace SlotSystem{
 					}
 					}SSEStateEngine m_eqpStateEngine;
 					public SSEState curEqpState{
-						get{return (SBEqpState)EqpStateEngine.curState;}
+						get{return (SBEqpState)eqpStateEngine.curState;}
 					}
 					public SSEState prevEqpState{
-						get{return (SBEqpState)EqpStateEngine.prevState;}
+						get{return (SBEqpState)eqpStateEngine.prevState;}
 					}
 					public void SetEqpState(SSEState state){
 						if(state == null || state is SBEqpState)
-							EqpStateEngine.SetState(state);
+							eqpStateEngine.SetState(state);
 						else
 							throw new System.InvalidOperationException("Slottable.SetEqpState: something other than SBEqpState is trying to be assinged");
 					}
@@ -183,6 +183,46 @@ namespace SlotSystem{
 						}
 					}
 					}static SBEqpState m_unequippedState;
+			/*	Mark state	*/
+				SSEStateEngine markStateEngine{
+					get{
+						if(m_markStateEngine == null)
+							m_markStateEngine = new SSEStateEngine(this);
+						return m_markStateEngine;
+					}
+					}SSEStateEngine m_markStateEngine;
+					public SSEState curMrkState{
+						get{return (SBMrkState)markStateEngine.curState;}
+					}
+					public SSEState prevMrkState{
+						get{return (SBMrkState)markStateEngine.prevState;}
+					}
+					public void SetMrkState(SSEState state){
+						if(state == null || state is SBMrkState)
+							markStateEngine.SetState(state);
+						else
+							throw new System.InvalidOperationException("Slottable.SetMrkState: something other than SBMrkState is trying to be assinged");
+					}
+				public static SBMrkState markedState{
+					get{
+						if(m_markedState != null)
+							return m_markedState;
+						else{
+							m_markedState = new SBMarkedState();
+							return m_markedState;
+						}
+					}
+					}static SBMrkState m_markedState;
+				public static SBMrkState unmarkedState{
+					get{
+						if(m_unmarkedState != null)
+							return m_unmarkedState;
+						else{
+							m_unmarkedState = new SBUnmarkedState();
+							return m_unmarkedState;
+						}
+					}
+					}static SBMrkState m_unmarkedState;
 		/*	processes	*/
 			/*	Selection Process	*/
 				public override SSEProcess selProcess{
@@ -229,10 +269,30 @@ namespace SlotSystem{
 						get{return (SBEqpProcess)eqpProcEngine.process;}
 					}
 					public void SetAndRunEquipProcess(SBEqpProcess process){
-						eqpProcEngine.SetAndRunProcess(process);
+						if(process == null || process is SBEqpProcess)
+							eqpProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("Slottable.SetAndRunEquipProcess: argument is not of type SBEqpProcess");
 					}
 				public IEnumeratorMock UnequipCoroutine(){return null;}
 				public IEnumeratorMock EquipCoroutine(){return null;}
+			/*	Mark Process	*/
+				public SSEProcessEngine mrkProcEngine{
+					get{
+						if(m_mrkProcEngine == null)
+							m_mrkProcEngine = new SSEProcessEngine();
+						return m_mrkProcEngine;
+					}
+					}SSEProcessEngine m_mrkProcEngine;
+					public SBMrkProcess mrkProcess{
+						get{return (SBMrkProcess)mrkProcEngine.process;}
+					}
+					public void SetAndRunMarkProcess(SBMrkProcess process){
+						if(process == null || process is SBMrkProcess)
+							mrkProcEngine.SetAndRunProcess(process);
+						else throw new System.InvalidOperationException("Slottable.SetAndRunEquipProcess: argument is not of type SBMrkProcess");
+					}
+				public IEnumeratorMock unmarkCoroutine(){return null;}
+				public IEnumeratorMock markCoroutine(){return null;}
 		/*	commands	*/
 			static public SlottableCommand TapCommand{
 				get{return m_tapCommand;}
@@ -296,6 +356,14 @@ namespace SlotSystem{
 				}
 				public void Unequip(){
 					SetEqpState(Slottable.unequippedState);
+				}
+			public bool isMarked{
+				get{return itemInst.isMarked;}
+				}public void Mark(){
+					SetMrkState(Slottable.markedState);
+				}
+				public void Unmark(){
+					SetMrkState(Slottable.unmarkedState);
 				}
 			public bool isStackable{
 				get{return itemInst.Item.IsStackable;}
@@ -387,7 +455,7 @@ namespace SlotSystem{
 				public void OnEndDragMock(PointerEventDataMock eventDataMock){
 					((SBActState)curActState).OnEndDragMock(this, eventDataMock);
 				}
-		/*	othr Interface implementation	*/
+		/*	other Interface implementation	*/
 			int IComparable.CompareTo(object other){
 				if(!(other is Slottable))
 					throw new InvalidOperationException("CompareTo: no a slottable");
@@ -406,9 +474,10 @@ namespace SlotSystem{
 			public void Initialize(InventoryItemInstanceMock item){
 				this.delayed = true;
 				this.SetItem(item);
-				selStateEngine.SetState(Slottable.sbDeactivatedState);
-				actStateEngine.SetState(Slottable.sbWaitForActionState);
-				EqpStateEngine.SetState(null);
+				SetSelState(Slottable.sbDeactivatedState);
+				SetActState(Slottable.sbWaitForActionState);
+				SetEqpState(null);
+				SetMrkState(Slottable.unmarkedState);
 			}
 			public void PickUp(){
 				SetActState(Slottable.pickedUpState);
@@ -452,6 +521,8 @@ namespace SlotSystem{
 			SetActState(orig.curActState);
 			SetEqpState(orig.prevEqpState);
 			SetEqpState(orig.curEqpState);
+			SetMrkState(orig.prevMrkState);
+			SetMrkState(orig.curMrkState);
 			SetSlotID(orig.slotID);
 			SetNewSlotID(orig.newSlotID);
 		}

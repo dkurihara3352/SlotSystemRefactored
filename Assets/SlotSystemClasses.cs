@@ -1105,6 +1105,20 @@ namespace SlotSystem{
 						this.coroutineMock = coroutineMock;
 					}
 				}
+			/*	Equip process*/
+				public abstract class SBMrkProcess: SBProcess{}
+				public class SBUnmarkProcess: SBMrkProcess{
+					public SBUnmarkProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+						sse = sb;
+						this.coroutineMock = coroutineMock;
+					}
+				}
+				public class SBMarkProcess: SBMrkProcess{
+					public SBMarkProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+						sse = sb;
+						this.coroutineMock = coroutineMock;
+					}
+				}
 		/*	states	*/
 			/*	superclasses	*/
 				public abstract class SBState: SSEState{
@@ -1129,6 +1143,7 @@ namespace SlotSystem{
 					public abstract void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
 				}
 				public abstract class SBEqpState: SBState{}
+				public abstract class SBMrkState: SBState{}
 			/*	SB Selection States	*/
 				public class SBDeactivatedState: SBSelState{
 					public override void EnterState(StateHandler sh){
@@ -1388,6 +1403,39 @@ namespace SlotSystem{
 							if(sb.prevEqpState != null && sb.prevEqpState == Slottable.equippedState){
 								SBEqpProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
 								sb.SetAndRunEquipProcess(process);
+							}
+						}
+					}
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
+				}
+			/*	SB Mark states	*/
+				public class SBMarkedState: SBMrkState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						if(sb.sg.isPool){
+							if(sb.prevMrkState != null && sb.prevMrkState == Slottable.unmarkedState){
+								SBMrkProcess process = new SBMarkProcess(sb, sb.markCoroutine);
+								sb.SetAndRunMarkProcess(process);
+							}
+						}
+					}
+					public override void ExitState(StateHandler sh){
+						base.ExitState(sh);
+					}
+				}
+				public class SBUnmarkedState: SBMrkState{
+					public override void EnterState(StateHandler sh){
+						base.EnterState(sh);
+						if(sb.prevMrkState == null || sb.prevMrkState == Slottable.unmarkedState){
+							/*	when initialized	*/
+							return;
+						}
+						if(sb.sg.isPool){
+							if(sb.prevMrkState != null && sb.prevMrkState == Slottable.markedState){
+								SBMrkProcess process = new SBUnmarkProcess(sb, sb.unmarkCoroutine);
+								sb.SetAndRunMarkProcess(process);
 							}
 						}
 					}
@@ -1746,6 +1794,11 @@ namespace SlotSystem{
 				public bool isEquipped{
 					get{return m_isEquipped;}
 					set{m_isEquipped = value;}
+				}
+				bool m_isMarked = false;
+				public bool isMarked{
+					get{return m_isMarked;}
+					set{m_isMarked = value;}
 				}
 				public override bool Equals(object other){
 					if(!(other is InventoryItemInstanceMock))
@@ -2589,6 +2642,11 @@ namespace SlotSystem{
 							result = Red("Equipped");
 						else if(state is SBUnequippedState)
 							result = Blue("Unequipped");
+					}else if(state is SBMrkState){
+						if(state is SBMarkedState)
+							result = Red("Marked");
+						else if(state is SBUnmarkedState)
+							result = Blue("Unmarked");
 					}
 					return result;
 				}
@@ -2625,6 +2683,11 @@ namespace SlotSystem{
 							result = "Equipped";
 						else if(state is SBUnequippedState)
 							result = "Unequipped";
+					}else if(state is SBMrkState){
+						if(state is SBMarkedState)
+							result = "Marked";
+						else if(state is SBUnmarkedState)
+							result = "Unmarked";
 					}
 					return result;
 				}
@@ -2656,6 +2719,10 @@ namespace SlotSystem{
 						res = Red("Unequip");
 					else if(process is SBEquipProcess)
 						res = Blue("Equipping");
+					else if(process is SBUnmarkProcess)
+						res = Red("Unmark");
+					else if(process is SBMarkProcess)
+						res = Blue("Mark");
 					return res;
 				}
 				public static string SBDebug(Slottable sb){
@@ -2685,10 +2752,18 @@ namespace SlotSystem{
 								eqpProc = "";
 							else
 								eqpProc = SBProcessName((SBEqpProcess)sb.eqpProcess) + " running? " + (sb.eqpProcess.isRunning?Blue("true"):Red("false"));
+						string prevMrk = SBStateNamePlain((SBMrkState)sb.prevMrkState);
+						string curMrk = SBStateName((SBMrkState)sb.curMrkState);
+						string mrkProc;
+							if(sb.mrkProcess == null)
+								mrkProc = "";
+							else
+								mrkProc = SBProcessName((SBMrkProcess)sb.mrkProcess) + " running? " + (sb.mrkProcess.isRunning?Blue("true"):Red("false"));
 						res = sbName + ": " +
 							Bold("Sel ") + " from " + prevSel + " to " + curSel + " proc " + selProc + ", " + 
 							Bold("Act ") + " from " + prevAct + " to " + curAct + " proc " + actProc + ", " + 
 							Bold("Eqp ") + " from " + prevEqp + " to " + curEqp + " proc " + eqpProc + ", " +
+							Bold("Mrk ") + " from " + prevMrk + " to " + curMrk + " proc " + mrkProc + ", " +
 							Bold("SlotID: ") + " from " + sb.slotID.ToString() + " to " + sb.newSlotID.ToString() 
 							;
 					}

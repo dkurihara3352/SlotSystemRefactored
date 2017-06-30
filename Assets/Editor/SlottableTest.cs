@@ -1054,47 +1054,130 @@ public class SlottableTest{
 		// CheckTransactionOnAllSG();
 		// TestAllTACheck();
 		/*	TAs	*/
-		// TestVolSortOnAll();
-		// TestRevertOnAll();
-		// TestReorderOnAll();
-		// TestFillOnAll();
-		// TestSwapOnAll();
-		// TestSwapSelectively(sgpAll, sgeBow);
-		// TestFillSelectively(sgpAll, sgg_111);
-
-		// TestAddAndRemoveAll();
-		// TestSGGeneric();
-		// TestSSMPointFocusAll();
-		// PrintSystemHierarchyDetailed(ssm);
-		// TestCreateTransactionRevised();
-		
+			// TestVolSortOnAll();
+			// TestRevertOnAll();
+			// TestReorderOnAll();
+			// TestFillOnAll();
+			// TestSwapOnAll();
+			// TestSwapSelectively(sgpAll, sgeBow);
+			// TestFillSelectively(sgpAll, sgg_111);
+		TestLambda();
 	}
-	/*	working	*/
-		public void TestSGGeneric(){
-			// AE(sgm.sgBundles.Count, 3);
-			// AE(sgm.genBundles.Count, 1);
-			// AE(sgm.allSGPs.Count, 5);
-			// AE(sgm.allSGEs.Count, 3);
-			// AE(sgm.allSGGs.Count, 2);
-			// AE(sgm.focusedBundles.Count, 2);
-			// AE(sgm.focusedSGGs.Count, 2);
-			// sgm.FocusBundle(genBundle);
-			// AE(sgm.FocusedBundles.Count, 3);
+	/*	Lambda Expression	*/
+		public void TestLambda(){
+			// Transformer<int> sqr =  x => x * x;
+			System.Func<int, int> sqr =  x => x * x;
+			AE(sqr(3), 9);
+			System.Func<int, int ,int> mult = (x, y) => x * y;
+			AE(mult(10, 5), 50);
+			int someInt = 1;
+			System.Func<int, int ,int> complex = (i, j) => {
+				int sum = i + j;
+				int prod = i * j;
+				return (int)sum * prod - someInt;
+			};
+			someInt = 100;
+			Debug.Log("complex: " + complex(sqr(2), mult(2, 2)).ToString());
 		}
-		public void TestAddAndRemoveAll(){
-			PerformOnAllSGAfterFocusing(TestAddAndRemove);
-			PrintTestResult();
+	/*	Event and Delegate examples */
+		// public delegate int Transformer(int i);
+		public delegate T Transformer<T>(T arg);
+		public int Square(int i){
+			return i*i;
+		}
+		public int Cube(int i){
+			return i* i * i;
+		}
+		public float Cube(float f){
+			return f * f;
+		}
+		// public void TransformAll(IList<int> ints, Transformer<int> t){
+		// 	int count = 0;
+		// 	foreach(int i in ints){
+		// 		ints[count++] = t(i);
+		// 	}
+		// }
+		// public void TransformAll<T>(IList<T> list, Transformer<T> t){
+		// 	int count = 0;
+		// 	foreach(var i in list){
+		// 		list[count++] = t(i);
+		// 	}
+		// }
+		public delegate void ValueChangedEventHandler<T>(object source, T eventArgs) where T: System.EventArgs;
+		public class ValueChangedEventArgs: System.EventArgs{
+			public readonly float oldValue;
+			public readonly float newValue;
+			public ValueChangedEventArgs(float oldVal, float newVal){
+				this.oldValue = oldVal;
+				this.newValue = newVal;
 			}
-			public void TestAddAndRemove(SlotGroup testSG, bool isPAS){
-				List<Slottable> sbs = testSG.toList;
-					AssertFocused();
-				// sgm.MoveSBs(testSG, null, sbs);
-				// 	ASSGM(sgm,
-				// 		null, null, testSG, null, null, null, null, null,
-				// 		SGMDeactivated, SGMFocused, null,
-				// 		SGMWFA, SGMTransaction, typeof(SGMTransactionProcess),
-				// 		typeof())
+		}
+		public class ValueChangeBroadcaster{
+			public event ValueChangedEventHandler<ValueChangedEventArgs> handler;
+			public float value{
+				get{return m_value;}
+				set{
+					if(m_value != value){
+						ValueChangedEventArgs eventArgs = new ValueChangedEventArgs(m_value, value);
+						OnValueChange(eventArgs);
+					}
+					m_value = value;
+				}
+				}float m_value = 0f;
+			public void OnValueChange(ValueChangedEventArgs e){
+				if(handler != null) handler(this, e);
 			}
+		}
+		public class ValueChangeSubscriber{
+			public ValueChangeSubscriber(string name, ValueChangeBroadcaster caster){
+				this.name = name;
+				caster.handler += Print;
+				this.caster = caster;
+			}
+			~ValueChangeSubscriber(){
+				caster.handler -= Print;
+			}
+			ValueChangeBroadcaster caster; 
+			string name = "";
+			void Print(object source, ValueChangedEventArgs eventArgs){
+				Debug.Log(name + " received value changed event call: from " + eventArgs.oldValue.ToString() + " to " + eventArgs.newValue.ToString());
+			}
+		}
+		public void TransformAll<T>(IList<T> list, System.Func<T, T> func){
+			int count = 0;
+			foreach(var i in list){
+				list[count++] = func(i);
+			}
+		}
+
+		delegate void Printer(string str);
+		public void PrintRed(string str){
+			Debug.Log(Util.Red(str));
+		}
+		public void PrintBlue(string str){
+			Debug.Log(Util.Blue(str));
+		}
+		public void TestEventAndDelegate(){
+			// int[] ints = new int[]{1, 2, 3, 4};
+			// TransformAll(ints, Cube);
+			// foreach(int i in ints){
+			// 	Debug.Log(i.ToString());
+			// }
+			// float[] floats = new float[]{.2f, .3f, .4f};
+			// TransformAll(floats, Cube);
+			// foreach(float f in floats){
+			// 	Debug.Log(f.ToString());
+			// }
+			ValueChangeBroadcaster broadcaster = new ValueChangeBroadcaster();
+			ValueChangeSubscriber listenerA = new ValueChangeSubscriber("listenerA", broadcaster);
+			ValueChangeSubscriber listenerB = new ValueChangeSubscriber("listenerB", broadcaster);
+
+			broadcaster.value = 2f;
+			broadcaster.value = 3.3f;
+			broadcaster.value = 122f;
+
+			
+		}
 	/*	ssm features test */
 		public void TestSSMPointFocusAll(){
 			PerformOnAllSGAfterFocusing(TestSSMPointFocusAll);
@@ -1864,7 +1947,8 @@ public class SlottableTest{
 						ASSB(sb,
 							SBDeactivated, SBDeactivated, null,
 							SBWFA, SBWFA, null, false,
-							null, null, null);
+							null, null, null,
+							SBUnmarked, SBUnmarked, null);
 						ANull(sb.curEqpState);
 						ANull(sb.prevEqpState);
 					}
@@ -2135,6 +2219,7 @@ public class SlottableTest{
 			public void CrossTestSwapSelectively(Slottable sb, bool isPAS, SlotGroup tarSG){
 				CrossTestSGSelectively(TestSwap, sb, isPAS, tarSG);
 			}
+
 		public void TestFillOnAll(){
 			PerformOnAllSBs(CrossTestFill);
 			PrintTestResult();
@@ -2482,16 +2567,19 @@ public class SlottableTest{
 							ASSB(sb,
 								SBFocused, SBSelected, typeof(SBHighlightProcess),
 								SBWFA, SBWFPickUp, typeof(WaitForPickUpProcess), true,
+								null, null, null,
 								null, null, null);
 						sb.OnPointerUpMock(eventData);
 							ASSB(sb,
 								SBFocused, SBSelected, typeof(SBHighlightProcess),
 								SBWFPickUp, SBWFNT, typeof(WaitForNextTouchProcess), true,
+								null, null, null,
 								null, null, null);
 						sb.actProcess.Expire();
 							ASSB(sb,
 								SBSelected, SBFocused, typeof(SBDehighlightProcess),
 								SBWFNT, SBWFA, null, false,
+								null, null, null,
 								null, null, null);
 						AssertFocused();
 					/*	multi tap -> pickup	*/
@@ -2509,12 +2597,14 @@ public class SlottableTest{
 							ASSB(sb,
 								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 								SBWFNT, SBPickedUp, typeof(SBPickedUpProcess), true,
-								null, null, null);							
+								null, null, null,
+								null, null, null);
 						sb.OnPointerUpMock(eventData);
 						if(sb.isStackable){
 							ASSB(sb,
 								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 								SBPickedUp, SBWFNT, typeof(WaitForNextTouchProcess), true,
+								null, null, null,
 								null, null, null);
 							sb.actProcess.Expire();
 						}
@@ -2530,6 +2620,7 @@ public class SlottableTest{
 							ASSB(sb,
 								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 								sb.isStackable?SBWFNT:SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), false,
+								null, null, null,
 								null, null, null);
 						ssm.dIcon1.CompleteMovement();
 						AssertFocused();
@@ -2539,6 +2630,7 @@ public class SlottableTest{
 							ASSB(sb,
 								SBSelected, SBDefocused, typeof(SBGreyoutProcess),
 								sb.isStackable?SBWFNT:SBPickedUp, SBMoveWithin, typeof(SBMoveWithinProcess), false,
+								null, null, null,
 								null, null, null);
 						ssm.dIcon1.CompleteMovement();
 						AssertFocused();
@@ -2561,7 +2653,8 @@ public class SlottableTest{
 						ASSB(sb,
 							null, SBDefocused, null,
 							SBWFA, SBWFPointerUp, typeof(WaitForPointerUpProcess), true,
-							null,null,null);
+							null,null,null,
+							null, null, null);
 					sb.OnPointerUpMock(eventData);
 					AssertFocused();
 				}
@@ -2868,6 +2961,7 @@ public class SlottableTest{
 							ASSB(testSB,
 								null, SBFocused, null,
 								null, SBWFA, null, false,
+								null, null, null,
 								null, null, null);
 						PickUp(testSB, out picked);
 							ASSSM(ssm,
@@ -3544,11 +3638,29 @@ public class SlottableTest{
 			public void ASSB(Slottable sb,
 			SBSelState prevSel, SBSelState curSel , System.Type selProcT,
 			SBActState prevAct, SBActState curAct, System.Type actProcT, bool isRunning,
+			SBEqpState prevEqp, SBEqpState curEqp, System.Type eqpProcT,
+			SBMrkState prevMrk, SBMrkState curMrk, System.Type mrkProcT){
+				ASBSelState(sb, prevSel, curSel, selProcT);
+				ASBActState(sb, prevAct, curAct, actProcT, isRunning);
+				if(curEqp != null)
+					ASBEqpState(sb, prevEqp, curEqp, eqpProcT);
+				if(curMrk != null)
+					ASBMrkState(sb, prevMrk, curMrk, mrkProcT);
+			}
+			public void ASSB(Slottable sb,
+			SBSelState prevSel, SBSelState curSel , System.Type selProcT,
+			SBActState prevAct, SBActState curAct, System.Type actProcT, bool isRunning,
 			SBEqpState prevEqp, SBEqpState curEqp, System.Type eqpProcT){
 				ASBSelState(sb, prevSel, curSel, selProcT);
 				ASBActState(sb, prevAct, curAct, actProcT, isRunning);
 				if(curEqp != null)
 					ASBEqpState(sb, prevEqp, curEqp, eqpProcT);
+			}
+			public void ASSB(Slottable sb,
+			SBSelState prevSel, SBSelState curSel , System.Type selProcT,
+			SBActState prevAct, SBActState curAct, System.Type actProcT, bool isRunning){
+				ASBSelState(sb, prevSel, curSel, selProcT);
+				ASBActState(sb, prevAct, curAct, actProcT, isRunning);
 			}
 			public void ASSB_s(Slottable sb, SBSelState selState, SBActState actState){
 				AE(sb.curSelState, selState);
@@ -3585,6 +3697,16 @@ public class SlottableTest{
 						ANull(sb.eqpProcess);
 				}
 				AE(sb.curEqpState, cur);
+			}
+			public void ASBMrkState(Slottable sb, SBMrkState prev, SBMrkState cur, System.Type procT){
+				if(prev != null){
+					AE(sb.prevMrkState, prev);
+					if(procT != null)
+						AE(sb.eqpProcess.GetType(), procT);
+					else
+						ANull(sb.eqpProcess);
+				}
+				AE(sb.curMrkState, cur);
 			}
 			public void ASBReset(Slottable sb){
 				ASBActState(sb, null, SBWFA, null, false);
@@ -3645,17 +3767,20 @@ public class SlottableTest{
 										ASSB(sbp,
 											null, SBFocused, null,
 											null, SBWFA, null, false, 
-											null, sbp.isEquipped?SBEquipped:SBUnequipped, null);
+											null, sbp.isEquipped?SBEquipped:SBUnequipped, null,
+											null, null, null);
 									else
 										ASSB(sbp,
 											null, SBDefocused, null,
 											null, SBWFA, null, false,
-											null, sbp.isEquipped?SBEquipped:SBUnequipped, null);
+											null, sbp.isEquipped?SBEquipped:SBUnequipped, null,
+											null, null, null);
 								}else{
 									ASSB(sbp,
 										null, SBDefocused, null,
 										null, SBWFA, null, false,
-										null, sbp.isEquipped?SBEquipped:SBUnequipped, null);
+										null, sbp.isEquipped?SBEquipped:SBUnequipped, null,
+										null, null, null);
 								}
 								if(sbpItem == itemInst){
 									AB(sbp.isEquipped, true);
@@ -3670,7 +3795,8 @@ public class SlottableTest{
 									ASSB(sbe,
 										null, isSBEFiltered?SBFocused:SBDefocused, null,
 										null, SBWFA, null, false, 
-										null, SBEquipped, null);
+										null, SBEquipped, null,
+										null, null, null);
 								}else{// deemed not the equipped bow/wear
 									AB(sbp.isEquipped, false);
 									AB(sgpAll.equippedSBs.Contains(sbp), false);
@@ -3690,17 +3816,20 @@ public class SlottableTest{
 									ASSB(sbp,
 										null, SBFocused, null,
 										null, SBWFA, null, false, 
-										null, sbp.isEquipped?SBEquipped: SBUnequipped, null);
+										null, sbp.isEquipped?SBEquipped: SBUnequipped, null,
+										null, null, null);
 								else
 									ASSB(sbp,
 										null, SBDefocused, null,
 										null, SBWFA, null, false,
-										null, sbp.isEquipped?SBEquipped: SBUnequipped, null);
+										null, sbp.isEquipped?SBEquipped: SBUnequipped, null,
+										null, null, null);
 							}else{
 								ASSB(sbp,
 									null, SBDefocused, null,
 									null, SBWFA, null, false,
-									null, sbp.isEquipped?SBEquipped: SBUnequipped, null);
+									null, sbp.isEquipped?SBEquipped: SBUnequipped, null,
+									null, null, null);
 							}
 							if(sbpItem == itemInst){
 								AB(sbp.isEquipped, true);
@@ -3808,30 +3937,35 @@ public class SlottableTest{
 												ASSB(sbp,
 													null, SBDefocused, null,
 													null, SBWFA, null, false,
-													SBUnequipped, SBEquipped, typeof(SBEquipProcess));
+													SBUnequipped, SBEquipped, typeof(SBEquipProcess),
+													null, null, null);
 											}else{
 												ASSB(sbp,
 													null, SBFocused, null,
 													null, SBWFA, null, false,
-													SBUnequipped, SBEquipped, typeof(SBEquipProcess));	
+													SBUnequipped, SBEquipped, typeof(SBEquipProcess),
+													null, null, null);
 											}
 										}else{
 											ASSB(sbp,
 												null, SBDefocused, null,
 												null, SBWFA, null, false,
-												SBUnequipped, SBEquipped, typeof(SBEquipProcess));	
+												SBUnequipped, SBEquipped, typeof(SBEquipProcess),
+												null, null, null);
 										}
 									}else{	/* deemed not equipped */
 										if(sgp == ssm.focusedSGP){
 											ASSB(sbp,
 												null, SBFocused, null,
 												null, SBWFA, null, false,
-												null, SBUnequipped, null);
+												null, SBUnequipped, null,
+												null, null, null);
 										}else{
 											ASSB(sbp,
 												null, SBDefocused, null,
 												null, SBWFA, null, false,
-												null, SBUnequipped, null);
+												null, SBUnequipped, null,
+												null, null, null);
 										}
 									}
 								}
@@ -4087,6 +4221,12 @@ public class SlottableTest{
 			}
 			SBEqpState SBUnequipped{
 				get{return Slottable.unequippedState;}
+			}
+			SBMrkState SBMarked{
+				get{return Slottable.markedState;}
+			}
+			SBMrkState SBUnmarked{
+				get{return Slottable.unmarkedState;}
 			}
 
 }
