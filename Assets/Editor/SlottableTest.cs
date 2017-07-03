@@ -1048,7 +1048,7 @@ public class SlottableTest{
 		ssm.Activate();
 		AssertFocused();
 	}
-	[Test]
+	// [Test]
 	public void TestAll(){
 		// CheckTransacitonWithSBSpecifiedOnAll();
 		// CheckTransactionOnAllSG();
