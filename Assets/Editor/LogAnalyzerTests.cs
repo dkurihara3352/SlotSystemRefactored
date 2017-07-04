@@ -149,6 +149,5 @@ public class EventsRelatedTests{
 		someView.LoadedTrigger();
 		Assert.That(isCalled, Is.True);
 	}
-
-	//this is as far as develop has come
+	// added comment in develop 
 }
