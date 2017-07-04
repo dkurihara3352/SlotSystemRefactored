@@ -162,11 +162,4 @@ public class EventsRelatedTests{
 		//added comments in feature branch a lot
 		//added comments in feature branch a lot
 		//added comments in feature branch a lot
-
-		//adding some more comment
-		//adding some more comment
-		//adding some more comment
-		//adding some more comment
-		//adding some more comment
-		//adding some more comment
 }
