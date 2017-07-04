@@ -149,7 +149,5 @@ public class EventsRelatedTests{
 		someView.LoadedTrigger();
 		Assert.That(isCalled, Is.True);
 	}
-	//adde still another commnet
-	//added in develop
-		//where's the all changes to the feature branch?
+	// feature branch
 }
