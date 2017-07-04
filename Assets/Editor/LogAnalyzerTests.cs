@@ -60,13 +60,19 @@ public class ICalculatorTests{
 		ICalculator calc = Substitute.For<ICalculator>();
 		calc.Add(1, 2).Returns(3);
 		Assert.That(calc.Add(1, 2), Is.EqualTo(3));
+		calc.Received().Add(1, 2);
+		// calc.DidNotReceive().Add(1, 2);
+		calc.Mode.Returns("SomeMode");
+		Assert.That(calc.Mode, Is.EqualTo("SomeMode"));
+		calc.Mode = "SomeOtherMode";
+		Assert.That(calc.Mode, Is.EqualTo("SomeOtherMode"));
+		calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(10);
+		Assert.That(calc.Add(1, 222), Is.EqualTo(10));
+		calc.
+			When(x => x.Add(Arg.Is<int>(y => y < 0), Arg.Any<int>())).
+			Do(context => {throw new System.Exception("fake exception");});
+		Assert.Throws<System.Exception>(() => calc.Add(-2, 2));
 	}
-}
-public interface ICalculator
-{
-    int Add(int a, int b);
-    string Mode { get; set; }
-    event System.EventHandler PoweringUp;
 }
 [TestFixture]
 public class MemCalculatorTests{
@@ -84,5 +90,63 @@ public class MemCalculatorTests{
 	}
 	public MemCalculator MakeMemCalculator(){
 		return new MemCalculator();
+	}
+}
+[TestFixture]
+public class LogAnalyzer2Tests{
+	[Test]
+	public void Analyze_LoggerThrows_WriteToWebService(){
+		FakeLogger2 stubLogger = new FakeLogger2();
+		stubLogger.thrown = new System.Exception("fake exception");
+		FakeWebService mockWebService = new FakeWebService();
+		LogAnalyzer2 logAn = new LogAnalyzer2(stubLogger, mockWebService);
+		logAn.minNameLength = 8;
+
+		string tooShortFileName = "abs.txt";
+		logAn.Analyze(tooShortFileName);
+
+		Assert.That(mockWebService.messageToWebService, Is.StringContaining("fake exception"));
+	}
+	[Test]
+	public void Analyze_LoggerThrows_WriteToWebService_NSubVer(){
+		ILogger stubLogger = Substitute.For<ILogger>();
+		stubLogger.
+			When(x => x.LogError(Arg.Any<string>())).
+			Do(info => {throw new System.Exception("fake exception");});
+		IWebService mockWebService = Substitute.For<IWebService>();
+		LogAnalyzer2 logAn = new LogAnalyzer2(stubLogger, mockWebService);
+		logAn.minNameLength = 8;
+
+		string tooShortFileName = "abs.txt";
+		logAn.Analyze(tooShortFileName);
+
+		mockWebService.Received().Write(Arg.Is<string>(s => s.Contains("fake exception")));	
+	}
+	
+}
+[TestFixture]
+public class EventsRelatedTests{
+	[Test]
+	public void ctor_WhenViewIsLoaded_RenderView(){
+		IView mockView = Substitute.For<IView>();
+		Presenter presenter = new Presenter(mockView);
+		mockView.Loaded += Raise.Event<System.Action>();
+		mockView.Received().Render(Arg.Is<string>(s => s.Contains("Hello World")));
+	}
+	[Test]
+	public void ctor_WhenViewHasError_CallsLogger(){
+		IView stubView = Substitute.For<IView>();
+		ILogger mockLogger = Substitute.For<ILogger>();
+		Presenter presenter = new Presenter(stubView, mockLogger);
+		stubView.ErrorOccurred += Raise.Event<System.Action<string>>("error occurred");
+		mockLogger.Received().LogError(Arg.Is<string>(s => s.Contains("error occurred")));
+	}
+	[Test]
+	public void TestIfEventIsFiredManually(){
+		SomeView someView = new SomeView();
+		bool isCalled = false;
+		someView.Loaded += () => { isCalled = true;};
+		someView.LoadedTrigger();
+		Assert.That(isCalled, Is.True);
 	}
 }
