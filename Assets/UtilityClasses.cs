@@ -94,11 +94,11 @@ namespace Utility{
 					Generate(n-1, ref ie, ref result);
 				}
 			}
-			public static IEnumerable<T> SwappedList<T>(IEnumerable<T> ie, int a, int b){
+			public static IEnumerable<T> SwappedList<T>(IEnumerable<T> ie, int i, int j){
 				List<T> result = new List<T>(ie);
-				T temp = result[a];
-				result[a] = result[b];
-				result[b] = temp;
+				T temp = result[i];
+				result[i] = result[j];
+				result[j] = temp;
 				return result;
 			}
 		private static System.Random rng = new System.Random();
