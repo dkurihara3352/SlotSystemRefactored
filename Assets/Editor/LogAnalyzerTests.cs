@@ -149,5 +149,4 @@ public class EventsRelatedTests{
 		someView.LoadedTrigger();
 		Assert.That(isCalled, Is.True);
 	}
-	// feature branch
 }
