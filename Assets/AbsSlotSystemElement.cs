@@ -149,6 +149,7 @@ namespace SlotSystem{
 					else
 						return parent.immediateBundle;
 				}
+				set{}
 			}
 			public SlotSystemManager ssm{
 				get{return m_ssm;}
@@ -168,14 +169,14 @@ namespace SlotSystem{
 			}
 			public bool isPageElement{
 				get{
-					return parent is SlotSystemPage;
+					return (parent is SlotSystemPage);
 				}
 			}
 			public bool isToggledOn{
 				get{
 					if(isPageElement){
 						SlotSystemPage page = (SlotSystemPage)parent;
-						return page.GetPageElement(this).isFocusToggleOn;
+						return (page.GetPageElement(this).isFocusToggleOn);
 					}
 					return false;
 				}

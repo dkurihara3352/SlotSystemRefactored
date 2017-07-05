@@ -33,7 +33,7 @@ namespace SlotSystem{
 					return m_pageElements;
 				}
 			}protected IEnumerable<SlotSystemPageElement> m_pageElements;
-		public SlotSystemPageElement GetPageElement(SlotSystemElement element){
+		public virtual SlotSystemPageElement GetPageElement(SlotSystemElement element){
 			foreach(SlotSystemPageElement pageEle in pageElements){
 				if(pageEle.element == element)
 					return pageEle;
