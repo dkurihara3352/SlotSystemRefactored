@@ -4,6 +4,7 @@ using NUnit.Framework;
 using NSubstitute;
 
 [TestFixture]
+[Ignore]
 public class LogAnalyzerTests{
 	[TestCase("someInvalidFileName.foo", false)]
 	[TestCase("someInvalidFileName.SLF", true)]
@@ -54,6 +55,7 @@ public class LogAnalyzerTests{
 	}
 }
 [TestFixture]
+[Ignore]
 public class ICalculatorTests{
 	[Test]
 	public void Add_Always_ReturnsSumValue(){
@@ -75,6 +77,7 @@ public class ICalculatorTests{
 	}
 }
 [TestFixture]
+[Ignore]
 public class MemCalculatorTests{
 	[Test]
 	public void Sum_ByDefault_ReturnsZero(){
@@ -93,6 +96,7 @@ public class MemCalculatorTests{
 	}
 }
 [TestFixture]
+[Ignore]
 public class LogAnalyzer2Tests{
 	[Test]
 	public void Analyze_LoggerThrows_WriteToWebService(){
@@ -125,6 +129,7 @@ public class LogAnalyzer2Tests{
 	
 }
 [TestFixture]
+[Ignore]
 public class EventsRelatedTests{
 	[Test]
 	public void ctor_WhenViewIsLoaded_RenderView(){

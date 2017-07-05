@@ -4,6 +4,8 @@ using NUnit.Framework;
 using SlotSystem;
 using System.Collections.Generic;
 using Utility;
+[TestFixture]
+[Ignore]
 public class SlottableTest{
 	public enum TestElement{SB, SG, SSM, TA}
 	public abstract class SlotSystemTestResult{
@@ -1048,7 +1050,7 @@ public class SlottableTest{
 		ssm.Activate();
 		AssertFocused();
 	}
-	// [Test]
+	[Test]
 	public void TestAll(){
 		// CheckTransacitonWithSBSpecifiedOnAll();
 		// CheckTransactionOnAllSG();

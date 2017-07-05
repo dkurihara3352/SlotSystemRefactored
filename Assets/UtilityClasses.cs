@@ -52,17 +52,6 @@ namespace Utility{
 			}
 			return result;
 		}
-		// public static IEnumerable<IEnumerable<T>> Combinations<T>(int n, List<T> set){
-		// 	foreach(var intCombo in Combinations(n, set.Count)){	
-		// 		yield return ComboElement(intCombo, set);
-		// 	}
-			
-		// }
-		// public static IEnumerable<T> ComboElement<T>(int[] intCombo, List<T> set){
-		// 	foreach(int i in intCombo){
-		// 		yield return set[i -1];
-		// 	}
-		// }
 		public static IEnumerable<int[]> Combinations(int m, int n){
 			int[] result = new int[m];
 			Stack<int> stack = new Stack<int>();
@@ -121,14 +110,15 @@ namespace Utility{
 		}
 		public static void Shuffle<T>(this IList<T> list)
 		{  
-			int n = list.Count;  
-			while (n > 1) {  
+			List<T> origCopy = new List<T>(list);
+			int n = list.Count;
+			while (n > 1) { 
 				n--;  
 				int k = rng.Next(n + 1);  
-				T value = list[k];  
+				T value = list[k];
 				list[k] = list[n];  
 				list[n] = value;  
-			}  
+			}
 		}
 	}
 }
