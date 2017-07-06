@@ -7,406 +7,35 @@ using Utility;
 namespace SlotSystem{
 	public class SlotSystemClasses{
 	}
-	/*	test classes	*/
-		public class IEnumeratorMock{}
-		public class PointerEventDataMock{
-			public GameObject pointerDrag;
-		}
 	
 	/*	SSM	Classes	*/
 		/*	states	*/
 			/*	Selection State	*/
-				public abstract class SSMState: SSEState{
-					protected SlotSystemManager ssm{
-						get{
-							return (SlotSystemManager)base.sse;
-						}
-					}
-				}
-				public class SSMSelState: SSMState{}
-				public class SSMDeactivatedState: SSMSelState{
-					public override void EnterState(StateHandler sh){
-						base.EnterState(sh);
-						ssm.SetAndRunSelProcess(null);
-						ssm.SetActState(SlotSystemManager.ssmWaitForActionState);
-					}
-					public override void ExitState(StateHandler sh){
-						base.ExitState(sh);
-					}
-				}
-				public class SSMDefocusedState: SSMSelState{
-					public override void EnterState(StateHandler sh){
-						base.EnterState(sh);
-						if(ssm.prevSelState == SlotSystemManager.ssmFocusedState)
-							ssm.SetAndRunSelProcess(new SSMGreyoutProcess(ssm, ssm.greyoutCoroutine));
-					}
-					public override void ExitState(StateHandler sh){
-						base.ExitState(sh);
-					}
-				}
-				public class SSMFocusedState: SSMSelState{
-					public override void EnterState(StateHandler sh){
-						base.EnterState(sh);
-						if(ssm.prevSelState == SlotSystemManager.ssmDefocusedState)
-							ssm.SetAndRunSelProcess(new SSMGreyinProcess(ssm, ssm.greyinCoroutine));
-					}
-					public override void ExitState(StateHandler sh){
-						base.ExitState(sh);
-					}
-				}
+				
 			/*	Action State	*/
-				public class SSMActState: SSMState{}
-				public class SSMWaitForActionState: SSMActState{
-					public override void EnterState(StateHandler sh){
-						base.EnterState(sh);
-						ssm.SetAndRunActProcess(null);
-					}
-					public override void ExitState(StateHandler sh){
-						base.ExitState(sh);
-					}
-				}
-				public class SSMProbingState: SSMActState{
-					public override void EnterState(StateHandler sh){
-						base.EnterState(sh);
-						if(ssm.prevActState == SlotSystemManager.ssmWaitForActionState)
-							ssm.SetAndRunActProcess(new SSMProbeProcess(ssm, ssm.probeCoroutine));
-						else
-							throw new System.InvalidOperationException("SGMProbingState: Entering from an invalid state");
-					}
-					public override void ExitState(StateHandler sh){
-						base.ExitState(sh);
-					}
-				}
-				public class SSMTransactionState: SSMActState{
-					public override void EnterState(StateHandler sh){
-						base.EnterState(sh);
-						ssm.SetAndRunActProcess(new SSMTransactionProcess(ssm));
-					}
-					public override void ExitState(StateHandler sh){
-						base.ExitState(sh);
-					}
-				}
+				
 		/*	process	*/
 			/*	superclasses	*/
-				public abstract class SSMProcess: AbsSSEProcess{
-					protected SlotSystemManager ssm{
-						get{return (SlotSystemManager)sse;}
-					}
-				}
+
 			/*	Selection Process	*/
-				public class SSMSelProcess: SSMProcess{}
-				public class SSMGreyinProcess: SSMSelProcess{
-					public SSMGreyinProcess(SlotSystemManager ssm, System.Func<IEnumeratorMock> coroutineMock){
-						this.sse = ssm;
-						this.coroutineMock = coroutineMock;
-					}
-				}
-				public class SSMGreyoutProcess: SSMSelProcess{
-					public SSMGreyoutProcess(SlotSystemManager ssm, System.Func<IEnumeratorMock> coroutineMock){
-						this.sse = ssm;
-						this.coroutineMock = coroutineMock;
-					}
-				}
+				
+				
+				
 			/*	Action Process	*/
-				public class SSMActProcess: SSMProcess{}
-				public class SSMProbeProcess: SSMActProcess{
-					public SSMProbeProcess(SlotSystemManager ssm, System.Func<IEnumeratorMock> coroutineMock){
-						this.sse = ssm;
-						this.coroutineMock = coroutineMock;
-					}
-				}
-				public class SSMTransactionProcess: SSMActProcess{
-					public SSMTransactionProcess(SlotSystemManager ssm){
-						this.sse = ssm;
-						this.coroutineMock = ssm.transactionCoroutine;
-					}
-					public override void Expire(){
-						base.Expire();
-						ssm.transaction.OnComplete();
-					}
-				}
+				
+				
+				
 	/*	Transaction classes	*/
 		/*	transaction	*/
-			public interface SlotSystemTransaction{
-				Slottable targetSB{get;}
-				SlotGroup sg1{get;}
-				SlotGroup sg2{get;}
-				List<InventoryItemInstanceMock> moved{get;}
-				void Indicate();
-				void Execute();
-				void OnComplete();
-			}
-			public abstract class AbsSlotSystemTransaction: SlotSystemTransaction{
-				public static SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered){
-					SlotGroup origSG = pickedSB.sg;
-					if(hovered != null){
-						if(hovered is SlotGroup){
-							SlotGroup hovSG = (SlotGroup)hovered;
-							if(hovSG.AcceptsFilter(pickedSB)){
-								if(hovSG != origSG && origSG.isShrinkable){
-									if(hovSG.HasItem(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
-										return new StackTransaction(pickedSB, hovSG.GetSB(pickedSB.itemInst));
-										
-									if(hovSG.hasEmptySlot){
-										if(!hovSG.HasItem(pickedSB.itemInst))
-											return new FillTransaction(pickedSB, hovSG);
-									}else{
-										if(hovSG.isExpandable){
-											return new FillTransaction(pickedSB, hovSG);
-										}else{
-											if(hovSG.SwappableSBs(pickedSB).Count == 1){
-												Slottable calcedSB = hovSG.SwappableSBs(pickedSB)[0];
-												if(calcedSB.itemInst != pickedSB.itemInst)
-													return new SwapTransaction(pickedSB, calcedSB);
-											}
-										}
-									}
-								}
-							}
-							return new RevertTransaction(pickedSB);
-						}else if(hovered is Slottable){
-							Slottable hovSB = (Slottable)hovered;
-							SlotGroup hovSBSG = hovSB.sg;
-							if(hovSBSG == origSG){
-								if(hovSB != pickedSB){
-									if(!hovSBSG.isAutoSort)
-										return new ReorderTransaction(pickedSB, hovSB);
-								}
-							}else{
-								if(hovSBSG.AcceptsFilter(pickedSB)){
-									//swap or stack, else insert
-									if(pickedSB.itemInst == hovSB.itemInst){
-										if(hovSBSG.isPool && origSG.isShrinkable)
-											return new FillTransaction(pickedSB, hovSBSG);
-										if(pickedSB.itemInst.Item.IsStackable)
-											return new StackTransaction(pickedSB, hovSB);
-									}else{
-										if(hovSBSG.HasItem(pickedSB.itemInst)){
-											if(!origSG.HasItem(hovSB.itemInst)){
-												if(hovSBSG.isPool){
-													if(origSG.AcceptsFilter(hovSB))
-														return new SwapTransaction(pickedSB, hovSB);
-													if(origSG.isShrinkable)
-														return new FillTransaction(pickedSB, hovSBSG);
-												}
-											}
-										}else{
-											if(origSG.AcceptsFilter(hovSB))
-												return new SwapTransaction(pickedSB, hovSB);
-											if(hovSBSG.hasEmptySlot || hovSBSG.isExpandable)
-												if(origSG.isShrinkable)
-												return new FillTransaction(pickedSB, hovSBSG);
-										}
-									}
-								}
-							}
-							return new RevertTransaction(pickedSB);
-						}else
-							throw new System.InvalidOperationException("AbsSlotSystemTransaction.GetTransaction: hovered is neither SG nor SB");
-					}
-					return new RevertTransaction(pickedSB);
-				}
-				protected SlotSystemManager ssm = SlotSystemManager.curSSM;
-				protected List<InventoryItemInstanceMock> removed = new List<InventoryItemInstanceMock>();
-				protected List<InventoryItemInstanceMock> added = new List<InventoryItemInstanceMock>();
-				public virtual Slottable targetSB{get{return null;}}
-				public virtual SlotGroup sg1{get{return null;}}
-				public virtual SlotGroup sg2{get{return null;}}
-				public virtual List<InventoryItemInstanceMock> moved{get{return null;}}
-				public virtual void Indicate(){}
-				public virtual void Execute(){
-					ssm.SetActState(SlotSystemManager.ssmTransactionState);
-				}
-				public virtual void OnComplete(){
-					ssm.ResetAndFocus();
-				}
-			}
-			public class EmptyTransaction: AbsSlotSystemTransaction{}
-			public class RevertTransaction: AbsSlotSystemTransaction{
-				public Slottable m_pickedSB;
-				public SlotGroup m_origSG;
-				public RevertTransaction(Slottable pickedSB){
-					m_pickedSB = pickedSB;
-					m_origSG = m_pickedSB.sg;
-				}
-				public RevertTransaction(RevertTransaction orig){
-					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-					this.m_origSG = Util.CloneSG(orig.m_origSG);
-				}
-				public override void Indicate(){}
-				public override void Execute(){
-					m_origSG.SetActState(SlotGroup.revertState);
-					ssm.dIcon1.SetDestination(m_origSG, m_origSG.GetNewSlot(m_pickedSB.itemInst));
-					m_origSG.OnActionExecute();
-					base.Execute();
-				}
-				public override void OnComplete(){
-					m_origSG.OnCompleteSlotMovements();
-					base.OnComplete();
-				}
-			}
-			public class ReorderTransaction: AbsSlotSystemTransaction{
-				public Slottable m_pickedSB;
-				public Slottable m_selectedSB;
-				public SlotGroup m_origSG;
-				public ReorderTransaction(Slottable pickedSB, Slottable selected){
-					m_pickedSB = pickedSB;
-					m_selectedSB = selected;
-					m_origSG = m_pickedSB.sg;
-				}
-				public ReorderTransaction(ReorderTransaction orig){
-					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-					this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
-					this.m_origSG = Util.CloneSG(orig.m_origSG);
-				}
-				public override Slottable targetSB{get{return m_selectedSB;}}
-				public override SlotGroup sg1{get{return m_origSG;}}
-				public override void Indicate(){}
-				public override void Execute(){
-					sg1.SetActState(SlotGroup.reorderState);
-					ssm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.itemInst));
-					sg1.OnActionExecute();
-					base.Execute();
-				}
-				public override void OnComplete(){
-					sg1.OnCompleteSlotMovements();
-					base.OnComplete();
-				}
-			}
-			public class StackTransaction: AbsSlotSystemTransaction{
-				public Slottable m_pickedSB;
-				public SlotGroup m_origSG;
-				public Slottable m_selectedSB;
-				public SlotGroup m_selectedSG;
-				public List<InventoryItemInstanceMock> itemCache = new List<InventoryItemInstanceMock>();
-				public StackTransaction(Slottable pickedSB ,Slottable selected){
-					m_pickedSB = pickedSB;
-					m_origSG = pickedSB.sg;
-					m_selectedSB = selected;
-					m_selectedSG = m_selectedSB.sg;
-					InventoryItemInstanceMock cache = pickedSB.itemInst;
-					cache.Quantity = pickedSB.pickedAmount;
-					itemCache.Add(cache);
-				}
-				public StackTransaction(StackTransaction orig){
-					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-					this.m_origSG = Util.CloneSG(orig.m_origSG);
-					this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
-					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
-					InventoryItemInstanceMock item = this.m_pickedSB.itemInst;
-					item.Quantity = orig.m_pickedSB.pickedAmount;
-					itemCache.Add(item);
-				}
-				public override Slottable targetSB{get{return m_selectedSB;}}
-				public override SlotGroup sg1{get{return m_origSG;}}
-				public override SlotGroup sg2{get{return m_selectedSG;}}
-				public override List<InventoryItemInstanceMock> moved{get{return itemCache;}}
-				public override void Indicate(){}
-				public override void Execute(){
-					sg1.SetActState(SlotGroup.removeState);
-					sg2.SetActState(SlotGroup.addState);
-					ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
-					base.Execute();
-				}
-				public override void OnComplete(){
-					sg1.OnCompleteSlotMovements();
-					sg2.OnCompleteSlotMovements();
-					base.OnComplete();
-				}
-			}
-			public class SwapTransaction: AbsSlotSystemTransaction{
-				public Slottable m_pickedSB;
-				public SlotGroup m_origSG;
-				public Slottable m_selectedSB;
-				public SlotGroup m_selectedSG;
-				public SwapTransaction(Slottable pickedSB, Slottable selected){
-					m_pickedSB = pickedSB;
-					m_selectedSB = selected;
-					m_origSG = m_pickedSB.sg;
-					m_selectedSG = m_selectedSB.sg;
-				}
-				public SwapTransaction(SwapTransaction orig){
-					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-					this.m_origSG = Util.CloneSG(orig.m_origSG);
-					this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
-					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
-				}
-				public override Slottable targetSB{get{return m_selectedSB;}}
-				public override SlotGroup sg1{get{return m_origSG;}}
-				public override SlotGroup sg2{get{return m_selectedSG;}}
-				public override void Indicate(){}
-				public override void Execute(){
-					sg1.SetActState(SlotGroup.swapState);
-					sg2.SetActState(SlotGroup.swapState);
-					ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
-					DraggedIcon di2 = new DraggedIcon(targetSB);
-					ssm.SetDIcon2(di2);
-					ssm.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.itemInst));
-					sg1.OnActionExecute();
-					sg2.OnActionExecute();
-					base.Execute();
-				}
-				public override void OnComplete(){
-					sg1.OnCompleteSlotMovements();
-					sg2.OnCompleteSlotMovements();
-					base.OnComplete();
-				}
-			}
-			public class FillTransaction: AbsSlotSystemTransaction{
-				public Slottable m_pickedSB;
-				public SlotGroup m_selectedSG;
-				public SlotGroup m_origSG;
-				public FillTransaction(Slottable pickedSB, SlotGroup selected){
-					m_pickedSB = pickedSB;
-					m_selectedSG = selected;
-					m_origSG = m_pickedSB.sg;
-				}
-				public FillTransaction(FillTransaction orig){
-					this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
-					this.m_origSG = Util.CloneSG(orig.m_origSG);
-				}
-				public override SlotGroup sg1{get{return m_origSG;}}
-				public override SlotGroup sg2{get{return m_selectedSG;}}
-				public override void Indicate(){}
-				public override void Execute(){
-					sg1.SetActState(SlotGroup.fillState);
-					sg2.SetActState(SlotGroup.fillState);
-					ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
-					sg1.OnActionExecute();
-					sg2.OnActionExecute();
-					base.Execute();
-				}
-				public override void OnComplete(){
-					sg1.OnCompleteSlotMovements();
-					sg2.OnCompleteSlotMovements();
-					base.OnComplete();
-				}
-			}
-			public class SortTransaction: AbsSlotSystemTransaction{
-				public SlotGroup m_selectedSG;
-				public SGSorter m_sorter;
-				public SortTransaction(SlotGroup sg, SGSorter sorter){
-					m_selectedSG = sg;
-					m_sorter = sorter;
-				}
-				public SortTransaction(SortTransaction orig){
-					this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
-					this.m_sorter = orig.m_sorter;
-				}
-				public override SlotGroup sg1{get{return m_selectedSG;}}
-				public override void Indicate(){}
-				public override void Execute(){
-					sg1.SetSorter(m_sorter);
-					sg1.SetActState(SlotGroup.sortState);
-					sg1.OnActionExecute();
-					base.Execute();
-				}
-				public override void OnComplete(){
-					sg1.OnCompleteSlotMovements();
-					base.OnComplete();
-				}
-			}
+			
+			
+			
+			
+			
+			
+			
+			
+		
 	/*	SlotGroup Classes	*/
 		/*	states	*/
 			/*	superclasses	*/
@@ -418,11 +47,11 @@ namespace SlotSystem{
 					}
 				}
 				public abstract class SGSelState: SGState{
-					public virtual void OnHoverEnterMock(SlotGroup sg, PointerEventDataMock eventDataMock){
+					public virtual void OnHoverEnterMock(SlotGroup sg, PointerEventDataFake eventDataMock){
 						// sg.ssm.SetHoveredSG(sg);
 						sg.ssm.SetHovered(sg);
 					}
-					public virtual void OnHoverExitMock(SlotGroup sg, PointerEventDataMock eventDataMock){
+					public virtual void OnHoverExitMock(SlotGroup sg, PointerEventDataFake eventDataMock){
 
 					}
 				}
@@ -532,10 +161,10 @@ namespace SlotSystem{
 				public class SGAddState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						List<InventoryItemInstanceMock> cache = sg.ssm.transaction.moved;
+						List<InventoryItemInstance> cache = sg.ssm.transaction.moved;
 						List<Slottable> newSBs = sg.toList;
 						int origCount = newSBs.Count;
-						foreach(InventoryItemInstanceMock itemInst in cache){
+						foreach(InventoryItemInstance itemInst in cache){
 							bool found = false;
 							foreach(Slottable sb in newSBs){
 								if(sb!= null){
@@ -578,12 +207,12 @@ namespace SlotSystem{
 				public class SGRemoveState: SGActState{
 					public override void EnterState(StateHandler sh){
 						base.EnterState(sh);
-						List<InventoryItemInstanceMock> cache = sg.ssm.transaction.moved;
+						List<InventoryItemInstance> cache = sg.ssm.transaction.moved;
 						List<Slottable> newSBs = sg.toList;
 						int origCount = newSBs.Count;
 						List<Slottable> removedList = new List<Slottable>();
 						List<Slottable> nonremoved = new List<Slottable>();
-						foreach(InventoryItemInstanceMock itemInst in cache){
+						foreach(InventoryItemInstance itemInst in cache){
 							foreach(Slottable sb in newSBs){
 								if(sb!= null){
 									if(sb.itemInst == itemInst){
@@ -751,35 +380,35 @@ namespace SlotSystem{
 			/*	Selecttion Process	*/
 				public abstract class SGSelProcess: SGProcess{}
 				public class SGGreyinProcess: SGSelProcess{
-					public SGGreyinProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+					public SGGreyinProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sg;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SGGreyoutProcess: SGSelProcess{
-					public SGGreyoutProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+					public SGGreyoutProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sg;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SGHighlightProcess: SGSelProcess{
-					public SGHighlightProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+					public SGHighlightProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sg;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SGDehighlightProcess: SGSelProcess{
-					public SGDehighlightProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+					public SGDehighlightProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sg;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 			/*	Action Process*/
 				public abstract class SGActProcess: SGProcess{}
 				public class SGTransactionProcess: SGActProcess{
-					public SGTransactionProcess(SlotGroup sg, System.Func<IEnumeratorMock> coroutineMock){
+					public SGTransactionProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sg;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 					public override void Expire(){
 						base.Expire();
@@ -810,7 +439,7 @@ namespace SlotSystem{
 						foreach(SlottableItem item in items){
 							GameObject newSBGO = new GameObject("newSBGO");
 							Slottable newSB = newSBGO.AddComponent<Slottable>();
-							newSB.Initialize((InventoryItemInstanceMock)item);
+							newSB.Initialize((InventoryItemInstance)item);
 							newSB.SetSSM(sg.ssm);
 							sg.slots[items.IndexOf(item)].sb = newSB;
 						}
@@ -836,7 +465,7 @@ namespace SlotSystem{
 					*/
 					foreach(Slottable sb in sg){
 						if(sb != null){
-							InventoryItemInstanceMock item = sb.itemInst;
+							InventoryItemInstance item = sb.itemInst;
 							if(sb.newSlotID == -1){/* removed	*/
 								sg.inventory.Remove(item);
 								sg.ssm.MarkEquippedInPool(item, false);
@@ -979,12 +608,12 @@ namespace SlotSystem{
 						int indexAtMin = -1;
 						int addedAO;
 						if(addedMax == null) addedAO = -1;
-						else addedAO = ((InventoryItemInstanceMock)addedMax.item).AcquisitionOrder;
+						else addedAO = ((InventoryItemInstance)addedMax.item).AcquisitionOrder;
 
 						for(int i = 0; i < trimmed.Count; i++){
-							InventoryItemInstanceMock inst = (InventoryItemInstanceMock)trimmed[i].item;
+							InventoryItemInstance inst = (InventoryItemInstance)trimmed[i].item;
 							if(inst.AcquisitionOrder > addedAO){
-								if(indexAtMin == -1 || inst.AcquisitionOrder < ((InventoryItemInstanceMock)trimmed[indexAtMin].item).AcquisitionOrder){
+								if(indexAtMin == -1 || inst.AcquisitionOrder < ((InventoryItemInstance)trimmed[indexAtMin].item).AcquisitionOrder){
 									indexAtMin = i;
 								}
 							}
@@ -1006,35 +635,35 @@ namespace SlotSystem{
 			/*	Selecttion process	*/
 				public abstract class SBSelProcess: SBProcess{}
 				public class SBGreyoutProcess: SBSelProcess{
-					public SBGreyoutProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBGreyoutProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SBGreyinProcess: SBSelProcess{
-					public SBGreyinProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBGreyinProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SBHighlightProcess: SBSelProcess{
-					public SBHighlightProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBHighlightProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SBDehighlightProcess: SBSelProcess{
-					public SBDehighlightProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBDehighlightProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 			/*	Action process	*/
 				public abstract class SBActProcess: SBProcess{}
 				public class WaitForPointerUpProcess: SBActProcess{
-					public WaitForPointerUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public WaitForPointerUpProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 					public override void Expire(){
 						base.Expire();
@@ -1042,9 +671,9 @@ namespace SlotSystem{
 					}
 				}
 				public class WaitForPickUpProcess: SBActProcess{
-					public WaitForPickUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public WaitForPickUpProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 					public override void Expire(){
 						base.Expire();
@@ -1052,15 +681,15 @@ namespace SlotSystem{
 					}
 				}
 				public class SBPickedUpProcess: SBActProcess{
-					public SBPickedUpProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBPickedUpProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class WaitForNextTouchProcess: SBActProcess{
-					public WaitForNextTouchProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public WaitForNextTouchProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 					public override void Expire(){
 						base.Expire();
@@ -1074,49 +703,49 @@ namespace SlotSystem{
 					}
 				}
 				public class SBRemoveProcess: SBActProcess{
-					public SBRemoveProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBRemoveProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SBAddProcess: SBActProcess{
-					public SBAddProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBAddProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SBMoveWithinProcess: SBActProcess{
-					public SBMoveWithinProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBMoveWithinProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 			/*	Equip process*/
 				public abstract class SBEqpProcess: SBProcess{}
 				public class SBUnequipProcess: SBEqpProcess{
-					public SBUnequipProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBUnequipProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SBEquipProcess: SBEqpProcess{
-					public SBEquipProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBEquipProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 			/*	Equip process*/
 				public abstract class SBMrkProcess: SBProcess{}
 				public class SBUnmarkProcess: SBMrkProcess{
-					public SBUnmarkProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBUnmarkProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 				public class SBMarkProcess: SBMrkProcess{
-					public SBMarkProcess(Slottable sb, System.Func<IEnumeratorMock> coroutineMock){
+					public SBMarkProcess(Slottable sb, System.Func<IEnumeratorFake> coroutineMock){
 						sse = sb;
-						this.coroutineMock = coroutineMock;
+						this.coroutineFake = coroutineMock;
 					}
 				}
 		/*	states	*/
@@ -1129,18 +758,18 @@ namespace SlotSystem{
 					}
 				}
 				public abstract class SBSelState: SBState{
-					public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataFake eventDataMock){
 						// sb.ssm.SetHoveredSB(sb);
 						sb.ssm.SetHovered(sb);
 					}
-					public virtual void OnHoverExitMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public virtual void OnHoverExitMock(Slottable sb, PointerEventDataFake eventDataMock){
 					}
 				}
 				public abstract class SBActState: SBState{
-					public abstract void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock);
-					public abstract void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock);
-					public abstract void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock);
-					public abstract void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock);
+					public abstract void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock);
+					public abstract void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock);
+					public abstract void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock);
+					public abstract void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock);
 				}
 				public abstract class SBEqpState: SBState{}
 				public abstract class SBMrkState: SBState{}
@@ -1213,16 +842,16 @@ namespace SlotSystem{
 						SBActProcess process = null;
 						sb.SetAndRunActProcess(process);
 					}
-					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.Tap();
 						sb.Reset();
 						sb.Defocus();
 					}
-					public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.Reset();
 						sb.Defocus();
 					}
-					public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){
 						if(sb.isFocused){
 							sb.SetSelState(Slottable.sbSelectedState);
 							sb.SetActState(Slottable.waitForPickUpState);
@@ -1230,7 +859,7 @@ namespace SlotSystem{
 						else
 							sb.SetActState(Slottable.waitForPointerUpState);
 					}
-					public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
@@ -1241,20 +870,20 @@ namespace SlotSystem{
 						SBActProcess wfPtuProcess = new WaitForPointerUpProcess(sb, sb.WaitForPointerUpCoroutine);
 						sb.SetAndRunActProcess(wfPtuProcess);
 					}
-					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.Tap();
 						sb.Reset();
 						sb.Defocus();
 					}
-					public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.Reset();
 						sb.Defocus();
 					}
-					public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
-					public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+					public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
 				}
 				public class WaitForPickUpState: SBActState{
 					public override void EnterState(StateHandler sh){
@@ -1262,18 +891,18 @@ namespace SlotSystem{
 						SBActProcess wfpuProcess = new WaitForPickUpProcess(sb, sb.WaitForPickUpCoroutine);
 						sb.SetAndRunActProcess(wfpuProcess);
 					}
-					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.SetActState(Slottable.waitForNextTouchState);
 					}
-					public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.Reset();
 						sb.Focus();
 					}
 					public override void ExitState(StateHandler sh){
 						base.ExitState(sh);
 					}
-					public override void OnDeselectedMock(Slottable slottable, PointerEventDataMock eventDataMock){}
-					public override void OnPointerDownMock(Slottable slottable, PointerEventDataMock eventDataMock){}
+					public override void OnDeselectedMock(Slottable slottable, PointerEventDataFake eventDataMock){}
+					public override void OnPointerDownMock(Slottable slottable, PointerEventDataFake eventDataMock){}
 				}
 				public class WaitForNextTouchState: SBActState{
 					public override void EnterState(StateHandler sh){
@@ -1281,7 +910,7 @@ namespace SlotSystem{
 						SBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.WaitForNextTouchCoroutine);
 						sb.SetAndRunActProcess(wfntProcess);
 					}
-					public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){
 						if(!sb.isPickedUp)
 							sb.PickUp();
 						else{
@@ -1289,7 +918,7 @@ namespace SlotSystem{
 							sb.Increment();
 						}
 					}
-					public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.Reset();
 						sb.Focus();
 					}
@@ -1297,8 +926,8 @@ namespace SlotSystem{
 						public override void ExitState(StateHandler sh){
 							base.ExitState(sh);
 						}
-						public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+						public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
 				}
 				public class PickedUpState: SBActState{
 					public override void EnterState(StateHandler sh){
@@ -1313,24 +942,24 @@ namespace SlotSystem{
 						SBActProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
 						sb.SetAndRunActProcess(pickedUpProcess);
 					}
-					public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.Reset();
 						sb.Focus();
 					}
-					public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
 						if(sb.ssm.hovered == (SlotSystemElement)sb && sb.isStackable)
 							sb.SetActState(Slottable.waitForNextTouchState);
 						else
 							sb.ExecuteTransaction();
 					}
-					public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){
+					public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
 						sb.ExecuteTransaction();
 					}
 					/*	undef	*/
 						public override void ExitState(StateHandler sh){
 							base.ExitState(sh);
 						}
-						public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
+						public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
 				}
 				public class SBRemovedState: SBActState{
 					public override void EnterState(StateHandler sh){
@@ -1342,10 +971,10 @@ namespace SlotSystem{
 						public override void ExitState(StateHandler sh){
 							base.ExitState(sh);
 						}
-						public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+						public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
 				}
 				public class SBAddedState: SBActState{
 					public override void EnterState(StateHandler sh){
@@ -1357,10 +986,10 @@ namespace SlotSystem{
 						public override void ExitState(StateHandler sh){
 							base.ExitState(sh);
 						}
-						public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+						public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
 				}
 				public class SBMoveWithinState: SBActState{
 					public override void EnterState(StateHandler sh){
@@ -1372,10 +1001,10 @@ namespace SlotSystem{
 						public override void ExitState(StateHandler sh){
 							base.ExitState(sh);
 						}
-						public override void OnPointerDownMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnPointerUpMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnDeselectedMock(Slottable sb, PointerEventDataMock eventDataMock){}
-						public override void OnEndDragMock(Slottable sb, PointerEventDataMock eventDataMock){}
+						public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
+						public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
 				}
 			/*	SB Equip states	*/
 				public class SBEquippedState: SBEqpState{
@@ -1466,9 +1095,9 @@ namespace SlotSystem{
 			}
 		}
 		public class DraggedIcon{
-			public InventoryItemInstanceMock item{
+			public InventoryItemInstance item{
 				get{return m_item;}
-				}InventoryItemInstanceMock m_item;
+				}InventoryItemInstance m_item;
 			public IconDestination dest{
 				get{return m_dest;}
 				}IconDestination m_dest;
@@ -1537,12 +1166,12 @@ namespace SlotSystem{
 							base.EnterState(sh);
 							SSEProcess process = null;
 							if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
-							process = null;
-							sse.InstantGreyout();
+								process = null;
+								sse.InstantGreyout();
 							}else if(sse.prevSelState == AbsSlotSystemElement.focusedState)
 								process = new SSEGreyoutProcess(sse, sse.greyoutCoroutine);
 							else if(sse.prevSelState == AbsSlotSystemElement.selectedState)
-								process = new SSEHighlightProcess(sse, sse.greyoutCoroutine);
+								process = new SSEDehighlightProcess(sse, sse.dehighlightCoroutine);
 							sse.SetAndRunSelProcess(process);
 						}
 					}
@@ -1598,7 +1227,7 @@ namespace SlotSystem{
 					}
 					public interface SSEProcess{
 						bool isRunning{get;}
-						System.Func<IEnumeratorMock> coroutineMock{set;}
+						System.Func<IEnumeratorFake> coroutineFake{set;}
 						void Start();
 						void Stop();
 						void Expire();
@@ -1607,9 +1236,9 @@ namespace SlotSystem{
 						public bool isRunning{
 							get{return m_isRunning;}
 							} bool m_isRunning;
-						public System.Func<IEnumeratorMock> coroutineMock{
+						public System.Func<IEnumeratorFake> coroutineFake{
 							set{m_coroutineMock = value;}
-							}System.Func<IEnumeratorMock> m_coroutineMock;
+							}System.Func<IEnumeratorFake> m_coroutineMock;
 						protected SlotSystemElement sse{
 							get{return m_sse;}
 							set{m_sse = value;}
@@ -1630,27 +1259,27 @@ namespace SlotSystem{
 				/*	sel process	*/
 					public abstract class SSESelProcess: AbsSSEProcess{}
 						public class SSEGreyoutProcess: SSESelProcess{
-							public SSEGreyoutProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+							public SSEGreyoutProcess(SlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
 								this.sse = sse;
-								this.coroutineMock = coroutineMock;
+								this.coroutineFake = coroutineMock;
 							}
 						}
 						public class SSEGreyinProcess: SSESelProcess{
-							public SSEGreyinProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+							public SSEGreyinProcess(SlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
 								this.sse = sse;
-								this.coroutineMock = coroutineMock;
+								this.coroutineFake = coroutineMock;
 							}
 						}
 						public class SSEHighlightProcess: SSESelProcess{
-							public SSEHighlightProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+							public SSEHighlightProcess(SlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
 								this.sse = sse;
-								this.coroutineMock = coroutineMock;
+								this.coroutineFake = coroutineMock;
 							}
 						}
 						public class SSEDehighlightProcess: SSESelProcess{
-							public SSEDehighlightProcess(SlotSystemElement sse, System.Func<IEnumeratorMock> coroutineMock){
+							public SSEDehighlightProcess(SlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
 								this.sse = sse;
-								this.coroutineMock = coroutineMock;
+								this.coroutineFake = coroutineMock;
 							}
 						}
 				/*	act process	*/
@@ -1664,10 +1293,10 @@ namespace SlotSystem{
 				void SetAndRunActProcess(SSEProcess process);
 				SSEProcess selProcess{get;}
 				SSEProcess actProcess{get;}
-				IEnumeratorMock greyoutCoroutine();
-				IEnumeratorMock greyinCoroutine();
-				IEnumeratorMock highlightCoroutine();
-				IEnumeratorMock dehighlightCoroutine();
+				IEnumeratorFake greyoutCoroutine();
+				IEnumeratorFake greyinCoroutine();
+				IEnumeratorFake highlightCoroutine();
+				IEnumeratorFake dehighlightCoroutine();
 				void InstantGreyin();
 				void InstantGreyout();
 				void InstantHighlight();
@@ -1726,49 +1355,14 @@ namespace SlotSystem{
 				void UpdateTransaction();
 				SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered);
 			}
-		/*	TransactionResult	*/
-			public class TransactionResult{
-				SlotSystemTransaction ta;
-				Slottable selectedSB;
-				SlotGroup selectedSG;
-				public TransactionResult(Slottable sb, SlotGroup sg, SlotSystemTransaction ta){
-					this.ta = ta;
-					selectedSB = sb;
-					selectedSG = sg;
-				}
-				public SlotSystemTransaction TryGetTransaction(Slottable sb, SlotGroup sg){
-					if((sb != null && this.selectedSB == sb) ||
-						(sg != null && this.selectedSG == sg))
-							return ta;
-					else return null;
-				}
-			}
-			public class TransactionResults{
-				List<TransactionResult> trs;
-				public TransactionResults(){
-					trs = new List<TransactionResult>();
-				}
-				public void AddTransactionResult(TransactionResult tr){
-					this.trs.Add(tr);
-				}
-				public SlotSystemTransaction GetTransaction(Slottable sb, SlotGroup sg){
-					SlotSystemTransaction result = null;
-					foreach(TransactionResult tr in trs){
-						result = tr.TryGetTransaction(sb, sg);
-						if(result != null)
-							return result;
-					}
-					return result;
-				}
-			}
 		/*	Inventory Item	*/
 			public interface SlottableItem: IEquatable<SlottableItem>, IComparable<SlottableItem>, IComparable{
 				int Quantity{get;}
 				bool IsStackable{get;}
 			}
-			public class InventoryItemInstanceMock: SlottableItem{
-				InventoryItemMock m_item;
-				public InventoryItemMock Item{
+			public class InventoryItemInstance: SlottableItem{
+				InventoryItem m_item;
+				public InventoryItem Item{
 					get{return m_item;}
 					set{m_item = value;}
 				}
@@ -1801,14 +1395,14 @@ namespace SlotSystem{
 					set{m_isMarked = value;}
 				}
 				public override bool Equals(object other){
-					if(!(other is InventoryItemInstanceMock))
+					if(!(other is InventoryItemInstance))
 						return false;
 					return Equals((SlottableItem)other);
 				}
 				public bool Equals(SlottableItem other){
-					if(!(other is InventoryItemInstanceMock))
+					if(!(other is InventoryItemInstance))
 						return false;
-					InventoryItemInstanceMock otherInst = (InventoryItemInstanceMock)other;
+					InventoryItemInstance otherInst = (InventoryItemInstance)other;
 					if(m_item.IsStackable)
 						return m_item.Equals(otherInst.Item);
 					else
@@ -1817,10 +1411,10 @@ namespace SlotSystem{
 				public override int GetHashCode(){
 					return m_item.ItemID.GetHashCode() + 31;
 				}
-				public static bool operator ==(InventoryItemInstanceMock a, InventoryItemInstanceMock b){
+				public static bool operator ==(InventoryItemInstance a, InventoryItemInstance b){
 					return a.Equals(b);
 				}
-				public static bool operator != (InventoryItemInstanceMock a, InventoryItemInstanceMock b){
+				public static bool operator != (InventoryItemInstance a, InventoryItemInstance b){
 					if(object.ReferenceEquals(a, null)){
 						return !object.ReferenceEquals(b, null);
 					}
@@ -1835,9 +1429,9 @@ namespace SlotSystem{
 					return CompareTo((SlottableItem)other);
 				}
 				public int CompareTo(SlottableItem other){
-					if(!(other is InventoryItemInstanceMock))
+					if(!(other is InventoryItemInstance))
 						throw new InvalidOperationException("System.Object.CompareTo: not an InventoryItemInstance");
-					InventoryItemInstanceMock otherInst = (InventoryItemInstanceMock)other;
+					InventoryItemInstance otherInst = (InventoryItemInstance)other;
 
 					int result = m_item.ItemID.CompareTo(otherInst.Item.ItemID);
 					if(result == 0)
@@ -1846,7 +1440,7 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public class InventoryItemMock: IEquatable<InventoryItemMock>, IComparable, IComparable<InventoryItemMock>{
+			public class InventoryItem: IEquatable<InventoryItem>, IComparable, IComparable<InventoryItem>{
 				bool m_isStackable;
 				public bool IsStackable{
 					get{return m_isStackable;}
@@ -1860,11 +1454,11 @@ namespace SlotSystem{
 				}
 
 				public override bool Equals(object other){
-					if(!(other is InventoryItemMock)) return false;
+					if(!(other is InventoryItem)) return false;
 					else
-						return Equals((InventoryItemMock)other);
+						return Equals((InventoryItem)other);
 				}
-				public bool Equals(InventoryItemMock other){
+				public bool Equals(InventoryItem other){
 					return m_itemId == other.ItemID;
 				}
 
@@ -1872,28 +1466,28 @@ namespace SlotSystem{
 					return 31 + m_itemId.GetHashCode();
 				}
 
-				public static bool operator == (InventoryItemMock a, InventoryItemMock b){
+				public static bool operator == (InventoryItem a, InventoryItem b){
 					return a.ItemID == b.ItemID;
 				}
 
-				public static bool operator != (InventoryItemMock a, InventoryItemMock b){
+				public static bool operator != (InventoryItem a, InventoryItem b){
 					return a.ItemID != b.ItemID;
 				}
 				int IComparable.CompareTo(object other){
-					if(!(other is InventoryItemMock))
+					if(!(other is InventoryItem))
 						throw new InvalidOperationException("Compare To: not a InventoryItemMock");
-					return CompareTo((InventoryItemMock)other);
+					return CompareTo((InventoryItem)other);
 				}
-				public int CompareTo(InventoryItemMock other){
-					if(!(other is InventoryItemMock))
+				public int CompareTo(InventoryItem other){
+					if(!(other is InventoryItem))
 						throw new InvalidOperationException("Compare To: not a InventoryItemMock");
 					
 					return this.m_itemId.CompareTo(other.ItemID);
 				}
-				public static bool operator > (InventoryItemMock a, InventoryItemMock b){
+				public static bool operator > (InventoryItem a, InventoryItem b){
 					return a.CompareTo(b) > 0;
 				}
-				public static bool operator < (InventoryItemMock a, InventoryItemMock b){
+				public static bool operator < (InventoryItem a, InventoryItem b){
 					return a.CompareTo(b) < 0;
 				}
 			}
@@ -1964,8 +1558,8 @@ namespace SlotSystem{
 					}
 				public void Add(SlottableItem item){
 					foreach(SlottableItem it in m_items){
-						InventoryItemInstanceMock invInst = (InventoryItemInstanceMock)it;
-						InventoryItemInstanceMock addedInst = (InventoryItemInstanceMock)item;
+						InventoryItemInstance invInst = (InventoryItemInstance)it;
+						InventoryItemInstance addedInst = (InventoryItemInstance)item;
 						if(invInst == addedInst && invInst.IsStackable){
 							invInst.Quantity += addedInst.Quantity;
 							return;
@@ -1977,8 +1571,8 @@ namespace SlotSystem{
 				public void Remove(SlottableItem item){
 					SlottableItem itemToRemove = null;
 					foreach(SlottableItem it in m_items){
-						InventoryItemInstanceMock checkedInst = (InventoryItemInstanceMock)it;
-						InventoryItemInstanceMock removedInst = (InventoryItemInstanceMock)item;
+						InventoryItemInstance checkedInst = (InventoryItemInstance)it;
+						InventoryItemInstance removedInst = (InventoryItemInstance)item;
 						if(checkedInst == removedInst){
 							if(!removedInst.IsStackable)
 								itemToRemove = it;
@@ -1995,7 +1589,7 @@ namespace SlotSystem{
 				}
 				void IndexItems(){
 					for(int i = 0; i < m_items.Count; i ++){
-						((InventoryItemInstanceMock)m_items[i]).SetAcquisitionOrder(i);
+						((InventoryItemInstance)m_items[i]).SetAcquisitionOrder(i);
 					}
 				}
 			}
@@ -2097,17 +1691,17 @@ namespace SlotSystem{
 				}
 			}
 		/*	mock items	*/
-			public class BowMock: InventoryItemMock{
+			public class BowMock: InventoryItem{
 				public BowMock(){
 					IsStackable = false;
 				}
 			}
-			public class WearMock: InventoryItemMock{
+			public class WearMock: InventoryItem{
 				public WearMock(){
 					IsStackable = false;
 				}
 			}
-			public abstract class CarriedGearMock: InventoryItemMock{
+			public abstract class CarriedGearMock: InventoryItem{
 			}
 			public class ShieldMock: CarriedGearMock{
 				public ShieldMock(){
@@ -2129,23 +1723,23 @@ namespace SlotSystem{
 					IsStackable = false;
 				}
 			}
-			public class PartsMock: InventoryItemMock{
+			public class PartsMock: InventoryItem{
 				public PartsMock(){
 					IsStackable = true;
 				}
 			}
 		/*	mock instances	*/
-			public class BowInstanceMock: InventoryItemInstanceMock{
+			public class BowInstanceMock: InventoryItemInstance{
 				public BowInstanceMock(){
 					this.Quantity = 1;
 				}
 			}
-			public class WearInstanceMock: InventoryItemInstanceMock{
+			public class WearInstanceMock: InventoryItemInstance{
 				public WearInstanceMock(){
 					this.Quantity = 1;
 				}
 			}
-			public class CarriedGearInstanceMock: InventoryItemInstanceMock{}
+			public class CarriedGearInstanceMock: InventoryItemInstance{}
 			public class ShieldInstanceMock: CarriedGearInstanceMock{
 				public ShieldInstanceMock(){
 					this.Quantity = 1;
@@ -2166,7 +1760,7 @@ namespace SlotSystem{
 					this.Quantity = 1;
 				}
 			}
-			public class PartsInstanceMock: InventoryItemInstanceMock{}
+			public class PartsInstanceMock: InventoryItemInstance{}
 	/*	utility	*/
 		public static class Util{
 			public static SlotSystemTransaction CloneTA(SlotSystemTransaction orig){
@@ -2540,7 +2134,7 @@ namespace SlotSystem{
 					return res;
 				}
 			/*	SB	*/
-				public static string ItemInstName(InventoryItemInstanceMock itemInst){
+				public static string ItemInstName(InventoryItemInstance itemInst){
 					string result = "";
 					if(itemInst != null){
 						switch(itemInst.Item.ItemID){
@@ -2581,8 +2175,8 @@ namespace SlotSystem{
 					if(sb != null){
 						result = ItemInstName(sb.itemInst);
 						if(SlotSystemManager.curSSM != null){
-							List<InventoryItemInstanceMock> sameItemInsts = new List<InventoryItemInstanceMock>();
-							foreach(InventoryItemInstanceMock itemInst in SlotSystemManager.curSSM.poolInv){
+							List<InventoryItemInstance> sameItemInsts = new List<InventoryItemInstance>();
+							foreach(InventoryItemInstance itemInst in SlotSystemManager.curSSM.poolInv){
 								if(itemInst.Item == sb.itemInst.Item)
 									sameItemInsts.Add(itemInst);
 							}
