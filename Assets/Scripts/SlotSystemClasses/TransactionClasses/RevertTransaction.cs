@@ -11,8 +11,8 @@ namespace SlotSystem{
 			m_origSG = m_pickedSB.sg;
 		}
 		public RevertTransaction(RevertTransaction orig){
-			this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-			this.m_origSG = Util.CloneSG(orig.m_origSG);
+			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
+			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
 		}
 		public override void Indicate(){}
 		public override void Execute(){

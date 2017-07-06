@@ -13,9 +13,9 @@ namespace SlotSystem{
 			m_origSG = m_pickedSB.sg;
 		}
 		public FillTransaction(FillTransaction orig){
-			this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-			this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
-			this.m_origSG = Util.CloneSG(orig.m_origSG);
+			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
+			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
+			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
 		}
 		public override SlotGroup sg1{get{return m_origSG;}}
 		public override SlotGroup sg2{get{return m_selectedSG;}}

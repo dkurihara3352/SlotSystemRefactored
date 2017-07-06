@@ -11,7 +11,7 @@ namespace SlotSystem{
 			m_sorter = sorter;
 		}
 		public SortTransaction(SortTransaction orig){
-			this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
+			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
 			this.m_sorter = orig.m_sorter;
 		}
 		public override SlotGroup sg1{get{return m_selectedSG;}}

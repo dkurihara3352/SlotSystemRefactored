@@ -7,7 +7,7 @@ namespace SlotSystem{
 		public void Filter(ref List<SlottableItem> items){
 			List<SlottableItem> res = new List<SlottableItem>();
 			foreach(SlottableItem item in items){
-				if(item is CarriedGearInstanceMock)
+				if(item is CarriedGearInstance)
 					res.Add(item);
 			}
 			items = res;

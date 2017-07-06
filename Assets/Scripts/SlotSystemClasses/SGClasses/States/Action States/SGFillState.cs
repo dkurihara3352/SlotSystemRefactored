@@ -28,7 +28,7 @@ namespace SlotSystem{
 					newSB.SetSSM(sg.ssm);
 					newSB.Defocus();
 					newSB.SetEqpState(Slottable.unequippedState);
-					Util.AddInEmptyOrConcat(ref newSBs, newSB);
+					SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
 				}
 				if(removed != null){
 					Slottable rem = null;

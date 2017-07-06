@@ -24,7 +24,7 @@ public class SlottableTest{
 			if(a != null && b != null){
 				if(a is Slottable)
 					if(b is Slottable)
-						flag &= Util.SBsShareSGAndItem((Slottable)a, (Slottable)b);
+						flag &= SlotSystemUtil.SBsShareSGAndItem((Slottable)a, (Slottable)b);
 					else return false;
 				else if(a is SSEProcess || a is SlotSystemTransaction)
 					flag &= a.GetType() == b.GetType();
@@ -38,19 +38,19 @@ public class SlottableTest{
 				string hoveredStr = "null";
 				if(hovered != null)
 					if(hovered is Slottable)
-						hoveredStr = Util.SBofSG((Slottable)hovered);
+						hoveredStr = SlotSystemUtil.SBofSG((Slottable)hovered);
 					else
 						hoveredStr = hovered.eName;
 				return
-					"testSB: " + (testSB == null? "null": Util.SBofSG(testSB)) + 
+					"testSB: " + (testSB == null? "null": SlotSystemUtil.SBofSG(testSB)) + 
 					", hovered: " + hoveredStr
 					;
 			}
 		}
 		public string asString{
 			get{
-				return "isPAS: " + (isPAS?Util.Blue("true"):Util.Red("false")) + 
-					", isTAS: " + (isTAS?Util.Blue("true"):Util.Red("false"));
+				return "isPAS: " + (isPAS?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false")) + 
+					", isTAS: " + (isTAS?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
 			}
 		}
 		public virtual string fullDebugString{
@@ -70,9 +70,9 @@ public class SlottableTest{
 			public SSETestResult(bool isPAS, bool isTAS, Slottable testSB, SlotSystemElement hovered, SSEState curSel, SSEState prevSel, SSEProcess selProc, SSEState curAct, SSEState prevAct, SSEProcess actProc, bool isRunning){
 				this.isPAS = isPAS;
 				this.isTAS = isTAS;
-				this.testSB = Util.CloneSB(testSB);
+				this.testSB = SlotSystemUtil.CloneSB(testSB);
 				if(hovered is Slottable)
-					this.hovered = Util.CloneSB((Slottable)hovered);
+					this.hovered = SlotSystemUtil.CloneSB((Slottable)hovered);
 				else
 					this.hovered = hovered;
 				this.curSelState = curSel;
@@ -103,13 +103,13 @@ public class SlottableTest{
 			public override string debugString{
 				get{
 					return base.debugString + " " +
-					"Sel from " + Util.SSEStateName((SSESelState)prevSelState)+ 
-					" to " + Util.SSEStateNamePlain((SSESelState)curSelState) + 
-					", selProc: " + (selProcess == null? "null": Util.SSEProcessName((SSESelProcess)selProcess)) +
-					", Act from " + Util.SSEStateName((SSEActState)prevActState) + 
-					" to " + Util.SSEStateNamePlain((SSEActState)curActState) + 
-					", actProc: " + (actProcess == null?"null": Util.SSEProcessName((SSEActProcess)actProcess)) + 
-					", running?: " + (isActProcessRunning?Util.Blue("true"):Util.Red("false"));
+					"Sel from " + SlotSystemUtil.SSEStateName((SSESelState)prevSelState)+ 
+					" to " + SlotSystemUtil.SSEStateNamePlain((SSESelState)curSelState) + 
+					", selProc: " + (selProcess == null? "null": SlotSystemUtil.SSEProcessName((SSESelProcess)selProcess)) +
+					", Act from " + SlotSystemUtil.SSEStateName((SSEActState)prevActState) + 
+					" to " + SlotSystemUtil.SSEStateNamePlain((SSEActState)curActState) + 
+					", actProc: " + (actProcess == null?"null": SlotSystemUtil.SSEProcessName((SSEActProcess)actProcess)) + 
+					", running?: " + (isActProcessRunning?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
 				}
 			}
 		}
@@ -142,9 +142,9 @@ public class SlottableTest{
 				bool di1Done, bool di2Done, bool sg1Done, bool sg2Done){
 				this.isPAS = isPAS;
 				this.isTAS = isTAS;
-				this.testSB = Util.CloneSB(testSB);
+				this.testSB = SlotSystemUtil.CloneSB(testSB);
 				if(hovered is Slottable)
-					this.hovered = Util.CloneSB((Slottable)hovered);
+					this.hovered = SlotSystemUtil.CloneSB((Slottable)hovered);
 				else
 					this.hovered = hovered;
 				this.curSelState = curSel;
@@ -155,10 +155,10 @@ public class SlottableTest{
 				this.actProcess = actProc;
 				this.isActProcessRunning = isRunning;
 				this.ta = ta;
-				this.pickedSB = Util.CloneSB(pickedSB);
-				this.targetSB = Util.CloneSB(targetSB);
-				this.di1SB = Util.CloneSB(di1SB);
-				this.di2SB = Util.CloneSB(di2SB);
+				this.pickedSB = SlotSystemUtil.CloneSB(pickedSB);
+				this.targetSB = SlotSystemUtil.CloneSB(targetSB);
+				this.di1SB = SlotSystemUtil.CloneSB(di1SB);
+				this.di2SB = SlotSystemUtil.CloneSB(di2SB);
 				this.sg1 = sg1;
 				this.sg2 = sg2;
 				this.di1Done = di1Done;
@@ -169,24 +169,24 @@ public class SlottableTest{
 			public override string debugString{
 				get{
 					return base.debugString + " " +
-					"Sel from " + Util.SSMStateNamePlain((SSMSelState)prevSelState)+ 
-					" to " + Util.SSMStateName((SSMSelState)curSelState) + 
-					", selProc: " + (selProcess == null? "null": Util.SSMProcessName((SSMSelProcess)selProcess)) +
-					", Act from " + Util.SSMStateNamePlain((SSMActState)prevActState) + 
-					" to " + Util.SSMStateName((SSMActState)curActState) + 
-					", actProc: " + (actProcess == null?"null": Util.SSMProcessName((SSMActProcess)actProcess)) + 
-					", running?: " + (isActProcessRunning?Util.Blue("true"):Util.Red("false")) +
-					", TA: " + Util.TransactionName(ta) + 
-					", pSB: " + Util.SBofSG(pickedSB) +
-					", tSB: " + Util.SBofSG(targetSB) +
-					", di1: " + Util.SBofSG(di1SB) + 
-					", di2: " + Util.SBofSG(di2SB) + 
+					"Sel from " + SlotSystemUtil.SSMStateNamePlain((SSMSelState)prevSelState)+ 
+					" to " + SlotSystemUtil.SSMStateName((SSMSelState)curSelState) + 
+					", selProc: " + (selProcess == null? "null": SlotSystemUtil.SSMProcessName((SSMSelProcess)selProcess)) +
+					", Act from " + SlotSystemUtil.SSMStateNamePlain((SSMActState)prevActState) + 
+					" to " + SlotSystemUtil.SSMStateName((SSMActState)curActState) + 
+					", actProc: " + (actProcess == null?"null": SlotSystemUtil.SSMProcessName((SSMActProcess)actProcess)) + 
+					", running?: " + (isActProcessRunning?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false")) +
+					", TA: " + SlotSystemUtil.TransactionName(ta) + 
+					", pSB: " + SlotSystemUtil.SBofSG(pickedSB) +
+					", tSB: " + SlotSystemUtil.SBofSG(targetSB) +
+					", di1: " + SlotSystemUtil.SBofSG(di1SB) + 
+					", di2: " + SlotSystemUtil.SBofSG(di2SB) + 
 					", sg1: " + (sg1 == null? "null": sg1.eName) + 
 					", sg2: " + (sg2 == null? "null": sg2.eName) + 
-					", di1Done? " + (di1Done?Util.Blue("true"): Util.Red("false")) +
-					", di2Done? " + (di2Done?Util.Blue("true"): Util.Red("false")) +
-					", sg1Done? " + (sg1Done?Util.Blue("true"): Util.Red("false")) +
-					", sg2Done? " + (sg2Done?Util.Blue("true"): Util.Red("false"))
+					", di1Done? " + (di1Done?SlotSystemUtil.Blue("true"): SlotSystemUtil.Red("false")) +
+					", di2Done? " + (di2Done?SlotSystemUtil.Blue("true"): SlotSystemUtil.Red("false")) +
+					", sg1Done? " + (sg1Done?SlotSystemUtil.Blue("true"): SlotSystemUtil.Red("false")) +
+					", sg2Done? " + (sg2Done?SlotSystemUtil.Blue("true"): SlotSystemUtil.Red("false"))
 					; 
 				}
 			}
@@ -233,9 +233,9 @@ public class SlottableTest{
 				SSEState curSel, SSEState prevSel, SSEProcess selProc, SSEState curAct, SSEState prevAct, SSEProcess actProc, bool isRunning){
 				this.isPAS = isPAS;
 				this.isTAS = isTAS;
-				this.testSB = Util.CloneSB(testSB);
+				this.testSB = SlotSystemUtil.CloneSB(testSB);
 				if(hovered is Slottable)
-					this.hovered = Util.CloneSB((Slottable)hovered);
+					this.hovered = SlotSystemUtil.CloneSB((Slottable)hovered);
 				else
 					this.hovered = hovered;
 				this.curSelState = curSel;
@@ -249,13 +249,13 @@ public class SlottableTest{
 			public override string debugString{
 				get{
 					return base.debugString + " " +
-					"Sel from " + Util.SGStateNamePlain((SGSelState)prevSelState)+ 
-					" to " + Util.SGStateName((SGSelState)curSelState) + 
-					", selProc: " + (selProcess == null? "null": Util.SGProcessName((SGSelProcess)selProcess)) +
-					", Act from " + Util.SGStateNamePlain((SGActState)prevActState) + 
-					" to " + Util.SGStateName((SGActState)curActState) + 
-					", actProc: " + (actProcess == null?"null": Util.SGProcessName((SGActProcess)actProcess)) + 
-					", running?: " + (isActProcessRunning?Util.Blue("true"):Util.Red("false"));
+					"Sel from " + SlotSystemUtil.SGStateNamePlain((SGSelState)prevSelState)+ 
+					" to " + SlotSystemUtil.SGStateName((SGSelState)curSelState) + 
+					", selProc: " + (selProcess == null? "null": SlotSystemUtil.SGProcessName((SGSelProcess)selProcess)) +
+					", Act from " + SlotSystemUtil.SGStateNamePlain((SGActState)prevActState) + 
+					" to " + SlotSystemUtil.SGStateName((SGActState)curActState) + 
+					", actProc: " + (actProcess == null?"null": SlotSystemUtil.SGProcessName((SGActProcess)actProcess)) + 
+					", running?: " + (isActProcessRunning?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
 				}
 			}
 			public override bool HasSameValue(SlotSystemTestResult other){
@@ -298,9 +298,9 @@ public class SlottableTest{
 				int slotID, int newSlotID){
 				this.isPAS = isPAS;
 				this.isTAS = isTAS;
-				this.testSB = Util.CloneSB(testSB);
+				this.testSB = SlotSystemUtil.CloneSB(testSB);
 				if(hovered is Slottable)
-					this.hovered = Util.CloneSB((Slottable)hovered);
+					this.hovered = SlotSystemUtil.CloneSB((Slottable)hovered);
 				else
 					this.hovered = hovered;
 				this.curSelState = curSel;
@@ -319,16 +319,16 @@ public class SlottableTest{
 			public override string debugString{
 				get{
 					return base.debugString + " " +
-					"Sel from " + Util.SBStateNamePlain((SBSelState)prevSelState)+ 
-					" to " + Util.SBStateName((SBSelState)curSelState) + 
-					", selProc: " + (selProcess == null? "null": Util.SBProcessName((SBSelProcess)selProcess)) +
-					", Act from " + Util.SBStateNamePlain((SBActState)prevActState) + 
-					" to " + Util.SBStateName((SBActState)curActState) + 
-					", actProc: " + (actProcess == null?"null": Util.SBProcessName((SBActProcess)actProcess)) + 
-					", running?: " + (isActProcessRunning?Util.Blue("true"):Util.Red("false")) +
-					", Eqp from " + Util.SBStateNamePlain((SBEqpState)prevEqpState) + 
-					" to " + Util.SBStateName((SBEqpState)curEqpState) + 
-					", eqpProc: " + (eqpProcess == null?"null": Util.SBProcessName((SBEqpProcess)eqpProcess)) + 
+					"Sel from " + SlotSystemUtil.SBStateNamePlain((SBSelState)prevSelState)+ 
+					" to " + SlotSystemUtil.SBStateName((SBSelState)curSelState) + 
+					", selProc: " + (selProcess == null? "null": SlotSystemUtil.SBProcessName((SBSelProcess)selProcess)) +
+					", Act from " + SlotSystemUtil.SBStateNamePlain((SBActState)prevActState) + 
+					" to " + SlotSystemUtil.SBStateName((SBActState)curActState) + 
+					", actProc: " + (actProcess == null?"null": SlotSystemUtil.SBProcessName((SBActProcess)actProcess)) + 
+					", running?: " + (isActProcessRunning?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false")) +
+					", Eqp from " + SlotSystemUtil.SBStateNamePlain((SBEqpState)prevEqpState) + 
+					" to " + SlotSystemUtil.SBStateName((SBEqpState)curEqpState) + 
+					", eqpProc: " + (eqpProcess == null?"null": SlotSystemUtil.SBProcessName((SBEqpProcess)eqpProcess)) + 
 					", slotID from " + slotID.ToString() +
 					" to " + newSlotID.ToString()
 					;
@@ -366,13 +366,13 @@ public class SlottableTest{
 			public TATestResult(bool isPAS, bool isTAS, Slottable testSB, SlotSystemElement hovered){
 				this.isPAS = isPAS;
 				this.isTAS = isTAS;
-				this.testSB = Util.CloneSB(testSB);
+				this.testSB = SlotSystemUtil.CloneSB(testSB);
 				if(hovered is Slottable)
-					this.hovered = Util.CloneSB((Slottable)hovered);
+					this.hovered = SlotSystemUtil.CloneSB((Slottable)hovered);
 				else
 					this.hovered = hovered;
 				this.ta = testSB.ssm.GetTransaction(testSB, hovered);
-				this.targetSB = Util.CloneSB(ta.targetSB);
+				this.targetSB = SlotSystemUtil.CloneSB(ta.targetSB);
 				this.sg1 = ta.sg1;
 				this.sg2 = ta.sg2;
 				taType = ta.GetType();
@@ -394,9 +394,9 @@ public class SlottableTest{
 			public override string debugString{
 				get{
 					return base.debugString + " " +
-					Util.TransactionName(ta) + 
-					", testSB: " + Util.SBofSG(testSB) +
-					", targetSB: " + Util.SBofSG(targetSB) +
+					SlotSystemUtil.TransactionName(ta) + 
+					", testSB: " + SlotSystemUtil.SBofSG(testSB) +
+					", targetSB: " + SlotSystemUtil.SBofSG(targetSB) +
 					", sg1: " + (sg1 == null? "null": sg1.eName) + 
 					", sg2: " + (sg2 == null? "null": sg2.eName)
 					;
@@ -499,7 +499,7 @@ public class SlottableTest{
 	/*	fields 	*/
 		/*	other	*/
 			bool picked;
-			PointerEventDataMock eventData = new PointerEventDataMock();
+			PointerEventDataFake eventData = new PointerEventDataFake();
 		/*	ssm */
 			GameObject ssmGO;
 			SlotSystemManager ssm;
@@ -590,80 +590,80 @@ public class SlottableTest{
 	public void Setup(){
 		/*	Items	*/
 			/*	bows	*/
-				BowMock defBow = new BowMock();
+				BowFake defBow = new BowFake();
 				defBow.ItemID = 0;
-				BowMock crfBow = new BowMock();
+				BowFake crfBow = new BowFake();
 				crfBow.ItemID = 1;
-				BowInstanceMock defBowA = new BowInstanceMock();//	equipped
+				BowInstance defBowA = new BowInstance();//	equipped
 				defBowA.Item = defBow;
-				BowInstanceMock defBowB = new BowInstanceMock();
+				BowInstance defBowB = new BowInstance();
 				defBowB.Item = defBow;
-				BowInstanceMock crfBowA = new BowInstanceMock();
+				BowInstance crfBowA = new BowInstance();
 				crfBowA.Item = crfBow;
 			/*	wears	*/
-				WearMock defWear = new WearMock();
+				WearFake defWear = new WearFake();
 				defWear.ItemID = 100;
-				WearMock crfWear = new WearMock();
+				WearFake crfWear = new WearFake();
 				crfWear.ItemID = 101;
-				WearInstanceMock defWearA = new WearInstanceMock();//	equipped
+				WearInstance defWearA = new WearInstance();//	equipped
 				defWearA.Item = defWear;
-				WearInstanceMock defWearB = new WearInstanceMock();
+				WearInstance defWearB = new WearInstance();
 				defWearB.Item = defWear;
-				WearInstanceMock crfWearA = new WearInstanceMock();
+				WearInstance crfWearA = new WearInstance();
 				crfWearA.Item = crfWear;
 			/*	parts	*/
-				PartsMock defParts = new PartsMock();
+				PartsFake defParts = new PartsFake();
 				defParts.ItemID = 600;
 				defParts.IsStackable = true;
-				PartsMock crfParts = new PartsMock();
+				PartsFake crfParts = new PartsFake();
 				crfParts.ItemID = 601;
 				crfParts.IsStackable = true;
 				
-				PartsInstanceMock defPartsA = new PartsInstanceMock();
+				PartsInstance defPartsA = new PartsInstance();
 				defPartsA.Item = defParts;
 				defPartsA.Quantity = 10;
-				PartsInstanceMock defPartsB = new PartsInstanceMock();
+				PartsInstance defPartsB = new PartsInstance();
 				defPartsB.Item = defParts;
 				defPartsB.Quantity = 5;
-				PartsInstanceMock crfPartsA = new PartsInstanceMock();
+				PartsInstance crfPartsA = new PartsInstance();
 				crfPartsA.Item = crfParts;
 				crfPartsA.Quantity = 3;
 				Assert.That(defPartsA, Is.EqualTo(defPartsB));
 				Assert.That(object.ReferenceEquals(defPartsA, defPartsB), Is.False);
 			/*	carried gears	*/
-				ShieldMock defShield = new ShieldMock();
+				ShieldFake defShield = new ShieldFake();
 				defShield.ItemID = 200;
 				AB(defShield.IsStackable, false);
 				
-				ShieldInstanceMock defShieldA = new ShieldInstanceMock();
+				ShieldInstance defShieldA = new ShieldInstance();
 				defShieldA.Item = defShield;
 				AE(defShieldA.Quantity, 1);
 				
-				ShieldMock crfShield = new ShieldMock();
+				ShieldFake crfShield = new ShieldFake();
 				crfShield.ItemID = 201;
 				AB(crfShield.IsStackable, false);
 
-				ShieldInstanceMock crfShieldA = new ShieldInstanceMock();
+				ShieldInstance crfShieldA = new ShieldInstance();
 				crfShieldA.Item = crfShield;
 				AE(crfShieldA.Quantity, 1);
 
-				MeleeWeaponMock defMWeapon = new MeleeWeaponMock();
+				MeleeWeaponFake defMWeapon = new MeleeWeaponFake();
 				defMWeapon.ItemID = 300;
-				MeleeWeaponMock crfMWeapon = new MeleeWeaponMock();
+				MeleeWeaponFake crfMWeapon = new MeleeWeaponFake();
 				crfMWeapon.ItemID = 301;
-				MeleeWeaponInstanceMock defMWeaponA = new MeleeWeaponInstanceMock();
+				MeleeWeaponInstance defMWeaponA = new MeleeWeaponInstance();
 				defMWeaponA.Item = defMWeapon;
-				MeleeWeaponInstanceMock crfMWeaponA = new MeleeWeaponInstanceMock();
+				MeleeWeaponInstance crfMWeaponA = new MeleeWeaponInstance();
 				crfMWeaponA.Item = crfMWeapon;
 
-				QuiverMock defQuiver = new QuiverMock();
+				QuiverFake defQuiver = new QuiverFake();
 				defQuiver.ItemID = 400;
-				QuiverInstanceMock defQuiverA = new QuiverInstanceMock();
+				QuiverInstance defQuiverA = new QuiverInstance();
 				defQuiverA.Item = defQuiver;
 
-				PackMock defPack = new PackMock();
+				PackFake defPack = new PackFake();
 				defPack.ItemID = 500;
-				PackInstanceMock defPackA = new PackInstanceMock();
+				PackInstance defPackA = new PackInstance();
 				defPackA.Item = defPack;
 		/*	Inventory	*/
 			/*	pool inv	*/
@@ -695,7 +695,7 @@ public class SlottableTest{
 							AB(poolInv.Contains(item), true);
 						}
 			/*	equip inv	*/
-				List<CarriedGearInstanceMock> initCGears = new List<CarriedGearInstanceMock>();
+				List<CarriedGearInstance> initCGears = new List<CarriedGearInstance>();
 				initCGears.Add(defShieldA);
 				initCGears.Add(defMWeaponA);
 				equipInv = new EquipmentSetInventory(defBowA, defWearA, initCGears, 4);
@@ -1154,10 +1154,10 @@ public class SlottableTest{
 
 		delegate void Printer(string str);
 		public void PrintRed(string str){
-			Debug.Log(Util.Red(str));
+			Debug.Log(SlotSystemUtil.Red(str));
 		}
 		public void PrintBlue(string str){
-			Debug.Log(Util.Blue(str));
+			Debug.Log(SlotSystemUtil.Blue(str));
 		}
 		public void TestEventAndDelegate(){
 			// int[] ints = new int[]{1, 2, 3, 4};
@@ -1187,8 +1187,8 @@ public class SlottableTest{
 			public void TestSSMPointFocusAll(SlotGroup sg, bool isPAS){
 				ssm.PointFocus(sg);
 				AssertFocused();
-				string ASstring = "isPAS? " + (isPAS?Util.Blue("true"):Util.Red("false"));
-				Debug.Log(Util.Bold(ASstring +" "+  sg.eName + " is point focused"));
+				string ASstring = "isPAS? " + (isPAS?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				Debug.Log(SlotSystemUtil.Bold(ASstring +" "+  sg.eName + " is point focused"));
 				PrintSystemHierarchyDetailed(ssm);
 			}
 		public void TestPrePickFilteringV2(){
@@ -1196,7 +1196,7 @@ public class SlottableTest{
 				if(sb.sg.isFocusedInHierarchy){
 					bool isFilteredIn;
 					ssm.PrePickFilter(sb, out isFilteredIn);
-					Debug.Log(Util.SBofSG(sb) + " is filtered? " + (isFilteredIn?Util.Blue("true"): Util.Red("false")));
+					Debug.Log(SlotSystemUtil.SBofSG(sb) + " is filtered? " + (isFilteredIn?SlotSystemUtil.Blue("true"): SlotSystemUtil.Red("false")));
 				}
 			}
 		}
@@ -1209,11 +1209,11 @@ public class SlottableTest{
 					SlotSystemElement ele = taPair.Key;
 					string eleName = ele.eName;
 					if(ele is Slottable)
-						eleName = Util.SBofSG((Slottable)ele);
-					string stacked = Util.TransactionName(ta) + " on " + eleName;
-					Util.Stack(stacked);
+						eleName = SlotSystemUtil.SBofSG((Slottable)ele);
+					string stacked = SlotSystemUtil.TransactionName(ta) + " on " + eleName;
+					SlotSystemUtil.Stack(stacked);
 				}
-				Debug.Log(Util.SBofSG(sb)+ " 's non-revert tas: " + Util.Stacked);
+				Debug.Log(SlotSystemUtil.SBofSG(sb)+ " 's non-revert tas: " + SlotSystemUtil.Stacked);
 			}
 			}
 			public void CheckAndAddNonReverts(Slottable testSB, Dictionary<SlotSystemElement,SlotSystemTransaction> result){
@@ -1372,16 +1372,16 @@ public class SlottableTest{
 					AB(subject.ContainsInHierarchy(target), false);
 			}
 			public void PrintCIH(SlotSystemElement ele){
-				Debug.Log(Util.Bold("Target: ") + ele.eName);
+				Debug.Log(SlotSystemUtil.Bold("Target: ") + ele.eName);
 				ssm.PerformInHierarchy(CheckAndPrintCIH, ele);
 			}
 				public void CheckAndPrintCIH(SlotSystemElement ele, object obj){
 					SlotSystemElement target = (SlotSystemElement)obj;
 					string res = Indent(ele.level) + ele.eName;
 					if(ele.ContainsInHierarchy(target))
-						res += Util.Blue(": Contains");
+						res += SlotSystemUtil.Blue(": Contains");
 					else
-						res += Util.Red(": NOT Contains");
+						res += SlotSystemUtil.Red(": NOT Contains");
 					Debug.Log(res);
 				}
 		public void AssertParenthood(){
@@ -1505,22 +1505,22 @@ public class SlottableTest{
 		}
 		public void TestSlotSystemActivateDeactivate(){
 			ssm.Deactivate();
-				Debug.Log(Util.Bold(Util.Yamabuki("Root deactivated")));
+				Debug.Log(SlotSystemUtil.Bold(SlotSystemUtil.Yamabuki("Root deactivated")));
 				PrintSystemHierarchyDetailed(ssm);
 			ssm.Activate();
-				Debug.Log(Util.Bold(Util.Yamabuki("Root activated")));
+				Debug.Log(SlotSystemUtil.Bold(SlotSystemUtil.Yamabuki("Root activated")));
 				AssertFocused();
 				PrintSystemHierarchyDetailed(ssm);
 			ssm.poolBundle.Defocus();
-				Debug.Log(Util.Bold(Util.Yamabuki("Pool defocused")));
+				Debug.Log(SlotSystemUtil.Bold(SlotSystemUtil.Yamabuki("Pool defocused")));
 				PrintSystemHierarchyDetailed(ssm);
 				ssm.poolBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
 			ssm.equipBundle.Defocus();
-				Debug.Log(Util.Bold(Util.Yamabuki("Equip defocused")));
+				Debug.Log(SlotSystemUtil.Bold(SlotSystemUtil.Yamabuki("Equip defocused")));
 				PrintSystemHierarchyDetailed(ssm);
 				ssm.equipBundle.PerformInHierarchy(AssertDefocusedSelfAndBelow);
 			ssm.Activate();
-				Debug.Log(Util.Bold(Util.Yamabuki("root activated")));
+				Debug.Log(SlotSystemUtil.Bold(SlotSystemUtil.Yamabuki("root activated")));
 				PrintSystemHierarchyDetailed(ssm);
 				AssertFocused();
 		}
@@ -1540,7 +1540,7 @@ public class SlottableTest{
 								if(!sg.isAutoSort){
 										ASSB_s(sb, SBFocused, SBWFA);
 								}else{
-									if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
+									if(sb.item is PartsInstance && !(sg.Filter is SGPartsFilter))
 										ASSB_s(sb, SBDefocused, SBWFA);
 									else
 										if(sb.isEquipped)
@@ -1597,7 +1597,7 @@ public class SlottableTest{
 						if(!sg.isAutoSort){
 							ASSB_s(sb, SBFocused, SBWFA);
 						}else{
-							if(sb.item is PartsInstanceMock && !(sg.Filter is SGPartsFilter))
+							if(sb.item is PartsInstance && !(sg.Filter is SGPartsFilter))
 								ASSB_s(sb, SBDefocused, SBWFA);
 							else
 								if(sb.isEquipped)
@@ -1679,13 +1679,13 @@ public class SlottableTest{
 		public void PrintElementInDetail(SlotSystemElement ele){
 			string eleName = ele.eName;
 			if(ele is SlotGroup)
-				eleName = Util.SGDebug((SlotGroup)ele);
+				eleName = SlotSystemUtil.SGDebug((SlotGroup)ele);
 			else if(ele is Slottable)
-				eleName = Util.SBDebug((Slottable)ele);
+				eleName = SlotSystemUtil.SBDebug((Slottable)ele);
 			else if(ele is SlotSystemManager)
-				eleName = Util.SSMDebug((SlotSystemManager)ele);
+				eleName = SlotSystemUtil.SSMDebug((SlotSystemManager)ele);
 			else
-				eleName = Util.SSEDebug(ele);
+				eleName = SlotSystemUtil.SSEDebug(ele);
 			Debug.Log(Indent(ele.level) + eleName);
 		}
 		public void PrintSystemHierarchyDetailed(SlotSystemElement ele){
@@ -1700,52 +1700,52 @@ public class SlottableTest{
 				sgpAll.ToggleAutoSort(true);
 					sgeBow.ToggleAutoSort(true);
 					sgeWear.ToggleAutoSort(true);
-					Debug.Log(Util.Bold("sgpAll true, sge true"));
+					Debug.Log(SlotSystemUtil.Bold("sgpAll true, sge true"));
 					TestEquippingFromTo(sgpAll, sgeBow);
 					TestEquippingFromTo(sgpAll, sgeWear);
 					sgeBow.ToggleAutoSort(false);
-					Debug.Log(Util.Bold("sgpAll true, sgBow false"));
+					Debug.Log(SlotSystemUtil.Bold("sgpAll true, sgBow false"));
 					TestEquippingFromTo(sgpAll, sgeBow);
 					sgeWear.ToggleAutoSort(false);
-					Debug.Log(Util.Bold("sgpAll true, sgWear false"));
+					Debug.Log(SlotSystemUtil.Bold("sgpAll true, sgWear false"));
 					TestEquippingFromTo(sgpAll, sgeWear);
 				sgpAll.ToggleAutoSort(false);
-					Debug.Log(Util.Bold("sgpAll false, sges false"));
+					Debug.Log(SlotSystemUtil.Bold("sgpAll false, sges false"));
 					TestEquippingFromTo(sgpAll, sgeBow);
 					TestEquippingFromTo(sgpAll, sgeWear);
 					sgeBow.ToggleAutoSort(true);
-					Debug.Log(Util.Bold("sgpAll false, sgBow true"));
+					Debug.Log(SlotSystemUtil.Bold("sgpAll false, sgBow true"));
 					TestEquippingFromTo(sgpAll, sgeBow);
 					sgeWear.ToggleAutoSort(true);
-					Debug.Log(Util.Bold("sgpAll false, sgWear true"));
+					Debug.Log(SlotSystemUtil.Bold("sgpAll false, sgWear true"));
 					TestEquippingFromTo(sgpAll, sgeWear);
 			ssm.PointFocus(sgpBow);
 				sgpBow.ToggleAutoSort(true);
 				sgeBow.ToggleAutoSort(true);
-					Debug.Log(Util.Bold("sgpBow true, sgBow true"));
+					Debug.Log(SlotSystemUtil.Bold("sgpBow true, sgBow true"));
 					TestEquippingFromTo(sgpBow, sgeBow);
 				sgeBow.ToggleAutoSort(false);
-					Debug.Log(Util.Bold("sgpBow true, sgBow false"));
+					Debug.Log(SlotSystemUtil.Bold("sgpBow true, sgBow false"));
 					TestEquippingFromTo(sgpBow, sgeBow);
 				sgpBow.ToggleAutoSort(false);
-					Debug.Log(Util.Bold("sgpBow false, sgBow false"));
+					Debug.Log(SlotSystemUtil.Bold("sgpBow false, sgBow false"));
 					TestEquippingFromTo(sgpBow, sgeBow);
 				sgeBow.ToggleAutoSort(true);
-					Debug.Log(Util.Bold("sgpBow false, sgBow true"));
+					Debug.Log(SlotSystemUtil.Bold("sgpBow false, sgBow true"));
 					TestEquippingFromTo(sgpBow, sgeBow);
 			ssm.PointFocus(sgpWear);
 				sgpWear.ToggleAutoSort(true);
 				sgeWear.ToggleAutoSort(true);
-					Debug.Log(Util.Bold("sgpWear true, sgWear true"));
+					Debug.Log(SlotSystemUtil.Bold("sgpWear true, sgWear true"));
 					TestEquippingFromTo(sgpWear, sgeWear);
 				sgeWear.ToggleAutoSort(false);
-					Debug.Log(Util.Bold("sgpWear true, sgWear false"));
+					Debug.Log(SlotSystemUtil.Bold("sgpWear true, sgWear false"));
 					TestEquippingFromTo(sgpWear, sgeWear);
 				sgpWear.ToggleAutoSort(false);
-					Debug.Log(Util.Bold("sgpWear false, sgWear false"));
+					Debug.Log(SlotSystemUtil.Bold("sgpWear false, sgWear false"));
 					TestEquippingFromTo(sgpWear, sgeWear);
 				sgeWear.ToggleAutoSort(true);
-					Debug.Log(Util.Bold("sgpWear false, sgWear true"));
+					Debug.Log(SlotSystemUtil.Bold("sgpWear false, sgWear true"));
 					TestEquippingFromTo(sgpWear, sgeWear);
 			}public void TestEquippingFromTo(SlotGroup sgp, SlotGroup sge){
 				foreach(Slottable sb in transactableSBs(sgp, sge, typeof(SwapTransaction))){
@@ -2054,17 +2054,17 @@ public class SlottableTest{
 					AB(ssm.focusedSGGs.Contains(sgg_111), true);
 					// AB(ssm.focusedSGGs.Contains(sgg_112), true);
 					// AB(ssm.focusedSGGs.Contains(sgg_21), true);
-				AE(sgg_111.parent.eName, Util.Bold("gPage_11"));
-				AE(sgg_112.parent.eName, Util.Bold("gPage_11"));
-				AE(sgg_12.parent.eName, Util.Bold("gBundle_1"));
-				AE(sgg_21.parent.eName, Util.Bold("gBundle_2"));
-				AE(sgg_22.parent.eName, Util.Bold("gBundle_2"));
-				AE(sgg_23.parent.eName, Util.Bold("gBundle_2"));
-				AE(sgg_24.parent.eName, Util.Bold("gBundle_2"));
-				AE(sgg_2511.parent.eName, Util.Bold("gPage_251"));
-				AE(sgg_2512.parent.eName, Util.Bold("gPage_251"));
-				AE(sgg_2521.parent.eName, Util.Bold("gPage_252"));
-				AE(sgg_2522.parent.eName, Util.Bold("gPage_252"));
+				AE(sgg_111.parent.eName, SlotSystemUtil.Bold("gPage_11"));
+				AE(sgg_112.parent.eName, SlotSystemUtil.Bold("gPage_11"));
+				AE(sgg_12.parent.eName, SlotSystemUtil.Bold("gBundle_1"));
+				AE(sgg_21.parent.eName, SlotSystemUtil.Bold("gBundle_2"));
+				AE(sgg_22.parent.eName, SlotSystemUtil.Bold("gBundle_2"));
+				AE(sgg_23.parent.eName, SlotSystemUtil.Bold("gBundle_2"));
+				AE(sgg_24.parent.eName, SlotSystemUtil.Bold("gBundle_2"));
+				AE(sgg_2511.parent.eName, SlotSystemUtil.Bold("gPage_251"));
+				AE(sgg_2512.parent.eName, SlotSystemUtil.Bold("gPage_251"));
+				AE(sgg_2521.parent.eName, SlotSystemUtil.Bold("gPage_252"));
+				AE(sgg_2522.parent.eName, SlotSystemUtil.Bold("gPage_252"));
 				AB(sgg_111.isPool, false);
 				AB(sgg_112.isPool, false);
 				AB(sgg_12.isPool, false);
@@ -2116,25 +2116,25 @@ public class SlottableTest{
 				AE(ssm.ContainsInHierarchy(sbp2), true);
 				AE(ssm.poolBundle.ContainsInHierarchy(sbp2), true);
 				AE(sgpAll.ContainsInHierarchy(sbp2), false);
-				if(sbp2.itemInst is BowInstanceMock){
+				if(sbp2.itemInst is BowInstance){
 					AE(sbp2.sg, sgpBow);
 					AE(sgpBow.ContainsInHierarchy(sbp2), true);
 					AE(sgpWear.ContainsInHierarchy(sbp2), false);
 					AE(sgpCGears.ContainsInHierarchy(sbp2), false);
 					AE(sgpParts.ContainsInHierarchy(sbp2), false);
-				}else if(sbp2.itemInst is WearInstanceMock){
+				}else if(sbp2.itemInst is WearInstance){
 					AE(sbp2.sg, sgpWear);
 					AE(sgpBow.ContainsInHierarchy(sbp2), false);
 					AE(sgpWear.ContainsInHierarchy(sbp2), true);
 					AE(sgpCGears.ContainsInHierarchy(sbp2), false);
 					AE(sgpParts.ContainsInHierarchy(sbp2), false);
-				}else if(sbp2.itemInst is CarriedGearInstanceMock){
+				}else if(sbp2.itemInst is CarriedGearInstance){
 					AE(sbp2.sg, sgpCGears);
 					AE(sgpBow.ContainsInHierarchy(sbp2), false);
 					AE(sgpWear.ContainsInHierarchy(sbp2), false);
 					AE(sgpCGears.ContainsInHierarchy(sbp2), true);
 					AE(sgpParts.ContainsInHierarchy(sbp2), false);
-				}else if(sbp2.itemInst is PartsInstanceMock){
+				}else if(sbp2.itemInst is PartsInstance){
 					AE(sbp2.sg, sgpParts);
 					AE(sgpBow.ContainsInHierarchy(sbp2), false);
 					AE(sgpWear.ContainsInHierarchy(sbp2), false);
@@ -2152,19 +2152,19 @@ public class SlottableTest{
 					else
 						AE(eSet.ContainsInHierarchy(sbe), false);
 				}
-				if(sbe.itemInst is BowInstanceMock){
+				if(sbe.itemInst is BowInstance){
 					AE(sbe.sg, sgeBow);
 					AE(sgeBow.ContainsInHierarchy(sbe), true);
 					AE(sgeWear.ContainsInHierarchy(sbe), false);
 					AE(sgeCGears.ContainsInHierarchy(sbe), false);
 				}
-				if(sbe.itemInst is WearInstanceMock){
+				if(sbe.itemInst is WearInstance){
 					AE(sbe.sg, sgeWear);
 					AE(sgeBow.ContainsInHierarchy(sbe), false);
 					AE(sgeWear.ContainsInHierarchy(sbe), true);
 					AE(sgeCGears.ContainsInHierarchy(sbe), false);
 				}
-				if(sbe.itemInst is CarriedGearInstanceMock){
+				if(sbe.itemInst is CarriedGearInstance){
 					AE(sbe.sg, sgeCGears);
 					AE(sgeBow.ContainsInHierarchy(sbe), false);
 					AE(sgeWear.ContainsInHierarchy(sbe), false);
@@ -2483,7 +2483,7 @@ public class SlottableTest{
 				/*	SelState */
 					if(isPAS){
 						if(sb.sg.isPool){
-							if(sb.isEquipped || (sb.itemInst is PartsInstanceMock && !(sb.sg.Filter is SGPartsFilter))){
+							if(sb.isEquipped || (sb.itemInst is PartsInstance && !(sb.sg.Filter is SGPartsFilter))){
 								if(sb.prevSelState == SBDeactivated){
 									ASBSelState(sb, SBDeactivated, SBDefocused, null);
 
@@ -3736,10 +3736,10 @@ public class SlottableTest{
 					Assert.That(inspectedBool, Is.False);
 			}
 			public void AssertEquipped(InventoryItemInstance itemInst){
-				if(itemInst is BowInstanceMock || itemInst is WearInstanceMock){
+				if(itemInst is BowInstance || itemInst is WearInstance){
 					/*	Bow or Wear?	*/
 					bool isBow = false;
-					if(itemInst is BowInstanceMock)
+					if(itemInst is BowInstance)
 						isBow = true;
 					System.Type typeToCheck;
 					InventoryItemInstance ssmEquipped;
@@ -3747,12 +3747,12 @@ public class SlottableTest{
 					SlotGroup sge;
 					SlotGroup sgp;
 					if(isBow){
-						typeToCheck = typeof(BowInstanceMock);
+						typeToCheck = typeof(BowInstance);
 						ssmEquipped = ssm.equippedBowInst;
 						sge = sgeBow;
 						sgp = sgpBow;
 					}else{
-						typeToCheck = typeof(WearInstanceMock);
+						typeToCheck = typeof(WearInstance);
 						ssmEquipped = ssm.equippedWearInst;
 						sge = sgeWear;
 						sgp = sgpWear;
@@ -3851,13 +3851,13 @@ public class SlottableTest{
 					}
 				}
 			}
-			public void AECGears(List<CarriedGearInstanceMock> items, PoolInventory poolInv, EquipmentSetInventory equipInv){
+			public void AECGears(List<CarriedGearInstance> items, PoolInventory poolInv, EquipmentSetInventory equipInv){
 				if(items != null){
 					AE(ssm.equippedCarriedGears.Count, items.Count);
 					AE(sgpAll.equippedSBs.Count, items.Count + 2);
 					AE(sgpCGears.equippedSBs.Count, items.Count);
 					AE(sgeCGears.equippedSBs.Count, items.Count);
-					foreach(CarriedGearInstanceMock item in items){
+					foreach(CarriedGearInstance item in items){
 						AB(ssm.equippedCarriedGears.Contains(item), true);
 						AB(sgpAll.equippedSBs.Contains(sgpAll.GetSB(item)), true);
 						ANull(sgpBow.GetSB(item));
@@ -3870,8 +3870,8 @@ public class SlottableTest{
 					}
 				}
 				foreach(InventoryItemInstance itemInInv in poolInv){
-					if(itemInInv is CarriedGearInstanceMock){
-						if(items.Contains((CarriedGearInstanceMock)itemInInv)){
+					if(itemInInv is CarriedGearInstance){
+						if(items.Contains((CarriedGearInstance)itemInInv)){
 							AB(itemInInv.isEquipped, true);
 							AB(sgpAll.GetSB(itemInInv).isEquipped, true);
 							AB(sgpCGears.GetSB(itemInInv).isEquipped, true);
@@ -3882,35 +3882,35 @@ public class SlottableTest{
 						}
 					}
 				}
-				foreach(CarriedGearInstanceMock item in items){
+				foreach(CarriedGearInstance item in items){
 					if(item != null){
 						AE(equipInv.Contains(item), true);
 					}
 				}
 				foreach(InventoryItemInstance itemInInv in equipInv){
-					if(itemInInv is CarriedGearInstanceMock){
+					if(itemInInv is CarriedGearInstance){
 						AB(itemInInv.isEquipped, true);
-						AE(items.Contains((CarriedGearInstanceMock)itemInInv), true);
+						AE(items.Contains((CarriedGearInstance)itemInInv), true);
 						AB(sgeCGears.GetSB(itemInInv).isEquipped, true);
 					}
 				}
 			}
 			public void AECGears(Slottable cg1, Slottable cg2, Slottable cg3, Slottable cg4){
-				List<CarriedGearInstanceMock> checkedList = new List<CarriedGearInstanceMock>();
+				List<CarriedGearInstance> checkedList = new List<CarriedGearInstance>();
 				if(cg1 != null)
-					checkedList.Add((CarriedGearInstanceMock)cg1.item);
+					checkedList.Add((CarriedGearInstance)cg1.item);
 				else
 					checkedList.Add(null);
 				if(cg2 != null)
-					checkedList.Add((CarriedGearInstanceMock)cg2.item);
+					checkedList.Add((CarriedGearInstance)cg2.item);
 				else
 					checkedList.Add(null);
 				if(cg3 != null)
-					checkedList.Add((CarriedGearInstanceMock)cg3.item);
+					checkedList.Add((CarriedGearInstance)cg3.item);
 				else
 					checkedList.Add(null);
 				if(cg4 != null)
-					checkedList.Add((CarriedGearInstanceMock)cg4.item);
+					checkedList.Add((CarriedGearInstance)cg4.item);
 				else
 					checkedList.Add(null);
 				
@@ -3932,8 +3932,8 @@ public class SlottableTest{
 					if(sgp.Filter is SGNullFilter || sgp.Filter is SGCGearsFilter){
 						foreach(Slottable sbp in sgp){
 							if(sbp != null){
-								if(sbp.itemInst is CarriedGearInstanceMock){
-									if(checkedList.Contains((CarriedGearInstanceMock)sbp.itemInst)){
+								if(sbp.itemInst is CarriedGearInstance){
+									if(checkedList.Contains((CarriedGearInstance)sbp.itemInst)){
 										if(sgp == ssm.focusedSGP){
 											if(sgp.isAutoSort){
 												ASSB(sbp,
@@ -4057,11 +4057,11 @@ public class SlottableTest{
 			public void PrintSBsArray(IEnumerable<Slottable> sbs){
 				foreach(Slottable sb in sbs){
 					if(sb != null)
-						Util.Stack(Util.SBName(sb));
+						SlotSystemUtil.Stack(SlotSystemUtil.SBName(sb));
 					else
-						Util.Stack("null");
+						SlotSystemUtil.Stack("null");
 				}
-				string str = Util.Stacked;
+				string str = SlotSystemUtil.Stacked;
 				Debug.Log("SBs: " + str);
 			}
 			public void PrintItemsArray(IEnumerable<SlottableItem> items){
@@ -4069,63 +4069,63 @@ public class SlottableTest{
 					if(item is InventoryItemInstance){
 						InventoryItemInstance itemInst = (InventoryItemInstance)item;
 						if(itemInst != null)
-							Util.Stack(Util.ItemInstName(itemInst));
+							SlotSystemUtil.Stack(SlotSystemUtil.ItemInstName(itemInst));
 						else
-							Util.Stack("null");
+							SlotSystemUtil.Stack("null");
 					}
 				}
-				string str = Util.Stacked;
+				string str = SlotSystemUtil.Stacked;
 				Debug.Log("itemInsts: " + str);
 			}
 			public void PrintSBs(List<Slottable> sbs){
 				foreach(Slottable sb in sbs){
-					Debug.Log(Util.SBDebug(sb));
+					Debug.Log(SlotSystemUtil.SBDebug(sb));
 				}
 			}
 			public void Print(Slottable sb){
-				Debug.Log(Util.SBDebug(sb));
+				Debug.Log(SlotSystemUtil.SBDebug(sb));
 			}
 			public void Print(SlotGroup sg){
-				Debug.Log(Util.SGDebug(sg));
+				Debug.Log(SlotSystemUtil.SGDebug(sg));
 			}
 			public void Print(SlotSystemManager ssm){
-				Debug.Log(Util.SSMDebug(ssm));
+				Debug.Log(SlotSystemUtil.SSMDebug(ssm));
 			}
 			public string Name(Slottable sb){
-				return Util.SBName(sb);
+				return SlotSystemUtil.SBName(sb);
 			}
 			public string Bold(string str){
-				return Util.Bold(str);
+				return SlotSystemUtil.Bold(str);
 			}
 			public string Red(string str){
-				return Util.Red(str);
+				return SlotSystemUtil.Red(str);
 			}
 			public string Blue(string str){
-				return Util.Blue(str);
+				return SlotSystemUtil.Blue(str);
 			}
 			public string Green(string str){
-				return Util.Green(str);
+				return SlotSystemUtil.Green(str);
 			}
 			public string Ciel(string str){
-				return Util.Ciel(str);
+				return SlotSystemUtil.Ciel(str);
 			}
 			public string Aqua(string str){
-				return Util.Aqua(str);
+				return SlotSystemUtil.Aqua(str);
 			}
 			public string Forest(string str){
-				return Util.Forest(str);
+				return SlotSystemUtil.Forest(str);
 			}
 			public string Brown(string str){
-				return Util.Brown(str);
+				return SlotSystemUtil.Brown(str);
 			}
 			public string Terra(string str){
-				return Util.Terra(str);
+				return SlotSystemUtil.Terra(str);
 			}
 			public string Berry(string str){
-				return Util.Berry(str);
+				return SlotSystemUtil.Berry(str);
 			}
 			public string Violet(string str){
-				return Util.Violet(str);
+				return SlotSystemUtil.Violet(str);
 			}
 
 		/*	SSM	*/

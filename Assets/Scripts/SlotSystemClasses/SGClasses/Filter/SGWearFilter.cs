@@ -7,7 +7,7 @@ namespace SlotSystem{
 		public void Filter(ref List<SlottableItem> items){
 			List<SlottableItem> res = new List<SlottableItem>();
 			foreach(SlottableItem item in items){
-				if(item is WearInstanceMock)
+				if(item is WearInstance)
 					res.Add(item);
 			}
 			items = res;

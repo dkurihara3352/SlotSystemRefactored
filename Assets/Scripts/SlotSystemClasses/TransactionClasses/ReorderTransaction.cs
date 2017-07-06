@@ -13,9 +13,9 @@ namespace SlotSystem{
 			m_origSG = m_pickedSB.sg;
 		}
 		public ReorderTransaction(ReorderTransaction orig){
-			this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-			this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
-			this.m_origSG = Util.CloneSG(orig.m_origSG);
+			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
+			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
+			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
 		}
 		public override Slottable targetSB{get{return m_selectedSB;}}
 		public override SlotGroup sg1{get{return m_origSG;}}

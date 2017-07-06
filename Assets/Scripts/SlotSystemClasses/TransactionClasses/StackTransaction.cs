@@ -19,10 +19,10 @@ namespace SlotSystem{
 			itemCache.Add(cache);
 		}
 		public StackTransaction(StackTransaction orig){
-			this.m_pickedSB = Util.CloneSB(orig.m_pickedSB);
-			this.m_origSG = Util.CloneSG(orig.m_origSG);
-			this.m_selectedSB = Util.CloneSB(orig.m_selectedSB);
-			this.m_selectedSG = Util.CloneSG(orig.m_selectedSG);
+			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
+			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
+			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
+			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
 			InventoryItemInstance item = this.m_pickedSB.itemInst;
 			item.Quantity = orig.m_pickedSB.pickedAmount;
 			itemCache.Add(item);

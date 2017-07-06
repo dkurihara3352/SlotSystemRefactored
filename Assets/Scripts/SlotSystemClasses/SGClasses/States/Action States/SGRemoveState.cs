@@ -39,7 +39,7 @@ namespace SlotSystem{
 				}
 			}else{
 				if(sg.isExpandable)
-					Util.Trim(ref newSBs);
+					SlotSystemUtil.Trim(ref newSBs);
 			}
 			sg.SetNewSBs(nonremoved);
 			sg.CreateNewSlots();

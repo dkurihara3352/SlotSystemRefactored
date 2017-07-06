@@ -28,7 +28,7 @@ namespace SlotSystem{
 					newSB.Initialize(itemInst);
 					newSB.SetSSM(sg.ssm);
 					newSB.Defocus();
-					Util.AddInEmptyOrConcat(ref newSBs, newSB);
+					SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
 				}
 			}
 			if(sg.isAutoSort)
