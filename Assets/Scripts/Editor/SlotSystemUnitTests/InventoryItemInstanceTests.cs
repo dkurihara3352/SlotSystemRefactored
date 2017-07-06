@@ -1,21 +1,75 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using NUnit.Framework;
+using SlotSystem;
 
+[TestFixture]
 public class InventoryItemInstanceTests {
 
 	[Test]
-	public void EditorTest() {
-		//Arrange
-		var gameObject = new GameObject();
+	public void Equals_ComparedToSameStackableItem_ReturnsTrue(){
+		PartsFake stubParts = MakePartsFake(0);
+		PartsInstance partsInstA = MakePartsInstance(stubParts);
+		PartsInstance partsInstB = MakePartsInstance(stubParts);
+		bool equality = partsInstA == partsInstB;
 
-		//Act
-		//Try to rename the GameObject
-		var newGameObjectName = "My game object";
-		gameObject.name = newGameObjectName;
+		Assert.That(equality, Is.True);
+	}
+	[Test]
+	public void objectReferenceEquals_ComparedToSameStackableItem_ReturnsFalse(){
+		PartsFake stubParts = MakePartsFake(0);
+		PartsInstance partsInstA = MakePartsInstance(stubParts);
+		PartsInstance partsInstB = MakePartsInstance(stubParts);
+		bool equality = object.ReferenceEquals(partsInstA, partsInstB);
 
-		//Assert
-		//The object has a new name
-		Assert.AreEqual(newGameObjectName, gameObject.name);
+		Assert.That(equality, Is.False);
+	}
+	[Test]
+	public void Equals_ComparedToDifferentStackableItem_ReturnsFalse(){
+		PartsFake stubPartsA = MakePartsFake(0);
+		PartsFake stubPartsB = MakePartsFake(1);
+		PartsInstance partsInstA = MakePartsInstance(stubPartsA);
+		PartsInstance partsInstB = MakePartsInstance(stubPartsB);
+		bool equality = partsInstA == partsInstB;
+
+		Assert.That(equality, Is.False);
+	}
+	[Test]
+	public void Equals_ComparedToSameNonStackableItem_ReturnsFalse(){
+		BowFake stubBow = MakeBowFake(0);
+		BowInstance stubBowInstA = MakeBowInstance(stubBow);
+		BowInstance stubBowInstB = MakeBowInstance(stubBow);
+		bool equality = stubBowInstA == stubBowInstB;
+
+		Assert.That(equality, Is.False);
+	}
+	[Test]
+	public void Equals_CompareToSelf_ReturnsTrue(){
+		BowFake stubBow = MakeBowFake(0);
+		BowInstance stubBowInstA = MakeBowInstance(stubBow);
+		BowInstance stubBowInstB = stubBowInstA;
+		bool equality = stubBowInstA == stubBowInstB;
+
+		Assert.That(equality, Is.True);
+	}
+	PartsInstance MakePartsInstance(PartsFake parts){
+		 PartsInstance result = new PartsInstance();
+		 result.Item = parts;
+		 return result;
+	}
+	PartsFake MakePartsFake(int id){
+		PartsFake result = new PartsFake();
+		result.ItemID = id;
+		return result;
+	}
+	BowInstance MakeBowInstance(BowFake bow){
+		BowInstance result = new BowInstance();
+		result.Item = bow;
+		return result;
+	}
+	BowFake MakeBowFake(int id){
+		BowFake result = new BowFake();
+		result.ItemID = id;
+		return result;
 	}
 }

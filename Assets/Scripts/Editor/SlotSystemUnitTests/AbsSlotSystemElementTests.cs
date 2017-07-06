@@ -679,23 +679,6 @@ public class AbsSlotSystemElementTests{
 			Assert.That(mockPageEle.isFocusToggleOn, Is.True);
 		}
 	/*	helpers */
-		class TestSlotSystemElement: AbsSlotSystemElement{
-			protected override IEnumerable<SlotSystemElement> elements{get{return m_elements;}}
-			IEnumerable<SlotSystemElement> m_elements;
-			public void SetElements(IEnumerable<SlotSystemElement> elements){
-				m_elements = elements;
-			}
-			public string message = "";
-			public override void InstantGreyout(){
-				message = "InstantGreyout called";
-			}
-			public override void InstantGreyin(){
-				message = "InstantGreyin called";
-			}
-			public override void InstantHighlight(){
-				message = "InstantHighlight called";
-			}
-		}
 		TestSlotSystemElement MakeSlotSystemElement(){
 			GameObject sseGO = new GameObject("sseGO");
 			return sseGO.AddComponent<TestSlotSystemElement>();
@@ -705,10 +688,6 @@ public class AbsSlotSystemElementTests{
 		}
 		TestSlotSystemPage MakeSlotSystemPage(){
 			return new GameObject("pageGO").AddComponent<TestSlotSystemPage>();
-		}
-		class TestSlotSystemPage: SlotSystemPage{
-			protected override IEnumerable<SlotSystemElement> elements{get{return m_elements;}}
-			IEnumerable<SlotSystemElement> m_elements;
 		}
 		SlotSystemPageElement MakeSlotSystemPageElement(SlotSystemElement ele, bool isFocusToggledOn){
 			return new SlotSystemPageElement(ele, isFocusToggledOn);
