@@ -165,7 +165,8 @@ namespace SlotSystem{
                             newSB.SetSSM(sg.ssm);
                             newSB.Defocus();
                             newSB.SetEqpState(Slottable.unequippedState);
-                            SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
+                            // SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
+                            newSBs.Fill(newSB);
                         }
                         if(removed != null){
                             Slottable rem = null;
@@ -262,7 +263,8 @@ namespace SlotSystem{
                             newSB.Initialize(itemInst);
                             newSB.SetSSM(sg.ssm);
                             newSB.Defocus();
-                            SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
+                            // SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
+                            newSBs.Fill(newSB);
                         }
                     }
                     if(sg.isAutoSort)
@@ -319,7 +321,8 @@ namespace SlotSystem{
                         }
                     }else{
                         if(sg.isExpandable)
-                            SlotSystemUtil.Trim(ref newSBs);
+                            // SlotSystemUtil.Trim(ref newSBs);
+                            newSBs.Trim();
                     }
                     sg.SetNewSBs(nonremoved);
                     sg.CreateNewSlots();

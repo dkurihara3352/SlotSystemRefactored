@@ -519,7 +519,7 @@ namespace SlotSystem{
 					SetSelState(SlotSystemManager.ssmDeactivatedState);
 					SetActState(SlotSystemManager.ssmWaitForActionState);
 				}
-				public SlotSystemElement FindParent(SlotSystemElement ele){
+				public virtual SlotSystemElement FindParent(SlotSystemElement ele){
 					foundParent = null;
 					PerformInHierarchy(CheckAndReportParent, ele);
 					return foundParent;

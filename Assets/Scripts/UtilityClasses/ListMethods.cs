@@ -83,6 +83,18 @@ namespace Utility{
 				list[n] = value;  
 			}
 		}
+		public static void Trim<T>(this List<T> list){
+			list.RemoveAll(element => element == null);
+		}
+		public static void Fill<T>(this IList<T> list, T element){
+			foreach(var ele in list){
+				if(ele == null){
+					list[list.IndexOf(ele)] = element;
+					return;
+				}
+			}
+			list.Add(element);
+		}
 	}
 }
 	

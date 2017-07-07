@@ -30,7 +30,9 @@ namespace SlotSystem{
 			foreach(SlottableItem it in m_items){
 				InventoryItemInstance invInst = (InventoryItemInstance)it;
 				InventoryItemInstance addedInst = (InventoryItemInstance)item;
-				if(invInst == addedInst && invInst.IsStackable){
+				if(object.ReferenceEquals(invInst, addedInst))
+					throw new System.InvalidOperationException("PoolInventory.Add: cannot add multiple same InventoryItemInstances. Try instantiate another instance with the same InventoryItem instead");
+				if(invInst == addedInst){
 					invInst.Quantity += addedInst.Quantity;
 					return;
 				}

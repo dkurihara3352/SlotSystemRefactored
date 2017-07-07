@@ -505,5 +505,23 @@ namespace SlotSystem{
 				pickedAmount = 0;
 				SetNewSlotID(-2);
 			}
+			public bool ShareSGAndItem(Slottable other){
+				bool flag = true;
+				flag &= this.sg == other.sg;
+				flag &= this.itemInst == other.itemInst;
+				return flag;
+			}
+			public bool HaveCommonItemFamily(Slottable other){
+				if(this.item is BowInstance)
+					return (other.item is BowInstance);
+				else if(this.item is WearInstance)
+					return (other.item is WearInstance);
+				else if(this.item is CarriedGearInstance)
+					return (other.item is CarriedGearInstance);
+				else if(this.item is PartsInstance)
+					return (other.item is PartsInstance);
+				else
+					return false;
+			}
 	}
 }

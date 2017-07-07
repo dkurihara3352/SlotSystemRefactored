@@ -5,7 +5,7 @@ using Utility;
 using System.Collections.Generic;
 using System.Collections;
 [TestFixture]
-[Ignore]
+// [Ignore]
 public class ListMethodsTests {
 	[Test]
 	public void MakeOrderedList_WhenCalled_ReturnsOrderedList(){
@@ -136,6 +136,52 @@ public class ListMethodsTests {
 				yield return case3;
 			}
 		}
+	[TestCaseSource(typeof(TrimCases))]
+	public void Trim_WhenCalled_SetsExpected(List<TestElement> list, List<TestElement> expected){
+		list.Trim();
+		Assert.That(list, Is.EqualTo(expected));
+	}
+		class TrimCases: IEnumerable{
+			public IEnumerator GetEnumerator(){
+				TestElement ele_1 = new TestElement();
+				TestElement ele_2 = new TestElement();
+				TestElement ele_3 = new TestElement();
+				TestElement ele_4 = new TestElement();
+				List<TestElement> case1List = new List<TestElement>(new TestElement[]{ ele_1, null, ele_2, ele_3, null, null, ele_4});
+				List<TestElement> case1Exp = new List<TestElement>(new TestElement[]{ele_1, ele_2, ele_3, ele_4});
+				yield return new object[]{case1List, case1Exp};
+			}
+		}
+	[TestCaseSource(typeof(FillCases))]
+	public void Fill_WhenCalled_SetsExpected(List<TestElement> list, TestElement added, List<TestElement> expected){
+		list.Fill(added);
+
+		Assert.That(list, Is.EqualTo(expected));
+	}
+		class FillCases: IEnumerable{
+			public IEnumerator GetEnumerator(){
+				TestElement ele_1 = new TestElement();
+				TestElement ele_2 = new TestElement();
+				TestElement ele_3 = new TestElement();
+				TestElement ele_4 = new TestElement();
+
+				List<TestElement> case1List = new List<TestElement>(new TestElement[]{null, ele_1, ele_2, null, ele_3});
+				List<TestElement> case1Exp = new List<TestElement>(new TestElement[]{ele_4, ele_1, ele_2, null, ele_3});
+
+				yield return new object[]{case1List, ele_4, case1Exp};
+				
+				List<TestElement> case2List = new List<TestElement>(new TestElement[]{ele_1, ele_2, null, ele_3});
+				List<TestElement> case2Exp = new List<TestElement>(new TestElement[]{ele_1, ele_2, ele_4, ele_3});
+
+				yield return new object[]{case2List, ele_4, case2Exp};
+				
+				List<TestElement> case3List = new List<TestElement>(new TestElement[]{ele_1, ele_2, ele_3});
+				List<TestElement> case3Exp = new List<TestElement>(new TestElement[]{ele_1, ele_2, ele_3, ele_4});
+
+				yield return new object[]{case3List, ele_4, case3Exp};
+			}
+		}
+	public class TestElement{}
 	public List<int> MakeOrderedList(){
 		List<int> result = new List<int>();
 		System.Random rng = new System.Random();

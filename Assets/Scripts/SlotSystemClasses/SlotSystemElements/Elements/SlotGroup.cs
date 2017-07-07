@@ -707,7 +707,7 @@ namespace SlotSystem{
 				List<Slottable> result = new List<Slottable>();
 				foreach(Slottable sb in slottables){
 					if(sb != null){
-						if(SlotSystemUtil.IsSwappable(pickedSB, sb))
+						if(SlotSystemUtil.AreSwappable(pickedSB, sb))
 							result.Add(sb);
 					}
 				}

@@ -52,6 +52,58 @@ public class InventoryItemInstanceTests {
 
 		Assert.That(equality, Is.True);
 	}
+	[Test]
+	public void CompareTo_IIWithGreaterID_ReturnsNegative(){
+		BowFake stubBowA = MakeBowFake(0);
+		BowFake stubBowB = MakeBowFake(1);
+		BowInstance stubBowInstA = MakeBowInstance(stubBowA);
+		BowInstance stubBowInstB = MakeBowInstance(stubBowB);
+
+		int result = stubBowInstA.CompareTo(stubBowInstB);
+
+		Assert.That(result, Is.LessThan(0));
+	}
+	[Test]
+	public void CompareTo_IIWithLesserID_ReturnsPositive(){
+		BowFake stubBowA = MakeBowFake(1);
+		BowFake stubBowB = MakeBowFake(0);
+		BowInstance stubBowInstA = MakeBowInstance(stubBowA);
+		BowInstance stubBowInstB = MakeBowInstance(stubBowB);
+
+		int result = stubBowInstA.CompareTo(stubBowInstB);
+
+		Assert.That(result, Is.GreaterThan(0));
+	}
+	[Test]
+	public void CompareTo_IIWithSameIDAndOrder_ReturnsZero(){
+		BowFake stubBow = MakeBowFake(0);
+		BowInstance stubBowInstA = MakeBowInstance(stubBow, 0);
+		BowInstance stubBowInstB = MakeBowInstance(stubBow, 0);
+
+		int result = stubBowInstA.CompareTo(stubBowInstB);
+
+		Assert.That(result, Is.EqualTo(0));
+	}
+	[Test]
+	public void CompareTo_IIWithSameIDAndGreaterOrder_ReturnsNegative(){
+		BowFake stubBow = MakeBowFake(0);
+		BowInstance stubBowInstA = MakeBowInstance(stubBow, 0);
+		BowInstance stubBowInstB = MakeBowInstance(stubBow, 1);
+
+		int result = stubBowInstA.CompareTo(stubBowInstB);
+
+		Assert.That(result, Is.LessThan(0));
+	}
+	[Test]
+	public void CompareTo_IIWithSameIDAndLesserOrder_ReturnsPositive(){
+		BowFake stubBow = MakeBowFake(0);
+		BowInstance stubBowInstA = MakeBowInstance(stubBow, 1);
+		BowInstance stubBowInstB = MakeBowInstance(stubBow, 0);
+
+		int result = stubBowInstA.CompareTo(stubBowInstB);
+
+		Assert.That(result, Is.GreaterThan(0));
+	}
 	PartsInstance MakePartsInstance(PartsFake parts){
 		 PartsInstance result = new PartsInstance();
 		 result.Item = parts;
@@ -65,6 +117,12 @@ public class InventoryItemInstanceTests {
 	BowInstance MakeBowInstance(BowFake bow){
 		BowInstance result = new BowInstance();
 		result.Item = bow;
+		return result;
+	}
+	BowInstance MakeBowInstance(BowFake bow, int acquisitionOrder){
+		BowInstance result = new BowInstance();
+		result.Item = bow;
+		result.SetAcquisitionOrder(acquisitionOrder);
 		return result;
 	}
 	BowFake MakeBowFake(int id){

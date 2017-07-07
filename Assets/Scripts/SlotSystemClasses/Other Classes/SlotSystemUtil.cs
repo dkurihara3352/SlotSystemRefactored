@@ -4,22 +4,6 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public static class SlotSystemUtil{
-		public static SlotSystemTransaction CloneTA(SlotSystemTransaction orig){
-			SlotSystemTransaction cloneTA = null;
-			if(orig is RevertTransaction)
-				cloneTA = new RevertTransaction((RevertTransaction)orig);
-			if(orig is ReorderTransaction)
-				cloneTA = new ReorderTransaction((ReorderTransaction)orig);
-			if(orig is StackTransaction)
-				cloneTA = new StackTransaction((StackTransaction)orig);
-			if(orig is SwapTransaction)
-				cloneTA = new SwapTransaction((SwapTransaction)orig);
-			if(orig is FillTransaction)
-				cloneTA = new FillTransaction((FillTransaction)orig);
-			if(orig is SortTransaction)
-				cloneTA = new SortTransaction((SortTransaction)orig);
-			return cloneTA;
-		}
 		public static Slottable CloneSB(Slottable orig){
 			if(orig != null){
 				GameObject cloneGO = new GameObject("cloneGO");
@@ -38,42 +22,7 @@ namespace SlotSystem{
 			}
 			return null;
 		}
-		public static bool SBsShareSGAndItem(Slottable sbA, Slottable sbB){
-			bool flag = true;
-			flag &= sbA.sg == sbB.sg;
-			flag &= sbA.itemInst == sbB.itemInst;
-			return flag;
-		}
-		public static void Trim(ref List<Slottable> sbs){
-			List<Slottable> trimmed = new List<Slottable>();
-			foreach(Slottable sb in sbs){
-				if(sb != null)
-					trimmed.Add(sb);
-			}
-			sbs = trimmed;
-		}
-		public static void AddInEmptyOrConcat(ref List<Slottable> sbs, Slottable added){
-			foreach(Slottable sb in sbs){
-				if(sb == null){
-					sbs[sbs.IndexOf(sb)] = added;
-					return;
-				}
-			}
-			sbs.Add(added);
-		}
-		public static bool HaveCommonItemFamily(Slottable sb, Slottable other){
-			if(sb.item is BowInstance)
-				return (other.item is BowInstance);
-			else if(sb.item is WearInstance)
-				return (other.item is WearInstance);
-			else if(sb.item is CarriedGearInstance)
-				return (other.item is CarriedGearInstance);
-			else if(sb.item is PartsInstance)
-				return (other.item is PartsInstance);
-			else
-				return false;
-		}
-		public static bool IsSwappable(Slottable pickedSB, Slottable otherSB){
+		public static bool AreSwappable(Slottable pickedSB, Slottable otherSB){
 			/*	precondition
 					1) they do not share same SG
 					2) otherSB.SG accepts pickedSB
