@@ -9,5 +9,5 @@ namespace SlotSystem{
 		}
 		public virtual void OnHoverExitMock(Slottable sb, PointerEventDataFake eventDataMock){
 		}
-	}
 }
+	}

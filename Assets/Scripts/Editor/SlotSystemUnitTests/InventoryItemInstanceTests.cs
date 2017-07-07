@@ -7,7 +7,7 @@ using SlotSystem;
 public class InventoryItemInstanceTests {
 
 	[Test]
-	public void Equals_ComparedToSameStackableItem_ReturnsTrue(){
+	public void Equals_ToSameStackableItem_ReturnsTrue(){
 		PartsFake stubParts = MakePartsFake(0);
 		PartsInstance partsInstA = MakePartsInstance(stubParts);
 		PartsInstance partsInstB = MakePartsInstance(stubParts);
@@ -16,7 +16,7 @@ public class InventoryItemInstanceTests {
 		Assert.That(equality, Is.True);
 	}
 	[Test]
-	public void objectReferenceEquals_ComparedToSameStackableItem_ReturnsFalse(){
+	public void objectReferenceEquals_ToSameStackableItem_ReturnsFalse(){
 		PartsFake stubParts = MakePartsFake(0);
 		PartsInstance partsInstA = MakePartsInstance(stubParts);
 		PartsInstance partsInstB = MakePartsInstance(stubParts);
@@ -25,7 +25,7 @@ public class InventoryItemInstanceTests {
 		Assert.That(equality, Is.False);
 	}
 	[Test]
-	public void Equals_ComparedToDifferentStackableItem_ReturnsFalse(){
+	public void Equals_ToDifferentStackableItem_ReturnsFalse(){
 		PartsFake stubPartsA = MakePartsFake(0);
 		PartsFake stubPartsB = MakePartsFake(1);
 		PartsInstance partsInstA = MakePartsInstance(stubPartsA);
@@ -35,7 +35,7 @@ public class InventoryItemInstanceTests {
 		Assert.That(equality, Is.False);
 	}
 	[Test]
-	public void Equals_ComparedToSameNonStackableItem_ReturnsFalse(){
+	public void Equals_ToSameNonStackableItem_ReturnsFalse(){
 		BowFake stubBow = MakeBowFake(0);
 		BowInstance stubBowInstA = MakeBowInstance(stubBow);
 		BowInstance stubBowInstB = MakeBowInstance(stubBow);
@@ -44,7 +44,7 @@ public class InventoryItemInstanceTests {
 		Assert.That(equality, Is.False);
 	}
 	[Test]
-	public void Equals_CompareToSelf_ReturnsTrue(){
+	public void Equals_ToSelf_ReturnsTrue(){
 		BowFake stubBow = MakeBowFake(0);
 		BowInstance stubBowInstA = MakeBowInstance(stubBow);
 		BowInstance stubBowInstB = stubBowInstA;

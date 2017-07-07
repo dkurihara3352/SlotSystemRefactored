@@ -4,13 +4,17 @@ using UnityEngine;
 using Utility;
 
 namespace SlotSystem{
-	public class SGReorderState: SGActState{
+	public class SGSortState: SGActState{
 		public override void EnterState(StateHandler sh){
 			base.EnterState(sh);
-			Slottable sb1 = sg.ssm.pickedSB;
-			Slottable sb2 = sg.ssm.targetSB;
 			List<Slottable> newSBs = new List<Slottable>(sg.toList);
-			newSBs.Reorder(sb1, sb2);
+			int origCount = newSBs.Count;
+			sg.Sorter.TrimAndOrderSBs(ref newSBs);
+			if(!sg.isExpandable){
+				while(newSBs.Count <origCount){
+					newSBs.Add(null);
+				}
+			}
 			sg.UpdateSBs(newSBs);
 			if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
 				SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
@@ -20,5 +24,5 @@ namespace SlotSystem{
 		public override void ExitState(StateHandler sh){
 			base.ExitState(sh);
 		}
-	}	
+	}
 }

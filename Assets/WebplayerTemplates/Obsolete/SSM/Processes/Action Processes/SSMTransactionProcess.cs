@@ -12,5 +12,5 @@ namespace SlotSystem{
 			base.Expire();
 			ssm.transaction.OnComplete();
 		}
-	}	
+	}
 }

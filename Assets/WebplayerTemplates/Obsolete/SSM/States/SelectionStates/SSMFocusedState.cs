@@ -13,5 +13,5 @@ namespace SlotSystem{
 		public override void ExitState(StateHandler sh){
 			base.ExitState(sh);
 		}
-	}	
+	}
 }
