@@ -292,9 +292,9 @@ public class AbsSlotSystemElementTests{
 		[Category("Fields")]
 		public void isToggledOn_ParentIsPageAndElementToggledOn_ReturnsTrue(){
 			TestSlotSystemElement testSSE = MakeSlotSystemElement();
-			SlotSystemPage stubPage = Substitute.For<SlotSystemPage>();
+			TestSlotSystemPage stubPage = MakeSlotSystemPage();
 			SlotSystemPageElement stubPageElement = MakeSlotSystemPageElement(testSSE, true);
-			stubPage.GetPageElement(Arg.Any<SlotSystemElement>()).Returns(stubPageElement);
+			stubPage.AddPageElement(testSSE, stubPageElement);
 			testSSE.parent = stubPage;
 
 			Assert.That(testSSE.isToggledOn, Is.True);
@@ -303,9 +303,9 @@ public class AbsSlotSystemElementTests{
 		[Category("Fields")]
 		public void isToggledOn_ParentIsPageAndElementToggledOff_ReturnsFalse(){
 			TestSlotSystemElement testSSE = MakeSlotSystemElement();
-			SlotSystemPage stubPage = Substitute.For<SlotSystemPage>();
+			TestSlotSystemPage stubPage = MakeSlotSystemPage();
 			SlotSystemPageElement stubPageElement = MakeSlotSystemPageElement(testSSE, false);
-			stubPage.GetPageElement(Arg.Any<SlotSystemElement>()).Returns(stubPageElement);
+			stubPage.AddPageElement(testSSE, stubPageElement);
 			testSSE.parent = stubPage;
 
 			Assert.That(testSSE.isToggledOn, Is.False);
@@ -670,9 +670,11 @@ public class AbsSlotSystemElementTests{
 		public void ToggleOnPageElement_IsPageElementAndElementNotToggledOn_TogglesPageElementOn(){
 			TestSlotSystemElement testSSE = MakeSlotSystemElement();
 			SlotSystemPageElement mockPageEle = MakeSlotSystemPageElement(testSSE, false);
-			SlotSystemPage stubPage = Substitute.For<SlotSystemPage>();
+			// SlotSystemPage stubPage = Substitute.For<SlotSystemPage>();
+			TestSlotSystemPage stubPage = MakeSlotSystemPage();
 			testSSE.parent = stubPage;
-			stubPage.GetPageElement(Arg.Any<SlotSystemElement>()).Returns(mockPageEle);
+			// stubPage.GetPageElement(Arg.Any<SlotSystemElement>()).Returns(mockPageEle);
+			stubPage.AddPageElement(testSSE, mockPageEle);
 
 			testSSE.ToggleOnPageElement();
 

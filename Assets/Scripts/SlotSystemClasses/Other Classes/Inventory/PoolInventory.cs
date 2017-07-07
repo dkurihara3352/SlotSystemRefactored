@@ -27,37 +27,48 @@ namespace SlotSystem{
 				m_sg = sg;
 			}
 		public void Add(SlottableItem item){
-			foreach(SlottableItem it in m_items){
-				InventoryItemInstance invInst = (InventoryItemInstance)it;
-				InventoryItemInstance addedInst = (InventoryItemInstance)item;
-				if(object.ReferenceEquals(invInst, addedInst))
-					throw new System.InvalidOperationException("PoolInventory.Add: cannot add multiple same InventoryItemInstances. Try instantiate another instance with the same InventoryItem instead");
-				if(invInst == addedInst){
-					invInst.Quantity += addedInst.Quantity;
-					return;
-				}
-			}
-			m_items.Add(item);
-			IndexItems();
-		}
-		public void Remove(SlottableItem item){
-			SlottableItem itemToRemove = null;
-			foreach(SlottableItem it in m_items){
-				InventoryItemInstance checkedInst = (InventoryItemInstance)it;
-				InventoryItemInstance removedInst = (InventoryItemInstance)item;
-				if(checkedInst == removedInst){
-					if(!removedInst.IsStackable)
-						itemToRemove = it;
-					else{
-						checkedInst.Quantity -= removedInst.Quantity;
-						if(checkedInst.Quantity <= 0)
-							itemToRemove = it;
+			if(item != null){
+				foreach(SlottableItem it in m_items){
+					InventoryItemInstance invInst = (InventoryItemInstance)it;
+					InventoryItemInstance addedInst = (InventoryItemInstance)item;
+					if(object.ReferenceEquals(invInst, addedInst))
+						throw new System.InvalidOperationException("PoolInventory.Add: cannot add multiple same InventoryItemInstances. Try instantiate another instance with the same InventoryItem instead");
+					if(invInst == addedInst){
+						invInst.Quantity += addedInst.Quantity;
+						return;
 					}
 				}
-			}
-			if(itemToRemove != null)
-				m_items.Remove(itemToRemove);
-			IndexItems();
+				m_items.Add(item);
+				IndexItems();
+			}else
+			throw new System.ArgumentNullException();
+		}
+		public void Remove(SlottableItem item){
+			if(item != null){
+				SlottableItem itemToRemove = null;
+				foreach(SlottableItem it in m_items){
+					InventoryItemInstance checkedInst = (InventoryItemInstance)it;
+					InventoryItemInstance removedInst = (InventoryItemInstance)item;
+					if(checkedInst == removedInst){
+						if(!removedInst.IsStackable)
+							itemToRemove = it;
+						else{
+							if(removedInst.Quantity > checkedInst.Quantity)
+								throw new System.InvalidOperationException("PoolInventory.Remove: cannot remove by greater quantity than there is");
+							else{
+								checkedInst.Quantity -= removedInst.Quantity;
+								if(checkedInst.Quantity <= 0)
+									itemToRemove = it;
+							}
+						}
+					}
+				}
+				if(itemToRemove != null){
+					m_items.Remove(itemToRemove);
+					IndexItems();
+				}
+			}else
+				throw new System.ArgumentNullException();
 		}
 		void IndexItems(){
 			for(int i = 0; i < m_items.Count; i ++){
