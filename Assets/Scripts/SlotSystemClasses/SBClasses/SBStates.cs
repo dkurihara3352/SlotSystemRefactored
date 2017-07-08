@@ -48,7 +48,7 @@ namespace SlotSystem{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
                     SBSelProcess process = null;
-                    if(sb.curSelState == Slottable.sbDeactivatedState){
+                    if(sb.prevSelState == Slottable.sbDeactivatedState){
                         sb.InstantGreyout();
                         process = null;
                     }else if(sb.prevSelState == Slottable.sbFocusedState){
@@ -181,13 +181,12 @@ namespace SlotSystem{
             public class PickedUpState: SBActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    sb.ssm.SetPickedSB(sb);
-                    sb.ssm.SetActState(SlotSystemManager.ssmProbingState);
-                    DraggedIcon di = new DraggedIcon(sb);
-                    sb.ssm.SetDIcon1(di);
-                    sb.ssm.CreateTransactionResultsV2();
+                    sb.SetPickedSB();
+                    sb.SetSSMActState(SlotSystemManager.ssmProbingState);
+                    sb.SetDIcon1();
+                    sb.CreateTAResult();
                     sb.OnHoverEnterMock();
-                    sb.ssm.UpdateTransaction();
+                    sb.UpdateTA();
                     SBActProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
                     sb.SetAndRunActProcess(pickedUpProcess);
                 }
@@ -196,7 +195,7 @@ namespace SlotSystem{
                     sb.Focus();
                 }
                 public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
-                    if(sb.ssm.hovered == (SlotSystemElement)sb && sb.isStackable)
+                    if(sb.isHovered && sb.isStackable)
                         sb.SetActState(Slottable.waitForNextTouchState);
                     else
                         sb.ExecuteTransaction();

@@ -615,10 +615,10 @@ namespace SlotSystem{
 					transactionCoroutine();
 				}
 			}
-			public Slottable pickedSB{
+			public virtual Slottable pickedSB{
 				get{return m_pickedSB;}
 				}Slottable m_pickedSB;
-				public void SetPickedSB(Slottable sb){
+				public virtual void SetPickedSB(Slottable sb){
 					this.m_pickedSB = sb;
 				}
 			public Slottable targetSB{
@@ -669,10 +669,10 @@ namespace SlotSystem{
 				public bool sg2Done{
 					get{return m_sg2Done;}
 					}bool m_sg2Done = true;
-			public DraggedIcon dIcon1{
+			public virtual DraggedIcon dIcon1{
 				get{return m_dIcon1;}
 				}DraggedIcon m_dIcon1;
-				public void SetDIcon1(DraggedIcon di){
+				public virtual void SetDIcon1(DraggedIcon di){
 					m_dIcon1 = di;
 					if(m_dIcon1 == null)
 						m_dIcon1Done = true;
@@ -682,10 +682,10 @@ namespace SlotSystem{
 				public bool dIcon1Done{
 				get{return m_dIcon1Done;}
 				}bool m_dIcon1Done = true;
-			public DraggedIcon dIcon2{
+			public virtual DraggedIcon dIcon2{
 				get{return m_dIcon2;}
 				}DraggedIcon m_dIcon2;
-				public void SetDIcon2(DraggedIcon di){
+				public virtual void SetDIcon2(DraggedIcon di){
 					m_dIcon2 = di;
 					if(m_dIcon2 == null)
 						m_dIcon2Done = true;
@@ -697,8 +697,8 @@ namespace SlotSystem{
 				}bool m_dIcon2Done = true;
 			public SlotSystemElement hovered{
 				get{return m_hovered;}
-				}SlotSystemElement m_hovered;
-				public void SetHovered(SlotSystemElement ele){
+				}protected SlotSystemElement m_hovered;
+				public virtual void SetHovered(SlotSystemElement ele){
 					if(ele == null || ele != hovered){
 						if(hovered != null){
 							if(hovered is Slottable)
@@ -710,7 +710,7 @@ namespace SlotSystem{
 					}
 				}
 			public Dictionary<SlotSystemElement, SlotSystemTransaction> transactionResultsV2;
-			public void CreateTransactionResultsV2(){
+			public virtual void CreateTransactionResultsV2(){
 				Dictionary<SlotSystemElement, SlotSystemTransaction> result = new Dictionary<SlotSystemElement, SlotSystemTransaction>();
 				foreach(SlotGroup sg in focusedSGs){
 					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, sg);
@@ -732,7 +732,7 @@ namespace SlotSystem{
 				}
 				this.transactionResultsV2 = result;
 			}
-			public void UpdateTransaction(){
+			public virtual void UpdateTransaction(){
 				SlotSystemTransaction ta = null;
 				if(transactionResultsV2.TryGetValue(hovered, out ta)){
 					SetTargetSB(ta.targetSB);

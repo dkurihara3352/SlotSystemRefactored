@@ -297,7 +297,7 @@ namespace SlotSystem{
 			static public SlottableCommand TapCommand{
 				get{return m_tapCommand;}
 				}static SlottableCommand m_tapCommand = new SBTapCommand();
-				public void Tap(){
+				public virtual void Tap(){
 					m_tapCommand.Execute(this);
 				}
 		/*	public fields	*/
@@ -344,7 +344,7 @@ namespace SlotSystem{
 			public override bool isDeactivated{
 				get{return curSelState == Slottable.sbDeactivatedState;}
 			}
-			public bool isPickedUp{
+			public virtual bool isPickedUp{
 				get{
 					return ssm.pickedSB == this;
 				}
@@ -365,7 +365,7 @@ namespace SlotSystem{
 				public void Unmark(){
 					SetMrkState(Slottable.unmarkedState);
 				}
-			public bool isStackable{
+			public virtual bool isStackable{
 				get{return itemInst.Item.IsStackable;}
 			}
 			public bool passesPrePickFilter{
@@ -434,11 +434,11 @@ namespace SlotSystem{
 				}
 		/*	Event methods	*/
 			/*	Selection event	*/
-				public void OnHoverEnterMock(){
+				public virtual void OnHoverEnterMock(){
 					PointerEventDataFake eventData = new PointerEventDataFake();
 					((SBSelState)curSelState).OnHoverEnterMock(this, eventData);
 				}
-				public void OnHoverExitMock(){
+				public virtual void OnHoverExitMock(){
 					PointerEventDataFake eventData = new PointerEventDataFake();
 					((SBSelState)curSelState).OnHoverExitMock(this, eventData);
 				}
@@ -479,16 +479,16 @@ namespace SlotSystem{
 				SetEqpState(null);
 				SetMrkState(Slottable.unmarkedState);
 			}
-			public void PickUp(){
+			public virtual void PickUp(){
 				SetActState(Slottable.pickedUpState);
 				m_pickedAmount = 1;
 			}
-			public void Increment(){
+			public virtual void Increment(){
 				if(m_item.IsStackable && m_item.Quantity > m_pickedAmount){
 					m_pickedAmount ++;
 				}
 			}
-			public void ExecuteTransaction(){
+			public virtual void ExecuteTransaction(){
 				ssm.SetActState(SlotSystemManager.ssmTransactionState);
 				ssm.transaction.Execute();
 			}
@@ -500,7 +500,7 @@ namespace SlotSystem{
 				if(itemInst.isEquipped) Equip();
 				else Unequip();
 			}
-			public void Reset(){
+			public virtual void Reset(){
 				SetActState(Slottable.sbWaitForActionState);
 				pickedAmount = 0;
 				SetNewSlotID(-2);
@@ -520,8 +520,34 @@ namespace SlotSystem{
 					return (other.item is CarriedGearInstance);
 				else if(this.item is PartsInstance)
 					return (other.item is PartsInstance);
-				else
+				else 
 					return false;
+			}
+		/*	Forward	*/
+			public virtual void SetPickedSB(){
+				ssm.SetPickedSB(this);
+			}
+			public virtual void SetSSMActState(SSMActState ssmState){
+				ssm.SetActState(ssmState);
+			}
+			public virtual void SetDIcon1(){
+				DraggedIcon dIcon = new DraggedIcon(this);
+				ssm.SetDIcon1(dIcon);
+			}
+			public virtual void SetDIcon2(){
+				DraggedIcon dIcon = new DraggedIcon(this);
+				ssm.SetDIcon2(dIcon);
+			}
+			public virtual void CreateTAResult(){
+				ssm.CreateTransactionResultsV2();
+			}
+			public virtual void UpdateTA(){
+				ssm.UpdateTransaction();
+			}
+			public virtual bool isHovered{
+				get{
+					return ssm.hovered == (SlotSystemElement)this;
+				}
 			}
 	}
 }
