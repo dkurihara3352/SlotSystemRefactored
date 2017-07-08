@@ -36,9 +36,9 @@ namespace SlotSystem{
 			public void SetSG(SlotGroup sg){
 				m_sg = sg;
 			}
-		BowInstance m_equippedBow;
-		WearInstance m_equippedWear;
-		List<CarriedGearInstance> m_equippedCGears = new List<CarriedGearInstance>();
+		protected BowInstance m_equippedBow;
+		protected WearInstance m_equippedWear;
+		protected List<CarriedGearInstance> m_equippedCGears = new List<CarriedGearInstance>();
 		public int equippableCGearsCount{
 			get{return m_equippableCGearsCount;}
 			}int m_equippableCGearsCount;
@@ -48,7 +48,7 @@ namespace SlotSystem{
 			sg.SetInitSlotsCount(num);
 		}
 		
-		List<SlottableItem> m_items{
+		protected List<SlottableItem> m_items{
 			get{
 				List<SlottableItem> result = new List<SlottableItem>();
 				if(m_equippedBow != null)
@@ -77,9 +77,10 @@ namespace SlotSystem{
 					if(m_equippedCGears.Count < m_equippableCGearsCount)
 						m_equippedCGears.Add((CarriedGearInstance)item);
 					else
-						throw new InvalidOperationException("trying to add a CarriedGear exceeding the maximum allowed count");
+						throw new InvalidOperationException("EquipmentSetInventory.Add: trying to add a CarriedGear exceeding the maximum allowed count");
 				}
-			}
+			}else
+				throw new ArgumentNullException();
 		}
 		public void Remove(SlottableItem removedItem){
 			if(removedItem != null){
@@ -98,7 +99,8 @@ namespace SlotSystem{
 					if(spottedOne != null)
 						m_equippedCGears.Remove(spottedOne);
 				}
-			}
+			}else
+				throw new ArgumentNullException();
 		}
 	}
 }
