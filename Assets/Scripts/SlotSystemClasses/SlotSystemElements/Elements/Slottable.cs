@@ -151,13 +151,13 @@ namespace SlotSystem{
 						return m_eqpStateEngine;
 					}
 					}SSEStateEngine m_eqpStateEngine;
-					public SSEState curEqpState{
+					public virtual SSEState curEqpState{
 						get{return (SBEqpState)eqpStateEngine.curState;}
 					}
-					public SSEState prevEqpState{
+					public virtual SSEState prevEqpState{
 						get{return (SBEqpState)eqpStateEngine.prevState;}
 					}
-					public void SetEqpState(SSEState state){
+					public virtual void SetEqpState(SSEState state){
 						if(state == null || state is SBEqpState)
 							eqpStateEngine.SetState(state);
 						else
@@ -191,13 +191,13 @@ namespace SlotSystem{
 						return m_markStateEngine;
 					}
 					}SSEStateEngine m_markStateEngine;
-					public SSEState curMrkState{
+					public virtual SSEState curMrkState{
 						get{return (SBMrkState)markStateEngine.curState;}
 					}
-					public SSEState prevMrkState{
+					public virtual SSEState prevMrkState{
 						get{return (SBMrkState)markStateEngine.prevState;}
 					}
-					public void SetMrkState(SSEState state){
+					public virtual void SetMrkState(SSEState state){
 						if(state == null || state is SBMrkState)
 							markStateEngine.SetState(state);
 						else
@@ -265,10 +265,10 @@ namespace SlotSystem{
 						return m_eqpProcEngine;
 					}
 					}SSEProcessEngine m_eqpProcEngine;
-					public SBEqpProcess eqpProcess{
+					public virtual SBEqpProcess eqpProcess{
 						get{return (SBEqpProcess)eqpProcEngine.process;}
 					}
-					public void SetAndRunEquipProcess(SBEqpProcess process){
+					public virtual void SetAndRunEquipProcess(SBEqpProcess process){
 						if(process == null || process is SBEqpProcess)
 							eqpProcEngine.SetAndRunProcess(process);
 						else throw new System.InvalidOperationException("Slottable.SetAndRunEquipProcess: argument is not of type SBEqpProcess");
@@ -283,10 +283,10 @@ namespace SlotSystem{
 						return m_mrkProcEngine;
 					}
 					}SSEProcessEngine m_mrkProcEngine;
-					public SBMrkProcess mrkProcess{
+					public virtual SBMrkProcess mrkProcess{
 						get{return (SBMrkProcess)mrkProcEngine.process;}
 					}
-					public void SetAndRunMarkProcess(SBMrkProcess process){
+					public virtual void SetAndRunMarkProcess(SBMrkProcess process){
 						if(process == null || process is SBMrkProcess)
 							mrkProcEngine.SetAndRunProcess(process);
 						else throw new System.InvalidOperationException("Slottable.SetAndRunEquipProcess: argument is not of type SBMrkProcess");
@@ -549,5 +549,6 @@ namespace SlotSystem{
 					return ssm.hovered == (SlotSystemElement)this;
 				}
 			}
+			public virtual bool isPool{get{return sg.isPool;}}
 	}
 }

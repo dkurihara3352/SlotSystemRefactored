@@ -258,7 +258,7 @@ namespace SlotSystem{
             public class SBEquippedState: SBEqpState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    if(sb.sg.isPool){
+                    if(sb.isPool){
                         if(sb.prevEqpState != null && sb.prevEqpState == Slottable.unequippedState){
                             SBEqpProcess process = new SBEquipProcess(sb, sb.EquipCoroutine);
                             sb.SetAndRunEquipProcess(process);
@@ -276,7 +276,7 @@ namespace SlotSystem{
                         /*	when initialized	*/
                         return;
                     }
-                    if(sb.sg.isPool){
+                    if(sb.isPool){
                         if(sb.prevEqpState != null && sb.prevEqpState == Slottable.equippedState){
                             SBEqpProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
                             sb.SetAndRunEquipProcess(process);
@@ -291,7 +291,7 @@ namespace SlotSystem{
             public class SBMarkedState: SBMrkState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    if(sb.sg.isPool){
+                    if(sb.isPool){
                         if(sb.prevMrkState != null && sb.prevMrkState == Slottable.unmarkedState){
                             SBMrkProcess process = new SBMarkProcess(sb, sb.markCoroutine);
                             sb.SetAndRunMarkProcess(process);
@@ -309,7 +309,7 @@ namespace SlotSystem{
                         /*	when initialized	*/
                         return;
                     }
-                    if(sb.sg.isPool){
+                    if(sb.isPool){
                         if(sb.prevMrkState != null && sb.prevMrkState == Slottable.markedState){
                             SBMrkProcess process = new SBUnmarkProcess(sb, sb.unmarkCoroutine);
                             sb.SetAndRunMarkProcess(process);
