@@ -18,7 +18,7 @@ namespace SlotSystem{
 					if(state == null || state is SBSelState)
 						selStateEngine.SetState(state);
 					else
-						throw new System.InvalidOperationException("Slottable.SetSelState: something other than SBSelState is beint attempted to be assigned");
+						throw new System.ArgumentException("Slottable.SetSelState: something other than SBSelState is beint attempted to be assigned");
 				}
 				public static SBSelState sbDeactivatedState{
 					get{
@@ -70,7 +70,7 @@ namespace SlotSystem{
 					if(state == null || state is SBActState)
 						actStateEngine.SetState(state);
 					else
-						throw new System.InvalidOperationException("Slottable.SetActState: something other than SBActionState is being attempted to be assigned");
+						throw new System.ArgumentException("Slottable.SetActState: something other than SBActionState is being attempted to be assigned");
 				}
 				public static SBActState sbWaitForActionState{
 					get{
@@ -144,12 +144,13 @@ namespace SlotSystem{
 						}
 						}static SBActState m_moveWithinState;
 			/*	Equip State	*/
-				SSEStateEngine eqpStateEngine{
+				public SSEStateEngine eqpStateEngine{
 					get{
 						if(m_eqpStateEngine == null)
 							m_eqpStateEngine = new SSEStateEngine(this);
 						return m_eqpStateEngine;
 					}
+					set{m_eqpStateEngine = value;}
 					}SSEStateEngine m_eqpStateEngine;
 					public virtual SSEState curEqpState{
 						get{return (SBEqpState)eqpStateEngine.curState;}
@@ -161,7 +162,7 @@ namespace SlotSystem{
 						if(state == null || state is SBEqpState)
 							eqpStateEngine.SetState(state);
 						else
-							throw new System.InvalidOperationException("Slottable.SetEqpState: something other than SBEqpState is trying to be assinged");
+							throw new System.ArgumentException("Slottable.SetEqpState: something other than SBEqpState is trying to be assinged");
 					}
 				public static SBEqpState equippedState{
 					get{
@@ -184,24 +185,25 @@ namespace SlotSystem{
 					}
 					}static SBEqpState m_unequippedState;
 			/*	Mark state	*/
-				SSEStateEngine markStateEngine{
+				public SSEStateEngine mrkStateEngine{
 					get{
 						if(m_markStateEngine == null)
 							m_markStateEngine = new SSEStateEngine(this);
 						return m_markStateEngine;
 					}
+					set{m_markStateEngine = value;}
 					}SSEStateEngine m_markStateEngine;
 					public virtual SSEState curMrkState{
-						get{return (SBMrkState)markStateEngine.curState;}
+						get{return (SBMrkState)mrkStateEngine.curState;}
 					}
 					public virtual SSEState prevMrkState{
-						get{return (SBMrkState)markStateEngine.prevState;}
+						get{return (SBMrkState)mrkStateEngine.prevState;}
 					}
 					public virtual void SetMrkState(SSEState state){
 						if(state == null || state is SBMrkState)
-							markStateEngine.SetState(state);
+							mrkStateEngine.SetState(state);
 						else
-							throw new System.InvalidOperationException("Slottable.SetMrkState: something other than SBMrkState is trying to be assinged");
+							throw new System.ArgumentException("Slottable.SetMrkState: something other than SBMrkState is trying to be assinged");
 					}
 				public static SBMrkState markedState{
 					get{
@@ -231,7 +233,7 @@ namespace SlotSystem{
 				public override void SetAndRunSelProcess(SSEProcess process){
 					if(process ==null || process is SBSelProcess)
 						selProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("Slottable.SetAndRunSelProcess: argument is not of type SBSelProcess");
+					else throw new System.ArgumentException("Slottable.SetAndRunSelProcess: argument is not of type SBSelProcess");
 				}
 				public override IEnumeratorFake greyoutCoroutine(){return null;}
 				public override IEnumeratorFake greyinCoroutine(){return null;}
@@ -244,7 +246,7 @@ namespace SlotSystem{
 				public override void SetAndRunActProcess(SSEProcess process){
 					if(process == null || process is SBActProcess)
 						actProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("Slottable.SetAndRunActProcess: argument is not of type SBActProcess");
+					else throw new System.ArgumentException("Slottable.SetAndRunActProcess: argument is not of type SBActProcess");
 				}
 				public IEnumeratorFake WaitForPointerUpCoroutine(){return null;}
 				public IEnumeratorFake WaitForPickUpCoroutine(){return null;}
@@ -264,14 +266,15 @@ namespace SlotSystem{
 							m_eqpProcEngine = new SSEProcessEngine();
 						return m_eqpProcEngine;
 					}
+					set{m_eqpProcEngine = value;}
 					}SSEProcessEngine m_eqpProcEngine;
-					public virtual SBEqpProcess eqpProcess{
+					public virtual SSEProcess eqpProcess{
 						get{return (SBEqpProcess)eqpProcEngine.process;}
 					}
-					public virtual void SetAndRunEquipProcess(SBEqpProcess process){
+					public virtual void SetAndRunEqpProcess(SSEProcess process){
 						if(process == null || process is SBEqpProcess)
 							eqpProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("Slottable.SetAndRunEquipProcess: argument is not of type SBEqpProcess");
+						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type SBEqpProcess");
 					}
 				public IEnumeratorFake UnequipCoroutine(){return null;}
 				public IEnumeratorFake EquipCoroutine(){return null;}
@@ -282,14 +285,15 @@ namespace SlotSystem{
 							m_mrkProcEngine = new SSEProcessEngine();
 						return m_mrkProcEngine;
 					}
+					set{m_mrkProcEngine = value;}
 					}SSEProcessEngine m_mrkProcEngine;
-					public virtual SBMrkProcess mrkProcess{
+					public virtual SSEProcess mrkProcess{
 						get{return (SBMrkProcess)mrkProcEngine.process;}
 					}
-					public virtual void SetAndRunMarkProcess(SBMrkProcess process){
+					public virtual void SetAndRunMrkProcess(SSEProcess process){
 						if(process == null || process is SBMrkProcess)
 							mrkProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("Slottable.SetAndRunEquipProcess: argument is not of type SBMrkProcess");
+						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type SBMrkProcess");
 					}
 				public IEnumeratorFake unmarkCoroutine(){return null;}
 				public IEnumeratorFake markCoroutine(){return null;}

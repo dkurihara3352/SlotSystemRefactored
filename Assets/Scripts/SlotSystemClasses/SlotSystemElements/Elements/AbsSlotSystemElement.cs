@@ -11,6 +11,7 @@ namespace SlotSystem{
 						m_selStateEngine = new SSEStateEngine(this);
 					return m_selStateEngine;
 				}
+				set{m_selStateEngine = value;}
 				}SSEStateEngine m_selStateEngine;
 				public virtual SSEState prevSelState{
 					get{return (SSESelState)selStateEngine.prevState;}
@@ -58,6 +59,7 @@ namespace SlotSystem{
 						m_actStateEngine = new SSEStateEngine(this);
 					return m_actStateEngine;
 				}
+				set{m_actStateEngine = value;}
 				}SSEStateEngine m_actStateEngine;
 				public virtual SSEState prevActState{
 					get{return (SSEActState)actStateEngine.prevState;}
@@ -86,6 +88,7 @@ namespace SlotSystem{
 							m_selProcEngine = new SSEProcessEngine();
 						return m_selProcEngine;
 					}
+					set{m_selProcEngine = value;}
 					}SSEProcessEngine m_selProcEngine;
 					public virtual SSEProcess selProcess{
 						get{return (SSESelProcess)selProcEngine.process;}
@@ -114,6 +117,7 @@ namespace SlotSystem{
 							m_actProcEngine = new SSEProcessEngine();
 						return m_actProcEngine;
 					}
+					set{m_actProcEngine = value;}
 					}SSEProcessEngine m_actProcEngine;
 					public virtual SSEProcess actProcess{
 						get{return (SSEActProcess)actProcEngine.process;}

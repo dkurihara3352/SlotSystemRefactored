@@ -30,9 +30,10 @@ public class FakeSB : Slottable {
 	
 
 	/*	Equip */
-		public override void SetAndRunEquipProcess(SBEqpProcess process){m_eqpProcess = process;}
-			public override SBEqpProcess eqpProcess{get{return m_eqpProcess;}}
-			SBEqpProcess m_eqpProcess;
+		public override void SetAndRunEqpProcess(SSEProcess process){m_eqpProcess = process;}
+			public override SSEProcess eqpProcess{get{return m_eqpProcess;}}
+			
+			SSEProcess m_eqpProcess;
 		public void SetPrevEqpState(SBEqpState state){m_prevEqpState = state;}
 			public override SSEState prevEqpState{get{return m_prevEqpState;}}
 			SBEqpState m_prevEqpState;
@@ -40,9 +41,9 @@ public class FakeSB : Slottable {
 			public override SSEState curEqpState{get{return m_curEqpState;}}
 			SSEState m_curEqpState;
 	/*	Mark	*/
-		public override void SetAndRunMarkProcess(SBMrkProcess process){m_mrkProcess = process;}
-			public override SBMrkProcess mrkProcess{get{return m_mrkProcess;}}
-			SBMrkProcess m_mrkProcess;
+		public override void SetAndRunMrkProcess(SSEProcess process){m_mrkProcess = process;}
+			public override SSEProcess mrkProcess{get{return m_mrkProcess;}}
+			SSEProcess m_mrkProcess;
 		public void SetPrevMrkState(SBMrkState state){m_prevMrkState = state;}
 			public override SSEState prevMrkState{get{return m_prevMrkState;}}
 			SBMrkState m_prevMrkState;

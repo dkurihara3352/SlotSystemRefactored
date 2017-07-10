@@ -15,7 +15,7 @@ namespace SlotSystem{
 		public SSEStateEngine(SlotSystemElement sse){
 			this.handler = sse;
 		}
-		public void SetState(SSEState state){
+		public virtual void SetState(SSEState state){
 			base.SetState(state);
 		}
 	}

@@ -261,7 +261,7 @@ namespace SlotSystem{
                     if(sb.isPool){
                         if(sb.prevEqpState != null && sb.prevEqpState == Slottable.unequippedState){
                             SBEqpProcess process = new SBEquipProcess(sb, sb.EquipCoroutine);
-                            sb.SetAndRunEquipProcess(process);
+                            sb.SetAndRunEqpProcess(process);
                         }
                     }
                 }
@@ -279,7 +279,7 @@ namespace SlotSystem{
                     if(sb.isPool){
                         if(sb.prevEqpState != null && sb.prevEqpState == Slottable.equippedState){
                             SBEqpProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
-                            sb.SetAndRunEquipProcess(process);
+                            sb.SetAndRunEqpProcess(process);
                         }
                     }
                 }
@@ -294,7 +294,7 @@ namespace SlotSystem{
                     if(sb.isPool){
                         if(sb.prevMrkState != null && sb.prevMrkState == Slottable.unmarkedState){
                             SBMrkProcess process = new SBMarkProcess(sb, sb.markCoroutine);
-                            sb.SetAndRunMarkProcess(process);
+                            sb.SetAndRunMrkProcess(process);
                         }
                     }
                 }
@@ -312,7 +312,7 @@ namespace SlotSystem{
                     if(sb.isPool){
                         if(sb.prevMrkState != null && sb.prevMrkState == Slottable.markedState){
                             SBMrkProcess process = new SBUnmarkProcess(sb, sb.unmarkCoroutine);
-                            sb.SetAndRunMarkProcess(process);
+                            sb.SetAndRunMrkProcess(process);
                         }
                     }
                 }

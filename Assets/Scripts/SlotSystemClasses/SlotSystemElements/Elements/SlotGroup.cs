@@ -160,39 +160,39 @@ namespace SlotSystem{
 						return null;
 					}
 		/*	public fields	*/
-			public AxisScrollerMock scroller{
+			public virtual AxisScrollerMock scroller{
 				get{return m_scroller;}
 				set{m_scroller = value;}
 				}AxisScrollerMock m_scroller;
-			public Inventory inventory{
+			public virtual Inventory inventory{
 				get{return m_inventory;}
 				}
 				Inventory m_inventory;
-				public void SetInventory(Inventory inv){
+				public virtual void SetInventory(Inventory inv){
 					m_inventory = inv;
 					inv.SetSG(this);
 				}
-			public bool isShrinkable{
+			public virtual bool isShrinkable{
 				get{return m_isShrinkable;}
 				set{m_isShrinkable = value;}
 				}bool m_isShrinkable;
-			public bool isExpandable{
+			public virtual bool isExpandable{
 				get{return m_isExpandable;}
 				set{m_isExpandable = value;}
 				}bool m_isExpandable;
-			public List<Slot> slots{
+			public virtual List<Slot> slots{
 				get{
 					if(m_slots == null)
 						m_slots = new List<Slot>();
 					return m_slots;}
 				}List<Slot> m_slots;
-				public void SetSlots(List<Slot> slots){
+				public virtual void SetSlots(List<Slot> slots){
 					m_slots = slots;
 				}
-			public List<Slot> newSlots{
+			public virtual List<Slot> newSlots{
 				get{return m_newSlots;}
 				}List<Slot> m_newSlots;
-				public void SetNewSlots(List<Slot> newSlots){
+				public virtual void SetNewSlots(List<Slot> newSlots){
 					m_newSlots = newSlots;
 				}
 			
@@ -215,28 +215,28 @@ namespace SlotSystem{
 					return false;
 				}
 			}
-			public bool isAutoSort{
+			public virtual bool isAutoSort{
 				get{return m_isAutoSort;}
 				}protected bool m_isAutoSort = true;
 				public void ToggleAutoSort(bool on){
 					m_isAutoSort = on;
 					ssm.Focus();
 				}
-			List<Slottable> slottables{
+			protected List<Slottable> slottables{
 				get{
 					return m_slottables;
 				}
-				}List<Slottable> m_slottables;
-				public void SetSBs(List<Slottable> sbs){
+				}protected List<Slottable> m_slottables;
+				public virtual void SetSBs(List<Slottable> sbs){
 					m_slottables = sbs;
 				}
-			public List<Slottable> newSBs{
+			public virtual List<Slottable> newSBs{
 				get{return m_newSBs;}
 				}List<Slottable> m_newSBs;
-				public void SetNewSBs(List<Slottable> sbs){
+				public virtual void SetNewSBs(List<Slottable> sbs){
 					m_newSBs = sbs;
 				}
-			public List<InventoryItemInstance> itemInstances{
+			public virtual List<InventoryItemInstance> itemInstances{
 				get{
 					List<InventoryItemInstance> result = new List<InventoryItemInstance>();
 						foreach(Slottable sb in slottables){
@@ -248,7 +248,7 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public List<InventoryItemInstance> actualItemInsts{
+			public virtual List<InventoryItemInstance> actualItemInsts{
 				get{
 					List<InventoryItemInstance> result = new List<InventoryItemInstance>();
 					foreach(InventoryItemInstance itemInst in itemInstances){
@@ -263,7 +263,7 @@ namespace SlotSystem{
 					return (ssm.focusedSGP == this || ssm.focusedSGEs.Contains(this));
 				}
 			}
-			public bool hasEmptySlot{
+			public virtual bool hasEmptySlot{
 				get{
 					bool emptyFound = false;
 					foreach(Slot slot in slots){
@@ -273,7 +273,7 @@ namespace SlotSystem{
 					return emptyFound;
 				}
 			}
-			public int actualSBsCount{
+			public virtual int actualSBsCount{
 				get{
 					int count = 0;
 					foreach(Slot slot in slots){
@@ -305,10 +305,10 @@ namespace SlotSystem{
 					return true;
 				}
 			}
-			public int initSlotsCount{
+			public virtual int initSlotsCount{
 				get{return m_initSlotsCount;}
 				}int m_initSlotsCount;
-				public void SetInitSlotsCount(int i){
+				public virtual void SetInitSlotsCount(int i){
 					m_initSlotsCount = i;
 				}
 
@@ -322,13 +322,13 @@ namespace SlotSystem{
 				get{return curSelState == SlotGroup.sgDeactivatedState;}
 			}
 		/*	commands methods	*/
-			public void InitializeItems(){
+			public virtual void InitializeItems(){
 				m_initItemsCommand.Execute(this);
 				}SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
-			public void OnActionComplete(){
+			public virtual void OnActionComplete(){
 				m_onActionCompleteCommand.Execute(this);
 				}SlotGroupCommand m_onActionCompleteCommand;
-			public void OnActionExecute(){
+			public virtual void OnActionExecute(){
 				m_onActionExecuteCommand.Execute(this);
 				}SlotGroupCommand m_onActionExecuteCommand;
 
@@ -365,13 +365,13 @@ namespace SlotSystem{
 				}
 				}static SGSorter m_acquisitionOrderSorter = new SGAcquisitionOrderSorter();
 			
-			public SGSorter Sorter{
+			public virtual SGSorter Sorter{
 				get{return m_sorter;}
 				}SGSorter m_sorter;
-				public void SetSorter(SGSorter sorter){
+				public virtual void SetSorter(SGSorter sorter){
 					m_sorter = sorter;
 				}
-			public void InstantSort(){
+			public virtual void InstantSort(){
 				List<Slottable> orderedSbs = slottables;
 				Sorter.OrderSBsWithRetainedSize(ref orderedSbs);
 				foreach(Slot slot in slots){
@@ -414,13 +414,13 @@ namespace SlotSystem{
 					return m_partsFilter;
 				}
 				}static SGFilter m_partsFilter;
-			public SGFilter Filter{
+			public virtual SGFilter Filter{
 				get{return m_filter;}
 				}SGFilter m_filter;
-				public void SetFilter(SGFilter filter){
+				public virtual void SetFilter(SGFilter filter){
 					m_filter = filter;
 				}
-			public bool AcceptsFilter(Slottable pickedSB){
+			public virtual bool AcceptsFilter(Slottable pickedSB){
 				if(this.Filter is SGNullFilter) return true;
 				else{
 					if(pickedSB.item is BowInstance)
@@ -434,11 +434,11 @@ namespace SlotSystem{
 				}
 			}
 		/*	events	*/
-			public void OnHoverEnterMock(){
+			public virtual void OnHoverEnterMock(){
 				PointerEventDataFake eventData = new PointerEventDataFake();
 				((SGSelState)curSelState).OnHoverEnterMock(this, eventData);
 			}
-			public void OnHoverExitMock(){
+			public virtual void OnHoverExitMock(){
 				PointerEventDataFake eventData = new PointerEventDataFake();
 				((SGSelState)curSelState).OnHoverExitMock(this, eventData);
 			}
@@ -454,7 +454,7 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public int Count{
+				public virtual int Count{
 					get{return slottables.Count;}
 				}
 				public override string eName{
@@ -468,10 +468,10 @@ namespace SlotSystem{
 						return res;
 					}
 				}
-				public List<Slottable> toList{get{return slottables;}}
+				public virtual List<Slottable> toList{get{return slottables;}}
 
 			/*	methods	*/
-				public int IndexOf(Slottable sb){
+				public virtual int IndexOf(Slottable sb){
 					return slottables.IndexOf(sb);
 				}
 				public override bool Contains(SlotSystemElement element){
@@ -484,10 +484,10 @@ namespace SlotSystem{
 					FocusSBs();
 					Reset();
 				}
-				public void FocusSelf(){
+				public virtual void FocusSelf(){
 					SetSelState(SlotGroup.sgFocusedState);
 				}
-				public void FocusSBs(){
+				public virtual void FocusSBs(){
 					foreach(Slottable sb in slottables){
 						if(sb != null){
 							sb.SetActState(Slottable.sbWaitForActionState);
@@ -504,10 +504,10 @@ namespace SlotSystem{
 					DefocusSBs();
 					Reset();
 				}
-				public void DefocusSelf(){
+				public virtual void DefocusSelf(){
 					SetSelState(SlotGroup.sgDefocusedState);
 				}
-				public void DefocusSBs(){
+				public virtual void DefocusSBs(){
 					foreach(Slottable sb in slottables){
 						if(sb != null){
 							sb.SetActState(Slottable.sbWaitForActionState);
@@ -546,7 +546,7 @@ namespace SlotSystem{
 					}
 				}
 		/*	methods	*/
-			public void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
+			public virtual void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
 				m_eName = name;
 				SetFilter(filter);
 				SetSorter(SlotGroup.ItemIDSorter);
@@ -563,7 +563,7 @@ namespace SlotSystem{
 				SetSelState(SlotGroup.sgDeactivatedState);
 				SetActState(SlotGroup.sgWaitForActionState);
 			}
-			public Slottable GetSB(InventoryItemInstance itemInst){
+			public virtual Slottable GetSB(InventoryItemInstance itemInst){
 				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(sb.itemInst == itemInst)
@@ -572,7 +572,7 @@ namespace SlotSystem{
 				}
 				return null;
 			}
-			public bool HasItem(InventoryItemInstance invInst){
+			public virtual bool HasItem(InventoryItemInstance invInst){
 				bool result = false;
 				foreach(Slottable sb in slottables){
 					if(sb != null){
@@ -582,7 +582,7 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public void UpdateSBs(List<Slottable> newSBs){
+			public virtual void UpdateSBs(List<Slottable> newSBs){
 				/*	Create and set new Slots	*/
 					List<Slot> newSlots = new List<Slot>();
 					for(int i = 0; i < newSBs.Count; i++){
@@ -625,7 +625,7 @@ namespace SlotSystem{
 				allSBs.AddRange(added);
 				SetSBs(allSBs);
 			}
-			public void CreateNewSlots(){
+			public virtual void CreateNewSlots(){
 				List<Slot> newSlots = new List<Slot>();
 				for(int i = 0; i < newSBs.Count; i++){
 					Slot newSlot = new Slot();
@@ -633,7 +633,7 @@ namespace SlotSystem{
 				}
 				SetNewSlots(newSlots);
 			}
-			public Slot GetNewSlot(InventoryItemInstance itemInst){
+			public virtual Slot GetNewSlot(InventoryItemInstance itemInst){
 				int index = -3;
 				foreach(Slottable sb in slottables){
 					if(sb != null){
@@ -643,7 +643,7 @@ namespace SlotSystem{
 				}
 				return newSlots[index];
 			}
-			public void SetSBsActStates(){
+			public virtual void SetSBsActStates(){
 				List<Slottable> moveWithins = new List<Slottable>();
 				List<Slottable> removed = new List<Slottable>();
 				List<Slottable> added = new List<Slottable>();
@@ -674,10 +674,10 @@ namespace SlotSystem{
 					sb.SetActState(Slottable.addedState);
 				}
 			}
-			public void CheckProcessCompletion(){
+			public virtual void CheckProcessCompletion(){
 				TransactionCoroutine();
 			}
-			public void OnCompleteSlotMovements(){
+			public virtual void OnCompleteSlotMovements(){
 				foreach(Slottable sb in slottables){
 					if(sb != null){
 						if(sb.newSlotID == -1){
@@ -692,7 +692,7 @@ namespace SlotSystem{
 				SetSlots(newSlots);
 				SyncSBsToSlots();
 			}
-			public void SyncSBsToSlots(){
+			public virtual void SyncSBsToSlots(){
 				List<Slottable> newSBs = new List<Slottable>();
 				foreach(Slot slot in slots){
 					newSBs.Add(slot.sb);
@@ -703,7 +703,7 @@ namespace SlotSystem{
 					sb.SetSlotID(newSBs.IndexOf(sb));
 				}
 			}
-			public List<Slottable> SwappableSBs(Slottable pickedSB){
+			public virtual List<Slottable> SwappableSBs(Slottable pickedSB){
 				List<Slottable> result = new List<Slottable>();
 				foreach(Slottable sb in slottables){
 					if(sb != null){
@@ -713,10 +713,190 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public void Reset(){
+			public virtual void Reset(){
 				SetActState(SlotGroup.sgWaitForActionState);
 				SetNewSBs(null);
 				SetNewSlots(null);
 			}
+			public virtual void ReorderAndUpdateSBs(){
+				Slottable sb1 = pickedSB;
+				Slottable sb2 = targetSB;
+				List<Slottable> newSBs = new List<Slottable>(toList);
+				newSBs.Reorder(sb1, sb2);
+				UpdateSBs(newSBs);
+			}
+			public virtual void UpdateToRevert(){
+				UpdateSBs(new List<Slottable>(toList));
+			}
+			public virtual void SortAndUpdateSBs(){
+				List<Slottable> newSBs = new List<Slottable>(toList);
+				int origCount = newSBs.Count;
+				Sorter.TrimAndOrderSBs(ref newSBs);
+				if(!isExpandable){
+					while(newSBs.Count <origCount){
+						newSBs.Add(null);
+					}
+				}
+				UpdateSBs(newSBs);
+			}
+			public virtual void FillAndUpdateSBs(){
+				Slottable added;
+					if(ssm.transaction.sg1 == this)
+						added = null;
+					else
+						added = ssm.pickedSB;
+				Slottable removed;
+					if(ssm.transaction.sg1 == this)
+						removed = ssm.pickedSB;
+					else
+						removed = null;
+
+				List<Slottable> newSBs = new List<Slottable>(toList);
+				int origCount = newSBs.Count;
+				if(!isPool){
+					if(added != null){
+						GameObject newSBGO = new GameObject("newSBGO");
+						Slottable newSB = newSBGO.AddComponent<Slottable>();
+						newSB.Initialize(added.itemInst);
+						newSB.SetSSM(ssm);
+						newSB.Defocus();
+						newSB.SetEqpState(Slottable.unequippedState);
+						newSBs.Fill(newSB);
+					}
+					if(removed != null){
+						Slottable rem = null;
+						foreach(Slottable sb in newSBs){
+							if(sb != null){
+								if(sb.itemInst == removed.itemInst)
+									rem = sb;
+							}
+						}
+						newSBs[newSBs.IndexOf(rem)] = null;
+					}
+				}
+				if(isAutoSort){
+					Sorter.TrimAndOrderSBs(ref newSBs);
+				}
+				if(!isExpandable){
+					while(newSBs.Count <origCount){
+						newSBs.Add(null);
+					}
+				}
+				UpdateSBs(newSBs);
+			}
+			public virtual void SwapAndUpdateSBs(){
+				Slottable added;
+					if(ssm.transaction.sg1 == this)
+						added = ssm.transaction.targetSB;
+					else
+						added = ssm.pickedSB;
+				Slottable removed;
+					if(ssm.transaction.sg1 == this)
+						removed = ssm.pickedSB;
+					else
+						removed = ssm.transaction.targetSB;
+				List<Slottable> newSBs = new List<Slottable>(toList);
+				int origCount = newSBs.Count;
+				if(!isPool){
+					GameObject newSBGO = new GameObject("newSBGO");
+					Slottable newSB = newSBGO.AddComponent<Slottable>();
+					newSB.Initialize(added.itemInst);
+					newSB.SetSSM(ssm);
+					newSB.SetEqpState(Slottable.unequippedState);
+					newSB.Defocus();
+					newSBs[newSBs.IndexOf(removed)] = newSB;
+				}
+				if(isAutoSort){
+					Sorter.TrimAndOrderSBs(ref newSBs);
+					if(!isExpandable){
+						while(newSBs.Count <origCount){
+							newSBs.Add(null);
+						}
+					}
+				}
+				UpdateSBs(newSBs);
+			}
+			public virtual void AddAndUpdateSBs(){
+				List<InventoryItemInstance> cache = ssm.transaction.moved;
+				List<Slottable> newSBs = toList;
+				int origCount = newSBs.Count;
+				foreach(InventoryItemInstance itemInst in cache){
+					bool found = false;
+					foreach(Slottable sb in newSBs){
+						if(sb!= null){
+							if(sb.itemInst == itemInst){
+								if(itemInst.Item.IsStackable){
+									sb.itemInst.Quantity += itemInst.Quantity;
+									found = true;
+								}
+							}
+						}
+					}
+					if(!found){
+						GameObject newSBSG = new GameObject("newSBSG");
+						Slottable newSB = newSBSG.AddComponent<Slottable>();
+						newSB.Initialize(itemInst);
+						newSB.SetSSM(ssm);
+						newSB.Defocus();
+						newSBs.Fill(newSB);
+					}
+				}
+				if(isAutoSort)
+					Sorter.TrimAndOrderSBs(ref newSBs);
+				if(!isExpandable){
+					while(newSBs.Count <origCount){
+						newSBs.Add(null);
+					}
+				}
+				SetNewSBs(newSBs);
+				CreateNewSlots();
+				SetSBsActStates();
+			}
+			public virtual void RemoveAndUpdateSBs(){
+				List<InventoryItemInstance> cache = ssm.transaction.moved;
+				List<Slottable> newSBs = toList;
+				int origCount = newSBs.Count;
+				List<Slottable> removedList = new List<Slottable>();
+				List<Slottable> nonremoved = new List<Slottable>();
+				foreach(InventoryItemInstance itemInst in cache){
+					foreach(Slottable sb in newSBs){
+						if(sb!= null){
+							if(sb.itemInst == itemInst){
+								if(itemInst.Item.IsStackable){
+									sb.itemInst.Quantity -= itemInst.Quantity;
+									if(sb.itemInst.Quantity <= 0)
+										removedList.Add(sb);
+								}else{
+									removedList.Add(sb);
+								}
+							}
+						}
+					}
+				}
+				foreach(Slottable sb in removedList){
+					newSBs[newSBs.IndexOf(sb)] = null;
+				}
+				if(isAutoSort){
+					Sorter.TrimAndOrderSBs(ref newSBs);
+					if(!isExpandable){
+						while(newSBs.Count <origCount){
+							newSBs.Add(null);
+						}
+					}
+				}else{
+					if(isExpandable)
+						// SlotSystemUtil.Trim(ref newSBs);
+						newSBs.Trim();
+				}
+				SetNewSBs(nonremoved);
+				CreateNewSlots();
+				SetSBsActStates();
+			}
+		/*	Forward	*/
+			public virtual void SetHovered(){
+				ssm.SetHovered(this);
+			}
+			public virtual Slottable pickedSB{get{return ssm.pickedSB;}}
+			public virtual Slottable targetSB{get{return ssm.targetSB;}}
 	}
 }

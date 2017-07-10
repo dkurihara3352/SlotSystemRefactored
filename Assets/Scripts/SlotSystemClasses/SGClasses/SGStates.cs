@@ -13,7 +13,7 @@ namespace SlotSystem{
 	}
         public abstract class SGSelState: SGState{
             public virtual void OnHoverEnterMock(SlotGroup sg, PointerEventDataFake eventDataMock){
-                sg.ssm.SetHovered(sg);
+                sg.SetHovered();
             }
             public virtual void OnHoverExitMock(SlotGroup sg, PointerEventDataFake eventDataMock){
 
@@ -56,7 +56,8 @@ namespace SlotSystem{
                     }else if(sg.prevSelState == SlotGroup.sgFocusedState)
                         process = new SGGreyoutProcess(sg, sg.greyoutCoroutine);
                     else if(sg.prevSelState == SlotGroup.sgSelectedState)
-                        process = new SGDehighlightProcess(sg, sg.greyoutCoroutine);
+                        // process = new SGDehighlightProcess(sg, sg.greyoutCoroutine);
+                        process = new SGGreyoutProcess(sg, sg.greyoutCoroutine);
                     sg.SetAndRunSelProcess(process);
                 }
                 public override void ExitState(StateHandler sh){
@@ -93,7 +94,7 @@ namespace SlotSystem{
             public class SGRevertState: SGActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    sg.UpdateSBs(new List<Slottable>(sg.toList));
+                    sg.UpdateToRevert();
                     if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
@@ -106,11 +107,7 @@ namespace SlotSystem{
             public class SGReorderState: SGActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    Slottable sb1 = sg.ssm.pickedSB;
-                    Slottable sb2 = sg.ssm.targetSB;
-                    List<Slottable> newSBs = new List<Slottable>(sg.toList);
-                    newSBs.Reorder(sb1, sb2);
-                    sg.UpdateSBs(newSBs);
+                    sg.ReorderAndUpdateSBs();
                     if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
@@ -123,15 +120,7 @@ namespace SlotSystem{
             public class SGSortState: SGActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    List<Slottable> newSBs = new List<Slottable>(sg.toList);
-                    int origCount = newSBs.Count;
-                    sg.Sorter.TrimAndOrderSBs(ref newSBs);
-                    if(!sg.isExpandable){
-                        while(newSBs.Count <origCount){
-                            newSBs.Add(null);
-                        }
-                    }
-                    sg.UpdateSBs(newSBs);
+                    sg.SortAndUpdateSBs();
                     if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
@@ -144,50 +133,7 @@ namespace SlotSystem{
             public class SGFillState: SGActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    Slottable added;
-                        if(sg.ssm.transaction.sg1 == sg)
-                            added = null;
-                        else
-                            added = sg.ssm.pickedSB;
-                    Slottable removed;
-                        if(sg.ssm.transaction.sg1 == sg)
-                            removed = sg.ssm.pickedSB;
-                        else
-                            removed = null;
-
-                    List<Slottable> newSBs = new List<Slottable>(sg.toList);
-                    int origCount = newSBs.Count;
-                    if(!sg.isPool){
-                        if(added != null){
-                            GameObject newSBGO = new GameObject("newSBGO");
-                            Slottable newSB = newSBGO.AddComponent<Slottable>();
-                            newSB.Initialize(added.itemInst);
-                            newSB.SetSSM(sg.ssm);
-                            newSB.Defocus();
-                            newSB.SetEqpState(Slottable.unequippedState);
-                            // SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
-                            newSBs.Fill(newSB);
-                        }
-                        if(removed != null){
-                            Slottable rem = null;
-                            foreach(Slottable sb in newSBs){
-                                if(sb != null){
-                                    if(sb.itemInst == removed.itemInst)
-                                        rem = sb;
-                                }
-                            }
-                            newSBs[newSBs.IndexOf(rem)] = null;
-                        }
-                    }
-                    if(sg.isAutoSort){
-                        sg.Sorter.TrimAndOrderSBs(ref newSBs);
-                    }
-                    if(!sg.isExpandable){
-                        while(newSBs.Count <origCount){
-                            newSBs.Add(null);
-                        }
-                    }
-                    sg.UpdateSBs(newSBs);
+                    sg.FillAndUpdateSBs();
                     if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
@@ -200,36 +146,7 @@ namespace SlotSystem{
             public class SGSwapState: SGActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    Slottable added;
-                        if(sg.ssm.transaction.sg1 == sg)
-                            added = sg.ssm.transaction.targetSB;
-                        else
-                            added = sg.ssm.pickedSB;
-                    Slottable removed;
-                        if(sg.ssm.transaction.sg1 == sg)
-                            removed = sg.ssm.pickedSB;
-                        else
-                            removed = sg.ssm.transaction.targetSB;
-                    List<Slottable> newSBs = new List<Slottable>(sg.toList);
-                    int origCount = newSBs.Count;
-                    if(!sg.isPool){
-                        GameObject newSBGO = new GameObject("newSBGO");
-                        Slottable newSB = newSBGO.AddComponent<Slottable>();
-                        newSB.Initialize(added.itemInst);
-                        newSB.SetSSM(sg.ssm);
-                        newSB.SetEqpState(Slottable.unequippedState);
-                        newSB.Defocus();
-                        newSBs[newSBs.IndexOf(removed)] = newSB;
-                    }
-                    if(sg.isAutoSort){
-                        sg.Sorter.TrimAndOrderSBs(ref newSBs);
-                        if(!sg.isExpandable){
-                            while(newSBs.Count <origCount){
-                                newSBs.Add(null);
-                            }
-                        }
-                    }
-                    sg.UpdateSBs(newSBs);
+                    sg.SwapAndUpdateSBs();
                     if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
@@ -242,41 +159,7 @@ namespace SlotSystem{
             public class SGAddState: SGActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    List<InventoryItemInstance> cache = sg.ssm.transaction.moved;
-                    List<Slottable> newSBs = sg.toList;
-                    int origCount = newSBs.Count;
-                    foreach(InventoryItemInstance itemInst in cache){
-                        bool found = false;
-                        foreach(Slottable sb in newSBs){
-                            if(sb!= null){
-                                if(sb.itemInst == itemInst){
-                                    if(itemInst.Item.IsStackable){
-                                        sb.itemInst.Quantity += itemInst.Quantity;
-                                        found = true;
-                                    }
-                                }
-                            }
-                        }
-                        if(!found){
-                            GameObject newSBSG = new GameObject("newSBSG");
-                            Slottable newSB = newSBSG.AddComponent<Slottable>();
-                            newSB.Initialize(itemInst);
-                            newSB.SetSSM(sg.ssm);
-                            newSB.Defocus();
-                            // SlotSystemUtil.AddInEmptyOrConcat(ref newSBs, newSB);
-                            newSBs.Fill(newSB);
-                        }
-                    }
-                    if(sg.isAutoSort)
-                        sg.Sorter.TrimAndOrderSBs(ref newSBs);
-                    if(!sg.isExpandable){
-                        while(newSBs.Count <origCount){
-                            newSBs.Add(null);
-                        }
-                    }
-                    sg.SetNewSBs(newSBs);
-                    sg.CreateNewSlots();
-                    sg.SetSBsActStates();
+                    sg.AddAndUpdateSBs();
                     if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
@@ -289,44 +172,7 @@ namespace SlotSystem{
             public class SGRemoveState: SGActState{
                 public override void EnterState(StateHandler sh){
                     base.EnterState(sh);
-                    List<InventoryItemInstance> cache = sg.ssm.transaction.moved;
-                    List<Slottable> newSBs = sg.toList;
-                    int origCount = newSBs.Count;
-                    List<Slottable> removedList = new List<Slottable>();
-                    List<Slottable> nonremoved = new List<Slottable>();
-                    foreach(InventoryItemInstance itemInst in cache){
-                        foreach(Slottable sb in newSBs){
-                            if(sb!= null){
-                                if(sb.itemInst == itemInst){
-                                    if(itemInst.Item.IsStackable){
-                                        sb.itemInst.Quantity -= itemInst.Quantity;
-                                        if(sb.itemInst.Quantity <= 0)
-                                            removedList.Add(sb);
-                                    }else{
-                                        removedList.Add(sb);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    foreach(Slottable sb in removedList){
-                        newSBs[newSBs.IndexOf(sb)] = null;
-                    }
-                    if(sg.isAutoSort){
-                        sg.Sorter.TrimAndOrderSBs(ref newSBs);
-                        if(!sg.isExpandable){
-                            while(newSBs.Count <origCount){
-                                newSBs.Add(null);
-                            }
-                        }
-                    }else{
-                        if(sg.isExpandable)
-                            // SlotSystemUtil.Trim(ref newSBs);
-                            newSBs.Trim();
-                    }
-                    sg.SetNewSBs(nonremoved);
-                    sg.CreateNewSlots();
-                    sg.SetSBsActStates();
+                    sg.RemoveAndUpdateSBs();
                     if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);

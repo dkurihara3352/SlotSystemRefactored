@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using NUnit.Framework;
 using SlotSystem;
+using NSubstitute;
 
 public class AbsSlotSystemTest{
 	protected TestSSM MakeFakeSSM(){
@@ -13,6 +14,58 @@ public class AbsSlotSystemTest{
 		GameObject fakeSBGO = new GameObject("fakeSBGO");
 		FakeSB fakeSB = fakeSBGO.AddComponent<FakeSB>();
 		return fakeSB;
+	}
+	protected FakeSG MakeFakeSG(){
+		return new GameObject("fakeSGGO").AddComponent<FakeSG>();
+	}
+	protected class FakeSBSelState: SBSelState{}
+	protected static SBSelState MakeSubSBSelState(){
+		return Substitute.For<SBSelState>();
+	}
+	protected static SBActState MakeSubSBActState(){
+		return Substitute.For<SBActState>();
+	}
+	protected static SBEqpState MakeSubSBEqpState(){
+		return Substitute.For<SBEqpState>();
+	}
+	protected static SBMrkState MakeSubSBMrkState(){
+		return Substitute.For<SBMrkState>();
+	}
+	protected static SGSelState MakeSubSGSelState(){
+		return Substitute.For<SGSelState>();
+	}
+	protected static SGActState MakeSubSGActState(){
+		return Substitute.For<SGActState>();
+	}
+	protected static SSMSelState MakeSubSSMSelState(){
+		return Substitute.For<SSMSelState>();
+	}
+	protected static SSMActState MakeSubSSMActState(){
+		return Substitute.For<SSMActState>();
+	}
+	protected static SBSelProcess MakeSubSBSelProc(){
+		return Substitute.For<SBSelProcess>();
+	}
+	protected static SBActProcess MakeSubSBActProc(){
+		return Substitute.For<SBActProcess>();
+	}
+	protected static SBEqpProcess MakeSubSBEqpProc(){
+		return Substitute.For<SBEqpProcess>();
+	}
+	protected static SBMrkProcess MakeSubSBMrkProc(){
+		return Substitute.For<SBMrkProcess>();
+	}
+	protected static SGSelProcess MakeSubSGSelProc(){
+		return Substitute.For<SGSelProcess>();
+	}
+	protected static SGActProcess MakeSubSGActProc(){
+		return Substitute.For<SGActProcess>();
+	}
+	protected static SSMSelProcess MakeSubSSMSelProc(){
+		return Substitute.For<SSMSelProcess>();
+	}
+	protected static SSMActProcess MakeSubSSMActProc(){
+		return Substitute.For<SSMActProcess>();
 	}
 	protected static BowInstance MakeBowInstance(int id){
 		BowFake bowFake = new BowFake();
@@ -63,5 +116,8 @@ public class AbsSlotSystemTest{
 		partsInst.Item = partsFake;
 		partsInst.Quantity = quantity;
 		return partsInst;
+	}
+	protected IEnumeratorFake FakeCoroutine(){
+		return new IEnumeratorFake();
 	}
 }
