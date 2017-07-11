@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SlotSystem;
 using System.Collections;
 using System.Collections.Generic;
+using NSubstitute;
 
 namespace SlotSystemTests{
 	namespace SGTests{
@@ -12,25 +13,21 @@ namespace SlotSystemTests{
 			[Test]
 			public void SGSelState_OnHoverEnter_WhenCalled_CallSGSetHovered(){
 				TestSGSelState sgSelState = new TestSGSelState();
-				FakeSG mockSG = MakeFakeSG();
-				mockSG.ResetCallChecks();
+				ISlotGroup mockSG = MakeSubSG();				
 
 				sgSelState.OnHoverEnterMock(mockSG, new PointerEventDataFake());
 
-				Assert.That(mockSG.IsSetHoveredCalled, Is.True);
-
-				mockSG.ResetCallChecks();
+				mockSG.Received().SetHovered();
 			}
 			/*	SelStates */
 				[TestCaseSource(typeof(VariousSGSelStatesEnterStateCases1))]
 				public void VariousSGSelStates_EnteState_FromDeactivated_SetsSGSelProcNull(SGSelState toState){
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.SetPrevSelState(SlotGroup.sgDeactivatedState);
-					mockSG.SetAndRunSelProcess(new TestSGSelProcess());
+					ISlotGroup mockSG = MakeSubSG();
+					mockSG.prevSelState = SlotGroup.sgDeactivatedState;
 
 					toState.EnterState(mockSG);
 
-					Assert.That(mockSG.selProcess, Is.Null);
+					mockSG.Received().SetAndRunSelProcess(null);
 				}
 					class VariousSGSelStatesEnterStateCases1: IEnumerable{
 						public IEnumerator GetEnumerator(){
@@ -41,25 +38,22 @@ namespace SlotSystemTests{
 					}
 				[TestCaseSource(typeof(VariousSGSelStateEnterStateCases2))]
 				public void VariousSGSelState_EnterState_FromDeactivatedState_CallsSGInstantMethods(SGSelState toState, InstantMethod instantMethod){
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.SetPrevSelState(SlotGroup.sgDeactivatedState);
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
+					mockSG.prevSelState = SlotGroup.sgDeactivatedState;
 
 					toState.EnterState(mockSG);
-					bool targetCallCheck = false;
+
 					switch(instantMethod){
 						case InstantMethod.InstantGreyin :
-							targetCallCheck = mockSG.IsInstantGreyinCalled;
+							mockSG.Received().InstantGreyin();
 						break;
 						case InstantMethod.InstantGreyout :
-							targetCallCheck = mockSG.IsInstantGreyoutCalled;
+							mockSG.Received().InstantGreyout();
 						break;
 						case InstantMethod.InstantHighlight :
-							targetCallCheck = mockSG.IsInstantHighlightCalled;
+							mockSG.Received().InstantHighlight();
 						break;
 					}
-					Assert.That(targetCallCheck, Is.True);
-					mockSG.ResetCallChecks();
 				}
 					public enum InstantMethod{
 						InstantGreyin,
@@ -85,55 +79,55 @@ namespace SlotSystemTests{
 						}
 					}
 				[TestCaseSource(typeof(SGFocusedStateEnterStateCases))]
-				public void VariousSGSelState_EnteState_FromVarious_SetsSGSelProcAccordingly(SGSelState fromState, SGSelState toState, System.Type procType){
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.SetPrevSelState(fromState);
+				public void VariousSGSelState_EnteState_FromVarious_SetsSGSelProcAccordingly<T>(SGSelState fromState, SGSelState toState, T selProc) where T: SGSelProcess{
+					ISlotGroup mockSG = MakeSubSG();
+					mockSG.prevSelState = fromState;
 
 					toState.EnterState(mockSG);
 
-					Assert.That(mockSG.selProcess, Is.TypeOf(procType));
+					mockSG.Received().SetAndRunSelProcess(Arg.Any<T>());
 				}
 					class SGFocusedStateEnterStateCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] case1 = new object[]{
 								SlotGroup.sgDefocusedState,
 								SlotGroup.sgFocusedState,
-								typeof(SGGreyinProcess)
+								new SGGreyinProcess(MakeSubSG(), FakeCoroutine)
 							};
 							yield return case1;
 
 							object[] case2 = new object[]{
 								SlotGroup.sgSelectedState,
 								SlotGroup.sgFocusedState,
-								typeof(SGDehighlightProcess)
+								new SGDehighlightProcess(MakeSubSG(), FakeCoroutine)
 							};
 							yield return case2;
 
 							object[] case3 = new object[]{
 								SlotGroup.sgFocusedState,
 								SlotGroup.sgDefocusedState,
-								typeof(SGGreyoutProcess)
+								new SGGreyoutProcess(MakeSubSG(), FakeCoroutine)
 							};
 							yield return case3;
 
 							object[] case4 = new object[]{
 								SlotGroup.sgSelectedState,
 								SlotGroup.sgDefocusedState,
-								typeof(SGGreyoutProcess)
+								new SGGreyoutProcess(MakeSubSG(), FakeCoroutine)
 							};
 							yield return case4;
 							
 							object[] case5 = new object[]{
 								SlotGroup.sgFocusedState,
 								SlotGroup.sgSelectedState,
-								typeof(SGHighlightProcess)
+								new SGHighlightProcess(MakeSubSG(), FakeCoroutine)
 							};
 							yield return case5;
 							
 							object[] case6 = new object[]{
 								SlotGroup.sgDefocusedState,
 								SlotGroup.sgSelectedState,
-								typeof(SGHighlightProcess)
+								new SGHighlightProcess(MakeSubSG(), FakeCoroutine)
 							};
 							yield return case6;
 						}
@@ -141,13 +135,13 @@ namespace SlotSystemTests{
 			/*	ActState	*/
 				[TestCaseSource(typeof(VariousSGActStateEnterStateCases))]
 				public void VariousSGActState_EnterState_FromWFAState_SetsSGActProcSGTransactionProces(SGActState toState){
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.SetPrevActState(SlotGroup.sgWaitForActionState);
-					mockSG.SetToList(new List<Slottable>());
+					ISlotGroup mockSG = MakeSubSG();
+					mockSG.prevSelState = SlotGroup.sgWaitForActionState;
+					// mockSG.SetToList(new List<Slottable>());
 					
 					toState.EnterState(mockSG);
 
-					Assert.That(mockSG.actProcess, Is.TypeOf(typeof(SGTransactionProcess)));
+					mockSG.Received().SetAndRunActProcess(Arg.Any<SGTransactionProcess>());
 				}
 					class VariousSGActStateEnterStateCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
@@ -163,96 +157,75 @@ namespace SlotSystemTests{
 				[Test]
 				public void SGWaitForActionState_EnterState_WhenCalled_SetsSGActProcNull(){
 					SGWaitForActionState sgwfaState = new SGWaitForActionState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.SetAndRunActProcess(new TestSGActProcess());
+					ISlotGroup mockSG = MakeSubSG();
 
 					sgwfaState.EnterState(mockSG);
 
-					Assert.That(mockSG.actProcess, Is.Null);
+					mockSG.Received().SetAndRunActProcess(null);
 				}
 				[Test]
 				public void SGRevertState_EnterState_WhenCalled_CallsSGUpdateToRevert(){
 					SGRevertState revState = new SGRevertState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
 
 					revState.EnterState(mockSG);
 
-					Assert.That(mockSG.IsUpdateToRevertCalled, Is.True);
+					mockSG.Received().UpdateToRevert();
 
-					mockSG.ResetCallChecks();
 				}
 				[Test]
 				public void SGReorderState_EnterState_WhenCalled_CallsSGReorderAndUpdateSBs(){
 					SGReorderState roState = new SGReorderState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
 
 					roState.EnterState(mockSG);
 
-					Assert.That(mockSG.IsReorderAndUpdateSBsCalled, Is.True);
-
-					mockSG.ResetCallChecks();
+					mockSG.Received().ReorderAndUpdateSBs();
 				}
 				[Test]
 				public void SGSortState_EnterState_WhenCalled_CallsSGSortAndUpdateSBs(){
 					SGSortState sortState = new SGSortState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
 
 					sortState.EnterState(mockSG);
 
-					Assert.That(mockSG.IsSortAndUpdateSBsCalled, Is.True);
-
-					mockSG.ResetCallChecks();
+					mockSG.Received().SortAndUpdateSBs();
 				}
 				[Test]
 				public void SGFillState_EnterState_WhenCalled_CallsSGFillAndUpdateSBs(){
 					SGFillState fillState = new SGFillState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
 
 					fillState.EnterState(mockSG);
 
-					Assert.That(mockSG.IsFillAndUpdateSBsCalled, Is.True);
-
-					mockSG.ResetCallChecks();
+					mockSG.Received().FillAndUpdateSBs();
 				}
 				[Test]
 				public void SGSwapState_EnterState_WhenCalled_CallsSGSwapAndUpdateSBs(){
 					SGSwapState fillState = new SGSwapState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
 
 					fillState.EnterState(mockSG);
 
-					Assert.That(mockSG.IsSwapAndUpdateSBsCalled, Is.True);
-
-					mockSG.ResetCallChecks();
+					mockSG.Received().SwapAndUpdateSBs();
 				}
 				[Test]
 				public void SGAddState_EnterState_WhenCalled_CallsSGAddAndUpdateSBs(){
 					SGAddState fillState = new SGAddState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
 
 					fillState.EnterState(mockSG);
 
-					Assert.That(mockSG.IsAddAndUpdateSBsCalled, Is.True);
-
-					mockSG.ResetCallChecks();
+					mockSG.Received().AddAndUpdateSBs();
 				}
 				[Test]
 				public void SGRemoveState_EnterState_WhenCalled_CallsSGRemoveAndUpdateSBs(){
 					SGRemoveState fillState = new SGRemoveState();
-					FakeSG mockSG = MakeFakeSG();
-					mockSG.ResetCallChecks();
+					ISlotGroup mockSG = MakeSubSG();
 
 					fillState.EnterState(mockSG);
 
-					Assert.That(mockSG.IsRemoveAndUpdateSBsCalled, Is.True);
-
-					mockSG.ResetCallChecks();
+					mockSG.Received().RemoveAndUpdateSBs();
 				}
 		}
 		/*	helpers */

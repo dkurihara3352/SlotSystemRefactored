@@ -16,9 +16,9 @@ namespace SlotSystem{
 		public override bool isFocusedInBundle{
 			get{return m_isFocusedInBundle;}
 			}bool m_isFocusedInBundle;
-		public override List<Slottable> equippedSBs{
+		public override List<ISlottable> equippedSBs{
 			get{return m_equippedSBs;}
-			}List<Slottable> m_equippedSBs;
+			}List<ISlottable> m_equippedSBs;
 		public override bool isAllTASBsDone{
 			get{return m_isAllTASBsDone;}
 			}bool m_isAllTASBsDone;
@@ -34,7 +34,7 @@ namespace SlotSystem{
 		public override string eName{
 			get{return m_eName;}
 		}
-		public void Initialize(SlotGroup orig){
+		public void Initialize(ISlotGroup orig){
 			this.scroller = orig.scroller;
 			SetInventory(orig.inventory);
 			this.isShrinkable = orig.isShrinkable;
@@ -58,32 +58,32 @@ namespace SlotSystem{
 			m_isSGE = orig.isSGE;
 			m_isSGG = orig.isSGG;
 			m_isAutoSort = orig.isAutoSort;
-			List<Slottable> sbsClone = new List<Slottable>();
-				foreach(Slottable sb in orig){
+			List<ISlottable> sbsClone = new List<ISlottable>();
+				foreach(ISlottable sb in orig){
 					if(sb == null)
 						sbsClone.Add(null);
 					else{
-						Slottable cloneSB = SlotSystemUtil.CloneSB(sb);
+						ISlottable cloneSB = SlotSystemUtil.CloneSB(sb);
 						sbsClone.Add(sb);
 					}
 				}
 				SetSBs(sbsClone);
-			List<Slottable> newSbsClone = new List<Slottable>();
+			List<ISlottable> newSbsClone = new List<ISlottable>();
 				if(orig.newSBs != null)
-				foreach(Slottable sb in orig.newSBs){
+				foreach(ISlottable sb in orig.newSBs){
 					if(sb == null)
 						newSbsClone.Add(null);
 					else{
-						Slottable cloneSB = SlotSystemUtil.CloneSB(sb);
+						ISlottable cloneSB = SlotSystemUtil.CloneSB(sb);
 						newSbsClone.Add(sb);
 					}
 				}
 				SetNewSBs(newSbsClone);
 			m_isFocusedInBundle = orig.isFocusedInBundle;
-			List<Slottable> equippedSBsClone = new List<Slottable>();
+			List<ISlottable> equippedSBsClone = new List<ISlottable>();
 				if(orig.equippedSBs != null)
-				foreach(Slottable sb in orig.equippedSBs){
-					Slottable cloneSB = SlotSystemUtil.CloneSB(sb);
+				foreach(ISlottable sb in orig.equippedSBs){
+					ISlottable cloneSB = SlotSystemUtil.CloneSB(sb);
 					equippedSBsClone.Add(cloneSB);
 				}
 				m_equippedSBs = equippedSBsClone;

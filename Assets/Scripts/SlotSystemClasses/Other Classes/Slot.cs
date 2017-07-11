@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class Slot{
-		Slottable m_sb;
-		public Slottable sb{
+		ISlottable m_sb;
+		public ISlottable sb{
 			get{return m_sb;}
 			set{m_sb = value;}
 		}

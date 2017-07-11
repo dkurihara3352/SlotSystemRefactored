@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public interface SlottableCommand{
-		void Execute(Slottable sb);
+		void Execute(ISlottable sb);
 	}
 	public class SBTapCommand: SlottableCommand{
-		public void Execute(Slottable sb){
+		public void Execute(ISlottable sb){
 
 		}
 	}

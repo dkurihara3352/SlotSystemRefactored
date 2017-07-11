@@ -194,8 +194,8 @@ namespace SlotSystemTests{
 				[Test]
 				[Category("Fields")]
 				public void immediateBundle_NoBundleInAncestry_ReturnsNull(){
-					SlotSystemElement stubEle_1 = Substitute.For<SlotSystemElement>();
-					SlotSystemElement stubEle_2 = Substitute.For<SlotSystemElement>();
+					ISlotSystemElement stubEle_1 = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement stubEle_2 = Substitute.For<ISlotSystemElement>();
 					stubEle_1.parent = stubEle_2;
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					testSSE.parent = stubEle_1;
@@ -207,8 +207,8 @@ namespace SlotSystemTests{
 				public void immediateBundle_SomeBundlesUpInAncestry_ReturnsMostProximal(){
 					SlotSystemBundle stubBundle_further = MakeSlotSystemBundle();
 					SlotSystemBundle stubBundle_closer = MakeSlotSystemBundle();
-					SlotSystemElement stubEle_1 = MakeSlotSystemElement();
-					SlotSystemElement stubEle_2 = MakeSlotSystemElement();
+					ISlotSystemElement stubEle_1 = MakeSlotSystemElement();
+					ISlotSystemElement stubEle_2 = MakeSlotSystemElement();
 
 					stubEle_2.parent = stubEle_1;
 					stubEle_1.parent = stubBundle_closer;
@@ -267,7 +267,7 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isPageElement_ParentIsPage_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					TestSlotSystemPage stubPage = MakeSlotSystemPage();
+					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
 					testSSE.parent = stubPage;
 
 					Assert.That(testSSE.isPageElement, Is.True);
@@ -294,9 +294,8 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isToggledOn_ParentIsPageAndElementToggledOn_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					TestSlotSystemPage stubPage = MakeSlotSystemPage();
-					SlotSystemPageElement stubPageElement = MakeSlotSystemPageElement(testSSE, true);
-					stubPage.AddPageElement(testSSE, stubPageElement);
+					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
+					stubPage.GetPageElement(testSSE).isFocusToggleOn.Returns(true);
 					testSSE.parent = stubPage;
 
 					Assert.That(testSSE.isToggledOn, Is.True);
@@ -305,9 +304,8 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isToggledOn_ParentIsPageAndElementToggledOff_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					TestSlotSystemPage stubPage = MakeSlotSystemPage();
-					SlotSystemPageElement stubPageElement = MakeSlotSystemPageElement(testSSE, false);
-					stubPage.AddPageElement(testSSE, stubPageElement);
+					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
+					stubPage.GetPageElement(testSSE).isFocusToggleOn.Returns(false);
 					testSSE.parent = stubPage;
 
 					Assert.That(testSSE.isToggledOn, Is.False);
@@ -376,11 +374,11 @@ namespace SlotSystemTests{
 					TestSlotSystemElement stubPar3 = MakeSlotSystemElement();
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					testSSE.parent = stubPar3;
-					stubPar3.SetElements(new SlotSystemElement[]{testSSE});
+					stubPar3.SetElements(new ISlotSystemElement[]{testSSE});
 					stubPar3.parent = stubPar2;
-					stubPar2.SetElements(new SlotSystemElement[]{stubPar3});
+					stubPar2.SetElements(new ISlotSystemElement[]{stubPar3});
 					stubPar2.parent = stubPar1;
-					stubPar1.SetElements(new SlotSystemElement[]{stubPar2});
+					stubPar1.SetElements(new ISlotSystemElement[]{stubPar2});
 					stubPar1.Focus();
 					
 					Assert.That(testSSE.isFocusedInHierarchy, Is.True);
@@ -393,11 +391,11 @@ namespace SlotSystemTests{
 					TestSlotSystemElement stubPar3 = MakeSlotSystemElement();
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					testSSE.parent = stubPar3;
-					stubPar3.SetElements(new SlotSystemElement[]{testSSE});
+					stubPar3.SetElements(new ISlotSystemElement[]{testSSE});
 					stubPar3.parent = stubPar2;
-					stubPar2.SetElements(new SlotSystemElement[]{stubPar3});
+					stubPar2.SetElements(new ISlotSystemElement[]{stubPar3});
 					stubPar2.parent = stubPar1;
-					stubPar1.SetElements(new SlotSystemElement[]{stubPar2});
+					stubPar1.SetElements(new ISlotSystemElement[]{stubPar2});
 					stubPar2.Focus();
 					
 					Assert.That(testSSE.isFocusedInHierarchy, Is.False);
@@ -467,10 +465,10 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Activate_WhenCalled_CallsChildrensActivate(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemElement mockChildA = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildB = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildC = Substitute.For<SlotSystemElement>();
-					testSSE.SetElements(new SlotSystemElement[]{mockChildA, mockChildB, mockChildC});
+					ISlotSystemElement mockChildA = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildB = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildC = Substitute.For<ISlotSystemElement>();
+					testSSE.SetElements(new ISlotSystemElement[]{mockChildA, mockChildB, mockChildC});
 
 					testSSE.Activate();
 
@@ -482,10 +480,10 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Deactivate_WhenCalled_CallsChildrensDeactivate(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemElement mockChildA = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildB = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildC = Substitute.For<SlotSystemElement>();
-					testSSE.SetElements(new SlotSystemElement[]{mockChildA, mockChildB, mockChildC});
+					ISlotSystemElement mockChildA = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildB = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildC = Substitute.For<ISlotSystemElement>();
+					testSSE.SetElements(new ISlotSystemElement[]{mockChildA, mockChildB, mockChildC});
 
 					testSSE.Deactivate();
 
@@ -506,10 +504,10 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Focus_WhenCalled_CallsChildrensFocus(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemElement mockChildA = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildB = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildC = Substitute.For<SlotSystemElement>();
-					testSSE.SetElements(new SlotSystemElement[]{mockChildA, mockChildB, mockChildC});
+					ISlotSystemElement mockChildA = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildB = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildC = Substitute.For<ISlotSystemElement>();
+					testSSE.SetElements(new ISlotSystemElement[]{mockChildA, mockChildB, mockChildC});
 
 					testSSE.Focus();
 
@@ -530,10 +528,10 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Defocus_WhenCalled_CallsChildrensDefocus(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemElement mockChildA = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildB = Substitute.For<SlotSystemElement>();
-					SlotSystemElement mockChildC = Substitute.For<SlotSystemElement>();
-					testSSE.SetElements(new SlotSystemElement[]{mockChildA, mockChildB, mockChildC});
+					ISlotSystemElement mockChildA = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildB = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement mockChildC = Substitute.For<ISlotSystemElement>();
+					testSSE.SetElements(new ISlotSystemElement[]{mockChildA, mockChildB, mockChildC});
 
 					testSSE.Defocus();
 
@@ -561,10 +559,10 @@ namespace SlotSystemTests{
 					TestSlotSystemElement mockChild_2_1 = MakeSlotSystemElement();
 					TestSlotSystemElement mockChild_2_2 = MakeSlotSystemElement();
 					TestSlotSystemElement mockPar = MakeSlotSystemElement();
-					mockChild_1.SetElements(new SlotSystemElement[]{mockChild_1_1, mockChild_1_2});
-					mockChild_2.SetElements(new SlotSystemElement[]{mockChild_2_1, mockChild_2_2});
-					testSSE.SetElements(new SlotSystemElement[]{mockChild_1, mockChild_2});
-					mockPar.SetElements(new SlotSystemElement[]{testSSE});
+					mockChild_1.SetElements(new ISlotSystemElement[]{mockChild_1_1, mockChild_1_2});
+					mockChild_2.SetElements(new ISlotSystemElement[]{mockChild_2_1, mockChild_2_2});
+					testSSE.SetElements(new ISlotSystemElement[]{mockChild_1, mockChild_2});
+					mockPar.SetElements(new ISlotSystemElement[]{testSSE});
 
 					testSSE.PerformInHierarchy(x => ((TestSlotSystemElement)x).message = "performed");
 
@@ -588,12 +586,12 @@ namespace SlotSystemTests{
 					TestSlotSystemElement mockChild_2_1 = MakeSlotSystemElement();
 					TestSlotSystemElement mockChild_2_2 = MakeSlotSystemElement();
 					TestSlotSystemElement mockPar = MakeSlotSystemElement();
-					mockChild_1.SetElements(new SlotSystemElement[]{mockChild_1_1, mockChild_1_2});
-					mockChild_2.SetElements(new SlotSystemElement[]{mockChild_2_1, mockChild_2_2});
-					testSSE.SetElements(new SlotSystemElement[]{mockChild_1, mockChild_2});
-					mockPar.SetElements(new SlotSystemElement[]{testSSE});
+					mockChild_1.SetElements(new ISlotSystemElement[]{mockChild_1_1, mockChild_1_2});
+					mockChild_2.SetElements(new ISlotSystemElement[]{mockChild_2_1, mockChild_2_2});
+					testSSE.SetElements(new ISlotSystemElement[]{mockChild_1, mockChild_2});
+					mockPar.SetElements(new ISlotSystemElement[]{testSSE});
 
-					System.Action<SlotSystemElement, object> act = (SlotSystemElement x, object s) => ((TestSlotSystemElement)x).message = (string)s;
+					System.Action<ISlotSystemElement, object> act = (ISlotSystemElement x, object s) => ((TestSlotSystemElement)x).message = (string)s;
 					testSSE.PerformInHierarchy(act, "performed");
 
 					Assert.That(mockPar.message, Is.Empty);
@@ -616,12 +614,12 @@ namespace SlotSystemTests{
 					TestSlotSystemElement mockChild_2_1 = MakeSlotSystemElement();
 					TestSlotSystemElement mockChild_2_2 = MakeSlotSystemElement();
 					TestSlotSystemElement mockPar = MakeSlotSystemElement();
-					mockChild_1.SetElements(new SlotSystemElement[]{mockChild_1_1, mockChild_1_2});
-					mockChild_2.SetElements(new SlotSystemElement[]{mockChild_2_1, mockChild_2_2});
-					testSSE.SetElements(new SlotSystemElement[]{mockChild_1, mockChild_2});
-					mockPar.SetElements(new SlotSystemElement[]{testSSE});
+					mockChild_1.SetElements(new ISlotSystemElement[]{mockChild_1_1, mockChild_1_2});
+					mockChild_2.SetElements(new ISlotSystemElement[]{mockChild_2_1, mockChild_2_2});
+					testSSE.SetElements(new ISlotSystemElement[]{mockChild_1, mockChild_2});
+					mockPar.SetElements(new ISlotSystemElement[]{testSSE});
 
-					System.Action<SlotSystemElement, IList<string>> act = (SlotSystemElement x, IList<string> list) => {
+					System.Action<ISlotSystemElement, IList<string>> act = (ISlotSystemElement x, IList<string> list) => {
 						string concat = "";
 						foreach(string s in list){
 							concat += s;
@@ -644,7 +642,7 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Contains_NoElements_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemElement stubEle = Substitute.For<SlotSystemElement>();
+					ISlotSystemElement stubEle = Substitute.For<ISlotSystemElement>();
 					
 					Assert.That(testSSE.Contains(stubEle), Is.False);
 				}
@@ -652,9 +650,9 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Contains_NonMember_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemElement stubMember = Substitute.For<SlotSystemElement>();
-					SlotSystemElement stubNonMember = Substitute.For<SlotSystemElement>();
-					testSSE.SetElements(new SlotSystemElement[]{stubMember});
+					ISlotSystemElement stubMember = Substitute.For<ISlotSystemElement>();
+					ISlotSystemElement stubNonMember = Substitute.For<ISlotSystemElement>();
+					testSSE.SetElements(new ISlotSystemElement[]{stubMember});
 					
 					Assert.That(testSSE.Contains(stubNonMember), Is.False);
 				}
@@ -662,8 +660,8 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Contains_Member_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemElement stubMember = Substitute.For<SlotSystemElement>();
-					testSSE.SetElements(new SlotSystemElement[]{stubMember});
+					ISlotSystemElement stubMember = Substitute.For<ISlotSystemElement>();
+					testSSE.SetElements(new ISlotSystemElement[]{stubMember});
 					
 					Assert.That(testSSE.Contains(stubMember), Is.True);
 				}
@@ -671,16 +669,15 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void ToggleOnPageElement_IsPageElementAndElementNotToggledOn_TogglesPageElementOn(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					SlotSystemPageElement mockPageEle = MakeSlotSystemPageElement(testSSE, false);
-					// SlotSystemPage stubPage = Substitute.For<SlotSystemPage>();
-					TestSlotSystemPage stubPage = MakeSlotSystemPage();
+					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
+					ISlotSystemPageElement mockPageEle = Substitute.For<ISlotSystemPageElement>();
+					mockPageEle.isFocusToggleOn = false;
+					stubPage.GetPageElement(testSSE).Returns(mockPageEle);
 					testSSE.parent = stubPage;
-					// stubPage.GetPageElement(Arg.Any<SlotSystemElement>()).Returns(mockPageEle);
-					stubPage.AddPageElement(testSSE, mockPageEle);
 
 					testSSE.ToggleOnPageElement();
 
-					Assert.That(mockPageEle.isFocusToggleOn, Is.True);
+					mockPageEle.Received().isFocusToggleOn = true;
 				}
 			/*	helpers */
 				TestSlotSystemElement MakeSlotSystemElement(){
@@ -689,12 +686,6 @@ namespace SlotSystemTests{
 				}
 				SlotSystemBundle MakeSlotSystemBundle(){
 					return new GameObject("ssBundleGO").AddComponent<SlotSystemBundle>();
-				}
-				TestSlotSystemPage MakeSlotSystemPage(){
-					return new GameObject("pageGO").AddComponent<TestSlotSystemPage>();
-				}
-				SlotSystemPageElement MakeSlotSystemPageElement(SlotSystemElement ele, bool isFocusToggledOn){
-					return new SlotSystemPageElement(ele, isFocusToggledOn);
 				}
 		}
 	}

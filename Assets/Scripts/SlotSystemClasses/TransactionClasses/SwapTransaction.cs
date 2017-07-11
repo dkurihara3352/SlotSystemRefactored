@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SwapTransaction: AbsSlotSystemTransaction{
-		public Slottable m_pickedSB;
-		public SlotGroup m_origSG;
-		public Slottable m_selectedSB;
-		public SlotGroup m_selectedSG;
-		public SwapTransaction(Slottable pickedSB, Slottable selected){
+		public ISlottable m_pickedSB;
+		public ISlotGroup m_origSG;
+		public ISlottable m_selectedSB;
+		public ISlotGroup m_selectedSG;
+		public SwapTransaction(ISlottable pickedSB, ISlottable selected){
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
 			m_origSG = m_pickedSB.sg;
@@ -20,9 +20,9 @@ namespace SlotSystem{
 			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
 			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
 		}
-		public override Slottable targetSB{get{return m_selectedSB;}}
-		public override SlotGroup sg1{get{return m_origSG;}}
-		public override SlotGroup sg2{get{return m_selectedSG;}}
+		public override ISlottable targetSB{get{return m_selectedSB;}}
+		public override ISlotGroup sg1{get{return m_origSG;}}
+		public override ISlotGroup sg2{get{return m_selectedSG;}}
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1.SetActState(SlotGroup.swapState);

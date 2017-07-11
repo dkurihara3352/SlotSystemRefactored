@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class RevertTransaction: AbsSlotSystemTransaction{
-		public Slottable m_pickedSB;
-		public SlotGroup m_origSG;
-		public RevertTransaction(Slottable pickedSB){
+		public ISlottable m_pickedSB;
+		public ISlotGroup m_origSG;
+		public RevertTransaction(ISlottable pickedSB){
 			m_pickedSB = pickedSB;
 			m_origSG = m_pickedSB.sg;
 		}

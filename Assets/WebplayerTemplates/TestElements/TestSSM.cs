@@ -4,19 +4,18 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class TestSSM : SlotSystemManager {
-		public Dictionary<SlotSystemElement, SlotSystemElement> parentDict = new Dictionary<SlotSystemElement, SlotSystemElement>();
-		public void AddParentChild(Slottable sb, SlotGroup sg){
+		public Dictionary<ISlotSystemElement, ISlotSystemElement> parentDict = new Dictionary<ISlotSystemElement, ISlotSystemElement>();
+		public void AddParentChild(ISlottable sb, ISlotGroup sg){
 			parentDict.Add(sb, sg);
 		}
-
-		public override SlotSystemElement FindParent(SlotSystemElement ele){
-			foreach(KeyValuePair<SlotSystemElement, SlotSystemElement> pair in parentDict){
+		public override ISlotSystemElement FindParent(ISlotSystemElement ele){
+			foreach(KeyValuePair<ISlotSystemElement, ISlotSystemElement> pair in parentDict){
 				if(pair.Key == ele)
 					return pair.Value;
 			}
 			return null;
 		}
-		public override void SetHovered(SlotSystemElement ele){
+		public override void SetHovered(ISlotSystemElement ele){
 			m_hovered = ele;
 		}
 		public override void SetActState(SSEState state){
@@ -47,15 +46,15 @@ namespace SlotSystem{
 			public override DraggedIcon dIcon2{
 				get{return m_dIcon2;}
 			}DraggedIcon m_dIcon2;
-		public override void SetPickedSB(Slottable sb){
+		public override void SetPickedSB(ISlottable sb){
 			m_pickedSB = sb;
 		}
-			public override Slottable pickedSB{
+			public override ISlottable pickedSB{
 				get{
 					return m_pickedSB;
 				}
-			}Slottable m_pickedSB;
-		public override void CreateTransactionResultsV2(){
+			}ISlottable m_pickedSB;
+		public override void CreateTransactionResults(){
 			m_isCTRCalled = true;
 		}
 			public bool IsCTRCalled{

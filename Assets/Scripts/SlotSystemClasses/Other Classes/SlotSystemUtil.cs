@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public static class SlotSystemUtil{
-		public static Slottable CloneSB(Slottable orig){
+		public static ISlottable CloneSB(ISlottable orig){
 			if(orig != null){
 				GameObject cloneGO = new GameObject("cloneGO");
 				SBClone clone = cloneGO.AddComponent<SBClone>();
@@ -13,7 +13,7 @@ namespace SlotSystem{
 			}
 			return null;
 		}
-		public static SlotGroup CloneSG(SlotGroup orig){
+		public static ISlotGroup CloneSG(ISlotGroup orig){
 			if(orig != null){
 				GameObject cloneSGGO = new GameObject("cloneSGGO");
 				SGClone cloneSG = cloneSGGO.AddComponent<SGClone>();
@@ -22,7 +22,7 @@ namespace SlotSystem{
 			}
 			return null;
 		}
-		public static bool AreSwappable(Slottable pickedSB, Slottable otherSB){
+		public static bool AreSwappable(ISlottable pickedSB, ISlottable otherSB){
 			/*	precondition
 					1) they do not share same SG
 					2) otherSB.SG accepts pickedSB
@@ -38,7 +38,7 @@ namespace SlotSystem{
 			return false;
 		}
 		/*	SSE	*/
-			public static string SSEDebug(SlotSystemElement sse){
+			public static string SSEDebug(ISlotSystemElement sse){
 				string res = "";
 				string prevSel = SSEStateNamePlain(sse.prevSelState);
 				string curSel = SSEStateName(sse.curSelState);
@@ -169,14 +169,14 @@ namespace SlotSystem{
 					res = SlotSystemUtil.Blue("Transaction");
 				return res;
 			}
-			public static string SSMDebug(SlotSystemManager ssm){
+			public static string SSMDebug(ISlotSystemManager ssm){
 				string res = "";
 				string pSB = SlotSystemUtil.SBofSG(ssm.pickedSB);
 				string tSB = SlotSystemUtil.SBofSG(ssm.targetSB);
 				string hovered = "";
-					if(ssm.hovered is Slottable)
-						hovered = SBofSG((Slottable)ssm.hovered);
-					else if(ssm.hovered is SlotGroup)
+					if(ssm.hovered is ISlottable)
+						hovered = SBofSG((ISlottable)ssm.hovered);
+					else if(ssm.hovered is ISlotGroup)
 						hovered = ssm.hovered.eName;
 				string di1;
 					if(ssm.dIcon1 == null)
@@ -299,7 +299,7 @@ namespace SlotSystem{
 					res = SlotSystemUtil.Khaki("Transaction");
 				return res;
 			}
-			public static string SGDebug(SlotGroup sg){
+			public static string SGDebug(ISlotGroup sg){
 				string res = "";
 				string prevSel = SGStateNamePlain((SGSelState)sg.prevSelState);
 				string curSel = SGStateName((SGSelState)sg.curSelState);
@@ -360,7 +360,7 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public static string SBName(Slottable sb){
+			public static string SBName(ISlottable sb){
 				string result = "null";
 				if(sb != null){
 					result = ItemInstName(sb.itemInst);
@@ -384,7 +384,7 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public static string SBofSG(Slottable sb){
+			public static string SBofSG(ISlottable sb){
 				string res = "";
 				if(sb != null){
 					res = SlotSystemUtil.SBName(sb) + " of " + sb.sg.eName;
@@ -509,7 +509,7 @@ namespace SlotSystem{
 					res = Blue("Mark");
 				return res;
 			}
-			public static string SBDebug(Slottable sb){
+			public static string SBDebug(ISlottable sb){
 				string res = "";
 				if(sb == null)
 					res = "null";
@@ -554,7 +554,7 @@ namespace SlotSystem{
 				return res;
 			}
 		/*	Debug	*/
-			public static string TADebug(Slottable testSB, SlotSystemElement hovered){
+			public static string TADebug(ISlottable testSB, ISlotSystemElement hovered){
 				SlotSystemTransaction ta = testSB.ssm.GetTransaction(testSB, hovered);
 				string taStr = TransactionName(ta);
 				string taTargetSB = SlotSystemUtil.SBofSG(ta.targetSB);

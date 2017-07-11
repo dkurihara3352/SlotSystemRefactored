@@ -10,15 +10,15 @@ namespace SlotSystem{
 		public IconDestination dest{
 			get{return m_dest;}
 			}IconDestination m_dest;
-			public void SetDestination(SlotGroup sg, Slot slot){
+			public void SetDestination(ISlotGroup sg, Slot slot){
 				IconDestination newDest = new IconDestination(sg, slot);
 				m_dest = newDest;
 			}
-		SlotSystemManager m_ssm;
-		public Slottable sb{
+		ISlotSystemManager m_ssm;
+		public ISlottable sb{
 			get{return m_sb;}
-			}Slottable m_sb;
-		public DraggedIcon(Slottable sb){
+			}ISlottable m_sb;
+		public DraggedIcon(ISlottable sb){
 			m_sb = sb;
 			m_item = this.sb.itemInst;
 			m_ssm = SlotSystemManager.curSSM;

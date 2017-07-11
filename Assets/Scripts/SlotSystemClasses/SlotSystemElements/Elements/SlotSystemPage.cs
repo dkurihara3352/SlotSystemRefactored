@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public abstract class SlotSystemPage : AbsSlotSystemElement{
+	public abstract class SlotSystemPage : AbsSlotSystemElement, ISlotSystemPage{
 		public void PageFocus(){
-			foreach(SlotSystemPageElement pageEle in pageElements){
+			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.isFocusToggleOn)
 					pageEle.element.Focus();
 				else
@@ -12,12 +12,12 @@ namespace SlotSystem{
 			}
 		}
 		public void ToggleBack(){
-			foreach(SlotSystemPageElement pageEle in pageElements){
+			foreach(ISlotSystemPageElement pageEle in pageElements){
 				pageEle.isFocusToggleOn = pageEle.isFocusedOnActivate;
 			}
 		}
-		public void TogglePageElementFocus(SlotSystemElement ele, bool toggle){
-			foreach(SlotSystemPageElement pageEle in pageElements){
+		public void TogglePageElementFocus(ISlotSystemElement ele, bool toggle){
+			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.element == ele){
 					if(toggle && !pageEle.isFocusToggleOn){
 						pageEle.isFocusToggleOn = true;
@@ -28,17 +28,25 @@ namespace SlotSystem{
 			}
 			ssm.Focus();
 		}
-		public IEnumerable<SlotSystemPageElement> pageElements{
+		public IEnumerable<ISlotSystemPageElement> pageElements{
 				get{
 					return m_pageElements;
 				}
-			}protected IEnumerable<SlotSystemPageElement> m_pageElements;
-		public virtual SlotSystemPageElement GetPageElement(SlotSystemElement element){
-			foreach(SlotSystemPageElement pageEle in pageElements){
+				set{}
+			}protected IEnumerable<ISlotSystemPageElement> m_pageElements;
+		public virtual ISlotSystemPageElement GetPageElement(ISlotSystemElement element){
+			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.element == element)
 					return pageEle;
 			}
 			return null;
 		}
+	}
+	public interface ISlotSystemPage: IAbsSlotSystemElement{
+		IEnumerable<ISlotSystemPageElement> pageElements{get;set;}
+		void PageFocus();
+		void ToggleBack();
+		void TogglePageElementFocus(ISlotSystemElement ele, bool toggle);
+		ISlotSystemPageElement GetPageElement(ISlotSystemElement element);
 	}
 }

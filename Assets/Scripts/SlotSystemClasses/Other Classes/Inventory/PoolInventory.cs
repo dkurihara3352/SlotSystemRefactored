@@ -21,9 +21,9 @@ namespace SlotSystem{
 			get{return m_items[i];}
 		}
 		List<SlottableItem> m_items = new List<SlottableItem>();
-		public SlotGroup sg{get{return m_sg;}}
-			SlotGroup m_sg;
-			public void SetSG(SlotGroup sg){
+		public ISlotGroup sg{get{return m_sg;}}
+			ISlotGroup m_sg;
+			public void SetSG(ISlotGroup sg){
 				m_sg = sg;
 			}
 		public void Add(SlottableItem item){

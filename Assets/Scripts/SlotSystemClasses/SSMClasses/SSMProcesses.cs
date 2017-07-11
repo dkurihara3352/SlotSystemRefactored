@@ -4,32 +4,32 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public abstract class SSMProcess: AbsSSEProcess{
-		protected SlotSystemManager ssm{
-			get{return (SlotSystemManager)sse;}
+		protected ISlotSystemManager ssm{
+			get{return (ISlotSystemManager)sse;}
 		}
 	}
 		public class SSMSelProcess: SSMProcess{}
 			public class SSMGreyinProcess: SSMSelProcess{
-				public SSMGreyinProcess(SlotSystemManager ssm, System.Func<IEnumeratorFake> coroutineMock){
+				public SSMGreyinProcess(ISlotSystemManager ssm, System.Func<IEnumeratorFake> coroutineMock){
 					this.sse = ssm;
 					this.coroutineFake = coroutineMock;
 				}
 			}
 			public class SSMGreyoutProcess: SSMSelProcess{
-				public SSMGreyoutProcess(SlotSystemManager ssm, System.Func<IEnumeratorFake> coroutineMock){
+				public SSMGreyoutProcess(ISlotSystemManager ssm, System.Func<IEnumeratorFake> coroutineMock){
 					this.sse = ssm;
 					this.coroutineFake = coroutineMock;
 				}
 			}
 		public class SSMActProcess: SSMProcess{}
 			public class SSMProbeProcess: SSMActProcess{
-				public SSMProbeProcess(SlotSystemManager ssm, System.Func<IEnumeratorFake> coroutineMock){
+				public SSMProbeProcess(ISlotSystemManager ssm, System.Func<IEnumeratorFake> coroutineMock){
 					this.sse = ssm;
 					this.coroutineFake = coroutineMock;
 				}
 			}
 			public class SSMTransactionProcess: SSMActProcess{
-				public SSMTransactionProcess(SlotSystemManager ssm){
+				public SSMTransactionProcess(ISlotSystemManager ssm){
 					this.sse = ssm;
 					this.coroutineFake = ssm.transactionCoroutine;
 				}

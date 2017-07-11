@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Utility{
 	public abstract class SwitchableStateEngine{
-		public virtual StateHandler handler{get{return m_handler;} set{m_handler = value;}}
-			StateHandler m_handler;
+		public virtual IStateHandler handler{get{return m_handler;} set{m_handler = value;}}
+			IStateHandler m_handler;
 		virtual public SwitchableState prevState{
 			get{
 				return m_prevState;

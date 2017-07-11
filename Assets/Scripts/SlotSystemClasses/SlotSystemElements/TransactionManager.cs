@@ -5,16 +5,31 @@ using UnityEngine;
 namespace SlotSystem{
 	public interface TransactionManager{
 		SlotSystemTransaction transaction{get;}
-		void AcceptSGTAComp(SlotGroup sg);
+		void AcceptSGTAComp(ISlotGroup sg);
 		void AcceptDITAComp(DraggedIcon di);
-		Slottable pickedSB{get;}
-		Slottable targetSB{get;}
-		SlotGroup sg1{get;}
-		SlotGroup sg2{get;}
+		ISlottable pickedSB{get;}
+		ISlottable targetSB{get;}
+		ISlotGroup sg1{get;}
+		ISlotGroup sg2{get;}
 		DraggedIcon dIcon1{get;}
 		DraggedIcon dIcon2{get;}
-		SlotSystemElement hovered{get;}
+		ISlotSystemElement hovered{get;}
 		void UpdateTransaction();
-		SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered);
+		void CreateTransactionResults();
+		void ReferToTAAndUpdateSelState(ISlotGroup sg);
+		SlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
+		
+		void SetTransaction(SlotSystemTransaction transaction);	
+		void SetPickedSB(ISlottable sb);
+		void SetTargetSB(ISlottable sb);
+		void SetSG1(ISlotGroup sg);
+		bool sg1Done{get;}
+		void SetSG2(ISlotGroup sg);
+		bool sg2Done{get;}
+		void SetDIcon1(DraggedIcon di);
+		bool dIcon1Done{get;}
+		void SetDIcon2(DraggedIcon di);
+		bool dIcon2Done{get;}
+		void SetHovered(ISlotSystemElement ele);
 	}
 }

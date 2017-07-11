@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public abstract class AbsSlotSystemTransaction: SlotSystemTransaction{
-		public static SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered){
-			SlotGroup origSG = pickedSB.sg;
+		public static SlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+			ISlotGroup origSG = pickedSB.sg;
 			if(hovered != null){
-				if(hovered is SlotGroup){
-					SlotGroup hovSG = (SlotGroup)hovered;
+				if(hovered is ISlotGroup){
+					ISlotGroup hovSG = (ISlotGroup)hovered;
 					if(hovSG.AcceptsFilter(pickedSB)){
 						if(hovSG != origSG && origSG.isShrinkable){
 							if(hovSG.HasItem(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
@@ -22,7 +22,7 @@ namespace SlotSystem{
 									return new FillTransaction(pickedSB, hovSG);
 								}else{
 									if(hovSG.SwappableSBs(pickedSB).Count == 1){
-										Slottable calcedSB = hovSG.SwappableSBs(pickedSB)[0];
+										ISlottable calcedSB = hovSG.SwappableSBs(pickedSB)[0];
 										if(calcedSB.itemInst != pickedSB.itemInst)
 											return new SwapTransaction(pickedSB, calcedSB);
 									}
@@ -31,9 +31,9 @@ namespace SlotSystem{
 						}
 					}
 					return new RevertTransaction(pickedSB);
-				}else if(hovered is Slottable){
-					Slottable hovSB = (Slottable)hovered;
-					SlotGroup hovSBSG = hovSB.sg;
+				}else if(hovered is ISlottable){
+					ISlottable hovSB = (ISlottable)hovered;
+					ISlotGroup hovSBSG = hovSB.sg;
 					if(hovSBSG == origSG){
 						if(hovSB != pickedSB){
 							if(!hovSBSG.isAutoSort)
@@ -73,12 +73,12 @@ namespace SlotSystem{
 			}
 			return new RevertTransaction(pickedSB);
 		}
-		protected SlotSystemManager ssm = SlotSystemManager.curSSM;
+		protected ISlotSystemManager ssm = SlotSystemManager.curSSM;
 		protected List<InventoryItemInstance> removed = new List<InventoryItemInstance>();
 		protected List<InventoryItemInstance> added = new List<InventoryItemInstance>();
-		public virtual Slottable targetSB{get{return null;}}
-		public virtual SlotGroup sg1{get{return null;}}
-		public virtual SlotGroup sg2{get{return null;}}
+		public virtual ISlottable targetSB{get{return null;}}
+		public virtual ISlotGroup sg1{get{return null;}}
+		public virtual ISlotGroup sg2{get{return null;}}
 		public virtual List<InventoryItemInstance> moved{get{return null;}}
 		public virtual void Indicate(){}
 		public virtual void Execute(){

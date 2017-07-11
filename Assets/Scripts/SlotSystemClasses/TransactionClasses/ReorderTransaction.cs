@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class ReorderTransaction: AbsSlotSystemTransaction{
-		public Slottable m_pickedSB;
-		public Slottable m_selectedSB;
-		public SlotGroup m_origSG;
-		public ReorderTransaction(Slottable pickedSB, Slottable selected){
+		public ISlottable m_pickedSB;
+		public ISlottable m_selectedSB;
+		public ISlotGroup m_origSG;
+		public ReorderTransaction(ISlottable pickedSB, ISlottable selected){
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
 			m_origSG = m_pickedSB.sg;
@@ -17,8 +17,8 @@ namespace SlotSystem{
 			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
 			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
 		}
-		public override Slottable targetSB{get{return m_selectedSB;}}
-		public override SlotGroup sg1{get{return m_origSG;}}
+		public override ISlottable targetSB{get{return m_selectedSB;}}
+		public override ISlotGroup sg1{get{return m_origSG;}}
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1.SetActState(SlotGroup.reorderState);

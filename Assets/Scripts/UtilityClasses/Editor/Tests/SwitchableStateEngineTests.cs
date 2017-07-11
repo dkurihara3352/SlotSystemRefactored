@@ -65,7 +65,7 @@ namespace UtilityClassTests{
 
 			testEngine.SetTestState(mockState);
 
-			testEngine.curState.Received().EnterState(Arg.Any<StateHandler>());
+			testEngine.curState.Received().EnterState(Arg.Any<IStateHandler>());
 		}
 		[Test]
 		public void SetState_SettingDifferentState_CallsExitStateOnPrevState(){
@@ -76,7 +76,7 @@ namespace UtilityClassTests{
 			testEngine.SetTestState(mockState);
 			testEngine.SetTestState(stubState);
 
-			testEngine.prevState.Received().ExitState(Arg.Any<StateHandler>());
+			testEngine.prevState.Received().ExitState(Arg.Any<IStateHandler>());
 		}
 		[Test]
 		public void SetState_SettingDifferentState_CallsEnterStateOnCurState(){
@@ -87,7 +87,7 @@ namespace UtilityClassTests{
 			testEngine.SetTestState(stubState);
 			testEngine.SetTestState(mockState);
 
-			testEngine.curState.Received().EnterState(Arg.Any<StateHandler>());
+			testEngine.curState.Received().EnterState(Arg.Any<IStateHandler>());
 		}
 		[Test]
 		public void SetState_SettingSomeStateToNull_CallsExitStateOnPrev(){
@@ -96,7 +96,7 @@ namespace UtilityClassTests{
 
 			testEngine.SetTestState(null);
 
-			testEngine.prevState.Received().ExitState(Arg.Any<StateHandler>());
+			testEngine.prevState.Received().ExitState(Arg.Any<IStateHandler>());
 		}
 		[Test]
 		public void SetState_SettingSameState_DoesNotCallStates(){
@@ -106,9 +106,9 @@ namespace UtilityClassTests{
 
 			testStateEngine.SetTestState(mockCurState);
 
-			testStateEngine.prevState.DidNotReceive().ExitState(Arg.Any<StateHandler>());
-			testStateEngine.curState.DidNotReceive().EnterState(Arg.Any<StateHandler>());
-			testStateEngine.curState.DidNotReceive().ExitState(Arg.Any<StateHandler>());
+			testStateEngine.prevState.DidNotReceive().ExitState(Arg.Any<IStateHandler>());
+			testStateEngine.curState.DidNotReceive().EnterState(Arg.Any<IStateHandler>());
+			testStateEngine.curState.DidNotReceive().ExitState(Arg.Any<IStateHandler>());
 		}
 		TestStateEngine MakeTestStateEngine(SwitchableState prev, SwitchableState cur){
 			return new TestStateEngine(prev, cur);
@@ -122,12 +122,12 @@ namespace UtilityClassTests{
 			}
 			public TestStateEngine(SwitchableState prev, SwitchableState cur){
 				m_prevState = prev; m_curState = cur;
-				handler = Substitute.For<StateHandler>();
+				handler = Substitute.For<IStateHandler>();
 			}
 		}
 		class TestSwitchableState: SwitchableState{
-			public void EnterState(StateHandler handler){}
-			public void ExitState(StateHandler handler){}
+			public void EnterState(IStateHandler handler){}
+			public void ExitState(IStateHandler handler){}
 		}
 	}
 }

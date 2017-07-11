@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public class GenericPage : SlotSystemPage{
-		protected override IEnumerable<SlotSystemElement> elements{
+	public class GenericPage : SlotSystemPage, ISlotSystemPage{
+		public override IEnumerable<ISlotSystemElement> elements{
 				get{
-					foreach(SlotSystemPageElement pageEle in pageElements){
+					foreach(ISlotSystemPageElement pageEle in pageElements){
 						yield return pageEle.element;
 					}
 				}
-				}IEnumerable<SlotSystemElement> m_elements;
-		public void Initialize(string name, IEnumerable<SlotSystemPageElement> pageEles){
+				}IEnumerable<ISlotSystemElement> m_elements;
+		public void Initialize(string name, IEnumerable<ISlotSystemPageElement> pageEles){
 			m_eName = SlotSystemUtil.Bold(name);
 			m_pageElements = pageEles;
 			base.Initialize();

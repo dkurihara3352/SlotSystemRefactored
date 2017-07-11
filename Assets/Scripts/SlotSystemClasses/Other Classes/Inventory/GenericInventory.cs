@@ -28,10 +28,10 @@ namespace SlotSystem{
 		public void Remove(SlottableItem item){
 			items.Remove(item);
 		}
-		public SlotGroup sg{
+		public ISlotGroup sg{
 			get{return m_sg;}
-			}SlotGroup m_sg;
-			public void SetSG(SlotGroup sg){
+			}ISlotGroup m_sg;
+			public void SetSG(ISlotGroup sg){
 				m_sg = sg;
 			}
 	}

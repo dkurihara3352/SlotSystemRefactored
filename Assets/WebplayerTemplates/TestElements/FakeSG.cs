@@ -106,13 +106,10 @@ namespace SlotSystem{
 				SGFilter m_filter;
 				public override void SetFilter(SGFilter sorter){SetFilter((object)sorter);}
 				public void SetFilter(object obj){if(obj == null || obj is SGFilter) m_filter = (SGFilter) obj;}
-			public IEnumerable<SlotSystemElement> GetElements(){return m_elements;}
-				IEnumerable<SlotSystemElement> m_elements;
-				public void SetElements(object obj){if(obj == null || obj is IEnumerable<SlotSystemElement>) m_elements = obj as IEnumerable<SlotSystemElement>;}
-			public override int Count{get{return m_count;}}
-				int m_count;
-				public void SetCount(int i){m_count = i;}
-			public override string eName{get{return m_eName;}}
+			public IEnumerable<ISlotSystemElement> GetElements(){return m_elements;}
+				IEnumerable<ISlotSystemElement> m_elements;
+				public void SetElements(object obj){if(obj == null || obj is IEnumerable<ISlotSystemElement>) m_elements = obj as IEnumerable<ISlotSystemElement>;}
+						public override string eName{get{return m_eName;}}
 				public void SetEName(object obj){if(obj == null || obj is string) m_eName = (string) obj;}
 			public override List<Slottable> toList{get{return m_toList;}}
 				List<Slottable> m_toList;
@@ -167,8 +164,6 @@ namespace SlotSystem{
 				IEnumerable<System.Action<int>> ints = new System.Action<int>[]{
 					SetActualSBsCount,
 					SetInitSlotsCount,
-					SetCount,
-					SetIndexOf,
 				};
 				foreach(var act in ints) act(-1);
 			}
@@ -194,10 +189,7 @@ namespace SlotSystem{
 			public override void OnHoverExitMock(){m_isOnHoverExitMockCalled = true;}
 				bool m_isOnHoverExitMockCalled;
 				public bool IsOnHoverExitMockCalled{get{return m_isOnHoverExitMockCalled;}}
-			public override int IndexOf(Slottable sb){return m_indexOf;}
-				int m_indexOf;
-				public void SetIndexOf(int i){m_indexOf = i;}
-			public override bool Contains(SlotSystemElement element){return m_contains;}
+						public override bool Contains(ISlotSystemElement element){return m_contains;}
 				bool m_contains;
 				public void SetContains(bool bl){m_contains = bl;}
 			public override void Focus(){m_isFocusCalled = true;}
@@ -221,13 +213,13 @@ namespace SlotSystem{
 			public override void Deactivate(){m_isDeactivateCalled = true;}
 				bool m_isDeactivateCalled;
 				public bool IsDeactivateCalled{get{return m_isDeactivateCalled;}}
-			public override void PerformInHierarchy(System.Action<SlotSystemElement> act){m_isPerformInHierarchyV1Called = true;}
+			public override void PerformInHierarchy(System.Action<ISlotSystemElement> act){m_isPerformInHierarchyV1Called = true;}
 				bool m_isPerformInHierarchyV1Called;
 				public bool IsPerformInHierarchyV1Called{get{return m_isPerformInHierarchyV1Called;}}
-			public override void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){m_isPerformInHierarchyV2Called = true;}
+			public override void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){m_isPerformInHierarchyV2Called = true;}
 				bool m_isPerformInHierarchyV2Called;
 				public bool IsPerformInHierarchyV2Called{get{return m_isPerformInHierarchyV2Called;}}
-			public override void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){m_isPerformInHierarchyV3Called = true;}
+			public override void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list){m_isPerformInHierarchyV3Called = true;}
 				bool m_isPerformInHierarchyV3Called;
 				public bool IsPerformInHierarchyV3Called{get{return m_isPerformInHierarchyV3Called;}}
 			

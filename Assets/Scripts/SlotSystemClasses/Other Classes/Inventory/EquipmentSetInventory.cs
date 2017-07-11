@@ -31,9 +31,9 @@ namespace SlotSystem{
 		public SlottableItem this[int i]{
 			get{return m_items[i];}
 		}
-		public SlotGroup sg{get{return m_sg;}}
-			SlotGroup m_sg;
-			public void SetSG(SlotGroup sg){
+		public ISlotGroup sg{get{return m_sg;}}
+			ISlotGroup m_sg;
+			public void SetSG(ISlotGroup sg){
 				m_sg = sg;
 			}
 		protected BowInstance m_equippedBow;

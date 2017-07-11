@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Utility{
 	public interface SwitchableState{
 
-		void EnterState(StateHandler handler);
-		void ExitState(StateHandler handler);
+		void EnterState(IStateHandler handler);
+		void ExitState(IStateHandler handler);
 	}
 }

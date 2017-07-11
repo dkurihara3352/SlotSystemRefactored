@@ -7,16 +7,14 @@ using SlotSystem;
 using NSubstitute;
 
 public class AbsSlotSystemTest{
-	protected TestSSM MakeFakeSSM(){
-		return new GameObject("ssm").AddComponent<TestSSM>();
+	protected static ISlotSystemManager MakeSubSSM(){
+		return Substitute.For<ISlotSystemManager>();
 	}
-	protected FakeSB MakeFakeSB(){
-		GameObject fakeSBGO = new GameObject("fakeSBGO");
-		FakeSB fakeSB = fakeSBGO.AddComponent<FakeSB>();
-		return fakeSB;
+	protected static ISlotGroup MakeSubSG(){
+		return Substitute.For<ISlotGroup>();
 	}
-	protected FakeSG MakeFakeSG(){
-		return new GameObject("fakeSGGO").AddComponent<FakeSG>();
+	protected static ISlottable MakeSubSB(){
+		return Substitute.For<ISlottable>();
 	}
 	protected class FakeSBSelState: SBSelState{}
 	protected static SBSelState MakeSubSBSelState(){
@@ -117,7 +115,7 @@ public class AbsSlotSystemTest{
 		partsInst.Quantity = quantity;
 		return partsInst;
 	}
-	protected IEnumeratorFake FakeCoroutine(){
+	protected static IEnumeratorFake FakeCoroutine(){
 		return new IEnumeratorFake();
 	}
 }

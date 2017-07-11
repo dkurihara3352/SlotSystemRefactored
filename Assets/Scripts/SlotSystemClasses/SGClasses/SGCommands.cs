@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public interface SlotGroupCommand{
-		void Execute(SlotGroup Sg);
+		void Execute(ISlotGroup Sg);
 	}
 	public class SGEmptyCommand: SlotGroupCommand{
-		public void Execute(SlotGroup sg){
+		public void Execute(ISlotGroup sg){
 		}
 	}
 	public class SGInitItemsCommand: SlotGroupCommand{
-		public void Execute(SlotGroup sg){
+		public void Execute(ISlotGroup sg){
 			List<SlottableItem> items = new List<SlottableItem>(sg.inventory);
 			sg.Filter.Filter(ref items);
 			/*	Slots	*/
@@ -29,7 +29,7 @@ namespace SlotSystem{
 				}
 				foreach(SlottableItem item in items){
 					GameObject newSBGO = new GameObject("newSBGO");
-					Slottable newSB = newSBGO.AddComponent<Slottable>();
+					ISlottable newSB = newSBGO.AddComponent<Slottable>();
 					newSB.Initialize((InventoryItemInstance)item);
 					newSB.SetSSM(sg.ssm);
 					sg.slots[items.IndexOf(item)].sb = newSB;
@@ -40,12 +40,12 @@ namespace SlotSystem{
 		}
 	}
 	public class SGUpdateEquipAtExecutionCommand: SlotGroupCommand{
-		public void Execute(SlotGroup sg){
+		public void Execute(ISlotGroup sg){
 			/*	update inventory
 				update item's equip status
 				update sb's equip status and state
 			*/
-			foreach(Slottable sb in sg){
+			foreach(ISlottable sb in sg){
 				if(sb != null){
 					InventoryItemInstance item = sb.itemInst;
 					if(sb.newSlotID == -1){/* removed	*/
@@ -75,7 +75,7 @@ namespace SlotSystem{
 		}
 	}
 	public class SGUpdateEquipStatusCommand: SlotGroupCommand{
-		public void Execute(SlotGroup sg){
+		public void Execute(ISlotGroup sg){
 			sg.ssm.UpdateEquipStatesOnAll();
 		}
 	}

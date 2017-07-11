@@ -4,38 +4,38 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public abstract class SGProcess: AbsSSEProcess{
-		public SlotGroup sg{
-			get{return (SlotGroup)sse;}
+		public ISlotGroup sg{
+			get{return (ISlotGroup)sse;}
 		}
 	}
 		public abstract class SGSelProcess: SGProcess{}
 			public class SGGreyinProcess: SGSelProcess{
-				public SGGreyinProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
+				public SGGreyinProcess(ISlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sg;
 					this.coroutineFake = coroutineMock;
 				}
 			}
 			public class SGGreyoutProcess: SGSelProcess{
-				public SGGreyoutProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
+				public SGGreyoutProcess(ISlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sg;
 					this.coroutineFake = coroutineMock;
 				}
 			}
 			public class SGHighlightProcess: SGSelProcess{
-				public SGHighlightProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
+				public SGHighlightProcess(ISlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sg;
 					this.coroutineFake = coroutineMock;
 				}
 			}
 			public class SGDehighlightProcess: SGSelProcess{
-				public SGDehighlightProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
+				public SGDehighlightProcess(ISlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sg;
 					this.coroutineFake = coroutineMock;
 				}
 			}
 		public abstract class SGActProcess: SGProcess{}
 			public class SGTransactionProcess: SGActProcess{
-				public SGTransactionProcess(SlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
+				public SGTransactionProcess(ISlotGroup sg, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sg;
 					this.coroutineFake = coroutineMock;
 				}

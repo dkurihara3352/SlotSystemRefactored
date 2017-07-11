@@ -343,14 +343,140 @@ namespace SlotSystemTests{
 							}
 						}
 
-			/*	Fields	*/
+			/*	Methods	*/
+			[Test]
+			[Category("Methods")]
+			public void Initialize_WhenCalled_SetsStatesVarious(){
+				Slottable sb = MakeSB();
+				BowInstance bowInst = MakeBowInstance(0);
+
+				sb.Initialize(bowInst);
+
+				InitializeWhenCalledCase actual = new InitializeWhenCalledCase(
+					sb.curSelState,
+					sb.curActState,
+					sb.curEqpState,
+					sb.curMrkState
+				);
+				InitializeWhenCalledCase expected = new InitializeWhenCalledCase(
+					Slottable.sbDeactivatedState,
+					Slottable.sbWaitForActionState,
+					null,
+					Slottable.unmarkedState
+				);
+
+				Assert.That(actual, Is.EqualTo(expected));
+
+			}
+				struct InitializeWhenCalledCase{
+					public SSEState selState;
+					public SSEState actState;
+					public SSEState eqpState;
+					public SSEState mrkState;
+					public InitializeWhenCalledCase(SSEState sel, SSEState act, SSEState eqp, SSEState mrk){
+						selState = sel;
+						actState = act;
+						eqpState = eqp;
+						mrkState = mrk;
+					}
+				}
+			[Test]
+			[Category("Methods")]
+			public void Initialize_WhenCalled_SetsItem(){
+				Slottable sb = MakeSB();
+				BowInstance bow = MakeBowInstance(0);
+				sb.Initialize(bow);
+
+				Assert.That(sb.item, Is.SameAs(bow));
+			}
+			[Test]
+			[Category("Methods")]
+			public void Pickup_WhenCalled_SetsPickedUpState(){
+				Slottable sb = MakeSB();
+				SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
+				sb.actStateEngine = mockEngine;
+				sb.PickUp();
+
+				mockEngine.Received().SetState(Slottable.pickedUpState);
+			}
+			[Test]
+			[Category("Methods")]
+			public void Pickup_WhenCalled_SetsPickedAmountOne(){
+				Slottable sb = MakeSB();
+				SSEStateEngine stubEngine = MakeSubSSEStateEngine(sb);
+				sb.actStateEngine = stubEngine;
+				sb.PickUp();
+
+				Assert.That(sb.pickedAmount, Is.EqualTo(1));
+			}
+			[TestCaseSource(typeof(IncrementCases))]
+			[Category("Methods")]
+			public void Increment_Stackable_IncrementsPickedAmountUpToQuanity(InventoryItemInstance item, int expected){
+				Slottable sb = MakeSB();
+				SSEStateEngine stubEngine = MakeSubSSEStateEngine(sb);
+				sb.actStateEngine = stubEngine;
+				sb.SetItem(item);
+
+				for(int i =0; i< expected *2; i++){
+					sb.Increment();
+				}
+
+				Assert.That(sb.pickedAmount, Is.EqualTo(expected));
+			}
+				class IncrementCases: IEnumerable{
+					public IEnumerator GetEnumerator(){
+						object[] case1 = new object[]{
+							MakePartsInstance(0, 2),
+							2
+						};
+						yield return case1;
+
+						object[] case2 = new object[]{
+							MakePartsInstance(0, 10),
+							10
+						};
+						yield return case2;
+
+					}
+				}
+			[TestCaseSource(typeof(IncrementNonStackableCases))]
+			[Category("Methods")]
+			public void Increment_NonStackable_DoesNotIncrement(InventoryItemInstance item){
+				Slottable sb = MakeSB();
+				sb.SetItem(item);
+				for(int i = 0; i < 10; i++)
+					sb.Increment();
+
+				Assert.That(sb.pickedAmount, Is.EqualTo(0));
+			}
+				class IncrementNonStackableCases: IEnumerable{
+					public IEnumerator GetEnumerator(){
+						yield return MakeBowInstance(0);
+						yield return MakeWearInstance(0);
+						yield return MakeShieldInstance(0);
+						yield return MakeMeleeWeaponInstance(0);
+						yield return MakeQuiverInstance(0);
+						yield return MakePackInstance(0);
+					}
+				}
+			[Test]
+			[Category("Methods")]
+			public void ExecuteTransaction_WhenCalled_CallsSSMExecuteTransaction(){
+				ISlotSystemManager mockSSM = MakeSubSSM();
+				Slottable stubSB = MakeSB();
+				stubSB.ssm = mockSSM;
+
+				stubSB.ExecuteTransaction();
+
+				mockSSM.Received().ExecuteTransaction();
+			}
 			/*	helper	*/
 			private static Slottable MakeSB(){
 				GameObject sbGO = new GameObject("sbGO");
 				Slottable sb = sbGO.AddComponent<Slottable>();
 				return sb;
 			}
-			SSEStateEngine MakeSubSSEStateEngine(SlotSystemElement sse){
+			SSEStateEngine MakeSubSSEStateEngine(ISlotSystemElement sse){
 				return Substitute.For<SSEStateEngine>(sse);
 			}
 			SSEProcessEngine MakeSubSSEProcEngine(){

@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public interface SGSorter{
-		void OrderSBsWithRetainedSize(ref List<Slottable> sbs);
-		void TrimAndOrderSBs(ref List<Slottable> sbs);
+		void OrderSBsWithRetainedSize(ref List<ISlottable> sbs);
+		void TrimAndOrderSBs(ref List<ISlottable> sbs);
 	}
 		public class　SGItemIDSorter: SGSorter{
-			public void OrderSBsWithRetainedSize(ref List<Slottable> sbs){
+			public void OrderSBsWithRetainedSize(ref List<ISlottable> sbs){
 				int origCount = sbs.Count;
-				List<Slottable> trimmed = sbs;
+				List<ISlottable> trimmed = sbs;
 				this.TrimAndOrderSBs(ref trimmed);
 				while(trimmed.Count < origCount){
 					trimmed.Add(null);
 				}
 				sbs = trimmed;
 			}
-			public void TrimAndOrderSBs(ref List<Slottable> sbs){
-				List<Slottable> trimmed = new List<Slottable>();
-				foreach(Slottable sb in sbs){
+			public void TrimAndOrderSBs(ref List<ISlottable> sbs){
+				List<ISlottable> trimmed = new List<ISlottable>();
+				foreach(ISlottable sb in sbs){
 					if(sb != null)
 						trimmed.Add(sb);
 				}
@@ -28,18 +28,18 @@ namespace SlotSystem{
 			}
 		}
 		public class SGInverseItemIDSorter: SGSorter{
-			public void OrderSBsWithRetainedSize(ref List<Slottable> sbs){
+			public void OrderSBsWithRetainedSize(ref List<ISlottable> sbs){
 				int origCount = sbs.Count;
-				List<Slottable> trimmed = sbs;
+				List<ISlottable> trimmed = sbs;
 				this.TrimAndOrderSBs(ref trimmed);
 				while(trimmed.Count < origCount){
 					trimmed.Add(null);
 				}
 				sbs = trimmed;
 			}
-			public void TrimAndOrderSBs(ref List<Slottable> sbs){
-				List<Slottable> trimmed = new List<Slottable>();
-				foreach(Slottable sb in sbs){
+			public void TrimAndOrderSBs(ref List<ISlottable> sbs){
+				List<ISlottable> trimmed = new List<ISlottable>();
+				foreach(ISlottable sb in sbs){
 					if(sb != null)
 						trimmed.Add(sb);
 				}
@@ -49,23 +49,23 @@ namespace SlotSystem{
 			}
 		}
 		public class SGAcquisitionOrderSorter: SGSorter{
-			public void OrderSBsWithRetainedSize(ref List<Slottable> sbs){
+			public void OrderSBsWithRetainedSize(ref List<ISlottable> sbs){
 				int origCount = sbs.Count;
-				List<Slottable> trimmed = sbs;
+				List<ISlottable> trimmed = sbs;
 				this.TrimAndOrderSBs(ref trimmed);
 				while(trimmed.Count < origCount){
 					trimmed.Add(null);
 				}
 				sbs = trimmed;
 			}
-			public void TrimAndOrderSBs(ref List<Slottable> sbs){
-				List<Slottable> trimmed = new List<Slottable>();
-				foreach(Slottable sb in sbs){
+			public void TrimAndOrderSBs(ref List<ISlottable> sbs){
+				List<ISlottable> trimmed = new List<ISlottable>();
+				foreach(ISlottable sb in sbs){
 					if(sb != null)
 						trimmed.Add(sb);
 				}
-				List<Slottable> temp = new List<Slottable>();
-				Slottable addedMax = null;
+				List<ISlottable> temp = new List<ISlottable>();
+				ISlottable addedMax = null;
 				while(temp.Count < trimmed.Count){
 					int indexAtMin = -1;
 					int addedAO;
@@ -80,7 +80,7 @@ namespace SlotSystem{
 							}
 						}
 					}
-					Slottable added = trimmed[indexAtMin];
+					ISlottable added = trimmed[indexAtMin];
 					temp.Add(added);
 					addedMax = added;
 				}

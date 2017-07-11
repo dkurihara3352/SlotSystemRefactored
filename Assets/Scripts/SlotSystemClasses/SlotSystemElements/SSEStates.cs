@@ -5,14 +5,14 @@ using Utility;
 
 namespace SlotSystem{
 	public abstract class SSEState: SwitchableState{
-		protected SlotSystemElement sse;
-		public virtual void EnterState(StateHandler handler){
-			sse = (SlotSystemElement)handler;
+		protected ISlotSystemElement sse;
+		public virtual void EnterState(IStateHandler handler){
+			sse = (ISlotSystemElement)handler;
 		}
-		public virtual void ExitState(StateHandler handler){}
+		public virtual void ExitState(IStateHandler handler){}
 	}
 	public class SSEStateEngine: SwitchableStateEngine{
-		public SSEStateEngine(SlotSystemElement sse){
+		public SSEStateEngine(ISlotSystemElement sse){
 			this.handler = sse;
 		}
 		public virtual void SetState(SSEState state){
@@ -21,13 +21,13 @@ namespace SlotSystem{
 	}
 		public abstract class SSESelState: SSEState{}
 			public class SSEDeactivatedState: SSESelState{
-				public override void EnterState(StateHandler sh){
+				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
 					sse.SetAndRunSelProcess(null);
 				}
 			}
 			public class SSEFocusedState: SSESelState{
-				public override void EnterState(StateHandler sh){
+				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
 					SSEProcess process = null;
 					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
@@ -42,7 +42,7 @@ namespace SlotSystem{
 				}
 			}
 			public class SSEDefocusedState: SSESelState{
-				public override void EnterState(StateHandler sh){
+				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
 					SSEProcess process = null;
 					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
@@ -56,7 +56,7 @@ namespace SlotSystem{
 				}
 			}
 			public class SSESelectedState : SSESelState{
-				public override void EnterState(StateHandler sh){
+				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
 					SSEProcess process = null;
 					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
@@ -73,7 +73,7 @@ namespace SlotSystem{
 			}
 		public abstract class SSEActState: SSEState{}
 			public class SSEWaitForActionState: SSEActState{
-				public override void EnterState(StateHandler sh){
+				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
 					sse.SetAndRunActProcess(null);
 				}

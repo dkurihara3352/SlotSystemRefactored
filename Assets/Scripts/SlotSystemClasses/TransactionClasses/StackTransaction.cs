@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class StackTransaction: AbsSlotSystemTransaction{
-		public Slottable m_pickedSB;
-		public SlotGroup m_origSG;
-		public Slottable m_selectedSB;
-		public SlotGroup m_selectedSG;
+		public ISlottable m_pickedSB;
+		public ISlotGroup m_origSG;
+		public ISlottable m_selectedSB;
+		public ISlotGroup m_selectedSG;
 		public List<InventoryItemInstance> itemCache = new List<InventoryItemInstance>();
-		public StackTransaction(Slottable pickedSB ,Slottable selected){
+		public StackTransaction(ISlottable pickedSB ,ISlottable selected){
 			m_pickedSB = pickedSB;
 			m_origSG = pickedSB.sg;
 			m_selectedSB = selected;
@@ -27,9 +27,9 @@ namespace SlotSystem{
 			item.Quantity = orig.m_pickedSB.pickedAmount;
 			itemCache.Add(item);
 		}
-		public override Slottable targetSB{get{return m_selectedSB;}}
-		public override SlotGroup sg1{get{return m_origSG;}}
-		public override SlotGroup sg2{get{return m_selectedSG;}}
+		public override ISlottable targetSB{get{return m_selectedSB;}}
+		public override ISlotGroup sg1{get{return m_origSG;}}
+		public override ISlotGroup sg2{get{return m_selectedSG;}}
 		public override List<InventoryItemInstance> moved{get{return itemCache;}}
 		public override void Indicate(){}
 		public override void Execute(){

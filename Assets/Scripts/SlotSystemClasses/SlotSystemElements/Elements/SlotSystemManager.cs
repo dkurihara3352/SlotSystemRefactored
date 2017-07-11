@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public class SlotSystemManager : SlotSystemPage, TransactionManager{
-		public static SlotSystemManager curSSM;
+	public class SlotSystemManager : SlotSystemPage, ISlotSystemManager{
+		public static ISlotSystemManager curSSM;
 			public void SetCurSSM(){
 				if(curSSM != null){
-					if(curSSM != this){
+					if(curSSM != (ISlotSystemManager)this){
 						curSSM.Defocus();
 						curSSM = this;
 					}else{
@@ -18,41 +18,41 @@ namespace SlotSystem{
 			}
 		/*	Managerial	*/
 			/* fields	*/
-				public List<SlotGroup> allSGs{
+				public List<ISlotGroup> allSGs{
 					get{
-						List<SlotGroup> result = new List<SlotGroup>();
+						List<ISlotGroup> result = new List<ISlotGroup>();
 						result.AddRange(allSGPs);
 						result.AddRange(allSGEs);
 						result.AddRange(allSGGs);
 						return result;
 					}
 				}
-				public List<SlotGroup> allSGPs{
+				public List<ISlotGroup> allSGPs{
 					get{
-						List<SlotGroup> result = new List<SlotGroup>();
+						List<ISlotGroup> result = new List<ISlotGroup>();
 						poolBundle.PerformInHierarchy(AddInSGList, result);
 						return result;
 					}
 				}
-				public List<SlotGroup> allSGEs{
+				public List<ISlotGroup> allSGEs{
 					get{
-						List<SlotGroup> result = new List<SlotGroup>();
+						List<ISlotGroup> result = new List<ISlotGroup>();
 						equipBundle.PerformInHierarchy(AddInSGList, result);
 						return result;
 					}
 				}
-				public List<SlotGroup> allSGGs{
+				public List<ISlotGroup> allSGGs{
 					get{
-						List<SlotGroup> result = new List<SlotGroup>();
-						foreach(SlotSystemBundle gBun in otherBundles){
+						List<ISlotGroup> result = new List<ISlotGroup>();
+						foreach(ISlotSystemBundle gBun in otherBundles){
 							gBun.PerformInHierarchy(AddInSGList, result);
 						}
 						return result;
 					}
 				}
-				public void AddInSGList(SlotSystemElement ele, IList<SlotGroup> sgs){
-					if(ele is SlotGroup)
-					sgs.Add((SlotGroup)ele);
+				public void AddInSGList(ISlotSystemElement ele, IList<ISlotGroup> sgs){
+					if(ele is ISlotGroup)
+					sgs.Add((ISlotGroup)ele);
 				}
 				public List<InventoryItemInstance> allEquippedItems{
 					get{
@@ -65,50 +65,50 @@ namespace SlotSystem{
 						return items;
 					}
 				}
-				public SlotGroup focusedSGP{
+				public ISlotGroup focusedSGP{
 					get{
 						if(poolBundle.isToggledOn){
-							SlotSystemElement focusedEle = poolBundle.focusedElement;
-							return (SlotGroup)focusedEle;
+							ISlotSystemElement focusedEle = poolBundle.focusedElement;
+							return (ISlotGroup)focusedEle;
 						}
 						return null;
 					}
 				}
-				public EquipmentSet focusedEqSet{
+				public IEquipmentSet focusedEqSet{
 					get{
 						if(equipBundle.isToggledOn)
-							return (EquipmentSet)equipBundle.focusedElement;
+							return (IEquipmentSet)equipBundle.focusedElement;
 						return null;
 					}
 				}
-				public List<SlotGroup> focusedSGEs{
+				public List<ISlotGroup> focusedSGEs{
 					get{
-						List<SlotGroup> result = new List<SlotGroup>();
-						EquipmentSet focusedEquipSet = focusedEqSet;
-						foreach(SlotSystemElement ele in focusedEquipSet){
-							result.Add((SlotGroup)ele);
+						List<ISlotGroup> result = new List<ISlotGroup>();
+						IEquipmentSet focusedEquipSet = focusedEqSet;
+						foreach(ISlotSystemElement ele in focusedEquipSet){
+							result.Add((ISlotGroup)ele);
 						}
 						return result;
 					}
 				}
-				public List<SlotGroup> focusedSGGs{
+				public List<ISlotGroup> focusedSGGs{
 					get{
-						List<SlotGroup> res = new List<SlotGroup>();
-						foreach(SlotSystemBundle gBundle in otherBundles){
+						List<ISlotGroup> res = new List<ISlotGroup>();
+						foreach(ISlotSystemBundle gBundle in otherBundles){
 							gBundle.PerformInHierarchy(AddFocusedSGTo, res);
 						}
 						return res;
 					}
 				}
-				public void AddFocusedSGTo(SlotSystemElement ele, IList<SlotGroup> list){
-					if(ele is SlotGroup){
-						SlotGroup sg = (SlotGroup)ele;
-						SlotSystemElement inspected = sg;
+				public void AddFocusedSGTo(ISlotSystemElement ele, IList<ISlotGroup> list){
+					if(ele is ISlotGroup){
+						ISlotGroup sg = (ISlotGroup)ele;
+						ISlotSystemElement inspected = sg;
 						bool isF = true;
 						while(true){
 							if(inspected.parent == null)
 								break;
-							if((inspected.isPageElement && !inspected.isToggledOn)||(inspected.isBundleElement && inspected != ((SlotSystemBundle)inspected.parent).focusedElement)){
+							if((inspected.isPageElement && !inspected.isToggledOn)||(inspected.isBundleElement && inspected != ((ISlotSystemBundle)inspected.parent).focusedElement)){
 								isF = false;
 								break;
 							}else{
@@ -119,20 +119,20 @@ namespace SlotSystem{
 							list.Add(sg);
 					}
 				}
-				public List<SlotGroup> focusedSGs{
+				public List<ISlotGroup> focusedSGs{
 					get{
-						List<SlotGroup> result = new List<SlotGroup>();
+						List<ISlotGroup> result = new List<ISlotGroup>();
 						result.Add(focusedSGP);
 						result.AddRange(focusedSGEs);
 						result.AddRange(focusedSGGs);
 						return result;
 					}
 				}
-				public List<EquipmentSet> equipmentSets{
+				public List<IEquipmentSet> equipmentSets{
 					get{
-						List<EquipmentSet> result = new List<EquipmentSet>();
-						foreach(SlotSystemElement ele in equipBundle){
-							result.Add((EquipmentSet)ele);
+						List<IEquipmentSet> result = new List<IEquipmentSet>();
+						foreach(ISlotSystemElement ele in equipBundle){
+							result.Add((IEquipmentSet)ele);
 						}
 						return result;
 					}
@@ -149,7 +149,7 @@ namespace SlotSystem{
 				}
 				public BowInstance equippedBowInst{
 					get{
-						foreach(SlotGroup sge in focusedSGEs){
+						foreach(ISlotGroup sge in focusedSGEs){
 							if(sge.Filter is SGBowFilter)
 								return (BowInstance)sge.slots[0].sb.itemInst;
 						}
@@ -158,7 +158,7 @@ namespace SlotSystem{
 				}
 				public WearInstance equippedWearInst{
 					get{
-						foreach(SlotGroup sge in focusedSGEs){
+						foreach(ISlotGroup sge in focusedSGEs){
 							if(sge.Filter is SGWearFilter)
 								return (WearInstance)sge.slots[0].sb.itemInst;
 						}
@@ -168,9 +168,9 @@ namespace SlotSystem{
 				public List<CarriedGearInstance> equippedCarriedGears{
 					get{
 						List<CarriedGearInstance> result = new List<CarriedGearInstance>();
-						foreach(SlotGroup sge in focusedSGEs){
+						foreach(ISlotGroup sge in focusedSGEs){
 							if(sge.Filter is SGCGearsFilter){
-								foreach(Slottable sb in sge){
+								foreach(ISlottable sb in sge){
 									if(sb != null)
 										result.Add((CarriedGearInstance)sb.itemInst);
 								}
@@ -185,16 +185,16 @@ namespace SlotSystem{
 						return items;
 					}
 				}
-				public List<Slottable> allSBs{
+				public List<ISlottable> allSBs{
 					get{
-						List<Slottable> res = new List<Slottable>();
+						List<ISlottable> res = new List<ISlottable>();
 						PerformInHierarchy(AddSBToRes, res);
 						return res;
 					}
 				}
-					public void AddSBToRes(SlotSystemElement ele, IList<Slottable> list){
-						if(ele is Slottable)
-							list.Add((Slottable)ele);
+					public void AddSBToRes(ISlotSystemElement ele, IList<ISlottable> list){
+						if(ele is ISlottable)
+							list.Add((ISlottable)ele);
 					}
 			/*	methods	*/
 				public void Reset(){
@@ -247,21 +247,21 @@ namespace SlotSystem{
 							itemInst.isEquipped = equippedParts != null && equippedParts.Contains((PartsInstance)itemInst);
 					}
 					/*	set sbs equip states	*/
-					foreach(SlotGroup sg in allSGs){
-						foreach(Slottable sb in sg){
+					foreach(ISlotGroup sg in allSGs){
+						foreach(ISlottable sb in sg){
 							if(sb!= null)
 								sb.UpdateEquipState();
 						}
 					}
 				}
-				public void SortSG(SlotGroup sg, SGSorter sorter){
+				public void SortSG(ISlotGroup sg, SGSorter sorter){
 					SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
 					SetTargetSB(sortTransaction.targetSB);
 					SetSG1(sortTransaction.sg1);
 					SetTransaction(sortTransaction);
 					transaction.Execute();
 				}
-				public void ChangeEquippableCGearsCount(int i, SlotGroup targetSG){
+				public void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG){
 					if(!targetSG.isExpandable){
 						if(targetSG.curSelState == SlotGroup.sgFocusedState ||
 							targetSG.curSelState == SlotGroup.sgDefocusedState){
@@ -271,7 +271,7 @@ namespace SlotSystem{
 								ResetAndFocus();
 							}
 					}else{
-						throw new System.InvalidOperationException("SlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
+						throw new System.InvalidOperationException("ISlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
 					}
 				}
 				public void MarkEquippedInPool(InventoryItemInstance item, bool equipped){
@@ -286,10 +286,10 @@ namespace SlotSystem{
 					else
 						PerformInHierarchy(Unequip, item);
 				}
-				public void Equip(SlotSystemElement ele, object obj){
-					if(ele is Slottable){
+				public void Equip(ISlotSystemElement ele, object obj){
+					if(ele is ISlottable){
 						InventoryItemInstance item = (InventoryItemInstance)obj;
-						Slottable sb = (Slottable)ele;
+						ISlottable sb = (ISlottable)ele;
 						/*	assume all sbs are properly set in slottables, not int newSBs	*/
 						if(sb.itemInst == item){
 							if(sb.sg.isFocusedInBundle){/*	focused sgp or sge	*/
@@ -302,10 +302,10 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void Unequip(SlotSystemElement ele, object obj){
-					if(ele is Slottable){
+				public void Unequip(ISlotSystemElement ele, object obj){
+					if(ele is ISlottable){
 						InventoryItemInstance item = (InventoryItemInstance)obj;
-						Slottable sb = (Slottable)ele;
+						ISlottable sb = (ISlottable)ele;
 						/*	assume all sbs are properly set in slottables, not int newSBs	*/
 						if(sb.itemInst == item){
 							if(sb.sg.isFocusedInBundle){
@@ -318,33 +318,33 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void PointFocus(SlotSystemElement ele){
+				public void PointFocus(ISlotSystemElement ele){
 					/*	focus the given element and all those above it to the root
 							if any element in the course is page element and is not toggled on, toggle it on and focus
 							if any elemen in the course is bundle element and is not the focused element in the bundle, make it the focused element and focus it
 					*/
 					FindAndFocusInBundle(ele);
 					if(ele.isPageElement){
-						SlotSystemPage page = (SlotSystemPage)ele.parent;
-						SlotSystemPageElement pageEle = page.GetPageElement(ele);
+						ISlotSystemPage page = (ISlotSystemPage)ele.parent;
+						ISlotSystemPageElement pageEle = page.GetPageElement(ele);
 						if(!pageEle.isFocusToggleOn)
 							page.TogglePageElementFocus(ele, true);
 					}
 					if(ele.isBundleElement){
-						SlotSystemBundle bundle = (SlotSystemBundle)ele.parent;
+						ISlotSystemBundle bundle = (ISlotSystemBundle)ele.parent;
 						if(bundle.focusedElement != ele){
 							bundle.SetFocusedBundleElement(ele);
 							bundle.Focus();
 						}
 					}
 				}
-				public void PrePickFilter(Slottable sb, out bool isFilteredIn){
+				public void PrePickFilter(ISlottable sb, out bool isFilteredIn){
 					bool res = false;
-					foreach(SlotGroup targetSG in ssm.focusedSGs){
+					foreach(ISlotGroup targetSG in ssm.focusedSGs){
 						if(ssm.GetTransaction(sb, targetSG).GetType() != typeof(RevertTransaction)){
 							res = true; break;
 						}
-						foreach(Slottable targetSB in targetSG){
+						foreach(ISlottable targetSB in targetSG){
 							if(ssm.GetTransaction(sb, targetSB).GetType() != typeof(RevertTransaction)){
 								res = true; break;
 							}
@@ -463,24 +463,22 @@ namespace SlotSystem{
 						return null;
 					}
 			/* public fields	*/
-				public override SlotSystemBundle immediateBundle{
+				public override ISlotSystemBundle immediateBundle{
 					get{return null;}
 				}
-				public SlotSystemBundle poolBundle{
+				public ISlotSystemBundle poolBundle{
 					get{return m_poolBundle;}
-					}SlotSystemBundle m_poolBundle;
-				public SlotSystemBundle equipBundle{
+					}ISlotSystemBundle m_poolBundle;
+				public ISlotSystemBundle equipBundle{
 					get{return m_equipBundle;}
-					}SlotSystemBundle m_equipBundle;
-				public IEnumerable<SlotSystemBundle> otherBundles{
+					}ISlotSystemBundle m_equipBundle;
+				public IEnumerable<ISlotSystemBundle> otherBundles{
 					get{
 						if(m_otherBundles == null)
-							m_otherBundles = new SlotSystemBundle[]{};
+							m_otherBundles = new ISlotSystemBundle[]{};
 						return m_otherBundles;}
-					}IEnumerable<SlotSystemBundle> m_otherBundles;
-
-
-				protected override IEnumerable<SlotSystemElement> elements{
+					}IEnumerable<ISlotSystemBundle> m_otherBundles;
+				public override IEnumerable<ISlotSystemElement> elements{
 					get{
 						yield return poolBundle;
 						yield return equipBundle;
@@ -498,18 +496,18 @@ namespace SlotSystem{
 					get{return curSelState == SlotSystemManager.ssmDeactivatedState;}
 				}
 			/*	methods	*/
-				public void Initialize(SlotSystemPageElement pBundPageEle, SlotSystemPageElement eBundPageEle , IEnumerable<SlotSystemPageElement> gBundPageEles){
+				public void Initialize(ISlotSystemPageElement pBundPageEle, ISlotSystemPageElement eBundPageEle , IEnumerable<ISlotSystemPageElement> gBundPageEles){
 					m_eName = SlotSystemUtil.Bold("SSM");
-					this.m_poolBundle = (SlotSystemBundle)pBundPageEle.element;
-					this.m_equipBundle = (SlotSystemBundle)eBundPageEle.element;
-					List<SlotSystemBundle> gBunds = new List<SlotSystemBundle>();
-					foreach(SlotSystemPageElement pageEle in gBundPageEles){
-						gBunds.Add((SlotSystemBundle)pageEle.element);
+					this.m_poolBundle = (ISlotSystemBundle)pBundPageEle.element;
+					this.m_equipBundle = (ISlotSystemBundle)eBundPageEle.element;
+					List<ISlotSystemBundle> gBunds = new List<ISlotSystemBundle>();
+					foreach(ISlotSystemPageElement pageEle in gBundPageEles){
+						gBunds.Add((ISlotSystemBundle)pageEle.element);
 					}
-					List<SlotSystemPageElement> pageEles = new List<SlotSystemPageElement>();
+					List<ISlotSystemPageElement> pageEles = new List<ISlotSystemPageElement>();
 					pageEles.Add(pBundPageEle);
 					pageEles.Add(eBundPageEle);
-					foreach(SlotSystemPageElement pageEle in gBundPageEles){
+					foreach(ISlotSystemPageElement pageEle in gBundPageEles){
 						pageEles.Add(pageEle);
 					}
 					m_pageElements = pageEles;
@@ -519,26 +517,26 @@ namespace SlotSystem{
 					SetSelState(SlotSystemManager.ssmDeactivatedState);
 					SetActState(SlotSystemManager.ssmWaitForActionState);
 				}
-				public virtual SlotSystemElement FindParent(SlotSystemElement ele){
+				public virtual ISlotSystemElement FindParent(ISlotSystemElement ele){
 					foundParent = null;
 					PerformInHierarchy(CheckAndReportParent, ele);
 					return foundParent;
-					}public SlotSystemElement foundParent;
-				void CheckAndReportParent(SlotSystemElement ele, object obj){
-					if(!(ele is Slottable)){
-						SlotSystemElement tarEle = (SlotSystemElement)obj;
-						foreach(SlotSystemElement e in ele){
+					}public ISlotSystemElement foundParent;
+				public void CheckAndReportParent(ISlotSystemElement ele, object obj){
+					if(!(ele is ISlottable)){
+						ISlotSystemElement tarEle = (ISlotSystemElement)obj;
+						foreach(ISlotSystemElement e in ele){
 							if(e == tarEle)
 								this.foundParent = ele;
 						}
 					}
 				}
-				void SetSSM(SlotSystemElement ele){
+				public void SetSSM(ISlotSystemElement ele){
 					ele.ssm = this;
 				}
-				void SetParent(SlotSystemElement ele){
-					if(!((ele is Slottable) || (ele is SlotGroup)))
-					foreach(SlotSystemElement e in ele){
+				public void SetParent(ISlotSystemElement ele){
+					if(!((ele is ISlottable) || (ele is ISlotGroup)))
+					foreach(ISlotSystemElement e in ele){
 						if(e != null)
 						e.parent = ele;
 					}
@@ -554,30 +552,30 @@ namespace SlotSystem{
 				}
 				public override void Defocus(){
 					SetSelState(SlotSystemManager.ssmDefocusedState);
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.Defocus();
 					}
 				}
 				public override void Deactivate(){
 					SetSelState(SlotSystemManager.ssmDeactivatedState);
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.Deactivate();
 					}
 					ToggleBack();
 				}
-				public void FindAndFocusInBundle(SlotSystemElement ele){
+				public void FindAndFocusInBundle(ISlotSystemElement ele){
 					PerformInHierarchy(FocusInBundle, ele);
 					}
-					public void FocusInBundle(SlotSystemElement inspected, object target){
-						SlotSystemElement targetEle = (SlotSystemElement)target;
+					public void FocusInBundle(ISlotSystemElement inspected, object target){
+						ISlotSystemElement targetEle = (ISlotSystemElement)target;
 						if(inspected == targetEle){
-							SlotSystemElement tested = inspected;
+							ISlotSystemElement tested = inspected;
 							while(true){
-								SlotSystemBundle immBundle = tested.immediateBundle;
+								ISlotSystemBundle immBundle = tested.immediateBundle;
 								if(immBundle == null)
 									break;
-								SlotSystemElement containingEle = null;
-								foreach(SlotSystemElement e in immBundle){
+								ISlotSystemElement containingEle = null;
+								foreach(ISlotSystemElement e in immBundle){
 									if(e.ContainsInHierarchy(tested) || e == tested)
 										containingEle = e;
 								}
@@ -601,7 +599,7 @@ namespace SlotSystem{
 						}
 					}
 				}
-			public void AcceptSGTAComp(SlotGroup sg){
+			public void AcceptSGTAComp(ISlotGroup sg){
 				if(sg2 != null && sg == sg2) m_sg2Done = true;
 				else if(sg1 != null && sg == sg1) m_sg1Done = true;
 				if(curActState == SlotSystemManager.ssmTransactionState){
@@ -615,16 +613,20 @@ namespace SlotSystem{
 					transactionCoroutine();
 				}
 			}
-			public virtual Slottable pickedSB{
+			public void ExecuteTransaction(){
+				SetActState(SlotSystemManager.ssmTransactionState);
+				transaction.Execute();
+			}
+			public virtual ISlottable pickedSB{
 				get{return m_pickedSB;}
-				}Slottable m_pickedSB;
-				public virtual void SetPickedSB(Slottable sb){
+				}ISlottable m_pickedSB;
+				public virtual void SetPickedSB(ISlottable sb){
 					this.m_pickedSB = sb;
 				}
-			public Slottable targetSB{
+			public ISlottable targetSB{
 				get{return m_targetSB;}
-				}Slottable m_targetSB;
-				public void SetTargetSB(Slottable sb){
+				}ISlottable m_targetSB;
+				public void SetTargetSB(ISlottable sb){
 					if(sb == null || sb != targetSB){
 						if(targetSB != null)
 							targetSB.SetSelState(Slottable.sbFocusedState);
@@ -633,10 +635,10 @@ namespace SlotSystem{
 					if(targetSB != null)
 						targetSB.SetSelState(Slottable.sbSelectedState);
 				}
-			public SlotGroup sg1{
+			public ISlotGroup sg1{
 				get{return m_sg1;}
-				}SlotGroup m_sg1;
-				public void SetSG1(SlotGroup sg){
+				}ISlotGroup m_sg1;
+				public void SetSG1(ISlotGroup sg){
 					if(sg == null || sg != sg1){
 						if(sg1 != null)
 							ReferToTAAndUpdateSelState(sg1);
@@ -650,10 +652,10 @@ namespace SlotSystem{
 				public bool sg1Done{
 				get{return m_sg1Done;}
 				}bool m_sg1Done = true;
-			public SlotGroup sg2{
+			public ISlotGroup sg2{
 				get{return m_sg2;}
-				}SlotGroup m_sg2;
-				public void SetSG2(SlotGroup sg){
+				}ISlotGroup m_sg2;
+				public void SetSG2(ISlotGroup sg){
 					if(sg == null || sg != sg2){
 						if(sg2 != null)
 							ReferToTAAndUpdateSelState(sg2);
@@ -695,31 +697,31 @@ namespace SlotSystem{
 				public bool dIcon2Done{
 				get{return m_dIcon2Done;}
 				}bool m_dIcon2Done = true;
-			public SlotSystemElement hovered{
+			public ISlotSystemElement hovered{
 				get{return m_hovered;}
-				}protected SlotSystemElement m_hovered;
-				public virtual void SetHovered(SlotSystemElement ele){
+				}protected ISlotSystemElement m_hovered;
+				public virtual void SetHovered(ISlotSystemElement ele){
 					if(ele == null || ele != hovered){
 						if(hovered != null){
-							if(hovered is Slottable)
-								((Slottable)hovered).OnHoverExitMock();
-							else if(hovered is SlotGroup)
-								((SlotGroup)hovered).OnHoverExitMock();
+							if(hovered is ISlottable)
+								((ISlottable)hovered).OnHoverExitMock();
+							else if(hovered is ISlotGroup)
+								((ISlotGroup)hovered).OnHoverExitMock();
 						}
 						m_hovered = ele;
 					}
 				}
-			public Dictionary<SlotSystemElement, SlotSystemTransaction> transactionResultsV2;
-			public virtual void CreateTransactionResultsV2(){
-				Dictionary<SlotSystemElement, SlotSystemTransaction> result = new Dictionary<SlotSystemElement, SlotSystemTransaction>();
-				foreach(SlotGroup sg in focusedSGs){
+			public Dictionary<ISlotSystemElement, SlotSystemTransaction> transactionResults;
+			public virtual void CreateTransactionResults(){
+				Dictionary<ISlotSystemElement, SlotSystemTransaction> result = new Dictionary<ISlotSystemElement, SlotSystemTransaction>();
+				foreach(ISlotGroup sg in focusedSGs){
 					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, sg);
 					result.Add(sg, ta);
 					if(ta is RevertTransaction)
 						sg.DefocusSelf();
 					else
 						sg.FocusSelf();
-					foreach(Slottable sb in sg){
+					foreach(ISlottable sb in sg){
 						if(sb != null){
 							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb);
 							result.Add(sb, ta2);
@@ -730,21 +732,21 @@ namespace SlotSystem{
 						}
 					}
 				}
-				this.transactionResultsV2 = result;
+				this.transactionResults = result;
 			}
 			public virtual void UpdateTransaction(){
 				SlotSystemTransaction ta = null;
-				if(transactionResultsV2.TryGetValue(hovered, out ta)){
+				if(transactionResults.TryGetValue(hovered, out ta)){
 					SetTargetSB(ta.targetSB);
 					SetSG1(ta.sg1);
 					SetSG2(ta.sg2);
 					SetTransaction(ta);
 				}
 			}
-			public void ReferToTAAndUpdateSelState(SlotGroup sg){
-				if(transactionResultsV2 != null){
+			public void ReferToTAAndUpdateSelState(ISlotGroup sg){
+				if(transactionResults != null){
 					SlotSystemTransaction ta = null;
-					if(transactionResultsV2.TryGetValue(sg, out ta)){
+					if(transactionResults.TryGetValue(sg, out ta)){
 						if(ta is RevertTransaction)
 							sg.SetSelState(SlotGroup.sgDefocusedState);
 						else
@@ -753,8 +755,59 @@ namespace SlotSystem{
 				}else
 					sg.SetSelState(SlotGroup.sgFocusedState);
 			}
-			public SlotSystemTransaction GetTransaction(Slottable pickedSB, SlotSystemElement hovered){
+			public SlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
 				return AbsSlotSystemTransaction.GetTransaction(pickedSB, hovered);
 			}
+	}
+	public interface ISlotSystemManager: IAbsSlotSystemElement, TransactionManager{
+		void SetCurSSM();
+		IEnumeratorFake probeCoroutine();
+		IEnumeratorFake transactionCoroutine();
+		/*	Managerial */
+			List<ISlotGroup> allSGs{get;}
+			List<ISlotGroup> allSGPs{get;}
+			List<ISlotGroup> allSGEs{get;}
+			List<ISlotGroup> allSGGs{get;}
+			void AddInSGList(ISlotSystemElement ele, IList<ISlotGroup> sgs);
+			List<InventoryItemInstance> allEquippedItems{get;}
+			ISlotGroup focusedSGP{get;}
+			IEquipmentSet focusedEqSet{get;}
+			List<ISlotGroup> focusedSGEs{get;}
+			List<ISlotGroup> focusedSGGs{get;}
+			void AddFocusedSGTo(ISlotSystemElement ele, IList<ISlotGroup> list);
+			List<ISlotGroup> focusedSGs{get;}
+			List<IEquipmentSet> equipmentSets{get;}
+			PoolInventory poolInv{get;}
+			EquipmentSetInventory equipInv{get;}
+			BowInstance equippedBowInst{get;}
+			WearInstance equippedWearInst{get;}
+			List<CarriedGearInstance> equippedCarriedGears{get;}
+			List<PartsInstance> equippedParts{get;}
+			List<ISlottable> allSBs{get;}
+			void AddSBToRes(ISlotSystemElement ele, IList<ISlottable> list);
+			void Reset();
+			void ResetAndFocus();
+			void ClearFields();
+			void UpdateEquipStatesOnAll();
+			void SortSG(ISlotGroup sg, SGSorter sorter);
+			void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG);
+			void MarkEquippedInPool(InventoryItemInstance item, bool equipped);
+			void SetEquippedOnAllSBs(InventoryItemInstance item, bool equipped);
+			void Equip(ISlotSystemElement ele, object obj);
+			void Unequip(ISlotSystemElement ele, object obj);
+			void PointFocus(ISlotSystemElement ele);
+			void PrePickFilter(ISlottable sb, out bool isFilteredIn);
+			void ExecuteTransaction();
+		/*	SlotSystemElement 	*/
+			ISlotSystemBundle poolBundle{get;}
+			ISlotSystemBundle equipBundle{get;}
+			IEnumerable<ISlotSystemBundle> otherBundles{get;}
+			ISlotSystemElement FindParent(ISlotSystemElement ele);
+			void CheckAndReportParent(ISlotSystemElement ele, object obj);
+			void SetSSM(ISlotSystemElement ele);
+			void SetParent(ISlotSystemElement ele);
+			void FindAndFocusInBundle(ISlotSystemElement ele);
+			void FocusInBundle(ISlotSystemElement inspected, object target);
+		
 	}
 }

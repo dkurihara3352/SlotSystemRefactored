@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SBClone: Slottable{
-		public override SlotSystemElement parent{
+		public override ISlotSystemElement parent{
 			get{return m_parent;}
-		}SlotSystemElement m_parent;
-		public void Initialize(Slottable orig){
+		}ISlotSystemElement m_parent;
+		public void Initialize(ISlottable orig){
 			this.delayed = orig.delayed;
 			this.SetItem(orig.itemInst);
 			m_parent = orig.sg;

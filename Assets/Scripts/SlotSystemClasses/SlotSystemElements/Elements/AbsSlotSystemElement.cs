@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace SlotSystem{
-	public abstract class AbsSlotSystemElement :MonoBehaviour, SlotSystemElement{
+	public abstract class AbsSlotSystemElement :MonoBehaviour, IAbsSlotSystemElement{
 		/*	state	*/
 			public SSEStateEngine selStateEngine{
 				get{
@@ -15,9 +15,11 @@ namespace SlotSystem{
 				}SSEStateEngine m_selStateEngine;
 				public virtual SSEState prevSelState{
 					get{return (SSESelState)selStateEngine.prevState;}
+					set{}
 				}
 				public virtual SSEState curSelState{
 					get{return (SSEState)selStateEngine.curState;}
+					set{}
 				}
 				public virtual void SetSelState(SSEState state){
 					if(state == null || state is SSESelState)
@@ -63,9 +65,11 @@ namespace SlotSystem{
 				}SSEStateEngine m_actStateEngine;
 				public virtual SSEState prevActState{
 					get{return (SSEActState)actStateEngine.prevState;}
+					set{}
 				}
 				public virtual SSEState curActState{
 					get{return (SSEActState)actStateEngine.curState;}
+					set{}
 				}
 				public virtual void SetActState(SSEState state){
 					if(state == null || state is SSEActState)
@@ -92,6 +96,7 @@ namespace SlotSystem{
 					}SSEProcessEngine m_selProcEngine;
 					public virtual SSEProcess selProcess{
 						get{return (SSESelProcess)selProcEngine.process;}
+						set{}
 					}
 					public virtual void SetAndRunSelProcess(SSEProcess process){
 						if(process == null||process is SSESelProcess)
@@ -121,6 +126,7 @@ namespace SlotSystem{
 					}SSEProcessEngine m_actProcEngine;
 					public virtual SSEProcess actProcess{
 						get{return (SSEActProcess)actProcEngine.process;}
+						set{}
 					}
 					public virtual void SetAndRunActProcess(SSEProcess process){
 						if(process == null || process is SSEActProcess)
@@ -128,7 +134,7 @@ namespace SlotSystem{
 						else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");
 					}
 		/*	public fields	*/
-			public virtual SlotSystemElement this[int i]{
+			public virtual ISlotSystemElement this[int i]{
 				get{
 					int id = 0;
 					foreach(var ele in elements){
@@ -139,26 +145,26 @@ namespace SlotSystem{
 				}
 			}
 			public virtual string eName{get{return m_eName;}}protected string m_eName;
-			protected abstract IEnumerable<SlotSystemElement> elements{get;}
-			public virtual SlotSystemElement parent{
+			public abstract IEnumerable<ISlotSystemElement> elements{get;}
+			public virtual ISlotSystemElement parent{
 				get{return m_parent;}
 				set{m_parent = value;}
-				}SlotSystemElement m_parent;
-			public virtual SlotSystemBundle immediateBundle{
+				}ISlotSystemElement m_parent;
+			public virtual ISlotSystemBundle immediateBundle{
 				get{
 					if(parent == null)
 						return null;
-					if(parent is SlotSystemBundle)
-						return (SlotSystemBundle)parent;
+					if(parent is ISlotSystemBundle)
+						return (ISlotSystemBundle)parent;
 					else
 						return parent.immediateBundle;
 				}
 				set{}
 			}
-			public SlotSystemManager ssm{
+			public ISlotSystemManager ssm{
 				get{return m_ssm;}
 				set{m_ssm = value;}
-				}SlotSystemManager m_ssm;
+				}ISlotSystemManager m_ssm;
 			public virtual int level{
 				get{
 					if(parent == null)
@@ -168,18 +174,18 @@ namespace SlotSystem{
 			}
 			public bool isBundleElement{
 				get{
-					return parent is SlotSystemBundle;
+					return parent is ISlotSystemBundle;
 				}
 			}
 			public bool isPageElement{
 				get{
-					return (parent is SlotSystemPage);
+					return (parent is ISlotSystemPage);
 				}
 			}
 			public bool isToggledOn{
 				get{
 					if(isPageElement){
-						SlotSystemPage page = (SlotSystemPage)parent;
+						ISlotSystemPage page = (ISlotSystemPage)parent;
 						return (page.GetPageElement(this).isFocusToggleOn);
 					}
 					return false;
@@ -187,16 +193,19 @@ namespace SlotSystem{
 			}
 			public virtual bool isFocused{
 				get{return curSelState == AbsSlotSystemElement.focusedState;}
+				set{}
 			}
 			public virtual bool isDefocused{
 				get{return curSelState == AbsSlotSystemElement.defocusedState;}
+				set{}
 			}
 			public virtual bool isDeactivated{
 				get{return curSelState == AbsSlotSystemElement.deactivatedState;}
+				set{}
 			}
 			public bool isFocusedInHierarchy{
 				get{
-					SlotSystemElement inspected = this;
+					ISlotSystemElement inspected = this;
 					while(true){
 						if(inspected　== null)
 							break;
@@ -213,19 +222,19 @@ namespace SlotSystem{
 				SetSelState(AbsSlotSystemElement.deactivatedState);
 				SetActState(AbsSlotSystemElement.waitForActionState);
 			}
-			public virtual IEnumerator<SlotSystemElement> GetEnumerator(){
-				foreach(SlotSystemElement ele in elements)
+			public virtual IEnumerator<ISlotSystemElement> GetEnumerator(){
+				foreach(ISlotSystemElement ele in elements)
 					yield return ele;
 				}IEnumerator IEnumerable.GetEnumerator(){
 					return GetEnumerator();
 				}
-			public virtual bool ContainsInHierarchy(SlotSystemElement ele){
+			public virtual bool ContainsInHierarchy(ISlotSystemElement ele){
 				if(ele != null){
-					SlotSystemElement testEle = ele.parent;
+					ISlotSystemElement testEle = ele.parent;
 					while(true){
 						if(testEle == null)
 							return false;
-						if(testEle == (SlotSystemElement)this)
+						if(testEle == (ISlotSystemElement)this)
 							return true;
 						testEle = testEle.parent;
 					}
@@ -233,14 +242,14 @@ namespace SlotSystem{
 				throw new System.ArgumentNullException();
 			}
 			public virtual void Activate(){
-				foreach(SlotSystemElement ele in this){
+				foreach(ISlotSystemElement ele in this){
 					ele.Activate();
 				}
 			}
 			public virtual void Deactivate(){
 				SetSelState(AbsSlotSystemElement.deactivatedState);
 				if(elements != null){
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.Deactivate();
 					}
 				}
@@ -248,41 +257,41 @@ namespace SlotSystem{
 			public virtual void Focus(){
 				SetSelState(AbsSlotSystemElement.focusedState);
 				if(elements != null)
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.Focus();
 					}
 			}
 			public virtual void Defocus(){
 				SetSelState(AbsSlotSystemElement.defocusedState);
 				if(elements != null)
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.Defocus();
 					}
 			}
-			public virtual void PerformInHierarchy(System.Action<SlotSystemElement> act){
+			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement> act){
 				act(this);
 				if(elements != null)
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.PerformInHierarchy(act);
 					}
 			}
-			public virtual void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
 				act(this, obj);
 				if(elements != null)
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.PerformInHierarchy(act, obj);
 					}
 			}
-			public virtual void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
+			public virtual void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list){
 				act(this, list);
 				if(elements != null)
-					foreach(SlotSystemElement ele in this){
+					foreach(ISlotSystemElement ele in this){
 						ele.PerformInHierarchy<T>(act, list);
 					}
 			}
-			public virtual bool Contains(SlotSystemElement element){
+			public virtual bool Contains(ISlotSystemElement element){
 				if(elements != null)
-					foreach(SlotSystemElement ele in elements){
+					foreach(ISlotSystemElement ele in elements){
 						if(ele != null && ele == element)
 							return true;
 					}
@@ -290,8 +299,8 @@ namespace SlotSystem{
 			}
 			public void ToggleOnPageElement(){
 				if(isPageElement){
-					SlotSystemPage page = (SlotSystemPage)parent;
-					SlotSystemPageElement pageEle = page.GetPageElement(this);
+					ISlotSystemPage page = (ISlotSystemPage)parent;
+					ISlotSystemPageElement pageEle = page.GetPageElement(this);
 					if(!pageEle.isFocusToggleOn)
 						pageEle.isFocusToggleOn = true;
 				}
@@ -299,5 +308,15 @@ namespace SlotSystem{
 			public virtual void InstantGreyout(){}
 			public virtual void InstantGreyin(){}
 			public virtual void InstantHighlight(){}
+	}
+	public interface IAbsSlotSystemElement: ISlotSystemElement{
+		IEnumerable<ISlotSystemElement> elements{get;}
+		SSEStateEngine selStateEngine{get;set;}
+		void SetSelState(SSEState state);
+		SSEStateEngine actStateEngine{get;set;}
+		void SetActState(SSEState state);
+		SSEProcessEngine selProcEngine{get;set;}
+		SSEProcessEngine actProcEngine{get;set;}
+		void Initialize();
 	}
 }

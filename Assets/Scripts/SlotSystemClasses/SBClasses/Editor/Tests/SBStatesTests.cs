@@ -14,71 +14,62 @@ namespace SlotSystemTests{
 		public class SBStatesTest: AbsSlotSystemTest{
 			/*	SBSelStates */
 				[Test]
-				public void SBSelState_OnHoverEnterMock_WhenCalled_SetsSSMsHoveredWithSB(){
+				public void SBSelState_OnHoverEnterMock_WhenCalled_CallsSBSetHovered(){
 					FakeSBSelState sbSelState = new FakeSBSelState();
-					FakeSB stubSB = MakeFakeSB();
-					TestSSM mockSSM = MakeFakeSSM();
-					stubSB.SetSSM(mockSSM);
+					ISlottable stubSB = MakeSubSB();
 
 					sbSelState.OnHoverEnterMock(stubSB, new PointerEventDataFake());
 
-					Assert.That(mockSSM.hovered, Is.SameAs(stubSB));
+					stubSB.Received().SetHovered();
 				}
 				/*	SBDeactivatedState	*/
 					[Test]
 					public void SBDeactivatedState_EnterState_WhenCalled_SetsSBsSelProcToNull(){
 						SBDeactivatedState deactState = new SBDeactivatedState();
-						FakeSB mockSB = MakeFakeSB();
-						FakeSBSelState stubState = new FakeSBSelState();
-						mockSB.SetSelState(stubState);
+						ISlottable mockSB = MakeSubSB();
 
 						deactState.EnterState(mockSB);
 
-						Assert.That(mockSB.selProcess, Is.Null);
+						mockSB.Received().SetAndRunSelProcess(null);
 					}
 				/*	SBFocusedState	*/
 					[Test]
 					public void SBFocusedState_EnterState_FromSBDeactivated_CallsInstantGreyin(){
 						SBFocusedState focState = new SBFocusedState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetPrevSelState(Slottable.sbDeactivatedState);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.prevSelState = Slottable.sbDeactivatedState;
 
 						focState.EnterState(mockSB);
 
-						Assert.That(mockSB.message, Is.StringContaining("InstantGreyin called"));
+						mockSB.Received().InstantGreyin();
 					}
 					[Test]
 					public void SBFocusedState_EnterState_FromSBDeactivated_SetsSelProcNull(){
 						SBFocusedState focState = new SBFocusedState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetPrevSelState(Slottable.sbDeactivatedState);
-						FakeSBselProcess stubSBSelProc = new FakeSBselProcess();
-						mockSB.SetAndRunSelProcess((SSEProcess)stubSBSelProc);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.prevSelState = Slottable.sbDeactivatedState;
 
 						focState.EnterState(mockSB);
 
-						Assert.That(mockSB.selProcess, Is.Null);
+						mockSB.Received().SetAndRunSelProcess(null);
 					}
 					[TestCaseSource(typeof(SBFocusedStateEnterStateFromNonDeactivated))]
-					public void SBFocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly(SBSelState prevState, Type procType){
+					public void SBFocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T sgProc) where T: SGSelProcess{
 						SBFocusedState focState = new SBFocusedState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetPrevSelState(prevState);
-						FakeSBselProcess stubSBSelProc = new FakeSBselProcess();
-						mockSB.SetAndRunSelProcess((SSEProcess)stubSBSelProc);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.prevSelState = prevState;
 
 						focState.EnterState(mockSB);
 
-						Assert.That(mockSB.selProcess, Is.TypeOf(procType));
-
+						mockSB.Received().SetAndRunSelProcess(Arg.Any<T>());
 					}
 						class SBFocusedStateEnterStateFromNonDeactivated: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								object[] case1 = new object[]{
-									Slottable.sbDefocusedState, typeof(SBGreyinProcess)
+									Slottable.sbDefocusedState, new SBGreyinProcess(MakeSubSB(), FakeCoroutine)
 								};
 								object[] case2 = new object[]{
-									Slottable.sbSelectedState, typeof(SBDehighlightProcess)
+									Slottable.sbSelectedState, new SBDehighlightProcess(MakeSubSB(), FakeCoroutine)
 								};
 								yield return case1;
 								yield return case2;
@@ -88,45 +79,41 @@ namespace SlotSystemTests{
 					[Test]
 					public void SBDefocusedState_EnterState_FromSGDeactivated_CallsInstantGreyout(){
 						SBDefocusedState defocState = new SBDefocusedState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetPrevSelState(Slottable.sbDeactivatedState);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.prevSelState = Slottable.sbDeactivatedState;
 
 						defocState.EnterState(mockSB);
 
-						Assert.That(mockSB.message, Is.StringContaining("InstantGreyout called"));
+						mockSB.Received().InstantGreyout();
 					}
 					[Test]
 					public void SBDefocusedState_EnterState_FromSBDeactivated_SetsSelProcNull(){
 						SBDefocusedState defocState = new SBDefocusedState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetPrevSelState(Slottable.sbDeactivatedState);
-						FakeSBselProcess stubSBSelProc = new FakeSBselProcess();
-						mockSB.SetAndRunSelProcess((SSEProcess)stubSBSelProc);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.prevSelState = Slottable.sbDeactivatedState;
+						mockSB.selProcess = MakeSubSBSelProc();
 
 						defocState.EnterState(mockSB);
 
-						Assert.That(mockSB.selProcess, Is.Null);
+						mockSB.Received().SetAndRunSelProcess(null);
 					}
 					[TestCaseSource(typeof(SBDefocusedStateEnterStateFromNonDeactivated))]
-					public void SBDefocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly(SBSelState prevState, Type procType){
+					public void SBDefocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: SBSelProcess{
 						SBDefocusedState focState = new SBDefocusedState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetPrevSelState(prevState);
-						FakeSBselProcess stubSBSelProc = new FakeSBselProcess();
-						mockSB.SetAndRunSelProcess((SSEProcess)stubSBSelProc);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.prevSelState = prevState;
 
 						focState.EnterState(mockSB);
 
-						Assert.That(mockSB.selProcess, Is.TypeOf(procType));
-
+						mockSB.Received().SetAndRunSelProcess(Arg.Any<T>());
 					}
 						class SBDefocusedStateEnterStateFromNonDeactivated: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								object[] case1 = new object[]{
-									Slottable.sbFocusedState, typeof(SBGreyoutProcess)
+									Slottable.sbFocusedState, new SBGreyoutProcess(MakeSubSB(), FakeCoroutine)
 								};
 								object[] case2 = new object[]{
-									Slottable.sbSelectedState, typeof(SBGreyoutProcess)
+									Slottable.sbSelectedState, new SBGreyoutProcess(MakeSubSB(), FakeCoroutine)
 								};
 								yield return case1;
 								yield return case2;
@@ -136,45 +123,40 @@ namespace SlotSystemTests{
 				[Test]
 				public void SBSelectedState_EnterState_FromSGDeactivated_CallsInstantHighlight(){
 					SBSelectedState defocState = new SBSelectedState();
-					FakeSB mockSB = MakeFakeSB();
-					mockSB.SetPrevSelState(Slottable.sbDeactivatedState);
+					ISlottable mockSB = MakeSubSB();
+					mockSB.prevSelState = Slottable.sbDeactivatedState;
 
 					defocState.EnterState(mockSB);
 
-					Assert.That(mockSB.message, Is.StringContaining("InstantHighlight called"));
+					mockSB.Received().InstantHighlight();
 				}
 				[Test]
 				public void SBSelectedState_EnterState_FromSBDeactivated_SetsSelProcNull(){
 					SBSelectedState defocState = new SBSelectedState();
-					FakeSB mockSB = MakeFakeSB();
-					mockSB.SetPrevSelState(Slottable.sbDeactivatedState);
-					FakeSBselProcess stubSBSelProc = new FakeSBselProcess();
-					mockSB.SetAndRunSelProcess((SSEProcess)stubSBSelProc);
+					ISlottable mockSB = MakeSubSB();
+					mockSB.prevSelState = Slottable.sbDeactivatedState;
 
 					defocState.EnterState(mockSB);
 
-					Assert.That(mockSB.selProcess, Is.Null);
+					mockSB.Received().SetAndRunSelProcess(null);
 				}
 				[TestCaseSource(typeof(SBSelectedStateEnterStateFromNonDeactivated))]
-				public void SBSelectedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly(SBSelState prevState, Type procType){
+				public void SBSelectedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: SBSelProcess{
 					SBSelectedState focState = new SBSelectedState();
-					FakeSB mockSB = MakeFakeSB();
-					mockSB.SetPrevSelState(prevState);
-					FakeSBselProcess stubSBSelProc = new FakeSBselProcess();
-					mockSB.SetAndRunSelProcess((SSEProcess)stubSBSelProc);
+					ISlottable mockSB = MakeSubSB();
+					mockSB.prevSelState = prevState;
 
 					focState.EnterState(mockSB);
 
-					Assert.That(mockSB.selProcess, Is.TypeOf(procType));
-
+					mockSB.Received().SetAndRunSelProcess(Arg.Any<T>());
 				}
 					class SBSelectedStateEnterStateFromNonDeactivated: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] case1 = new object[]{
-								Slottable.sbFocusedState, typeof(SBHighlightProcess)
+								Slottable.sbFocusedState, new SBHighlightProcess(MakeSubSB(), FakeCoroutine)
 							};
 							object[] case2 = new object[]{
-								Slottable.sbDefocusedState, typeof(SBHighlightProcess)
+								Slottable.sbDefocusedState, new SBHighlightProcess(MakeSubSB(), FakeCoroutine)
 							};
 							yield return case1;
 							yield return case2;
@@ -183,378 +165,345 @@ namespace SlotSystemTests{
 			/*	SBActStates	*/
 				/*	WaitForActionState	*/
 					[Test]
-					public void WaitForActionState_EnterState_Always_SetsSelProcNull(){
+					public void WaitForActionState_EnterState_Always_SetsActProcNull(){
 						WaitForActionState wfaState = new WaitForActionState();
-						FakeSB mockSB = MakeFakeSB();
-						FakeSBactProcess stubActProc = new FakeSBactProcess();
-						mockSB.SetAndRunActProcess(stubActProc);
+						ISlottable mockSB = MakeSubSB();
 
 						wfaState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.Null);
+						mockSB.Received().SetAndRunActProcess(null);
 					}
 					[Test]
 					public void WaitForActionState_OnPointerUpMock_WhenCalled_CallsSBMethods(){
 						WaitForActionState wfaState = new WaitForActionState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
 
 						wfaState.OnPointerUpMock(mockSB, new PointerEventDataFake());
-
-						Assert.That(mockSB.isTapCalled, Is.True);
-						Assert.That(mockSB.isResetCalled, Is.True);
-						Assert.That(mockSB.isDefocusCalled, Is.True);
 						
-						mockSB.ResetCallCheck();
+						Received.InOrder(() => {
+							mockSB.Tap();
+							mockSB.Reset();
+							mockSB.Defocus();
+						});
 					}
 					[Test]
 					public void WaitForActionState_OnEndDrag_WhenCalled_CallsSBMethods(){
 						WaitForActionState wfaState = new WaitForActionState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
 
 						wfaState.OnEndDragMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isResetCalled, Is.True);
-						Assert.That(mockSB.isDefocusCalled, Is.True);
-
-						mockSB.ResetCallCheck();
+						Received.InOrder( () => {
+							mockSB.Reset();
+							mockSB.Defocus();
+						});
 					}
 					[Test]
 					public void WaitForActionState_OnPointerDown_IsNotFocused_SetsActStateWFPointerUpState(){
 						WaitForActionState wfaState = new WaitForActionState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsFocused(false);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isFocused = false;
 
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.curActState, Is.SameAs(Slottable.waitForPointerUpState));
+						mockSB.Received().SetActState(Slottable.waitForPointerUpState);
 					}
 					[Test]
 					public void WaitForActionState_OnPointerDown_IsFocused_SetsComplexStates(){
 						WaitForActionState wfaState = new WaitForActionState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsFocused(true);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isFocused = false;
 
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.curActState, Is.SameAs(Slottable.waitForPickUpState));
-						Assert.That(mockSB.curSelState, Is.SameAs(Slottable.sbSelectedState));
+						mockSB.Received().SetActState(Slottable.waitForPickUpState);
+						mockSB.Received().SetSelState(Slottable.sbSelectedState);
 					}
 
 				/*	WaitForPickUpState	*/
 					[Test]
 					public void WaitForPickUpState_EnterState_WhenCalled_SetsActProcWFPickUpProcess(){
 						WaitForPickUpState wfpuState = new WaitForPickUpState();
-						FakeSB mockSB = MakeFakeSB();
+						ISlottable mockSB = MakeSubSB();
 
 						wfpuState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(WaitForPickUpProcess)));
+						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForPickUpProcess>());
 					}
 					[Test]
 					public void WaitForPickUpState_OnPointerUp_WhenCalled_SetsActStateWFNTState(){
 						WaitForPickUpState wfpuState = new WaitForPickUpState();
-						FakeSB mockSB = MakeFakeSB();
+						ISlottable mockSB = MakeSubSB();
 
 						wfpuState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.curActState, Is.SameAs(Slottable.waitForNextTouchState));
+						mockSB.Received().SetActState(Slottable.waitForNextTouchState);
 					}
 					[Test]
 					public void WaitForPickUpState_OnEndDrag_WhenCalled_CallsSBMethods(){
 						WaitForPickUpState wfpuState = new WaitForPickUpState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
 
 						wfpuState.OnEndDragMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isResetCalled, Is.True);
-						Assert.That(mockSB.isFocusCalled, Is.True);
-
-						mockSB.ResetCallCheck();
+						Received.InOrder(()=> {
+							mockSB.Reset();
+							mockSB.Focus();
+						});
 					}
 				/*	WaitForPointerUpState	*/
 					[Test]
 					public void WaitForPointerUpState_EnterState_WhenCalled_SetsSBActProcWFPtUProcess(){
 						WaitForPointerUpState wfptuState = new WaitForPointerUpState();
-						FakeSB mockSB = MakeFakeSB();
+						ISlottable mockSB = MakeSubSB();
 
 						wfptuState.EnterState(mockSB);
 
 						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(WaitForPointerUpProcess)));
+						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForPointerUpProcess>());
 					}
 					[Test]
 					public void WaitForPointerUpState_OnPointerUp_WhenCalled_CallsSB(){
 						WaitForPointerUpState wfptuState = new WaitForPointerUpState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
 
 						wfptuState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isTapCalled, Is.True);
-						Assert.That(mockSB.isResetCalled, Is.True);
-						Assert.That(mockSB.isDefocusCalled, Is.True);
-
-						mockSB.ResetCallCheck();
+						Received.InOrder(() => {
+							mockSB.Tap();
+							mockSB.Reset();
+							mockSB.Defocus();
+						});
 					}
 					[Test]
 					public void WaitForPointerUpState_OnEndDrag_WhenCalled_CallsSB(){
 						WaitForPointerUpState wfptuState = new WaitForPointerUpState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
 
 						wfptuState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isResetCalled, Is.True);
-						Assert.That(mockSB.isDefocusCalled, Is.True);
-
-						mockSB.ResetCallCheck();
+						Received.InOrder(() => {
+							mockSB.Reset();
+							mockSB.Defocus();
+						});
 					}
 				/*	WaitForNextTouchState	*/
 					[Test]
 					public void WaitForNextTouchState_EnterState_WhenCalled_SetsSBActProcWFNTProcess(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
-						FakeSB mockSB = MakeFakeSB();
+						ISlottable mockSB = MakeSubSB();
 
 						wfntState.EnterState(mockSB);
 
 						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(WaitForNextTouchProcess)));
+						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForNextTouchProcess>());
 					}
 					[Test]
 					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_SetsActStatePickedUpState(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsPickedUp(true);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isPickedUp = true;
 
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.curActState, Is.SameAs(Slottable.pickedUpState));
+						mockSB.Received().SetActState(Slottable.pickedUpState);
 					}
 					[Test]
 					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_CallSBIncrement(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsPickedUp(true);
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isPickedUp = true;
 
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isIncrementCalled, Is.True);
-						
-						mockSB.ResetCallCheck();
+						mockSB.Received().Increment();
 					}
 					[Test]
 					public void WaitForNextTouchState_OnPointerDown_IsNotPickedUp_CallSBPickUp(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsPickedUp(false);
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isPickedUp = false;
 
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isPickUpCalled, Is.True);
-						
-						mockSB.ResetCallCheck();
+						mockSB.Received().PickUp();
 					}
 					[Test]
-					public void WaitForNextTouchState_OnDeselected_WhenCalled_CallSB(){
+					public void WaitForNextTouchState_OnDeselected_IsNotPickedUp_CallSB(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsPickedUp(false);
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isPickedUp = false;
 
 						wfntState.OnDeselectedMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isResetCalled, Is.True);
-						Assert.That(mockSB.isFocusCalled, Is.True);
-						
-						mockSB.ResetCallCheck();
+						Received.InOrder(() => {
+							mockSB.Reset();
+							mockSB.Focus();
+						});
 					}
 				/*	PickedUpState	*/
 					[Test]
 					public void PickedUpState_EnterState_WhenCalled_CallSB(){
 						PickedUpState puState = new PickedUpState();
-						FakeSB mockSB = MakeFakeSB();
-						TestSSM stubSSM = MakeFakeSSM();
-						mockSB.SetSSM(stubSSM);
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
+						ISlotSystemManager stubSSM = MakeSubSSM();
+						mockSB.ssm = stubSSM;
 
 						puState.EnterState(mockSB);
 
-						IEnumerable<bool> callChecksNoArg = new bool[]{
-							mockSB.isSetPickedSBCalled,
-							mockSB.isSetDIcon1Called,
-							mockSB.isCTRCalled,
-							mockSB.isOnHoverEnterCalled,
-							mockSB.isUpdateTACalled
-						};
-						Assert.That(callChecksNoArg, Is.All.True);
-						
-						mockSB.ResetCallCheck();
+						Received.InOrder(() => {
+							mockSB.SetPickedSB();
+							mockSB.SetDIcon1();
+							mockSB.CreateTAResult();
+							mockSB.OnHoverEnterMock();
+							mockSB.UpdateTA();
+						});
 					}
 					[Test]
 					public void PickedUpState_EnterState_WhenCalled_SetsSSMActStateProbing(){
 						PickedUpState puState = new PickedUpState();
-						FakeSB mockSB = MakeFakeSB();
-						TestSSM stubSSM = MakeFakeSSM();
-						mockSB.SetSSM(stubSSM);
+						ISlottable mockSB = MakeSubSB();
+						ISlotSystemManager stubSSM = MakeSubSSM();
+						mockSB.ssm = stubSSM;
 
 						puState.EnterState(mockSB);
 
-						Assert.That(mockSB.SSMActStateSet, Is.SameAs(SlotSystemManager.ssmProbingState));
+						mockSB.Received().SetSSMActState(SlotSystemManager.ssmProbingState);
 					}
 					[Test]
 					public void PickedUpState_EnterState_WhenCalled_SetsActProcPickedUpProcess(){
 						PickedUpState puState = new PickedUpState();
-						FakeSB mockSB = MakeFakeSB();
-						TestSSM stubSSM = MakeFakeSSM();
-						mockSB.SetSSM(stubSSM);
+						ISlottable mockSB = MakeSubSB();
+						ISlotSystemManager stubSSM = MakeSubSSM();
+						mockSB.ssm = stubSSM;
 
 						puState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(SBPickedUpProcess)));
+						mockSB.Received().SetAndRunActProcess(Arg.Any<SBPickedUpProcess>());
 					}
 					[Test]
 					public void PickedUpState_OnDeselected_WhenCalled_CallSB(){
 						PickedUpState puState = new PickedUpState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
 
 						puState.OnDeselectedMock(mockSB, new PointerEventDataFake());
 
-						IEnumerable<bool> checkCalls = new bool[]{
-							mockSB.isResetCalled,
-							mockSB.isFocusCalled
-						};
-
-						Assert.That(checkCalls, Is.All.True);
-						
-						mockSB.ResetCallCheck();
+						Received.InOrder(() => {
+							mockSB.Reset();
+							mockSB.Focus();
+						});
 					}
 					[Test]
 					public void PickedUpState_OnPointerUp_IsHoveredAndIsStackable_SetsActStateWFNTState(){
 						PickedUpState puState = new PickedUpState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsHovered(true);
-						mockSB.SetIsStackable(true);
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isHovered = true;
+						mockSB.isStackable = true;
 
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.curActState, Is.SameAs(Slottable.waitForNextTouchState));
+						mockSB.Received().SetActState(Slottable.waitForNextTouchState);
 					}
 					[Test]
 					public void PickedUpState_OnPointerUp_NOTIsHoveredAndIsStackable_CallSB(){
 						PickedUpState puState = new PickedUpState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.SetIsHovered(false);
-						mockSB.SetIsStackable(true);
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isHovered = false;
+						mockSB.isStackable = true;
 
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isExecuteTransactionCalled, Is.True);
-						
-						mockSB.ResetCallCheck();
+						mockSB.Received().ExecuteTransaction();
 					}
 					[Test]
 					public void PickedUpState_OnEndDrag_WhenCalled_CallSB(){
 						PickedUpState puState = new PickedUpState();
-						FakeSB mockSB = MakeFakeSB();
-						mockSB.ResetCallCheck();
+						ISlottable mockSB = MakeSubSB();
 
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						Assert.That(mockSB.isExecuteTransactionCalled, Is.True);
-						
-						mockSB.ResetCallCheck();
+						mockSB.Received().ExecuteTransaction();
 					}
 				/*	SBMoveWithinState	*/
 					[Test]
 					public void SBMoveWithinState_EnterState_WhenCalled_SetsActProcSBMWProcess(){
 						SBMoveWithinState mwState = new SBMoveWithinState();
-						FakeSB mockSB = MakeFakeSB();
+						ISlottable mockSB = MakeSubSB();
 
 						mwState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(SBMoveWithinProcess)));
+						mockSB.Received().SetAndRunActProcess(Arg.Any<SBMoveWithinProcess>());
 					}
 				/*	SBAddedState	*/
 					[Test]
 					public void SBAddedState_EnterState_WhenCalled_SetsActProcAddedProcess(){
 						SBAddedState addedState = new SBAddedState();
-						FakeSB mockSB = MakeFakeSB();
+						ISlottable mockSB = MakeSubSB();
 
 						addedState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(SBAddProcess)));
+						mockSB.Received().SetAndRunActProcess(Arg.Any<SBAddProcess>());
 					}
 				/*	SBRemovedState	*/
 					[Test]
 					public void SBRemovedState_EnterState_WhenCalled_SetsActProcRemovedProcess(){
 						SBRemovedState remState = new SBRemovedState();
-						FakeSB mockSB = MakeFakeSB();
+						ISlottable mockSB = MakeSubSB();
 
 						remState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(SBRemoveProcess)));
+						mockSB.Received().SetAndRunActProcess(Arg.Any<SBRemoveProcess>());
 					}
 
 			/*	SBEqpStates	*/
 				[Test]
 				public void SBEquippedState_EnterState_IsPoolAndPrevEqpStateUnequipped_SetsEqpProcEquipProc(){
 					SBEquippedState eqState = new SBEquippedState();
-					FakeSB mockSB = MakeFakeSB();
-					mockSB.SetPrevEqpState(Slottable.unequippedState);
-					mockSB.SetIsPool(true);
+					ISlottable mockSB = MakeSubSB();
+					mockSB.prevEqpState = Slottable.unequippedState;
+					mockSB.isPool = true;
 
 					eqState.EnterState(mockSB);
 
-					Assert.That(mockSB.eqpProcess, Is.TypeOf(typeof(SBEquipProcess)));
+					mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
 				}
 			/*	SBUnequipState	*/
 				[Test]
 				public void SBUnequippedState_EnterState_IsPoolAndPrevEqpStateEquipped_SetsEqpProcUnequipProc(){
 					SBUnequippedState unequipeedState = new SBUnequippedState();
-					FakeSB mockSB = MakeFakeSB();
-					mockSB.SetPrevEqpState(Slottable.equippedState);
-					mockSB.SetIsPool(true);
+					ISlottable mockSB = MakeSubSB();
+					mockSB.prevEqpState = Slottable.equippedState;
+					mockSB.isPool = true;
 
 					unequipeedState.EnterState(mockSB);
 
-					Assert.That(mockSB.eqpProcess, Is.TypeOf(typeof(SBUnequipProcess)));
+					mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
 				}
 			/*	SBMarkedState	*/
 				[Test]
 				public void SBMarkedState_EnterState_IsPoolAndPrevEqpStateUnmarked_SetsMrkProcMarkProcess(){
 					SBMarkedState markedState = new SBMarkedState();
-					FakeSB mockSB = MakeFakeSB();
-					mockSB.SetPrevMrkState(Slottable.unmarkedState);
-					mockSB.SetIsPool(true);
+					ISlottable mockSB = MakeSubSB();
+					mockSB.prevMrkState = Slottable.unmarkedState;
+					mockSB.isPool = true;
 
 					markedState.EnterState(mockSB);
 
-					Assert.That(mockSB.mrkProcess, Is.TypeOf(typeof(SBMarkProcess)));
+					mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
 				}
 			/*	SBUnmarkedState	*/
 				[Test]
 				public void SBUnmarkedState_EnterState_IsPoolAndPrevMrkStateMarked_SetsMrkProcUnmarkProcess(){
 					SBUnmarkedState unmarkedState = new SBUnmarkedState();
-					FakeSB mockSB = MakeFakeSB();
-					mockSB.SetPrevMrkState(Slottable.markedState);
-					mockSB.SetIsPool(true);
+					ISlottable mockSB = MakeSubSB();
+					mockSB.prevMrkState = Slottable.markedState;
+					mockSB.isPool = true;
 
 					unmarkedState.EnterState(mockSB);
 
-					Assert.That(mockSB.mrkProcess, Is.TypeOf(typeof(SBUnmarkProcess)));
+					mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
 				}
 			/*	Helper */
-				class FakeSBSelState: SBSelState{}
-				class FakeSSEState: SSEState{}
-				class FakeSBProcess: SBProcess{}
-				class FakeSBselProcess: SBSelProcess{}
-				class FakeSBactProcess: SBActProcess{}
-				
 		}
 	}
 }

@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SortTransaction: AbsSlotSystemTransaction{
-		public SlotGroup m_selectedSG;
+		public ISlotGroup m_selectedSG;
 		public SGSorter m_sorter;
-		public SortTransaction(SlotGroup sg, SGSorter sorter){
+		public SortTransaction(ISlotGroup sg, SGSorter sorter){
 			m_selectedSG = sg;
 			m_sorter = sorter;
 		}
@@ -14,7 +14,7 @@ namespace SlotSystem{
 			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
 			this.m_sorter = orig.m_sorter;
 		}
-		public override SlotGroup sg1{get{return m_selectedSG;}}
+		public override ISlotGroup sg1{get{return m_selectedSG;}}
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1.SetSorter(m_sorter);

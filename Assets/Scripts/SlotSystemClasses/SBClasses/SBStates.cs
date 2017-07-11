@@ -5,30 +5,30 @@ using Utility;
 
 namespace SlotSystem{
 	public abstract class SBState: SSEState{
-		protected Slottable sb{
+		protected ISlottable sb{
 			get{
-				return (Slottable)sse;
+				return (ISlottable)sse;
 			}
 		}
 	}
         public abstract class SBSelState: SBState{
-            public virtual void OnHoverEnterMock(Slottable sb, PointerEventDataFake eventDataMock){
-                sb.ssm.SetHovered(sb);
+            public virtual void OnHoverEnterMock(ISlottable sb, PointerEventDataFake eventDataMock){
+                sb.SetHovered();
             }
-            public virtual void OnHoverExitMock(Slottable sb, PointerEventDataFake eventDataMock){
+            public virtual void OnHoverExitMock(ISlottable sb, PointerEventDataFake eventDataMock){
             }
         }
             public class SBDeactivatedState: SBSelState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sb.SetAndRunSelProcess(null);
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
             public class SBFocusedState: SBSelState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBSelProcess process = null;
                     if(sb.prevSelState == Slottable.sbDeactivatedState){
@@ -40,12 +40,12 @@ namespace SlotSystem{
                     }
                     sb.SetAndRunSelProcess(process);
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
             public class SBDefocusedState: SBSelState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBSelProcess process = null;
                     if(sb.prevSelState == Slottable.sbDeactivatedState){
@@ -58,12 +58,12 @@ namespace SlotSystem{
                     }
                     sb.SetAndRunSelProcess(process);
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
             public class SBSelectedState: SBSelState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBSelProcess process = null;
                     if(sb.prevSelState == Slottable.sbDeactivatedState){
@@ -75,32 +75,32 @@ namespace SlotSystem{
                     }
                     sb.SetAndRunSelProcess(process);
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
         public abstract class SBActState: SBState{
-            public abstract void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock);
-            public abstract void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock);
-            public abstract void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock);
-            public abstract void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock);
+            public abstract void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock);
+            public abstract void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock);
+            public abstract void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock);
+            public abstract void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock);
         }
             public class WaitForActionState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBActProcess process = null;
                     sb.SetAndRunActProcess(process);
                 }
-                public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Tap();
                     sb.Reset();
                     sb.Defocus();
                 }
-                public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Reset();
                     sb.Defocus();
                 }
-                public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     if(sb.isFocused){
                         sb.SetSelState(Slottable.sbSelectedState);
                         sb.SetActState(Slottable.waitForPickUpState);
@@ -108,58 +108,58 @@ namespace SlotSystem{
                     else
                         sb.SetActState(Slottable.waitForPointerUpState);
                 }
-                public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                public override void ExitState(StateHandler sh){
+                public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
             public class WaitForPickUpState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBActProcess wfpuProcess = new WaitForPickUpProcess(sb, sb.WaitForPickUpCoroutine);
                     sb.SetAndRunActProcess(wfpuProcess);
                 }
-                public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.SetActState(Slottable.waitForNextTouchState);
                 }
-                public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Reset();
                     sb.Focus();
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
-                public override void OnDeselectedMock(Slottable slottable, PointerEventDataFake eventDataMock){}
-                public override void OnPointerDownMock(Slottable slottable, PointerEventDataFake eventDataMock){}
+                public override void OnDeselectedMock(ISlottable slottable, PointerEventDataFake eventDataMock){}
+                public override void OnPointerDownMock(ISlottable slottable, PointerEventDataFake eventDataMock){}
             }
             public class WaitForPointerUpState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBActProcess wfPtuProcess = new WaitForPointerUpProcess(sb, sb.WaitForPointerUpCoroutine);
                     sb.SetAndRunActProcess(wfPtuProcess);
                 }
-                public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Tap();
                     sb.Reset();
                     sb.Defocus();
                 }
-                public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Reset();
                     sb.Defocus();
                 }
-                public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                public override void ExitState(StateHandler sh){
+                public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
-                public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
+                public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){}
             }
             public class WaitForNextTouchState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.WaitForNextTouchCoroutine);
                     sb.SetAndRunActProcess(wfntProcess);
                 }
-                public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     if(!sb.isPickedUp)
                         sb.PickUp();
                     else{
@@ -167,19 +167,19 @@ namespace SlotSystem{
                         sb.Increment();
                     }
                 }
-                public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Reset();
                     sb.Focus();
                 }
                 /*	undef	*/
-                    public override void ExitState(StateHandler sh){
+                    public override void ExitState(IStateHandler sh){
                         base.ExitState(sh);
                     }
-                    public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){}
             }
             public class PickedUpState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sb.SetPickedSB();
                     sb.SetSSMActState(SlotSystemManager.ssmProbingState);
@@ -190,73 +190,73 @@ namespace SlotSystem{
                     SBActProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
                     sb.SetAndRunActProcess(pickedUpProcess);
                 }
-                public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Reset();
                     sb.Focus();
                 }
-                public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     if(sb.isHovered && sb.isStackable)
                         sb.SetActState(Slottable.waitForNextTouchState);
                     else
                         sb.ExecuteTransaction();
                 }
-                public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){
+                public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.ExecuteTransaction();
                 }
                 /*	undef	*/
-                    public override void ExitState(StateHandler sh){
+                    public override void ExitState(IStateHandler sh){
                         base.ExitState(sh);
                     }
-                    public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){}
             }
             public class SBMoveWithinState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBMoveWithinProcess process = new SBMoveWithinProcess(sb, sb.MoveWithinCoroutine);
                     sb.SetAndRunActProcess(process);
                 }
                 /*	*/
-                    public override void ExitState(StateHandler sh){
+                    public override void ExitState(IStateHandler sh){
                         base.ExitState(sh);
                     }
-                    public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){}
             }
             public class SBAddedState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBAddProcess process = new SBAddProcess(sb, sb.AddCorouine);
                     sb.SetAndRunActProcess(process);
                 }
                 /*	*/
-                    public override void ExitState(StateHandler sh){
+                    public override void ExitState(IStateHandler sh){
                         base.ExitState(sh);
                     }
-                    public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){}
             }
             public class SBRemovedState: SBActState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     SBRemoveProcess process = new SBRemoveProcess(sb, sb.RemoveCoroutine);
                     sb.SetAndRunActProcess(process);
                 }
                 /*	*/
-                    public override void ExitState(StateHandler sh){
+                    public override void ExitState(IStateHandler sh){
                         base.ExitState(sh);
                     }
-                    public override void OnPointerDownMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnPointerUpMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnDeselectedMock(Slottable sb, PointerEventDataFake eventDataMock){}
-                    public override void OnEndDragMock(Slottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){}
+                    public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){}
             }
         public abstract class SBEqpState: SBState{}
             public class SBEquippedState: SBEqpState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     if(sb.isPool){
                         if(sb.prevEqpState != null && sb.prevEqpState == Slottable.unequippedState){
@@ -265,12 +265,12 @@ namespace SlotSystem{
                         }
                     }
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
             public class SBUnequippedState: SBEqpState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     if(sb.prevEqpState == null || sb.prevEqpState == Slottable.unequippedState){
                         /*	when initialized	*/
@@ -283,13 +283,13 @@ namespace SlotSystem{
                         }
                     }
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
         public abstract class SBMrkState: SBState{}
             public class SBMarkedState: SBMrkState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     if(sb.isPool){
                         if(sb.prevMrkState != null && sb.prevMrkState == Slottable.unmarkedState){
@@ -298,12 +298,12 @@ namespace SlotSystem{
                         }
                     }
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }
             public class SBUnmarkedState: SBMrkState{
-                public override void EnterState(StateHandler sh){
+                public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     if(sb.prevMrkState == null || sb.prevMrkState == Slottable.unmarkedState){
                         /*	when initialized	*/
@@ -316,7 +316,7 @@ namespace SlotSystem{
                         }
                     }
                 }
-                public override void ExitState(StateHandler sh){
+                public override void ExitState(IStateHandler sh){
                     base.ExitState(sh);
                 }
             }

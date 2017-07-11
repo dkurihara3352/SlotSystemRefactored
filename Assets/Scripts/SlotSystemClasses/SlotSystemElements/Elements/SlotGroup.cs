@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace SlotSystem{
-	public class SlotGroup : AbsSlotSystemElement{
+	public class SlotGroup : AbsSlotSystemElement, ISlotGroup{
 		/*	states	*/
 			/*	Engines	*/
 				/*	Selection State	*/
@@ -150,7 +150,7 @@ namespace SlotSystem{
 					}
 					public IEnumeratorFake TransactionCoroutine(){
 						bool flag = true;
-						foreach(Slottable sb in slottables){
+						foreach(ISlottable sb in slottables){
 							if(sb != null)
 							flag &= !sb.actProcess.isRunning;
 						}
@@ -208,7 +208,7 @@ namespace SlotSystem{
 			}
 			public virtual bool isSGG{
 				get{
-					foreach(SlotSystemBundle gBundle in ssm.otherBundles){
+					foreach(ISlotSystemBundle gBundle in ssm.otherBundles){
 						if(gBundle.ContainsInHierarchy(this))
 							return true;
 					}
@@ -222,24 +222,24 @@ namespace SlotSystem{
 					m_isAutoSort = on;
 					ssm.Focus();
 				}
-			protected List<Slottable> slottables{
+			public List<ISlottable> slottables{
 				get{
 					return m_slottables;
 				}
-				}protected List<Slottable> m_slottables;
-				public virtual void SetSBs(List<Slottable> sbs){
+				}protected List<ISlottable> m_slottables;
+				public virtual void SetSBs(List<ISlottable> sbs){
 					m_slottables = sbs;
 				}
-			public virtual List<Slottable> newSBs{
+			public virtual List<ISlottable> newSBs{
 				get{return m_newSBs;}
-				}List<Slottable> m_newSBs;
-				public virtual void SetNewSBs(List<Slottable> sbs){
+				}List<ISlottable> m_newSBs;
+				public virtual void SetNewSBs(List<ISlottable> sbs){
 					m_newSBs = sbs;
 				}
 			public virtual List<InventoryItemInstance> itemInstances{
 				get{
 					List<InventoryItemInstance> result = new List<InventoryItemInstance>();
-						foreach(Slottable sb in slottables){
+						foreach(ISlottable sb in slottables){
 							if(sb != null)
 								result.Add(sb.itemInst);
 							else
@@ -260,7 +260,7 @@ namespace SlotSystem{
 			}
 			public virtual bool isFocusedInBundle{
 				get{
-					return (ssm.focusedSGP == this || ssm.focusedSGEs.Contains(this));
+					return (ssm.focusedSGP == (ISlotGroup)this || ssm.focusedSGEs.Contains(this));
 				}
 			}
 			public virtual bool hasEmptySlot{
@@ -283,10 +283,10 @@ namespace SlotSystem{
 					return count;
 				}
 			}
-			public virtual List<Slottable> equippedSBs{
+			public virtual List<ISlottable> equippedSBs{
 				get{
-					List<Slottable> result = new List<Slottable>();
-					foreach(Slottable sb in slottables){
+					List<ISlottable> result = new List<ISlottable>();
+					foreach(ISlottable sb in slottables){
 						if(sb != null && sb.isEquipped)
 							result.Add(sb);
 					}
@@ -295,7 +295,7 @@ namespace SlotSystem{
 			}
 			public virtual bool isAllTASBsDone{
 				get{
-					foreach(Slottable sb in slottables){
+					foreach(ISlottable sb in slottables){
 						if(sb != null){
 							if(sb.actProcess  != null)
 								if(sb.actProcess.isRunning)
@@ -372,7 +372,7 @@ namespace SlotSystem{
 					m_sorter = sorter;
 				}
 			public virtual void InstantSort(){
-				List<Slottable> orderedSbs = slottables;
+				List<ISlottable> orderedSbs = slottables;
 				Sorter.OrderSBsWithRetainedSize(ref orderedSbs);
 				foreach(Slot slot in slots){
 					slot.sb = orderedSbs[slots.IndexOf(slot)];
@@ -416,11 +416,12 @@ namespace SlotSystem{
 				}static SGFilter m_partsFilter;
 			public virtual SGFilter Filter{
 				get{return m_filter;}
+				set{m_filter = value;}
 				}SGFilter m_filter;
 				public virtual void SetFilter(SGFilter filter){
 					m_filter = filter;
 				}
-			public virtual bool AcceptsFilter(Slottable pickedSB){
+			public virtual bool AcceptsFilter(ISlottable pickedSB){
 				if(this.Filter is SGNullFilter) return true;
 				else{
 					if(pickedSB.item is BowInstance)
@@ -444,18 +445,15 @@ namespace SlotSystem{
 			}
 		/*	SlotSystemElement implementation	*/
 			/* fields	*/
-				public override SlotSystemElement this[int i]{
+				public override ISlotSystemElement this[int i]{
 					get{return slottables[i];}
 				}
-				protected override IEnumerable<SlotSystemElement> elements{
+				public override IEnumerable<ISlotSystemElement> elements{
 					get{
-						foreach(Slottable sb in slottables){
-							yield return (SlotSystemElement)sb;
+						foreach(ISlottable sb in slottables){
+							yield return (ISlotSystemElement)sb;
 						}
 					}
-				}
-				public virtual int Count{
-					get{return slottables.Count;}
 				}
 				public override string eName{
 					get{
@@ -468,15 +466,12 @@ namespace SlotSystem{
 						return res;
 					}
 				}
-				public virtual List<Slottable> toList{get{return slottables;}}
+				public virtual List<ISlottable> toList{get{return slottables;}}
 
 			/*	methods	*/
-				public virtual int IndexOf(Slottable sb){
-					return slottables.IndexOf(sb);
-				}
-				public override bool Contains(SlotSystemElement element){
-					if(element is Slottable)
-						return slottables.Contains((Slottable)element);
+				public override bool Contains(ISlotSystemElement element){
+					if(element is ISlottable)
+						return slottables.Contains((ISlottable)element);
 					return false;
 				}
 				public override void Focus(){
@@ -488,7 +483,7 @@ namespace SlotSystem{
 					SetSelState(SlotGroup.sgFocusedState);
 				}
 				public virtual void FocusSBs(){
-					foreach(Slottable sb in slottables){
+					foreach(ISlottable sb in slottables){
 						if(sb != null){
 							sb.SetActState(Slottable.sbWaitForActionState);
 							sb.Reset();
@@ -508,7 +503,7 @@ namespace SlotSystem{
 					SetSelState(SlotGroup.sgDefocusedState);
 				}
 				public virtual void DefocusSBs(){
-					foreach(Slottable sb in slottables){
+					foreach(ISlottable sb in slottables){
 						if(sb != null){
 							sb.SetActState(Slottable.sbWaitForActionState);
 							sb.Reset();
@@ -518,29 +513,29 @@ namespace SlotSystem{
 				}
 				public override void Deactivate(){
 					SetSelState(SlotGroup.sgDeactivatedState);
-					foreach(Slottable sb in slottables){
+					foreach(ISlottable sb in slottables){
 						if(sb != null){
 							sb.Deactivate();
 						}
 					}
 				}
-				public override void PerformInHierarchy(System.Action<SlotSystemElement> act){
+				public override void PerformInHierarchy(System.Action<ISlotSystemElement> act){
 					act(this);
-					foreach(Slottable sb in slottables){
+					foreach(ISlottable sb in slottables){
 						if(sb != null)
 							sb.PerformInHierarchy(act);
 					}
 				}
-				public override void PerformInHierarchy(System.Action<SlotSystemElement, object> act, object obj){
+				public override void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
 					act(this, obj);
-					foreach(Slottable sb in slottables){
+					foreach(ISlottable sb in slottables){
 						if(sb != null)
 							sb.PerformInHierarchy(act, obj);
 					}
 				}
-				public override void PerformInHierarchy<T>(System.Action<SlotSystemElement, IList<T>> act, IList<T> list){
+				public override void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list){
 					act(this, list);
-					foreach(Slottable sb in slottables){
+					foreach(ISlottable sb in slottables){
 						if(sb != null)
 							sb.PerformInHierarchy<T>(act, list);
 					}
@@ -563,8 +558,8 @@ namespace SlotSystem{
 				SetSelState(SlotGroup.sgDeactivatedState);
 				SetActState(SlotGroup.sgWaitForActionState);
 			}
-			public virtual Slottable GetSB(InventoryItemInstance itemInst){
-				foreach(Slottable sb in slottables){
+			public virtual ISlottable GetSB(InventoryItemInstance itemInst){
+				foreach(ISlottable sb in slottables){
 					if(sb != null){
 						if(sb.itemInst == itemInst)
 							return sb;
@@ -574,7 +569,7 @@ namespace SlotSystem{
 			}
 			public virtual bool HasItem(InventoryItemInstance invInst){
 				bool result = false;
-				foreach(Slottable sb in slottables){
+				foreach(ISlottable sb in slottables){
 					if(sb != null){
 						if(sb.itemInst == invInst)
 							return true;
@@ -582,7 +577,7 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public virtual void UpdateSBs(List<Slottable> newSBs){
+			public virtual void UpdateSBs(List<ISlottable> newSBs){
 				/*	Create and set new Slots	*/
 					List<Slot> newSlots = new List<Slot>();
 					for(int i = 0; i < newSBs.Count; i++){
@@ -591,10 +586,10 @@ namespace SlotSystem{
 					}
 					SetNewSlots(newSlots);
 				/*	Set SBs act states	*/
-				List<Slottable> moveWithins = new List<Slottable>();
-				List<Slottable> removed = new List<Slottable>();
-				List<Slottable> added = new List<Slottable>();
-				foreach(Slottable sb in slottables){
+				List<ISlottable> moveWithins = new List<ISlottable>();
+				List<ISlottable> removed = new List<ISlottable>();
+				List<ISlottable> added = new List<ISlottable>();
+				foreach(ISlottable sb in slottables){
 					if(sb != null){
 						if(newSBs.Contains(sb))
 							moveWithins.Add(sb);
@@ -602,25 +597,25 @@ namespace SlotSystem{
 							removed.Add(sb);
 					}
 				}
-				foreach(Slottable sb in newSBs){
+				foreach(ISlottable sb in newSBs){
 					if(sb != null){
 						if(!slottables.Contains(sb))
 							added.Add(sb);
 					}
 				}
-				foreach(Slottable sb in moveWithins){
+				foreach(ISlottable sb in moveWithins){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
 					sb.SetActState(Slottable.moveWithinState);
 				}
-				foreach(Slottable sb in removed){
+				foreach(ISlottable sb in removed){
 					sb.SetNewSlotID(-1);
 					sb.SetActState(Slottable.removedState);
 				}
-				foreach(Slottable sb in added){
+				foreach(ISlottable sb in added){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
 					sb.SetActState(Slottable.addedState);
 				}
-				List<Slottable> allSBs = new List<Slottable>();
+				List<ISlottable> allSBs = new List<ISlottable>();
 				allSBs.AddRange(slottables);
 				allSBs.AddRange(added);
 				SetSBs(allSBs);
@@ -635,7 +630,7 @@ namespace SlotSystem{
 			}
 			public virtual Slot GetNewSlot(InventoryItemInstance itemInst){
 				int index = -3;
-				foreach(Slottable sb in slottables){
+				foreach(ISlottable sb in slottables){
 					if(sb != null){
 						if(sb.itemInst == itemInst)
 							index = sb.newSlotID;
@@ -644,10 +639,10 @@ namespace SlotSystem{
 				return newSlots[index];
 			}
 			public virtual void SetSBsActStates(){
-				List<Slottable> moveWithins = new List<Slottable>();
-				List<Slottable> removed = new List<Slottable>();
-				List<Slottable> added = new List<Slottable>();
-				foreach(Slottable sb in slottables){
+				List<ISlottable> moveWithins = new List<ISlottable>();
+				List<ISlottable> removed = new List<ISlottable>();
+				List<ISlottable> added = new List<ISlottable>();
+				foreach(ISlottable sb in slottables){
 					if(sb != null){
 						if(newSBs.Contains(sb))
 							moveWithins.Add(sb);
@@ -655,21 +650,21 @@ namespace SlotSystem{
 							removed.Add(sb);
 					}
 				}
-				foreach(Slottable sb in newSBs){
+				foreach(ISlottable sb in newSBs){
 					if(sb != null){
 						if(!slottables.Contains(sb))
 							added.Add(sb);
 					}
 				}
-				foreach(Slottable sb in moveWithins){
+				foreach(ISlottable sb in moveWithins){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
 					sb.SetActState(Slottable.moveWithinState);
 				}
-				foreach(Slottable sb in removed){
+				foreach(ISlottable sb in removed){
 					sb.SetNewSlotID(-1);
 					sb.SetActState(Slottable.removedState);
 				}
-				foreach(Slottable sb in added){
+				foreach(ISlottable sb in added){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
 					sb.SetActState(Slottable.addedState);
 				}
@@ -678,12 +673,10 @@ namespace SlotSystem{
 				TransactionCoroutine();
 			}
 			public virtual void OnCompleteSlotMovements(){
-				foreach(Slottable sb in slottables){
+				foreach(ISlottable sb in slottables){
 					if(sb != null){
 						if(sb.newSlotID == -1){
-							GameObject sbGO = sb.gameObject;
-							DestroyImmediate(sbGO);
-							DestroyImmediate(sb);
+							sb.Destroy();
 						}else{
 							newSlots[sb.newSlotID].sb = sb;
 						}
@@ -693,19 +686,19 @@ namespace SlotSystem{
 				SyncSBsToSlots();
 			}
 			public virtual void SyncSBsToSlots(){
-				List<Slottable> newSBs = new List<Slottable>();
+				List<ISlottable> newSBs = new List<ISlottable>();
 				foreach(Slot slot in slots){
 					newSBs.Add(slot.sb);
 				}
 				SetSBs(newSBs);
-				foreach(Slottable sb in slottables){
+				foreach(ISlottable sb in slottables){
 					if(sb != null)
 					sb.SetSlotID(newSBs.IndexOf(sb));
 				}
 			}
-			public virtual List<Slottable> SwappableSBs(Slottable pickedSB){
-				List<Slottable> result = new List<Slottable>();
-				foreach(Slottable sb in slottables){
+			public virtual List<ISlottable> SwappableSBs(ISlottable pickedSB){
+				List<ISlottable> result = new List<ISlottable>();
+				foreach(ISlottable sb in slottables){
 					if(sb != null){
 						if(SlotSystemUtil.AreSwappable(pickedSB, sb))
 							result.Add(sb);
@@ -719,17 +712,17 @@ namespace SlotSystem{
 				SetNewSlots(null);
 			}
 			public virtual void ReorderAndUpdateSBs(){
-				Slottable sb1 = pickedSB;
-				Slottable sb2 = targetSB;
-				List<Slottable> newSBs = new List<Slottable>(toList);
+				ISlottable sb1 = pickedSB;
+				ISlottable sb2 = targetSB;
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
 				newSBs.Reorder(sb1, sb2);
 				UpdateSBs(newSBs);
 			}
 			public virtual void UpdateToRevert(){
-				UpdateSBs(new List<Slottable>(toList));
+				UpdateSBs(new List<ISlottable>(toList));
 			}
 			public virtual void SortAndUpdateSBs(){
-				List<Slottable> newSBs = new List<Slottable>(toList);
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
 				int origCount = newSBs.Count;
 				Sorter.TrimAndOrderSBs(ref newSBs);
 				if(!isExpandable){
@@ -740,23 +733,23 @@ namespace SlotSystem{
 				UpdateSBs(newSBs);
 			}
 			public virtual void FillAndUpdateSBs(){
-				Slottable added;
-					if(ssm.transaction.sg1 == this)
+				ISlottable added;
+					if(ssm.transaction.sg1 == (ISlotGroup)this)
 						added = null;
 					else
 						added = ssm.pickedSB;
-				Slottable removed;
-					if(ssm.transaction.sg1 == this)
+				ISlottable removed;
+					if(ssm.transaction.sg1 == (ISlotGroup)this)
 						removed = ssm.pickedSB;
 					else
 						removed = null;
 
-				List<Slottable> newSBs = new List<Slottable>(toList);
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
 				int origCount = newSBs.Count;
 				if(!isPool){
 					if(added != null){
 						GameObject newSBGO = new GameObject("newSBGO");
-						Slottable newSB = newSBGO.AddComponent<Slottable>();
+						ISlottable newSB = newSBGO.AddComponent<Slottable>();
 						newSB.Initialize(added.itemInst);
 						newSB.SetSSM(ssm);
 						newSB.Defocus();
@@ -764,8 +757,8 @@ namespace SlotSystem{
 						newSBs.Fill(newSB);
 					}
 					if(removed != null){
-						Slottable rem = null;
-						foreach(Slottable sb in newSBs){
+						ISlottable rem = null;
+						foreach(ISlottable sb in newSBs){
 							if(sb != null){
 								if(sb.itemInst == removed.itemInst)
 									rem = sb;
@@ -785,21 +778,21 @@ namespace SlotSystem{
 				UpdateSBs(newSBs);
 			}
 			public virtual void SwapAndUpdateSBs(){
-				Slottable added;
-					if(ssm.transaction.sg1 == this)
+				ISlottable added;
+					if(ssm.transaction.sg1 == (ISlotGroup)this)
 						added = ssm.transaction.targetSB;
 					else
 						added = ssm.pickedSB;
-				Slottable removed;
-					if(ssm.transaction.sg1 == this)
+				ISlottable removed;
+					if(ssm.transaction.sg1 == (ISlotGroup)this)
 						removed = ssm.pickedSB;
 					else
 						removed = ssm.transaction.targetSB;
-				List<Slottable> newSBs = new List<Slottable>(toList);
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
 				int origCount = newSBs.Count;
 				if(!isPool){
 					GameObject newSBGO = new GameObject("newSBGO");
-					Slottable newSB = newSBGO.AddComponent<Slottable>();
+					ISlottable newSB = newSBGO.AddComponent<Slottable>();
 					newSB.Initialize(added.itemInst);
 					newSB.SetSSM(ssm);
 					newSB.SetEqpState(Slottable.unequippedState);
@@ -818,11 +811,11 @@ namespace SlotSystem{
 			}
 			public virtual void AddAndUpdateSBs(){
 				List<InventoryItemInstance> cache = ssm.transaction.moved;
-				List<Slottable> newSBs = toList;
+				List<ISlottable> newSBs = toList;
 				int origCount = newSBs.Count;
 				foreach(InventoryItemInstance itemInst in cache){
 					bool found = false;
-					foreach(Slottable sb in newSBs){
+					foreach(ISlottable sb in newSBs){
 						if(sb!= null){
 							if(sb.itemInst == itemInst){
 								if(itemInst.Item.IsStackable){
@@ -834,7 +827,7 @@ namespace SlotSystem{
 					}
 					if(!found){
 						GameObject newSBSG = new GameObject("newSBSG");
-						Slottable newSB = newSBSG.AddComponent<Slottable>();
+						ISlottable newSB = newSBSG.AddComponent<Slottable>();
 						newSB.Initialize(itemInst);
 						newSB.SetSSM(ssm);
 						newSB.Defocus();
@@ -854,12 +847,12 @@ namespace SlotSystem{
 			}
 			public virtual void RemoveAndUpdateSBs(){
 				List<InventoryItemInstance> cache = ssm.transaction.moved;
-				List<Slottable> newSBs = toList;
+				List<ISlottable> newSBs = toList;
 				int origCount = newSBs.Count;
-				List<Slottable> removedList = new List<Slottable>();
-				List<Slottable> nonremoved = new List<Slottable>();
+				List<ISlottable> removedList = new List<ISlottable>();
+				List<ISlottable> nonremoved = new List<ISlottable>();
 				foreach(InventoryItemInstance itemInst in cache){
-					foreach(Slottable sb in newSBs){
+					foreach(ISlottable sb in newSBs){
 						if(sb!= null){
 							if(sb.itemInst == itemInst){
 								if(itemInst.Item.IsStackable){
@@ -873,7 +866,7 @@ namespace SlotSystem{
 						}
 					}
 				}
-				foreach(Slottable sb in removedList){
+				foreach(ISlottable sb in removedList){
 					newSBs[newSBs.IndexOf(sb)] = null;
 				}
 				if(isAutoSort){
@@ -885,7 +878,6 @@ namespace SlotSystem{
 					}
 				}else{
 					if(isExpandable)
-						// SlotSystemUtil.Trim(ref newSBs);
 						newSBs.Trim();
 				}
 				SetNewSBs(nonremoved);
@@ -894,9 +886,86 @@ namespace SlotSystem{
 			}
 		/*	Forward	*/
 			public virtual void SetHovered(){
-				ssm.SetHovered(this);
+				ssm.SetHovered((ISlotGroup)this);
 			}
-			public virtual Slottable pickedSB{get{return ssm.pickedSB;}}
-			public virtual Slottable targetSB{get{return ssm.targetSB;}}
+			public virtual ISlottable pickedSB{get{return ssm.pickedSB;}}
+			public virtual ISlottable targetSB{get{return ssm.targetSB;}}
+	}
+	public interface ISlotGroup: IAbsSlotSystemElement{
+		IEnumeratorFake TransactionCoroutine();
+		/*	fields	*/
+			AxisScrollerMock scroller{get;}
+			Inventory inventory{get;}
+			void SetInventory(Inventory inv);
+			bool isShrinkable{get; set;}
+			bool isExpandable{get; set;}
+			List<Slot> slots{get;}
+			void SetSlots(List<Slot> slots);
+			List<Slot> newSlots{get;}
+			void SetNewSlots(List<Slot> newSlots);
+			bool isPool{get;}
+			bool isSGE{get;}
+			bool isSGG{get;}
+			bool isAutoSort{get;}
+			void ToggleAutoSort(bool on);
+			List<ISlottable> slottables{get;}
+			void SetSBs(List<ISlottable> sbs);
+			List<ISlottable> newSBs{get;}
+			void SetNewSBs(List<ISlottable> sbs);
+			List<InventoryItemInstance> itemInstances{get;}
+			List<InventoryItemInstance> actualItemInsts{get;}
+			bool isFocusedInBundle{get;}
+			bool hasEmptySlot{get;}
+			int actualSBsCount{get;}
+			List<ISlottable> equippedSBs{get;}
+			bool isAllTASBsDone{get;}
+			int initSlotsCount{get;}
+			void SetInitSlotsCount(int i);
+
+		/*	commands 	*/
+			void InitializeItems();
+			void OnActionComplete();
+			void OnActionExecute();
+		/*	Sorter	*/
+			SGSorter Sorter{get;}
+			void SetSorter(SGSorter sorter);
+			void InstantSort();
+		/*	Filter	*/
+			SGFilter Filter{get;set;}
+			void SetFilter(SGFilter filter);
+			bool AcceptsFilter(ISlottable pickedSB);
+		/*	Events	*/
+			void OnHoverEnterMock();
+			void OnHoverExitMock();
+		/*	SSE */
+			List<ISlottable> toList{get;}
+			void FocusSelf();
+			void FocusSBs();
+			void DefocusSelf();
+			void DefocusSBs();
+		/*	Methods	*/
+			void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand);
+			ISlottable GetSB(InventoryItemInstance itemInst);
+			bool HasItem(InventoryItemInstance invInst);
+			void UpdateSBs(List<ISlottable> newSBs);
+			void CreateNewSlots();
+			Slot GetNewSlot(InventoryItemInstance itemInst);
+			void SetSBsActStates();
+			void CheckProcessCompletion();
+			void OnCompleteSlotMovements();
+			void SyncSBsToSlots();
+			List<ISlottable> SwappableSBs(ISlottable pickedSB);
+			void Reset();
+			void ReorderAndUpdateSBs();
+			void UpdateToRevert();
+			void SortAndUpdateSBs();
+			void FillAndUpdateSBs();
+			void SwapAndUpdateSBs();
+			void AddAndUpdateSBs();
+			void RemoveAndUpdateSBs();
+		/*	Forward	*/
+			void SetHovered();
+			ISlottable pickedSB{get;}
+			ISlottable targetSB{get;}
 	}
 }

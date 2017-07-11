@@ -39,7 +39,7 @@ namespace SlotSystemTests{
 					[TestCaseSource(typeof(AddSameStackableCases))]
 					public void Add_SameStackableDiffInsts_IncreasesQuantity(IEnumerable<InventoryItemInstance> addedItems, List<InventoryItemInstance> expected){
 						PoolInventory poolInv = MakePoolInventory();
-						int expectedCount = QuanitySum(addedItems);
+						int expectedCount = QuantitySum(addedItems);
 						
 						foreach(var item in addedItems)
 							poolInv.Add((InventoryItemInstance)item);
@@ -464,7 +464,7 @@ namespace SlotSystemTests{
 							item.Quantity = quants[count++];
 						}
 					}
-					int QuanitySum(IEnumerable<InventoryItemInstance> items){
+					int QuantitySum(IEnumerable<InventoryItemInstance> items){
 						int sum = 0;
 						foreach(var item in items){
 							InventoryItemInstance itemInst = (InventoryItemInstance)item;
