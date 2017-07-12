@@ -96,10 +96,11 @@ namespace SlotSystemTests{
 						Assert.That(ex.Message, Is.StringContaining("cannot add multiple same InventoryItemInstances. Try instantiate another instance with the same InventoryItem instead"));
 					}
 					[Test]
+					[ExpectedException(typeof(System.ArgumentNullException))]
 					public void Add_Null_ThrowsException(){
 						PoolInventory poolInv = MakePoolInventory();
 						
-						System.Exception ex = Assert.Catch<System.ArgumentNullException>(() => poolInv.Add(null));
+						poolInv.Add(null);
 					}
 					[TestCaseSource(typeof(AddVariousCases))]
 					public void Add_Various_PerformComplexBehaviour(IEnumerable<InventoryItemInstance> addedItems, List<InventoryItemInstance> expected, Dictionary<InventoryItemInstance, int> itemQuantityDict){
@@ -186,10 +187,11 @@ namespace SlotSystemTests{
 							}
 						}
 					[Test]
+					[ExpectedException(typeof(System.ArgumentNullException))]
 					public void Remove_Null_ThrowsException(){
 						PoolInventory poolInv = MakePoolInventory();
 						
-						System.Exception ex = Assert.Catch<System.ArgumentNullException>(() => poolInv.Remove(null));
+						poolInv.Remove(null);
 					}
 					[TestCaseSource(typeof(RemoveNonMemberCases))]
 					public void Remove_NonMember_IgnoresUpdate(IEnumerable<InventoryItemInstance> added, IEnumerable<InventoryItemInstance> removed, List<InventoryItemInstance> expected){

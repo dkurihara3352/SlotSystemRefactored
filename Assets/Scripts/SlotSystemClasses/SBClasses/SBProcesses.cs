@@ -3,38 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public abstract class SBProcess: AbsSSEProcess{
+	public abstract class SBProcess: AbsSSEProcess, ISBProcess{
 		public ISlottable sb{
 			get{return (ISlottable)sse;}
+			set{}
 		}
 	}
-		public abstract class SBSelProcess: SBProcess{}
-			public class SBGreyinProcess: SBSelProcess{
+	public interface ISBProcess: ISSEProcess{
+		ISlottable sb{get;set;}
+	}
+		public interface ISBSelProcess: ISSEProcess{}
+			public class SBGreyinProcess: SBProcess, ISBSelProcess{
 				public SBGreyinProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBGreyoutProcess: SBSelProcess{
+			public class SBGreyoutProcess: SBProcess, ISBSelProcess{
 				public SBGreyoutProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBHighlightProcess: SBSelProcess{
+			public class SBHighlightProcess: SBProcess, ISBSelProcess{
 				public SBHighlightProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBDehighlightProcess: SBSelProcess{
+			public class SBDehighlightProcess: SBProcess, ISBSelProcess{
 				public SBDehighlightProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-		public abstract class SBActProcess: SBProcess{}
-			public class WaitForPickUpProcess: SBActProcess{
+		public interface ISBActProcess: ISBProcess{}
+			public class WaitForPickUpProcess: SBProcess, ISBActProcess{
 				public WaitForPickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
@@ -44,7 +48,7 @@ namespace SlotSystem{
 					sb.PickUp();
 				}
 			}
-			public class WaitForPointerUpProcess: SBActProcess{
+			public class WaitForPointerUpProcess: SBProcess, ISBActProcess{
 				public WaitForPointerUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
@@ -54,7 +58,7 @@ namespace SlotSystem{
 					sb.SetSelState(Slottable.sbDefocusedState);
 				}
 			}
-			public class WaitForNextTouchProcess: SBActProcess{
+			public class WaitForNextTouchProcess: SBProcess, ISBActProcess{
 				public WaitForNextTouchProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
@@ -70,51 +74,51 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public class SBPickedUpProcess: SBActProcess{
+			public class SBPickedUpProcess: SBProcess, ISBActProcess{
 				public SBPickedUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBMoveWithinProcess: SBActProcess{
+			public class SBMoveWithinProcess: SBProcess, ISBActProcess{
 				public SBMoveWithinProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBAddProcess: SBActProcess{
+			public class SBAddProcess: SBProcess, ISBActProcess{
 				public SBAddProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBRemoveProcess: SBActProcess{
+			public class SBRemoveProcess: SBProcess, ISBActProcess{
 				public SBRemoveProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-		public abstract class SBEqpProcess: SBProcess{}
-			public class SBEquipProcess: SBEqpProcess{
+		public interface ISBEqpProcess: ISBProcess{}
+			public class SBEquipProcess: SBProcess, ISBEqpProcess{
 				public SBEquipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBUnequipProcess: SBEqpProcess{
+			public class SBUnequipProcess: SBProcess, ISBEqpProcess{
 				public SBUnequipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-		public abstract class SBMrkProcess: SBProcess{}
-			public class SBMarkProcess: SBMrkProcess{
+		public interface ISBMrkProcess: ISBProcess{}
+			public class SBMarkProcess: SBProcess, ISBMrkProcess{
 				public SBMarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}
 			}
-			public class SBUnmarkProcess: SBMrkProcess{
+			public class SBUnmarkProcess: SBProcess, ISBMrkProcess{
 				public SBUnmarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;

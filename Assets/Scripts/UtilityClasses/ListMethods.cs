@@ -73,7 +73,6 @@ namespace Utility{
 		}
 		public static void Shuffle<T>(this IList<T> list)
 		{  
-			List<T> origCopy = new List<T>(list);
 			int n = list.Count;
 			while (n > 1) { 
 				n--;  

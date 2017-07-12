@@ -51,7 +51,7 @@ namespace SlotSystem{
 				foreach(Slot oSlot in orig.newSlots){
 					Slot newSlot = new Slot();
 					newSlot.sb = oSlot.sb;
-					slotsClone.Add(newSlot);
+					newSlotsClone.Add(newSlot);
 				}
 				SetNewSlots(slotsClone);
 			m_isPool = orig.isPool;
@@ -64,7 +64,7 @@ namespace SlotSystem{
 						sbsClone.Add(null);
 					else{
 						ISlottable cloneSB = SlotSystemUtil.CloneSB(sb);
-						sbsClone.Add(sb);
+						sbsClone.Add(cloneSB);
 					}
 				}
 				SetSBs(sbsClone);
@@ -75,7 +75,7 @@ namespace SlotSystem{
 						newSbsClone.Add(null);
 					else{
 						ISlottable cloneSB = SlotSystemUtil.CloneSB(sb);
-						newSbsClone.Add(sb);
+						newSbsClone.Add(cloneSB);
 					}
 				}
 				SetNewSBs(newSbsClone);

@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public interface SSEProcess{
-		bool isRunning{get;}
+	public interface ISSEProcess{
+		bool isRunning{get;set;}
 		System.Func<IEnumeratorFake> coroutineFake{set;}
 		void Start();
 		void Stop();
 		void Expire();
 	}
-	public class AbsSSEProcess: SSEProcess{
-		public bool isRunning{
+	public class AbsSSEProcess: ISSEProcess{
+		public virtual bool isRunning{
 			get{return m_isRunning;}
-			} bool m_isRunning;
+			set{}
+			}bool m_isRunning;
 		public System.Func<IEnumeratorFake> coroutineFake{
 			set{m_coroutineMock = value;}
 			}System.Func<IEnumeratorFake> m_coroutineMock;
@@ -35,11 +36,11 @@ namespace SlotSystem{
 		}
 	}
 	public class SSEProcessEngine{
-		public virtual SSEProcess process{
+		public virtual ISSEProcess process{
 			get{return m_process;}
 			// set{m_process = value;}
-			}protected SSEProcess m_process;
-		public virtual void SetAndRunProcess(SSEProcess process){
+			}protected ISSEProcess m_process;
+		public virtual void SetAndRunProcess(ISSEProcess process){
 			if(process != null)
 				process.Stop();
 			m_process = process;

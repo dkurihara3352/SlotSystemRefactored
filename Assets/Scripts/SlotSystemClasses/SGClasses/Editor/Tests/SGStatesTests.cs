@@ -9,7 +9,7 @@ using NSubstitute;
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
-		public class SGStatesTests: AbsSlotSystemTest {
+		public class SGStatesTests: AbsSlotSystemTest{
 			[Test]
 			public void SGSelState_OnHoverEnter_WhenCalled_CallSGSetHovered(){
 				TestSGSelState sgSelState = new TestSGSelState();
@@ -79,7 +79,7 @@ namespace SlotSystemTests{
 						}
 					}
 				[TestCaseSource(typeof(SGFocusedStateEnterStateCases))]
-				public void VariousSGSelState_EnteState_FromVarious_SetsSGSelProcAccordingly<T>(SGSelState fromState, SGSelState toState, T selProc) where T: SGSelProcess{
+				public void VariousSGSelState_EnteState_FromVarious_SetsSGSelProcAccordingly<T>(SGSelState fromState, SGSelState toState, T selProc) where T: ISGSelProcess{
 					ISlotGroup mockSG = MakeSubSG();
 					mockSG.prevSelState = fromState;
 
@@ -136,8 +136,7 @@ namespace SlotSystemTests{
 				[TestCaseSource(typeof(VariousSGActStateEnterStateCases))]
 				public void VariousSGActState_EnterState_FromWFAState_SetsSGActProcSGTransactionProces(SGActState toState){
 					ISlotGroup mockSG = MakeSubSG();
-					mockSG.prevSelState = SlotGroup.sgWaitForActionState;
-					// mockSG.SetToList(new List<Slottable>());
+					mockSG.prevActState = SlotGroup.sgWaitForActionState;
 					
 					toState.EnterState(mockSG);
 
@@ -230,7 +229,5 @@ namespace SlotSystemTests{
 		}
 		/*	helpers */
 		class TestSGSelState: SGSelState{}
-		class TestSGSelProcess: SGSelProcess{}
-		class TestSGActProcess: SGActProcess{}
 	}
 }

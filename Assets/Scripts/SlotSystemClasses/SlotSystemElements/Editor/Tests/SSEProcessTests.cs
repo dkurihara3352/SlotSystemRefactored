@@ -19,7 +19,7 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetAndRunProcess_NullToAny_SetsProcess(){
 				SSEProcessEngine engine = MakeProcessEngine();
-				SSEProcess process = Substitute.For<SSEProcess>();
+				ISSEProcess process = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(process);
 				
@@ -28,8 +28,7 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetAndRunProcess_ToAnother_SetsProcess(){
 				SSEProcessEngine engine = MakeProcessEngine();
-				SSEProcess process = Substitute.For<SSEProcess>();
-				SSEProcess another = Substitute.For<SSEProcess>();
+				ISSEProcess another = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(another);
 				
@@ -38,7 +37,7 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetAndRunProcess_AnyToNull_SetsNull(){
 				SSEProcessEngine engine = MakeProcessEngine();
-				SSEProcess process = Substitute.For<SSEProcess>();
+				ISSEProcess process = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(process);
 				engine.SetAndRunProcess(null);
@@ -48,7 +47,7 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetAndRunProcess_ToAny_StartsProcess(){
 				SSEProcessEngine engine = MakeProcessEngine();
-				SSEProcess mockProcess = Substitute.For<SSEProcess>();
+				ISSEProcess mockProcess = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(mockProcess);
 				
@@ -57,8 +56,8 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetAndRunProcess_AnyToAnother_StopsProcess(){
 				SSEProcessEngine engine = MakeProcessEngine();
-				SSEProcess mockProcess = Substitute.For<SSEProcess>();
-				SSEProcess another = Substitute.For<SSEProcess>();
+				ISSEProcess mockProcess = Substitute.For<ISSEProcess>();
+				ISSEProcess another = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(mockProcess);
 				engine.SetAndRunProcess(another);

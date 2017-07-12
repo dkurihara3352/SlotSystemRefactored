@@ -54,7 +54,7 @@ namespace SlotSystemTests{
 						mockSB.Received().SetAndRunSelProcess(null);
 					}
 					[TestCaseSource(typeof(SBFocusedStateEnterStateFromNonDeactivated))]
-					public void SBFocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T sgProc) where T: SGSelProcess{
+					public void SBFocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T sgProc) where T: ISGSelProcess{
 						SBFocusedState focState = new SBFocusedState();
 						ISlottable mockSB = MakeSubSB();
 						mockSB.prevSelState = prevState;
@@ -98,7 +98,7 @@ namespace SlotSystemTests{
 						mockSB.Received().SetAndRunSelProcess(null);
 					}
 					[TestCaseSource(typeof(SBDefocusedStateEnterStateFromNonDeactivated))]
-					public void SBDefocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: SBSelProcess{
+					public void SBDefocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: ISBSelProcess{
 						SBDefocusedState focState = new SBDefocusedState();
 						ISlottable mockSB = MakeSubSB();
 						mockSB.prevSelState = prevState;
@@ -141,7 +141,7 @@ namespace SlotSystemTests{
 					mockSB.Received().SetAndRunSelProcess(null);
 				}
 				[TestCaseSource(typeof(SBSelectedStateEnterStateFromNonDeactivated))]
-				public void SBSelectedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: SBSelProcess{
+				public void SBSelectedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: ISBSelProcess{
 					SBSelectedState focState = new SBSelectedState();
 					ISlottable mockSB = MakeSubSB();
 					mockSB.prevSelState = prevState;
@@ -212,7 +212,7 @@ namespace SlotSystemTests{
 					public void WaitForActionState_OnPointerDown_IsFocused_SetsComplexStates(){
 						WaitForActionState wfaState = new WaitForActionState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isFocused = false;
+						mockSB.isFocused = true;
 
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
@@ -259,7 +259,6 @@ namespace SlotSystemTests{
 
 						wfptuState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(WaitForPointerUpProcess)));
 						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForPointerUpProcess>());
 					}
 					[Test]
@@ -295,7 +294,6 @@ namespace SlotSystemTests{
 
 						wfntState.EnterState(mockSB);
 
-						Assert.That(mockSB.actProcess, Is.TypeOf(typeof(WaitForNextTouchProcess)));
 						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForNextTouchProcess>());
 					}
 					[Test]

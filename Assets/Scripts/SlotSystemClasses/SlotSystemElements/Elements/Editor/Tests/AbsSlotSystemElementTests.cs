@@ -196,9 +196,10 @@ namespace SlotSystemTests{
 				public void immediateBundle_NoBundleInAncestry_ReturnsNull(){
 					ISlotSystemElement stubEle_1 = Substitute.For<ISlotSystemElement>();
 					ISlotSystemElement stubEle_2 = Substitute.For<ISlotSystemElement>();
-					stubEle_1.parent = stubEle_2;
+					stubEle_1.immediateBundle = null;
+					stubEle_2.immediateBundle = stubEle_1.immediateBundle;
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					testSSE.parent = stubEle_1;
+					testSSE.parent = stubEle_2;
 
 					Assert.That(testSSE.immediateBundle, Is.Null);
 				}
@@ -413,10 +414,11 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				[Category("Methods")]
+				[ExpectedException(typeof(System.ArgumentNullException))]
 				public void ContainsInHierarchy_Null_ThrowsException(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 
-					System.Exception ex = Assert.Throws<System.ArgumentNullException>(() => testSSE.ContainsInHierarchy(null));
+					testSSE.ContainsInHierarchy(null);
 				}
 				[Test]
 				[Category("Methods")]

@@ -95,10 +95,12 @@ namespace SlotSystemTests{
                         }
 
                     [Test]
+                    [ExpectedException(typeof(System.ArgumentNullException))]
                     public void Add_Null_ThrowsException(){
                         TestEquipmentSetInventory equipInv = MakeEquipInventory();
 
-                        System.Exception ex = Assert.Catch<System.ArgumentNullException>(() => equipInv.Add(null));
+                        // System.Exception ex = Assert.Catch<System.ArgumentNullException>(() => equipInv.Add(null));
+                        equipInv.Add(null);
                     }
                     
                     [TestCaseSource(typeof(AddCGExeedingCases))]
@@ -127,10 +129,11 @@ namespace SlotSystemTests{
 
                 /*  Remove  */
                     [Test]
+                    [ExpectedException(typeof(System.ArgumentNullException))]
                     public void Remove_Null_ThrowsException(){
                         TestEquipmentSetInventory esi = MakeEquipInventory();
 
-                        System.Exception ex = Assert.Catch<System.ArgumentNullException>(() => esi.Remove(null));
+                        esi.Remove(null);
                     }
                     [TestCaseSource(typeof(RemoveNonMemberCases))]
                     public void Remove_NonMember_IgnoresUpdate(List<InventoryItemInstance> added, IEnumerable<InventoryItemInstance> removed){
@@ -185,11 +188,8 @@ namespace SlotSystemTests{
                         class RemoveMemberCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
                                 BowInstance bow_A = MakeBowInstance(0);
-                                BowInstance bow_A_1 = MakeBowInstance(0);
                                 WearInstance wear_A = MakeWearInstance(0);
-                                WearInstance wear_A_1 = MakeWearInstance(0);
                                 ShieldInstance shield_A = MakeShieldInstance(0);
-                                ShieldInstance shield_A_1 = MakeShieldInstance(0);
                                 MeleeWeaponInstance mWeapon_A = MakeMeleeWeaponInstance(0);
                                 QuiverInstance quiver_A = MakeQuiverInstance(0);
                                 PackInstance pack_A = MakePackInstance(0);
@@ -244,11 +244,8 @@ namespace SlotSystemTests{
                         class ItemsCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
                                 BowInstance bow_A = MakeBowInstance(0);
-                                BowInstance bow_A_1 = MakeBowInstance(0);
                                 WearInstance wear_A = MakeWearInstance(0);
-                                WearInstance wear_A_1 = MakeWearInstance(0);
                                 ShieldInstance shield_A = MakeShieldInstance(0);
-                                ShieldInstance shield_A_1 = MakeShieldInstance(0);
                                 MeleeWeaponInstance mWeapon_A = MakeMeleeWeaponInstance(0);
                                 QuiverInstance quiver_A = MakeQuiverInstance(0);
                                 PackInstance pack_A = MakePackInstance(0);

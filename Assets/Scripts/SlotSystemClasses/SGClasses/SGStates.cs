@@ -31,7 +31,7 @@ namespace SlotSystem{
             public class SGFocusedState: SGSelState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SGSelProcess process = null;
+                    ISGSelProcess process = null;
                     if(sg.prevSelState == SlotGroup.sgDeactivatedState){
                         process = null;
                         sg.InstantGreyin();
@@ -49,7 +49,7 @@ namespace SlotSystem{
             public class SGDefocusedState: SGSelState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SGSelProcess process = null;
+                    ISGSelProcess process = null;
                     if(sg.prevSelState == SlotGroup.sgDeactivatedState){
                         process = null;
                         sg.InstantGreyout();
@@ -66,7 +66,7 @@ namespace SlotSystem{
             public class SGSelectedState: SGSelState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SGSelProcess process = null;
+                    ISGSelProcess process = null;
                     if(sg.prevSelState == SlotGroup.sgDeactivatedState){
                         sg.InstantHighlight();
                     }else if(sg.prevSelState == SlotGroup.sgDefocusedState)

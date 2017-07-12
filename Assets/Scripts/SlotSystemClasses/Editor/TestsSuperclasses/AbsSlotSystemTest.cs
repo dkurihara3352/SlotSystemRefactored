@@ -41,29 +41,29 @@ public class AbsSlotSystemTest{
 	protected static SSMActState MakeSubSSMActState(){
 		return Substitute.For<SSMActState>();
 	}
-	protected static SBSelProcess MakeSubSBSelProc(){
-		return Substitute.For<SBSelProcess>();
+	protected static ISBSelProcess MakeSubSBSelProc(){
+		return Substitute.For<ISBSelProcess>();
 	}
-	protected static SBActProcess MakeSubSBActProc(){
-		return Substitute.For<SBActProcess>();
+	protected static ISBActProcess MakeSubSBActProc(){
+		return Substitute.For<ISBActProcess>();
 	}
-	protected static SBEqpProcess MakeSubSBEqpProc(){
-		return Substitute.For<SBEqpProcess>();
+	protected static ISBEqpProcess MakeSubSBEqpProc(){
+		return Substitute.For<ISBEqpProcess>();
 	}
-	protected static SBMrkProcess MakeSubSBMrkProc(){
-		return Substitute.For<SBMrkProcess>();
+	protected static ISBMrkProcess MakeSubSBMrkProc(){
+		return Substitute.For<ISBMrkProcess>();
 	}
-	protected static SGSelProcess MakeSubSGSelProc(){
-		return Substitute.For<SGSelProcess>();
+	protected static ISGSelProcess MakeSubSGSelProc(){
+		return Substitute.For<ISGSelProcess>();
 	}
-	protected static SGActProcess MakeSubSGActProc(){
-		return Substitute.For<SGActProcess>();
+	protected static ISGActProcess MakeSubSGActProc(){
+		return Substitute.For<ISGActProcess>();
 	}
-	protected static SSMSelProcess MakeSubSSMSelProc(){
-		return Substitute.For<SSMSelProcess>();
+	protected static ISSMSelProcess MakeSubSSMSelProc(){
+		return Substitute.For<ISSMSelProcess>();
 	}
-	protected static SSMActProcess MakeSubSSMActProc(){
-		return Substitute.For<SSMActProcess>();
+	protected static ISSMActProcess MakeSubSSMActProc(){
+		return Substitute.For<ISSMActProcess>();
 	}
 	protected static BowInstance MakeBowInstance(int id){
 		BowFake bowFake = new BowFake();

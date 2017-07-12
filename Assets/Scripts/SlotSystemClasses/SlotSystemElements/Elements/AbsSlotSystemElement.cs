@@ -94,11 +94,11 @@ namespace SlotSystem{
 					}
 					set{m_selProcEngine = value;}
 					}SSEProcessEngine m_selProcEngine;
-					public virtual SSEProcess selProcess{
+					public virtual ISSEProcess selProcess{
 						get{return (SSESelProcess)selProcEngine.process;}
 						set{}
 					}
-					public virtual void SetAndRunSelProcess(SSEProcess process){
+					public virtual void SetAndRunSelProcess(ISSEProcess process){
 						if(process == null||process is SSESelProcess)
 							selProcEngine.SetAndRunProcess(process);
 						else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
@@ -124,11 +124,11 @@ namespace SlotSystem{
 					}
 					set{m_actProcEngine = value;}
 					}SSEProcessEngine m_actProcEngine;
-					public virtual SSEProcess actProcess{
+					public virtual ISSEProcess actProcess{
 						get{return (SSEActProcess)actProcEngine.process;}
 						set{}
 					}
-					public virtual void SetAndRunActProcess(SSEProcess process){
+					public virtual void SetAndRunActProcess(ISSEProcess process){
 						if(process == null || process is SSEActProcess)
 							actProcEngine.SetAndRunProcess(process);
 						else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");

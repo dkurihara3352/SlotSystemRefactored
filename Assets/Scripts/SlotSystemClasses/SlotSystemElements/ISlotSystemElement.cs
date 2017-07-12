@@ -9,10 +9,10 @@ namespace SlotSystem{
 		SSEState prevSelState{get;set;}
 		SSEState curActState{get;set;}
 		SSEState prevActState{get;set;}
-		void SetAndRunSelProcess(SSEProcess process);
-		void SetAndRunActProcess(SSEProcess process);
-		SSEProcess selProcess{get;set;}
-		SSEProcess actProcess{get;set;}
+		void SetAndRunSelProcess(ISSEProcess process);
+		void SetAndRunActProcess(ISSEProcess process);
+		ISSEProcess selProcess{get;set;}
+		ISSEProcess actProcess{get;set;}
 		IEnumeratorFake greyoutCoroutine();
 		IEnumeratorFake greyinCoroutine();
 		IEnumeratorFake highlightCoroutine();
@@ -32,7 +32,7 @@ namespace SlotSystem{
 		void Deactivate();
 		void Focus();
 		void Defocus();
-		ISlotSystemBundle immediateBundle{get;}
+		ISlotSystemBundle immediateBundle{get;set;}
 		ISlotSystemElement parent{get;set;}
 		ISlotSystemManager ssm{get;set;}
 		bool ContainsInHierarchy(ISlotSystemElement ele);

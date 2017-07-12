@@ -229,26 +229,26 @@ namespace SlotSystem{
 					}static SBMrkState m_unmarkedState;
 		/*	processes	*/
 			/*	Selection Process	*/
-				public override SSEProcess selProcess{
-					get{return (SBSelProcess)selProcEngine.process;}
+				public override ISSEProcess selProcess{
+					get{return (ISBSelProcess)selProcEngine.process;}
 				}
-				public override void SetAndRunSelProcess(SSEProcess process){
-					if(process ==null || process is SBSelProcess)
+				public override void SetAndRunSelProcess(ISSEProcess process){
+					if(process ==null || process is ISBSelProcess)
 						selProcEngine.SetAndRunProcess(process);
-					else throw new System.ArgumentException("Slottable.SetAndRunSelProcess: argument is not of type SBSelProcess");
+					else throw new System.ArgumentException("Slottable.SetAndRunSelProcess: argument is not of type ISBSelProcess");
 				}
 				public override IEnumeratorFake greyoutCoroutine(){return null;}
 				public override IEnumeratorFake greyinCoroutine(){return null;}
 				public override IEnumeratorFake highlightCoroutine(){return null;}
 				public override IEnumeratorFake dehighlightCoroutine(){return null;}
 			/*	Action Process	*/
-				public override SSEProcess actProcess{
-					get{return (SBActProcess)actProcEngine.process;}
+				public override ISSEProcess actProcess{
+					get{return (ISBActProcess)actProcEngine.process;}
 				}
-				public override void SetAndRunActProcess(SSEProcess process){
-					if(process == null || process is SBActProcess)
+				public override void SetAndRunActProcess(ISSEProcess process){
+					if(process == null || process is ISBActProcess)
 						actProcEngine.SetAndRunProcess(process);
-					else throw new System.ArgumentException("Slottable.SetAndRunActProcess: argument is not of type SBActProcess");
+					else throw new System.ArgumentException("Slottable.SetAndRunActProcess: argument is not of type ISBActProcess");
 				}
 				public IEnumeratorFake WaitForPointerUpCoroutine(){return null;}
 				public IEnumeratorFake WaitForPickUpCoroutine(){return null;}
@@ -270,13 +270,13 @@ namespace SlotSystem{
 					}
 					set{m_eqpProcEngine = value;}
 					}SSEProcessEngine m_eqpProcEngine;
-					public virtual SSEProcess eqpProcess{
-						get{return (SBEqpProcess)eqpProcEngine.process;}
+					public virtual ISSEProcess eqpProcess{
+						get{return (ISBEqpProcess)eqpProcEngine.process;}
 					}
-					public virtual void SetAndRunEqpProcess(SSEProcess process){
-						if(process == null || process is SBEqpProcess)
+					public virtual void SetAndRunEqpProcess(ISSEProcess process){
+						if(process == null || process is ISBEqpProcess)
 							eqpProcEngine.SetAndRunProcess(process);
-						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type SBEqpProcess");
+						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type ISBEqpProcess");
 					}
 				public IEnumeratorFake UnequipCoroutine(){return null;}
 				public IEnumeratorFake EquipCoroutine(){return null;}
@@ -289,13 +289,13 @@ namespace SlotSystem{
 					}
 					set{m_mrkProcEngine = value;}
 					}SSEProcessEngine m_mrkProcEngine;
-					public virtual SSEProcess mrkProcess{
-						get{return (SBMrkProcess)mrkProcEngine.process;}
+					public virtual ISSEProcess mrkProcess{
+						get{return (ISBMrkProcess)mrkProcEngine.process;}
 					}
-					public virtual void SetAndRunMrkProcess(SSEProcess process){
-						if(process == null || process is SBMrkProcess)
+					public virtual void SetAndRunMrkProcess(ISSEProcess process){
+						if(process == null || process is ISBMrkProcess)
 							mrkProcEngine.SetAndRunProcess(process);
-						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type SBMrkProcess");
+						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type ISBMrkProcess");
 					}
 				public IEnumeratorFake unmarkCoroutine(){return null;}
 				public IEnumeratorFake markCoroutine(){return null;}
@@ -327,12 +327,14 @@ namespace SlotSystem{
 				}
 			public int slotID{
 				get{return m_slotID;}
+				set{}
 				}int m_slotID = -1;
 				public void SetSlotID(int i){
 					m_slotID = i;
 				}
 			public int newSlotID{
 				get{return m_newSlotID;}
+				set{}
 				}int m_newSlotID = -2;
 				public void SetNewSlotID(int id){
 					m_newSlotID = id;
@@ -584,13 +586,13 @@ namespace SlotSystem{
 			IEnumeratorFake AddCorouine();
 			IEnumeratorFake MoveWithinCoroutine();
 			SSEProcessEngine eqpProcEngine{get;set;}
-			SSEProcess eqpProcess{get;}
-			void SetAndRunEqpProcess(SSEProcess process);
+			ISSEProcess eqpProcess{get;}
+			void SetAndRunEqpProcess(ISSEProcess process);
 			IEnumeratorFake UnequipCoroutine();
 			IEnumeratorFake EquipCoroutine();
 			SSEProcessEngine mrkProcEngine{get;set;}
-			SSEProcess mrkProcess{get;}
-			void SetAndRunMrkProcess(SSEProcess process);
+			ISSEProcess mrkProcess{get;}
+			void SetAndRunMrkProcess(ISSEProcess process);
 			IEnumeratorFake unmarkCoroutine();
 			IEnumeratorFake markCoroutine();
 		/*	Commands	*/
@@ -601,9 +603,9 @@ namespace SlotSystem{
 			SlottableItem item{get;}
 			void SetItem(SlottableItem item);
 			InventoryItemInstance itemInst{get;set;}
-			int slotID{get;}
+			int slotID{get;set;}
 			void SetSlotID(int i);
-			int newSlotID{get;}
+			int newSlotID{get;set;}
 			void SetNewSlotID(int id);
 			ISlotGroup sg{get;set;}
 			bool isPickedUp{get;set;}

@@ -13,28 +13,11 @@ namespace SlotSystem{
 	public class SGInitItemsCommand: SlotGroupCommand{
 		public void Execute(ISlotGroup sg){
 			List<SlottableItem> items = new List<SlottableItem>(sg.inventory);
-			sg.Filter.Filter(ref items);
-			/*	Slots	*/
-				List<Slot> newSlots = new List<Slot>();
-				int slotCountToCreate = sg.initSlotsCount == 0? items.Count: sg.initSlotsCount;
-				for(int i = 0; i <slotCountToCreate; i++){
-					Slot newSlot = new Slot();
-					newSlots.Add(newSlot);
-				}
-				sg.SetSlots(newSlots);
-			/*	SBs	*/
-				/*	if the number of filtered items exceeds the slot count, remove unfittable items from the inventory	*/
-				while(sg.slots.Count < items.Count){
-					items.RemoveAt(sg.slots.Count);
-				}
-				foreach(SlottableItem item in items){
-					GameObject newSBGO = new GameObject("newSBGO");
-					ISlottable newSB = newSBGO.AddComponent<Slottable>();
-					newSB.Initialize((InventoryItemInstance)item);
-					newSB.SetSSM(sg.ssm);
-					sg.slots[items.IndexOf(item)].sb = newSB;
-				}
-				sg.SyncSBsToSlots();
+			// sg.RunFilter(ref items);
+			items = sg.FilterItem(items);
+			sg.InitSlots(items);
+			sg.InitSBs(items);
+			sg.SyncSBsToSlots();
 			if(sg.isAutoSort)
 				sg.InstantSort();
 		}
@@ -49,18 +32,14 @@ namespace SlotSystem{
 				if(sb != null){
 					InventoryItemInstance item = sb.itemInst;
 					if(sb.newSlotID == -1){/* removed	*/
-						sg.inventory.Remove(item);
-						sg.ssm.MarkEquippedInPool(item, false);
-						sg.ssm.SetEquippedOnAllSBs(item, false);
+						sg.SyncEquipped(item, false);
 						/*	Set unequipped with transition
 								all sbp in FocusedSGP
 							Set unequipped without transition
 								sll sbp in Defocused SGPs
 						*/
 					}else if(sb.slotID == -1){/*	added	*/
-						sg.inventory.Add(item);
-						sg.ssm.MarkEquippedInPool(item, true);
-						sg.ssm.SetEquippedOnAllSBs(item, true);
+						sg.SyncEquipped(item, true);
 						/*	Set equipped with transition
 								all the sbp in Focused SGP
 								all sbe in FocusedSGEs (NOT those defocused)
@@ -76,7 +55,7 @@ namespace SlotSystem{
 	}
 	public class SGUpdateEquipStatusCommand: SlotGroupCommand{
 		public void Execute(ISlotGroup sg){
-			sg.ssm.UpdateEquipStatesOnAll();
+			sg.UpdateEquipStatesOnAll();
 		}
 	}
 }

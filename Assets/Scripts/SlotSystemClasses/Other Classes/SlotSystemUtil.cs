@@ -94,7 +94,7 @@ namespace SlotSystem{
 				}
 				return res;
 			}
-			public static string SSEProcessName(SSEProcess process){
+			public static string SSEProcessName(ISSEProcess process){
 				string res = "";
 				if(process is SSEGreyinProcess)
 					res = SlotSystemUtil.Blue("Greyin");
@@ -157,7 +157,7 @@ namespace SlotSystem{
 					res = SlotSystemUtil.Beni("Empty");
 				return res;
 			}
-			public static string SSMProcessName(SSMProcess proc){
+			public static string SSMProcessName(ISSMProcess proc){
 				string res = "";
 				if(proc is SSMGreyinProcess)
 					res = SlotSystemUtil.Red("Greyin");
@@ -197,14 +197,14 @@ namespace SlotSystem{
 					if(ssm.selProcess == null)
 						selProc = "";
 					else
-						selProc = SlotSystemUtil.SSMProcessName((SSMSelProcess)ssm.selProcess) + " running? " + (ssm.selProcess.isRunning?Blue("true"):Red("false"));
+						selProc = SlotSystemUtil.SSMProcessName((ISSMProcess)ssm.selProcess) + " running? " + (ssm.selProcess.isRunning?Blue("true"):Red("false"));
 				string prevAct = SlotSystemUtil.SSMStateNamePlain((SSMActState)ssm.prevActState);
 				string curAct = SlotSystemUtil.SSMStateName((SSMActState)ssm.curActState);
 				string actProc;
-					if((SSMActProcess)ssm.actProcess == null)
+					if((ISSMProcess)ssm.actProcess == null)
 						actProc = "";
 					else
-						actProc = SlotSystemUtil.SSMProcessName((SSMActProcess)ssm.actProcess) + " running? " + (ssm.actProcess.isRunning?Blue("true"):Red("false"));
+						actProc = SlotSystemUtil.SSMProcessName((ISSMProcess)ssm.actProcess) + " running? " + (ssm.actProcess.isRunning?Blue("true"):Red("false"));
 				string ta = SlotSystemUtil.TransactionName(ssm.transaction);
 				string d1Done = "d1Done: " + (ssm.dIcon1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
 				string d2Done = "d2Done: " + (ssm.dIcon2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
@@ -285,7 +285,7 @@ namespace SlotSystem{
 				}
 				return res;
 			}
-			public static string SGProcessName(SGProcess proc){
+			public static string SGProcessName(ISGProcess proc){
 				string res = "";
 				if(proc is SGGreyinProcess)
 					res = SlotSystemUtil.Blue("Greyin");
@@ -307,14 +307,14 @@ namespace SlotSystem{
 					if(sg.selProcess == null)
 						selProc = "";
 					else
-						selProc = SGProcessName((SGSelProcess)sg.selProcess) + " running? " + (sg.selProcess.isRunning?Blue("true"):Red("false"));
+						selProc = SGProcessName((ISGProcess)sg.selProcess) + " running? " + (sg.selProcess.isRunning?Blue("true"):Red("false"));
 				string prevAct = SGStateNamePlain((SGActState)sg.prevActState);
 				string curAct = SGStateName((SGActState)sg.curActState);
 				string actProc;
 					if(sg.actProcess == null)
 						actProc = "";
 					else
-						actProc = SGProcessName((SGActProcess)sg.actProcess) + " running? " + (sg.actProcess.isRunning?Blue("true"):Red("false"));
+						actProc = SGProcessName((ISGProcess)sg.actProcess) + " running? " + (sg.actProcess.isRunning?Blue("true"):Red("false"));
 				res =  
 					sg.eName + " " +
 					Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
@@ -475,7 +475,7 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public static string SBProcessName(SBProcess process){
+			public static string SBProcessName(ISBProcess process){
 				string res = "";
 				if(process is SBGreyoutProcess)
 					res = Green("Greyout");
@@ -521,28 +521,28 @@ namespace SlotSystem{
 						if(sb.selProcess == null)
 							selProc = "";
 						else
-							selProc = SBProcessName((SBSelProcess)sb.selProcess) + " running? " + (sb.selProcess.isRunning?Blue("true"):Red("false"));
+							selProc = SBProcessName((ISBProcess)sb.selProcess) + " running? " + (sb.selProcess.isRunning?Blue("true"):Red("false"));
 					string prevAct = SBStateNamePlain((SBActState)sb.prevActState);
 					string curAct = SBStateName((SBActState)sb.curActState);
 					string actProc;
 						if(sb.actProcess == null)
 							actProc = "";
 						else
-							actProc = SBProcessName((SBActProcess)sb.actProcess) + " running? " + (sb.actProcess.isRunning?Blue("true"):Red("false"));
+							actProc = SBProcessName((ISBProcess)sb.actProcess) + " running? " + (sb.actProcess.isRunning?Blue("true"):Red("false"));
 					string prevEqp = SBStateNamePlain((SBEqpState)sb.prevEqpState);
 					string curEqp = SBStateName((SBEqpState)sb.curEqpState);
 					string eqpProc;
 						if(sb.eqpProcess == null)
 							eqpProc = "";
 						else
-							eqpProc = SBProcessName((SBEqpProcess)sb.eqpProcess) + " running? " + (sb.eqpProcess.isRunning?Blue("true"):Red("false"));
+							eqpProc = SBProcessName((ISBProcess)sb.eqpProcess) + " running? " + (sb.eqpProcess.isRunning?Blue("true"):Red("false"));
 					string prevMrk = SBStateNamePlain((SBMrkState)sb.prevMrkState);
 					string curMrk = SBStateName((SBMrkState)sb.curMrkState);
 					string mrkProc;
 						if(sb.mrkProcess == null)
 							mrkProc = "";
 						else
-							mrkProc = SBProcessName((SBMrkProcess)sb.mrkProcess) + " running? " + (sb.mrkProcess.isRunning?Blue("true"):Red("false"));
+							mrkProc = SBProcessName((ISBProcess)sb.mrkProcess) + " running? " + (sb.mrkProcess.isRunning?Blue("true"):Red("false"));
 					res = sbName + ": " +
 						Bold("Sel ") + " from " + prevSel + " to " + curSel + " proc " + selProc + ", " + 
 						Bold("Act ") + " from " + prevAct + " to " + curAct + " proc " + actProc + ", " + 

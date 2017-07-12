@@ -425,13 +425,13 @@ namespace SlotSystem{
 
 			/*	process	*/
 				/*	Selection Process	*/
-					public override SSEProcess selProcess{
-						get{return (SSMSelProcess)selProcEngine.process;}
+					public override ISSEProcess selProcess{
+						get{return (ISSMSelProcess)selProcEngine.process;}
 					}
-					public override void SetAndRunSelProcess(SSEProcess process){
-						if(process == null||process is SSMSelProcess)
+					public override void SetAndRunSelProcess(ISSEProcess process){
+						if(process == null||process is ISSMSelProcess)
 							selProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("SlotSystemManager.SetAndRunSelProcess: argument is not of type SSMSelProcess");
+						else throw new System.InvalidOperationException("SlotSystemManager.SetAndRunSelProcess: argument is not of type ISSMSelProcess");
 					}
 					public override IEnumeratorFake greyoutCoroutine(){
 						return null;
@@ -440,13 +440,13 @@ namespace SlotSystem{
 						return null;
 					}
 				/*	Action Process	*/
-					public override SSEProcess actProcess{
-							get{return (SSMActProcess)actProcEngine.process;}
+					public override ISSEProcess actProcess{
+							get{return (ISSMActProcess)actProcEngine.process;}
 						}
-						public override void SetAndRunActProcess(SSEProcess process){
-							if(process == null||process is SSMActProcess)
+						public override void SetAndRunActProcess(ISSEProcess process){
+							if(process == null||process is ISSMActProcess)
 								actProcEngine.SetAndRunProcess(process);
-							else throw new System.InvalidOperationException("SlotSystemManager.SetAndRunActProcess: argument is not of type SSMActProcess");
+							else throw new System.InvalidOperationException("SlotSystemManager.SetAndRunActProcess: argument is not of type ISSMActProcess");
 						}
 					public IEnumeratorFake probeCoroutine(){
 						return null;

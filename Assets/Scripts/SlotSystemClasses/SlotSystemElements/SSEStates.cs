@@ -29,7 +29,7 @@ namespace SlotSystem{
 			public class SSEFocusedState: SSESelState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
-					SSEProcess process = null;
+					ISSEProcess process = null;
 					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
 						process = null;
 						sse.InstantGreyin();
@@ -44,7 +44,7 @@ namespace SlotSystem{
 			public class SSEDefocusedState: SSESelState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
-					SSEProcess process = null;
+					ISSEProcess process = null;
 					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
 						process = null;
 						sse.InstantGreyout();
@@ -58,7 +58,7 @@ namespace SlotSystem{
 			public class SSESelectedState : SSESelState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
-					SSEProcess process = null;
+					ISSEProcess process = null;
 					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
 						process = null;
 						sse.InstantHighlight();

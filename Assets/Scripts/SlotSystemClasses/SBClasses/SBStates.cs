@@ -30,7 +30,7 @@ namespace SlotSystem{
             public class SBFocusedState: SBSelState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SBSelProcess process = null;
+                    ISBSelProcess process = null;
                     if(sb.prevSelState == Slottable.sbDeactivatedState){
                         sb.InstantGreyin();
                     }else if(sb.prevSelState == Slottable.sbDefocusedState){
@@ -47,7 +47,7 @@ namespace SlotSystem{
             public class SBDefocusedState: SBSelState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SBSelProcess process = null;
+                    ISBSelProcess process = null;
                     if(sb.prevSelState == Slottable.sbDeactivatedState){
                         sb.InstantGreyout();
                         process = null;
@@ -65,7 +65,7 @@ namespace SlotSystem{
             public class SBSelectedState: SBSelState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SBSelProcess process = null;
+                    ISBSelProcess process = null;
                     if(sb.prevSelState == Slottable.sbDeactivatedState){
                         sb.InstantHighlight();
                     }else if(sb.prevSelState == Slottable.sbDefocusedState){
@@ -88,7 +88,7 @@ namespace SlotSystem{
             public class WaitForActionState: SBActState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SBActProcess process = null;
+                    ISBActProcess process = null;
                     sb.SetAndRunActProcess(process);
                 }
                 public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
@@ -116,7 +116,7 @@ namespace SlotSystem{
             public class WaitForPickUpState: SBActState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SBActProcess wfpuProcess = new WaitForPickUpProcess(sb, sb.WaitForPickUpCoroutine);
+                    ISBActProcess wfpuProcess = new WaitForPickUpProcess(sb, sb.WaitForPickUpCoroutine);
                     sb.SetAndRunActProcess(wfpuProcess);
                 }
                 public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
@@ -135,7 +135,7 @@ namespace SlotSystem{
             public class WaitForPointerUpState: SBActState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SBActProcess wfPtuProcess = new WaitForPointerUpProcess(sb, sb.WaitForPointerUpCoroutine);
+                    ISBActProcess wfPtuProcess = new WaitForPointerUpProcess(sb, sb.WaitForPointerUpCoroutine);
                     sb.SetAndRunActProcess(wfPtuProcess);
                 }
                 public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
@@ -156,7 +156,7 @@ namespace SlotSystem{
             public class WaitForNextTouchState: SBActState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    SBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.WaitForNextTouchCoroutine);
+                    ISBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.WaitForNextTouchCoroutine);
                     sb.SetAndRunActProcess(wfntProcess);
                 }
                 public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){
@@ -187,7 +187,7 @@ namespace SlotSystem{
                     sb.CreateTAResult();
                     sb.OnHoverEnterMock();
                     sb.UpdateTA();
-                    SBActProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
+                    ISBActProcess pickedUpProcess = new SBPickedUpProcess(sb, sb.PickUpCoroutine);
                     sb.SetAndRunActProcess(pickedUpProcess);
                 }
                 public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){
@@ -260,7 +260,7 @@ namespace SlotSystem{
                     base.EnterState(sh);
                     if(sb.isPool){
                         if(sb.prevEqpState != null && sb.prevEqpState == Slottable.unequippedState){
-                            SBEqpProcess process = new SBEquipProcess(sb, sb.EquipCoroutine);
+                            ISBEqpProcess process = new SBEquipProcess(sb, sb.EquipCoroutine);
                             sb.SetAndRunEqpProcess(process);
                         }
                     }
@@ -278,7 +278,7 @@ namespace SlotSystem{
                     }
                     if(sb.isPool){
                         if(sb.prevEqpState != null && sb.prevEqpState == Slottable.equippedState){
-                            SBEqpProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
+                            ISBEqpProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
                             sb.SetAndRunEqpProcess(process);
                         }
                     }
@@ -293,7 +293,7 @@ namespace SlotSystem{
                     base.EnterState(sh);
                     if(sb.isPool){
                         if(sb.prevMrkState != null && sb.prevMrkState == Slottable.unmarkedState){
-                            SBMrkProcess process = new SBMarkProcess(sb, sb.markCoroutine);
+                            ISBMrkProcess process = new SBMarkProcess(sb, sb.markCoroutine);
                             sb.SetAndRunMrkProcess(process);
                         }
                     }
@@ -311,7 +311,7 @@ namespace SlotSystem{
                     }
                     if(sb.isPool){
                         if(sb.prevMrkState != null && sb.prevMrkState == Slottable.markedState){
-                            SBMrkProcess process = new SBUnmarkProcess(sb, sb.unmarkCoroutine);
+                            ISBMrkProcess process = new SBUnmarkProcess(sb, sb.unmarkCoroutine);
                             sb.SetAndRunMrkProcess(process);
                         }
                     }

@@ -11,7 +11,6 @@ namespace SlotSystemTests{
 
 			[Test]
 			public void AreSwappable_DifferentSGsAndMutuallyAcceptingAndNotStackable_ReturnsTrue(){
-				ISlotSystemManager stubSSM = MakeSubSSM();
 				BowInstance stubBowInst_A = MakeBowInstance(0);
 				BowInstance stubBowInst_B = MakeBowInstance(0);
 				ISlottable stubSB_A = MakeSubSB();
@@ -31,7 +30,6 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void AreSwappable_SameSGsAndMutuallyAcceptingAndNotStackable_ReturnsFalse(){
-				ISlotSystemManager stubSSM = MakeSubSSM();
 				BowInstance stubBowInst_A = MakeBowInstance(0);
 				BowInstance stubBowInst_B = MakeBowInstance(0);
 				ISlottable stubSB_A = MakeSubSB();
@@ -46,11 +44,10 @@ namespace SlotSystemTests{
 				stubSG.Filter = new SGBowFilter();
 				stubSG.Filter = new SGBowFilter();
 				
-				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.True);
+				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.False);
 			}
 			[Test]
 			public void AreSwappable_DiffSGsAndMutuallyNOTAcceptingAndNOTStackable_ReturnsFalse(){
-				ISlotSystemManager stubSSM = MakeSubSSM();
 				BowInstance stubBowInst_A = MakeBowInstance(0);
 				BowInstance stubBowInst_B = MakeBowInstance(0);
 				ISlottable stubSB_A = MakeSubSB();
@@ -70,7 +67,6 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void AreSwappable_DiffSGsAndMutuallyNOTAcceptingAndISStackable_ReturnsFalse(){
-				ISlotSystemManager stubSSM = MakeSubSSM();
 				PartsInstance stubParts_A = MakePartsInstance(0, 1);
 				PartsInstance stubParts_B = MakePartsInstance(0, 1);
 				ISlottable stubSB_A = MakeSubSB();

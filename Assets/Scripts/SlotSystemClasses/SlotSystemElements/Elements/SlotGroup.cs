@@ -117,48 +117,48 @@ namespace SlotSystem{
 							return m_sortState;
 						}
 						}private static SGActState m_sortState;			
-			/*	process	*/
-				/*	Selection Process	*/
-					public override SSEProcess selProcess{
-						get{return (SGSelProcess)selProcEngine.process;}
+		/*	process	*/
+			/*	Selection Process	*/
+				public override ISSEProcess selProcess{
+					get{return (ISGSelProcess)selProcEngine.process;}
+				}
+				public override void SetAndRunSelProcess(ISSEProcess process){
+					if(process == null || process is ISGSelProcess)
+						selProcEngine.SetAndRunProcess(process);
+					else throw new System.InvalidOperationException("SlotGroup.SetAndrunSelProcess: argument is not of type ISGSelProcess");
+				}
+				public override IEnumeratorFake greyinCoroutine(){
+					return null;
+				}
+				public override IEnumeratorFake greyoutCoroutine(){
+					return null;
+				}
+				public override IEnumeratorFake highlightCoroutine(){
+					return null;
+				}
+				public override IEnumeratorFake dehighlightCoroutine(){
+					return null;
+				}
+			/*	Action Process	*/
+				public override ISSEProcess actProcess{
+					get{return (ISGActProcess)actProcEngine.process;}
+				}
+				public override void SetAndRunActProcess(ISSEProcess process){
+					if(process == null || process is ISGActProcess)
+						actProcEngine.SetAndRunProcess(process);
+					else throw new System.InvalidOperationException("SlotGroup.SetAndRunActProcess: argument is not of type ISGActProcess");
+				}
+				public IEnumeratorFake TransactionCoroutine(){
+					bool flag = true;
+					foreach(ISlottable sb in slottables){
+						if(sb != null)
+						flag &= !sb.actProcess.isRunning;
 					}
-					public override void SetAndRunSelProcess(SSEProcess process){
-						if(process == null || process is SGSelProcess)
-							selProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("SlotGroup.SetAndrunSelProcess: argument is not of type SGSelProcess");
+					if(flag){
+						actProcess.Expire();
 					}
-					public override IEnumeratorFake greyinCoroutine(){
-						return null;
-					}
-					public override IEnumeratorFake greyoutCoroutine(){
-						return null;
-					}
-					public override IEnumeratorFake highlightCoroutine(){
-						return null;
-					}
-					public override IEnumeratorFake dehighlightCoroutine(){
-						return null;
-					}
-				/*	Action Process	*/
-					public override SSEProcess actProcess{
-						get{return (SGActProcess)actProcEngine.process;}
-					}
-					public override void SetAndRunActProcess(SSEProcess process){
-						if(process == null || process is SGActProcess)
-							actProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("SlotGroup.SetAndRunActProcess: argument is not of type SGActProcess");
-					}
-					public IEnumeratorFake TransactionCoroutine(){
-						bool flag = true;
-						foreach(ISlottable sb in slottables){
-							if(sb != null)
-							flag &= !sb.actProcess.isRunning;
-						}
-						if(flag){
-							actProcess.Expire();
-						}
-						return null;
-					}
+					return null;
+				}
 		/*	public fields	*/
 			public virtual AxisScrollerMock scroller{
 				get{return m_scroller;}
@@ -166,6 +166,7 @@ namespace SlotSystem{
 				}AxisScrollerMock m_scroller;
 			public virtual Inventory inventory{
 				get{return m_inventory;}
+				set{}
 				}
 				Inventory m_inventory;
 				public virtual void SetInventory(Inventory inv){
@@ -200,6 +201,7 @@ namespace SlotSystem{
 				get{
 					return ssm.poolBundle.ContainsInHierarchy(this);
 				}
+				set{}
 			}
 			public virtual bool isSGE{
 				get{
@@ -217,6 +219,7 @@ namespace SlotSystem{
 			}
 			public virtual bool isAutoSort{
 				get{return m_isAutoSort;}
+				set{}
 				}protected bool m_isAutoSort = true;
 				public void ToggleAutoSort(bool on){
 					m_isAutoSort = on;
@@ -890,12 +893,55 @@ namespace SlotSystem{
 			}
 			public virtual ISlottable pickedSB{get{return ssm.pickedSB;}}
 			public virtual ISlottable targetSB{get{return ssm.targetSB;}}
+			// public void RunFilter(ref List<SlottableItem> items){
+			// 	Filter.Filter(ref items);
+			// }
+			public List<SlottableItem> FilterItem(List<SlottableItem> items){
+				Filter.Filter(ref items);
+				return items;
+			}
+			public void InitSlots(List<SlottableItem> items){
+				List<Slot> newSlots = new List<Slot>();
+				int slotCountToCreate = initSlotsCount == 0? items.Count: initSlotsCount;
+				for(int i = 0; i <slotCountToCreate; i++){
+					Slot newSlot = new Slot();
+					newSlots.Add(newSlot);
+				}
+				SetSlots(newSlots);
+			}
+			public void InitSBs(List<SlottableItem> items){
+				/*	if the number of filtered items exceeds the slot count, remove unfittable items from the inventory	*/
+				while(slots.Count < items.Count){
+					items.RemoveAt(slots.Count);
+				}
+				foreach(SlottableItem item in items){
+					GameObject newSBGO = new GameObject("newSBGO");
+					ISlottable newSB = newSBGO.AddComponent<Slottable>();
+					newSB.Initialize((InventoryItemInstance)item);
+					newSB.SetSSM(ssm);
+					slots[items.IndexOf(item)].sb = newSB;
+				}
+			}
+			public void SyncEquipped(InventoryItemInstance item, bool equipped){
+				if(equipped)
+					inventory.Add(item);
+				else
+					inventory.Remove(item);
+				ssm.MarkEquippedInPool(item, equipped);
+				ssm.SetEquippedOnAllSBs(item, equipped);
+			}
+			public void UpdateEquipStatesOnAll(){
+				ssm.UpdateEquipStatesOnAll();
+			}
+			public void ReportTAComp(){
+				ssm.AcceptSGTAComp(this);
+			}
 	}
 	public interface ISlotGroup: IAbsSlotSystemElement{
 		IEnumeratorFake TransactionCoroutine();
 		/*	fields	*/
 			AxisScrollerMock scroller{get;}
-			Inventory inventory{get;}
+			Inventory inventory{get;set;}
 			void SetInventory(Inventory inv);
 			bool isShrinkable{get; set;}
 			bool isExpandable{get; set;}
@@ -903,10 +949,10 @@ namespace SlotSystem{
 			void SetSlots(List<Slot> slots);
 			List<Slot> newSlots{get;}
 			void SetNewSlots(List<Slot> newSlots);
-			bool isPool{get;}
+			bool isPool{get;set;}
 			bool isSGE{get;}
 			bool isSGG{get;}
-			bool isAutoSort{get;}
+			bool isAutoSort{get;set;}
 			void ToggleAutoSort(bool on);
 			List<ISlottable> slottables{get;}
 			void SetSBs(List<ISlottable> sbs);
@@ -967,5 +1013,12 @@ namespace SlotSystem{
 			void SetHovered();
 			ISlottable pickedSB{get;}
 			ISlottable targetSB{get;}
+			// void RunFilter(ref List<SlottableItem> items);
+			List<SlottableItem> FilterItem(List<SlottableItem> items);
+			void InitSlots(List<SlottableItem> items);
+			void InitSBs(List<SlottableItem> items);
+			void SyncEquipped(InventoryItemInstance item, bool equipped);
+			void UpdateEquipStatesOnAll();
+			void ReportTAComp();
 	}
 }
