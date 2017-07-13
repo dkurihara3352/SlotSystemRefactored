@@ -6,9 +6,9 @@ namespace SlotSystem{
 		public void PageFocus(){
 			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.isFocusToggleOn)
-					pageEle.element.Focus();
+					pageEle.Focus();
 				else
-					pageEle.element.Defocus();
+					pageEle.Defocus();
 			}
 		}
 		public void ToggleBack(){
@@ -32,7 +32,7 @@ namespace SlotSystem{
 				get{
 					return m_pageElements;
 				}
-				set{}
+				set{m_pageElements = value;}
 			}protected IEnumerable<ISlotSystemPageElement> m_pageElements;
 		public virtual ISlotSystemPageElement GetPageElement(ISlotSystemElement element){
 			foreach(ISlotSystemPageElement pageEle in pageElements){

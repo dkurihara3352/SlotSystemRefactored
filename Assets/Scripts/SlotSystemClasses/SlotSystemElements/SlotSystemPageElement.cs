@@ -19,10 +19,18 @@ namespace SlotSystem{
 			m_isFocusToggleOn = isFocusToggleOn;
 			m_isFocusedOnActivate = isFocusToggleOn;				
 		}
+		public void Focus(){
+			element.Focus();
+		}
+		public void Defocus(){
+			element.Defocus();
+		}
 	}
 	public interface ISlotSystemPageElement{
 		ISlotSystemElement element{get;}
 		bool isFocusedOnActivate{get;}
 		bool isFocusToggleOn{get;set;}
+		void Focus();
+		void Defocus();
 	}
 }

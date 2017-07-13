@@ -619,11 +619,6 @@ namespace SlotSystemTests{
 					}
 			/*	Forward	*/
 			/*	helper	*/
-			private static Slottable MakeSB(){
-				GameObject sbGO = new GameObject("sbGO");
-				Slottable sb = sbGO.AddComponent<Slottable>();
-				return sb;
-			}
 			SSEStateEngine MakeSubSSEStateEngine(ISlotSystemElement sse){
 				return Substitute.For<SSEStateEngine>(sse);
 			}

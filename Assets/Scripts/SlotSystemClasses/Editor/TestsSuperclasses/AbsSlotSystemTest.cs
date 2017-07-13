@@ -7,6 +7,73 @@ using SlotSystem;
 using NSubstitute;
 
 public class AbsSlotSystemTest{
+	[TearDown]
+	public void CleanupScene(){
+		Object[] gos = GameObject.FindGameObjectsWithTag("TestGO");
+		foreach(var obj in gos)
+			GameObject.DestroyImmediate(obj);
+	}
+	protected static ISlotSystemBundle MakeSubBundle(){
+		return Substitute.For<ISlotSystemBundle>();
+	}
+	protected static SlotSystemManager MakeSSM(){
+		GameObject go = new GameObject("go");
+		go.tag = "TestGO";
+		SlotSystemManager ssm = go.AddComponent<SlotSystemManager>();
+		return ssm;
+	}
+	protected static SlotSystemBundle MakeSSBundle(){
+		GameObject go = new GameObject("ssBunGO");
+		go.tag = "TestGO";
+		SlotSystemBundle ssBun = go.AddComponent<SlotSystemBundle>();
+		return ssBun;
+	}
+	protected static GenericPage MakeGenPage(){
+		GameObject go = new GameObject("genPageGO");
+		go.tag = "TestGO";
+		GenericPage gPage = go.AddComponent<GenericPage>();
+		return gPage;
+	}
+	protected static EquipmentSet MakeEquipmentSet(){
+		GameObject go = new GameObject("eSetGO");
+		go.tag = "TestGO";
+		EquipmentSet eSet = go.AddComponent<EquipmentSet>();
+		return eSet;
+	}
+	protected static ISlotSystemElement MakeSubSSE(){
+		return Substitute.For<ISlotSystemElement>();
+	}
+	protected static TestSlotSystemPage MakeTestSSPage(){
+		GameObject testSSPageGO = new GameObject("testSSPageGO");
+		TestSlotSystemPage testSSPage = testSSPageGO.AddComponent<TestSlotSystemPage>();
+		testSSPageGO.tag = "TestGO";
+		return testSSPage;
+	}
+	protected static ISlotSystemPageElement MakeSubPageElement(){
+		return Substitute.For<ISlotSystemPageElement>();
+	}
+	protected static SlotSystemPageElement MakePageElement(ISlotSystemElement ele, bool isOnByDef){
+		return new SlotSystemPageElement(ele, isOnByDef);
+	}
+	protected static Slottable MakeSB(){
+		GameObject sbGO = new GameObject("sbGO");
+		sbGO.tag = "TestGO";
+		Slottable sb = sbGO.AddComponent<Slottable>();
+		return sb;
+	}
+	protected static SlotGroup MakeSG(){
+		GameObject go = new GameObject("go");
+		go.tag = "TestGO";
+		return go.AddComponent<SlotGroup>();
+	}
+	protected static SlotGroup MakeSGWithEmptySBs(){
+		GameObject go = new GameObject("go");
+		go.tag = "TestGO";
+		SlotGroup sg = go.AddComponent<SlotGroup>();
+		sg.SetSBs(new List<ISlottable>());
+		return sg;
+
+	}
 	protected static ISlotSystemManager MakeSubSSM(){
 		return Substitute.For<ISlotSystemManager>();
 	}

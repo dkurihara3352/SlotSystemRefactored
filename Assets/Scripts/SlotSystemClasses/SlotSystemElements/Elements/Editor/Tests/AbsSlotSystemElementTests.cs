@@ -73,7 +73,7 @@ namespace SlotSystemTests{
 							testSSE.SetSelState(AbsSlotSystemElement.selectedState);
 							testSSE.SetSelState(AbsSlotSystemElement.defocusedState);
 
-							Assert.That(testSSE.selProcess, Is.TypeOf(typeof(SSEDehighlightProcess)));
+							Assert.That(testSSE.selProcess, Is.TypeOf(typeof(SSEGreyoutProcess)));
 						}
 					/*	To Focus	*/
 						[Test]

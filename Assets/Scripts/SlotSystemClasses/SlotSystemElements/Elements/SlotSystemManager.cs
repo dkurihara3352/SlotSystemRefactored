@@ -101,6 +101,10 @@ namespace SlotSystem{
 					}
 				}
 				public void AddFocusedSGTo(ISlotSystemElement ele, IList<ISlotGroup> list){
+					if(ele is ISlotGroup && ele.isFocusedInHierarchy)
+						list.Add((ISlotGroup)ele);
+				}
+				public void AddFocusedSGToObs(ISlotSystemElement ele, IList<ISlotGroup> list){
 					if(ele is ISlotGroup){
 						ISlotGroup sg = (ISlotGroup)ele;
 						ISlotSystemElement inspected = sg;

@@ -51,7 +51,7 @@ namespace SlotSystem{
 					}else if(sse.prevSelState == AbsSlotSystemElement.focusedState)
 						process = new SSEGreyoutProcess(sse, sse.greyoutCoroutine);
 					else if(sse.prevSelState == AbsSlotSystemElement.selectedState)
-						process = new SSEDehighlightProcess(sse, sse.dehighlightCoroutine);
+						process = new SSEGreyoutProcess(sse, sse.greyoutCoroutine);
 					sse.SetAndRunSelProcess(process);
 				}
 			}
