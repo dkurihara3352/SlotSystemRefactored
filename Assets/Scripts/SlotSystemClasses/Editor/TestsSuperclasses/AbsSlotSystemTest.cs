@@ -40,6 +40,19 @@ public class AbsSlotSystemTest{
 		EquipmentSet eSet = go.AddComponent<EquipmentSet>();
 		return eSet;
 	}
+	protected static EquipmentSet MakeEquipmentSetInitWithSGs(){
+		GameObject go = new GameObject("eSetGO");
+		go.tag = "TestGO";
+		EquipmentSet eSet = go.AddComponent<EquipmentSet>();
+		SlotGroup bowSG = MakeSGWithEmptySBs();
+			SlotSystemPageElement bowSGPE = MakePageElement(bowSG, true);
+		SlotGroup wearSG = MakeSGWithEmptySBs();
+			SlotSystemPageElement wearSGPE = MakePageElement(wearSG, true);
+		SlotGroup cGearsSG = MakeSGWithEmptySBs();
+			SlotSystemPageElement cGearsSGPE = MakePageElement(cGearsSG, true);
+		eSet.Initialize(bowSGPE, wearSGPE, cGearsSGPE);
+		return eSet;
+	}
 	protected static ISlotSystemElement MakeSubSSE(){
 		return Substitute.For<ISlotSystemElement>();
 	}
