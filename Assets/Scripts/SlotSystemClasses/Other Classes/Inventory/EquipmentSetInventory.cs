@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 
 namespace SlotSystem{
-	public class EquipmentSetInventory: Inventory{
+	public class EquipmentSetInventory: IEquipmentSetInventory{
 		public IEnumerator<SlottableItem> GetEnumerator(){
 			foreach(SlottableItem item in m_items){
 				yield return item;
@@ -102,5 +102,9 @@ namespace SlotSystem{
 			}else
 				throw new ArgumentNullException();
 		}
+	}
+	public interface IEquipmentSetInventory: Inventory{
+		int equippableCGearsCount{get;}
+		void SetEquippableCGearsCount(int num);
 	}
 }

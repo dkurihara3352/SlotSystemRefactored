@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class PoolInventory: Inventory{
+	public class PoolInventory: IPoolInventory{
 		public IEnumerator<SlottableItem> GetEnumerator(){
 			foreach(SlottableItem item in m_items){
 				yield return item;
@@ -75,5 +75,7 @@ namespace SlotSystem{
 				((InventoryItemInstance)m_items[i]).SetAcquisitionOrder(i);
 			}
 		}
+	}
+	public interface IPoolInventory: Inventory{
 	}
 }

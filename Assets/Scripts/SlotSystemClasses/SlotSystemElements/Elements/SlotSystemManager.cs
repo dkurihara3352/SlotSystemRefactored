@@ -141,14 +141,14 @@ namespace SlotSystem{
 						return result;
 					}
 				}
-				public PoolInventory poolInv{
+				public IPoolInventory poolInv{
 					get{
-						return (PoolInventory)focusedSGP.inventory;
+						return (IPoolInventory)focusedSGP.inventory;
 					}
 				}
-				public EquipmentSetInventory equipInv{
+				public IEquipmentSetInventory equipInv{
 					get{
-						return (EquipmentSetInventory)focusedSGEs[0].inventory;
+						return (IEquipmentSetInventory)focusedSGEs[0].inventory;
 					}
 				}
 				public BowInstance equippedBowInst{
@@ -781,8 +781,8 @@ namespace SlotSystem{
 			void AddFocusedSGTo(ISlotSystemElement ele, IList<ISlotGroup> list);
 			List<ISlotGroup> focusedSGs{get;}
 			List<IEquipmentSet> equipmentSets{get;}
-			PoolInventory poolInv{get;}
-			EquipmentSetInventory equipInv{get;}
+			IPoolInventory poolInv{get;}
+			IEquipmentSetInventory equipInv{get;}
 			BowInstance equippedBowInst{get;}
 			WearInstance equippedWearInst{get;}
 			List<CarriedGearInstance> equippedCarriedGears{get;}
