@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public abstract class AbsSlotSystemTransaction: SlotSystemTransaction{
-		public static SlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+	public abstract class AbsSlotSystemTransaction: ISlotSystemTransaction{
+		public static ISlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
 			ISlotGroup origSG = pickedSB.sg;
 			if(hovered != null){
 				if(hovered is ISlotGroup){

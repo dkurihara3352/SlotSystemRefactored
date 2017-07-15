@@ -462,7 +462,7 @@ namespace SlotSystemTests{
 				[Test]
 				[Category("Methods")]
 				public void ExecuteTransaction_WhenCalled_CallsSSMExecuteTransaction(){
-					ISlotSystemManager mockSSM = MakeSubSSM();
+					ISlotSystemManager mockSSM = MakeSubISSM();
 					Slottable stubSB = MakeSB();
 					stubSB.ssm = mockSSM;
 
@@ -490,7 +490,7 @@ namespace SlotSystemTests{
 					stubBow.isEquipped = true;
 					testSB.SetItem(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
-					ISlotSystemManager stubSSM = MakeSubSSM();
+					ISlotSystemManager stubSSM = MakeSubISSM();
 					stubSSM.FindParent(testSB).Returns(stubSG);
 					testSB.SetSSM(stubSSM);
 
@@ -506,7 +506,7 @@ namespace SlotSystemTests{
 					stubBow.isEquipped = false;
 					testSB.SetItem(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
-					ISlotSystemManager stubSSM = MakeSubSSM();
+					ISlotSystemManager stubSSM = MakeSubISSM();
 					stubSSM.FindParent(testSB).Returns(stubSG);
 					testSB.SetSSM(stubSSM);
 
@@ -546,7 +546,7 @@ namespace SlotSystemTests{
 				public void ShareSGAndItem_VariousCombo_ReturnsAccordingly(ISlotGroup sg, ISlotGroup otherSG, InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
 					Slottable sb = MakeSB();
 					Slottable otherSB = MakeSB();
-					ISlotSystemManager stubSSM = MakeSubSSM();
+					ISlotSystemManager stubSSM = MakeSubISSM();
 					sb.SetSSM(stubSSM);
 					otherSB.SetSSM(stubSSM);
 					stubSSM.FindParent(sb).Returns(sg);

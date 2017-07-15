@@ -25,7 +25,7 @@ public class AbsSlotSystemTest{
 			SlotSystemManager ssm = go.AddComponent<SlotSystemManager>();
 			return ssm;
 		}
-		protected static ISlotSystemManager MakeSubSSM(){
+		protected static ISlotSystemManager MakeSubISSM(){
 			return Substitute.For<ISlotSystemManager>();
 		}
 		protected static ISlotSystemPage MakeSubSSPage(){
@@ -48,6 +48,9 @@ public class AbsSlotSystemTest{
 			go.tag = "TestGO";
 			EquipmentSet eSet = go.AddComponent<EquipmentSet>();
 			return eSet;
+		}
+		protected static IEquipmentSet MakeSubESet(){
+			return Substitute.For<IEquipmentSet>();
 		}
 		protected static IEquipmentSet MakeSubEquipmentSetInitWithSGs(){
 			IEquipmentSet eSet = Substitute.For<IEquipmentSet>();
@@ -101,7 +104,6 @@ public class AbsSlotSystemTest{
 			SlotGroup sg = go.AddComponent<SlotGroup>();
 			sg.SetSBs(new List<ISlottable>());
 			return sg;
-
 		}
 		protected static Slottable MakeSB(){
 			GameObject sbGO = new GameObject("sbGO");
@@ -229,5 +231,8 @@ public class AbsSlotSystemTest{
 		}
 		protected static IEnumeratorFake FakeCoroutine(){
 			return new IEnumeratorFake();
+		}
+		protected static ISlotSystemTransaction MakeSubTA(){
+			return Substitute.For<ISlotSystemTransaction>();
 		}
 }

@@ -6,8 +6,9 @@ namespace SlotSystem{
 	public static class SlotSystemUtil{
 		public static ISlottable CloneSB(ISlottable orig){
 			if(orig != null){
-				GameObject cloneGO = new GameObject("cloneGO");
-				SBClone clone = cloneGO.AddComponent<SBClone>();
+				// GameObject cloneGO = new GameObject("cloneGO");
+				// SBClone clone = cloneGO.AddComponent<SBClone>();
+				SBClone clone = new SBClone();
 				clone.Initialize(orig);
 				return clone;
 			}
@@ -15,8 +16,9 @@ namespace SlotSystem{
 		}
 		public static ISlotGroup CloneSG(ISlotGroup orig){
 			if(orig != null){
-				GameObject cloneSGGO = new GameObject("cloneSGGO");
-				SGClone cloneSG = cloneSGGO.AddComponent<SGClone>();
+				// GameObject cloneSGGO = new GameObject("cloneSGGO");
+				// SGClone cloneSG = cloneSGGO.AddComponent<SGClone>();
+				SGClone cloneSG = new SGClone();
 				cloneSG.Initialize(orig);
 				return cloneSG;
 			}
@@ -139,7 +141,7 @@ namespace SlotSystem{
 					res = "Transaction";
 				return res;
 			}
-			public static string TransactionName(SlotSystemTransaction ta){
+			public static string TransactionName(ISlotSystemTransaction ta){
 				string res = "";
 				if(ta is RevertTransaction)
 					res = SlotSystemUtil.Red("RevertTA");
@@ -555,7 +557,7 @@ namespace SlotSystem{
 			}
 		/*	Debug	*/
 			public static string TADebug(ISlottable testSB, ISlotSystemElement hovered){
-				SlotSystemTransaction ta = testSB.ssm.GetTransaction(testSB, hovered);
+				ISlotSystemTransaction ta = testSB.ssm.GetTransaction(testSB, hovered);
 				string taStr = TransactionName(ta);
 				string taTargetSB = SlotSystemUtil.SBofSG(ta.targetSB);
 				string taSG1 = ta.sg1==null?"null":ta.sg1.eName;
@@ -566,7 +568,7 @@ namespace SlotSystem{
 					"sg2: " + taSG2
 					;
 			}
-			public static string TADebug(SlotSystemTransaction ta){
+			public static string TADebug(ISlotSystemTransaction ta){
 				string taStr = TransactionName(ta);
 				string taTargetSB = SlotSystemUtil.SBofSG(ta.targetSB);
 				string taSG1 = ta.sg1==null?"null":ta.sg1.eName;

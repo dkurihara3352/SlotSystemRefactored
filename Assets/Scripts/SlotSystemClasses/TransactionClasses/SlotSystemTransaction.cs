@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public interface SlotSystemTransaction{
+	public interface ISlotSystemTransaction{
 		ISlottable targetSB{get;}
 		ISlotGroup sg1{get;}
 		ISlotGroup sg2{get;}

@@ -18,7 +18,7 @@ namespace SlotSystem{
 			}
 		/*	Managerial	*/
 			/* fields	*/
-				public List<ISlotGroup> allSGs{
+				public virtual List<ISlotGroup> allSGs{
 					get{
 						List<ISlotGroup> result = new List<ISlotGroup>();
 						result.AddRange(allSGPs);
@@ -27,21 +27,22 @@ namespace SlotSystem{
 						return result;
 					}
 				}
-				public List<ISlotGroup> allSGPs{
+				public virtual List<ISlotGroup> allSGPs
+				{
 					get{
 						List<ISlotGroup> result = new List<ISlotGroup>();
 						poolBundle.PerformInHierarchy(AddInSGList, result);
 						return result;
 					}
 				}
-				public List<ISlotGroup> allSGEs{
+				public virtual List<ISlotGroup> allSGEs{
 					get{
 						List<ISlotGroup> result = new List<ISlotGroup>();
 						equipBundle.PerformInHierarchy(AddInSGList, result);
 						return result;
 					}
 				}
-				public List<ISlotGroup> allSGGs{
+				public virtual List<ISlotGroup> allSGGs{
 					get{
 						List<ISlotGroup> result = new List<ISlotGroup>();
 						foreach(ISlotSystemBundle gBun in otherBundles){
@@ -258,8 +259,8 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void SortSG(ISlotGroup sg, SGSorter sorter){
-					SlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
+				public void SortSG(ISlotGroup sg, SGSorter sorter){//later
+					ISlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
 					SetTargetSB(sortTransaction.targetSB);
 					SetSG1(sortTransaction.sg1);
 					SetTransaction(sortTransaction);
@@ -267,13 +268,12 @@ namespace SlotSystem{
 				}
 				public void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG){
 					if(!targetSG.isExpandable){
-						if(targetSG.curSelState == SlotGroup.sgFocusedState ||
-							targetSG.curSelState == SlotGroup.sgDefocusedState){
-								equipInv.SetEquippableCGearsCount(i);
-								targetSG.InitializeItems();
-								UpdateEquipStatesOnAll();
-								ResetAndFocus();
-							}
+						if(targetSG.isFocused || targetSG.isDefocused){
+							equipInv.SetEquippableCGearsCount(i);
+							targetSG.InitializeItems();
+							UpdateEquipStatesOnAll();
+							ResetAndFocus();
+						}
 					}else{
 						throw new System.InvalidOperationException("ISlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
 					}
@@ -294,12 +294,12 @@ namespace SlotSystem{
 					if(ele is ISlottable){
 						InventoryItemInstance item = (InventoryItemInstance)obj;
 						ISlottable sb = (ISlottable)ele;
-						/*	assume all sbs are properly set in slottables, not int newSBs	*/
+						/*	assume all sbs are properly set in slottables, not in newSBs	*/
 						if(sb.itemInst == item){
 							if(sb.sg.isFocusedInBundle){/*	focused sgp or sge	*/
 								if(sb.newSlotID != -1)/*	not being removed	*/
 									sb.SetEqpState(Slottable.equippedState);
-							}else if(sb.sg.isPool){/*	defocused sgp	*/
+							}else if(sb.sg.isPool){/*	defocused sgp, setting equipped w/o transition	*/
 								sb.SetEqpState(null);
 								sb.SetEqpState(Slottable.equippedState);
 							}
@@ -322,27 +322,7 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void PointFocus(ISlotSystemElement ele){
-					/*	focus the given element and all those above it to the root
-							if any element in the course is page element and is not toggled on, toggle it on and focus
-							if any elemen in the course is bundle element and is not the focused element in the bundle, make it the focused element and focus it
-					*/
-					FindAndFocusInBundle(ele);
-					if(ele.isPageElement){
-						ISlotSystemPage page = (ISlotSystemPage)ele.parent;
-						ISlotSystemPageElement pageEle = page.GetPageElement(ele);
-						if(!pageEle.isFocusToggleOn)
-							page.TogglePageElementFocus(ele, true);
-					}
-					if(ele.isBundleElement){
-						ISlotSystemBundle bundle = (ISlotSystemBundle)ele.parent;
-						if(bundle.focusedElement != ele){
-							bundle.SetFocusedBundleElement(ele);
-							bundle.Focus();
-						}
-					}
-				}
-				public void PrePickFilter(ISlottable sb, out bool isFilteredIn){
+				public void PrePickFilter(ISlottable sb, out bool isFilteredIn){//later
 					bool res = false;
 					foreach(ISlotGroup targetSG in ssm.focusedSGs){
 						if(ssm.GetTransaction(sb, targetSG).GetType() != typeof(RevertTransaction)){
@@ -470,13 +450,13 @@ namespace SlotSystem{
 				public override ISlotSystemBundle immediateBundle{
 					get{return null;}
 				}
-				public ISlotSystemBundle poolBundle{
+				public virtual ISlotSystemBundle poolBundle{
 					get{return m_poolBundle;}
 					}ISlotSystemBundle m_poolBundle;
-				public ISlotSystemBundle equipBundle{
+				public virtual ISlotSystemBundle equipBundle{
 					get{return m_equipBundle;}
 					}ISlotSystemBundle m_equipBundle;
-				public IEnumerable<ISlotSystemBundle> otherBundles{
+				public virtual IEnumerable<ISlotSystemBundle> otherBundles{
 					get{
 						if(m_otherBundles == null)
 							m_otherBundles = new ISlotSystemBundle[]{};
@@ -592,10 +572,10 @@ namespace SlotSystem{
 						}
 					}
 		/*	Transaction Manager	*/
-			public SlotSystemTransaction transaction{
+			public ISlotSystemTransaction transaction{
 				get{return m_transaction;}
-				}SlotSystemTransaction m_transaction;
-				public void SetTransaction(SlotSystemTransaction transaction){
+				}ISlotSystemTransaction m_transaction;
+				public void SetTransaction(ISlotSystemTransaction transaction){
 					if(m_transaction != transaction){
 						m_transaction = transaction;
 						if(m_transaction != null){
@@ -715,11 +695,11 @@ namespace SlotSystem{
 						m_hovered = ele;
 					}
 				}
-			public Dictionary<ISlotSystemElement, SlotSystemTransaction> transactionResults;
+			public Dictionary<ISlotSystemElement, ISlotSystemTransaction> transactionResults;
 			public virtual void CreateTransactionResults(){
-				Dictionary<ISlotSystemElement, SlotSystemTransaction> result = new Dictionary<ISlotSystemElement, SlotSystemTransaction>();
+				Dictionary<ISlotSystemElement, ISlotSystemTransaction> result = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 				foreach(ISlotGroup sg in focusedSGs){
-					SlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, sg);
+					ISlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, sg);
 					result.Add(sg, ta);
 					if(ta is RevertTransaction)
 						sg.DefocusSelf();
@@ -727,7 +707,7 @@ namespace SlotSystem{
 						sg.FocusSelf();
 					foreach(ISlottable sb in sg){
 						if(sb != null){
-							SlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb);
+							ISlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb);
 							result.Add(sb, ta2);
 							if(ta2 is RevertTransaction || ta2 is FillTransaction)
 								sb.Defocus();
@@ -739,7 +719,7 @@ namespace SlotSystem{
 				this.transactionResults = result;
 			}
 			public virtual void UpdateTransaction(){
-				SlotSystemTransaction ta = null;
+				ISlotSystemTransaction ta = null;
 				if(transactionResults.TryGetValue(hovered, out ta)){
 					SetTargetSB(ta.targetSB);
 					SetSG1(ta.sg1);
@@ -749,7 +729,7 @@ namespace SlotSystem{
 			}
 			public void ReferToTAAndUpdateSelState(ISlotGroup sg){
 				if(transactionResults != null){
-					SlotSystemTransaction ta = null;
+					ISlotSystemTransaction ta = null;
 					if(transactionResults.TryGetValue(sg, out ta)){
 						if(ta is RevertTransaction)
 							sg.SetSelState(SlotGroup.sgDefocusedState);
@@ -759,7 +739,7 @@ namespace SlotSystem{
 				}else
 					sg.SetSelState(SlotGroup.sgFocusedState);
 			}
-			public SlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+			public ISlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
 				return AbsSlotSystemTransaction.GetTransaction(pickedSB, hovered);
 			}
 	}
@@ -799,7 +779,6 @@ namespace SlotSystem{
 			void SetEquippedOnAllSBs(InventoryItemInstance item, bool equipped);
 			void Equip(ISlotSystemElement ele, object obj);
 			void Unequip(ISlotSystemElement ele, object obj);
-			void PointFocus(ISlotSystemElement ele);
 			void PrePickFilter(ISlottable sb, out bool isFilteredIn);
 			void ExecuteTransaction();
 		/*	SlotSystemElement 	*/

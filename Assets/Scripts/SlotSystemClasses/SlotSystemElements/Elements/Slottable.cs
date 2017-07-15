@@ -535,8 +535,8 @@ namespace SlotSystem{
 					return false;
 			}
 			public void Destroy(){
-				GameObject go = gameObject;
-				DestroyImmediate(go);
+				// GameObject go = gameObject;
+				// DestroyImmediate(go);
 			}
 		/*	Forward	*/
 			public virtual void SetPickedSB(){
