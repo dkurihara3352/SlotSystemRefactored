@@ -87,9 +87,7 @@ public class AbsSlotSystemTest{
 		}
 		protected static ISlotGroup MakeSubSGWithEmptySBs(){
 			ISlotGroup sg = MakeSubSG();
-			List<ISlottable> sbs = new List<ISlottable>();
 			List<ISlotSystemElement> eles = new List<ISlotSystemElement>();
-			sg.slottables.Returns(sbs);
 			sg.elements.Returns(eles);
 			return sg;
 		}

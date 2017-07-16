@@ -448,12 +448,13 @@ namespace SlotSystemTests{
 					ISlotSystemPageElement eBunPE = MakeSubEquipBundlePEInitWithSGs();
 					IEnumerable<ISlotSystemPageElement> genBunPEs = MakeSubGenBundlePEsInitWithSGs();
 					ISlotSystemBundle pBun = MakeSubBundle();
+						List<ISlotSystemElement> sbs = new List<ISlotSystemElement>();
 						ISlotGroup sgpA = MakeSubSG();
-							sgpA.slottables.Returns(new List<ISlottable>());
+							sgpA.GetEnumerator().Returns(sbs.GetEnumerator());
 						ISlotGroup sgpB = MakeSubSG();
-							sgpA.slottables.Returns(new List<ISlottable>());
+							sgpB.GetEnumerator().Returns(sbs.GetEnumerator());
 						ISlotGroup sgpC = MakeSubSG();
-							sgpA.slottables.Returns(new List<ISlottable>());
+							sgpC.GetEnumerator().Returns(sbs.GetEnumerator());
 						IPoolInventory pInv = MakeSubPoolInv();
 						sgpA.inventory.Returns(pInv);
 						pBun.elements.Returns(new ISlotSystemElement[]{
@@ -1004,7 +1005,7 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInBundle.Returns(true);
+						stubSG.isFocusedInHierarchy.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
 						mockSB.itemInst.Returns(bow);
@@ -1019,7 +1020,7 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInBundle.Returns(false);
+						stubSG.isFocusedInHierarchy.Returns(false);
 						stubSG.isPool.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
@@ -1037,7 +1038,7 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInBundle.Returns(true);
+						stubSG.isFocusedInHierarchy.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
 						mockSB.itemInst.Returns(bow);
@@ -1052,7 +1053,7 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInBundle.Returns(false);
+						stubSG.isFocusedInHierarchy.Returns(false);
 						stubSG.isPool.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
@@ -2750,11 +2751,12 @@ namespace SlotSystemTests{
 					ISlotSystemPageElement poolBundlePE = MakeSubPageElement();
 					poolBundlePE.element.Returns(poolBundle);
 					ISlotGroup sgpA = MakeSubSG();
-						sgpA.slottables.Returns(new List<ISlottable>());
+						IEnumerable<ISlotSystemElement> emptyEles = new ISlotSystemElement[]{};
+						sgpA.GetEnumerator().Returns(emptyEles.GetEnumerator());
 					ISlotGroup sgpB = MakeSubSG();
-						sgpB.slottables.Returns(new List<ISlottable>());
+						sgpB.GetEnumerator().Returns(emptyEles.GetEnumerator());
 					ISlotGroup sgpC = MakeSubSG();
-						sgpC.slottables.Returns(new List<ISlottable>());
+						sgpC.GetEnumerator().Returns(emptyEles.GetEnumerator());
 					IEnumerable<ISlotSystemElement> sgs = new ISlotSystemElement[]{
 						sgpA, sgpB, sgpC
 					};

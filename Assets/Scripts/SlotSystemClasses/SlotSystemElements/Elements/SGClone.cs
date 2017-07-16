@@ -13,13 +13,13 @@ namespace SlotSystem{
 		public override bool isSGG{
 			get{return m_isSGG;}
 			}bool m_isSGG;
-		public override bool isFocusedInBundle{
-			get{return m_isFocusedInBundle;}
-			}bool m_isFocusedInBundle;
+		// public override bool isFocusedInBundle{
+		// 	get{return m_isFocusedInBundle;}
+		// 	}bool m_isFocusedInBundle;
 		public override List<ISlottable> equippedSBs{
 			get{return m_equippedSBs;}
 			}List<ISlottable> m_equippedSBs;
-		public override bool isAllTASBsDone{
+		public override bool isAllSBActProcDone{
 			get{return m_isAllTASBsDone;}
 			}bool m_isAllTASBsDone;
 		public override bool isFocused{
@@ -34,11 +34,17 @@ namespace SlotSystem{
 		public override string eName{
 			get{return m_eName;}
 		}
+		public override bool isShrinkable{
+			get{return m_isShrinkable;}
+		}bool m_isShrinkable;
+		public override bool isExpandable{
+			get{return m_isExpandable;}
+		}bool m_isExpandable;
 		public void Initialize(ISlotGroup orig){
 			this.scroller = orig.scroller;
 			SetInventory(orig.inventory);
-			this.isShrinkable = orig.isShrinkable;
-			this.isExpandable = orig.isExpandable;
+			m_isShrinkable = orig.isShrinkable;
+			m_isExpandable = orig.isExpandable;
 			List<Slot> slotsClone = new List<Slot>();
 				foreach(Slot oSlot in orig.slots){
 					Slot newSlot = new Slot();
@@ -79,7 +85,6 @@ namespace SlotSystem{
 					}
 				}
 				SetNewSBs(newSbsClone);
-			m_isFocusedInBundle = orig.isFocusedInBundle;
 			List<ISlottable> equippedSBsClone = new List<ISlottable>();
 				if(orig.equippedSBs != null)
 				foreach(ISlottable sb in orig.equippedSBs){
@@ -87,7 +92,7 @@ namespace SlotSystem{
 					equippedSBsClone.Add(cloneSB);
 				}
 				m_equippedSBs = equippedSBsClone;
-			m_isAllTASBsDone = orig.isAllTASBsDone;
+			m_isAllTASBsDone = orig.isAllSBActProcDone;
 			SetInitSlotsCount(orig.initSlotsCount);
 			this.m_isFocused = orig.isFocused;
 			this.m_isDefocused = orig.isDefocused;

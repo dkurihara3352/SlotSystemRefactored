@@ -302,7 +302,7 @@ namespace SlotSystem{
 						ISlottable sb = (ISlottable)ele;
 						/*	assume all sbs are properly set in slottables, not in newSBs	*/
 						if(sb.itemInst == item){
-							if(sb.sg.isFocusedInBundle){/*	focused sgp or sge	*/
+							if(sb.sg.isFocusedInHierarchy){/*	focused sgp or sge	*/
 								if(sb.newSlotID != -1)/*	not being removed	*/
 									sb.SetEqpState(Slottable.equippedState);
 							}else if(sb.sg.isPool){/*	defocused sgp, setting equipped w/o transition	*/
@@ -318,7 +318,7 @@ namespace SlotSystem{
 						ISlottable sb = (ISlottable)ele;
 						/*	assume all sbs are properly set in slottables, not int newSBs	*/
 						if(sb.itemInst == item){
-							if(sb.sg.isFocusedInBundle){
+							if(sb.sg.isFocusedInHierarchy){
 								if(sb.slotID != -1)/*	not being added	*/
 									sb.SetEqpState(Slottable.unequippedState);
 							}else if(sb.sg.isPool){/*	defocused sgp	*/

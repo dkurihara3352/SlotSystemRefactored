@@ -16,8 +16,8 @@ namespace SlotSystemTests{
 				SGInitItemsCommand comm = new SGInitItemsCommand();
 				ISlotGroup mockSG = MakeSubSG();
 				Inventory stubInv = Substitute.For<Inventory>();
-				mockSG.inventory = stubInv;
-				mockSG.isAutoSort = false;
+				mockSG.inventory.Returns(stubInv);
+				mockSG.isAutoSort.Returns(false);
 				BowInstance bow = MakeBowInstance(0);
 				WearInstance wear = MakeWearInstance(0);
 				IEnumerable<InventoryItemInstance> items = new InventoryItemInstance[]{bow, wear};
@@ -43,7 +43,7 @@ namespace SlotSystemTests{
 			public void SGInitItemsCommand_Execute_SGIsAutoSort_CallsSGInstantSort(){
 				SGInitItemsCommand comm = new SGInitItemsCommand();
 				ISlotGroup mockSG = MakeSubSG();
-				mockSG.isAutoSort = true;
+				mockSG.isAutoSort.Returns(true);
 				comm.Execute(mockSG);
 
 				mockSG.Received().InstantSort();
