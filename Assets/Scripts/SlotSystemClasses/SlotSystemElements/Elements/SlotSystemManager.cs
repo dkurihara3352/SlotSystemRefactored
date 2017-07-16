@@ -126,13 +126,12 @@ namespace SlotSystem{
 				}
 				public List<ISlotGroup> focusedSGs{
 					get{
-						List<ISlotGroup> result = new List<ISlotGroup>();
-						result.Add(focusedSGP);
-						result.AddRange(focusedSGEs);
-						result.AddRange(focusedSGGs);
-						return result;
+						if(focusedSGsFactory == null)
+							focusedSGsFactory = new FocusedSGsFactory(this);
+						return focusedSGsFactory.focusedSGs;
 					}
-				}
+					}IFocusedSGsFactory focusedSGsFactory;
+					public void SetFocusedSGsFactory(IFocusedSGsFactory fac){focusedSGsFactory = fac;}
 				public List<IEquipmentSet> equipmentSets{
 					get{
 						List<IEquipmentSet> result = new List<IEquipmentSet>();
@@ -259,13 +258,20 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void SortSG(ISlotGroup sg, SGSorter sorter){//later
-					ISlotSystemTransaction sortTransaction = new SortTransaction(sg, sorter);
+				public void SortSG(ISlotGroup sg, SGSorter sorter){
+					ISlotSystemTransaction sortTransaction = sortFA.MakeSortTA(sg, sorter);
 					SetTargetSB(sortTransaction.targetSB);
 					SetSG1(sortTransaction.sg1);
 					SetTransaction(sortTransaction);
 					transaction.Execute();
-				}
+				}ISortTransactionFactory sortFA{
+					get{
+						if(m_sortFA == null)
+							m_sortFA = new SortTransactionFactory();
+						return m_sortFA;
+					}
+				}ISortTransactionFactory m_sortFA;
+				public void SetSortFA(ISortTransactionFactory fa){m_sortFA = fa;}
 				public void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG){
 					if(!targetSG.isExpandable){
 						if(targetSG.isFocused || targetSG.isDefocused){
@@ -322,16 +328,22 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void PrePickFilter(ISlottable sb, out bool isFilteredIn){//later
+				public void PrePickFilter(ISlottable sb, out bool isFilteredIn){
 					bool res = false;
-					foreach(ISlotGroup targetSG in ssm.focusedSGs){
-						if(ssm.GetTransaction(sb, targetSG).GetType() != typeof(RevertTransaction)){
-							res = true; break;
-						}
-						foreach(ISlottable targetSB in targetSG){
-							if(ssm.GetTransaction(sb, targetSB).GetType() != typeof(RevertTransaction)){
+					foreach(ISlotGroup targetSG in focusedSGs){
+						ISlotSystemTransaction ta = MakeTransaction(sb, targetSG);
+						if(ta == null)
+							throw new System.InvalidOperationException("SlotSystemManager.PrePickFilter: given hoveredSSE does not yield any transaction. something's wrong baby");
+						else{
+							if(!(ta is IRevertTransaction)){
 								res = true; break;
 							}
+						}
+						foreach(ISlottable targetSB in targetSG){
+							if(sb != null)
+								if(!(MakeTransaction(sb, targetSB) is IRevertTransaction)){
+									res = true; break;
+								}
 						}
 					}
 					isFilteredIn = res;
@@ -572,9 +584,15 @@ namespace SlotSystem{
 						}
 					}
 		/*	Transaction Manager	*/
-			public ISlotSystemTransaction transaction{
-				get{return m_transaction;}
-				}ISlotSystemTransaction m_transaction;
+			public ITransactionFactory taFactory{
+				get{
+					if(m_taFactory == null)
+						m_taFactory = new TransactionFactory();
+					return m_taFactory;
+				}
+			}ITransactionFactory m_taFactory;
+			public void SetTAFactory(ITransactionFactory taFac){m_taFactory = taFac;}
+			public ISlotSystemTransaction transaction{get{return m_transaction;}} ISlotSystemTransaction m_transaction;
 				public void SetTransaction(ISlotSystemTransaction transaction){
 					if(m_transaction != transaction){
 						m_transaction = transaction;
@@ -601,63 +619,47 @@ namespace SlotSystem{
 				SetActState(SlotSystemManager.ssmTransactionState);
 				transaction.Execute();
 			}
-			public virtual ISlottable pickedSB{
-				get{return m_pickedSB;}
-				}ISlottable m_pickedSB;
-				public virtual void SetPickedSB(ISlottable sb){
-					this.m_pickedSB = sb;
-				}
-			public ISlottable targetSB{
-				get{return m_targetSB;}
-				}ISlottable m_targetSB;
+			public virtual ISlottable pickedSB{get{return m_pickedSB;}} ISlottable m_pickedSB;
+				public virtual void SetPickedSB(ISlottable sb){this.m_pickedSB = sb;}
+			public ISlottable targetSB{get{return m_targetSB;}} ISlottable m_targetSB;
 				public void SetTargetSB(ISlottable sb){
 					if(sb == null || sb != targetSB){
 						if(targetSB != null)
 							targetSB.SetSelState(Slottable.sbFocusedState);
+						this.m_targetSB = sb;
+						if(targetSB != null)
+							targetSB.SetSelState(Slottable.sbSelectedState);
 					}
-					this.m_targetSB = sb;
-					if(targetSB != null)
-						targetSB.SetSelState(Slottable.sbSelectedState);
 				}
-			public ISlotGroup sg1{
-				get{return m_sg1;}
-				}ISlotGroup m_sg1;
+			public ISlotGroup sg1{get{return m_sg1;}} ISlotGroup m_sg1;
 				public void SetSG1(ISlotGroup sg){
 					if(sg == null || sg != sg1){
 						if(sg1 != null)
 							ReferToTAAndUpdateSelState(sg1);
+						this.m_sg1 = sg;
+						if(sg1 != null)
+							m_sg1Done = false;
+						else
+							m_sg1Done = true;
 					}
-					this.m_sg1 = sg;
-					if(sg1 != null)
-						m_sg1Done = false;
-					else
-						m_sg1Done = true;
 				}
-				public bool sg1Done{
-				get{return m_sg1Done;}
-				}bool m_sg1Done = true;
-			public ISlotGroup sg2{
-				get{return m_sg2;}
-				}ISlotGroup m_sg2;
+				public bool sg1Done{get{return m_sg1Done;}} bool m_sg1Done = true;
+			public ISlotGroup sg2{get{return m_sg2;}} ISlotGroup m_sg2;
 				public void SetSG2(ISlotGroup sg){
 					if(sg == null || sg != sg2){
 						if(sg2 != null)
 							ReferToTAAndUpdateSelState(sg2);
+						this.m_sg2 = sg;
+						if(sg2 != null)
+							sg2.SetSelState(SlotGroup.sgSelectedState);
+						if(sg2 != null)
+							m_sg2Done = false;
+						else
+							m_sg2Done = true;
 					}
-					this.m_sg2 = sg;
-					if(sg2 != null)
-						sg2.SetSelState(SlotGroup.sgSelectedState);
-					if(sg2 != null)
-						m_sg2Done = false;
-					else
-						m_sg2Done = true;
 				}
-				public bool sg2Done{
-					get{return m_sg2Done;}
-					}bool m_sg2Done = true;
-			public virtual DraggedIcon dIcon1{
-				get{return m_dIcon1;}
-				}DraggedIcon m_dIcon1;
+				public bool sg2Done{get{return m_sg2Done;}} bool m_sg2Done = true;
+			public virtual DraggedIcon dIcon1{get{return m_dIcon1;}} DraggedIcon m_dIcon1;
 				public virtual void SetDIcon1(DraggedIcon di){
 					m_dIcon1 = di;
 					if(m_dIcon1 == null)
@@ -665,12 +667,8 @@ namespace SlotSystem{
 					else
 						m_dIcon1Done = false;
 				}
-				public bool dIcon1Done{
-				get{return m_dIcon1Done;}
-				}bool m_dIcon1Done = true;
-			public virtual DraggedIcon dIcon2{
-				get{return m_dIcon2;}
-				}DraggedIcon m_dIcon2;
+				public bool dIcon1Done{get{return m_dIcon1Done;}} bool m_dIcon1Done = true;
+			public virtual DraggedIcon dIcon2{get{return m_dIcon2;}} DraggedIcon m_dIcon2;
 				public virtual void SetDIcon2(DraggedIcon di){
 					m_dIcon2 = di;
 					if(m_dIcon2 == null)
@@ -678,12 +676,8 @@ namespace SlotSystem{
 					else
 						m_dIcon2Done = false;
 				}
-				public bool dIcon2Done{
-				get{return m_dIcon2Done;}
-				}bool m_dIcon2Done = true;
-			public ISlotSystemElement hovered{
-				get{return m_hovered;}
-				}protected ISlotSystemElement m_hovered;
+				public bool dIcon2Done{get{return m_dIcon2Done;}} bool m_dIcon2Done = true;
+			public ISlotSystemElement hovered{get{return m_hovered;}} protected ISlotSystemElement m_hovered;
 				public virtual void SetHovered(ISlotSystemElement ele){
 					if(ele == null || ele != hovered){
 						if(hovered != null){
@@ -699,17 +693,17 @@ namespace SlotSystem{
 			public virtual void CreateTransactionResults(){
 				Dictionary<ISlotSystemElement, ISlotSystemTransaction> result = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 				foreach(ISlotGroup sg in focusedSGs){
-					ISlotSystemTransaction ta = AbsSlotSystemTransaction.GetTransaction(pickedSB, sg);
+					ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg);
 					result.Add(sg, ta);
-					if(ta is RevertTransaction)
+					if(ta is IRevertTransaction)
 						sg.DefocusSelf();
 					else
 						sg.FocusSelf();
 					foreach(ISlottable sb in sg){
 						if(sb != null){
-							ISlotSystemTransaction ta2 = AbsSlotSystemTransaction.GetTransaction(pickedSB, sb);
+							ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb);
 							result.Add(sb, ta2);
-							if(ta2 is RevertTransaction || ta2 is FillTransaction)
+							if(ta2 is IRevertTransaction || ta2 is IFillTransaction)
 								sb.Defocus();
 							else
 								sb.Focus();
@@ -731,7 +725,7 @@ namespace SlotSystem{
 				if(transactionResults != null){
 					ISlotSystemTransaction ta = null;
 					if(transactionResults.TryGetValue(sg, out ta)){
-						if(ta is RevertTransaction)
+						if(ta is IRevertTransaction)
 							sg.SetSelState(SlotGroup.sgDefocusedState);
 						else
 							sg.SetSelState(SlotGroup.sgFocusedState);
@@ -739,8 +733,8 @@ namespace SlotSystem{
 				}else
 					sg.SetSelState(SlotGroup.sgFocusedState);
 			}
-			public ISlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
-				return AbsSlotSystemTransaction.GetTransaction(pickedSB, hovered);
+			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+				return taFactory.MakeTransaction(pickedSB, hovered);
 			}
 	}
 	public interface ISlotSystemManager: IAbsSlotSystemElement, TransactionManager{
@@ -792,5 +786,29 @@ namespace SlotSystem{
 			void FindAndFocusInBundle(ISlotSystemElement ele);
 			void FocusInBundle(ISlotSystemElement inspected, object target);
 		
+	}
+	public class FocusedSGsFactory: IFocusedSGsFactory{
+		ISlotSystemManager ssm;
+		public FocusedSGsFactory(ISlotSystemManager ssm){this.ssm = ssm;}
+		public List<ISlotGroup> focusedSGs{
+			get{
+				List<ISlotGroup> result = new List<ISlotGroup>();
+				result.Add(ssm.focusedSGP);
+				result.AddRange(ssm.focusedSGEs);
+				result.AddRange(ssm.focusedSGGs);
+				return result;
+			}
+		}
+	}
+	public interface IFocusedSGsFactory{
+		List<ISlotGroup> focusedSGs{get;}
+	}
+	public class SortTransactionFactory: ISortTransactionFactory{
+		public ISortTransaction MakeSortTA(ISlotGroup sg, SGSorter sorter){
+			return new SortTransaction(sg, sorter);
+		}
+	}
+	public interface ISortTransactionFactory{
+		ISortTransaction MakeSortTA(ISlotGroup sg, SGSorter sorter);
 	}
 }

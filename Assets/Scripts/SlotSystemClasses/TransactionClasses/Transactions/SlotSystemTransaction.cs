@@ -12,4 +12,13 @@ namespace SlotSystem{
 		void Execute();
 		void OnComplete();
 	}
+	public class TestTransaction: ISlotSystemTransaction{
+		public ISlottable targetSB{get;}
+		public ISlotGroup sg1{get;}
+		public ISlotGroup sg2{get;}
+		public List<InventoryItemInstance> moved{get;}
+		public void Indicate(){}
+		public void Execute(){}
+		public void OnComplete(){}
+	}
 }

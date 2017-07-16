@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public abstract class AbsSlotSystemTransaction: ISlotSystemTransaction{
-		public static ISlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+	public class TransactionFactory: ITransactionFactory{
+
+		public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
 			ISlotGroup origSG = pickedSB.sg;
 			if(hovered != null){
 				if(hovered is ISlotGroup){
@@ -73,19 +74,8 @@ namespace SlotSystem{
 			}
 			return new RevertTransaction(pickedSB);
 		}
-		protected ISlotSystemManager ssm = SlotSystemManager.curSSM;
-		protected List<InventoryItemInstance> removed = new List<InventoryItemInstance>();
-		protected List<InventoryItemInstance> added = new List<InventoryItemInstance>();
-		public virtual ISlottable targetSB{get{return null;}}
-		public virtual ISlotGroup sg1{get{return null;}}
-		public virtual ISlotGroup sg2{get{return null;}}
-		public virtual List<InventoryItemInstance> moved{get{return null;}}
-		public virtual void Indicate(){}
-		public virtual void Execute(){
-			ssm.SetActState(SlotSystemManager.ssmTransactionState);
-		}
-		public virtual void OnComplete(){
-			ssm.ResetAndFocus();
-		}
+	}
+	public interface ITransactionFactory{
+		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
 	}
 }

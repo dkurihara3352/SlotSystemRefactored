@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public interface TransactionManager{
+		ITransactionFactory taFactory{get;}
 		ISlotSystemTransaction transaction{get;}
 		void AcceptSGTAComp(ISlotGroup sg);
 		void AcceptDITAComp(DraggedIcon di);
@@ -17,7 +18,7 @@ namespace SlotSystem{
 		void UpdateTransaction();
 		void CreateTransactionResults();
 		void ReferToTAAndUpdateSelState(ISlotGroup sg);
-		ISlotSystemTransaction GetTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
+		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
 		
 		void SetTransaction(ISlotSystemTransaction transaction);	
 		void SetPickedSB(ISlottable sb);

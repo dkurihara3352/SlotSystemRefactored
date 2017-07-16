@@ -143,17 +143,17 @@ namespace SlotSystem{
 			}
 			public static string TransactionName(ISlotSystemTransaction ta){
 				string res = "";
-				if(ta is RevertTransaction)
+				if(ta is IRevertTransaction)
 					res = SlotSystemUtil.Red("RevertTA");
-				else if(ta is ReorderTransaction)
+				else if(ta is IReorderTransaction)
 					res = SlotSystemUtil.Blue("ReorderTA");
-				else if(ta is StackTransaction)
+				else if(ta is IStackTransaction)
 					res = SlotSystemUtil.Aqua("StackTA");
-				else if(ta is SwapTransaction)
+				else if(ta is ISwapTransaction)
 					res = SlotSystemUtil.Terra("SwapTA");
-				else if(ta is FillTransaction)
+				else if(ta is IFillTransaction)
 					res = SlotSystemUtil.Forest("FillTA");
-				else if(ta is SortTransaction)
+				else if(ta is ISortTransaction)
 					res = SlotSystemUtil.Khaki("SortTA");
 				else if(ta is EmptyTransaction)
 					res = SlotSystemUtil.Beni("Empty");
@@ -557,7 +557,7 @@ namespace SlotSystem{
 			}
 		/*	Debug	*/
 			public static string TADebug(ISlottable testSB, ISlotSystemElement hovered){
-				ISlotSystemTransaction ta = testSB.ssm.GetTransaction(testSB, hovered);
+				ISlotSystemTransaction ta = testSB.ssm.MakeTransaction(testSB, hovered);
 				string taStr = TransactionName(ta);
 				string taTargetSB = SlotSystemUtil.SBofSG(ta.targetSB);
 				string taSG1 = ta.sg1==null?"null":ta.sg1.eName;

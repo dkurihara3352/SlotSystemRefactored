@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class SortTransaction: AbsSlotSystemTransaction{
+	public class SortTransaction: AbsSlotSystemTransaction, ISortTransaction{
 		public ISlotGroup m_selectedSG;
 		public SGSorter m_sorter;
 		public SortTransaction(ISlotGroup sg, SGSorter sorter){
@@ -27,4 +27,6 @@ namespace SlotSystem{
 			base.OnComplete();
 		}
 	}
+	public interface ISortTransaction: ISlotSystemTransaction{}
+	public class TestSortTransaction: TestTransaction, ISortTransaction{}
 }

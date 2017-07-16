@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class ReorderTransaction: AbsSlotSystemTransaction{
+	public class ReorderTransaction: AbsSlotSystemTransaction, IReorderTransaction{
 		public ISlottable m_pickedSB;
 		public ISlottable m_selectedSB;
 		public ISlotGroup m_origSG;
@@ -30,5 +30,7 @@ namespace SlotSystem{
 			sg1.OnCompleteSlotMovements();
 			base.OnComplete();
 		}
-	}	
+	}
+	public interface IReorderTransaction: ISlotSystemTransaction{}
+	public class TestReorderTransaction: TestTransaction, IReorderTransaction{}
 }

@@ -344,7 +344,7 @@ namespace SlotSystemTests{
 					public void PickedUpState_EnterState_WhenCalled_CallSB(){
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
-						ISlotSystemManager stubSSM = MakeSubISSM();
+						ISlotSystemManager stubSSM = MakeSubSSM();
 						mockSB.ssm = stubSSM;
 
 						puState.EnterState(mockSB);
@@ -361,7 +361,7 @@ namespace SlotSystemTests{
 					public void PickedUpState_EnterState_WhenCalled_SetsSSMActStateProbing(){
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
-						ISlotSystemManager stubSSM = MakeSubISSM();
+						ISlotSystemManager stubSSM = MakeSubSSM();
 						mockSB.ssm = stubSSM;
 
 						puState.EnterState(mockSB);
@@ -372,7 +372,7 @@ namespace SlotSystemTests{
 					public void PickedUpState_EnterState_WhenCalled_SetsActProcPickedUpProcess(){
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
-						ISlotSystemManager stubSSM = MakeSubISSM();
+						ISlotSystemManager stubSSM = MakeSubSSM();
 						mockSB.ssm = stubSSM;
 
 						puState.EnterState(mockSB);

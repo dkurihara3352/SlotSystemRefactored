@@ -25,7 +25,7 @@ public class AbsSlotSystemTest{
 			SlotSystemManager ssm = go.AddComponent<SlotSystemManager>();
 			return ssm;
 		}
-		protected static ISlotSystemManager MakeSubISSM(){
+		protected static ISlotSystemManager MakeSubSSM(){
 			return Substitute.For<ISlotSystemManager>();
 		}
 		protected static ISlotSystemPage MakeSubSSPage(){
@@ -234,5 +234,26 @@ public class AbsSlotSystemTest{
 		}
 		protected static ISlotSystemTransaction MakeSubTA(){
 			return Substitute.For<ISlotSystemTransaction>();
+		}
+		protected static ITransactionFactory MakeSubTAFactory(){
+			return Substitute.For<ITransactionFactory>();
+		}
+		protected static IRevertTransaction MakeTestRevertTA(){
+			return new TestRevertTransaction();
+		}
+		protected static IReorderTransaction MakeTestReorderTA(){
+			return new TestReorderTransaction();
+		}
+		protected static ISortTransaction MakeTestSortTA(){
+			return new TestSortTransaction();
+		}
+		protected static IFillTransaction MakeTestFillTA(){
+			return new TestFillTransaction();
+		}
+		protected static ISwapTransaction MakeTestSwapTA(){
+			return new TestSwapTransaction();
+		}
+		protected static IStackTransaction MakeTestStackTA(){
+			return new TestStackTransaction();
 		}
 }
