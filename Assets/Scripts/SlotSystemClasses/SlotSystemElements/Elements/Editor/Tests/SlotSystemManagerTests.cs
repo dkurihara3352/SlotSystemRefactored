@@ -100,10 +100,10 @@ namespace SlotSystemTests{
 				SlotSystemManager initSSM = InitializedSSM();
 				
 				Assert.That(initSSM.ssm, Is.SameAs(initSSM));
-				initSSM.poolBundle.Received().PerformInHierarchy(initSSM.SetSSM);
-				initSSM.equipBundle.Received().PerformInHierarchy(initSSM.SetSSM);
+				initSSM.poolBundle.Received().PerformInHierarchy(initSSM.SetSSMInH);
+				initSSM.equipBundle.Received().PerformInHierarchy(initSSM.SetSSMInH);
 				foreach(var oBun in initSSM.otherBundles)
-					oBun.Received().PerformInHierarchy(initSSM.SetSSM);
+					oBun.Received().PerformInHierarchy(initSSM.SetSSMInH);
 			}
 			[Test][Category("Methods")]
 			public void Initialize_WhenCalled_CallsSetParentInHierarchy(){
@@ -1161,9 +1161,9 @@ namespace SlotSystemTests{
 
 					foreach(var ele in elements)
 						if(valid)
-							ele.Received().parent = parent;
+							ele.Received().SetParent(parent);
 						else
-							ele.DidNotReceive().parent = parent;
+							ele.DidNotReceive().SetParent(parent);
 				}
 					class SetParentCases: IEnumerable{
 						public IEnumerator GetEnumerator(){

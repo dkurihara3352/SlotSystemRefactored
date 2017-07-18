@@ -23,7 +23,7 @@ namespace SlotSystem{
 					if(sb != null)
 						trimmed.Add(sb);
 				}
-				trimmed.Sort();
+				trimmed.Sort(new ItemIDOrderComparer());
 				sbs = trimmed;
 			}
 		}
@@ -43,7 +43,7 @@ namespace SlotSystem{
 					if(sb != null)
 						trimmed.Add(sb);
 				}
-				trimmed.Sort();
+				trimmed.Sort(new ItemIDOrderComparer());
 				trimmed.Reverse();
 				sbs = trimmed;
 			}
@@ -72,6 +72,13 @@ namespace SlotSystem{
 			public override int Compare(ISlottable x, ISlottable y){
 				if(x.itemInst.AcquisitionOrder.Equals(y.itemInst.AcquisitionOrder)) return 0;
 					return x.itemInst.AcquisitionOrder.CompareTo(y.itemInst.AcquisitionOrder);
+			}
+		}
+		public class ItemIDOrderComparer: Comparer<ISlottable>{
+			public override int Compare(ISlottable x, ISlottable y){
+				if(x.itemInst.Item.ItemID.Equals(y.itemInst.Item.ItemID))
+					return new AcquisitionOrderComparer().Compare(x, y);
+				return x.itemInst.Item.ItemID.CompareTo(y.itemInst.Item.ItemID);
 			}
 		}
 }

@@ -491,6 +491,7 @@ namespace SlotSystem{
 				public override bool isDeactivated{
 					get{return curSelState == SlotSystemManager.ssmDeactivatedState;}
 				}
+				public override ISlotSystemManager ssm{get{return this;}}
 			/*	methods	*/
 				public void Initialize(ISlotSystemPageElement pBundPageEle, ISlotSystemPageElement eBundPageEle , IEnumerable<ISlotSystemPageElement> gBundPageEles){
 					m_eName = SlotSystemUtil.Bold("SSM");
@@ -508,7 +509,7 @@ namespace SlotSystem{
 					}
 					m_pageElements = pageEles;
 					m_otherBundles = gBunds;
-					PerformInHierarchy(SetSSM);
+					PerformInHierarchy(SetSSMInH);
 					PerformInHierarchy(SetParent);
 					SetSelState(SlotSystemManager.ssmDeactivatedState);
 					SetActState(SlotSystemManager.ssmWaitForActionState);
@@ -527,14 +528,17 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void SetSSM(ISlotSystemElement ele){
-					ele.ssm = this;
+				public void SetSSMInH(ISlotSystemElement ele){
+					ele.SetSSM(this);
 				}
-				public void SetParent(ISlotSystemElement ele){
+				public override void SetSSM(ISlotSystemElement ssm){
+				}
+
+				public override void SetParent(ISlotSystemElement ele){
 					if(!((ele is ISlottable) || (ele is ISlotGroup)))
 					foreach(ISlotSystemElement e in ele){
 						if(e != null)
-						e.parent = ele;
+						e.SetParent(ele);
 					}
 				}
 				public override void Activate(){
@@ -781,10 +785,9 @@ namespace SlotSystem{
 			IEnumerable<ISlotSystemBundle> otherBundles{get;}
 			ISlotSystemElement FindParent(ISlotSystemElement ele);
 			void CheckAndReportParent(ISlotSystemElement ele, object obj);
-			void SetSSM(ISlotSystemElement ele);
-			void SetParent(ISlotSystemElement ele);
 			void FindAndFocusInBundle(ISlotSystemElement ele);
 			void FocusInBundle(ISlotSystemElement inspected, object target);
+			void SetSSMInH(ISlotSystemElement ele);
 		
 	}
 	public class FocusedSGsFactory: IFocusedSGsFactory{

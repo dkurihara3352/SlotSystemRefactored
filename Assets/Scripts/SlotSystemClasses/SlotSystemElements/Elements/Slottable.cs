@@ -150,14 +150,13 @@ namespace SlotSystem{
 							m_eqpStateEngine = new SSEStateEngine(this);
 						return m_eqpStateEngine;
 					}
-					set{m_eqpStateEngine = value;}
 					}SSEStateEngine m_eqpStateEngine;
+					public void SetEqpStateEngine(SSEStateEngine engine){m_eqpStateEngine = engine;}
 					public virtual SSEState curEqpState{
 						get{return (SBEqpState)eqpStateEngine.curState;}
 					}
 					public virtual SSEState prevEqpState{
 						get{return (SBEqpState)eqpStateEngine.prevState;}
-						set{}
 					}
 					public virtual void SetEqpState(SSEState state){
 						if(state == null || state is SBEqpState)
@@ -192,14 +191,13 @@ namespace SlotSystem{
 							m_markStateEngine = new SSEStateEngine(this);
 						return m_markStateEngine;
 					}
-					set{m_markStateEngine = value;}
 					}SSEStateEngine m_markStateEngine;
+					public void SetMrkStateEngine(SSEStateEngine engine){m_markStateEngine = engine;}
 					public virtual SSEState curMrkState{
 						get{return (SBMrkState)mrkStateEngine.curState;}
 					}
 					public virtual SSEState prevMrkState{
 						get{return (SBMrkState)mrkStateEngine.prevState;}
-						set{}
 					}
 					public virtual void SetMrkState(SSEState state){
 						if(state == null || state is SBMrkState)
@@ -268,8 +266,8 @@ namespace SlotSystem{
 							m_eqpProcEngine = new SSEProcessEngine();
 						return m_eqpProcEngine;
 					}
-					set{m_eqpProcEngine = value;}
 					}SSEProcessEngine m_eqpProcEngine;
+					public void SetEqpProcessEngine(SSEProcessEngine engine){m_eqpProcEngine = engine;}
 					public virtual ISSEProcess eqpProcess{
 						get{return (ISBEqpProcess)eqpProcEngine.process;}
 					}
@@ -287,8 +285,8 @@ namespace SlotSystem{
 							m_mrkProcEngine = new SSEProcessEngine();
 						return m_mrkProcEngine;
 					}
-					set{m_mrkProcEngine = value;}
 					}SSEProcessEngine m_mrkProcEngine;
+					public void SetMrkProcessEngine(SSEProcessEngine engine){m_mrkProcEngine = engine;}
 					public virtual ISSEProcess mrkProcess{
 						get{return (ISBMrkProcess)mrkProcEngine.process;}
 					}
@@ -315,26 +313,21 @@ namespace SlotSystem{
 				get{return m_pickedAmount;}
 				set{m_pickedAmount = value;}
 				}int m_pickedAmount = 0;
-			public SlottableItem item{
-				get{return m_item;}
-				}SlottableItem m_item;
+			public InventoryItemInstance itemInst{
+					get{return (InventoryItemInstance)item;}
+				}
+				SlottableItem item{get{return m_item;}} SlottableItem m_item;
 				public void SetItem(SlottableItem item){
 					m_item = item;
 				}
-			public InventoryItemInstance itemInst{
-					get{return (InventoryItemInstance)item;}
-					set{}
-				}
 			public int slotID{
 				get{return m_slotID;}
-				set{}
 				}int m_slotID = -1;
 				public void SetSlotID(int i){
 					m_slotID = i;
 				}
 			public int newSlotID{
 				get{return m_newSlotID;}
-				set{}
 				}int m_newSlotID = -2;
 				public void SetNewSlotID(int id){
 					m_newSlotID = id;
@@ -343,7 +336,6 @@ namespace SlotSystem{
 				get{
 					return (ISlotGroup)parent;
 				}
-				set{}
 			}
 			public override bool isFocused{
 				get{return curSelState == Slottable.sbFocusedState;}
@@ -358,7 +350,6 @@ namespace SlotSystem{
 				get{
 					return ssm.pickedSB == (ISlottable)this;
 				}
-				set{}
 			}
 			public bool isEquipped{
 				get{ return itemInst.isEquipped;}
@@ -378,7 +369,6 @@ namespace SlotSystem{
 				}
 			public virtual bool isStackable{
 				get{return itemInst.Item.IsStackable;}
-				set{}
 			}
 			public bool passesPrePickFilter{
 				get{
@@ -400,7 +390,6 @@ namespace SlotSystem{
 					get{
 						return ssm.FindParent(this);
 					}
-					set{}
 				}
 				public override ISlotSystemBundle immediateBundle{
 					get{
@@ -408,9 +397,6 @@ namespace SlotSystem{
 							return null;
 						return parent.immediateBundle;
 					}
-				}
-				public void SetSSM(ISlotSystemManager ssm){
-					this.ssm = ssm;
 				}
 				public override int level{
 					get{return sg.level +1;}
@@ -474,7 +460,7 @@ namespace SlotSystem{
 				return CompareTo((ISlottable)other);
 			}
 			public int CompareTo(ISlottable other){
-				return this.item.CompareTo(other.item);
+				return this.itemInst.CompareTo(other.itemInst);
 			}
 			public static bool operator > (Slottable a, ISlottable b){
 				return a.CompareTo(b) > 0;
@@ -523,14 +509,14 @@ namespace SlotSystem{
 				return flag;
 			}
 			public bool HaveCommonItemFamily(ISlottable other){
-				if(this.item is BowInstance)
-					return (other.item is BowInstance);
-				else if(this.item is WearInstance)
-					return (other.item is WearInstance);
-				else if(this.item is CarriedGearInstance)
-					return (other.item is CarriedGearInstance);
-				else if(this.item is PartsInstance)
-					return (other.item is PartsInstance);
+				if(this.itemInst is BowInstance)
+					return (other.itemInst is BowInstance);
+				else if(this.itemInst is WearInstance)
+					return (other.itemInst is WearInstance);
+				else if(this.itemInst is CarriedGearInstance)
+					return (other.itemInst is CarriedGearInstance);
+				else if(this.itemInst is PartsInstance)
+					return (other.itemInst is PartsInstance);
 				else 
 					return false;
 			}
@@ -561,22 +547,23 @@ namespace SlotSystem{
 			}
 			public virtual bool isHovered{
 				get{return ssm.hovered == (ISlotSystemElement)this;}
-				set{}
 			}
-			public virtual bool isPool{get{return sg.isPool;}set{}}
+			public virtual bool isPool{get{return sg.isPool;}}
 			public void SetHovered(){
 				ssm.SetHovered((ISlottable)this);
 			}
 	}
 	public interface ISlottable: IAbsSlotSystemElement ,IComparable<ISlottable>, IComparable{
 		/*	States and Processes	*/
-			SSEStateEngine eqpStateEngine{get; set;}
+			SSEStateEngine eqpStateEngine{get;}
+			void SetEqpStateEngine(SSEStateEngine engine);
 			SSEState curEqpState{get;}
-			SSEState prevEqpState{get;set;}
+			SSEState prevEqpState{get;}
 			void SetEqpState(SSEState state);
-			SSEStateEngine mrkStateEngine{get;set;}
+			SSEStateEngine mrkStateEngine{get;}
+			void SetMrkStateEngine(SSEStateEngine engine);
 			SSEState curMrkState{get;}
-			SSEState prevMrkState{get;set;}
+			SSEState prevMrkState{get;}
 			void SetMrkState(SSEState state);
 			IEnumeratorFake WaitForPointerUpCoroutine();
 			IEnumeratorFake WaitForPickUpCoroutine();
@@ -585,12 +572,14 @@ namespace SlotSystem{
 			IEnumeratorFake RemoveCoroutine();
 			IEnumeratorFake AddCorouine();
 			IEnumeratorFake MoveWithinCoroutine();
-			SSEProcessEngine eqpProcEngine{get;set;}
+			SSEProcessEngine eqpProcEngine{get;}
+			void SetEqpProcessEngine(SSEProcessEngine engine);
 			ISSEProcess eqpProcess{get;}
 			void SetAndRunEqpProcess(ISSEProcess process);
 			IEnumeratorFake UnequipCoroutine();
 			IEnumeratorFake EquipCoroutine();
-			SSEProcessEngine mrkProcEngine{get;set;}
+			SSEProcessEngine mrkProcEngine{get;}
+			void SetMrkProcessEngine(SSEProcessEngine engine);
 			ISSEProcess mrkProcess{get;}
 			void SetAndRunMrkProcess(ISSEProcess process);
 			IEnumeratorFake unmarkCoroutine();
@@ -600,26 +589,22 @@ namespace SlotSystem{
 		/*	fields	*/
 			bool delayed{get;set;}
 			int pickedAmount{get;set;}
-			SlottableItem item{get;}
 			void SetItem(SlottableItem item);
-			InventoryItemInstance itemInst{get;set;}
-			int slotID{get;set;}
+			InventoryItemInstance itemInst{get;}
+			int slotID{get;}
 			void SetSlotID(int i);
-			int newSlotID{get;set;}
+			int newSlotID{get;}
 			void SetNewSlotID(int id);
-			ISlotGroup sg{get;set;}
-			bool isPickedUp{get;set;}
+			ISlotGroup sg{get;}
+			bool isPickedUp{get;}
 			bool isEquipped{get;}
 			void Equip();
 			void Unequip();
 			bool isMarked{get;}
 			void Mark();
 			void Unmark();
-			bool isStackable{get;set;}
+			bool isStackable{get;}
 			bool passesPrePickFilter{get;}
-
-		/*	SSE imple	*/
-			void SetSSM(ISlotSystemManager ssm);
 		/*	Event Methods	*/
 			void OnHoverEnterMock();
 			void OnHoverExitMock();
@@ -647,8 +632,8 @@ namespace SlotSystem{
 			void SetDIcon2();
 			void CreateTAResult();
 			void UpdateTA();
-			bool isHovered{get;set;}
-			bool isPool{get;set;}
+			bool isHovered{get;}
+			bool isPool{get;}
 			void SetHovered();
 	}
 }

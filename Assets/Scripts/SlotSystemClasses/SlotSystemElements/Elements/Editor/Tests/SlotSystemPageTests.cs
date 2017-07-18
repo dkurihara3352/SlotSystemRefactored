@@ -52,7 +52,7 @@ namespace SlotSystemTests{
 			public void TogglePageElementFocus_WhenCalled_FindAndTogglePEleAndCallsSSMFocus(bool isFocusToggelOn, bool toggle, bool called, bool expected){
 				TestSlotSystemPage ssp = MakeTestSSPage();
 				ISlotSystemManager mockSSM = MakeSubSSM();
-				ssp.ssm = mockSSM;
+				ssp.SetSSM(mockSSM);
 				ISlotSystemPageElement stubPEle_A = MakeSubPageElement();
 				ISlotSystemPageElement mockPEle_B = MakeSubPageElement();
 				ISlotSystemPageElement stubPEle_C = MakeSubPageElement();

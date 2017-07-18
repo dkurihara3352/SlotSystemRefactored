@@ -37,7 +37,7 @@ namespace SlotSystemTests{
 					public void SBFocusedState_EnterState_FromSBDeactivated_CallsInstantGreyin(){
 						SBFocusedState focState = new SBFocusedState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.prevSelState = Slottable.sbDeactivatedState;
+						mockSB.prevSelState.Returns(Slottable.sbDeactivatedState);
 
 						focState.EnterState(mockSB);
 
@@ -47,7 +47,7 @@ namespace SlotSystemTests{
 					public void SBFocusedState_EnterState_FromSBDeactivated_SetsSelProcNull(){
 						SBFocusedState focState = new SBFocusedState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.prevSelState = Slottable.sbDeactivatedState;
+						mockSB.prevSelState.Returns(Slottable.sbDeactivatedState);
 
 						focState.EnterState(mockSB);
 
@@ -57,7 +57,7 @@ namespace SlotSystemTests{
 					public void SBFocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T sgProc) where T: ISGSelProcess{
 						SBFocusedState focState = new SBFocusedState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.prevSelState = prevState;
+						mockSB.prevSelState.Returns(prevState);
 
 						focState.EnterState(mockSB);
 
@@ -80,7 +80,7 @@ namespace SlotSystemTests{
 					public void SBDefocusedState_EnterState_FromSGDeactivated_CallsInstantGreyout(){
 						SBDefocusedState defocState = new SBDefocusedState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.prevSelState = Slottable.sbDeactivatedState;
+						mockSB.prevSelState.Returns(Slottable.sbDeactivatedState);
 
 						defocState.EnterState(mockSB);
 
@@ -90,8 +90,8 @@ namespace SlotSystemTests{
 					public void SBDefocusedState_EnterState_FromSBDeactivated_SetsSelProcNull(){
 						SBDefocusedState defocState = new SBDefocusedState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.prevSelState = Slottable.sbDeactivatedState;
-						mockSB.selProcess = MakeSubSBSelProc();
+						mockSB.prevSelState.Returns(Slottable.sbDeactivatedState);
+						mockSB.selProcess.Returns(MakeSubSBSelProc());
 
 						defocState.EnterState(mockSB);
 
@@ -101,7 +101,7 @@ namespace SlotSystemTests{
 					public void SBDefocusedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: ISBSelProcess{
 						SBDefocusedState focState = new SBDefocusedState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.prevSelState = prevState;
+						mockSB.prevSelState.Returns(prevState);
 
 						focState.EnterState(mockSB);
 
@@ -124,7 +124,7 @@ namespace SlotSystemTests{
 				public void SBSelectedState_EnterState_FromSGDeactivated_CallsInstantHighlight(){
 					SBSelectedState defocState = new SBSelectedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevSelState = Slottable.sbDeactivatedState;
+					mockSB.prevSelState.Returns(Slottable.sbDeactivatedState);
 
 					defocState.EnterState(mockSB);
 
@@ -134,7 +134,7 @@ namespace SlotSystemTests{
 				public void SBSelectedState_EnterState_FromSBDeactivated_SetsSelProcNull(){
 					SBSelectedState defocState = new SBSelectedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevSelState = Slottable.sbDeactivatedState;
+					mockSB.prevSelState.Returns(Slottable.sbDeactivatedState);
 
 					defocState.EnterState(mockSB);
 
@@ -144,7 +144,7 @@ namespace SlotSystemTests{
 				public void SBSelectedState_EnterState_FromNonDeactivated_SetsSelProcAccordingly<T>(SBSelState prevState, T selProc) where T: ISBSelProcess{
 					SBSelectedState focState = new SBSelectedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevSelState = prevState;
+					mockSB.prevSelState.Returns(prevState);
 
 					focState.EnterState(mockSB);
 
@@ -202,7 +202,7 @@ namespace SlotSystemTests{
 					public void WaitForActionState_OnPointerDown_IsNotFocused_SetsActStateWFPointerUpState(){
 						WaitForActionState wfaState = new WaitForActionState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isFocused = false;
+						mockSB.isFocused.Returns(false);
 
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
@@ -212,7 +212,7 @@ namespace SlotSystemTests{
 					public void WaitForActionState_OnPointerDown_IsFocused_SetsComplexStates(){
 						WaitForActionState wfaState = new WaitForActionState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isFocused = true;
+						mockSB.isFocused.Returns(true);
 
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
@@ -300,7 +300,7 @@ namespace SlotSystemTests{
 					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_SetsActStatePickedUpState(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isPickedUp = true;
+						mockSB.isPickedUp.Returns(true);
 
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
@@ -310,7 +310,7 @@ namespace SlotSystemTests{
 					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_CallSBIncrement(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isPickedUp = true;
+						mockSB.isPickedUp.Returns(true);
 
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
@@ -320,7 +320,7 @@ namespace SlotSystemTests{
 					public void WaitForNextTouchState_OnPointerDown_IsNotPickedUp_CallSBPickUp(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isPickedUp = false;
+						mockSB.isPickedUp.Returns(false);
 
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
@@ -330,7 +330,7 @@ namespace SlotSystemTests{
 					public void WaitForNextTouchState_OnDeselected_IsNotPickedUp_CallSB(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isPickedUp = false;
+						mockSB.isPickedUp.Returns(false);
 
 						wfntState.OnDeselectedMock(mockSB, new PointerEventDataFake());
 
@@ -345,7 +345,7 @@ namespace SlotSystemTests{
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
 						ISlotSystemManager stubSSM = MakeSubSSM();
-						mockSB.ssm = stubSSM;
+						mockSB.ssm.Returns(stubSSM);
 
 						puState.EnterState(mockSB);
 
@@ -362,7 +362,7 @@ namespace SlotSystemTests{
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
 						ISlotSystemManager stubSSM = MakeSubSSM();
-						mockSB.ssm = stubSSM;
+						mockSB.ssm.Returns(stubSSM);
 
 						puState.EnterState(mockSB);
 
@@ -373,7 +373,7 @@ namespace SlotSystemTests{
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
 						ISlotSystemManager stubSSM = MakeSubSSM();
-						mockSB.ssm = stubSSM;
+						mockSB.ssm.Returns(stubSSM);
 
 						puState.EnterState(mockSB);
 
@@ -395,8 +395,8 @@ namespace SlotSystemTests{
 					public void PickedUpState_OnPointerUp_IsHoveredAndIsStackable_SetsActStateWFNTState(){
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isHovered = true;
-						mockSB.isStackable = true;
+						mockSB.isHovered.Returns(true);
+						mockSB.isStackable.Returns(true);
 
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
@@ -406,8 +406,8 @@ namespace SlotSystemTests{
 					public void PickedUpState_OnPointerUp_NOTIsHoveredAndIsStackable_CallSB(){
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
-						mockSB.isHovered = false;
-						mockSB.isStackable = true;
+						mockSB.isHovered.Returns(false);
+						mockSB.isStackable.Returns(true);
 
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
@@ -458,9 +458,8 @@ namespace SlotSystemTests{
 				public void SBEquippedState_EnterState_IsPoolAndPrevEqpStateUnequipped_SetsEqpProcEquipProc(){
 					SBEquippedState eqState = new SBEquippedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevEqpState = Slottable.unequippedState;
-					mockSB.isPool = true;
-
+					mockSB.prevEqpState.Returns(Slottable.unequippedState);
+					mockSB.isPool.Returns(true);
 					eqState.EnterState(mockSB);
 
 					mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
@@ -470,8 +469,8 @@ namespace SlotSystemTests{
 				public void SBUnequippedState_EnterState_IsPoolAndPrevEqpStateEquipped_SetsEqpProcUnequipProc(){
 					SBUnequippedState unequipeedState = new SBUnequippedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevEqpState = Slottable.equippedState;
-					mockSB.isPool = true;
+					mockSB.prevEqpState.Returns(Slottable.equippedState);
+					mockSB.isPool.Returns(true);
 
 					unequipeedState.EnterState(mockSB);
 
@@ -482,8 +481,8 @@ namespace SlotSystemTests{
 				public void SBMarkedState_EnterState_IsPoolAndPrevEqpStateUnmarked_SetsMrkProcMarkProcess(){
 					SBMarkedState markedState = new SBMarkedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevMrkState = Slottable.unmarkedState;
-					mockSB.isPool = true;
+					mockSB.prevMrkState.Returns(Slottable.unmarkedState);
+					mockSB.isPool.Returns(true);
 
 					markedState.EnterState(mockSB);
 
@@ -494,8 +493,8 @@ namespace SlotSystemTests{
 				public void SBUnmarkedState_EnterState_IsPoolAndPrevMrkStateMarked_SetsMrkProcUnmarkProcess(){
 					SBUnmarkedState unmarkedState = new SBUnmarkedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevMrkState = Slottable.markedState;
-					mockSB.isPool = true;
+					mockSB.prevMrkState.Returns(Slottable.markedState);
+					mockSB.isPool.Returns(true);
 
 					unmarkedState.EnterState(mockSB);
 

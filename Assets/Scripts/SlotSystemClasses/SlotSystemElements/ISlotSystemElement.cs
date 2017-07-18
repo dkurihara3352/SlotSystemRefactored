@@ -5,14 +5,14 @@ using Utility;
 
 namespace SlotSystem{
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
-		SSEState curSelState{get;set;}
-		SSEState prevSelState{get;set;}
-		SSEState curActState{get;set;}
-		SSEState prevActState{get;set;}
+		SSEState curSelState{get;}
+		SSEState prevSelState{get;}
+		SSEState curActState{get;}
+		SSEState prevActState{get;}
 		void SetAndRunSelProcess(ISSEProcess process);
 		void SetAndRunActProcess(ISSEProcess process);
-		ISSEProcess selProcess{get;set;}
-		ISSEProcess actProcess{get;set;}
+		ISSEProcess selProcess{get;}
+		ISSEProcess actProcess{get;}
 		IEnumeratorFake greyoutCoroutine();
 		IEnumeratorFake greyinCoroutine();
 		IEnumeratorFake highlightCoroutine();
@@ -24,17 +24,19 @@ namespace SlotSystem{
 		bool isBundleElement{get;}
 		bool isPageElement{get;}
 		bool isToggledOn{get;}
-		bool isFocused{get;set;}
-		bool isDefocused{get;set;}
-		bool isDeactivated{get;set;}
+		bool isFocused{get;}
+		bool isDefocused{get;}
+		bool isDeactivated{get;}
 		bool isFocusedInHierarchy{get;}
 		void Activate();
 		void Deactivate();
 		void Focus();
 		void Defocus();
-		ISlotSystemBundle immediateBundle{get;set;}
-		ISlotSystemElement parent{get;set;}
-		ISlotSystemManager ssm{get;set;}
+		ISlotSystemBundle immediateBundle{get;}
+		ISlotSystemElement parent{get;}
+		void SetParent(ISlotSystemElement par);
+		ISlotSystemManager ssm{get;}
+		void SetSSM(ISlotSystemElement ssm);
 		bool ContainsInHierarchy(ISlotSystemElement ele);
 		void PerformInHierarchy(System.Action<ISlotSystemElement> act);
 		void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj);

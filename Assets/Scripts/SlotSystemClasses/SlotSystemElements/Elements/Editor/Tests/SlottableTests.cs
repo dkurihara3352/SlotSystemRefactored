@@ -15,29 +15,25 @@ namespace SlotSystemTests{
 			/*	States*/
 				/*	SelState	*/
 					[Test]
-					public void SetSelState_Null_CallsSelStateEngineSetState(){
+					public void SetSelState_Null_SetsSelStateNull(){
 						Slottable sb = MakeSB();
-						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.selStateEngine = mockEngine;
+						
 						sb.SetSelState(null);
 
-						mockEngine.Received().SetState(null);
+						Assert.That(sb.curSelState, Is.Null);
 					}
 					[Test]
-					public void SetSelState_SBSelState_CallsSelStateEngineSetState(){
+					public void SetSelState_SBSelState_SetsSelState(){
 						Slottable sb = MakeSB();
-						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.selStateEngine = mockEngine;
 						SBSelState stubSelState = MakeSubSBSelState();
+
 						sb.SetSelState(stubSelState);
 
-						mockEngine.Received().SetState(stubSelState);
+						Assert.That(sb.curSelState, Is.SameAs(stubSelState));
 					}
 					[TestCaseSource(typeof(SetSelStateInvalidStateCases))]
 					public void SetSelState_InvalidState_ThrowsException(SSEState state){
 						Slottable sb = MakeSB();
-						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.selStateEngine = mockEngine;
 
 						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetSelState(state));
 
@@ -56,29 +52,25 @@ namespace SlotSystemTests{
 						}
 				/*	ActState	*/
 					[Test]
-					public void SetActState_Null_CallsActStateEngineSetState(){
+					public void SetActState_Null_SetsActStateNull(){
 						Slottable sb = MakeSB();
-						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.actStateEngine = mockEngine;
+
 						sb.SetActState(null);
 
-						mockEngine.Received().SetState(null);
+						Assert.That(sb.curActState, Is.Null);
 					}
 					[Test]
-					public void SetActState_SBActState_CallsActStateEngineSetState(){
+					public void SetActState_SBActState_SetsActState(){
 						Slottable sb = MakeSB();
-						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.actStateEngine = mockEngine;
 						SBActState stubActState = MakeSubSBActState();
+
 						sb.SetActState(stubActState);
 
-						mockEngine.Received().SetState(stubActState);
+						Assert.That(sb.curActState, Is.SameAs(stubActState));
 					}
 					[TestCaseSource(typeof(SetActStateInvalidStateCases))]
 					public void SetActState_InvalidState_ThrowsException(SSEState state){
 						Slottable sb = MakeSB();
-						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.actStateEngine = mockEngine;
 
 						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetActState(state));
 
@@ -100,7 +92,7 @@ namespace SlotSystemTests{
 					public void SetEqpState_Null_CallsEqpStateEngineSetState(){
 						Slottable sb = MakeSB();
 						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.eqpStateEngine = mockEngine;
+						sb.SetEqpStateEngine(mockEngine);
 						sb.SetEqpState(null);
 
 						mockEngine.Received().SetState(null);
@@ -109,7 +101,7 @@ namespace SlotSystemTests{
 					public void SetEqpState_SBEqpState_CallsEqpStateEngineSetState(){
 						Slottable sb = MakeSB();
 						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.eqpStateEngine = mockEngine;
+						sb.SetEqpStateEngine(mockEngine);
 						SBEqpState stubEqpState = MakeSubSBEqpState();
 						sb.SetEqpState(stubEqpState);
 
@@ -119,7 +111,7 @@ namespace SlotSystemTests{
 					public void SetEqpState_InvalidState_ThrowsException(SSEState state){
 						Slottable sb = MakeSB();
 						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.eqpStateEngine = mockEngine;
+						sb.SetEqpStateEngine(mockEngine);
 
 						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetEqpState(state));
 
@@ -141,7 +133,7 @@ namespace SlotSystemTests{
 					public void SetMrkState_Null_CallsMrkStateEngineSetState(){
 						Slottable sb = MakeSB();
 						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.mrkStateEngine = mockEngine;
+						sb.SetMrkStateEngine(mockEngine);
 						sb.SetMrkState(null);
 
 						mockEngine.Received().SetState(null);
@@ -150,7 +142,7 @@ namespace SlotSystemTests{
 					public void SetMrkState_SBMrkState_CallsMrkStateEngineSetState(){
 						Slottable sb = MakeSB();
 						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.mrkStateEngine = mockEngine;
+						sb.SetMrkStateEngine(mockEngine);
 						SBMrkState stubMrkState = MakeSubSBMrkState();
 						sb.SetMrkState(stubMrkState);
 
@@ -160,7 +152,7 @@ namespace SlotSystemTests{
 					public void SetMrkState_InvalidState_ThrowsException(SSEState state){
 						Slottable sb = MakeSB();
 						SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-						sb.mrkStateEngine = mockEngine;
+						sb.SetMrkStateEngine(mockEngine);
 
 						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetMrkState(state));
 
@@ -180,29 +172,23 @@ namespace SlotSystemTests{
 			/*	Process	*/
 				/*	SelProc	*/
 					[Test]
-					public void SetAndRunSelState_Null_CallsEngineWithNull(){
+					public void SetAndRunSelState_Null_SetsSelProcNull(){
 						Slottable sb = MakeSB();
-						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.selProcEngine = mockEngine;
 						sb.SetAndRunSelProcess(null);
 
-						mockEngine.Received().SetAndRunProcess(null);
+						Assert.That(sb.selProcess, Is.Null);
 					}
 					[Test]
-					public void SetAndRunSelProcess_SBSelProcess_CallsSelProcEngineWithTheProc(){
+					public void SetAndRunSelProcess_SBSelProcess_SetsSelProc(){
 						Slottable sb = MakeSB();
-						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.selProcEngine = mockEngine;
 						ISBSelProcess stubProc = MakeSubSBSelProc();
 						sb.SetAndRunSelProcess(stubProc);
 
-						mockEngine.Received().SetAndRunProcess(stubProc);
+						Assert.That(sb.selProcess, Is.SameAs(stubProc));
 					}
 					[TestCaseSource(typeof(SetAndRunSelProcessInvalidProcessCases))]
 					public void SetAndRunSelProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
 						Slottable sb = MakeSB();
-						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.selProcEngine = mockEngine;
 						
 						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunSelProcess(proc));
 
@@ -221,29 +207,25 @@ namespace SlotSystemTests{
 						}
 				/*	ActProc	*/
 					[Test]
-					public void SetAndRunActState_Null_CallsEngineWithNull(){
+					public void SetAndRunActState_Null_SetsActProcNull(){
 						Slottable sb = MakeSB();
-						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.actProcEngine = mockEngine;
+						
 						sb.SetAndRunActProcess(null);
 
-						mockEngine.Received().SetAndRunProcess(null);
+						Assert.That(sb.actProcess, Is.Null);
 					}
 					[Test]
-					public void SetAndRunActProcess_ISBActProcess_CallsActProcEngineWithTheProc(){
+					public void SetAndRunActProcess_ISBActProcess_SetsActProc(){
 						Slottable sb = MakeSB();
-						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.actProcEngine = mockEngine;
+						
 						ISBActProcess stubProc = MakeSubSBActProc();
 						sb.SetAndRunActProcess(stubProc);
 
-						mockEngine.Received().SetAndRunProcess(stubProc);
+						Assert.That(sb.actProcess, Is.SameAs(stubProc));
 					}
 					[TestCaseSource(typeof(SetAndRunActProcessInvalidProcessCases))]
 					public void SetAndRunActProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
 						Slottable sb = MakeSB();
-						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.actProcEngine = mockEngine;
 						
 						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunActProcess(proc));
 
@@ -265,7 +247,7 @@ namespace SlotSystemTests{
 					public void SetAndRunEqpState_Null_CallsEngineWithNull(){
 						Slottable sb = MakeSB();
 						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.eqpProcEngine = mockEngine;
+						sb.SetEqpProcessEngine(mockEngine);
 						sb.SetAndRunEqpProcess(null);
 
 						mockEngine.Received().SetAndRunProcess(null);
@@ -274,7 +256,7 @@ namespace SlotSystemTests{
 					public void SetAndRunEqpProcess_ISBEqpProcess_CallsEqpProcEngineWithTheProc(){
 						Slottable sb = MakeSB();
 						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.eqpProcEngine = mockEngine;
+						sb.SetEqpProcessEngine(mockEngine);
 						ISBEqpProcess stubProc = MakeSubSBEqpProc();
 						sb.SetAndRunEqpProcess(stubProc);
 
@@ -284,7 +266,7 @@ namespace SlotSystemTests{
 					public void SetAndRunEqpProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
 						Slottable sb = MakeSB();
 						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.eqpProcEngine = mockEngine;
+						sb.SetEqpProcessEngine(mockEngine);
 						
 						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunEqpProcess(proc));
 
@@ -306,7 +288,7 @@ namespace SlotSystemTests{
 					public void SetAndRunMrkState_Null_CallsEngineWithNull(){
 						Slottable sb = MakeSB();
 						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.mrkProcEngine = mockEngine;
+						sb.SetMrkProcessEngine(mockEngine);
 						sb.SetAndRunMrkProcess(null);
 
 						mockEngine.Received().SetAndRunProcess(null);
@@ -315,7 +297,7 @@ namespace SlotSystemTests{
 					public void SetAndRunMrkProcess_ISBMrkProcess_CallsMrkProcEngineWithTheProc(){
 						Slottable sb = MakeSB();
 						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.mrkProcEngine = mockEngine;
+						sb.SetMrkProcessEngine(mockEngine);
 						ISBMrkProcess stubProc = MakeSubSBMrkProc();
 						sb.SetAndRunMrkProcess(stubProc);
 
@@ -325,8 +307,7 @@ namespace SlotSystemTests{
 					public void SetAndRunMrkProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
 						Slottable sb = MakeSB();
 						SSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.mrkProcEngine = mockEngine;
-						
+						sb.SetMrkProcessEngine(mockEngine);
 						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunMrkProcess(proc));
 
 						Assert.That(ex.Message, Is.StringContaining("Slottable.SetAndRunEquipProcess: argument is not of type ISBMrkProcess"));
@@ -387,24 +368,26 @@ namespace SlotSystemTests{
 					BowInstance bow = MakeBowInstance(0);
 					sb.Initialize(bow);
 
-					Assert.That(sb.item, Is.SameAs(bow));
+					Assert.That(sb.itemInst, Is.SameAs(bow));
 				}
 				[Test]
 				[Category("Methods")]
 				public void Pickup_WhenCalled_SetsPickedUpState(){
 					Slottable sb = MakeSB();
-					SSEStateEngine mockEngine = MakeSubSSEStateEngine(sb);
-					sb.actStateEngine = mockEngine;
+					sb.SetSSM(MakeSubSSM());
+					sb.SetSelState(MakeSubSBSelState());
+					
 					sb.PickUp();
 
-					mockEngine.Received().SetState(Slottable.pickedUpState);
+					Assert.That(sb.curActState, Is.SameAs(Slottable.pickedUpState));
 				}
 				[Test]
 				[Category("Methods")]
 				public void Pickup_WhenCalled_SetsPickedAmountOne(){
 					Slottable sb = MakeSB();
-					SSEStateEngine stubEngine = MakeSubSSEStateEngine(sb);
-					sb.actStateEngine = stubEngine;
+					sb.SetSSM(MakeSubSSM());
+					sb.SetSelState(MakeSubSBSelState());
+					
 					sb.PickUp();
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(1));
@@ -413,8 +396,7 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void Increment_Stackable_IncrementsPickedAmountUpToQuanity(InventoryItemInstance item, int expected){
 					Slottable sb = MakeSB();
-					SSEStateEngine stubEngine = MakeSubSSEStateEngine(sb);
-					sb.actStateEngine = stubEngine;
+					
 					sb.SetItem(item);
 
 					for(int i =0; i< expected *2; i++){
@@ -464,7 +446,7 @@ namespace SlotSystemTests{
 				public void ExecuteTransaction_WhenCalled_CallsSSMExecuteTransaction(){
 					ISlotSystemManager mockSSM = MakeSubSSM();
 					Slottable stubSB = MakeSB();
-					stubSB.ssm = mockSSM;
+					stubSB.SetSSM(mockSSM);
 
 					stubSB.ExecuteTransaction();
 

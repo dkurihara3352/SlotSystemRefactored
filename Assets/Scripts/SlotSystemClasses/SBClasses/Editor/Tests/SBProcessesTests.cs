@@ -33,7 +33,7 @@ namespace SlotSystemTests{
 			public void WaitForNextTouchProcess_Expire_SBIsPickedUp_CallsSBExecuteTransaction(){
 				ISlottable mockSB = MakeSubSB();
 				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(mockSB, FakeCoroutine);
-				mockSB.isPickedUp = true;
+				mockSB.isPickedUp.Returns(true);
 
 				wfntProc.Expire();
 
@@ -43,7 +43,7 @@ namespace SlotSystemTests{
 			public void WaitForNextTouchProcess_Expire_SBIsNOTPickedUp_CallsSBVarious(){
 				ISlottable mockSB = MakeSubSB();
 				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(mockSB, FakeCoroutine);
-				mockSB.isPickedUp = false;
+				mockSB.isPickedUp.Returns(false);
 
 				wfntProc.Expire();
 

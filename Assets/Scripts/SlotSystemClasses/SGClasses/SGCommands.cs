@@ -6,11 +6,12 @@ namespace SlotSystem{
 	public interface SlotGroupCommand{
 		void Execute(ISlotGroup Sg);
 	}
-	public class SGEmptyCommand: SlotGroupCommand{
+	public class SGEmptyCommand: ISGEmptyCommand{
 		public void Execute(ISlotGroup sg){
 		}
 	}
-	public class SGInitItemsCommand: SlotGroupCommand{
+	public interface ISGEmptyCommand: SlotGroupCommand{}
+	public class SGInitItemsCommand: ISGInitItemsCommand{
 		public void Execute(ISlotGroup sg){
 			List<SlottableItem> items = new List<SlottableItem>(sg.inventory);
 			// sg.RunFilter(ref items);
@@ -22,7 +23,8 @@ namespace SlotSystem{
 				sg.InstantSort();
 		}
 	}
-	public class SGUpdateEquipAtExecutionCommand: SlotGroupCommand{
+		public interface ISGInitItemsCommand: SlotGroupCommand{}
+	public class SGUpdateEquipAtExecutionCommand: ISGUpdateEquipAtExeecutionCommand{
 		public void Execute(ISlotGroup sg){
 			/*	update inventory
 				update item's equip status
@@ -53,9 +55,11 @@ namespace SlotSystem{
 			}
 		}
 	}
-	public class SGUpdateEquipStatusCommand: SlotGroupCommand{
+		public interface ISGUpdateEquipAtExeecutionCommand: SlotGroupCommand{}
+	public class SGUpdateEquipStatusCommand: ISGUpdateEquipStatusCommand{
 		public void Execute(ISlotGroup sg){
 			sg.UpdateEquipStatesOnAll();
 		}
 	}
+		public interface ISGUpdateEquipStatusCommand: SlotGroupCommand{}
 }

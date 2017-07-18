@@ -227,6 +227,41 @@ public class AbsSlotSystemTest{
 			partsInst.Quantity = quantity;
 			return partsInst;
 		}
+		protected static BowInstance MakeBowInstWithOrder(int id, int order){
+			BowInstance bow = MakeBowInstance(id);
+			bow.SetAcquisitionOrder(order);
+			return bow;
+		}
+		protected static WearInstance MakeWearInstWithOrder(int id, int order){
+			WearInstance wear = MakeWearInstance(id);
+			wear.SetAcquisitionOrder(order);
+			return wear;
+		}
+		protected static ShieldInstance MakeShieldInstWithOrder(int id, int order){
+			ShieldInstance shield = MakeShieldInstance(id);
+			shield.SetAcquisitionOrder(order);
+			return shield;
+		}
+		protected static MeleeWeaponInstance MakeMeleeWeaponInstWithOrder(int id, int order){
+			MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(id);
+			mWeapon.SetAcquisitionOrder(order);
+			return mWeapon;
+		}
+		protected static QuiverInstance MakeQuiverInstWithOrder(int id, int order){
+			QuiverInstance quvier = MakeQuiverInstance(id);
+			quvier.SetAcquisitionOrder(order);
+			return quvier;
+		}
+		protected static PackInstance MakePackInstWithOrder(int id, int order){
+			PackInstance pack = MakePackInstance(id);
+			pack.SetAcquisitionOrder(order);
+			return pack;
+		}
+		protected static PartsInstance MakePartsInstWithOrder(int id, int qua, int order){
+			PartsInstance parts = MakePartsInstance(id, qua);
+			parts.SetAcquisitionOrder(order);
+			return parts;
+		}
 		protected static IEnumeratorFake FakeCoroutine(){
 			return new IEnumeratorFake();
 		}

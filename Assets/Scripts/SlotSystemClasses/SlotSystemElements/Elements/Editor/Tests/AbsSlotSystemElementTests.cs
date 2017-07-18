@@ -187,35 +187,34 @@ namespace SlotSystemTests{
 				public void immediateBundle_WhenParentIsBundle_ReturnsBundle(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					SlotSystemBundle stubBundle = MakeSlotSystemBundle();
-					testSSE.parent = stubBundle;
+					testSSE.SetParent(stubBundle);
 
 					Assert.That(testSSE.immediateBundle, Is.SameAs(stubBundle));
 				}
 				[Test]
 				[Category("Fields")]
 				public void immediateBundle_NoBundleInAncestry_ReturnsNull(){
-					ISlotSystemElement stubEle_1 = Substitute.For<ISlotSystemElement>();
-					ISlotSystemElement stubEle_2 = Substitute.For<ISlotSystemElement>();
-					stubEle_1.immediateBundle = null;
-					stubEle_2.immediateBundle = stubEle_1.immediateBundle;
+					TestSlotSystemElement stubGrPar = MakeSlotSystemElement();
+					TestSlotSystemElement stubPar = MakeSlotSystemElement();
+						stubPar.SetParent(stubGrPar);
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					testSSE.parent = stubEle_2;
+						testSSE.SetParent(stubPar);
 
-					Assert.That(testSSE.immediateBundle, Is.Null);
+					ISlotSystemBundle actual = testSSE.immediateBundle;
+
+					Assert.That(actual, Is.Null);
 				}
 				[Test]
 				[Category("Fields")]
 				public void immediateBundle_SomeBundlesUpInAncestry_ReturnsMostProximal(){
-					SlotSystemBundle stubBundle_further = MakeSlotSystemBundle();
 					SlotSystemBundle stubBundle_closer = MakeSlotSystemBundle();
-					ISlotSystemElement stubEle_1 = MakeSlotSystemElement();
-					ISlotSystemElement stubEle_2 = MakeSlotSystemElement();
-
-					stubEle_2.parent = stubEle_1;
-					stubEle_1.parent = stubBundle_closer;
-					stubBundle_closer.parent = stubBundle_further;
+					TestSlotSystemElement stubEle_1 = MakeSlotSystemElement();
+						stubEle_1.SetParent(stubBundle_closer);
+					TestSlotSystemElement stubEle_2 = MakeSlotSystemElement();
+						stubEle_2.SetParent(stubEle_1);
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					testSSE.parent = stubEle_2;
+						testSSE.SetParent(stubEle_2);
+
 
 					Assert.That(testSSE.immediateBundle, Is.SameAs(stubBundle_closer));
 				}
@@ -231,7 +230,7 @@ namespace SlotSystemTests{
 				public void level_OneParent_ReturnsOne(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubEle = MakeSlotSystemElement();
-					testSSE.parent = stubEle;
+					testSSE.SetParent(stubEle);
 
 					Assert.That(testSSE.level, Is.EqualTo(1));
 				}
@@ -241,8 +240,8 @@ namespace SlotSystemTests{
 					TestSlotSystemElement stubEle_1 = MakeSlotSystemElement();
 					TestSlotSystemElement stubEle_2 = MakeSlotSystemElement();
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					stubEle_2.parent = stubEle_1;
-					testSSE.parent = stubEle_2;
+					stubEle_2.SetParent(stubEle_1);
+					testSSE.SetParent(stubEle_2);
 
 					Assert.That(testSSE.level, Is.EqualTo(2));
 				}
@@ -251,7 +250,7 @@ namespace SlotSystemTests{
 				public void isBundleElement_ParentIsBundle_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					SlotSystemBundle stubBundle = MakeSlotSystemBundle();
-					testSSE.parent = stubBundle;
+					testSSE.SetParent(stubBundle);
 
 					Assert.That(testSSE.isBundleElement, Is.True);
 				}
@@ -260,7 +259,7 @@ namespace SlotSystemTests{
 				public void isBundleElement_ParentIsNotBundle_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubSSE = MakeSlotSystemElement();
-					testSSE.parent = stubSSE;
+					testSSE.SetParent(stubSSE);
 
 					Assert.That(testSSE.isBundleElement, Is.False);
 				}
@@ -269,7 +268,7 @@ namespace SlotSystemTests{
 				public void isPageElement_ParentIsPage_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
-					testSSE.parent = stubPage;
+					testSSE.SetParent(stubPage);
 
 					Assert.That(testSSE.isPageElement, Is.True);
 				}
@@ -278,7 +277,7 @@ namespace SlotSystemTests{
 				public void isPageElement_ParentIsNotPage_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubSSE = MakeSlotSystemElement();
-					testSSE.parent = stubSSE;
+					testSSE.SetParent(stubSSE);
 
 					Assert.That(testSSE.isPageElement, Is.False);
 				}
@@ -287,7 +286,7 @@ namespace SlotSystemTests{
 				public void isToggledOn_ParentNotPage_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubSSE = MakeSlotSystemElement();
-					testSSE.parent = stubSSE;
+					testSSE.SetParent(stubSSE);
 
 					Assert.That(testSSE.isToggledOn, Is.False);
 				}
@@ -297,7 +296,7 @@ namespace SlotSystemTests{
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
 					stubPage.GetPageElement(testSSE).isFocusToggleOn.Returns(true);
-					testSSE.parent = stubPage;
+					testSSE.SetParent(stubPage);
 
 					Assert.That(testSSE.isToggledOn, Is.True);
 				}
@@ -307,7 +306,7 @@ namespace SlotSystemTests{
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
 					stubPage.GetPageElement(testSSE).isFocusToggleOn.Returns(false);
-					testSSE.parent = stubPage;
+					testSSE.SetParent(stubPage);
 
 					Assert.That(testSSE.isToggledOn, Is.False);
 				}
@@ -361,7 +360,7 @@ namespace SlotSystemTests{
 				public void isFocusedInHierarchy_SelfFocusedParentNotFocused_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubPar = MakeSlotSystemElement();
-					testSSE.parent = stubPar;
+					testSSE.SetParent(stubPar);
 					stubPar.Defocus();
 					testSSE.Focus();
 					
@@ -374,11 +373,11 @@ namespace SlotSystemTests{
 					TestSlotSystemElement stubPar2 = MakeSlotSystemElement();
 					TestSlotSystemElement stubPar3 = MakeSlotSystemElement();
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					testSSE.parent = stubPar3;
+					testSSE.SetParent(stubPar3);
 					stubPar3.SetElements(new ISlotSystemElement[]{testSSE});
-					stubPar3.parent = stubPar2;
+					stubPar3.SetParent(stubPar2);
 					stubPar2.SetElements(new ISlotSystemElement[]{stubPar3});
-					stubPar2.parent = stubPar1;
+					stubPar2.SetParent(stubPar1);
 					stubPar1.SetElements(new ISlotSystemElement[]{stubPar2});
 					stubPar1.Focus();
 					
@@ -391,11 +390,11 @@ namespace SlotSystemTests{
 					TestSlotSystemElement stubPar2 = MakeSlotSystemElement();
 					TestSlotSystemElement stubPar3 = MakeSlotSystemElement();
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
-					testSSE.parent = stubPar3;
+					testSSE.SetParent(stubPar3);
 					stubPar3.SetElements(new ISlotSystemElement[]{testSSE});
-					stubPar3.parent = stubPar2;
+					stubPar3.SetParent(stubPar2);
 					stubPar2.SetElements(new ISlotSystemElement[]{stubPar3});
-					stubPar2.parent = stubPar1;
+					stubPar2.SetParent(stubPar1);
 					stubPar1.SetElements(new ISlotSystemElement[]{stubPar2});
 					stubPar2.Focus();
 					
@@ -433,7 +432,7 @@ namespace SlotSystemTests{
 				public void ContainsInHierarchy_Parent_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubPar = MakeSlotSystemElement();
-					testSSE.parent = stubPar;
+					testSSE.SetParent(stubPar);
 
 					bool result = testSSE.ContainsInHierarchy(stubPar);
 
@@ -444,7 +443,7 @@ namespace SlotSystemTests{
 				public void ContainsInHierarchy_DirectChild_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubChild = MakeSlotSystemElement();
-					stubChild.parent = testSSE;
+					stubChild.SetParent(testSSE);
 
 					bool result = testSSE.ContainsInHierarchy(stubChild);
 
@@ -456,8 +455,8 @@ namespace SlotSystemTests{
 					TestSlotSystemElement testSSE = MakeSlotSystemElement();
 					TestSlotSystemElement stubChild = MakeSlotSystemElement();
 					TestSlotSystemElement stubGrandChild = MakeSlotSystemElement();
-					stubGrandChild.parent = stubChild;
-					stubChild.parent = testSSE;
+					stubGrandChild.SetParent(stubChild);
+					stubChild.SetParent(testSSE);
 
 					bool result = testSSE.ContainsInHierarchy(stubGrandChild);
 
@@ -675,7 +674,7 @@ namespace SlotSystemTests{
 					ISlotSystemPageElement mockPageEle = Substitute.For<ISlotSystemPageElement>();
 					mockPageEle.isFocusToggleOn = false;
 					stubPage.GetPageElement(testSSE).Returns(mockPageEle);
-					testSSE.parent = stubPage;
+					testSSE.SetParent(stubPage);
 
 					testSSE.ToggleOnPageElement();
 

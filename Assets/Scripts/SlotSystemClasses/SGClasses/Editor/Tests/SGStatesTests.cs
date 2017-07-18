@@ -23,7 +23,7 @@ namespace SlotSystemTests{
 				[TestCaseSource(typeof(VariousSGSelStatesEnterStateCases1))]
 				public void VariousSGSelStates_EnteState_FromDeactivated_SetsSGSelProcNull(SGSelState toState){
 					ISlotGroup mockSG = MakeSubSG();
-					mockSG.prevSelState = SlotGroup.sgDeactivatedState;
+					mockSG.prevSelState.Returns(SlotGroup.sgDeactivatedState);
 
 					toState.EnterState(mockSG);
 
@@ -39,7 +39,7 @@ namespace SlotSystemTests{
 				[TestCaseSource(typeof(VariousSGSelStateEnterStateCases2))]
 				public void VariousSGSelState_EnterState_FromDeactivatedState_CallsSGInstantMethods(SGSelState toState, InstantMethod instantMethod){
 					ISlotGroup mockSG = MakeSubSG();
-					mockSG.prevSelState = SlotGroup.sgDeactivatedState;
+					mockSG.prevSelState.Returns(SlotGroup.sgDeactivatedState);
 
 					toState.EnterState(mockSG);
 
@@ -81,7 +81,7 @@ namespace SlotSystemTests{
 				[TestCaseSource(typeof(SGFocusedStateEnterStateCases))]
 				public void VariousSGSelState_EnteState_FromVarious_SetsSGSelProcAccordingly<T>(SGSelState fromState, SGSelState toState, T selProc) where T: ISGSelProcess{
 					ISlotGroup mockSG = MakeSubSG();
-					mockSG.prevSelState = fromState;
+					mockSG.prevSelState.Returns(fromState);
 
 					toState.EnterState(mockSG);
 
@@ -136,7 +136,7 @@ namespace SlotSystemTests{
 				[TestCaseSource(typeof(VariousSGActStateEnterStateCases))]
 				public void VariousSGActState_EnterState_FromWFAState_SetsSGActProcSGTransactionProces(SGActState toState){
 					ISlotGroup mockSG = MakeSubSG();
-					mockSG.prevActState = SlotGroup.sgWaitForActionState;
+					mockSG.prevActState.Returns(SlotGroup.sgWaitForActionState);
 					
 					toState.EnterState(mockSG);
 

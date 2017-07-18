@@ -11,15 +11,12 @@ namespace SlotSystem{
 						m_selStateEngine = new SSEStateEngine(this);
 					return m_selStateEngine;
 				}
-				set{m_selStateEngine = value;}
 				}SSEStateEngine m_selStateEngine;
 				public virtual SSEState prevSelState{
 					get{return (SSESelState)selStateEngine.prevState;}
-					set{}
 				}
 				public virtual SSEState curSelState{
 					get{return (SSEState)selStateEngine.curState;}
-					set{}
 				}
 				public virtual void SetSelState(SSEState state){
 					if(state == null || state is SSESelState)
@@ -61,15 +58,12 @@ namespace SlotSystem{
 						m_actStateEngine = new SSEStateEngine(this);
 					return m_actStateEngine;
 				}
-				set{m_actStateEngine = value;}
 				}SSEStateEngine m_actStateEngine;
 				public virtual SSEState prevActState{
 					get{return (SSEActState)actStateEngine.prevState;}
-					set{}
 				}
 				public virtual SSEState curActState{
 					get{return (SSEActState)actStateEngine.curState;}
-					set{}
 				}
 				public virtual void SetActState(SSEState state){
 					if(state == null || state is SSEActState)
@@ -92,11 +86,9 @@ namespace SlotSystem{
 							m_selProcEngine = new SSEProcessEngine();
 						return m_selProcEngine;
 					}
-					set{m_selProcEngine = value;}
 					}SSEProcessEngine m_selProcEngine;
 					public virtual ISSEProcess selProcess{
 						get{return (SSESelProcess)selProcEngine.process;}
-						set{}
 					}
 					public virtual void SetAndRunSelProcess(ISSEProcess process){
 						if(process == null||process is SSESelProcess)
@@ -122,11 +114,9 @@ namespace SlotSystem{
 							m_actProcEngine = new SSEProcessEngine();
 						return m_actProcEngine;
 					}
-					set{m_actProcEngine = value;}
 					}SSEProcessEngine m_actProcEngine;
 					public virtual ISSEProcess actProcess{
 						get{return (SSEActProcess)actProcEngine.process;}
-						set{}
 					}
 					public virtual void SetAndRunActProcess(ISSEProcess process){
 						if(process == null || process is SSEActProcess)
@@ -146,10 +136,8 @@ namespace SlotSystem{
 			}
 			public virtual string eName{get{return m_eName;}}protected string m_eName;
 			public abstract IEnumerable<ISlotSystemElement> elements{get;}
-			public virtual ISlotSystemElement parent{
-				get{return m_parent;}
-				set{m_parent = value;}
-				}ISlotSystemElement m_parent;
+			public virtual ISlotSystemElement parent{get{return m_parent;}} ISlotSystemElement m_parent;
+				public virtual void SetParent(ISlotSystemElement par){m_parent = par;}
 			public virtual ISlotSystemBundle immediateBundle{
 				get{
 					if(parent == null)
@@ -159,12 +147,9 @@ namespace SlotSystem{
 					else
 						return parent.immediateBundle;
 				}
-				set{}
 			}
-			public ISlotSystemManager ssm{
-				get{return m_ssm;}
-				set{m_ssm = value;}
-				}ISlotSystemManager m_ssm;
+			public virtual ISlotSystemManager ssm{get{return m_ssm;}} ISlotSystemManager m_ssm;
+				public virtual void SetSSM(ISlotSystemElement ssm){m_ssm = (ISlotSystemManager)ssm;}
 			public virtual int level{
 				get{
 					if(parent == null)
@@ -193,15 +178,12 @@ namespace SlotSystem{
 			}
 			public virtual bool isFocused{
 				get{return curSelState == AbsSlotSystemElement.focusedState;}
-				set{}
 			}
 			public virtual bool isDefocused{
 				get{return curSelState == AbsSlotSystemElement.defocusedState;}
-				set{}
 			}
 			public virtual bool isDeactivated{
 				get{return curSelState == AbsSlotSystemElement.deactivatedState;}
-				set{}
 			}
 			public bool isFocusedInHierarchy{
 				get{
@@ -311,12 +293,12 @@ namespace SlotSystem{
 	}
 	public interface IAbsSlotSystemElement: ISlotSystemElement{
 		IEnumerable<ISlotSystemElement> elements{get;}
-		SSEStateEngine selStateEngine{get;set;}
+		SSEStateEngine selStateEngine{get;}
 		void SetSelState(SSEState state);
-		SSEStateEngine actStateEngine{get;set;}
+		SSEStateEngine actStateEngine{get;}
 		void SetActState(SSEState state);
-		SSEProcessEngine selProcEngine{get;set;}
-		SSEProcessEngine actProcEngine{get;set;}
+		SSEProcessEngine selProcEngine{get;}
+		SSEProcessEngine actProcEngine{get;}
 		void Initialize();
 	}
 }
