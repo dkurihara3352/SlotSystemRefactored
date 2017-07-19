@@ -24,7 +24,7 @@ namespace SlotSystem{
 			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
 			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
 			InventoryItemInstance item = this.m_pickedSB.itemInst;
-			item.quantity = orig.m_pickedSB.pickedAmount;
+			m_pickedSB.SetQuantity(orig.m_pickedSB.pickedAmount);
 			itemCache.Add(item);
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}

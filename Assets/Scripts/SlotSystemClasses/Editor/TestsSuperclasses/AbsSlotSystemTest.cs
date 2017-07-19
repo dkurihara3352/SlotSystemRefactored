@@ -122,6 +122,12 @@ public class AbsSlotSystemTest{
 			return new SlotSystemPageElement(ele, isOnByDef);
 		}
 	/*	Non elements	*/
+		protected static List<Slot> CreateSlots(int count){
+			List<Slot> slots = new List<Slot>();
+			for(int i = 0; i< count; i++)
+				slots.Add(new Slot());
+			return slots;
+		}
 		protected static IEquipmentSetInventory MakeSubEquipInv(){
 			return Substitute.For<IEquipmentSetInventory>();
 		}

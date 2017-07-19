@@ -486,7 +486,7 @@ namespace SlotSystem{
 				m_pickedAmount = 1;
 			}
 			public virtual void Increment(){
-				if(m_item.IsStackable && m_item.quantity > m_pickedAmount){
+				if(m_item.IsStackable && quantity > m_pickedAmount){
 					m_pickedAmount ++;
 				}
 			}
