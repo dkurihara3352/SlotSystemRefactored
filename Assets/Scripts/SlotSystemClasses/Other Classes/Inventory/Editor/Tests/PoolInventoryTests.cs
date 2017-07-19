@@ -20,7 +20,7 @@ namespace SlotSystemTests{
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 						foreach(var item in poolInv){
 							InventoryItemInstance itemInst = (InventoryItemInstance)item;
-							Assert.That(itemInst.Quantity, Is.EqualTo(1));
+							Assert.That(itemInst.quantity, Is.EqualTo(1));
 						}
 					}
 						class AddNonStackableCases: IEnumerable{
@@ -45,7 +45,7 @@ namespace SlotSystemTests{
 							poolInv.Add((InventoryItemInstance)item);
 
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
-						Assert.That(expected[0].Quantity, Is.EqualTo(expectedCount));
+						Assert.That(expected[0].quantity, Is.EqualTo(expectedCount));
 					}
 						class AddSameStackableCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
@@ -72,8 +72,8 @@ namespace SlotSystemTests{
 						poolInv.Add(partsInst_B);
 
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
-						Assert.That(partsInst_A.Quantity, Is.EqualTo(1));
-						Assert.That(partsInst_B.Quantity, Is.EqualTo(1));
+						Assert.That(partsInst_A.quantity, Is.EqualTo(1));
+						Assert.That(partsInst_B.quantity, Is.EqualTo(1));
 					}
 					[Test]
 					public void Add_NonStackableSameInst_ThrowsException(){
@@ -112,7 +112,7 @@ namespace SlotSystemTests{
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 
 						foreach(KeyValuePair<InventoryItemInstance, int> pair in itemQuantityDict){
-							Assert.That(pair.Key.Quantity, Is.EqualTo(pair.Value));
+							Assert.That(pair.Key.quantity, Is.EqualTo(pair.Value));
 						}
 
 						RevertQuant(addedItems, origQuant);
@@ -241,7 +241,7 @@ namespace SlotSystemTests{
 						
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 						foreach(KeyValuePair<InventoryItemInstance, int> pair in quantDict){
-							Assert.That(pair.Key.Quantity, Is.EqualTo(pair.Value));
+							Assert.That(pair.Key.quantity, Is.EqualTo(pair.Value));
 						}
 
 						RevertQuant(added, origAddedQuants);
@@ -287,7 +287,7 @@ namespace SlotSystemTests{
 						
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 						foreach(KeyValuePair<InventoryItemInstance, int> pair in quantDict){
-							Assert.That(pair.Key.Quantity, Is.EqualTo(pair.Value));
+							Assert.That(pair.Key.quantity, Is.EqualTo(pair.Value));
 						}
 
 						RevertQuant(added, origAddedQuants);
@@ -338,7 +338,7 @@ namespace SlotSystemTests{
 						
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 						foreach(KeyValuePair<InventoryItemInstance, int> pair in quantDict){
-							Assert.That(pair.Key.Quantity, Is.EqualTo(pair.Value));
+							Assert.That(pair.Key.quantity, Is.EqualTo(pair.Value));
 						}
 
 						RevertQuant(added, origAddedQuants);
@@ -457,20 +457,20 @@ namespace SlotSystemTests{
 					int[] CacheOrigQuant(IEnumerable<InventoryItemInstance> items){
 						List<int> resList = new List<int>();
 						foreach(var item in items)
-							resList.Add(item.Quantity);
+							resList.Add(item.quantity);
 						return resList.ToArray();
 					}
 					void RevertQuant(IEnumerable<InventoryItemInstance> items, int[] quants){
 						int count = 0;
 						foreach(var item in items){
-							item.Quantity = quants[count++];
+							item.quantity = quants[count++];
 						}
 					}
 					int QuantitySum(IEnumerable<InventoryItemInstance> items){
 						int sum = 0;
 						foreach(var item in items){
 							InventoryItemInstance itemInst = (InventoryItemInstance)item;
-							sum += itemInst.Quantity;
+							sum += itemInst.quantity;
 						}
 						return sum;
 					}
@@ -493,7 +493,7 @@ namespace SlotSystemTests{
 								result.Add(MakeBowInstance(itemID));
 							}else if(item is PartsInstance){
 								PartsFake partsFake = (PartsFake)(((PartsInstance)item).Item);
-								int quant = item.Quantity;
+								int quant = item.quantity;
 								int itemID = partsFake.ItemID;
 								result.Add(MakePartsInstance(itemID, quant));
 							}

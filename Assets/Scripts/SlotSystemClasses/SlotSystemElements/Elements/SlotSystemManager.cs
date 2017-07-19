@@ -691,8 +691,12 @@ namespace SlotSystem{
 								((ISlotGroup)hovered).OnHoverExitMock();
 						}
 						m_hovered = ele;
+						if(hovered != null)
+							UpdateTransaction();
 					}
 				}
+			public virtual List<InventoryItemInstance> moved{get{return m_moved;}} List<InventoryItemInstance> m_moved;
+			public virtual void SetMoved(List<InventoryItemInstance> moved){this.m_moved = moved;}
 			public Dictionary<ISlotSystemElement, ISlotSystemTransaction> transactionResults;
 			public virtual void CreateTransactionResults(){
 				Dictionary<ISlotSystemElement, ISlotSystemTransaction> result = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
@@ -717,12 +721,15 @@ namespace SlotSystem{
 				this.transactionResults = result;
 			}
 			public virtual void UpdateTransaction(){
-				ISlotSystemTransaction ta = null;
-				if(transactionResults.TryGetValue(hovered, out ta)){
-					SetTargetSB(ta.targetSB);
-					SetSG1(ta.sg1);
-					SetSG2(ta.sg2);
-					SetTransaction(ta);
+				if(transactionResults != null){
+					ISlotSystemTransaction ta = null;
+					if(transactionResults.TryGetValue(hovered, out ta)){
+						SetTargetSB(ta.targetSB);
+						SetSG1(ta.sg1);
+						SetSG2(ta.sg2);
+						SetMoved(ta.moved);
+						SetTransaction(ta);
+					}
 				}
 			}
 			public void ReferToTAAndUpdateSelState(ISlotGroup sg){

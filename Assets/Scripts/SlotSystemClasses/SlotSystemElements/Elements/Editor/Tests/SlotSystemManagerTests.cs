@@ -2478,6 +2478,48 @@ namespace SlotSystemTests{
 					mockSG.DidNotReceive().OnHoverExitMock();
 				}
 				[Test][Category("Transaction")]
+				public void SetHovered_WhenCalled_UpdateTransactionFields(){
+					SlotSystemManager ssm = MakeSSM();
+						ISlotSystemTransaction stubTA = MakeSubTA();
+							ISlottable targetSB = MakeSubSB();
+							ISlotGroup sg1 = MakeSubSG();
+							ISlotGroup sg2 = MakeSubSG();
+							stubTA.targetSB.Returns(targetSB);
+							stubTA.sg1.Returns(sg1);
+							stubTA.sg2.Returns(sg2);
+						ISlottable hoveredSB = MakeSubSB();
+						Dictionary<ISlotSystemElement, ISlotSystemTransaction> taResults = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
+						taResults.Add(hoveredSB, stubTA);
+						ssm.transactionResults = taResults;
+					SetHoveredTestData expected = new SetHoveredTestData(targetSB, sg1, sg2, stubTA);
+
+					ssm.SetHovered(hoveredSB);
+
+					SetHoveredTestData actual = new SetHoveredTestData(ssm.targetSB, ssm.sg1, ssm.sg2, ssm.transaction);
+					bool equality = actual.Equals(expected);
+					Assert.That(equality, Is.True);
+				}
+					class SetHoveredTestData: IEquatable<SetHoveredTestData>{
+						public ISlottable targetSB;
+						public ISlotGroup sg1;
+						public ISlotGroup sg2;
+						public ISlotSystemTransaction ta;
+						public SetHoveredTestData(ISlottable tSB, ISlotGroup sg1, ISlotGroup sg2, ISlotSystemTransaction ta){
+							this.targetSB = tSB;
+							this.sg1 = sg1;
+							this.sg2 = sg2;
+							this.ta = ta;
+						}
+						public bool Equals(SetHoveredTestData other){
+							bool flag = true;
+							flag &= object.ReferenceEquals(this.targetSB, other.targetSB);
+							flag &= object.ReferenceEquals(this.sg1, other.sg1);
+							flag &= object.ReferenceEquals(this.sg2, other.sg2);
+							flag &= object.ReferenceEquals(this.ta, other.ta);
+							return flag;
+						}
+					}
+				[Test][Category("Transaction")]
 				public void CreateTransactionResults_WhenCalled_CreateAndStoreSGTAPairInDict(){
 					SlotSystemManager ssm = MakeSSM();
 						ISlottable pickedSB = MakeSubSB();
@@ -2616,9 +2658,6 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 						ISlotGroup hovered = MakeSubSG();
 							ssm.SetHovered(hovered);
-						ISlottable pickedSB = MakeSubSB();
-							ssm.SetPickedSB(pickedSB);
-						ITransactionFactory taFac = MakeSubTAFactory();
 							ISlotSystemTransaction stubTA = MakeSubTA();
 								ISlottable targetSB = MakeSubSB();
 								ISlotGroup sg1 = MakeSubSG();
@@ -2626,7 +2665,6 @@ namespace SlotSystemTests{
 								stubTA.targetSB.Returns(targetSB);
 								stubTA.sg1.Returns(sg1);
 								stubTA.sg2.Returns(sg2);
-							taFac.MakeTransaction(Arg.Any<ISlottable>(), hovered).Returns(stubTA);
 						Dictionary<ISlotSystemElement, ISlotSystemTransaction> dict = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 							dict.Add(hovered, stubTA);
 							ssm.transactionResults = dict;
@@ -2638,7 +2676,6 @@ namespace SlotSystemTests{
 					bool equality = actual.Equals(expected);
 
 					Assert.That(equality, Is.True);
-					
 				}
 					class UpdateTransactionTestCase: IEquatable<UpdateTransactionTestCase>{
 						public ISlottable targetSB;

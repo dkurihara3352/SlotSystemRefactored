@@ -5,7 +5,7 @@ using System;
 
 namespace SlotSystem{
 	public interface SlottableItem: IEquatable<SlottableItem>, IComparable<SlottableItem>, IComparable{
-		int Quantity{get;}
+		int quantity{get;}
 		bool IsStackable{get;}
 	}
 }

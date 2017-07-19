@@ -538,11 +538,11 @@ namespace SlotSystem{
 				SetNewSBs(newSBs);
 				CreateNewSlots();
 				SetSBsActStates();
-				List<ISlottable> added = new List<ISlottable>();
-				foreach(var sb in newSBs)
-					if(!slottables.Contains(sb)) added.Add(sb);
 				List<ISlottable> allSBs = new List<ISlottable>(slottables);
-				allSBs.AddRange(added);
+					List<ISlottable> added = new List<ISlottable>();
+					foreach(var sb in newSBs)
+						if(!slottables.Contains(sb)) added.Add(sb);
+					allSBs.AddRange(added);
 				SetSBs(allSBs);
 			}
 			public virtual void CreateNewSlots(){
@@ -647,13 +647,11 @@ namespace SlotSystem{
 			}
 			public virtual void SortAndUpdateSBs(){
 				List<ISlottable> newSBs = new List<ISlottable>(toList);
-				int origCount = newSBs.Count;
-				Sorter.TrimAndOrderSBs(ref newSBs);
-				if(!isExpandable){
-					while(newSBs.Count <origCount){
-						newSBs.Add(null);
-					}
-				}
+				if(isExpandable)
+					Sorter.TrimAndOrderSBs(ref newSBs);
+				else
+					Sorter.OrderSBsWithRetainedSize(ref newSBs);
+				
 				UpdateSBs(newSBs);
 			}
 			public virtual void FillAndUpdateSBs(){
@@ -664,21 +662,11 @@ namespace SlotSystem{
 
 				if(!isPool){
 					if(added != null)
-						CreateNewSBAndFill(added, newSBs);
+						CreateNewSBAndFill(added.itemInst, newSBs);
 					if(removed != null)
 						NullifyIndexOf(removed, newSBs);
 				}
-				if(isAutoSort){
-					if(isExpandable)
-						Sorter.TrimAndOrderSBs(ref newSBs);
-					else
-						Sorter.OrderSBsWithRetainedSize(ref newSBs);
-				}
-				// if(!isExpandable){
-				// 	while(newSBs.Count <origCount){
-				// 		newSBs.Add(null);
-				// 	}
-				// }
+				SortContextually(ref newSBs);
 				UpdateSBs(newSBs);
 			}
 				public ISlottable GetAddedForFill(){
@@ -697,10 +685,10 @@ namespace SlotSystem{
 						removed = null;
 					return removed;
 				}
-				public void CreateNewSBAndFill(ISlottable added, List<ISlottable> list){
+				public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
 					GameObject newSBGO = new GameObject("newSBGO");
 					ISlottable newSB = newSBGO.AddComponent<Slottable>();
-					newSB.Initialize(added.itemInst);
+					newSB.Initialize(addedItem);
 					newSB.SetSSM(ssm);
 					newSB.Defocus();
 					newSB.SetEqpState(Slottable.unequippedState);
@@ -716,74 +704,94 @@ namespace SlotSystem{
 					}
 					list[list.IndexOf(rem)] = null;
 				}
-			public virtual void SwapAndUpdateSBs(){
-				ISlottable added;
-					if(ssm.transaction.sg1 == (ISlotGroup)this)
-						added = ssm.transaction.targetSB;
-					else
-						added = ssm.pickedSB;
-				ISlottable removed;
-					if(ssm.transaction.sg1 == (ISlotGroup)this)
-						removed = ssm.pickedSB;
-					else
-						removed = ssm.transaction.targetSB;
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-				int origCount = newSBs.Count;
-				if(!isPool){
-					GameObject newSBGO = new GameObject("newSBGO");
-					ISlottable newSB = newSBGO.AddComponent<Slottable>();
-					newSB.Initialize(added.itemInst);
-					newSB.SetSSM(ssm);
-					newSB.SetEqpState(Slottable.unequippedState);
-					newSB.Defocus();
-					newSBs[newSBs.IndexOf(removed)] = newSB;
-				}
-				if(isAutoSort){
-					Sorter.TrimAndOrderSBs(ref newSBs);
-					if(!isExpandable){
-						while(newSBs.Count <origCount){
-							newSBs.Add(null);
-						}
+				public void SortContextually(ref List<ISlottable> list){
+					if(isAutoSort){
+						if(isExpandable)
+							Sorter.TrimAndOrderSBs(ref list);
+						else
+							Sorter.OrderSBsWithRetainedSize(ref list);
 					}
 				}
+			public virtual void SwapAndUpdateSBs(){
+				ISlottable added = GetAddedForSwap();
+				ISlottable removed = GetRemovedForSwap();
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
+				
+				CreateNewSBAndSwapInList(added, removed, newSBs);
+
+				SortContextually(ref newSBs);
 				UpdateSBs(newSBs);
 			}
+				public ISlottable GetAddedForSwap(){
+					ISlottable added = null;
+					if(ssm.sg1 == (ISlotGroup)this)
+						added = ssm.targetSB;
+					else
+						added = ssm.pickedSB;
+					return added;
+				}
+				public ISlottable GetRemovedForSwap(){
+					ISlottable removed;
+					if(ssm.sg1 == (ISlotGroup)this)
+						removed = ssm.pickedSB;
+					else
+						removed = ssm.targetSB;
+					return removed;
+				}
+				public void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list){
+					if(!isPool){
+						GameObject newSBGO = new GameObject("newSBGO");
+						ISlottable newSB = newSBGO.AddComponent<Slottable>();
+						newSB.Initialize(added.itemInst);
+						newSB.SetSSM(ssm);
+						newSB.SetEqpState(Slottable.unequippedState);
+						newSB.Defocus();
+						list[list.IndexOf(removed)] = newSB;
+					}
+				}
 			public virtual void AddAndUpdateSBs(){
-				List<InventoryItemInstance> cache = ssm.transaction.moved;
-				List<ISlottable> newSBs = toList;
-				int origCount = newSBs.Count;
-				foreach(InventoryItemInstance itemInst in cache){
-					bool found = false;
+				List<InventoryItemInstance> added = ssm.moved;
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
+
+				foreach(InventoryItemInstance itemInst in added){
+					bool stacked = false;
 					foreach(ISlottable sb in newSBs){
 						if(sb!= null){
 							if(sb.itemInst == itemInst){
 								if(itemInst.Item.IsStackable){
-									sb.itemInst.Quantity += itemInst.Quantity;
-									found = true;
+									sb.itemInst.quantity += itemInst.quantity;
+									stacked = true;
 								}
 							}
 						}
 					}
-					if(!found){
-						GameObject newSBSG = new GameObject("newSBSG");
-						ISlottable newSB = newSBSG.AddComponent<Slottable>();
+					if(!stacked){
+						GameObject newSBGO = new GameObject("newSBGO");
+						ISlottable newSB = newSBGO.AddComponent<Slottable>();
 						newSB.Initialize(itemInst);
 						newSB.SetSSM(ssm);
 						newSB.Defocus();
 						newSBs.Fill(newSB);
 					}
 				}
-				if(isAutoSort)
-					Sorter.TrimAndOrderSBs(ref newSBs);
-				if(!isExpandable){
-					while(newSBs.Count <origCount){
-						newSBs.Add(null);
-					}
-				}
-				SetNewSBs(newSBs);
-				CreateNewSlots();
-				SetSBsActStates();
+				SortContextually(ref newSBs);
+				// SetNewSBs(newSBs);
+				// CreateNewSlots();
+				// SetSBsActStates();
+				UpdateSBs(newSBs);
 			}
+				public bool TryStack(List<ISlottable> target, InventoryItemInstance addedItem){
+					if(addedItem.IsStackable)
+						foreach(ISlottable sb in target){
+							if(sb != null){
+								if(sb.itemInst == addedItem){
+									sb.SetQuantity(sb.quantity + addedItem.quantity);
+									return true;
+								}
+							}
+						}
+					return false;
+				}
 			public virtual void RemoveAndUpdateSBs(){
 				List<InventoryItemInstance> cache = ssm.transaction.moved;
 				List<ISlottable> newSBs = toList;
@@ -795,8 +803,8 @@ namespace SlotSystem{
 						if(sb!= null){
 							if(sb.itemInst == itemInst){
 								if(itemInst.Item.IsStackable){
-									sb.itemInst.Quantity -= itemInst.Quantity;
-									if(sb.itemInst.Quantity <= 0)
+									sb.itemInst.quantity -= itemInst.quantity;
+									if(sb.itemInst.quantity <= 0)
 										removedList.Add(sb);
 								}else{
 									removedList.Add(sb);
@@ -829,9 +837,6 @@ namespace SlotSystem{
 			}
 			public virtual ISlottable pickedSB{get{return ssm.pickedSB;}}
 			public virtual ISlottable targetSB{get{return ssm.targetSB;}}
-			// public void RunFilter(ref List<SlottableItem> items){
-			// 	Filter.Filter(ref items);
-			// }
 			public List<SlottableItem> FilterItem(List<SlottableItem> items){
 				Filter.Filter(ref items);
 				return items;
@@ -939,7 +944,15 @@ namespace SlotSystem{
 			void UpdateToRevert();
 			void SortAndUpdateSBs();
 			void FillAndUpdateSBs();
+				ISlottable GetAddedForFill();
+				ISlottable GetRemovedForFill();
+				void CreateNewSBAndFill(InventoryItemInstance added, List<ISlottable> list);
+				void NullifyIndexOf(ISlottable removed, List<ISlottable> list);
+				void SortContextually(ref List<ISlottable> list);
 			void SwapAndUpdateSBs();
+				ISlottable GetAddedForSwap();
+				ISlottable GetRemovedForSwap();
+				void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list);
 			void AddAndUpdateSBs();
 			void RemoveAndUpdateSBs();
 		/*	Forward	*/

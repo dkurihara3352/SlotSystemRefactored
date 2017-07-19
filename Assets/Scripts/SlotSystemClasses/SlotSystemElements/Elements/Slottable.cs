@@ -377,6 +377,10 @@ namespace SlotSystem{
 					return isFilteredIn;
 				}
 			}
+			public int quantity{get{return itemInst.quantity;}}
+			public void SetQuantity(int quant){
+				itemInst.quantity = quant;
+			}
 		/*	SlotSystemElement imple	*/
 			/*	fields	*/
 				public override ISlotSystemElement this[int i]{get{return null;}}
@@ -482,7 +486,7 @@ namespace SlotSystem{
 				m_pickedAmount = 1;
 			}
 			public virtual void Increment(){
-				if(m_item.IsStackable && m_item.Quantity > m_pickedAmount){
+				if(m_item.IsStackable && m_item.quantity > m_pickedAmount){
 					m_pickedAmount ++;
 				}
 			}
@@ -521,8 +525,8 @@ namespace SlotSystem{
 					return false;
 			}
 			public void Destroy(){
-				// GameObject go = gameObject;
-				// DestroyImmediate(go);
+				GameObject go = gameObject;
+				DestroyImmediate(go);
 			}
 		/*	Forward	*/
 			public virtual void SetPickedSB(){
@@ -605,6 +609,8 @@ namespace SlotSystem{
 			void Unmark();
 			bool isStackable{get;}
 			bool passesPrePickFilter{get;}
+			int quantity{get;}
+			void SetQuantity(int quant);
 		/*	Event Methods	*/
 			void OnHoverEnterMock();
 			void OnHoverExitMock();

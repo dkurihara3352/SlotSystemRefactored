@@ -15,6 +15,7 @@ namespace SlotSystem{
 		DraggedIcon dIcon1{get;}
 		DraggedIcon dIcon2{get;}
 		ISlotSystemElement hovered{get;}
+		List<InventoryItemInstance> moved{get;}
 		void UpdateTransaction();
 		void CreateTransactionResults();
 		void ReferToTAAndUpdateSelState(ISlotGroup sg);
@@ -32,5 +33,6 @@ namespace SlotSystem{
 		void SetDIcon2(DraggedIcon di);
 		bool dIcon2Done{get;}
 		void SetHovered(ISlotSystemElement ele);
+		void SetMoved(List<InventoryItemInstance> moved);
 	}
 }

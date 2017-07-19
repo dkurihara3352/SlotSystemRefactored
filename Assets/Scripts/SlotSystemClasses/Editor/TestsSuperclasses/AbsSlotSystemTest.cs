@@ -224,7 +224,7 @@ public class AbsSlotSystemTest{
 			partsFake.ItemID = 6000 + id;
 			PartsInstance partsInst = new PartsInstance();
 			partsInst.Item = partsFake;
-			partsInst.Quantity = quantity;
+			partsInst.quantity = quantity;
 			return partsInst;
 		}
 		protected static BowInstance MakeBowInstWithOrder(int id, int order){

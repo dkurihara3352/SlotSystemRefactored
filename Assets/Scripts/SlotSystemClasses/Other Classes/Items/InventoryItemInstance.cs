@@ -11,7 +11,7 @@ namespace SlotSystem{
 			set{m_item = value;}
 		}
 		int m_quantity;
-		public int Quantity{
+		public int quantity{
 			get{return m_quantity;}
 			set{m_quantity = value;}
 		}

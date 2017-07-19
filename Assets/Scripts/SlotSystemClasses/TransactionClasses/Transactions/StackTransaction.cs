@@ -15,7 +15,7 @@ namespace SlotSystem{
 			m_selectedSB = selected;
 			m_selectedSG = m_selectedSB.sg;
 			InventoryItemInstance cache = pickedSB.itemInst;
-			cache.Quantity = pickedSB.pickedAmount;
+			cache.quantity = pickedSB.pickedAmount;
 			itemCache.Add(cache);
 		}
 		public StackTransaction(StackTransaction orig){
@@ -24,7 +24,7 @@ namespace SlotSystem{
 			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
 			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
 			InventoryItemInstance item = this.m_pickedSB.itemInst;
-			item.Quantity = orig.m_pickedSB.pickedAmount;
+			item.quantity = orig.m_pickedSB.pickedAmount;
 			itemCache.Add(item);
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
