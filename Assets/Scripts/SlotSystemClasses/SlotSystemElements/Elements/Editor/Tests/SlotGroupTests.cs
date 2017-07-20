@@ -928,15 +928,14 @@ namespace SlotSystemTests{
 							yield return new object[]{slots, expected};
 						}
 					}
-				[TestCase(0, false)]
-				[TestCase(1, false)]
-				[TestCase(-1, true)]
+				[TestCase(true, true)]
+				[TestCase(false, false)]
 				[Category("Methods")]
-				public void OnCompleteSlotMovements_NewSlotIDMinus1_CallsSBDestory(int id, bool expected){
+				public void OnCompleteSlotMovements_NewSlotIDMinus1_CallsSBDestory(bool removed, bool expected){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
 							ISlottable sb = MakeSubSB();
-							sb.newSlotID.Returns(id);
+							sb.isRemoved.Returns(removed);
 						sbs = new List<ISlottable>(new ISlottable[]{sb});
 						sg.SetSBs(sbs);
 						List<Slot> newSlots = new List<Slot>(new Slot[]{ new Slot(), new Slot()});
@@ -969,6 +968,7 @@ namespace SlotSystemTests{
 						public IEnumerator GetEnumerator(){
 							ISlottable rsbA = MakeSubSB();
 								rsbA.newSlotID.Returns(-1);
+								rsbA.isRemoved.Returns(true);
 							ISlottable sbA = MakeSubSB();
 								sbA.newSlotID.Returns(0);
 								//null
@@ -979,6 +979,7 @@ namespace SlotSystemTests{
 								//null
 							ISlottable rsbB = MakeSubSB();
 								rsbB.newSlotID.Returns(-1);
+								rsbB.isRemoved.Returns(true);
 								//null
 							ISlottable sbD = MakeSubSB();
 								sbD.newSlotID.Returns(3);

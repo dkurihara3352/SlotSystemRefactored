@@ -135,54 +135,57 @@ public class AbsSlotSystemTest{
 			return Substitute.For<IPoolInventory>();
 		}
 		protected class FakeSBSelState: SBSelState{}
-		protected static SBSelState MakeSubSBSelState(){
-			return Substitute.For<SBSelState>();
-		}
-		protected static SBActState MakeSubSBActState(){
-			return Substitute.For<SBActState>();
-		}
-		protected static SBEqpState MakeSubSBEqpState(){
-			return Substitute.For<SBEqpState>();
-		}
-		protected static SBMrkState MakeSubSBMrkState(){
-			return Substitute.For<SBMrkState>();
-		}
-		protected static SGSelState MakeSubSGSelState(){
-			return Substitute.For<SGSelState>();
-		}
-		protected static SGActState MakeSubSGActState(){
-			return Substitute.For<SGActState>();
-		}
-		protected static SSMSelState MakeSubSSMSelState(){
-			return Substitute.For<SSMSelState>();
-		}
-		protected static SSMActState MakeSubSSMActState(){
-			return Substitute.For<SSMActState>();
-		}
-		protected static ISBSelProcess MakeSubSBSelProc(){
-			return Substitute.For<ISBSelProcess>();
-		}
-		protected static ISBActProcess MakeSubSBActProc(){
-			return Substitute.For<ISBActProcess>();
-		}
-		protected static ISBEqpProcess MakeSubSBEqpProc(){
-			return Substitute.For<ISBEqpProcess>();
-		}
-		protected static ISBMrkProcess MakeSubSBMrkProc(){
-			return Substitute.For<ISBMrkProcess>();
-		}
-		protected static ISGSelProcess MakeSubSGSelProc(){
-			return Substitute.For<ISGSelProcess>();
-		}
-		protected static ISGActProcess MakeSubSGActProc(){
-			return Substitute.For<ISGActProcess>();
-		}
-		protected static ISSMSelProcess MakeSubSSMSelProc(){
-			return Substitute.For<ISSMSelProcess>();
-		}
-		protected static ISSMActProcess MakeSubSSMActProc(){
-			return Substitute.For<ISSMActProcess>();
-		}
+		/* States */
+			protected static SBSelState MakeSubSBSelState(){
+				return Substitute.For<SBSelState>();
+			}
+			protected static SBActState MakeSubSBActState(){
+				return Substitute.For<SBActState>();
+			}
+			protected static SBEqpState MakeSubSBEqpState(){
+				return Substitute.For<SBEqpState>();
+			}
+			protected static SBMrkState MakeSubSBMrkState(){
+				return Substitute.For<SBMrkState>();
+			}
+			protected static SGSelState MakeSubSGSelState(){
+				return Substitute.For<SGSelState>();
+			}
+			protected static SGActState MakeSubSGActState(){
+				return Substitute.For<SGActState>();
+			}
+			protected static SSMSelState MakeSubSSMSelState(){
+				return Substitute.For<SSMSelState>();
+			}
+			protected static SSMActState MakeSubSSMActState(){
+				return Substitute.For<SSMActState>();
+			}
+		/* Process */
+			protected static ISBSelProcess MakeSubSBSelProc(){
+				return Substitute.For<ISBSelProcess>();
+			}
+			protected static ISBActProcess MakeSubSBActProc(){
+				return Substitute.For<ISBActProcess>();
+			}
+			protected static ISBEqpProcess MakeSubSBEqpProc(){
+				return Substitute.For<ISBEqpProcess>();
+			}
+			protected static ISBMrkProcess MakeSubSBMrkProc(){
+				return Substitute.For<ISBMrkProcess>();
+			}
+			protected static ISGSelProcess MakeSubSGSelProc(){
+				return Substitute.For<ISGSelProcess>();
+			}
+			protected static ISGActProcess MakeSubSGActProc(){
+				return Substitute.For<ISGActProcess>();
+			}
+			protected static ISSMSelProcess MakeSubSSMSelProc(){
+				return Substitute.For<ISSMSelProcess>();
+			}
+			protected static ISSMActProcess MakeSubSSMActProc(){
+				return Substitute.For<ISSMActProcess>();
+			}
+		/* ItemInstance */
 		protected static BowInstance MakeBowInstance(int id){
 			BowFake bowFake = new BowFake();
 			bowFake.ItemID = id;

@@ -11,7 +11,7 @@ namespace SlotSystem{
 		}
 		public virtual void ExitState(IStateHandler handler){}
 	}
-	public class SSEStateEngine: SwitchableStateEngine{
+	public class SSEStateEngine: SwitchableStateEngine, ISSEStateEngine{
 		public SSEStateEngine(ISlotSystemElement sse){
 			this.handler = sse;
 		}
@@ -19,6 +19,7 @@ namespace SlotSystem{
 			base.SetState(state);
 		}
 	}
+		public interface ISSEStateEngine: ISwitchableStateEngine{}
 		public abstract class SSESelState: SSEState{}
 			public class SSEDeactivatedState: SSESelState{
 				public override void EnterState(IStateHandler sh){

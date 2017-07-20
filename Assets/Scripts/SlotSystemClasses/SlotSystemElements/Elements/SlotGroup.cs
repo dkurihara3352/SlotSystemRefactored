@@ -597,7 +597,7 @@ namespace SlotSystem{
 			public virtual void OnCompleteSlotMovements(){
 				foreach(ISlottable sb in this){
 					if(sb != null){
-						if(sb.newSlotID == -1){
+						if(sb.isRemoved){
 							sb.Destroy();
 						}else{
 							newSlots[sb.newSlotID].sb = sb;
@@ -853,26 +853,26 @@ namespace SlotSystem{
 		/*	fields	*/
 			AxisScrollerMock scroller{get;}
 			Inventory inventory{get;}
-			void SetInventory(Inventory inv);
+				void SetInventory(Inventory inv);
 			bool isShrinkable{get;}
 			bool isExpandable{get;}
 			List<Slot> slots{get;}
-			void SetSlots(List<Slot> slots);
+				void SetSlots(List<Slot> slots);
 			List<Slot> newSlots{get;}
-			void SetNewSlots(List<Slot> newSlots);
+				void SetNewSlots(List<Slot> newSlots);
 			bool isPool{get;}
 			bool isSGE{get;}
 			bool isSGG{get;}
 			bool isAutoSort{get;}
-			void ToggleAutoSort(bool on);
+				void ToggleAutoSort(bool on);
 			void SetSBs(List<ISlottable> sbs);
 			List<ISlottable> newSBs{get;}
-			void SetNewSBs(List<ISlottable> sbs);
+				void SetNewSBs(List<ISlottable> sbs);
 			bool hasEmptySlot{get;}
 			List<ISlottable> equippedSBs{get;}
 			bool isAllSBActProcDone{get;}
 			int initSlotsCount{get;}
-			void SetInitSlotsCount(int i);
+				void SetInitSlotsCount(int i);
 
 		/*	commands 	*/
 			void InitializeItems();
@@ -883,11 +883,11 @@ namespace SlotSystem{
 				SlotGroupCommand onActionExecuteCommand{get;}
 		/*	Sorter	*/
 			SGSorter Sorter{get;}
-			void SetSorter(SGSorter sorter);
+				void SetSorter(SGSorter sorter);
 			void InstantSort();
 		/*	Filter	*/
 			SGFilter Filter{get;}
-			void SetFilter(SGFilter filter);
+				void SetFilter(SGFilter filter);
 			bool AcceptsFilter(ISlottable pickedSB);
 		/*	Events	*/
 			void OnHoverEnterMock();
@@ -930,7 +930,6 @@ namespace SlotSystem{
 			void SetHovered();
 			ISlottable pickedSB{get;}
 			ISlottable targetSB{get;}
-			// void RunFilter(ref List<SlottableItem> items);
 			List<SlottableItem> FilterItem(List<SlottableItem> items);
 			void InitSlots(List<SlottableItem> items);
 			void InitSBs(List<SlottableItem> items);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utility{
-	public abstract class SwitchableStateEngine{
+	public abstract class SwitchableStateEngine: ISwitchableStateEngine{
 		public virtual IStateHandler handler{get{return m_handler;} set{m_handler = value;}}
 			IStateHandler m_handler;
 		virtual public SwitchableState prevState{
@@ -33,5 +33,12 @@ namespace Utility{
 					state.EnterState(handler);
 			}
 		}
+	}
+	public interface ISwitchableStateEngine{
+		IStateHandler handler{get;set;}
+		SwitchableState prevState{get;}
+		SwitchableState curState{get;}
+		void SetState(SwitchableState state);
+
 	}
 }

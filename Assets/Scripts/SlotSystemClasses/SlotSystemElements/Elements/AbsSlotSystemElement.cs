@@ -5,13 +5,14 @@ using Utility;
 namespace SlotSystem{
 	public abstract class AbsSlotSystemElement :MonoBehaviour, IAbsSlotSystemElement{
 		/*	state	*/
-			public SSEStateEngine selStateEngine{
+			public ISSEStateEngine selStateEngine{
 				get{
 					if(m_selStateEngine == null)
 						m_selStateEngine = new SSEStateEngine(this);
 					return m_selStateEngine;
 				}
-				}SSEStateEngine m_selStateEngine;
+				}ISSEStateEngine m_selStateEngine;
+				public void SetSelStateEngine(ISSEStateEngine engine){m_selStateEngine = engine;}
 				public virtual SSEState prevSelState{
 					get{return (SSESelState)selStateEngine.prevState;}
 				}
@@ -21,7 +22,7 @@ namespace SlotSystem{
 				public virtual void SetSelState(SSEState state){
 					if(state == null || state is SSESelState)
 						selStateEngine.SetState(state);
-					else throw new System.InvalidOperationException("AbsSlotSystemElement.SetSelState: argument is not of type SSESelState");
+					else throw new System.ArgumentException("AbsSlotSystemElement.SetSelState: argument is not of type SSESelState");
 				}
 				/*	static sel states	*/
 					public static SSESelState deactivatedState{
@@ -52,13 +53,14 @@ namespace SlotSystem{
 							return m_selectedState;
 						}
 						}static SSESelState m_selectedState;
-			public SSEStateEngine actStateEngine{
+			public ISSEStateEngine actStateEngine{
 				get{
 					if(m_actStateEngine == null)
 						m_actStateEngine = new SSEStateEngine(this);
 					return m_actStateEngine;
 				}
-				}SSEStateEngine m_actStateEngine;
+				}ISSEStateEngine m_actStateEngine;
+				public void SetActStateEngine(ISSEStateEngine engine){m_actStateEngine = engine;}
 				public virtual SSEState prevActState{
 					get{return (SSEActState)actStateEngine.prevState;}
 				}
@@ -68,7 +70,7 @@ namespace SlotSystem{
 				public virtual void SetActState(SSEState state){
 					if(state == null || state is SSEActState)
 						actStateEngine.SetState(state);
-					else throw new System.InvalidOperationException("AbsSlotSystemElement.SetActState: argument is not of type SSEActState");
+					else throw new System.ArgumentException("AbsSlotSystemElement.SetActState: argument is not of type SSEActState");
 				}
 				/*	static act state	*/
 					public static SSEActState waitForActionState{
@@ -80,20 +82,23 @@ namespace SlotSystem{
 						}static SSEActState m_waitForActionState;
 		/*	process	*/
 			/*	Selection Processs	*/
-				public SSEProcessEngine selProcEngine{
+				public ISSEProcessEngine selProcEngine{
 					get{
 						if(m_selProcEngine == null)
 							m_selProcEngine = new SSEProcessEngine();
 						return m_selProcEngine;
 					}
-					}SSEProcessEngine m_selProcEngine;
+					}ISSEProcessEngine m_selProcEngine;
+					public void SetSelProcEngine(ISSEProcessEngine engine){
+						m_selProcEngine = engine;
+					}
 					public virtual ISSEProcess selProcess{
 						get{return (SSESelProcess)selProcEngine.process;}
 					}
 					public virtual void SetAndRunSelProcess(ISSEProcess process){
 						if(process == null||process is SSESelProcess)
 							selProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
+						else throw new System.ArgumentException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
 					}
 				public virtual IEnumeratorFake greyoutCoroutine(){
 					return null;
@@ -108,20 +113,21 @@ namespace SlotSystem{
 					return null;
 				}
 			/*	Action Process	*/
-				public SSEProcessEngine actProcEngine{
+				public ISSEProcessEngine actProcEngine{
 					get{
 						if(m_actProcEngine == null)
 							m_actProcEngine = new SSEProcessEngine();
 						return m_actProcEngine;
 					}
-					}SSEProcessEngine m_actProcEngine;
+					}ISSEProcessEngine m_actProcEngine;
+					public void SetActProcEngine(ISSEProcessEngine engine){m_actProcEngine = engine;}
 					public virtual ISSEProcess actProcess{
 						get{return (SSEActProcess)actProcEngine.process;}
 					}
 					public virtual void SetAndRunActProcess(ISSEProcess process){
 						if(process == null || process is SSEActProcess)
 							actProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");
+						else throw new System.ArgumentException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");
 					}
 		/*	public fields	*/
 			public virtual ISlotSystemElement this[int i]{
@@ -131,7 +137,7 @@ namespace SlotSystem{
 						if(id++ == i)
 							return ele;	
 					}
-					throw new System.InvalidOperationException("AbsSlotSysElement.indexer: argument out of range");
+					throw new System.ArgumentOutOfRangeException("AbsSlotSysElement.indexer: argument out of range");
 				}
 			}
 			public virtual string eName{get{return m_eName;}}protected string m_eName;
@@ -142,7 +148,7 @@ namespace SlotSystem{
 				get{
 					if(parent == null)
 						return null;
-					if(parent is ISlotSystemBundle)
+					else if(parent is ISlotSystemBundle)
 						return (ISlotSystemBundle)parent;
 					else
 						return parent.immediateBundle;
@@ -293,12 +299,12 @@ namespace SlotSystem{
 	}
 	public interface IAbsSlotSystemElement: ISlotSystemElement{
 		IEnumerable<ISlotSystemElement> elements{get;}
-		SSEStateEngine selStateEngine{get;}
+		ISSEStateEngine selStateEngine{get;}
 		void SetSelState(SSEState state);
-		SSEStateEngine actStateEngine{get;}
+		ISSEStateEngine actStateEngine{get;}
 		void SetActState(SSEState state);
-		SSEProcessEngine selProcEngine{get;}
-		SSEProcessEngine actProcEngine{get;}
+		ISSEProcessEngine selProcEngine{get;}
+		ISSEProcessEngine actProcEngine{get;}
 		void Initialize();
 	}
 }

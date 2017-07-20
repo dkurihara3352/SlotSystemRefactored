@@ -6,7 +6,7 @@ namespace SlotSystem{
 		/*	fields	*/
 		public override IEnumerable<ISlotSystemElement> elements{
 			get{return m_elements;}
-			}IEnumerable<ISlotSystemElement> m_elements;
+			}IEnumerable<ISlotSystemElement> m_elements = new ISlotSystemElement[]{};
 
 		public ISlotSystemElement focusedElement{
 			get{return m_focusedElement;}

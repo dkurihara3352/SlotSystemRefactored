@@ -144,14 +144,14 @@ namespace SlotSystem{
 						}
 						}static SBActState m_moveWithinState;
 			/*	Equip State	*/
-				public SSEStateEngine eqpStateEngine{
+				public ISSEStateEngine eqpStateEngine{
 					get{
 						if(m_eqpStateEngine == null)
 							m_eqpStateEngine = new SSEStateEngine(this);
 						return m_eqpStateEngine;
 					}
-					}SSEStateEngine m_eqpStateEngine;
-					public void SetEqpStateEngine(SSEStateEngine engine){m_eqpStateEngine = engine;}
+					}ISSEStateEngine m_eqpStateEngine;
+					public void SetEqpStateEngine(ISSEStateEngine engine){m_eqpStateEngine = engine;}
 					public virtual SSEState curEqpState{
 						get{return (SBEqpState)eqpStateEngine.curState;}
 					}
@@ -185,14 +185,14 @@ namespace SlotSystem{
 					}
 					}static SBEqpState m_unequippedState;
 			/*	Mark state	*/
-				public SSEStateEngine mrkStateEngine{
+				public ISSEStateEngine mrkStateEngine{
 					get{
 						if(m_markStateEngine == null)
 							m_markStateEngine = new SSEStateEngine(this);
 						return m_markStateEngine;
 					}
-					}SSEStateEngine m_markStateEngine;
-					public void SetMrkStateEngine(SSEStateEngine engine){m_markStateEngine = engine;}
+					}ISSEStateEngine m_markStateEngine;
+					public void SetMrkStateEngine(ISSEStateEngine engine){m_markStateEngine = engine;}
 					public virtual SSEState curMrkState{
 						get{return (SBMrkState)mrkStateEngine.curState;}
 					}
@@ -260,14 +260,14 @@ namespace SlotSystem{
 					return null;
 				}
 			/*	Equip Process	*/
-				public SSEProcessEngine eqpProcEngine{
+				public ISSEProcessEngine eqpProcEngine{
 					get{
 						if(m_eqpProcEngine == null)
 							m_eqpProcEngine = new SSEProcessEngine();
 						return m_eqpProcEngine;
 					}
-					}SSEProcessEngine m_eqpProcEngine;
-					public void SetEqpProcessEngine(SSEProcessEngine engine){m_eqpProcEngine = engine;}
+					}ISSEProcessEngine m_eqpProcEngine;
+					public void SetEqpProcessEngine(ISSEProcessEngine engine){m_eqpProcEngine = engine;}
 					public virtual ISSEProcess eqpProcess{
 						get{return (ISBEqpProcess)eqpProcEngine.process;}
 					}
@@ -279,14 +279,14 @@ namespace SlotSystem{
 				public IEnumeratorFake UnequipCoroutine(){return null;}
 				public IEnumeratorFake EquipCoroutine(){return null;}
 			/*	Mark Process	*/
-				public SSEProcessEngine mrkProcEngine{
+				public ISSEProcessEngine mrkProcEngine{
 					get{
 						if(m_mrkProcEngine == null)
 							m_mrkProcEngine = new SSEProcessEngine();
 						return m_mrkProcEngine;
 					}
-					}SSEProcessEngine m_mrkProcEngine;
-					public void SetMrkProcessEngine(SSEProcessEngine engine){m_mrkProcEngine = engine;}
+					}ISSEProcessEngine m_mrkProcEngine;
+					public void SetMrkProcessEngine(ISSEProcessEngine engine){m_mrkProcEngine = engine;}
 					public virtual ISSEProcess mrkProcess{
 						get{return (ISBMrkProcess)mrkProcEngine.process;}
 					}
@@ -332,6 +332,8 @@ namespace SlotSystem{
 				public void SetNewSlotID(int id){
 					m_newSlotID = id;
 				}
+			public bool isAdded{get{return slotID == -1;}}
+			public bool isRemoved{get{return newSlotID == -1;}}
 			public ISlotGroup sg{
 				get{
 					return (ISlotGroup)parent;
@@ -559,13 +561,13 @@ namespace SlotSystem{
 	}
 	public interface ISlottable: IAbsSlotSystemElement ,IComparable<ISlottable>, IComparable{
 		/*	States and Processes	*/
-			SSEStateEngine eqpStateEngine{get;}
-			void SetEqpStateEngine(SSEStateEngine engine);
+			ISSEStateEngine eqpStateEngine{get;}
+			void SetEqpStateEngine(ISSEStateEngine engine);
 			SSEState curEqpState{get;}
 			SSEState prevEqpState{get;}
 			void SetEqpState(SSEState state);
-			SSEStateEngine mrkStateEngine{get;}
-			void SetMrkStateEngine(SSEStateEngine engine);
+			ISSEStateEngine mrkStateEngine{get;}
+			void SetMrkStateEngine(ISSEStateEngine engine);
 			SSEState curMrkState{get;}
 			SSEState prevMrkState{get;}
 			void SetMrkState(SSEState state);
@@ -576,14 +578,14 @@ namespace SlotSystem{
 			IEnumeratorFake RemoveCoroutine();
 			IEnumeratorFake AddCorouine();
 			IEnumeratorFake MoveWithinCoroutine();
-			SSEProcessEngine eqpProcEngine{get;}
-			void SetEqpProcessEngine(SSEProcessEngine engine);
+			ISSEProcessEngine eqpProcEngine{get;}
+			void SetEqpProcessEngine(ISSEProcessEngine engine);
 			ISSEProcess eqpProcess{get;}
 			void SetAndRunEqpProcess(ISSEProcess process);
 			IEnumeratorFake UnequipCoroutine();
 			IEnumeratorFake EquipCoroutine();
-			SSEProcessEngine mrkProcEngine{get;}
-			void SetMrkProcessEngine(SSEProcessEngine engine);
+			ISSEProcessEngine mrkProcEngine{get;}
+			void SetMrkProcessEngine(ISSEProcessEngine engine);
 			ISSEProcess mrkProcess{get;}
 			void SetAndRunMrkProcess(ISSEProcess process);
 			IEnumeratorFake unmarkCoroutine();
@@ -599,6 +601,8 @@ namespace SlotSystem{
 			void SetSlotID(int i);
 			int newSlotID{get;}
 			void SetNewSlotID(int id);
+			bool isAdded{get;}
+			bool isRemoved{get;}
 			ISlotGroup sg{get;}
 			bool isPickedUp{get;}
 			bool isEquipped{get;}

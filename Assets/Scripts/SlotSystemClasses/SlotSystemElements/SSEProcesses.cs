@@ -35,7 +35,7 @@ namespace SlotSystem{
 				m_isRunning = false;
 		}
 	}
-	public class SSEProcessEngine{
+	public class SSEProcessEngine: ISSEProcessEngine{
 		public virtual ISSEProcess process{
 			get{return m_process;}
 			// set{m_process = value;}
@@ -48,6 +48,10 @@ namespace SlotSystem{
 				process.Start();
 		}
 	}
+		public interface ISSEProcessEngine{
+			ISSEProcess process{get;}
+			void SetAndRunProcess(ISSEProcess process);
+		}
 		public abstract class SSESelProcess: AbsSSEProcess{}
 			public class SSEGreyinProcess: SSESelProcess{
 				public SSEGreyinProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){

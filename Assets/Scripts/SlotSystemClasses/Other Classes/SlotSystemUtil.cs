@@ -6,9 +6,8 @@ namespace SlotSystem{
 	public static class SlotSystemUtil{
 		public static ISlottable CloneSB(ISlottable orig){
 			if(orig != null){
-				// GameObject cloneGO = new GameObject("cloneGO");
-				// SBClone clone = cloneGO.AddComponent<SBClone>();
-				SBClone clone = new SBClone();
+				GameObject cloneGO = new GameObject("cloneGO");
+				SBClone clone = cloneGO.AddComponent<SBClone>();
 				clone.Initialize(orig);
 				return clone;
 			}
@@ -16,9 +15,8 @@ namespace SlotSystem{
 		}
 		public static ISlotGroup CloneSG(ISlotGroup orig){
 			if(orig != null){
-				// GameObject cloneSGGO = new GameObject("cloneSGGO");
-				// SGClone cloneSG = cloneSGGO.AddComponent<SGClone>();
-				SGClone cloneSG = new SGClone();
+				GameObject cloneSGGO = new GameObject("cloneSGGO");
+				SGClone cloneSG = cloneSGGO.AddComponent<SGClone>();
 				cloneSG.Initialize(orig);
 				return cloneSG;
 			}

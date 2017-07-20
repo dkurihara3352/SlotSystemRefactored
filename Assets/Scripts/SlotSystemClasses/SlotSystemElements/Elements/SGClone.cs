@@ -13,9 +13,7 @@ namespace SlotSystem{
 		public override bool isSGG{
 			get{return m_isSGG;}
 			}bool m_isSGG;
-		// public override bool isFocusedInBundle{
-		// 	get{return m_isFocusedInBundle;}
-		// 	}bool m_isFocusedInBundle;
+		
 		public override List<ISlottable> equippedSBs{
 			get{return m_equippedSBs;}
 			}List<ISlottable> m_equippedSBs;
@@ -33,13 +31,13 @@ namespace SlotSystem{
 			}bool m_isDeactivated;
 		public override string eName{
 			get{return m_eName;}
-		}
+			}
 		public override bool isShrinkable{
 			get{return m_isShrinkable;}
-		}bool m_isShrinkable;
+			}bool m_isShrinkable;
 		public override bool isExpandable{
 			get{return m_isExpandable;}
-		}bool m_isExpandable;
+			}bool m_isExpandable;
 		public void Initialize(ISlotGroup orig){
 			this.scroller = orig.scroller;
 			SetInventory(orig.inventory);
