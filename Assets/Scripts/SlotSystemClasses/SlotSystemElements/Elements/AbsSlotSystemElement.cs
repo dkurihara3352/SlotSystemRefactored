@@ -141,7 +141,17 @@ namespace SlotSystem{
 				}
 			}
 			public virtual string eName{get{return m_eName;}}protected string m_eName;
-			public abstract IEnumerable<ISlotSystemElement> elements{get;}
+			public virtual IEnumerable<ISlotSystemElement> elements{get{return m_elements;}} protected IEnumerable<ISlotSystemElement> m_elements;
+			public virtual void SetElements(){
+				List<ISlotSystemElement> elements = new List<ISlotSystemElement>();
+				for(int i = 0; i < transform.childCount; i++){
+					ISlotSystemElement ele = transform.GetChild(i).GetComponent<ISlotSystemElement>();
+					if(ele != null){
+						elements.Add(ele);
+					}
+				}
+				m_elements = elements;
+			}
 			public virtual ISlotSystemElement parent{get{return m_parent;}} ISlotSystemElement m_parent;
 				public virtual void SetParent(ISlotSystemElement par){m_parent = par;}
 			public virtual ISlotSystemBundle immediateBundle{
@@ -205,8 +215,16 @@ namespace SlotSystem{
 					return true;
 				}
 			}
+			public bool isInitiallyFocusedInPage{
+				get{
+					if(isPageElement){
+						return m_isInitiallyFocusedInPage;
+					}else return false;
+				}
+				set{m_isInitiallyFocusedInPage = value;}
+			}public bool m_isInitiallyFocusedInPage;
 		/*	methods	*/
-			public void Initialize(){
+			public virtual void InitializeStates(){
 				SetSelState(AbsSlotSystemElement.deactivatedState);
 				SetActState(AbsSlotSystemElement.waitForActionState);
 			}
@@ -298,13 +316,57 @@ namespace SlotSystem{
 			public virtual void InstantHighlight(){}
 	}
 	public interface IAbsSlotSystemElement: ISlotSystemElement{
-		IEnumerable<ISlotSystemElement> elements{get;}
 		ISSEStateEngine selStateEngine{get;}
 		void SetSelState(SSEState state);
 		ISSEStateEngine actStateEngine{get;}
 		void SetActState(SSEState state);
 		ISSEProcessEngine selProcEngine{get;}
 		ISSEProcessEngine actProcEngine{get;}
-		void Initialize();
+	}
+	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
+		SSEState curSelState{get;}
+		SSEState prevSelState{get;}
+		SSEState curActState{get;}
+		SSEState prevActState{get;}
+		void SetAndRunSelProcess(ISSEProcess process);
+		void SetAndRunActProcess(ISSEProcess process);
+		ISSEProcess selProcess{get;}
+		ISSEProcess actProcess{get;}
+		IEnumeratorFake greyoutCoroutine();
+		IEnumeratorFake greyinCoroutine();
+		IEnumeratorFake highlightCoroutine();
+		IEnumeratorFake dehighlightCoroutine();
+		void InstantGreyin();
+		void InstantGreyout();
+		void InstantHighlight();
+		string eName{get;}
+		bool isBundleElement{get;}
+		bool isPageElement{get;}
+		bool isToggledOn{get;}
+		bool isFocused{get;}
+		bool isDefocused{get;}
+		bool isDeactivated{get;}
+		bool isFocusedInHierarchy{get;}
+		bool isInitiallyFocusedInPage{get;set;}
+		void InitializeStates();
+		void Activate();
+		void Deactivate();
+		void Focus();
+		void Defocus();
+		ISlotSystemBundle immediateBundle{get;}
+		ISlotSystemElement parent{get;}
+		void SetParent(ISlotSystemElement par);
+		ISlotSystemManager ssm{get;}
+		void SetSSM(ISlotSystemElement ssm);
+		IEnumerable<ISlotSystemElement> elements{get;}
+		void SetElements();
+		bool ContainsInHierarchy(ISlotSystemElement ele);
+		void PerformInHierarchy(System.Action<ISlotSystemElement> act);
+		void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj);
+		void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list);
+		int level{get;}
+		bool Contains(ISlotSystemElement element);
+		ISlotSystemElement this[int i]{get;}
+		void ToggleOnPageElement();
 	}
 }

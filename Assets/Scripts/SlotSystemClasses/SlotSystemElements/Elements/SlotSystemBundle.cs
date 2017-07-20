@@ -4,10 +4,6 @@ using UnityEngine;
 namespace SlotSystem{
 	public class SlotSystemBundle : AbsSlotSystemElement, ISlotSystemBundle{
 		/*	fields	*/
-		public override IEnumerable<ISlotSystemElement> elements{
-			get{return m_elements;}
-			}IEnumerable<ISlotSystemElement> m_elements = new ISlotSystemElement[]{};
-
 		public ISlotSystemElement focusedElement{
 			get{return m_focusedElement;}
 			}ISlotSystemElement m_focusedElement;
@@ -21,7 +17,7 @@ namespace SlotSystem{
 		public void Initialize(string name, IEnumerable<ISlotSystemElement> elements){
 			m_eName = SlotSystemUtil.Bold(name);
 			m_elements = elements;
-			base.Initialize();
+			InitializeStates();
 		}
 		public override void Focus(){
 			SetSelState(AbsSlotSystemElement.focusedState);

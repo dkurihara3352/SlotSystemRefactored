@@ -16,6 +16,7 @@ namespace SlotSystem{
 				pageEle.isFocusToggleOn = pageEle.isFocusedOnActivate;
 			}
 		}
+		public override abstract void SetElements();
 		public void TogglePageElementFocus(ISlotSystemElement ele, bool toggle){
 			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.element == ele){

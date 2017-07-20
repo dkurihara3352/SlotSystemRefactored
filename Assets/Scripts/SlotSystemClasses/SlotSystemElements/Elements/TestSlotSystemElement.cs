@@ -4,8 +4,6 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class TestSlotSystemElement: AbsSlotSystemElement{
-		public  override IEnumerable<ISlotSystemElement> elements{get{return m_elements;}}
-		IEnumerable<ISlotSystemElement> m_elements;
 		public void SetElements(IEnumerable<ISlotSystemElement> elements){
 			m_elements = elements;
 		}

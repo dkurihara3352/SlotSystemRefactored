@@ -10,7 +10,26 @@ namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
 		public class GenericPageTests: AbsSlotSystemTest {
+			[Test][Category("Methods")]
+			public void SetElements_WhenCalled_SetsFields(){
+				GenericPage gPage = MakeGenPage();
+					TestSlotSystemElement testEleA = MakeTestSSE();
+					TestSlotSystemElement testEleB = MakeTestSSE();
+					TestSlotSystemElement testEleC = MakeTestSSE();
+					testEleA.gameObject.transform.SetParent(gPage.gameObject.transform);
+					testEleB.gameObject.transform.SetParent(gPage.gameObject.transform);
+					testEleC.gameObject.transform.SetParent(gPage.gameObject.transform);
+					testEleA.isInitiallyFocusedInPage = true;
+					testEleB.isInitiallyFocusedInPage = true;
+					testEleC.isInitiallyFocusedInPage = true;
+					IEnumerable<ISlotSystemElement> expected = new ISlotSystemElement[]{
+						testEleA, testEleB, testEleC
+					};
+				gPage.SetElements();
 
+				IEnumerable<ISlotSystemElement> actual = gPage;
+				Assert.That(actual, Is.EqualTo(expected));
+			}
 			[Test]
 			public void Initialize_WhenCalled_SetsFields(){
 				GenericPage gPage = MakeGenPage();
@@ -144,6 +163,7 @@ namespace SlotSystemTests{
 				pEle_A.Received().isFocusToggleOn = exp_A;
 				pEle_B.Received().isFocusToggleOn = exp_B;
 			}
+			/* Helper */
 		}
 	}
 }

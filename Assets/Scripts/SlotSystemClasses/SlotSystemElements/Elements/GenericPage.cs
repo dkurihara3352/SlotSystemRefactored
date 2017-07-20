@@ -4,16 +4,28 @@ using UnityEngine;
 namespace SlotSystem{
 	public class GenericPage : SlotSystemPage, ISlotSystemPage{
 		public override IEnumerable<ISlotSystemElement> elements{
-				get{
-					foreach(ISlotSystemPageElement pageEle in pageElements){
-						yield return pageEle.element;
-					}
+			get{
+				foreach(ISlotSystemPageElement pageEle in pageElements){
+					yield return pageEle.element;
 				}
-				}IEnumerable<ISlotSystemElement> m_elements;
+			}
+		}
 		public void Initialize(string name, IEnumerable<ISlotSystemPageElement> pageEles){
 			m_eName = SlotSystemUtil.Bold(name);
 			m_pageElements = pageEles;
-			base.Initialize();
+			InitializeStates();
+		}
+		public override void SetElements(){
+			List<ISlotSystemElement> elements = new List<ISlotSystemElement>();
+			List<ISlotSystemPageElement> pEles = new List<ISlotSystemPageElement>();
+			for(int i =0; i< transform.childCount; i++){
+				ISlotSystemElement element = transform.GetChild(i).GetComponent<ISlotSystemElement>();
+					elements.Add(element);
+				SlotSystemPageElement pEle = new SlotSystemPageElement(element, element.isInitiallyFocusedInPage);
+					pEles.Add(pEle);
+			}
+			m_elements = elements;
+			m_pageElements = pEles;
 		}
 		public override void Focus(){
 			SetSelState(AbsSlotSystemElement.focusedState);

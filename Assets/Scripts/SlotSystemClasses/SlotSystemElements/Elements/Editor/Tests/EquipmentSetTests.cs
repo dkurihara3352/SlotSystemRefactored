@@ -10,6 +10,33 @@ namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
 		public class EquipmentSetTests: AbsSlotSystemTest {
+			[Test][Category("Methods")]
+			public void SetElements_WhenCalled_SetsElementsAndSGs(){
+				EquipmentSet eSet = MakeEquipmentSet();
+					SlotGroup sgeBow = MakeSG();
+						sgeBow.transform.SetParent(eSet.transform);
+						sgeBow.isInitiallyFocusedInPage = true;
+						sgeBow.SetFilter(new SGBowFilter());
+					SlotGroup sgeWear = MakeSG();
+						sgeWear.transform.SetParent(eSet.transform);
+						sgeWear.isInitiallyFocusedInPage = true;
+						sgeWear.SetFilter(new SGWearFilter());
+					SlotGroup sgeCGears = MakeSG();
+						sgeCGears.transform.SetParent(eSet.transform);
+						sgeCGears.isInitiallyFocusedInPage = true;
+						sgeCGears.SetFilter(new SGCGearsFilter());
+					IEnumerable<ISlotSystemElement> expectedEles = new ISlotSystemElement[]{
+						sgeBow, sgeWear, sgeCGears
+					};
+				
+				eSet.SetElements();
+				
+				IEnumerable<ISlotSystemElement> actual = eSet;
+					Assert.That(actual, Is.EqualTo(expectedEles));
+				Assert.That(eSet.bowSG, Is.SameAs(sgeBow));
+				Assert.That(eSet.wearSG, Is.SameAs(sgeWear));
+				Assert.That(eSet.cGearsSG, Is.SameAs(sgeCGears));
+			}
 			[Test]
 			public void Initialize_WhenCalled_SetsFields(){
 				EquipmentSet eSet = MakeEquipmentSet();

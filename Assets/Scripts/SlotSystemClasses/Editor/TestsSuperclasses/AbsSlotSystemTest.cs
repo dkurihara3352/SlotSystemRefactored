@@ -19,6 +19,7 @@ public class AbsSlotSystemTest{
 			return object.ReferenceEquals(a, b);
 	}
 	/*	Elements	*/
+
 		protected static SlotSystemManager MakeSSM(){
 			GameObject go = new GameObject("go");
 			go.tag = "TestGO";
@@ -111,6 +112,10 @@ public class AbsSlotSystemTest{
 		}
 		protected static ISlottable MakeSubSB(){
 			return Substitute.For<ISlottable>();
+		}
+		protected static TestSlotSystemElement MakeTestSSE(){
+			GameObject sseGO = new GameObject("sseGO");
+			return sseGO.AddComponent<TestSlotSystemElement>();
 		}
 		protected static ISlotSystemElement MakeSubSSE(){
 			return Substitute.For<ISlotSystemElement>();

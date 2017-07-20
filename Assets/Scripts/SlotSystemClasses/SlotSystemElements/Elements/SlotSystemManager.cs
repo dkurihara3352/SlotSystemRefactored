@@ -493,6 +493,23 @@ namespace SlotSystem{
 				}
 				public override ISlotSystemManager ssm{get{return this;}}
 			/*	methods	*/
+				public void InspectorSetUp(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns){
+					m_poolBundle = pBun;
+					m_equipBundle = eBun;
+					m_otherBundles = gBuns;
+				}
+				public override void SetElements(){
+					List<ISlotSystemPageElement> pEles = new List<ISlotSystemPageElement>();
+					ISlotSystemPageElement pBunPE = new SlotSystemPageElement(poolBundle, poolBundle.isInitiallyFocusedInPage);
+						pEles.Add(pBunPE);
+					ISlotSystemPageElement eBunPE = new SlotSystemPageElement(equipBundle, equipBundle.isInitiallyFocusedInPage);
+						pEles.Add(eBunPE);
+					foreach(var gBun in otherBundles){
+						ISlotSystemPageElement gBunPE = new SlotSystemPageElement(gBun, gBun.isInitiallyFocusedInPage);
+						pEles.Add(gBunPE);
+					}
+					m_pageElements = pEles;
+				}
 				public void Initialize(ISlotSystemPageElement pBundPageEle, ISlotSystemPageElement eBundPageEle , IEnumerable<ISlotSystemPageElement> gBundPageEles){
 					m_eName = SlotSystemUtil.Bold("SSM");
 					this.m_poolBundle = (ISlotSystemBundle)pBundPageEle.element;

@@ -31,6 +31,50 @@ namespace SlotSystemTests{
 				Assert.That(SlotSystemManager.curSSM, Is.SameAs(ssm));
 			}
 			[Test][Category("Methods")]
+			public void InspectorSetUp_WhenCalled_SetsBundles(){
+				SlotSystemManager ssm = MakeSSM();
+					ISlotSystemBundle pBun = MakeSubBundle();
+					ISlotSystemBundle eBun = MakeSubBundle();
+					IEnumerable<ISlotSystemBundle> gBuns;
+						ISlotSystemBundle gBunA = MakeSubBundle();
+						ISlotSystemBundle gBunB = MakeSubBundle();
+						ISlotSystemBundle gBunC = MakeSubBundle();
+						gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};
+					
+				ssm.InspectorSetUp(pBun, eBun, gBuns);
+
+				Assert.That(ssm.poolBundle, Is.SameAs(pBun));
+				Assert.That(ssm.equipBundle, Is.SameAs(eBun));
+				Assert.That(ssm.otherBundles, Is.EqualTo(gBuns));
+			}
+			[Test][Category("Methods")]
+			public void SetElements_AfterInspectorSetUp_SetsPEs(){
+				SlotSystemManager ssm = MakeSSM();
+				ISlotSystemBundle pBun = MakeSubBundle();
+					ISlotSystemBundle eBun = MakeSubBundle();
+					IEnumerable<ISlotSystemBundle> gBuns;
+						ISlotSystemBundle gBunA = MakeSubBundle();
+						ISlotSystemBundle gBunB = MakeSubBundle();
+						ISlotSystemBundle gBunC = MakeSubBundle();
+						gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
+				ssm.InspectorSetUp(pBun, eBun, gBuns);
+
+				ssm.SetElements();
+
+				ISlotSystemPageElement pBunPE = ssm.GetPageElement(pBun);
+				ISlotSystemPageElement eBunPE = ssm.GetPageElement(eBun);
+				List<ISlotSystemPageElement> gBunPEs = new List<ISlotSystemPageElement>();
+				foreach(var gBun in gBuns)
+					gBunPEs.Add(ssm.GetPageElement(gBun));
+				Assert.That(pBunPE.element, Is.SameAs(pBun));
+				Assert.That(eBunPE.element, Is.SameAs(eBun));
+				Assert.That(gBunPEs.Count, Is.EqualTo(3));
+				List<ISlotSystemElement> gBunsList = new List<ISlotSystemElement>();
+					foreach(var gBunPE in gBunPEs)
+						gBunsList.Add(gBunPE.element);
+				Assert.That(gBunsList, Is.EqualTo(gBuns));
+			}
+			[Test][Category("Methods")]
 			public void Initialize_WhenCalled_SetsFields(){
 				SlotSystemManager ssm = MakeSSM();
 				ISlotSystemPageElement poolBundlePE = MakeSubPageElement();

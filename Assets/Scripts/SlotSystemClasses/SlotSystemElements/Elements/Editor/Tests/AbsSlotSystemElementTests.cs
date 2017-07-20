@@ -582,17 +582,46 @@ namespace SlotSystemTests{
 					Assert.That(testSSE.isFocusedInHierarchy, Is.False);
 				}
 			/*	Methods	*/
-				[Test]
-				[Category("Methods")]
-				public void Initialize_WhenCalled_SelStatesSetToSSEDeactivated(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
+				[Test][Category("Methods")]
+				public void SetElements_WhenCalled_SetsElements(){
+					TestSlotSystemElement sse = MakeTestSSE();
+						TestSlotSystemElement childA = MakeTestSSE();
+							childA.transform.SetParent(sse.transform);
+							childA.isInitiallyFocusedInPage = true;
+						TestSlotSystemElement childB = MakeTestSSE();
+							childB.transform.SetParent(sse.transform);
+							childB.isInitiallyFocusedInPage = true;
+						TestSlotSystemElement childC = MakeTestSSE();
+							childC.transform.SetParent(sse.transform);
+							childC.isInitiallyFocusedInPage = true;
+						IEnumerable<ISlotSystemElement> expectedEles = new ISlotSystemElement[]{childA, childB, childC};
+					
+					sse.SetElements();
 
-						testSSE.Initialize();
+					Assert.That(sse, Is.EqualTo(expectedEles));
+				}
+				[Test][Category("Methods")]
+				public void InitializeStates_WhenCalled_CallsStateEnginesSetState(){
+					TestSlotSystemElement sse = MakeTestSSE();
+						TestSlotSystemElement childA = MakeTestSSE();
+							childA.transform.SetParent(sse.transform);
+							childA.isInitiallyFocusedInPage = true;
+						TestSlotSystemElement childB = MakeTestSSE();
+							childB.transform.SetParent(sse.transform);
+							childB.isInitiallyFocusedInPage = true;
+						TestSlotSystemElement childC = MakeTestSSE();
+							childC.transform.SetParent(sse.transform);
+							childC.isInitiallyFocusedInPage = true;
+						ISSEStateEngine mockSelStateEg = Substitute.For<ISSEStateEngine>();
+							sse.SetSelStateEngine(mockSelStateEg);
+						ISSEStateEngine mockActStateEg = Substitute.For<ISSEStateEngine>();
+							sse.SetActStateEngine(mockActStateEg);
+					
+					sse.InitializeStates();
 
-						Assert.That(testSSE.prevSelState, Is.EqualTo(AbsSlotSystemElement.deactivatedState));
-						Assert.That(testSSE.curSelState, Is.EqualTo(AbsSlotSystemElement.deactivatedState));
-					}
-				//
+					mockSelStateEg.Received().SetState(AbsSlotSystemElement.deactivatedState);
+					mockActStateEg.Received().SetState(AbsSlotSystemElement.waitForActionState);
+				}
 				[Test][Category("Methods")]
 				public void ContainsInHierarchy_Various_ReturnsAccordingly(){
 					TestSlotSystemElement sse_0 = MakeTestSSE();
@@ -1268,25 +1297,25 @@ namespace SlotSystemTests{
 					
 					Assert.That(testSSE.Contains(stubMember), Is.True);
 				}
-				[Test]
+				[TestCase(true)]
+				[TestCase(false)]
 				[Category("Methods")]
-				public void ToggleOnPageElement_IsPageElementAndElementNotToggledOn_TogglesPageElementOn(){
+				public void ToggleOnPageElement_Various_CallsPageEleAccordingly(bool called){
 					TestSlotSystemElement testSSE = MakeTestSSE();
 					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
 					ISlotSystemPageElement mockPageEle = Substitute.For<ISlotSystemPageElement>();
-					mockPageEle.isFocusToggleOn = false;
+					mockPageEle.isFocusToggleOn.Returns(!called);
 					stubPage.GetPageElement(testSSE).Returns(mockPageEle);
 					testSSE.SetParent(stubPage);
 
 					testSSE.ToggleOnPageElement();
-
-					mockPageEle.Received().isFocusToggleOn = true;
+					
+					if(called)
+						mockPageEle.Received().isFocusToggleOn = true;
+					else
+						mockPageEle.DidNotReceive().isFocusToggleOn = true;
 				}
 			/*	helpers */
-				TestSlotSystemElement MakeTestSSE(){
-					GameObject sseGO = new GameObject("sseGO");
-					return sseGO.AddComponent<TestSlotSystemElement>();
-				}
 				SlotSystemBundle MakeSlotSystemBundle(){
 					return new GameObject("ssBundleGO").AddComponent<SlotSystemBundle>();
 				}
