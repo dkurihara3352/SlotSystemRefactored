@@ -510,27 +510,6 @@ namespace SlotSystem{
 					}
 					m_pageElements = pEles;
 				}
-				public void Initialize(ISlotSystemPageElement pBundPageEle, ISlotSystemPageElement eBundPageEle , IEnumerable<ISlotSystemPageElement> gBundPageEles){
-					m_eName = SlotSystemUtil.Bold("SSM");
-					this.m_poolBundle = (ISlotSystemBundle)pBundPageEle.element;
-					this.m_equipBundle = (ISlotSystemBundle)eBundPageEle.element;
-					List<ISlotSystemBundle> gBunds = new List<ISlotSystemBundle>();
-					foreach(ISlotSystemPageElement pageEle in gBundPageEles){
-						gBunds.Add((ISlotSystemBundle)pageEle.element);
-					}
-					List<ISlotSystemPageElement> pageEles = new List<ISlotSystemPageElement>();
-					pageEles.Add(pBundPageEle);
-					pageEles.Add(eBundPageEle);
-					foreach(ISlotSystemPageElement pageEle in gBundPageEles){
-						pageEles.Add(pageEle);
-					}
-					m_pageElements = pageEles;
-					m_otherBundles = gBunds;
-					PerformInHierarchy(SetSSMInH);
-					PerformInHierarchy(SetParent);
-					SetSelState(SlotSystemManager.ssmDeactivatedState);
-					SetActState(SlotSystemManager.ssmWaitForActionState);
-				}
 				public virtual ISlotSystemElement FindParent(ISlotSystemElement ele){
 					foundParent = null;
 					PerformInHierarchy(CheckAndReportParent, ele);
