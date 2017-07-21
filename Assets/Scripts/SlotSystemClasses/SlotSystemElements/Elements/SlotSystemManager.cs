@@ -16,6 +16,7 @@ namespace SlotSystem{
 					curSSM = this;
 				}
 			}
+		
 		/*	Managerial	*/
 			/* fields	*/
 				public virtual List<ISlotGroup> allSGs{
@@ -510,6 +511,18 @@ namespace SlotSystem{
 					}
 					m_pageElements = pEles;
 				}
+				public void Initialize(){
+					PerformInHierarchy(SetSSMInH);
+					PerformInHierarchy(SetParent);
+					PerformInHierarchy(InitStatesInHi);
+				}
+				public override void InitializeStates(){
+					SetSelState(SlotSystemManager.ssmDeactivatedState);
+					SetActState(SlotSystemManager.ssmWaitForActionState);
+				}
+				public void InitStatesInHi(ISlotSystemElement element){
+					element.InitializeStates();
+				}
 				public virtual ISlotSystemElement FindParent(ISlotSystemElement ele){
 					foundParent = null;
 					PerformInHierarchy(CheckAndReportParent, ele);
@@ -529,7 +542,6 @@ namespace SlotSystem{
 				}
 				public override void SetSSM(ISlotSystemElement ssm){
 				}
-
 				public override void SetParent(ISlotSystemElement ele){
 					if(!((ele is ISlottable) || (ele is ISlotGroup)))
 					foreach(ISlotSystemElement e in ele){
@@ -746,6 +758,7 @@ namespace SlotSystem{
 	}
 	public interface ISlotSystemManager: IAbsSlotSystemElement, TransactionManager{
 		void SetCurSSM();
+		void Initialize();
 		IEnumeratorFake probeCoroutine();
 		IEnumeratorFake transactionCoroutine();
 		/*	Managerial */
