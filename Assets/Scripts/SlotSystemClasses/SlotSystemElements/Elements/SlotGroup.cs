@@ -503,10 +503,12 @@ namespace SlotSystem{
 				SetSelState(SlotGroup.sgDeactivatedState);
 				SetActState(SlotGroup.sgWaitForActionState);
 			}
-			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter){
+			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
 				SetInventory(inv);
 				SetFilter(filter);
 				SetSorter(sorter);
+				SetInitSlotsCount(initSlotsCount);
+				m_isExpandable = initSlotsCount == 0;
 			}
 			public override void SetElements(){
 				InitializeItems();
@@ -895,7 +897,6 @@ namespace SlotSystem{
 			void DefocusSelf();
 			void DefocusSBs();
 		/*	Methods	*/
-			void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand);
 			ISlottable GetSB(InventoryItemInstance itemInst);
 			bool HasItem(InventoryItemInstance invInst);
 			void UpdateSBs(List<ISlottable> newSBs);

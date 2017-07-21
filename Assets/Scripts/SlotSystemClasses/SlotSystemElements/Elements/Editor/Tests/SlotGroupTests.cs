@@ -570,7 +570,7 @@ namespace SlotSystemTests{
 							inventory.Add(mWeapon);
 						SGFilter nullFilter = new SGNullFilter();
 						SGSorter idSorter = new SGItemIDSorter();
-					sg.InspectorSetUp(inventory, nullFilter, idSorter);
+					sg.InspectorSetUp(inventory, nullFilter, idSorter, 0);
 
 					sg.SetElements();
 
@@ -591,7 +591,7 @@ namespace SlotSystemTests{
 							inventory.Add(mWeapon);
 						SGFilter nullFilter = new SGNullFilter();
 						SGSorter idSorter = new SGItemIDSorter();
-					sg.InspectorSetUp(inventory, nullFilter, idSorter);
+					sg.InspectorSetUp(inventory, nullFilter, idSorter, 0);
 
 					sg.SetElements();
 
@@ -617,131 +617,61 @@ namespace SlotSystemTests{
 					Assert.That(sg.curActState, Is.SameAs(SlotGroup.sgWaitForActionState));
 					Assert.That(sg.prevActState, Is.SameAs(SlotGroup.sgWaitForActionState));
 				}
-				[Test][Category("Methods")]
-				public void InspectorSetUp_WhenCalled_SetsFields(){
+				[TestCase(0)]
+				[TestCase(10)]
+				[Category("Methods")]
+				public void InspectorSetUp_WhenCalled_SetsFields(int initSlotsCount){
 					SlotGroup sg = MakeSG();
 						GenericInventory genInv = Substitute.For<GenericInventory>();
 						SGFilter filter = new SGNullFilter();
 						SGSorter sorter = new SGItemIDSorter();
 					
-					sg.InspectorSetUp(genInv, filter, sorter);
+					sg.InspectorSetUp(genInv, filter, sorter, initSlotsCount);
 
 					Assert.That(sg.inventory, Is.SameAs(genInv));
 					Assert.That(sg.filter, Is.SameAs(filter));
 					Assert.That(sg.sorter, Is.SameAs(sorter));
+					Assert.That(sg.initSlotsCount, Is.EqualTo(initSlotsCount));
+					Assert.That(sg.isExpandable, Is.EqualTo(initSlotsCount == 0));
 				}
-				[Test][Category("Methods")]
-				public void Initialize_WhenCalled_CallInitCommandExecute(){
-					SlotGroup sg = MakeSG();
-						ISGInitItemsCommand mockInitComm = Substitute.For<ISGInitItemsCommand>();
-						sg.SetInitItemsCommand(mockInitComm);
-
-					sg.Initialize(" ", new SGNullFilter(), MakeSubPoolInv(), true, 0, Substitute.For<ISGEmptyCommand>(), Substitute.For<ISGEmptyCommand>());
-
-					mockInitComm.Received().Execute(sg);
-				}
-				[TestCaseSource(typeof(InitializeCases))][Category("Methods")]
-				public void Initialize_WhenCalled_SetsFieldsAndStates(
-					string name, 
-					SGFilter filter, 
-					Inventory inv, 
-					bool isShrinkable, 
-					int initSlotsCount, 
-					SlotGroupCommand oaCompComm, 
-					SlotGroupCommand oaExecComm)
-				{
-					SlotGroup sg = MakeSG();
-						ISGInitItemsCommand stubInitComm = Substitute.For<ISGInitItemsCommand>();
-						sg.SetInitItemsCommand(stubInitComm);
-					SGSetUpFieldsData expected = new SGSetUpFieldsData(
-						name, 
-						filter, 
-						inv, 
-						oaCompComm, 
-						oaExecComm, 
-						isShrinkable, 
-						initSlotsCount, 
-						initSlotsCount == 0, 
-						SlotGroup.sgDeactivatedState, 
-						SlotGroup.sgWaitForActionState
-					);
-
-					sg.Initialize(
-						name, 
-						filter, 
-						inv, 
-						isShrinkable, 
-						initSlotsCount, 
-						oaCompComm, 
-						oaExecComm
-					);
-
-					SGSetUpFieldsData actual = new SGSetUpFieldsData(
-						sg.name, 
-						sg.filter, 
-						sg.inventory, 
-						sg.onActionCompleteCommand, 
-						sg.onActionExecuteCommand, 
-						sg.isShrinkable, 
-						sg.initSlotsCount, 
-						sg.isExpandable, 
-						sg.curSelState, 
-						sg.curActState
-					);
-
-					bool equality = actual.Equals(expected);
-
-					Assert.That(equality, Is.True);
-				}
-					class InitializeCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							string name = "sgName";
-							SGNullFilter nullFilter = new SGNullFilter();
-							IPoolInventory pInv = MakeSubPoolInv();
-							ISGEmptyCommand empComm = Substitute.For<ISGEmptyCommand>();
-							yield return new object[]{name, nullFilter, pInv, false, 0, empComm, empComm};
-							yield return new object[]{name, nullFilter, pInv, false, 5, empComm, empComm};
-							yield return new object[]{name, nullFilter, pInv, true, 5, empComm, empComm};
-						}
+				class SGSetUpFieldsData: IEquatable<SGSetUpFieldsData>{
+					public string name;
+					public SGFilter filter;
+					public Inventory inventory;
+					public SlotGroupCommand OnACompComm;
+					public SlotGroupCommand oAExecComm;
+					public bool isShrinkable;
+					public int initSlotsCount;
+					public bool isExpandable;
+					public SSEState sgSelState;
+					public SSEState sgActState;
+					public SGSetUpFieldsData(string name, SGFilter filter, Inventory inventory, SlotGroupCommand OnACompComm, SlotGroupCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
+						this.name = name;
+						this.filter = filter;
+						this.inventory = inventory;
+						this.OnACompComm = OnACompComm;
+						this.oAExecComm = oAExecComm;
+						this.isShrinkable = isShrinkable;
+						this.initSlotsCount = initSlotsCount;
+						this.isExpandable = isExpandable;
+						this.sgSelState = sgSelState;
+						this.sgActState = sgActState;
 					}
-					class SGSetUpFieldsData: IEquatable<SGSetUpFieldsData>{
-						public string name;
-						public SGFilter filter;
-						public Inventory inventory;
-						public SlotGroupCommand OnACompComm;
-						public SlotGroupCommand oAExecComm;
-						public bool isShrinkable;
-						public int initSlotsCount;
-						public bool isExpandable;
-						public SSEState sgSelState;
-						public SSEState sgActState;
-						public SGSetUpFieldsData(string name, SGFilter filter, Inventory inventory, SlotGroupCommand OnACompComm, SlotGroupCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
-							this.name = name;
-							this.filter = filter;
-							this.inventory = inventory;
-							this.OnACompComm = OnACompComm;
-							this.oAExecComm = oAExecComm;
-							this.isShrinkable = isShrinkable;
-							this.initSlotsCount = initSlotsCount;
-							this.isExpandable = isExpandable;
-							this.sgSelState = sgSelState;
-							this.sgActState = sgActState;
-						}
-						public bool Equals(SGSetUpFieldsData other){
-							bool flag = true;
-								flag &= object.ReferenceEquals(this.filter, other.filter);
-								flag &= object.ReferenceEquals(this.inventory, other.inventory);
-								flag &= object.ReferenceEquals(this.OnACompComm, other.OnACompComm);
-								flag &= object.ReferenceEquals(this.oAExecComm, other.oAExecComm);
-								flag &= this.isShrinkable == other.isShrinkable;
-								flag &= this.initSlotsCount == other.initSlotsCount;
-								flag &= this.isExpandable == other.isExpandable;
-								flag &= object.ReferenceEquals(this.sgSelState, other.sgSelState);
-								flag &= object.ReferenceEquals(this.sgActState, other.sgActState);
-							return flag;
-						}
-
+					public bool Equals(SGSetUpFieldsData other){
+						bool flag = true;
+							flag &= object.ReferenceEquals(this.filter, other.filter);
+							flag &= object.ReferenceEquals(this.inventory, other.inventory);
+							flag &= object.ReferenceEquals(this.OnACompComm, other.OnACompComm);
+							flag &= object.ReferenceEquals(this.oAExecComm, other.oAExecComm);
+							flag &= this.isShrinkable == other.isShrinkable;
+							flag &= this.initSlotsCount == other.initSlotsCount;
+							flag &= this.isExpandable == other.isExpandable;
+							flag &= object.ReferenceEquals(this.sgSelState, other.sgSelState);
+							flag &= object.ReferenceEquals(this.sgActState, other.sgActState);
+						return flag;
 					}
+
+				}
 				[TestCaseSource(typeof(GetSBCases))][Category("Methods")]
 				public void GetSB_Various_ReturnsSBorNull(List<ISlottable> sbs, InventoryItemInstance item, ISlottable expected){
 					SlotGroup sg = MakeSG();
@@ -1384,7 +1314,7 @@ namespace SlotSystemTests{
 				[TestCaseSource(typeof(SortAndUpdateSBsCases))][Category("Methods")]
 				public void SortAndUpdateSBs_SGIsExpandableAndContainsNull_SGnewSBsSizeShrinks(SGSorter sorter, List<ISlottable> sbs, List<ISlottable> expOrder){
 					SlotGroup sg = MakeSG();
-						sg.Initialize("someSG", new SGNullFilter(), new PoolInventory(), true, 0, new SGEmptyCommand(), new SGEmptyCommand());
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, 0);
 						sg.SetSBs(sbs);
 						sg.SetSorter(sorter);
 					
@@ -1398,9 +1328,8 @@ namespace SlotSystemTests{
 				[TestCaseSource(typeof(SortAndUpdateSBsCases))][Category("Methods")]
 				public void SortAndUpdateSBs_SGIsExpandable_SortsAndCallsSBsSetNewSlotIDs(SGSorter sorter, List<ISlottable> sbs, List<ISlottable> expOrder){
 					SlotGroup sg = MakeSG();
-						sg.Initialize("someSG", new SGNullFilter(), new PoolInventory(), true, 0, new SGEmptyCommand(), new SGEmptyCommand());/* this makes isExpandable true */
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, 0);
 						sg.SetSBs(sbs);
-						sg.SetSorter(sorter);
 					
 					sg.SortAndUpdateSBs();
 
@@ -1568,21 +1497,19 @@ namespace SlotSystemTests{
 						}	
 					}
 				[TestCaseSource(typeof(FillAndUpdateSBs_SGNotPoolAndSSMSG1NotThisCases))][Category("Methods")]
-				public void FillAndUpdateSBs_AddedNotNull_NewSBIsSetupAndAddedToTheEndOfSGSBs(bool isExpandable, bool isAutoSort, List<ISlottable> sbs){
+				public void FillAndUpdateSBs_AddedNotNull_CreateAndSetsNewSBAndAddItToTheEndOfSGSBs(bool isExpandable, bool isAutoSort, List<ISlottable> sbs){
 					SlotGroup sg = MakeSG();
-						sg.Initialize("sg", new SGNullFilter(), new PoolInventory(), true, isExpandable?0: 10, new SGEmptyCommand(), new SGEmptyCommand());
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), Substitute.For<SGSorter>(), isExpandable?0: 10);
 						ISlotGroup otherSG = MakeSubSG();
-						ISlottable pickedSB = MakeSubSB();
-							BowInstance bow = MakeBowInstance(0);
-							pickedSB.itemInst.Returns(bow);
 						ISlotSystemManager ssm = MakeSubSSM();
 							ssm.sg1.Returns(otherSG);
-							ssm.pickedSB.Returns(pickedSB);
+							ISlottable pickedSB = MakeSubSB();
+								BowInstance bow = MakeBowInstance(0);
+								pickedSB.itemInst.Returns(bow);
+								ssm.pickedSB.Returns(pickedSB);
 								ISlotSystemBundle poolBundle = MakeSubBundle();
 									poolBundle.ContainsInHierarchy(sg).Returns(false);
 								ssm.poolBundle.Returns(poolBundle);
-						SGSorter sorter = Substitute.For<SGSorter>();
-						sg.SetSorter(sorter);
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(isAutoSort);
@@ -1638,7 +1565,17 @@ namespace SlotSystemTests{
 
 					}
 				[TestCaseSource(typeof(FillAndUpdateSBs_VariousCases))][Category("Methods")]
-				public void FillAndUpdateSBs_Various_SetsNewSBsAccordingly(bool added, ISlottable pickedSB, bool isAutoSort, SGSorter sorter, bool isPool, bool isExpandable, List<ISlottable> sbs, List<ISlottable> expNewSBs, int idAtAdded){
+				public void FillAndUpdateSBs_Various_SetsNewSBsAccordingly(
+					bool added, 
+					ISlottable pickedSB, 
+					bool isAutoSort, 
+					SGSorter sorter, 
+					bool isPool, 
+					bool isExpandable, 
+					List<ISlottable> sbs, 
+					List<ISlottable> expNewSBs, 
+					int idAtAdded)
+				{
 					SlotGroup sg = MakeSG();
 						ISlotGroup otherSG = MakeSubSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1653,8 +1590,7 @@ namespace SlotSystemTests{
 									else
 										poolBundle.ContainsInHierarchy(sg).Returns(false);
 								ssm.poolBundle.Returns(poolBundle);
-					sg.Initialize("sg", new SGNullFilter(), MakeSubPoolInv(), true, isExpandable?0: 10, new SGEmptyCommand(), new SGEmptyCommand());
-					sg.SetSorter(sorter);
+					sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 10);
 					sg.SetSSM(ssm);
 					sg.SetSBs(sbs);
 					sg.ToggleAutoSort(isAutoSort);
@@ -2000,9 +1936,19 @@ namespace SlotSystemTests{
 						}
 					}
 				[TestCaseSource(typeof(SwapAndUpdateSBsCases))][Category("Methods")]
-				public void SwapAndUpadteSBs_Various_SetsNewSBsAccordingly(bool isPool, bool isAutoSort, bool isExpandable, SGSorter sorter, bool sg1This,ISlottable added, ISlottable removed, List<ISlottable> sbs, List<ISlottable> expected, int indexAtAdded){
+				public void SwapAndUpadteSBs_Various_SetsNewSBsAccordingly(
+					bool isPool, 
+					bool isAutoSort, 
+					bool isExpandable, 
+					SGSorter sorter, 
+					bool sg1This,ISlottable added, 
+					ISlottable removed, 
+					List<ISlottable> sbs, 
+					List<ISlottable> expected, 
+					int indexAtAdded)
+				{
 					SlotGroup sg = MakeSG();
-						sg.Initialize("sg", new SGNullFilter(), MakeSubPoolInv(), true, isExpandable?0: 10, new SGEmptyCommand(), new SGEmptyCommand());
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 10);
 						ISlotSystemManager ssm = MakeSubSSM();
 							ISlottable targetSB = MakeSubSB();
 							ssm.targetSB.Returns(targetSB);
@@ -2021,7 +1967,6 @@ namespace SlotSystemTests{
 								pBun.ContainsInHierarchy(sg).Returns(isPool);
 							ssm.poolBundle.Returns(pBun);
 						sg.SetSSM(ssm);
-						sg.SetSorter(sorter);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(isAutoSort);
 					
@@ -2326,12 +2271,11 @@ namespace SlotSystemTests{
 					List<ISlottable> expectedSBs = new List<ISlottable>(expSBs);
 					List<ISlottable> expectedNewSBs = new List<ISlottable>(expNewSBs);
 					SlotGroup sg = MakeSG();
-					sg.Initialize("sg", new SGNullFilter(), MakeSubPoolInv(), true, isExpandable?0: 20, new SGEmptyCommand(), new SGEmptyCommand());
+					sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
 						ISlotSystemManager ssm = MakeSubSSM();
 							ssm.moved.Returns(added);
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
-						sg.SetSorter(sorter);
 						sg.ToggleAutoSort(isAutoSort);
 					
 					sg.AddAndUpdateSBs();
@@ -2492,12 +2436,11 @@ namespace SlotSystemTests{
 					Dictionary<InventoryItemInstance, int> removedQuantDict)
 				{
 					SlotGroup sg = MakeSG();
-						sg.Initialize("sg", new SGNullFilter(), MakeSubPoolInv(), true, isExpandable?0: 20, new SGEmptyCommand(), new SGEmptyCommand());
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
 							ISlotSystemManager ssm = MakeSubSSM();
 								ssm.moved.Returns(removed);
 							sg.SetSSM(ssm);
 							sg.SetSBs(sbs);
-							sg.SetSorter(sorter);
 							sg.ToggleAutoSort(isAutoSort);
 
 						sg.RemoveAndUpdateSBs();
@@ -2618,7 +2561,7 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void InitSlots_InitSlotsCountNonZero_SetsSlotsByInitSlotsCount(int initSlotsCount){
 					SlotGroup sg = MakeSG();
-						sg.Initialize("sg", new SGNullFilter(), MakeSubPoolInv(), true, initSlotsCount, new SGEmptyCommand(), new SGEmptyCommand());
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), new SGItemIDSorter() , initSlotsCount);
 					
 					sg.InitSlots(new List<SlottableItem>());
 
@@ -2633,7 +2576,7 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void InitSlots_InitSlotsCountZero_SetsSlotsByItemsCount(int itemsCount){
 					SlotGroup sg = MakeSG();
-						sg.Initialize("sg", new SGNullFilter(), MakeSubPoolInv(), true, 0, new SGEmptyCommand(), new SGEmptyCommand());
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), new SGItemIDSorter() , 0);
 					
 					sg.InitSlots(new List<SlottableItem>(new SlottableItem[itemsCount]));
 
