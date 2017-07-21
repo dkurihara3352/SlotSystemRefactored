@@ -19,9 +19,9 @@ namespace SlotSystemTests{
 					testEleA.gameObject.transform.SetParent(gPage.gameObject.transform);
 					testEleB.gameObject.transform.SetParent(gPage.gameObject.transform);
 					testEleC.gameObject.transform.SetParent(gPage.gameObject.transform);
-					testEleA.isInitiallyFocusedInPage = true;
-					testEleB.isInitiallyFocusedInPage = true;
-					testEleC.isInitiallyFocusedInPage = true;
+					testEleA.isToggledOnInPageByDefault = true;
+					testEleB.isToggledOnInPageByDefault = true;
+					testEleC.isToggledOnInPageByDefault = true;
 					IEnumerable<ISlotSystemElement> expected = new ISlotSystemElement[]{
 						testEleA, testEleB, testEleC
 					};

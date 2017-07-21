@@ -215,7 +215,7 @@ namespace SlotSystem{
 					return true;
 				}
 			}
-			public bool isInitiallyFocusedInPage{
+			public bool isToggledOnInPageByDefault{
 				get{
 					if(isPageElement){
 						return m_isInitiallyFocusedInPage;
@@ -347,7 +347,7 @@ namespace SlotSystem{
 		bool isDefocused{get;}
 		bool isDeactivated{get;}
 		bool isFocusedInHierarchy{get;}
-		bool isInitiallyFocusedInPage{get;set;}
+		bool isToggledOnInPageByDefault{get;set;}
 		void InitializeStates();
 		void Activate();
 		void Deactivate();

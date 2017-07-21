@@ -9,6 +9,5 @@ namespace SlotSystem{
 		public void SetPageElements(IEnumerable<ISlotSystemPageElement> pEles){
 			m_pageElements = pEles;
 		}
-		public override void SetElements(){}
 	}
 }

@@ -19,15 +19,15 @@ namespace SlotSystem{
 							ISlotGroup sg = (ISlotGroup)ele;
 								if(sg.filter is SGBowFilter){
 									m_bowSG = sg;
-									SlotSystemPageElement bowPE = new SlotSystemPageElement(sg, sg.isInitiallyFocusedInPage);
+									SlotSystemPageElement bowPE = new SlotSystemPageElement(sg, sg.isToggledOnInPageByDefault);
 									pEles.Add(bowPE);
 								}else if(sg.filter is SGWearFilter){
 									m_wearSG = sg;
-									SlotSystemPageElement wearPE = new SlotSystemPageElement(sg, sg.isInitiallyFocusedInPage);
+									SlotSystemPageElement wearPE = new SlotSystemPageElement(sg, sg.isToggledOnInPageByDefault);
 									pEles.Add(wearPE);
 								}else if(sg.filter is SGCGearsFilter){
 									m_cGearsSG = sg;
-									SlotSystemPageElement cGearsPE = new SlotSystemPageElement(sg, sg.isInitiallyFocusedInPage);
+									SlotSystemPageElement cGearsPE = new SlotSystemPageElement(sg, sg.isToggledOnInPageByDefault);
 									pEles.Add(cGearsPE);
 								}else throw new System.InvalidOperationException("EquipmentSet.InitializeMB: sg's filter is not set properly");
 

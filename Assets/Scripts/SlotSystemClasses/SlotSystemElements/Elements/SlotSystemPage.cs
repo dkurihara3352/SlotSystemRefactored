@@ -16,7 +16,20 @@ namespace SlotSystem{
 				pageEle.isFocusToggleOn = pageEle.isFocusedOnActivate;
 			}
 		}
-		public override abstract void SetElements();
+		public override void SetElements(){
+			List<ISlotSystemElement> elements = new List<ISlotSystemElement>();
+			List<ISlotSystemPageElement> pes = new List<ISlotSystemPageElement>();
+			for(int i = 0; i < transform.childCount; i++){
+				ISlotSystemElement sse = transform.GetChild(i).GetComponent<ISlotSystemElement>();
+				if(sse != null){
+					elements.Add(sse);
+					SlotSystemPageElement pe = new SlotSystemPageElement(sse, sse.isToggledOnInPageByDefault);
+					pes.Add(pe);
+				}
+			}
+			m_elements = elements;
+			m_pageElements = pes;
+		}
 		public void TogglePageElementFocus(ISlotSystemElement ele, bool toggle){
 			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.element == ele){

@@ -9,8 +9,39 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
+		[Category("OtherElements")]
 		public class SlotSystemPageTests: AbsSlotSystemTest {
+			[Test]
+			public void SetElements_WhenCalled_SetsElementsAndPageElements(){
+				TestSlotSystemPage page = MakeTestSSPage();
+					TestSlotSystemElement sseA = MakeTestSSE();
+						sseA.transform.SetParent(page.transform);
+					TestSlotSystemElement sseB = MakeTestSSE();
+						sseB.transform.SetParent(page.transform);
+					TestSlotSystemElement sseC = MakeTestSSE();
+						sseC.transform.SetParent(page.transform);
+					IEnumerable<ISlotSystemElement> sses = new ISlotSystemElement[]{sseA, sseB, sseC};
+				
+				page.SetElements();
 
+				IEnumerable<ISlotSystemElement> actualEles = page;
+				Assert.That(actualEles, Is.EqualTo(sses));
+				IEnumerable<ISlotSystemPageElement> actualPEs;
+					ISlotSystemPageElement sseAPE = page.GetPageElement(sseA);
+					ISlotSystemPageElement sseBPE = page.GetPageElement(sseB);
+					ISlotSystemPageElement sseCPE = page.GetPageElement(sseC);
+					actualPEs = new ISlotSystemPageElement[]{sseAPE, sseBPE, sseCPE};
+				Assert.That(actualPEs, Is.All.Not.Null);
+			}
+			public void TogglePageElement(){
+
+			}
+			public void ResetPageElementsToggle(){
+
+			}
+			public void Focus(){
+
+			}
 			[Test]
 			public void PageFocus_Various_CallsPageElesAppropriately(){
 				TestSlotSystemPage ssp = MakeTestSSPage();

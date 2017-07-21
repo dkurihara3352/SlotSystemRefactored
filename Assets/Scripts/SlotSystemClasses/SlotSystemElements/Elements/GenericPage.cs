@@ -21,7 +21,7 @@ namespace SlotSystem{
 			for(int i =0; i< transform.childCount; i++){
 				ISlotSystemElement element = transform.GetChild(i).GetComponent<ISlotSystemElement>();
 					elements.Add(element);
-				SlotSystemPageElement pEle = new SlotSystemPageElement(element, element.isInitiallyFocusedInPage);
+				SlotSystemPageElement pEle = new SlotSystemPageElement(element, element.isToggledOnInPageByDefault);
 					pEles.Add(pEle);
 			}
 			m_elements = elements;

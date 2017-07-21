@@ -587,13 +587,13 @@ namespace SlotSystemTests{
 					TestSlotSystemElement sse = MakeTestSSE();
 						TestSlotSystemElement childA = MakeTestSSE();
 							childA.transform.SetParent(sse.transform);
-							childA.isInitiallyFocusedInPage = true;
+							childA.isToggledOnInPageByDefault = true;
 						TestSlotSystemElement childB = MakeTestSSE();
 							childB.transform.SetParent(sse.transform);
-							childB.isInitiallyFocusedInPage = true;
+							childB.isToggledOnInPageByDefault = true;
 						TestSlotSystemElement childC = MakeTestSSE();
 							childC.transform.SetParent(sse.transform);
-							childC.isInitiallyFocusedInPage = true;
+							childC.isToggledOnInPageByDefault = true;
 						IEnumerable<ISlotSystemElement> expectedEles = new ISlotSystemElement[]{childA, childB, childC};
 					
 					sse.SetElements();
@@ -605,13 +605,13 @@ namespace SlotSystemTests{
 					TestSlotSystemElement sse = MakeTestSSE();
 						TestSlotSystemElement childA = MakeTestSSE();
 							childA.transform.SetParent(sse.transform);
-							childA.isInitiallyFocusedInPage = true;
+							childA.isToggledOnInPageByDefault = true;
 						TestSlotSystemElement childB = MakeTestSSE();
 							childB.transform.SetParent(sse.transform);
-							childB.isInitiallyFocusedInPage = true;
+							childB.isToggledOnInPageByDefault = true;
 						TestSlotSystemElement childC = MakeTestSSE();
 							childC.transform.SetParent(sse.transform);
-							childC.isInitiallyFocusedInPage = true;
+							childC.isToggledOnInPageByDefault = true;
 						ISSEStateEngine mockSelStateEg = Substitute.For<ISSEStateEngine>();
 							sse.SetSelStateEngine(mockSelStateEg);
 						ISSEStateEngine mockActStateEg = Substitute.For<ISSEStateEngine>();

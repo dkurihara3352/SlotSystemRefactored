@@ -1411,16 +1411,16 @@ namespace SlotSystemTests{
 				public void Deactivate_WhenCalled_SetsPEsToggleBackToDefault(bool pBunPEOn, bool eBunPEOn, bool gBunAPEOn, bool gBunBPEOn, bool gBunCPEOn){
 					SlotSystemManager ssm = MakeSSM();
 						ISlotSystemBundle pBun = MakeSubBundle();
-							pBun.isInitiallyFocusedInPage.Returns(pBunPEOn);
+							pBun.isToggledOnInPageByDefault.Returns(pBunPEOn);
 						ISlotSystemBundle eBun = MakeSubBundle();
-							eBun.isInitiallyFocusedInPage.Returns(eBunPEOn);
+							eBun.isToggledOnInPageByDefault.Returns(eBunPEOn);
 						IEnumerable<ISlotSystemBundle> gBuns;
 							ISlotSystemBundle gBunA = MakeSubBundle();
-								gBunA.isInitiallyFocusedInPage.Returns(gBunAPEOn);
+								gBunA.isToggledOnInPageByDefault.Returns(gBunAPEOn);
 							ISlotSystemBundle gBunB = MakeSubBundle();
-								gBunB.isInitiallyFocusedInPage.Returns(gBunBPEOn);
+								gBunB.isToggledOnInPageByDefault.Returns(gBunBPEOn);
 							ISlotSystemBundle gBunC = MakeSubBundle();
-								gBunC.isInitiallyFocusedInPage.Returns(gBunCPEOn);
+								gBunC.isToggledOnInPageByDefault.Returns(gBunCPEOn);
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
 					ssm.SetElements();
@@ -1441,11 +1441,11 @@ namespace SlotSystemTests{
 				// [Test][Category("Methods")]
 				/* Get bakc to this after refactoring isToggleON */
 				public void FocusInBundle_Various_CallsElementsAccordingly(){
-					SlotSystemManager ssm = MakeSSM();
-						SlotSystemBundle pBun = MakeSSBundle();
-							SlotGroup sgpAll = MakeSG();
-								PoolInventory pInv = new PoolInventory();
-									BowInstance bow = MakeBowInstance(0);
+					// SlotSystemManager ssm = MakeSSM();
+					// 	SlotSystemBundle pBun = MakeSSBundle();
+					// 		SlotGroup sgpAll = MakeSG();
+					// 			PoolInventory pInv = new PoolInventory();
+					// 				BowInstance bow = MakeBowInstance(0);
 
 				}
 				[Test][Category("Methods")]

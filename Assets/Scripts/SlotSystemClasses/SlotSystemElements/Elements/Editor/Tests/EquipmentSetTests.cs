@@ -15,15 +15,15 @@ namespace SlotSystemTests{
 				EquipmentSet eSet = MakeEquipmentSet();
 					SlotGroup sgeBow = MakeSG();
 						sgeBow.transform.SetParent(eSet.transform);
-						sgeBow.isInitiallyFocusedInPage = true;
+						sgeBow.isToggledOnInPageByDefault = true;
 						sgeBow.SetFilter(new SGBowFilter());
 					SlotGroup sgeWear = MakeSG();
 						sgeWear.transform.SetParent(eSet.transform);
-						sgeWear.isInitiallyFocusedInPage = true;
+						sgeWear.isToggledOnInPageByDefault = true;
 						sgeWear.SetFilter(new SGWearFilter());
 					SlotGroup sgeCGears = MakeSG();
 						sgeCGears.transform.SetParent(eSet.transform);
-						sgeCGears.isInitiallyFocusedInPage = true;
+						sgeCGears.isToggledOnInPageByDefault = true;
 						sgeCGears.SetFilter(new SGCGearsFilter());
 					IEnumerable<ISlotSystemElement> expectedEles = new ISlotSystemElement[]{
 						sgeBow, sgeWear, sgeCGears

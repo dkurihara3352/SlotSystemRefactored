@@ -500,12 +500,12 @@ namespace SlotSystem{
 				}
 				public override void SetElements(){
 					List<ISlotSystemPageElement> pEles = new List<ISlotSystemPageElement>();
-					ISlotSystemPageElement pBunPE = new SlotSystemPageElement(poolBundle, poolBundle.isInitiallyFocusedInPage);
+					ISlotSystemPageElement pBunPE = new SlotSystemPageElement(poolBundle, poolBundle.isToggledOnInPageByDefault);
 						pEles.Add(pBunPE);
-					ISlotSystemPageElement eBunPE = new SlotSystemPageElement(equipBundle, equipBundle.isInitiallyFocusedInPage);
+					ISlotSystemPageElement eBunPE = new SlotSystemPageElement(equipBundle, equipBundle.isToggledOnInPageByDefault);
 						pEles.Add(eBunPE);
 					foreach(var gBun in otherBundles){
-						ISlotSystemPageElement gBunPE = new SlotSystemPageElement(gBun, gBun.isInitiallyFocusedInPage);
+						ISlotSystemPageElement gBunPE = new SlotSystemPageElement(gBun, gBun.isToggledOnInPageByDefault);
 						pEles.Add(gBunPE);
 					}
 					m_pageElements = pEles;
