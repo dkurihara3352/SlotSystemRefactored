@@ -1438,6 +1438,12 @@ namespace SlotSystemTests{
 					Assert.That(gBunBPE.isFocusToggleOn, Is.EqualTo(gBunBPEOn));
 					Assert.That(gBunCPE.isFocusToggleOn, Is.EqualTo(gBunCPEOn));
 				}
+				// [Test][Category("Methods")]
+				/* Comeback to this after sg and sb is done */
+				public void FocusInBundle_Various_CallsElementsAccordingly(){
+					// SlotSystemManager ssm = MakeSSM();
+					// 	ISlotSystemBundle pBun = MakeSSBundle();
+				}
 				[Test][Category("Methods")]
 				[Ignore]
 				public void FocusInBundle_sbeBShield_CallsElementsAccordingly(){
@@ -2827,7 +2833,7 @@ namespace SlotSystemTests{
 								slot.sb = sbBow;
 							slots = new List<Slot>(new Slot[]{slot});
 						sgeBow.slots.Returns(slots);
-						sgeBow.Filter.Returns(new SGBowFilter());
+						sgeBow.filter.Returns(new SGBowFilter());
 					return sgeBow;
 				}
 				public ISlotGroup MakeSGEWear(){
@@ -2840,7 +2846,7 @@ namespace SlotSystemTests{
 								slot.sb = sbWear;
 							slots = new List<Slot>(new Slot[]{slot});
 						sgeWear.slots.Returns(slots);
-						sgeWear.Filter.Returns(new SGWearFilter());
+						sgeWear.filter.Returns(new SGWearFilter());
 					return sgeWear;
 				}
 				public ISlotGroup MakeSGECGears(){
@@ -2856,7 +2862,7 @@ namespace SlotSystemTests{
 							sbShield, sbMWeapon
 						};
 						sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());
-						sgeCGears.Filter.Returns(new SGCGearsFilter());
+						sgeCGears.filter.Returns(new SGCGearsFilter());
 					return sgeCGears;
 				}
 				public SlotSystemManager MakeSetUpSSM(){

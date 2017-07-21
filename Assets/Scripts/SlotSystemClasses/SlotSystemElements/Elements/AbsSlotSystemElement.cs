@@ -222,7 +222,7 @@ namespace SlotSystem{
 					}else return false;
 				}
 				set{m_isInitiallyFocusedInPage = value;}
-			}public bool m_isInitiallyFocusedInPage;
+			}public bool m_isInitiallyFocusedInPage = true;
 		/*	methods	*/
 			public virtual void InitializeStates(){
 				SetSelState(AbsSlotSystemElement.deactivatedState);

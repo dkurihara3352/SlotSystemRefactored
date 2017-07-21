@@ -328,7 +328,7 @@ namespace SlotSystem{
 				}
 				}static SGSorter m_acquisitionOrderSorter = new SGAcquisitionOrderSorter();
 			
-			public virtual SGSorter Sorter{
+			public virtual SGSorter sorter{
 				get{return m_sorter;}
 				}SGSorter m_sorter;
 				public virtual void SetSorter(SGSorter sorter){
@@ -336,7 +336,7 @@ namespace SlotSystem{
 				}
 			public virtual void InstantSort(){
 				List<ISlottable> orderedSbs = slottables;
-				Sorter.OrderSBsWithRetainedSize(ref orderedSbs);
+				sorter.OrderSBsWithRetainedSize(ref orderedSbs);
 				foreach(Slot slot in slots){
 					slot.sb = orderedSbs[slots.IndexOf(slot)];
 				}
@@ -377,23 +377,23 @@ namespace SlotSystem{
 					return m_partsFilter;
 				}
 				}static SGFilter m_partsFilter;
-			public virtual SGFilter Filter{
+			public virtual SGFilter filter{
 				get{return m_filter;}
 				}SGFilter m_filter;
 				public virtual void SetFilter(SGFilter filter){
 					m_filter = filter;
 				}
 			public virtual bool AcceptsFilter(ISlottable pickedSB){
-				if(this.Filter is SGNullFilter) return true;
+				if(this.filter is SGNullFilter) return true;
 				else{
 					if(pickedSB.itemInst is BowInstance)
-						return this.Filter is SGBowFilter;
+						return this.filter is SGBowFilter;
 					else if(pickedSB.itemInst is WearInstance)
-						return this.Filter is SGWearFilter;
+						return this.filter is SGWearFilter;
 					else if(pickedSB.itemInst is CarriedGearInstance)
-						return this.Filter is SGCGearsFilter;
+						return this.filter is SGCGearsFilter;
 					else
-						return this.Filter is SGPartsFilter;
+						return this.filter is SGPartsFilter;
 				}
 			}
 		/*	events	*/
@@ -431,6 +431,7 @@ namespace SlotSystem{
 				public virtual List<ISlottable> toList{get{return slottables;}}
 
 			/*	methods	*/
+
 				public override bool Contains(ISlotSystemElement element){
 					if(element is ISlottable)
 						return slottables.Contains((ISlottable)element);
@@ -498,6 +499,18 @@ namespace SlotSystem{
 					}
 				}
 		/*	methods	*/
+			public override void InitializeStates(){
+				SetSelState(SlotGroup.sgDeactivatedState);
+				SetActState(SlotGroup.sgWaitForActionState);
+			}
+			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter){
+				SetInventory(inv);
+				SetFilter(filter);
+				SetSorter(sorter);
+			}
+			public override void SetElements(){
+				InitializeItems();
+			}
 			public virtual void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
 				m_eName = name;
 				SetFilter(filter);
@@ -648,9 +661,9 @@ namespace SlotSystem{
 			public virtual void SortAndUpdateSBs(){
 				List<ISlottable> newSBs = new List<ISlottable>(toList);
 				if(isExpandable)
-					Sorter.TrimAndOrderSBs(ref newSBs);
+					sorter.TrimAndOrderSBs(ref newSBs);
 				else
-					Sorter.OrderSBsWithRetainedSize(ref newSBs);
+					sorter.OrderSBsWithRetainedSize(ref newSBs);
 				
 				UpdateSBs(newSBs);
 			}
@@ -707,9 +720,9 @@ namespace SlotSystem{
 				public void SortContextually(ref List<ISlottable> list){
 					if(isAutoSort){
 						if(isExpandable)
-							Sorter.TrimAndOrderSBs(ref list);
+							sorter.TrimAndOrderSBs(ref list);
 						else
-							Sorter.OrderSBsWithRetainedSize(ref list);
+							sorter.OrderSBsWithRetainedSize(ref list);
 					}
 				}
 			public virtual void SwapAndUpdateSBs(){
@@ -808,7 +821,7 @@ namespace SlotSystem{
 			public virtual ISlottable pickedSB{get{return ssm.pickedSB;}}
 			public virtual ISlottable targetSB{get{return ssm.targetSB;}}
 			public List<SlottableItem> FilterItem(List<SlottableItem> items){
-				Filter.Filter(ref items);
+				filter.Filter(ref items);
 				return items;
 			}
 			public void InitSlots(List<SlottableItem> items){
@@ -882,11 +895,11 @@ namespace SlotSystem{
 			void OnActionExecute();
 				SlotGroupCommand onActionExecuteCommand{get;}
 		/*	Sorter	*/
-			SGSorter Sorter{get;}
+			SGSorter sorter{get;}
 				void SetSorter(SGSorter sorter);
 			void InstantSort();
 		/*	Filter	*/
-			SGFilter Filter{get;}
+			SGFilter filter{get;}
 				void SetFilter(SGFilter filter);
 			bool AcceptsFilter(ISlottable pickedSB);
 		/*	Events	*/

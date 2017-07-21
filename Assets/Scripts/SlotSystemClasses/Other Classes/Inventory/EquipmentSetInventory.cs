@@ -44,7 +44,7 @@ namespace SlotSystem{
 			}int m_equippableCGearsCount;
 		public void SetEquippableCGearsCount(int num){
 			m_equippableCGearsCount = num;
-			if(sg != null && sg.Filter is SGCGearsFilter && !sg.isExpandable)
+			if(sg != null && sg.filter is SGCGearsFilter && !sg.isExpandable)
 			sg.SetInitSlotsCount(num);
 		}
 		

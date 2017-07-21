@@ -8,7 +8,7 @@ using NSubstitute;
 using SlotSystem;
 namespace SlotSystemTests{
 	namespace ElementsTests{
-		[TestFixture]
+		[TestFixture][Category("SG")]
 		public class SlotGroupTests: AbsSlotSystemTest{
 			[Test]
 			public void TransactionCoroutine_AllSBsNotRunning_CallsActProcessExpire(){
@@ -557,6 +557,80 @@ namespace SlotSystemTests{
 						list.Add(ele);
 					}
 				[Test][Category("Methods")]
+				public void SetElements_WhenCalled_SetsElements(){
+					SlotGroup sg = MakeSG();
+						GenericInventory inventory = new GenericInventory();
+							BowInstance bow = MakeBowInstance(0);
+							WearInstance wear = MakeWearInstance(0);
+							ShieldInstance shield = MakeShieldInstance(0);
+							MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
+							inventory.Add(bow);
+							inventory.Add(wear);
+							inventory.Add(shield);
+							inventory.Add(mWeapon);
+						SGFilter nullFilter = new SGNullFilter();
+						SGSorter idSorter = new SGItemIDSorter();
+					sg.InspectorSetUp(inventory, nullFilter, idSorter);
+
+					sg.SetElements();
+
+					List<ISlotSystemElement> actualEles = new List<ISlotSystemElement>(sg);
+					Assert.That(actualEles.Count, Is.EqualTo(4));
+				}
+				[Test][Category("Methods")]
+				public void SetElements_WhenCalled_SetsSBsAndSlots(){
+					SlotGroup sg = MakeSG();
+						GenericInventory inventory = new GenericInventory();
+							BowInstance bow = MakeBowInstance(0);
+							WearInstance wear = MakeWearInstance(0);
+							ShieldInstance shield = MakeShieldInstance(0);
+							MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
+							inventory.Add(bow);
+							inventory.Add(wear);
+							inventory.Add(shield);
+							inventory.Add(mWeapon);
+						SGFilter nullFilter = new SGNullFilter();
+						SGSorter idSorter = new SGItemIDSorter();
+					sg.InspectorSetUp(inventory, nullFilter, idSorter);
+
+					sg.SetElements();
+
+					ISlottable bowSB = sg.GetSB(bow);
+					ISlottable wearSB = sg.GetSB(wear);
+					ISlottable shieldSB = sg.GetSB(shield);
+					ISlottable mWeaponSB = sg.GetSB(mWeapon);
+					IEnumerable<ISlottable> actualSBs = new ISlottable[]{bowSB, wearSB, shieldSB, mWeaponSB};
+					Assert.That(actualSBs, Is.All.Not.Null);
+					Assert.That(sg.slots.Count, Is.EqualTo(4));
+					int count = 0;
+					foreach(ISlottable sb in sg)
+						Assert.That(sb.slotID, Is.EqualTo(count ++));
+				}
+				[Test][Category("Methods")]
+				public void InitializeState_WhenCalled_InitializesStates(){
+					SlotGroup sg = MakeSG();
+
+					sg.InitializeStates();
+
+					Assert.That(sg.curSelState, Is.SameAs(SlotGroup.sgDeactivatedState));
+					Assert.That(sg.prevSelState, Is.SameAs(SlotGroup.sgDeactivatedState));
+					Assert.That(sg.curActState, Is.SameAs(SlotGroup.sgWaitForActionState));
+					Assert.That(sg.prevActState, Is.SameAs(SlotGroup.sgWaitForActionState));
+				}
+				[Test][Category("Methods")]
+				public void InspectorSetUp_WhenCalled_SetsFields(){
+					SlotGroup sg = MakeSG();
+						GenericInventory genInv = Substitute.For<GenericInventory>();
+						SGFilter filter = new SGNullFilter();
+						SGSorter sorter = new SGItemIDSorter();
+					
+					sg.InspectorSetUp(genInv, filter, sorter);
+
+					Assert.That(sg.inventory, Is.SameAs(genInv));
+					Assert.That(sg.filter, Is.SameAs(filter));
+					Assert.That(sg.sorter, Is.SameAs(sorter));
+				}
+				[Test][Category("Methods")]
 				public void Initialize_WhenCalled_CallInitCommandExecute(){
 					SlotGroup sg = MakeSG();
 						ISGInitItemsCommand mockInitComm = Substitute.For<ISGInitItemsCommand>();
@@ -567,15 +641,53 @@ namespace SlotSystemTests{
 					mockInitComm.Received().Execute(sg);
 				}
 				[TestCaseSource(typeof(InitializeCases))][Category("Methods")]
-				public void Initialize_WhenCalled_SetsFieldsAndStates(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand oaCompComm, SlotGroupCommand oaExecComm){
+				public void Initialize_WhenCalled_SetsFieldsAndStates(
+					string name, 
+					SGFilter filter, 
+					Inventory inv, 
+					bool isShrinkable, 
+					int initSlotsCount, 
+					SlotGroupCommand oaCompComm, 
+					SlotGroupCommand oaExecComm)
+				{
 					SlotGroup sg = MakeSG();
 						ISGInitItemsCommand stubInitComm = Substitute.For<ISGInitItemsCommand>();
 						sg.SetInitItemsCommand(stubInitComm);
-					InitializeDataClass expected = new InitializeDataClass(name, filter, inv, oaCompComm, oaExecComm, isShrinkable, initSlotsCount, initSlotsCount == 0, SlotGroup.sgDeactivatedState, SlotGroup.sgWaitForActionState);
+					SGSetUpFieldsData expected = new SGSetUpFieldsData(
+						name, 
+						filter, 
+						inv, 
+						oaCompComm, 
+						oaExecComm, 
+						isShrinkable, 
+						initSlotsCount, 
+						initSlotsCount == 0, 
+						SlotGroup.sgDeactivatedState, 
+						SlotGroup.sgWaitForActionState
+					);
 
-					sg.Initialize(name, filter, inv, isShrinkable, initSlotsCount, oaCompComm, oaExecComm);
+					sg.Initialize(
+						name, 
+						filter, 
+						inv, 
+						isShrinkable, 
+						initSlotsCount, 
+						oaCompComm, 
+						oaExecComm
+					);
 
-					InitializeDataClass actual = new InitializeDataClass(sg.name, sg.Filter, sg.inventory, sg.onActionCompleteCommand, sg.onActionExecuteCommand, sg.isShrinkable, sg.initSlotsCount, sg.isExpandable, sg.curSelState, sg.curActState);
+					SGSetUpFieldsData actual = new SGSetUpFieldsData(
+						sg.name, 
+						sg.filter, 
+						sg.inventory, 
+						sg.onActionCompleteCommand, 
+						sg.onActionExecuteCommand, 
+						sg.isShrinkable, 
+						sg.initSlotsCount, 
+						sg.isExpandable, 
+						sg.curSelState, 
+						sg.curActState
+					);
 
 					bool equality = actual.Equals(expected);
 
@@ -592,7 +704,7 @@ namespace SlotSystemTests{
 							yield return new object[]{name, nullFilter, pInv, true, 5, empComm, empComm};
 						}
 					}
-					class InitializeDataClass: IEquatable<InitializeDataClass>{
+					class SGSetUpFieldsData: IEquatable<SGSetUpFieldsData>{
 						public string name;
 						public SGFilter filter;
 						public Inventory inventory;
@@ -603,7 +715,7 @@ namespace SlotSystemTests{
 						public bool isExpandable;
 						public SSEState sgSelState;
 						public SSEState sgActState;
-						public InitializeDataClass(string name, SGFilter filter, Inventory inventory, SlotGroupCommand OnACompComm, SlotGroupCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
+						public SGSetUpFieldsData(string name, SGFilter filter, Inventory inventory, SlotGroupCommand OnACompComm, SlotGroupCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
 							this.name = name;
 							this.filter = filter;
 							this.inventory = inventory;
@@ -615,7 +727,7 @@ namespace SlotSystemTests{
 							this.sgSelState = sgSelState;
 							this.sgActState = sgActState;
 						}
-						public bool Equals(InitializeDataClass other){
+						public bool Equals(SGSetUpFieldsData other){
 							bool flag = true;
 								flag &= object.ReferenceEquals(this.filter, other.filter);
 								flag &= object.ReferenceEquals(this.inventory, other.inventory);

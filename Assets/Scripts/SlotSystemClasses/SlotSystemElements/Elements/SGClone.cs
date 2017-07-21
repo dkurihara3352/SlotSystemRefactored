@@ -95,8 +95,8 @@ namespace SlotSystem{
 			this.m_isFocused = orig.isFocused;
 			this.m_isDefocused = orig.isDefocused;
 			this.m_isDeactivated = orig.isDeactivated;
-			SetSorter(orig.Sorter);
-			SetFilter(orig.Filter);
+			SetSorter(orig.sorter);
+			SetFilter(orig.filter);
 			this.m_eName = orig.eName;
 			SetSelState(orig.prevSelState);
 			SetSelState(orig.curSelState);

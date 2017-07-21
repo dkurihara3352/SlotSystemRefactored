@@ -17,15 +17,15 @@ namespace SlotSystem{
 					if(ele != null){
 						if(ele is ISlotGroup){
 							ISlotGroup sg = (ISlotGroup)ele;
-								if(sg.Filter is SGBowFilter){
+								if(sg.filter is SGBowFilter){
 									m_bowSG = sg;
 									SlotSystemPageElement bowPE = new SlotSystemPageElement(sg, sg.isInitiallyFocusedInPage);
 									pEles.Add(bowPE);
-								}else if(sg.Filter is SGWearFilter){
+								}else if(sg.filter is SGWearFilter){
 									m_wearSG = sg;
 									SlotSystemPageElement wearPE = new SlotSystemPageElement(sg, sg.isInitiallyFocusedInPage);
 									pEles.Add(wearPE);
-								}else if(sg.Filter is SGCGearsFilter){
+								}else if(sg.filter is SGCGearsFilter){
 									m_cGearsSG = sg;
 									SlotSystemPageElement cGearsPE = new SlotSystemPageElement(sg, sg.isInitiallyFocusedInPage);
 									pEles.Add(cGearsPE);

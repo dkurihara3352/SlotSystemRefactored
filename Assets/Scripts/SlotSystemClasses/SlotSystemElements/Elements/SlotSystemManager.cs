@@ -16,8 +16,7 @@ namespace SlotSystem{
 					curSSM = this;
 				}
 			}
-		
-		/*	Managerial	*/
+		/* Managerial */	
 			/* fields	*/
 				public virtual List<ISlotGroup> allSGs{
 					get{
@@ -155,7 +154,7 @@ namespace SlotSystem{
 				public BowInstance equippedBowInst{
 					get{
 						foreach(ISlotGroup sge in focusedSGEs){
-							if(sge.Filter is SGBowFilter)
+							if(sge.filter is SGBowFilter)
 								return (BowInstance)sge.slots[0].sb.itemInst;
 						}
 						return null;
@@ -164,7 +163,7 @@ namespace SlotSystem{
 				public WearInstance equippedWearInst{
 					get{
 						foreach(ISlotGroup sge in focusedSGEs){
-							if(sge.Filter is SGWearFilter)
+							if(sge.filter is SGWearFilter)
 								return (WearInstance)sge.slots[0].sb.itemInst;
 						}
 						return null;
@@ -174,7 +173,7 @@ namespace SlotSystem{
 					get{
 						List<CarriedGearInstance> result = new List<CarriedGearInstance>();
 						foreach(ISlotGroup sge in focusedSGEs){
-							if(sge.Filter is SGCGearsFilter){
+							if(sge.filter is SGCGearsFilter){
 								foreach(ISlottable sb in sge){
 									if(sb != null)
 										result.Add((CarriedGearInstance)sb.itemInst);
@@ -803,8 +802,39 @@ namespace SlotSystem{
 			void CheckAndReportParent(ISlotSystemElement ele, object obj);
 			void FindAndFocusInBundle(ISlotSystemElement ele);
 			void FocusInBundle(ISlotSystemElement inspected, object target);
-			void SetSSMInH(ISlotSystemElement ele);
+			void SetSSMInH(ISlotSystemElement ele);	
+	}
+	public interface TransactionManager{
+		ITransactionFactory taFactory{get;}
+		ISlotSystemTransaction transaction{get;}
+		void AcceptSGTAComp(ISlotGroup sg);
+		void AcceptDITAComp(DraggedIcon di);
+		ISlottable pickedSB{get;}
+		ISlottable targetSB{get;}
+		ISlotGroup sg1{get;}
+		ISlotGroup sg2{get;}
+		DraggedIcon dIcon1{get;}
+		DraggedIcon dIcon2{get;}
+		ISlotSystemElement hovered{get;}
+		List<InventoryItemInstance> moved{get;}
+		void UpdateTransaction();
+		void CreateTransactionResults();
+		void ReferToTAAndUpdateSelState(ISlotGroup sg);
+		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
 		
+		void SetTransaction(ISlotSystemTransaction transaction);	
+		void SetPickedSB(ISlottable sb);
+		void SetTargetSB(ISlottable sb);
+		void SetSG1(ISlotGroup sg);
+		bool sg1Done{get;}
+		void SetSG2(ISlotGroup sg);
+		bool sg2Done{get;}
+		void SetDIcon1(DraggedIcon di);
+		bool dIcon1Done{get;}
+		void SetDIcon2(DraggedIcon di);
+		bool dIcon2Done{get;}
+		void SetHovered(ISlotSystemElement ele);
+		void SetMoved(List<InventoryItemInstance> moved);
 	}
 	public class FocusedSGsFactory: IFocusedSGsFactory{
 		ISlotSystemManager ssm;
