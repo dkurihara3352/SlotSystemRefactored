@@ -40,8 +40,8 @@ namespace SlotSystem{
 		/*	SSE	*/
 			public static string SSEDebug(ISlotSystemElement sse){
 				string res = "";
-				string prevSel = SSEStateNamePlain(sse.prevSelState);
-				string curSel = SSEStateName(sse.curSelState);
+				string prevSel = SSEStateNamePlain((SSEState)sse.prevSelState);
+				string curSel = SSEStateName((SSEState)sse.curSelState);
 				string selProc;
 					if(sse.selProcess == null)
 						selProc = "";
@@ -109,13 +109,7 @@ namespace SlotSystem{
 		/*	SSM	*/
 			public static string SSMStateName(SSMState state){
 				string res = "";
-				if(state is SSMDeactivatedState)
-					res = SlotSystemUtil.Red("Deactivated");
-				else if(state is SSMDefocusedState)
-					res = SlotSystemUtil.Blue("Defocused");
-				else if(state is SSMFocusedState)
-					res = SlotSystemUtil.Green("Focused");
-				else if(state is SSMWaitForActionState)
+				if(state is SSMWaitForActionState)
 					res = SlotSystemUtil.Green("WaitForAction");
 				else if(state is SSMProbingState)
 					res = SlotSystemUtil.Ciel("Probing");
@@ -125,13 +119,7 @@ namespace SlotSystem{
 			}
 			public static string SSMStateNamePlain(SSMState state){
 				string res = "";
-				if(state is SSMDeactivatedState)
-					res = "Deactivated";
-				else if(state is SSMDefocusedState)
-					res = "Defocused";
-				else if(state is SSMFocusedState)
-					res = "Focused";
-				else if(state is SSMWaitForActionState)
+				if(state is SSMWaitForActionState)
 					res = "WaitForAction";
 				else if(state is SSMProbingState)
 					res = "Probing";
@@ -191,8 +179,8 @@ namespace SlotSystem{
 				
 				string sg1 = ssm.sg1 == null?"null":ssm.sg1.eName;
 				string sg2 = ssm.sg2 == null?"null":ssm.sg2.eName;
-				string prevSel = SlotSystemUtil.SSMStateNamePlain((SSMSelState)ssm.prevSelState);
-				string curSel = SlotSystemUtil.SSMStateName((SSMSelState)ssm.curSelState);
+				string prevSel = SlotSystemUtil.SSEStateNamePlain((SSEState)ssm.prevSelState);
+				string curSel = SlotSystemUtil.SSEStateName((SSEState)ssm.curSelState);
 				string selProc;
 					if(ssm.selProcess == null)
 						selProc = "";
@@ -229,15 +217,7 @@ namespace SlotSystem{
 		/*	SG	*/
 			public static string SGStateName(SGState state){
 				string res = "";
-				if(state is SGDeactivatedState){
-					res = SlotSystemUtil.Red("SGDeactivated");
-				}else if(state is SGDefocusedState){
-					res = SlotSystemUtil.Green("SGDefocused");
-				}else if(state is SGFocusedState){
-					res = SlotSystemUtil.Blue("SGFocused");
-				}else if(state is SGSelectedState){
-					res = SlotSystemUtil.Aqua("SGSelected");
-				}else if(state is SGWaitForActionState){
+				if(state is SGWaitForActionState){
 					res = SlotSystemUtil.Sangria("SGWFA");
 				}else if(state is SGRevertState){
 					res = SlotSystemUtil.Sangria("SGRevert");
@@ -258,15 +238,7 @@ namespace SlotSystem{
 			}
 			public static string SGStateNamePlain(SGState state){
 				string res = "";
-				if(state is SGDeactivatedState){
-					res = "SGDeactivated";
-				}else if(state is SGDefocusedState){
-					res = "SGDefocused";
-				}else if(state is SGFocusedState){
-					res = "SGFocused";
-				}else if(state is SGSelectedState){
-					res = "SGSelected";
-				}else if(state is SGWaitForActionState){
+				if(state is SGWaitForActionState){
 					res = "SGWFA";
 				}else if(state is SGRevertState){
 					res = "SGRevert";
@@ -301,8 +273,8 @@ namespace SlotSystem{
 			}
 			public static string SGDebug(ISlotGroup sg){
 				string res = "";
-				string prevSel = SGStateNamePlain((SGSelState)sg.prevSelState);
-				string curSel = SGStateName((SGSelState)sg.curSelState);
+				string prevSel = SSEStateNamePlain((SSEState)sg.prevSelState);
+				string curSel = SSEStateName((SSEState)sg.curSelState);
 				string selProc;
 					if(sg.selProcess == null)
 						selProc = "";
@@ -395,16 +367,7 @@ namespace SlotSystem{
 			}
 			public static string SBStateName(SBState state){
 				string result = "";
-				if(state is SBSelState){
-					if(state is SBDeactivatedState)
-						result = Red("Deactivated");
-					else if(state is SBFocusedState)
-						result = Blue("Focused");
-					else if(state is SBDefocusedState)
-						result = Green("Defocused");
-					else if(state is SBSelectedState)
-						result = Ciel("Selected");
-				}else if(state is SBActState){
+				if(state is SBActState){
 					if(state is WaitForActionState)
 						result = Aqua("WFAction");
 					else if(state is WaitForPointerUpState)
@@ -436,16 +399,7 @@ namespace SlotSystem{
 			}
 			public static string SBStateNamePlain(SBState state){
 				string result = "";
-				if(state is SBSelState){
-					if(state is SBDeactivatedState)
-						result = "Deactivated";
-					else if(state is SBFocusedState)
-						result = "Focused";
-					else if(state is SBDefocusedState)
-						result = "Defocused";
-					else if(state is SBSelectedState)
-						result = "Selected";
-				}else if(state is SBActState){
+				if(state is SBActState){
 					if(state is WaitForActionState)
 						result = "WFAction";
 					else if(state is WaitForPointerUpState)
@@ -515,8 +469,8 @@ namespace SlotSystem{
 					res = "null";
 				else{	
 					string sbName = SBofSG(sb);
-					string prevSel = SBStateNamePlain((SBSelState)sb.prevSelState);
-					string curSel = SBStateName((SBSelState)sb.curSelState);
+					string prevSel = SSEStateNamePlain((SSEState)sb.prevSelState);
+					string curSel = SSEStateName((SSEState)sb.curSelState);
 					string selProc;
 						if(sb.selProcess == null)
 							selProc = "";

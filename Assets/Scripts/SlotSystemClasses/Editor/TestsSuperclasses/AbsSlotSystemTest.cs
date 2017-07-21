@@ -139,11 +139,7 @@ public class AbsSlotSystemTest{
 		protected static IPoolInventory MakeSubPoolInv(){
 			return Substitute.For<IPoolInventory>();
 		}
-		protected class FakeSBSelState: SBSelState{}
 		/* States */
-			protected static SBSelState MakeSubSBSelState(){
-				return Substitute.For<SBSelState>();
-			}
 			protected static SBActState MakeSubSBActState(){
 				return Substitute.For<SBActState>();
 			}
@@ -153,14 +149,8 @@ public class AbsSlotSystemTest{
 			protected static SBMrkState MakeSubSBMrkState(){
 				return Substitute.For<SBMrkState>();
 			}
-			protected static SGSelState MakeSubSGSelState(){
-				return Substitute.For<SGSelState>();
-			}
 			protected static SGActState MakeSubSGActState(){
 				return Substitute.For<SGActState>();
-			}
-			protected static SSMSelState MakeSubSSMSelState(){
-				return Substitute.For<SSMSelState>();
 			}
 			protected static SSMActState MakeSubSSMActState(){
 				return Substitute.For<SSMActState>();

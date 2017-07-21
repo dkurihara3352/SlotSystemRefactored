@@ -55,7 +55,7 @@ namespace SlotSystem{
 				}
 				public override void Expire(){
 					base.Expire();
-					sb.SetSelState(Slottable.sbDefocusedState);
+					sb.SetSelState(AbsSlotSystemElement.defocusedState);
 				}
 			}
 			public class WaitForNextTouchProcess: SBProcess, ISBActProcess{

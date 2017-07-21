@@ -13,44 +13,6 @@ namespace SlotSystemTests{
 		[TestFixture]
 		[Category("SB")]
 		public class SlottableTests: AbsSlotSystemTest {
-			/*	States*/
-				/*	SelState	*/
-					[Test]
-					public void SetSelState_Null_SetsSelStateNull(){
-						Slottable sb = MakeSB();
-						
-						sb.SetSelState(null);
-
-						Assert.That(sb.curSelState, Is.Null);
-					}
-					[Test]
-					public void SetSelState_SBSelState_SetsSelState(){
-						Slottable sb = MakeSB();
-						SBSelState stubSelState = MakeSubSBSelState();
-
-						sb.SetSelState(stubSelState);
-
-						Assert.That(sb.curSelState, Is.SameAs(stubSelState));
-					}
-					[TestCaseSource(typeof(SetSelStateInvalidStateCases))]
-					public void SetSelState_InvalidState_ThrowsException(SSEState state){
-						Slottable sb = MakeSB();
-
-						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetSelState(state));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetSelState: something other than SBSelState is beint attempted to be assigned"));
-					}
-						class SetSelStateInvalidStateCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBActState();
-								yield return MakeSubSBEqpState();
-								yield return MakeSubSBMrkState();
-								yield return MakeSubSGSelState();
-								yield return MakeSubSGActState();
-								yield return MakeSubSSMSelState();
-								yield return MakeSubSSMActState();
-							}
-						}
 				/*	ActState	*/
 					[Test]
 					public void SetActState_Null_SetsActStateNull(){
@@ -79,12 +41,10 @@ namespace SlotSystemTests{
 					}
 						class SetActStateInvalidStateCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBSelState();
+								yield return Substitute.For<SSESelState>();
 								yield return MakeSubSBEqpState();
 								yield return MakeSubSBMrkState();
-								yield return MakeSubSGSelState();
 								yield return MakeSubSGActState();
-								yield return MakeSubSSMSelState();
 								yield return MakeSubSSMActState();
 							}
 						}
@@ -120,12 +80,10 @@ namespace SlotSystemTests{
 					}
 						class SetEqpStateInvalidStateCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBSelState();
+								yield return Substitute.For<SSESelState>();
 								yield return MakeSubSBActState();
 								yield return MakeSubSBMrkState();
-								yield return MakeSubSGSelState();
 								yield return MakeSubSGActState();
-								yield return MakeSubSSMSelState();
 								yield return MakeSubSSMActState();
 							}
 						}
@@ -161,12 +119,10 @@ namespace SlotSystemTests{
 					}
 						class SetMrkStateInvalidStateCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBSelState();
+								yield return Substitute.For<SSESelState>();
 								yield return MakeSubSBActState();
 								yield return MakeSubSBEqpState();
-								yield return MakeSubSGSelState();
 								yield return MakeSubSGActState();
-								yield return MakeSubSSMSelState();
 								yield return MakeSubSSMActState();
 							}
 						}
@@ -332,21 +288,21 @@ namespace SlotSystemTests{
 
 					sb.InitializeStates();
 
-					Assert.That(sb.curSelState, Is.SameAs(Slottable.sbDeactivatedState));
-					Assert.That(sb.prevSelState, Is.SameAs(Slottable.sbDeactivatedState));
+					Assert.That(sb.curSelState, Is.SameAs(AbsSlotSystemElement.deactivatedState));
+					Assert.That(sb.prevSelState, Is.Null);
 					Assert.That(sb.curActState, Is.SameAs(Slottable.sbWaitForActionState));
-					Assert.That(sb.prevActState, Is.SameAs(Slottable.sbWaitForActionState));
+					Assert.That(sb.prevActState, Is.Null);
 					Assert.That(sb.curEqpState, Is.Null);
 					Assert.That(sb.prevEqpState, Is.Null);
 					Assert.That(sb.curMrkState, Is.SameAs(Slottable.unmarkedState));
-					Assert.That(sb.prevMrkState, Is.SameAs(Slottable.unmarkedState));
+					Assert.That(sb.prevMrkState, Is.Null);
 				}
 				[Test]
 				[Category("Methods")]
 				public void Pickup_WhenCalled_SetsPickedUpState(){
 					Slottable sb = MakeSB();
 					sb.SetSSM(MakeSubSSM());
-					sb.SetSelState(MakeSubSBSelState());
+					sb.SetSelState(Substitute.For<ISSESelState>());
 					
 					sb.PickUp();
 
@@ -357,7 +313,7 @@ namespace SlotSystemTests{
 				public void Pickup_WhenCalled_SetsPickedAmountOne(){
 					Slottable sb = MakeSB();
 					sb.SetSSM(MakeSubSSM());
-					sb.SetSelState(MakeSubSBSelState());
+					sb.SetSelState(Substitute.For<ISSESelState>());
 					
 					sb.PickUp();
 

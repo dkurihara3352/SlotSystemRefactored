@@ -8,14 +8,14 @@ namespace SlotSystem{
 			m_elements = elements;
 		}
 		public string message = "";
-		public override void InstantGreyout(){
-			message = "InstantGreyout called";
+		public override void InstantDefocus(){
+			message = "InstantDefocus called";
 		}
-		public override void InstantGreyin(){
-			message = "InstantGreyin called";
+		public override void InstantFocus(){
+			message = "InstantFocus called";
 		}
-		public override void InstantHighlight(){
-			message = "InstantHighlight called";
+		public override void InstantSelect(){
+			message = "InstantSelect called";
 		}
 	}
 }

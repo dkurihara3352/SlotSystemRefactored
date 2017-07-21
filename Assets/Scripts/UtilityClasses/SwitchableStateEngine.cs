@@ -17,21 +17,22 @@ namespace Utility{
 			}
 			}protected SwitchableState m_curState;
 		public virtual void SetState(SwitchableState state){
-			if(curState != null){
-				if(curState != state){
-					curState.ExitState(handler);
-					m_prevState = curState;
-					m_curState = state;
-					if(curState != null){
-						curState.EnterState(handler);
-					}
-				}
-			}else{// used as initialization
-				m_prevState = state;
+			if(curState != state){
+				m_prevState = curState;
+				if(prevState != null)
+					prevState.ExitState(handler);
 				m_curState = state;
-				if(state != null)
-					state.EnterState(handler);
+				if(curState != null){
+					curState.EnterState(handler);
+				}
 			}
+			// if(curState != null){
+			// }else{// used as initialization
+			// 	m_prevState = state;
+			// 	m_curState = state;
+			// 	if(state != null)
+			// 		state.EnterState(handler);
+			// }
 		}
 	}
 	public interface ISwitchableStateEngine{

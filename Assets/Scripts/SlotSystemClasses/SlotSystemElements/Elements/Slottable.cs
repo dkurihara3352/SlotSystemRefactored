@@ -7,58 +7,6 @@ using Utility;
 namespace SlotSystem{
 	public class Slottable : AbsSlotSystemElement, ISlottable{
 		/*	States	*/
-			/*	Selection State	*/
-				public override SSEState curSelState{
-					get{return (SBSelState)selStateEngine.curState;}
-				}
-				public override SSEState prevSelState{
-					get{return (SBSelState)selStateEngine.prevState;}
-				}
-				public override void SetSelState(SSEState state){
-					if(state == null || state is SBSelState)
-						selStateEngine.SetState(state);
-					else
-						throw new System.ArgumentException("Slottable.SetSelState: something other than SBSelState is beint attempted to be assigned");
-				}
-				public static SBSelState sbDeactivatedState{
-					get{
-						if(Slottable.m_sbDeactivatedState != null)
-							return Slottable.m_sbDeactivatedState;
-						else{
-							Slottable.m_sbDeactivatedState = new SBDeactivatedState();	
-							return Slottable.m_sbDeactivatedState;
-						}
-					}
-					}static SBSelState m_sbDeactivatedState;
-				public static SBSelState sbSelectedState{
-					get{
-						if(Slottable.m_sbSelectedState != null)
-							return Slottable.m_sbSelectedState;
-						else
-							Slottable.m_sbSelectedState = new SBSelectedState();
-							return Slottable.m_sbSelectedState;
-					}
-					}static SBSelState m_sbSelectedState;			
-				public static SBSelState sbDefocusedState{
-					get{
-						if(Slottable.m_sbDefocusedState != null)
-							return Slottable.m_sbDefocusedState;
-						else{
-							Slottable.m_sbDefocusedState = new SBDefocusedState();
-							return Slottable.m_sbDefocusedState;
-						}
-					}
-					}static SBSelState m_sbDefocusedState;
-				public static SBSelState sbFocusedState{
-						get{
-							if(Slottable.m_sbFocusedState != null)
-								return Slottable.m_sbFocusedState;
-							else{
-								Slottable.m_sbFocusedState = new SBFocusedState();
-								return Slottable.m_sbFocusedState;
-							}
-						}
-						}static SBSelState m_sbFocusedState;
 			/*	Action State	*/
 				public override SSEState curActState{
 					get{return (SBActState)actStateEngine.curState;}
@@ -235,10 +183,10 @@ namespace SlotSystem{
 						selProcEngine.SetAndRunProcess(process);
 					else throw new System.ArgumentException("Slottable.SetAndRunSelProcess: argument is not of type ISBSelProcess");
 				}
-				public override IEnumeratorFake greyoutCoroutine(){return null;}
-				public override IEnumeratorFake greyinCoroutine(){return null;}
-				public override IEnumeratorFake highlightCoroutine(){return null;}
-				public override IEnumeratorFake dehighlightCoroutine(){return null;}
+				public override IEnumeratorFake deactivateCoroutine(){return null;}
+				public override IEnumeratorFake focusCoroutine(){return null;}
+				public override IEnumeratorFake defocusCoroutine(){return null;}
+				public override IEnumeratorFake selectCoroutine(){return null;}
 			/*	Action Process	*/
 				public override ISSEProcess actProcess{
 					get{return (ISBActProcess)actProcEngine.process;}
@@ -340,13 +288,13 @@ namespace SlotSystem{
 				}
 			}
 			public override bool isFocused{
-				get{return curSelState == Slottable.sbFocusedState;}
+				get{return curSelState == AbsSlotSystemElement.focusedState;}
 			}
 			public override bool isDefocused{
-				get{return curSelState == Slottable.sbDefocusedState;}
+				get{return curSelState == AbsSlotSystemElement.defocusedState;}
 			}
 			public override bool isDeactivated{
-				get{return curSelState == Slottable.sbDeactivatedState;}
+				get{return curSelState == AbsSlotSystemElement.deactivatedState;}
 			}
 			public virtual bool isPickedUp{
 				get{
@@ -416,13 +364,13 @@ namespace SlotSystem{
 				}
 				public override void Activate(){}
 				public override void Deactivate(){
-					SetSelState(Slottable.sbDeactivatedState);
+					SetSelState(AbsSlotSystemElement.deactivatedState);
 				}
 				public override void Focus(){
-					SetSelState(Slottable.sbFocusedState);
+					SetSelState(AbsSlotSystemElement.focusedState);
 				}
 				public override void Defocus(){
-					SetSelState(Slottable.sbDefocusedState);
+					SetSelState(AbsSlotSystemElement.defocusedState);
 				}
 				public override bool ContainsInHierarchy(ISlotSystemElement element){
 					return false;
@@ -440,11 +388,11 @@ namespace SlotSystem{
 			/*	Selection event	*/
 				public virtual void OnHoverEnterMock(){
 					PointerEventDataFake eventData = new PointerEventDataFake();
-					((SBSelState)curSelState).OnHoverEnterMock(this, eventData);
+					curSelState.OnHoverEnterMock(this, eventData);
 				}
 				public virtual void OnHoverExitMock(){
 					PointerEventDataFake eventData = new PointerEventDataFake();
-					((SBSelState)curSelState).OnHoverExitMock(this, eventData);
+					curSelState.OnHoverExitMock(this, eventData);
 				}
 			/*	Action Event	*/
 				public void OnPointerDownMock(PointerEventDataFake eventDataMock){
@@ -476,7 +424,7 @@ namespace SlotSystem{
 			}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(Slottable.sbDeactivatedState);
+				SetSelState(AbsSlotSystemElement.deactivatedState);
 				SetActState(Slottable.sbWaitForActionState);
 				SetEqpState(null);
 				SetMrkState(Slottable.unmarkedState);

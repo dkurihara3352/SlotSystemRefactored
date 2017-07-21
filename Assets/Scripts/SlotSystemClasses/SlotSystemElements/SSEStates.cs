@@ -20,55 +20,47 @@ namespace SlotSystem{
 		}
 	}
 		public interface ISSEStateEngine: ISwitchableStateEngine{}
-		public abstract class SSESelState: SSEState{}
+		public abstract class SSESelState: SSEState, ISSESelState{
+			public void OnHoverEnterMock(ISlotSystemElement element, PointerEventDataFake eventData){}
+			public void OnHoverExitMock(ISlotSystemElement element, PointerEventDataFake eventData){}
+		}
+		public interface ISSESelState: SwitchableState{
+			void OnHoverEnterMock(ISlotSystemElement element, PointerEventDataFake eventData);
+			void OnHoverExitMock(ISlotSystemElement element, PointerEventDataFake eventData);
+		}
 			public class SSEDeactivatedState: SSESelState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
-					sse.SetAndRunSelProcess(null);
+					if(sse.prevSelState != null)
+						sse.SetAndRunSelProcess(new SSEDeactivateProcess(sse, sse.deactivateCoroutine));
 				}
 			}
 			public class SSEFocusedState: SSESelState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
-					ISSEProcess process = null;
-					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
-						process = null;
-						sse.InstantGreyin();
+					if(sse.prevSelState != null){
+						sse.SetAndRunSelProcess(new SSEFocusProcess(sse, sse.focusCoroutine));
 					}
-					else if(sse.prevSelState == AbsSlotSystemElement.defocusedState)
-						process = new SSEGreyinProcess(sse, sse.greyinCoroutine);
-					else if(sse.prevSelState == AbsSlotSystemElement.selectedState)
-						process = new SSEDehighlightProcess(sse, sse.dehighlightCoroutine);
-					sse.SetAndRunSelProcess(process);
+					else
+						sse.InstantFocus();
 				}
 			}
 			public class SSEDefocusedState: SSESelState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
-					ISSEProcess process = null;
-					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
-						process = null;
-						sse.InstantGreyout();
-					}else if(sse.prevSelState == AbsSlotSystemElement.focusedState)
-						process = new SSEGreyoutProcess(sse, sse.greyoutCoroutine);
-					else if(sse.prevSelState == AbsSlotSystemElement.selectedState)
-						process = new SSEGreyoutProcess(sse, sse.greyoutCoroutine);
-					sse.SetAndRunSelProcess(process);
+					if(sse.prevSelState != null)
+						sse.SetAndRunSelProcess(new SSEDefocusProcess(sse, sse.defocusCoroutine));
+					else
+						sse.InstantDefocus();
 				}
 			}
 			public class SSESelectedState : SSESelState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);
-					ISSEProcess process = null;
-					if(sse.prevSelState == AbsSlotSystemElement.deactivatedState){
-						process = null;
-						sse.InstantHighlight();
-					}
-					else if(sse.prevSelState == AbsSlotSystemElement.defocusedState)
-						process = new SSEHighlightProcess(sse, sse.highlightCoroutine);
-					else if(sse.prevSelState == AbsSlotSystemElement.focusedState)
-						process = new SSEHighlightProcess(sse, sse.highlightCoroutine);
-					sse.SetAndRunSelProcess(process);
+					if(sse.prevSelState != null)
+						sse.SetAndRunSelProcess(new SSESelectProcess(sse, sse.selectCoroutine));
+					else
+						sse.InstantSelect();
 				}
 			
 			}

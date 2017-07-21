@@ -19,21 +19,8 @@ namespace SlotSystemTests{
 						Assert.That(testSSE.selProcess, Is.Null);
 					}
 					/*	SelStates	*/
-						[TestCaseSource(typeof(SetSelState_NonNullNorNonSSESelStateCases))][Category("State and Process")]
-						[ExpectedException(typeof(System.ArgumentException))]
-						public void SetSelState_NonNullNorNonSSESelState_ThrowsException(SSEState state){
-							TestSlotSystemElement sse = MakeTestSSE();
-							
-							sse.SetSelState(state);
-						}
-							class SetSelState_NonNullNorNonSSESelStateCases: IEnumerable{
-								public IEnumerator GetEnumerator(){
-									yield return Substitute.For<SSEActState>();
-									yield return Substitute.For<SBSelState>();
-								}
-							}
 						[TestCaseSource(typeof(SetSelState_NullOrSSESelStateCases))][Category("State and Process")]
-						public void SetSelState_NullOrSSESelState_CallsSSEStateEngineSetState(SSEState state){
+						public void SetSelState_NullOrSSESelState_CallsSSEStateEngineSetState(ISSESelState state){
 							TestSlotSystemElement sse = MakeTestSSE();
 								ISSEStateEngine engine = Substitute.For<ISSEStateEngine>();
 								sse.SetSelStateEngine(engine);
@@ -45,11 +32,11 @@ namespace SlotSystemTests{
 							class SetSelState_NullOrSSESelStateCases: IEnumerable{
 								public IEnumerator GetEnumerator(){
 									yield return null;
-									yield return Substitute.For<SSESelState>();
+									yield return Substitute.For<ISSESelState>();
 								}
 							}
 						[TestCaseSource(typeof(FromToProcCases))][Category("State and Process")]
-						public void SetSelState_Various_SetsSelProcAccordingly(SSEState from, SSEState to, ISSEProcess proc){
+						public void SetSelState_Various_SetsSelProcAccordingly(ISSESelState from, ISSESelState to, ISSEProcess proc){
 							TestSlotSystemElement sse = MakeTestSSE();
 							sse.SetSelState(from);
 
@@ -65,15 +52,15 @@ namespace SlotSystemTests{
 								public IEnumerator GetEnumerator(){
 									ISlotSystemElement sse = Substitute.For<ISlotSystemElement>();
 
-									SSEState deactivated = AbsSlotSystemElement.deactivatedState;
-									SSEState focused = AbsSlotSystemElement.focusedState;
-									SSEState defocused = AbsSlotSystemElement.defocusedState;
-									SSEState selected = AbsSlotSystemElement.selectedState;
+									ISSESelState deactivated = AbsSlotSystemElement.deactivatedState;
+									ISSESelState focused = AbsSlotSystemElement.focusedState;
+									ISSESelState defocused = AbsSlotSystemElement.defocusedState;
+									ISSESelState selected = AbsSlotSystemElement.selectedState;
 									
-									ISSEProcess greyin = new SSEGreyinProcess(sse, FakeCoroutine);
-									ISSEProcess greyout = new SSEGreyoutProcess(sse, FakeCoroutine);
-									ISSEProcess highlight = new SSEHighlightProcess(sse, FakeCoroutine);
-									ISSEProcess dehighlight = new SSEDehighlightProcess(sse, FakeCoroutine);
+									ISSEProcess deactProc = new SSEDeactivateProcess(sse, FakeCoroutine);
+									ISSEProcess focusProc = new SSEFocusProcess(sse, FakeCoroutine);
+									ISSEProcess defocusProc = new SSEDefocusProcess(sse, FakeCoroutine);
+									ISSEProcess selectProc = new SSESelectProcess(sse, FakeCoroutine);
 
 									yield return new object[]{null, null, null};
 									yield return new object[]{null, deactivated, null};
@@ -83,39 +70,39 @@ namespace SlotSystemTests{
 
 									yield return new object[]{deactivated, null, null};
 									yield return new object[]{deactivated, deactivated, null};
-									yield return new object[]{deactivated, focused, null};
-									yield return new object[]{deactivated, defocused, null};
-									yield return new object[]{deactivated, selected, null};
+									yield return new object[]{deactivated, focused, focusProc};
+									yield return new object[]{deactivated, defocused, defocusProc};
+									yield return new object[]{deactivated, selected, selectProc};
 									
 									yield return new object[]{focused, null, null};
-									yield return new object[]{focused, deactivated, null};
+									yield return new object[]{focused, deactivated, deactProc};
 									yield return new object[]{focused, focused, null};
-									yield return new object[]{focused, defocused, greyout};
-									yield return new object[]{focused, selected, highlight};
+									yield return new object[]{focused, defocused, defocusProc};
+									yield return new object[]{focused, selected, selectProc};
 									
 									yield return new object[]{defocused, null, null};
-									yield return new object[]{defocused, deactivated, null};
-									yield return new object[]{defocused, focused, greyin};
+									yield return new object[]{defocused, deactivated, deactProc};
+									yield return new object[]{defocused, focused, focusProc};
 									yield return new object[]{defocused, defocused, null};
-									yield return new object[]{defocused, selected, highlight};
+									yield return new object[]{defocused, selected, selectProc};
 
 									yield return new object[]{selected, null, null};
-									yield return new object[]{selected, deactivated, null};
-									yield return new object[]{selected, focused, dehighlight};
-									yield return new object[]{selected, defocused, greyout};
+									yield return new object[]{selected, deactivated, deactProc};
+									yield return new object[]{selected, focused, focusProc};
+									yield return new object[]{selected, defocused, defocusProc};
 									yield return new object[]{selected, selected, null};
 									
 								}
 							}
 						[TestCaseSource(typeof(FromToMethodCases))][Category("State and Process")]
-						public void SetSelState_Various_CallsInstantMethods(SSEState from, SSEState to, InstantMethods method){
+						public void SetSelState_Various_CallsInstantMethods(ISSESelState from, ISSESelState to, InstantMethods method){
 							TestSlotSystemElement sse = MakeTestSSE();
 							string expected = "default";
 							switch(method){
 								case InstantMethods.none: expected = ""; break;
-								case InstantMethods.greyin: expected = "InstantGreyin called"; break;
-								case InstantMethods.greyout: expected = "InstantGreyout called"; break;
-								case InstantMethods.highlight: expected = "InstantHighlight called"; break;
+								case InstantMethods.focus: expected = "InstantFocus called"; break;
+								case InstantMethods.defocus: expected = "InstantDefocus called"; break;
+								case InstantMethods.select: expected = "InstantSelect called"; break;
 								default: break;
 							}
 							sse.SetSelState(from);
@@ -126,25 +113,25 @@ namespace SlotSystemTests{
 
 							Assert.That(actual, Is.StringContaining(expected));
 						}
-							public enum InstantMethods{none, greyin, greyout, highlight};
+							public enum InstantMethods{none, focus, defocus, select};
 							class FromToMethodCases: IEnumerable{
 								public IEnumerator GetEnumerator(){
-									SSEState deactivated = AbsSlotSystemElement.deactivatedState;
-									SSEState focused = AbsSlotSystemElement.focusedState;
-									SSEState defocused = AbsSlotSystemElement.defocusedState;
-									SSEState selected = AbsSlotSystemElement.selectedState;
+									ISSESelState deactivated = AbsSlotSystemElement.deactivatedState;
+									ISSESelState focused = AbsSlotSystemElement.focusedState;
+									ISSESelState defocused = AbsSlotSystemElement.defocusedState;
+									ISSESelState selected = AbsSlotSystemElement.selectedState;
 
 									yield return new object[]{null, null, InstantMethods.none};
 									yield return new object[]{null, deactivated, InstantMethods.none};
-									yield return new object[]{null, focused, InstantMethods.none};
-									yield return new object[]{null, defocused, InstantMethods.none};
-									yield return new object[]{null, selected, InstantMethods.none};
+									yield return new object[]{null, focused, InstantMethods.focus};
+									yield return new object[]{null, defocused, InstantMethods.defocus};
+									yield return new object[]{null, selected, InstantMethods.select};
 
 									yield return new object[]{deactivated, null, InstantMethods.none};
 									yield return new object[]{deactivated, deactivated, InstantMethods.none};
-									yield return new object[]{deactivated, focused, InstantMethods.greyin};
-									yield return new object[]{deactivated, defocused, InstantMethods.greyout};
-									yield return new object[]{deactivated, selected, InstantMethods.highlight};
+									yield return new object[]{deactivated, focused, InstantMethods.none};
+									yield return new object[]{deactivated, defocused, InstantMethods.none};
+									yield return new object[]{deactivated, selected, InstantMethods.none};
 									
 									yield return new object[]{focused, null, InstantMethods.none};
 									yield return new object[]{focused, deactivated, InstantMethods.none};

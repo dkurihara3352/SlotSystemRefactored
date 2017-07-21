@@ -11,74 +11,6 @@ namespace SlotSystem{
 			}
 		}
 	}
-        public abstract class SBSelState: SBState{
-            public virtual void OnHoverEnterMock(ISlottable sb, PointerEventDataFake eventDataMock){
-                sb.SetHovered();
-            }
-            public virtual void OnHoverExitMock(ISlottable sb, PointerEventDataFake eventDataMock){
-            }
-        }
-            public class SBDeactivatedState: SBSelState{
-                public override void EnterState(IStateHandler sh){
-                    base.EnterState(sh);
-                    sb.SetAndRunSelProcess(null);
-                }
-                public override void ExitState(IStateHandler sh){
-                    base.ExitState(sh);
-                }
-            }
-            public class SBFocusedState: SBSelState{
-                public override void EnterState(IStateHandler sh){
-                    base.EnterState(sh);
-                    ISBSelProcess process = null;
-                    if(sb.prevSelState == Slottable.sbDeactivatedState){
-                        sb.InstantGreyin();
-                    }else if(sb.prevSelState == Slottable.sbDefocusedState){
-                        process = new SBGreyinProcess(sb, sb.greyinCoroutine);
-                    }else if(sb.prevSelState == Slottable.sbSelectedState){
-                        process = new SBDehighlightProcess(sb, sb.dehighlightCoroutine);
-                    }
-                    sb.SetAndRunSelProcess(process);
-                }
-                public override void ExitState(IStateHandler sh){
-                    base.ExitState(sh);
-                }
-            }
-            public class SBDefocusedState: SBSelState{
-                public override void EnterState(IStateHandler sh){
-                    base.EnterState(sh);
-                    ISBSelProcess process = null;
-                    if(sb.prevSelState == Slottable.sbDeactivatedState){
-                        sb.InstantGreyout();
-                        process = null;
-                    }else if(sb.prevSelState == Slottable.sbFocusedState){
-                        process = new SBGreyoutProcess(sb, sb.greyoutCoroutine);
-                    }else if(sb.prevSelState == Slottable.sbSelectedState){
-                        process = new SBGreyoutProcess(sb, sb.greyoutCoroutine);
-                    }
-                    sb.SetAndRunSelProcess(process);
-                }
-                public override void ExitState(IStateHandler sh){
-                    base.ExitState(sh);
-                }
-            }
-            public class SBSelectedState: SBSelState{
-                public override void EnterState(IStateHandler sh){
-                    base.EnterState(sh);
-                    ISBSelProcess process = null;
-                    if(sb.prevSelState == Slottable.sbDeactivatedState){
-                        sb.InstantHighlight();
-                    }else if(sb.prevSelState == Slottable.sbDefocusedState){
-                        process = new SBHighlightProcess(sb, sb.highlightCoroutine);
-                    }else if(sb.prevSelState == Slottable.sbFocusedState){
-                        process = new SBHighlightProcess(sb, sb.highlightCoroutine);
-                    }
-                    sb.SetAndRunSelProcess(process);
-                }
-                public override void ExitState(IStateHandler sh){
-                    base.ExitState(sh);
-                }
-            }
         public abstract class SBActState: SBState{
             public abstract void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock);
             public abstract void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock);
@@ -102,7 +34,7 @@ namespace SlotSystem{
                 }
                 public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     if(sb.isFocused){
-                        sb.SetSelState(Slottable.sbSelectedState);
+                        sb.SetSelState(AbsSlotSystemElement.selectedState);
                         sb.SetActState(Slottable.waitForPickUpState);
                     }
                     else

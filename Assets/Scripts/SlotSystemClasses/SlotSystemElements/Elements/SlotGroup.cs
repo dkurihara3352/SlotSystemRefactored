@@ -7,48 +7,7 @@ namespace SlotSystem{
 		/*	states	*/
 			/*	Engines	*/
 				/*	Selection State	*/
-					public override SSEState curSelState{
-						get{return (SGSelState)selStateEngine.curState;}
-					}
-					public override SSEState prevSelState{
-						get{return (SGSelState)selStateEngine.prevState;}
-					}
-					public override void SetSelState(SSEState state){
-						if(state == null || state is SGSelState)
-							selStateEngine.SetState(state);
-						else
-							throw new System.InvalidOperationException("SlotGroup.SetSelState: somthing other than SGSelectionState is trying to be assinged");
-					}
-					public static SGSelState sgDeactivatedState{
-						get{
-							if(SlotGroup.m_sgDeactivatedState == null)
-								m_sgDeactivatedState = new SGDeactivatedState();
-							return m_sgDeactivatedState;
-						}
-						}private static SGSelState m_sgDeactivatedState;
-					public static SGSelState sgDefocusedState{
-						get{
-							if(SlotGroup.m_sgDefocusedState == null)
-								m_sgDefocusedState = new SGDefocusedState();
-							return m_sgDefocusedState;
-						}
-						}private static SGSelState m_sgDefocusedState;
-					public static SGSelState sgFocusedState{
-						get{
-							if(SlotGroup.m_sgFocusedState == null)
-								m_sgFocusedState = new SGFocusedState();
-							return m_sgFocusedState;
-						}
-						}private static SGSelState m_sgFocusedState;
-					public static SGSelState sgSelectedState{
-						get{
-							if(m_sgSelectedState == null)
-								m_sgSelectedState = new SGSelectedState();
-							return m_sgSelectedState;
-						}
-						}private static SGSelState m_sgSelectedState;
-				
-				/*	Action State	*/
+					/*	Action State	*/
 					public override SSEState curActState{
 						get{return (SGActState)actStateEngine.curState;}
 					}
@@ -127,18 +86,10 @@ namespace SlotSystem{
 						selProcEngine.SetAndRunProcess(process);
 					else throw new System.InvalidOperationException("SlotGroup.SetAndrunSelProcess: argument is not of type ISGSelProcess");
 				}
-				public override IEnumeratorFake greyinCoroutine(){
-					return null;
-				}
-				public override IEnumeratorFake greyoutCoroutine(){
-					return null;
-				}
-				public override IEnumeratorFake highlightCoroutine(){
-					return null;
-				}
-				public override IEnumeratorFake dehighlightCoroutine(){
-					return null;
-				}
+				public override IEnumeratorFake deactivateCoroutine(){return null;}
+				public override IEnumeratorFake focusCoroutine(){return null;}
+				public override IEnumeratorFake defocusCoroutine(){return null;}
+				public override IEnumeratorFake selectCoroutine(){return null;}
 			/*	Action Process	*/
 				public override ISSEProcess actProcess{
 					get{return (ISGActProcess)actProcEngine.process;}
@@ -269,15 +220,7 @@ namespace SlotSystem{
 					m_initSlotsCount = i;
 				}
 
-			public override bool isFocused{
-				get{return curSelState == SlotGroup.sgFocusedState;}
-			}
-			public override bool isDefocused{
-				get{return curSelState == SlotGroup.sgDefocusedState;}
-			}
-			public override bool isDeactivated{
-				get{return curSelState == SlotGroup.sgDeactivatedState;}
-			}
+			
 		/*	commands methods	*/
 			public virtual void InitializeItems(){
 				initItemsCommand.Execute(this);
@@ -399,11 +342,11 @@ namespace SlotSystem{
 		/*	events	*/
 			public virtual void OnHoverEnterMock(){
 				PointerEventDataFake eventData = new PointerEventDataFake();
-				((SGSelState)curSelState).OnHoverEnterMock(this, eventData);
+				curSelState.OnHoverEnterMock(this, eventData);
 			}
 			public virtual void OnHoverExitMock(){
 				PointerEventDataFake eventData = new PointerEventDataFake();
-				((SGSelState)curSelState).OnHoverExitMock(this, eventData);
+				curSelState.OnHoverExitMock(this, eventData);
 			}
 		/*	SlotSystemElement implementation	*/
 			/* fields	*/
@@ -443,7 +386,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void FocusSelf(){
-					SetSelState(SlotGroup.sgFocusedState);
+					SetSelState(AbsSlotSystemElement.focusedState);
 				}
 				public virtual void FocusSBs(){
 					foreach(ISlottable sb in this){
@@ -462,7 +405,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void DefocusSelf(){
-					SetSelState(SlotGroup.sgDefocusedState);
+					SetSelState(AbsSlotSystemElement.defocusedState);
 				}
 				public virtual void DefocusSBs(){
 					foreach(ISlottable sb in this){
@@ -473,7 +416,7 @@ namespace SlotSystem{
 					}
 				}
 				public override void Deactivate(){
-					SetSelState(SlotGroup.sgDeactivatedState);
+					SetSelState(AbsSlotSystemElement.deactivatedState);
 					foreach(ISlottable sb in this){
 						if(sb != null){
 							sb.Deactivate();
@@ -500,7 +443,7 @@ namespace SlotSystem{
 				}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(SlotGroup.sgDeactivatedState);
+				SetSelState(AbsSlotSystemElement.deactivatedState);
 				SetActState(SlotGroup.sgWaitForActionState);
 			}
 			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){

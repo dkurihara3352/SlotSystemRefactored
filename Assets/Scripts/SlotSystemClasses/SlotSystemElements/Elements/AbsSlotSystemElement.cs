@@ -13,16 +13,14 @@ namespace SlotSystem{
 				}
 				}ISSEStateEngine m_selStateEngine;
 				public void SetSelStateEngine(ISSEStateEngine engine){m_selStateEngine = engine;}
-				public virtual SSEState prevSelState{
-					get{return (SSESelState)selStateEngine.prevState;}
+				public virtual ISSESelState prevSelState{
+					get{return (ISSESelState)selStateEngine.prevState;}
 				}
-				public virtual SSEState curSelState{
-					get{return (SSEState)selStateEngine.curState;}
+				public virtual ISSESelState curSelState{
+					get{return (ISSESelState)selStateEngine.curState;}
 				}
-				public virtual void SetSelState(SSEState state){
-					if(state == null || state is SSESelState)
-						selStateEngine.SetState(state);
-					else throw new System.ArgumentException("AbsSlotSystemElement.SetSelState: argument is not of type SSESelState");
+				public virtual void SetSelState(ISSESelState state){
+					selStateEngine.SetState(state);
 				}
 				/*	static sel states	*/
 					public static SSESelState deactivatedState{
@@ -100,16 +98,16 @@ namespace SlotSystem{
 							selProcEngine.SetAndRunProcess(process);
 						else throw new System.ArgumentException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
 					}
-				public virtual IEnumeratorFake greyoutCoroutine(){
+				public virtual IEnumeratorFake deactivateCoroutine(){
 					return null;
 				}
-				public virtual IEnumeratorFake greyinCoroutine(){
+				public virtual IEnumeratorFake focusCoroutine(){
 					return null;
 				}
-				public virtual IEnumeratorFake highlightCoroutine(){
+				public virtual IEnumeratorFake defocusCoroutine(){
 					return null;
 				}
-				public virtual IEnumeratorFake dehighlightCoroutine(){
+				public virtual IEnumeratorFake selectCoroutine(){
 					return null;
 				}
 			/*	Action Process	*/
@@ -311,34 +309,34 @@ namespace SlotSystem{
 						pageEle.isFocusToggleOn = true;
 				}
 			}
-			public virtual void InstantGreyout(){}
-			public virtual void InstantGreyin(){}
-			public virtual void InstantHighlight(){}
+			public virtual void InstantDefocus(){}
+			public virtual void InstantFocus(){}
+			public virtual void InstantSelect(){}
 	}
 	public interface IAbsSlotSystemElement: ISlotSystemElement{
 		ISSEStateEngine selStateEngine{get;}
-		void SetSelState(SSEState state);
+		void SetSelState(ISSESelState state);
 		ISSEStateEngine actStateEngine{get;}
 		void SetActState(SSEState state);
 		ISSEProcessEngine selProcEngine{get;}
 		ISSEProcessEngine actProcEngine{get;}
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
-		SSEState curSelState{get;}
-		SSEState prevSelState{get;}
+		ISSESelState curSelState{get;}
+		ISSESelState prevSelState{get;}
 		SSEState curActState{get;}
 		SSEState prevActState{get;}
 		void SetAndRunSelProcess(ISSEProcess process);
 		void SetAndRunActProcess(ISSEProcess process);
 		ISSEProcess selProcess{get;}
 		ISSEProcess actProcess{get;}
-		IEnumeratorFake greyoutCoroutine();
-		IEnumeratorFake greyinCoroutine();
-		IEnumeratorFake highlightCoroutine();
-		IEnumeratorFake dehighlightCoroutine();
-		void InstantGreyin();
-		void InstantGreyout();
-		void InstantHighlight();
+		IEnumeratorFake deactivateCoroutine();
+		IEnumeratorFake focusCoroutine();
+		IEnumeratorFake defocusCoroutine();
+		IEnumeratorFake selectCoroutine();
+		void InstantFocus();
+		void InstantDefocus();
+		void InstantSelect();
 		string eName{get;}
 		bool isBundleElement{get;}
 		bool isPageElement{get;}

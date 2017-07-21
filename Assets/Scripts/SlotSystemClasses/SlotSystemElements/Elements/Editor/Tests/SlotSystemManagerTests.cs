@@ -131,10 +131,10 @@ namespace SlotSystemTests{
 
 				ssm.Initialize();
 
-				Assert.That(ssm.curSelState, Is.SameAs(SlotSystemManager.ssmDeactivatedState));
-				Assert.That(ssm.prevSelState, Is.SameAs(SlotSystemManager.ssmDeactivatedState));
+				Assert.That(ssm.curSelState, Is.SameAs(AbsSlotSystemElement.deactivatedState));
+				Assert.That(ssm.prevSelState, Is.Null);
 				Assert.That(ssm.curActState, Is.SameAs(SlotSystemManager.ssmWaitForActionState));
-				Assert.That(ssm.prevActState, Is.SameAs(SlotSystemManager.ssmWaitForActionState));
+				Assert.That(ssm.prevActState, Is.Null);
 				pBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				eBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				foreach(var gBun in gBuns)
@@ -785,7 +785,7 @@ namespace SlotSystemTests{
 
 					ssm.ResetAndFocus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemManager.ssmFocusedState));
+					Assert.That(ssm.curSelState, Is.SameAs(AbsSlotSystemElement.focusedState));
 				}
 				[Test][Category("Methods")]
 				public void UpdateEquipStatesOnAll_WhenCalled_CallsEInvRemoveWithItemNotInAllEquippedItems(){
@@ -1318,7 +1318,7 @@ namespace SlotSystemTests{
 
 					ssm.Focus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemManager.ssmFocusedState));
+					Assert.That(ssm.curSelState, Is.SameAs(AbsSlotSystemElement.focusedState));
 				}
 				[TestCase(true, true, true, true, true)]
 				[TestCase(false, false, false, false, false)]
@@ -1374,7 +1374,7 @@ namespace SlotSystemTests{
 
 					ssm.Defocus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemManager.ssmDefocusedState));
+					Assert.That(ssm.curSelState, Is.SameAs(AbsSlotSystemElement.defocusedState));
 				}
 				[Test][Category("Methods")]
 				public void Defocus_WhenCalled_CallsAllBundlesDefocus(){
@@ -1393,7 +1393,7 @@ namespace SlotSystemTests{
 
 					ssm.Deactivate();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemManager.ssmDeactivatedState));
+					Assert.That(ssm.curSelState, Is.SameAs(AbsSlotSystemElement.deactivatedState));
 				}
 				[Test][Category("Methods")]
 				public void Deactivate_WhenCalled_CallsAllBundlesDeactivate(){
@@ -2219,7 +2219,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.Received().SetSelState(Slottable.sbSelectedState);
+					mockSB.Received().SetSelState(AbsSlotSystemElement.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_FromNullToSome_SetsItTargetSB(){
@@ -2239,7 +2239,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 					
-					mockSB.Received().SetSelState(Slottable.sbSelectedState);
+					mockSB.Received().SetSelState(AbsSlotSystemElement.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_FromOtherToSome_SetsItTargetSB(){
@@ -2261,7 +2261,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(stubSB);
 					
-					mockSB.Received().SetSelState(Slottable.sbFocusedState);
+					mockSB.Received().SetSelState(AbsSlotSystemElement.focusedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_SomeToNull_CallSBSetSelStateFocused(){
@@ -2271,7 +2271,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(null);
 
-					mockSB.Received().SetSelState(Slottable.sbFocusedState);
+					mockSB.Received().SetSelState(AbsSlotSystemElement.focusedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_SomeToNull_SetsNull(){
@@ -2291,7 +2291,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.Received(1).SetSelState(Slottable.sbSelectedState);
+					mockSB.Received(1).SetSelState(AbsSlotSystemElement.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_SomeToSame_DoesNotCallSetSelStateFocused(){
@@ -2301,7 +2301,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.DidNotReceive().SetSelState(Slottable.sbFocusedState);
+					mockSB.DidNotReceive().SetSelState(AbsSlotSystemElement.focusedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetSG1_NullToSome_SetsSG1(){
@@ -2388,7 +2388,7 @@ namespace SlotSystemTests{
 
 					ssm.SetSG2(mockSG);
 
-					mockSG.Received().SetSelState(SlotGroup.sgSelectedState);
+					mockSG.Received().SetSelState(AbsSlotSystemElement.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetSG2_OtherToSome_SetsSG2(){
@@ -2421,7 +2421,7 @@ namespace SlotSystemTests{
 					ssm.SetSG2(prevSG);
 					ssm.SetSG2(mockSG);
 
-					mockSG.Received().SetSelState(SlotGroup.sgSelectedState);
+					mockSG.Received().SetSelState(AbsSlotSystemElement.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetSG2_SomeToNull_SetsSG2Null(){
@@ -2803,10 +2803,10 @@ namespace SlotSystemTests{
 
 					ssm.ReferToTAAndUpdateSelState(mockSG);
 
-					mockSG.Received().SetSelState(SlotGroup.sgFocusedState);
+					mockSG.Received().SetSelState(AbsSlotSystemElement.focusedState);
 				}
 				[TestCaseSource(typeof(ReferToTAAndUpdateSelState_VariousTAsCases))][Category("Transaction")]
-				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotSystemTransaction ta, SSEState state){
+				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotSystemTransaction ta, ISSESelState state){
 					SlotSystemManager ssm = MakeSSM();
 						ISlotGroup mockSG = MakeSubSG();
 					Dictionary<ISlotSystemElement, ISlotSystemTransaction> dict = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
@@ -2818,12 +2818,12 @@ namespace SlotSystemTests{
 				}
 					class ReferToTAAndUpdateSelState_VariousTAsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							yield return new object[]{Substitute.For<IRevertTransaction>(), SlotGroup.sgDefocusedState};
-							yield return new object[]{Substitute.For<IReorderTransaction>(), SlotGroup.sgFocusedState};
-							yield return new object[]{Substitute.For<ISortTransaction>(), SlotGroup.sgFocusedState};
-							yield return new object[]{Substitute.For<IFillTransaction>(), SlotGroup.sgFocusedState};
-							yield return new object[]{Substitute.For<ISwapTransaction>(), SlotGroup.sgFocusedState};
-							yield return new object[]{Substitute.For<IStackTransaction>(), SlotGroup.sgFocusedState};
+							yield return new object[]{Substitute.For<IRevertTransaction>(), AbsSlotSystemElement.defocusedState};
+							yield return new object[]{Substitute.For<IReorderTransaction>(), AbsSlotSystemElement.focusedState};
+							yield return new object[]{Substitute.For<ISortTransaction>(), AbsSlotSystemElement.focusedState};
+							yield return new object[]{Substitute.For<IFillTransaction>(), AbsSlotSystemElement.focusedState};
+							yield return new object[]{Substitute.For<ISwapTransaction>(), AbsSlotSystemElement.focusedState};
+							yield return new object[]{Substitute.For<IStackTransaction>(), AbsSlotSystemElement.focusedState};
 						}
 					}
 			/*	helper	*/

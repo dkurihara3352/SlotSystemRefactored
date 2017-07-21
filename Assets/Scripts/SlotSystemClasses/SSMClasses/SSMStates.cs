@@ -11,37 +11,6 @@ namespace SlotSystem{
 			}
 		}
 	}
-		public class SSMSelState: SSMState{}
-			public class SSMDeactivatedState: SSMSelState{
-				public override void EnterState(IStateHandler sh){
-					base.EnterState(sh);
-					ssm.SetAndRunSelProcess(null);
-					ssm.SetActState(SlotSystemManager.ssmWaitForActionState);
-				}
-				public override void ExitState(IStateHandler sh){
-					base.ExitState(sh);
-				}
-			}
-			public class SSMFocusedState: SSMSelState{
-				public override void EnterState(IStateHandler sh){
-					base.EnterState(sh);
-					if(ssm.prevSelState == SlotSystemManager.ssmDefocusedState)
-						ssm.SetAndRunSelProcess(new SSMGreyinProcess(ssm, ssm.greyinCoroutine));
-				}
-				public override void ExitState(IStateHandler sh){
-					base.ExitState(sh);
-				}
-			}
-			public class SSMDefocusedState: SSMSelState{
-				public override void EnterState(IStateHandler sh){
-					base.EnterState(sh);
-					if(ssm.prevSelState == SlotSystemManager.ssmFocusedState)
-						ssm.SetAndRunSelProcess(new SSMGreyoutProcess(ssm, ssm.greyoutCoroutine));
-				}
-				public override void ExitState(IStateHandler sh){
-					base.ExitState(sh);
-				}
-			}
 		public class SSMActState: SSMState{}
 			public class SSMWaitForActionState: SSMActState{
 				public override void EnterState(IStateHandler sh){
