@@ -1439,10 +1439,14 @@ namespace SlotSystemTests{
 					Assert.That(gBunCPE.isFocusToggleOn, Is.EqualTo(gBunCPEOn));
 				}
 				// [Test][Category("Methods")]
-				/* Comeback to this after sg and sb is done */
+				/* Get bakc to this after refactoring isToggleON */
 				public void FocusInBundle_Various_CallsElementsAccordingly(){
-					// SlotSystemManager ssm = MakeSSM();
-					// 	ISlotSystemBundle pBun = MakeSSBundle();
+					SlotSystemManager ssm = MakeSSM();
+						SlotSystemBundle pBun = MakeSSBundle();
+							SlotGroup sgpAll = MakeSG();
+								PoolInventory pInv = new PoolInventory();
+									BowInstance bow = MakeBowInstance(0);
+
 				}
 				[Test][Category("Methods")]
 				[Ignore]
