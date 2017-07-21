@@ -11,6 +11,7 @@ using NSubstitute;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
+		[Category("SB")]
 		public class SlottableTests: AbsSlotSystemTest {
 			/*	States*/
 				/*	SelState	*/
@@ -325,50 +326,20 @@ namespace SlotSystemTests{
 						}
 
 			/*	Methods	*/
-				[Test]
-				[Category("Methods")]
-				public void Initialize_WhenCalled_SetsStatesVarious(){
+				[Test][Category("Methods")]
+				public void InitializeStates_WhenCalled_InitializesStates(){
 					Slottable sb = MakeSB();
-					BowInstance bowInst = MakeBowInstance(0);
 
-					sb.Initialize(bowInst);
+					sb.InitializeStates();
 
-					InitializeWhenCalledCase actual = new InitializeWhenCalledCase(
-						sb.curSelState,
-						sb.curActState,
-						sb.curEqpState,
-						sb.curMrkState
-					);
-					InitializeWhenCalledCase expected = new InitializeWhenCalledCase(
-						Slottable.sbDeactivatedState,
-						Slottable.sbWaitForActionState,
-						null,
-						Slottable.unmarkedState
-					);
-
-					Assert.That(actual, Is.EqualTo(expected));
-
-				}
-					struct InitializeWhenCalledCase{
-						public SSEState selState;
-						public SSEState actState;
-						public SSEState eqpState;
-						public SSEState mrkState;
-						public InitializeWhenCalledCase(SSEState sel, SSEState act, SSEState eqp, SSEState mrk){
-							selState = sel;
-							actState = act;
-							eqpState = eqp;
-							mrkState = mrk;
-						}
-					}
-				[Test]
-				[Category("Methods")]
-				public void Initialize_WhenCalled_SetsItem(){
-					Slottable sb = MakeSB();
-					BowInstance bow = MakeBowInstance(0);
-					sb.Initialize(bow);
-
-					Assert.That(sb.itemInst, Is.SameAs(bow));
+					Assert.That(sb.curSelState, Is.SameAs(Slottable.sbDeactivatedState));
+					Assert.That(sb.prevSelState, Is.SameAs(Slottable.sbDeactivatedState));
+					Assert.That(sb.curActState, Is.SameAs(Slottable.sbWaitForActionState));
+					Assert.That(sb.prevActState, Is.SameAs(Slottable.sbWaitForActionState));
+					Assert.That(sb.curEqpState, Is.Null);
+					Assert.That(sb.prevEqpState, Is.Null);
+					Assert.That(sb.curMrkState, Is.SameAs(Slottable.unmarkedState));
+					Assert.That(sb.prevMrkState, Is.SameAs(Slottable.unmarkedState));
 				}
 				[Test]
 				[Category("Methods")]

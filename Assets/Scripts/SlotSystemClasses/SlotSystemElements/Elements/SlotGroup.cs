@@ -686,7 +686,7 @@ namespace SlotSystem{
 				public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
 					GameObject newSBGO = new GameObject("newSBGO");
 					ISlottable newSB = newSBGO.AddComponent<Slottable>();
-					newSB.Initialize(addedItem);
+					newSB.SetItem(addedItem);
 					newSB.SetSSM(ssm);
 					newSB.Defocus();
 					newSB.SetEqpState(Slottable.unequippedState);
@@ -740,7 +740,7 @@ namespace SlotSystem{
 					if(!isPool){
 						GameObject newSBGO = new GameObject("newSBGO");
 						ISlottable newSB = newSBGO.AddComponent<Slottable>();
-						newSB.Initialize(added.itemInst);
+						newSB.SetItem(added.itemInst);
 						newSB.SetSSM(ssm);
 						newSB.SetEqpState(Slottable.unequippedState);
 						newSB.Defocus();
@@ -819,14 +819,14 @@ namespace SlotSystem{
 				SetSlots(newSlots);
 			}
 			public void InitSBs(List<SlottableItem> items){
-				/*	if the number of filtered items exceeds the slot count, remove unfittable items from the inventory	*/
 				while(slots.Count < items.Count){
 					items.RemoveAt(slots.Count);
 				}
 				foreach(SlottableItem item in items){
 					GameObject newSBGO = new GameObject("newSBGO");
 					ISlottable newSB = newSBGO.AddComponent<Slottable>();
-					newSB.Initialize((InventoryItemInstance)item);
+					newSB.SetItem(item);
+					newSB.InitializeStates();
 					newSB.SetSSM(ssm);
 					slots[items.IndexOf(item)].sb = newSB;
 				}

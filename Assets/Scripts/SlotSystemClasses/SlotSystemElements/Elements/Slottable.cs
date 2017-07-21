@@ -475,14 +475,13 @@ namespace SlotSystem{
 				return a.CompareTo(b) < 0;
 			}
 		/*	methods	*/
-			public void Initialize(InventoryItemInstance item){
-				delayed = true;
-				SetItem(item);
+			public override void InitializeStates(){
 				SetSelState(Slottable.sbDeactivatedState);
 				SetActState(Slottable.sbWaitForActionState);
 				SetEqpState(null);
 				SetMrkState(Slottable.unmarkedState);
 			}
+			public override void SetElements(){}
 			public virtual void PickUp(){
 				SetActState(Slottable.pickedUpState);
 				m_pickedAmount = 1;
@@ -625,7 +624,6 @@ namespace SlotSystem{
 
 
 		/*	Methods	*/
-			void Initialize(InventoryItemInstance item);
 			void PickUp();
 			void Increment();
 			void ExecuteTransaction();
