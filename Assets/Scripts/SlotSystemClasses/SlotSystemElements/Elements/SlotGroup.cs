@@ -511,23 +511,6 @@ namespace SlotSystem{
 			public override void SetElements(){
 				InitializeItems();
 			}
-			public virtual void Initialize(string name, SGFilter filter, Inventory inv, bool isShrinkable, int initSlotsCount, SlotGroupCommand onActionCompleteCommand, SlotGroupCommand onActionExecuteCommand){
-				m_eName = name;
-				SetFilter(filter);
-				SetSorter(SlotGroup.ItemIDSorter);
-				SetInventory(inv);
-				m_onActionCompleteCommand = onActionCompleteCommand;
-				m_onActionExecuteCommand = onActionExecuteCommand;
-				m_isShrinkable = isShrinkable;
-				if(initSlotsCount == 0)
-					m_isExpandable = true;
-				else
-					m_isExpandable = false;
-				m_initSlotsCount = initSlotsCount;
-				InitializeItems();			
-				SetSelState(SlotGroup.sgDeactivatedState);
-				SetActState(SlotGroup.sgWaitForActionState);
-			}
 			public virtual ISlottable GetSB(InventoryItemInstance itemInst){
 				foreach(ISlottable sb in this){
 					if(sb != null){
