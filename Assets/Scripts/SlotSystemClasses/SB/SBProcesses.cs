@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public abstract class SBProcess: AbsSSEProcess, ISBProcess{
+	public abstract class SBProcess: SSEProcess, ISBProcess{
 		public ISlottable sb{
 			get{return (ISlottable)sse;}
 			set{}

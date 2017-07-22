@@ -22,7 +22,7 @@ namespace SlotSystemTests{
 						[TestCaseSource(typeof(SetSelState_NullOrSSESelStateCases))][Category("State and Process")]
 						public void SetSelState_NullOrSSESelState_CallsSSEStateEngineSetState(ISSESelState state){
 							TestSlotSystemElement sse = MakeTestSSE();
-								ISSEStateEngine engine = Substitute.For<ISSEStateEngine>();
+								ISSEStateEngine<ISSESelState> engine = Substitute.For<ISSEStateEngine<ISSESelState>>();
 								sse.SetSelStateEngine(engine);
 							
 							sse.SetSelState(state);
@@ -152,93 +152,20 @@ namespace SlotSystemTests{
 									yield return new object[]{selected, selected, InstantMethods.none};
 								}
 							}
-						
-					/*	Act States	*/
-						[TestCaseSource(typeof(SetActState_NonNullNorNonSSEActStateCases))][Category("State and Process")]
-						[ExpectedException(typeof(System.ArgumentException))]
-						public void SetActState_NonNullNorNonSSEActState_ThrowsException(SSEState state){
-							TestSlotSystemElement sse = MakeTestSSE();
-							
-							sse.SetActState(state);
-						}
-							class SetActState_NonNullNorNonSSEActStateCases: IEnumerable{
-								public IEnumerator GetEnumerator(){
-									yield return Substitute.For<SSESelState>();
-									yield return Substitute.For<SBActState>();
-								}
-							}
-						[TestCaseSource(typeof(SetActState_NullOrSSESelStateCases))][Category("State and Process")]
-						public void SetActState_NullOrSSESelState_CallsSSEStateEngineSetState(SSEState state){
-							TestSlotSystemElement sse = MakeTestSSE();
-								ISSEStateEngine engine = Substitute.For<ISSEStateEngine>();
-								sse.SetActStateEngine(engine);
-							
-							sse.SetActState(state);
-
-							engine.Received().SetState(state);
-						}
-							class SetActState_NullOrSSESelStateCases: IEnumerable{
-								public IEnumerator GetEnumerator(){
-									yield return null;
-									yield return Substitute.For<SSEActState>();
-								}
-							}
 				/* Process */
-					[TestCaseSource(typeof(SetAndRunSelProcess_NOTNullNorSSESelProcessCases))][Category("State and Process")]
-					[ExpectedException(typeof(System.ArgumentException))]
-					public void SetAndRunSelProcess_NOTNullNorSSESelProcess_ThrowsException(ISSEProcess process){
+					[TestCaseSource(typeof(SetAndRunSelProcess_ISSESelProcessOrNullCases))][Category("State and Process")]
+					public void SetAndRunSelProcess_ISSESelProcessOrNull_CallsSelProcEngineSAR(ISSESelProcess process){
 						TestSlotSystemElement sse = MakeTestSSE();
-						
-						sse.SetAndRunSelProcess(process);
-					}
-						class SetAndRunSelProcess_NOTNullNorSSESelProcessCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<SSEActProcess>();
-								yield return Substitute.For<ISSEProcess>();
-							}
-						}
-					[TestCaseSource(typeof(SetAndRunSelProcess_NullOrSSESelProcessCases))][Category("State and Process")]
-					public void SetAndRunSelProcess_NullOrSSESelProcess_CallsSelProcEngineSAR(ISSEProcess process){
-						TestSlotSystemElement sse = MakeTestSSE();
-							ISSEProcessEngine engine = Substitute.For<ISSEProcessEngine>();
+							ISSEProcessEngine<ISSESelProcess> engine = Substitute.For<ISSEProcessEngine<ISSESelProcess>>();
 							sse.SetSelProcEngine(engine);
 						
 						sse.SetAndRunSelProcess(process);
 
 						engine.Received().SetAndRunProcess(process);
 					}
-						class SetAndRunSelProcess_NullOrSSESelProcessCases: IEnumerable{
+						class SetAndRunSelProcess_ISSESelProcessOrNullCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<SSESelProcess>();
-								yield return null;
-							}
-						}
-					[TestCaseSource(typeof(SetAndRunActProcess_NOTNullNorSSEActProcessCases))][Category("State and Process")]
-					[ExpectedException(typeof(System.ArgumentException))]
-					public void SetAndRunActProcess_NOTNullNorSSEActProcess_ThrowsException(ISSEProcess process){
-						TestSlotSystemElement sse = MakeTestSSE();
-						
-						sse.SetAndRunActProcess(process);
-					}
-						class SetAndRunActProcess_NOTNullNorSSEActProcessCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<SSESelProcess>();
-								yield return Substitute.For<ISSEProcess>();
-							}
-						}
-					[TestCaseSource(typeof(SetAndRunActProcess_NullOrSSEActProcessCases))][Category("State and Process")]
-					public void SetAndRunActProcess_NullOrSSEActProcess_CallsActProcEngineSAR(ISSEProcess process){
-						TestSlotSystemElement sse = MakeTestSSE();
-							ISSEProcessEngine engine = Substitute.For<ISSEProcessEngine>();
-							sse.SetActProcEngine(engine);
-						
-						sse.SetAndRunActProcess(process);
-
-						engine.Received().SetAndRunProcess(process);
-					}
-						class SetAndRunActProcess_NullOrSSEActProcessCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<SSEActProcess>();
+								yield return Substitute.For<ISSESelProcess>();
 								yield return null;
 							}
 						}
@@ -599,15 +526,12 @@ namespace SlotSystemTests{
 						TestSlotSystemElement childC = MakeTestSSE();
 							childC.transform.SetParent(sse.transform);
 							childC.isToggledOnInPageByDefault = true;
-						ISSEStateEngine mockSelStateEg = Substitute.For<ISSEStateEngine>();
+						ISSEStateEngine<ISSESelState> mockSelStateEg = Substitute.For<ISSEStateEngine<ISSESelState>>();
 							sse.SetSelStateEngine(mockSelStateEg);
-						ISSEStateEngine mockActStateEg = Substitute.For<ISSEStateEngine>();
-							sse.SetActStateEngine(mockActStateEg);
 					
 					sse.InitializeStates();
 
 					mockSelStateEg.Received().SetState(AbsSlotSystemElement.deactivatedState);
-					mockActStateEg.Received().SetState(AbsSlotSystemElement.waitForActionState);
 				}
 				[Test][Category("Methods")]
 				public void ContainsInHierarchy_Various_ReturnsAccordingly(){

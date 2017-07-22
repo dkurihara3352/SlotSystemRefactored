@@ -12,10 +12,10 @@ namespace UtilityClassTests{
 	public class SwitchableStateEngineTests: AbsSlotSystemTest{
 		[TestCaseSource(typeof(SetState_VariousCases))]
 		public void SetState_Various_Various(
-			SwitchableState from, 
-			SwitchableState to, 
-			SwitchableState expPrev, 
-			SwitchableState expCur, 
+			ISwitchableState from, 
+			ISwitchableState to, 
+			ISwitchableState expPrev, 
+			ISwitchableState expCur, 
 			bool exitCalled, 
 			bool enterCalled)
 		{
@@ -40,8 +40,8 @@ namespace UtilityClassTests{
 		}
 			class SetState_VariousCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
-					SwitchableState stateA = Substitute.For<SwitchableState>();
-					SwitchableState stateB = Substitute.For<SwitchableState>();
+					ISwitchableState stateA = Substitute.For<ISwitchableState>();
+					ISwitchableState stateB = Substitute.For<ISwitchableState>();
 					yield return SetState_VariousCase(
 						from: null, to: null, 
 						expPrev: null, expCur: null, 
@@ -69,22 +69,22 @@ namespace UtilityClassTests{
 					);					
 				}
 			}
-			static object[] SetState_VariousCase(SwitchableState from, SwitchableState to, SwitchableState expPrev, SwitchableState expCur, bool exitCalled, bool enterCalled){
+			static object[] SetState_VariousCase(ISwitchableState from, ISwitchableState to, ISwitchableState expPrev, ISwitchableState expCur, bool exitCalled, bool enterCalled){
 				return new object[]{from, to, expPrev, expCur, exitCalled, enterCalled};
 			}
 		/* Helpers */
-			TestStateEngine MakeTestStateEngine(SwitchableState prev, SwitchableState cur, IStateHandler handler){
+			TestStateEngine MakeTestStateEngine(ISwitchableState prev, ISwitchableState cur, IStateHandler handler){
 				return new TestStateEngine(prev, cur, handler);
 			}
-			class TestStateEngine: SwitchableStateEngine{
-				public void SetTestState(SwitchableState state){
+			class TestStateEngine: SwitchableStateEngine<ISwitchableState>{
+				public void SetTestState(ISwitchableState state){
 					SetState(state);
 				}
-				public TestStateEngine(SwitchableState prev, SwitchableState cur){
+				public TestStateEngine(ISwitchableState prev, ISwitchableState cur){
 					m_prevState = prev; m_curState = cur;
 					handler = Substitute.For<IStateHandler>();
 				}
-				public TestStateEngine(SwitchableState prev, SwitchableState cur, IStateHandler handler){
+				public TestStateEngine(ISwitchableState prev, ISwitchableState cur, IStateHandler handler){
 					m_prevState = prev; m_curState = cur;
 					this.handler = handler;
 				}

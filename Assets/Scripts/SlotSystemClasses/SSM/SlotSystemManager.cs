@@ -16,7 +16,7 @@ namespace SlotSystem{
 					curSSM = this;
 				}
 			}
-		/* Managerial */	
+		/* Managerial */
 			/* fields	*/
 				public virtual List<ISlotGroup> allSGs{
 					get{
@@ -351,77 +351,82 @@ namespace SlotSystem{
 		/*	SlotSystemElement	*/
 			/*	States	*/
 				/*	Action state	*/
-					public override SSEState curActState{
-						get{return (SSMActState)actStateEngine.curState;}
-					}
-					public override SSEState prevActState{
-						get{return (SSMActState)actStateEngine.prevState;}
-					}
-					public override void SetActState(SSEState state){
-						if(state == null || state is SSMActState)
-							actStateEngine.SetState(state);
-						else throw new System.InvalidOperationException("SlotSystemManager.SetActState: argument is not of type SSMActState");
-					}
-					public static SSMActState ssmWaitForActionState{
+					public ISSEStateEngine<ISSMActState> actStateEngine{
 						get{
-							if(m_ssmWaitForActionState == null)
-								m_ssmWaitForActionState = new SSMWaitForActionState();
-							return m_ssmWaitForActionState;
+							if(m_actStateEngine == null)
+								m_actStateEngine = new SSEStateEngine<ISSMActState>(this);
+							return m_actStateEngine;
 						}
-						}static SSMActState m_ssmWaitForActionState;
-					public static SSMActState ssmProbingState{
-						get{
-							if(m_ssmProbingState == null)
-								m_ssmProbingState = new SSMProbingState();
-							return m_ssmProbingState;
-						}
-						}static SSMActState m_ssmProbingState;
-					public static SSMActState ssmTransactionState{
-						get{
-							if(m_ssmTransactionState == null)
-								m_ssmTransactionState = new SSMTransactionState();
-							return m_ssmTransactionState;
-						}
-						}static SSMActState m_ssmTransactionState;
-					
-
+						}ISSEStateEngine<ISSMActState> m_actStateEngine;
+					public void SetActStateEngine(ISSEStateEngine<ISSMActState> engine){m_actStateEngine = engine;}
+					public virtual ISSMActState curActState{
+						get{return actStateEngine.curState;}
+					}
+					public virtual ISSMActState prevActState{
+						get{return actStateEngine.prevState;}
+					}
+					public virtual void SetActState(ISSMActState state){
+						actStateEngine.SetState(state);
+					}
+					/* Static states */
+						public static ISSMActState ssmWaitForActionState{
+							get{
+								if(m_ssmWaitForActionState == null)
+									m_ssmWaitForActionState = new SSMWaitForActionState();
+								return m_ssmWaitForActionState;
+							}
+							}static ISSMActState m_ssmWaitForActionState;
+						public static ISSMActState ssmProbingState{
+							get{
+								if(m_ssmProbingState == null)
+									m_ssmProbingState = new SSMProbingState();
+								return m_ssmProbingState;
+							}
+							}static ISSMActState m_ssmProbingState;
+						public static ISSMActState ssmTransactionState{
+							get{
+								if(m_ssmTransactionState == null)
+									m_ssmTransactionState = new SSMTransactionState();
+								return m_ssmTransactionState;
+							}
+							}static ISSMActState m_ssmTransactionState;
 			/*	process	*/
 				/*	Selection Process	*/
-					public override ISSEProcess selProcess{
-						get{return (ISSMSelProcess)selProcEngine.process;}
-					}
-					public override void SetAndRunSelProcess(ISSEProcess process){
-						if(process == null||process is ISSMSelProcess)
-							selProcEngine.SetAndRunProcess(process);
-						else throw new System.InvalidOperationException("SlotSystemManager.SetAndRunSelProcess: argument is not of type ISSMSelProcess");
-					}
-					public override IEnumeratorFake deactivateCoroutine(){return null;}
-					public override IEnumeratorFake focusCoroutine(){return null;}
-					public override IEnumeratorFake defocusCoroutine(){return null;}
-					public override IEnumeratorFake selectCoroutine(){return null;}
+					/* Coroutine */
+						public override IEnumeratorFake deactivateCoroutine(){return null;}
+						public override IEnumeratorFake focusCoroutine(){return null;}
+						public override IEnumeratorFake defocusCoroutine(){return null;}
+						public override IEnumeratorFake selectCoroutine(){return null;}
 				/*	Action Process	*/
-					public override ISSEProcess actProcess{
-							get{return (ISSMActProcess)actProcEngine.process;}
+					public virtual ISSEProcessEngine<ISSMActProcess> actProcEngine{
+						get{
+							if(m_actProcEngine == null)
+								m_actProcEngine = new SSEProcessEngine<ISSMActProcess>();
+							return m_actProcEngine;
 						}
-						public override void SetAndRunActProcess(ISSEProcess process){
-							if(process == null||process is ISSMActProcess)
-								actProcEngine.SetAndRunProcess(process);
-							else throw new System.InvalidOperationException("SlotSystemManager.SetAndRunActProcess: argument is not of type ISSMActProcess");
-						}
-					public IEnumeratorFake probeCoroutine(){
-						return null;
+						}ISSEProcessEngine<ISSMActProcess> m_actProcEngine;
+					public virtual void SetActProcEngine(ISSEProcessEngine<ISSMActProcess> engine){m_actProcEngine = engine;}
+					public virtual ISSMActProcess actProcess{
+						get{return actProcEngine.process;}
 					}
-					public IEnumeratorFake transactionCoroutine(){
-						bool done = true;
-						done &= m_dIcon1Done;
-						done &= m_dIcon2Done;
-						done &= m_sg1Done;
-						done &= m_sg2Done;
-						if(done){
-							this.actProcess.Expire();
-						}
-						return null;
+					public virtual void SetAndRunActProcess(ISSMActProcess process){
+						actProcEngine.SetAndRunProcess(process);
 					}
+					/* Coroutine */
+						public IEnumeratorFake probeCoroutine(){
+							return null;
+						}
+						public IEnumeratorFake transactionCoroutine(){
+							bool done = true;
+							done &= m_dIcon1Done;
+							done &= m_dIcon2Done;
+							done &= m_sg1Done;
+							done &= m_sg2Done;
+							if(done){
+								this.actProcess.Expire();
+							}
+							return null;
+						}
 			/* public fields	*/
 				public override ISlotSystemBundle immediateBundle{
 					get{return null;}
@@ -517,6 +522,13 @@ namespace SlotSystem{
 					UpdateEquipStatesOnAll();
 					Focus();
 				}
+				public override void Deactivate(){
+					SetSelState(AbsSlotSystemElement.deactivatedState);
+					foreach(ISlotSystemElement ele in this){
+						ele.Deactivate();
+					}
+					ToggleBack();
+				}
 				public override void Focus(){
 					SetSelState(AbsSlotSystemElement.focusedState);
 					PageFocus();
@@ -526,13 +538,6 @@ namespace SlotSystem{
 					foreach(ISlotSystemElement ele in this){
 						ele.Defocus();
 					}
-				}
-				public override void Deactivate(){
-					SetSelState(AbsSlotSystemElement.deactivatedState);
-					foreach(ISlotSystemElement ele in this){
-						ele.Deactivate();
-					}
-					ToggleBack();
 				}
 				public void FindAndFocusInBundle(ISlotSystemElement ele){
 					PerformInHierarchy(FocusInBundle, ele);
@@ -723,7 +728,17 @@ namespace SlotSystem{
 		void SetCurSSM();
 		void Initialize();
 		IEnumeratorFake probeCoroutine();
-		IEnumeratorFake transactionCoroutine();
+		/* States And Process */
+			ISSEStateEngine<ISSMActState> actStateEngine{get;}
+				void SetActStateEngine(ISSEStateEngine<ISSMActState> engine);
+				void SetActState(ISSMActState state);
+				ISSMActState curActState{get;}
+				ISSMActState prevActState{get;}
+			ISSEProcessEngine<ISSMActProcess> actProcEngine{get;}
+				void SetActProcEngine(ISSEProcessEngine<ISSMActProcess> engine);
+				void SetAndRunActProcess(ISSMActProcess process);
+				ISSMActProcess actProcess{get;}
+					IEnumeratorFake transactionCoroutine();
 		/*	Managerial */
 			List<ISlotGroup> allSGs{get;}
 			List<ISlotGroup> allSGPs{get;}

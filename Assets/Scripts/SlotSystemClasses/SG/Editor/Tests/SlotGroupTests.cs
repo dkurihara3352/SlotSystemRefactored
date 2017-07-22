@@ -19,7 +19,7 @@ namespace SlotSystemTests{
 					ISlottable sbC = MakeSBWithActProc(false);
 					sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
 				sg.SetSBs(sbs);
-				ISSEProcess sgActProc = MakeSubSGActProc();
+				ISGActProcess sgActProc = MakeSubSGActProc();
 				sg.SetAndRunActProcess(sgActProc);
 
 				sg.TransactionCoroutine();
@@ -1413,8 +1413,8 @@ namespace SlotSystemTests{
 						public InventoryItemInstance item;
 						public ISlotSystemManager ssm;
 						public ISSESelState sbSelState;
-						public SSEState sbEqpState;
-						public CreateNewSBAndFillTestData(InventoryItemInstance item, ISlotSystemManager ssm, ISSESelState selState, SSEState eqpState){
+						public ISBEqpState sbEqpState;
+						public CreateNewSBAndFillTestData(InventoryItemInstance item, ISlotSystemManager ssm, ISSESelState selState, ISBEqpState eqpState){
 							this.item = item;
 							this.ssm = ssm;
 							this.sbSelState = selState;
@@ -1549,8 +1549,8 @@ namespace SlotSystemTests{
 					class FillAndUpdateSBsTestData: IEquatable<FillAndUpdateSBsTestData>{
 						public ISlotSystemManager ssm;
 						public ISSESelState sbSelState;
-						public SSEState sbEqpState;
-						public FillAndUpdateSBsTestData(ISlotSystemManager ssm, ISSESelState sbSelState, SSEState sbEqpState){
+						public ISBEqpState sbEqpState;
+						public FillAndUpdateSBsTestData(ISlotSystemManager ssm, ISSESelState sbSelState, ISBEqpState sbEqpState){
 							this.ssm = ssm;
 							this.sbSelState = sbSelState;
 							this.sbEqpState = sbEqpState;
@@ -1919,8 +1919,8 @@ namespace SlotSystemTests{
 						public InventoryItemInstance item;
 						public ISlotSystemManager ssm;
 						public ISSESelState sbSelState;
-						public SSEState sbEqpState;
-						public CreatedNewSBData(InventoryItemInstance item, ISlotSystemManager ssm, ISSESelState sbSelState, SSEState sbEqpState){
+						public ISBEqpState sbEqpState;
+						public CreatedNewSBData(InventoryItemInstance item, ISlotSystemManager ssm, ISSESelState sbSelState, ISBEqpState sbEqpState){
 							this.item = item;
 							this.ssm = ssm;
 							this.sbSelState = sbSelState;
@@ -2637,7 +2637,7 @@ namespace SlotSystemTests{
 								BowInstance bowD = MakeBowInstance(3);
 								items = new List<SlottableItem>(new SlottableItem[]{bowA, bowB, bowC, bowD});
 							ISSESelState deaState = AbsSlotSystemElement.deactivatedState;
-							SSEState uneState = Slottable.unequippedState;
+							ISBEqpState uneState = Slottable.unequippedState;
 							List<CreatedNewSBData> expected;
 								CreatedNewSBData bowAData = new CreatedNewSBData(bowA, ssm, deaState, uneState);
 								CreatedNewSBData bowBData = new CreatedNewSBData(bowB, ssm, deaState, uneState);

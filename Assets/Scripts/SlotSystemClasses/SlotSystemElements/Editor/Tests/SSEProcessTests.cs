@@ -12,13 +12,13 @@ namespace SlotSystemTests{
 
 			[Test]
 			public void proces_ByDefault_IsNull(){
-				SSEProcessEngine engine = MakeProcessEngine();
+				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
 
 				Assert.That(engine.process, Is.Null);
 			}
 			[Test]
 			public void SetAndRunProcess_NullToAny_SetsProcess(){
-				SSEProcessEngine engine = MakeProcessEngine();
+				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
 				ISSEProcess process = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(process);
@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SetAndRunProcess_ToAnother_SetsProcess(){
-				SSEProcessEngine engine = MakeProcessEngine();
+				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
 				ISSEProcess another = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(another);
@@ -36,7 +36,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SetAndRunProcess_AnyToNull_SetsNull(){
-				SSEProcessEngine engine = MakeProcessEngine();
+				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
 				ISSEProcess process = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(process);
@@ -46,7 +46,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SetAndRunProcess_ToAny_StartsProcess(){
-				SSEProcessEngine engine = MakeProcessEngine();
+				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
 				ISSEProcess mockProcess = Substitute.For<ISSEProcess>();
 
 				engine.SetAndRunProcess(mockProcess);
@@ -55,7 +55,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SetAndRunProcess_AnyToAnother_StopsProcess(){
-				SSEProcessEngine engine = MakeProcessEngine();
+				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
 				ISSEProcess mockProcess = Substitute.For<ISSEProcess>();
 				ISSEProcess another = Substitute.For<ISSEProcess>();
 
@@ -93,13 +93,13 @@ namespace SlotSystemTests{
 
 				Assert.That(process.isRunning, Is.False);
 			}
-			SSEProcessEngine MakeProcessEngine(){
-				return new SSEProcessEngine();
+			SSEProcessEngine<ISSEProcess> MakeProcessEngine(){
+				return new SSEProcessEngine<ISSEProcess>();
 			}
 			System.Func<IEnumeratorFake> MakeCoroutine(){
 				return () => {return new IEnumeratorFake();};
 			}
-			class FakeAbsSSEProcess: AbsSSEProcess{
+			class FakeAbsSSEProcess: SSEProcess{
 				public FakeAbsSSEProcess(System.Func<IEnumeratorFake> coroutine){
 					coroutineFake = coroutine;
 				}

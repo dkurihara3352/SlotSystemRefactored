@@ -6,110 +6,115 @@ namespace SlotSystem{
 	public class SlotGroup : AbsSlotSystemElement, ISlotGroup{
 		/*	states	*/
 			/*	Engines	*/
-				/*	Selection State	*/
-					/*	Action State	*/
-					public override SSEState curActState{
-						get{return (SGActState)actStateEngine.curState;}
+				/*	Action State	*/
+					public virtual ISSEStateEngine<ISGActState> actStateEngine{
+						get{
+							if(m_actStateEngine == null)
+								m_actStateEngine = new SSEStateEngine<ISGActState>(this);
+							return m_actStateEngine;
+						}
+						}ISSEStateEngine<ISGActState> m_actStateEngine;
+					public virtual void SetActStateEngine(ISSEStateEngine<ISGActState> engine){m_actStateEngine = engine;}
+					public virtual ISGActState curActState{
+						get{return actStateEngine.curState;}
 					}
-					public override SSEState prevActState{
-						get{return (SGActState)actStateEngine.prevState;}
+					public virtual ISGActState prevActState{
+						get{return actStateEngine.prevState;}
 					}
-					public override void SetActState(SSEState state){
-						if(state == null || state is SGActState)
-							actStateEngine.SetState(state);
-						else
-							throw new System.InvalidOperationException("SlotGroup.SetActState: somthing other than SGActionState is trying to be assinged");
+					public virtual void SetActState(ISGActState state){
+						actStateEngine.SetState(state);
 					}
-					public static SGActState sgWaitForActionState{
-						get{
-							if(m_sgWaitForActionState == null)
-								m_sgWaitForActionState = new SGWaitForActionState();
-							return m_sgWaitForActionState;
-						}
-						}private static SGActState m_sgWaitForActionState;
-					public static SGActState revertState{
-						get{
-							if(m_revertState == null)
-								m_revertState = new SGRevertState();
-							return m_revertState;
-						}
-						}private static SGActState m_revertState;
-					public static SGActState reorderState{
-						get{
-							if(m_reorderState == null)
-								m_reorderState = new SGReorderState();
-							return m_reorderState;
-						}
-						}private static SGActState m_reorderState;
-					public static SGActState addState{
-						get{
-							if(m_addState == null)
-								m_addState = new SGAddState();
-							return m_addState;
-						}
-						}private static SGActState m_addState;
-					public static SGActState removeState{
-						get{
-							if(m_removeState == null)
-								m_removeState = new SGRemoveState();
-							return m_removeState;
-						}
-						}private static SGActState m_removeState;
-					public static SGActState swapState{
-						get{
-							if(m_swapState == null)
-								m_swapState = new SGSwapState();
-							return m_swapState;
-						}
-						}private static SGActState m_swapState;
-					public static SGActState fillState{
-						get{
-							if(m_fillState == null)
-								m_fillState = new SGFillState();
-							return m_fillState;
-						}
-						}private static SGActState m_fillState;
-					public static SGActState sortState{
+					/* Static states */
+						public static ISGActState sgWaitForActionState{
+							get{
+								if(m_sgWaitForActionState == null)
+									m_sgWaitForActionState = new SGWaitForActionState();
+								return m_sgWaitForActionState;
+							}
+							}private static ISGActState m_sgWaitForActionState;
+						public static ISGActState revertState{
+							get{
+								if(m_revertState == null)
+									m_revertState = new SGRevertState();
+								return m_revertState;
+							}
+							}private static ISGActState m_revertState;
+						public static ISGActState reorderState{
+							get{
+								if(m_reorderState == null)
+									m_reorderState = new SGReorderState();
+								return m_reorderState;
+							}
+							}private static ISGActState m_reorderState;
+						public static ISGActState addState{
+							get{
+								if(m_addState == null)
+									m_addState = new SGAddState();
+								return m_addState;
+							}
+							}private static ISGActState m_addState;
+						public static ISGActState removeState{
+							get{
+								if(m_removeState == null)
+									m_removeState = new SGRemoveState();
+								return m_removeState;
+							}
+							}private static ISGActState m_removeState;
+						public static ISGActState swapState{
+							get{
+								if(m_swapState == null)
+									m_swapState = new SGSwapState();
+								return m_swapState;
+							}
+							}private static ISGActState m_swapState;
+						public static ISGActState fillState{
+							get{
+								if(m_fillState == null)
+									m_fillState = new SGFillState();
+								return m_fillState;
+							}
+							}private static ISGActState m_fillState;
+						public static ISGActState sortState{
 						get{
 							if(m_sortState == null)
 								m_sortState = new SGSortState();
 							return m_sortState;
 						}
-						}private static SGActState m_sortState;			
+						}private static ISGActState m_sortState;			
 		/*	process	*/
 			/*	Selection Process	*/
-				public override ISSEProcess selProcess{
-					get{return (ISGSelProcess)selProcEngine.process;}
-				}
-				public override void SetAndRunSelProcess(ISSEProcess process){
-					if(process == null || process is ISGSelProcess)
-						selProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("SlotGroup.SetAndrunSelProcess: argument is not of type ISGSelProcess");
-				}
-				public override IEnumeratorFake deactivateCoroutine(){return null;}
-				public override IEnumeratorFake focusCoroutine(){return null;}
-				public override IEnumeratorFake defocusCoroutine(){return null;}
-				public override IEnumeratorFake selectCoroutine(){return null;}
+				/* Coroutine */
+					public override IEnumeratorFake deactivateCoroutine(){return null;}
+					public override IEnumeratorFake focusCoroutine(){return null;}
+					public override IEnumeratorFake defocusCoroutine(){return null;}
+					public override IEnumeratorFake selectCoroutine(){return null;}
 			/*	Action Process	*/
-				public override ISSEProcess actProcess{
-					get{return (ISGActProcess)actProcEngine.process;}
-				}
-				public override void SetAndRunActProcess(ISSEProcess process){
-					if(process == null || process is ISGActProcess)
-						actProcEngine.SetAndRunProcess(process);
-					else throw new System.InvalidOperationException("SlotGroup.SetAndRunActProcess: argument is not of type ISGActProcess");
-				}
-				public IEnumeratorFake TransactionCoroutine(){
-					bool flag = true;
-					foreach(ISlottable sb in this){
-						if(sb != null)
-						flag &= !sb.actProcess.isRunning;
+				public virtual ISSEProcessEngine<ISGActProcess> actProcEngine{
+					get{
+						if(m_actProcEngine == null)
+							m_actProcEngine = new SSEProcessEngine<ISGActProcess>();
+						return m_actProcEngine;
 					}
-					if(flag){
-						actProcess.Expire();
-					}
-					return null;
+					}ISSEProcessEngine<ISGActProcess> m_actProcEngine;
+				public virtual void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine){m_actProcEngine = engine;}
+				public virtual ISGActProcess actProcess{
+					get{return actProcEngine.process;}
 				}
+				public virtual void SetAndRunActProcess(ISGActProcess process){
+					actProcEngine.SetAndRunProcess(process);
+				}
+				/* Coroutine */
+					public IEnumeratorFake TransactionCoroutine(){
+						bool flag = true;
+						foreach(ISlottable sb in this){
+							if(sb != null)
+							flag &= !sb.actProcess.isRunning;
+						}
+						if(flag){
+							actProcess.Expire();
+						}
+						return null;
+					}
 		/*	public fields	*/
 			public virtual AxisScrollerMock scroller{
 				get{return m_scroller;}
@@ -790,7 +795,17 @@ namespace SlotSystem{
 			}
 	}
 	public interface ISlotGroup: IAbsSlotSystemElement{
-		IEnumeratorFake TransactionCoroutine();
+		/* States and Processes */
+			ISSEStateEngine<ISGActState> actStateEngine{get;}
+				void SetActStateEngine(ISSEStateEngine<ISGActState> engine);
+				void SetActState(ISGActState state);
+				ISGActState curActState{get;}
+				ISGActState prevActState{get;}
+			ISSEProcessEngine<ISGActProcess> actProcEngine{get;}
+				void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine);
+				ISGActProcess actProcess{get;}
+				void SetAndRunActProcess(ISGActProcess process);
+				IEnumeratorFake TransactionCoroutine();
 		/*	fields	*/
 			AxisScrollerMock scroller{get;}
 			Inventory inventory{get;}

@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utility{
-	public abstract class SwitchableStateEngine: ISwitchableStateEngine{
+	public abstract class SwitchableStateEngine<T>: ISwitchableStateEngine<T> where T: ISwitchableState{
 		public virtual IStateHandler handler{get{return m_handler;} set{m_handler = value;}}
 			IStateHandler m_handler;
-		virtual public SwitchableState prevState{
+		virtual public T prevState{
 			get{
 				return m_prevState;
 			}
-			}protected SwitchableState m_prevState;
-		virtual public SwitchableState curState{
+			}protected T m_prevState;
+		virtual public T curState{
 			get{
 				return m_curState;
 			}
-			}protected SwitchableState m_curState;
-		public virtual void SetState(SwitchableState state){
-			if(curState != state){
+			}protected T m_curState;
+		public virtual void SetState(T state){
+			if((ISwitchableState)curState != (ISwitchableState)state){
 				m_prevState = curState;
 				if(prevState != null)
 					prevState.ExitState(handler);
@@ -26,20 +26,17 @@ namespace Utility{
 					curState.EnterState(handler);
 				}
 			}
-			// if(curState != null){
-			// }else{// used as initialization
-			// 	m_prevState = state;
-			// 	m_curState = state;
-			// 	if(state != null)
-			// 		state.EnterState(handler);
-			// }
 		}
 	}
-	public interface ISwitchableStateEngine{
+	public interface ISwitchableStateEngine<T> where T: ISwitchableState{
 		IStateHandler handler{get;set;}
-		SwitchableState prevState{get;}
-		SwitchableState curState{get;}
-		void SetState(SwitchableState state);
+		T prevState{get;}
+		T curState{get;}
+		void SetState(T state);
 
+	}
+	public interface ISwitchableState{
+		void EnterState(IStateHandler handler);
+		void ExitState(IStateHandler handler);
 	}
 }

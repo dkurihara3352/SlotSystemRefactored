@@ -5,127 +5,82 @@ using Utility;
 namespace SlotSystem{
 	public abstract class AbsSlotSystemElement :MonoBehaviour, IAbsSlotSystemElement{
 		/*	state	*/
-			public ISSEStateEngine selStateEngine{
+			public ISSEStateEngine<ISSESelState> selStateEngine{
 				get{
 					if(m_selStateEngine == null)
-						m_selStateEngine = new SSEStateEngine(this);
+						m_selStateEngine = new SSEStateEngine<ISSESelState>(this);
 					return m_selStateEngine;
 				}
-				}ISSEStateEngine m_selStateEngine;
-				public void SetSelStateEngine(ISSEStateEngine engine){m_selStateEngine = engine;}
-				public virtual ISSESelState prevSelState{
-					get{return (ISSESelState)selStateEngine.prevState;}
-				}
-				public virtual ISSESelState curSelState{
-					get{return (ISSESelState)selStateEngine.curState;}
-				}
-				public virtual void SetSelState(ISSESelState state){
-					selStateEngine.SetState(state);
-				}
-				/*	static sel states	*/
-					public static SSESelState deactivatedState{
-						get{
-							if(m_deactivatedState == null)
-								m_deactivatedState = new SSEDeactivatedState();
-							return m_deactivatedState;
-						}
-						}static SSESelState m_deactivatedState;
-					public static SSESelState defocusedState{
-						get{
-							if(m_defocusedState == null)
-								m_defocusedState = new SSEDefocusedState();
-							return m_defocusedState;
-						}
-						}static SSESelState m_defocusedState;
-					public static SSESelState focusedState{
-						get{
-							if(m_focusedState == null)
-								m_focusedState = new SSEFocusedState();
-							return m_focusedState;
-						}
-						}static SSESelState m_focusedState;
-					public static SSESelState selectedState{
-						get{
-							if(m_selectedState == null)
-								m_selectedState = new SSESelectedState();
-							return m_selectedState;
-						}
-						}static SSESelState m_selectedState;
-			public ISSEStateEngine actStateEngine{
-				get{
-					if(m_actStateEngine == null)
-						m_actStateEngine = new SSEStateEngine(this);
-					return m_actStateEngine;
-				}
-				}ISSEStateEngine m_actStateEngine;
-				public void SetActStateEngine(ISSEStateEngine engine){m_actStateEngine = engine;}
-				public virtual SSEState prevActState{
-					get{return (SSEActState)actStateEngine.prevState;}
-				}
-				public virtual SSEState curActState{
-					get{return (SSEActState)actStateEngine.curState;}
-				}
-				public virtual void SetActState(SSEState state){
-					if(state == null || state is SSEActState)
-						actStateEngine.SetState(state);
-					else throw new System.ArgumentException("AbsSlotSystemElement.SetActState: argument is not of type SSEActState");
-				}
-				/*	static act state	*/
-					public static SSEActState waitForActionState{
-						get{
-							if(m_waitForActionState == null)
-								m_waitForActionState = new SSEWaitForActionState();
-							return m_waitForActionState;
-						}
-						}static SSEActState m_waitForActionState;
+				}ISSEStateEngine<ISSESelState> m_selStateEngine;
+			public void SetSelStateEngine(ISSEStateEngine<ISSESelState> engine){m_selStateEngine = engine;}
+			public virtual ISSESelState prevSelState{
+				get{return selStateEngine.prevState;}
+			}
+			public virtual ISSESelState curSelState{
+				get{return selStateEngine.curState;}
+			}
+			public virtual void SetSelState(ISSESelState state){
+				selStateEngine.SetState(state);
+			}
+			/*	static sel states	*/
+				public static ISSESelState deactivatedState{
+					get{
+						if(m_deactivatedState == null)
+							m_deactivatedState = new SSEDeactivatedState();
+						return m_deactivatedState;
+					}
+					}static ISSESelState m_deactivatedState;
+				public static ISSESelState defocusedState{
+					get{
+						if(m_defocusedState == null)
+							m_defocusedState = new SSEDefocusedState();
+						return m_defocusedState;
+					}
+					}static ISSESelState m_defocusedState;
+				public static ISSESelState focusedState{
+					get{
+						if(m_focusedState == null)
+							m_focusedState = new SSEFocusedState();
+						return m_focusedState;
+					}
+					}static ISSESelState m_focusedState;
+				public static ISSESelState selectedState{
+					get{
+						if(m_selectedState == null)
+							m_selectedState = new SSESelectedState();
+						return m_selectedState;
+					}
+					}static ISSESelState m_selectedState;
 		/*	process	*/
 			/*	Selection Processs	*/
-				public ISSEProcessEngine selProcEngine{
+				public ISSEProcessEngine<ISSESelProcess> selProcEngine{
 					get{
 						if(m_selProcEngine == null)
-							m_selProcEngine = new SSEProcessEngine();
+							m_selProcEngine = new SSEProcessEngine<ISSESelProcess>();
 						return m_selProcEngine;
 					}
-					}ISSEProcessEngine m_selProcEngine;
-					public void SetSelProcEngine(ISSEProcessEngine engine){
-						m_selProcEngine = engine;
-					}
-					public virtual ISSEProcess selProcess{
-						get{return (SSESelProcess)selProcEngine.process;}
-					}
-					public virtual void SetAndRunSelProcess(ISSEProcess process){
-						if(process == null||process is SSESelProcess)
-							selProcEngine.SetAndRunProcess(process);
-						else throw new System.ArgumentException("AbsSlotSystemElement.SetAndRunSelProcess: argument is not of type SSESelProcess");
-					}
-				public virtual IEnumeratorFake deactivateCoroutine(){
-					return null;
+					}ISSEProcessEngine<ISSESelProcess> m_selProcEngine;
+				public void SetSelProcEngine(ISSEProcessEngine<ISSESelProcess> engine){
+					m_selProcEngine = engine;
 				}
-				public virtual IEnumeratorFake focusCoroutine(){
-					return null;
+				public virtual ISSESelProcess selProcess{
+					get{return selProcEngine.process;}
 				}
-				public virtual IEnumeratorFake defocusCoroutine(){
-					return null;
+				public virtual void SetAndRunSelProcess(ISSESelProcess process){
+					selProcEngine.SetAndRunProcess(process);
 				}
-				public virtual IEnumeratorFake selectCoroutine(){
-					return null;
-				}
-			/*	Action Process	*/
-				public ISSEProcessEngine actProcEngine{
-					get{
-						if(m_actProcEngine == null)
-							m_actProcEngine = new SSEProcessEngine();
-						return m_actProcEngine;
+				/* Coroutines */
+					public virtual IEnumeratorFake deactivateCoroutine(){
+						return null;
 					}
-					}ISSEProcessEngine m_actProcEngine;
-					public void SetActProcEngine(ISSEProcessEngine engine){m_actProcEngine = engine;}
-					public virtual ISSEProcess actProcess{
-						get{return (SSEActProcess)actProcEngine.process;}
+					public virtual IEnumeratorFake focusCoroutine(){
+						return null;
 					}
-					public virtual void SetAndRunActProcess(ISSEProcess process){
-						if(process == null || process is SSEActProcess)
-							actProcEngine.SetAndRunProcess(process);
-						else throw new System.ArgumentException("AbsSlotSystemElement.SetAndRunActProcess: argument is not of type SSEActProcess");
+					public virtual IEnumeratorFake defocusCoroutine(){
+						return null;
+					}
+					public virtual IEnumeratorFake selectCoroutine(){
+						return null;
 					}
 		/*	public fields	*/
 			public virtual ISlotSystemElement this[int i]{
@@ -224,7 +179,6 @@ namespace SlotSystem{
 		/*	methods	*/
 			public virtual void InitializeStates(){
 				SetSelState(AbsSlotSystemElement.deactivatedState);
-				SetActState(AbsSlotSystemElement.waitForActionState);
 			}
 			public virtual IEnumerator<ISlotSystemElement> GetEnumerator(){
 				foreach(ISlotSystemElement ele in elements)
@@ -246,9 +200,10 @@ namespace SlotSystem{
 				throw new System.ArgumentNullException();
 			}
 			public virtual void Activate(){
-				foreach(ISlotSystemElement ele in this){
-					ele.Activate();
-				}
+				if(elements != null)
+					foreach(ISlotSystemElement ele in this){
+						ele.Activate();
+					}
 			}
 			public virtual void Deactivate(){
 				SetSelState(AbsSlotSystemElement.deactivatedState);
@@ -272,6 +227,8 @@ namespace SlotSystem{
 						ele.Defocus();
 					}
 			}
+			public virtual void Select(){}
+			public virtual void Deselect(){}
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement> act){
 				act(this);
 				if(elements != null)
@@ -314,22 +271,15 @@ namespace SlotSystem{
 			public virtual void InstantSelect(){}
 	}
 	public interface IAbsSlotSystemElement: ISlotSystemElement{
-		ISSEStateEngine selStateEngine{get;}
+		ISSEStateEngine<ISSESelState> selStateEngine{get;}
 		void SetSelState(ISSESelState state);
-		ISSEStateEngine actStateEngine{get;}
-		void SetActState(SSEState state);
-		ISSEProcessEngine selProcEngine{get;}
-		ISSEProcessEngine actProcEngine{get;}
+		ISSEProcessEngine<ISSESelProcess> selProcEngine{get;}
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
 		ISSESelState curSelState{get;}
 		ISSESelState prevSelState{get;}
-		SSEState curActState{get;}
-		SSEState prevActState{get;}
-		void SetAndRunSelProcess(ISSEProcess process);
-		void SetAndRunActProcess(ISSEProcess process);
-		ISSEProcess selProcess{get;}
-		ISSEProcess actProcess{get;}
+		void SetAndRunSelProcess(ISSESelProcess process);
+		ISSESelProcess selProcess{get;}
 		IEnumeratorFake deactivateCoroutine();
 		IEnumeratorFake focusCoroutine();
 		IEnumeratorFake defocusCoroutine();
@@ -351,6 +301,8 @@ namespace SlotSystem{
 		void Deactivate();
 		void Focus();
 		void Defocus();
+		void Select();
+		void Deselect();
 		ISlotSystemBundle immediateBundle{get;}
 		ISlotSystemElement parent{get;}
 		void SetParent(ISlotSystemElement par);

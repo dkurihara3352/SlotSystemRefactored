@@ -11,7 +11,9 @@ namespace SlotSystem{
 			}
 		}
 	}
-		public class SSMActState: SSMState{}
+	public interface ISSMState: ISSEState{}
+		public class SSMActState: SSMState, ISSMActState{}
+		public interface ISSMActState: ISSMState{}
 			public class SSMWaitForActionState: SSMActState{
 				public override void EnterState(IStateHandler sh){
 					base.EnterState(sh);

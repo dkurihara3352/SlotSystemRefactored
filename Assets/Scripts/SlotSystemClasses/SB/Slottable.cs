@@ -8,243 +8,216 @@ namespace SlotSystem{
 	public class Slottable : AbsSlotSystemElement, ISlottable{
 		/*	States	*/
 			/*	Action State	*/
-				public override SSEState curActState{
-					get{return (SBActState)actStateEngine.curState;}
+				public ISSEStateEngine<ISBActState> actStateEngine{
+					get{
+						if(m_actStateEngine == null)
+							m_actStateEngine = new SSEStateEngine<ISBActState>(this);
+						return m_actStateEngine;
+					}
+					}ISSEStateEngine<ISBActState> m_actStateEngine;
+				public void SetActStateEngine(ISSEStateEngine<ISBActState> engine){m_actStateEngine = engine;}
+				public virtual ISBActState curActState{
+					get{return actStateEngine.curState;}
 				}
-				public override SSEState prevActState{
-					get{return (SBActState)actStateEngine.prevState;}
+				public virtual ISBActState prevActState{
+					get{return actStateEngine.prevState;}
 				}
-				public override void SetActState(SSEState state){
-					if(state == null || state is SBActState)
-						actStateEngine.SetState(state);
-					else
-						throw new System.ArgumentException("Slottable.SetActState: something other than SBActionState is being attempted to be assigned");
+				public virtual void SetActState(ISBActState state){
+					actStateEngine.SetState(state);
 				}
-				public static SBActState sbWaitForActionState{
-					get{
-						if(m_sbWaitForActionState != null)
-							return m_sbWaitForActionState;
-						else{
-							m_sbWaitForActionState = new WaitForActionState();
-							return m_sbWaitForActionState;
-						}
-					}
-					}static SBActState m_sbWaitForActionState;
-				public static SBActState waitForPointerUpState{
-					get{
-						if(m_waitForPointerUpState != null)
-							return m_waitForPointerUpState;
-						else{
-							m_waitForPointerUpState = new WaitForPointerUpState();
-							return m_waitForPointerUpState;
-						}
-					}
-					}static SBActState m_waitForPointerUpState;
-				public static SBActState waitForPickUpState{
-					get{
-						if(Slottable.m_waitForPickUpState != null)
-							return Slottable.m_waitForPickUpState;
-						else{
-							Slottable.m_waitForPickUpState = new WaitForPickUpState();
-							return Slottable.m_waitForPickUpState;
-						}
-					}
-					}static SBActState m_waitForPickUpState;
-				public static SBActState waitForNextTouchState{
-					get{
-						if(Slottable.m_waitForNextTouchState != null)
-							return Slottable.m_waitForNextTouchState;
-						else{
-							Slottable.m_waitForNextTouchState = new WaitForNextTouchState();
-							return Slottable.m_waitForNextTouchState;
-						}
-					}
-					}static SBActState m_waitForNextTouchState;
-				public static SBActState pickedUpState{
-					get{
-						if(Slottable.m_pickedUpState != null)
-							return Slottable.m_pickedUpState;
-						else{
-							Slottable.m_pickedUpState = new PickedUpState();
-							return Slottable.m_pickedUpState;
-						}
-					}
-					}static SBActState m_pickedUpState;
-				public static SBActState removedState{
-					get{
-						if(Slottable.m_removedState == null)
-							Slottable.m_removedState = new SBRemovedState();
-						return Slottable.m_removedState;			
-					}
-					}static SBActState m_removedState;
-				public static SBActState addedState{
-					get{
-						if(Slottable.m_addedState == null)
-							Slottable.m_addedState = new SBAddedState();
-						return Slottable.m_addedState;			
-					}
-					}static SBActState m_addedState;
-				public static SBActState moveWithinState{
+				/* static states */
+					public static ISBActState sbWaitForActionState{
 						get{
-							if(Slottable.m_moveWithinState == null)
-								Slottable.m_moveWithinState = new SBMoveWithinState();
-							return Slottable.m_moveWithinState;			
+							if(m_sbWaitForActionState == null)
+								m_sbWaitForActionState = new WaitForActionState();
+							return m_sbWaitForActionState;
 						}
-						}static SBActState m_moveWithinState;
+						}static ISBActState m_sbWaitForActionState;
+					public static ISBActState waitForPointerUpState{
+						get{
+							if(m_waitForPointerUpState == null)
+								m_waitForPointerUpState = new WaitForPointerUpState();
+							return m_waitForPointerUpState;
+						}
+						}static ISBActState m_waitForPointerUpState;
+					public static ISBActState waitForPickUpState{
+						get{
+							if(m_waitForPickUpState == null)
+								m_waitForPickUpState = new WaitForPickUpState();
+							return m_waitForPickUpState;
+						}
+						}static ISBActState m_waitForPickUpState;
+					public static ISBActState waitForNextTouchState{
+						get{
+							if(m_waitForNextTouchState == null)
+								m_waitForNextTouchState = new WaitForNextTouchState();
+							return m_waitForNextTouchState;
+						}
+						}static ISBActState m_waitForNextTouchState;
+					public static ISBActState pickedUpState{
+						get{
+							if(m_pickedUpState == null)
+								m_pickedUpState = new PickedUpState();
+							return m_pickedUpState;
+						}
+						}static ISBActState m_pickedUpState;
+					public static ISBActState removedState{
+						get{
+							if(m_removedState == null)
+								m_removedState = new SBRemovedState();
+							return m_removedState;			
+						}
+						}static ISBActState m_removedState;
+					public static ISBActState addedState{
+						get{
+							if(m_addedState == null)
+								m_addedState = new SBAddedState();
+							return m_addedState;			
+						}
+						}static ISBActState m_addedState;
+					public static ISBActState moveWithinState{
+							get{
+								if(m_moveWithinState == null)
+									m_moveWithinState = new SBMoveWithinState();
+								return m_moveWithinState;			
+							}
+							}static ISBActState m_moveWithinState;
 			/*	Equip State	*/
-				public ISSEStateEngine eqpStateEngine{
+				public ISSEStateEngine<ISBEqpState> eqpStateEngine{
 					get{
 						if(m_eqpStateEngine == null)
-							m_eqpStateEngine = new SSEStateEngine(this);
+							m_eqpStateEngine = new SSEStateEngine<ISBEqpState>(this);
 						return m_eqpStateEngine;
 					}
-					}ISSEStateEngine m_eqpStateEngine;
-					public void SetEqpStateEngine(ISSEStateEngine engine){m_eqpStateEngine = engine;}
-					public virtual SSEState curEqpState{
-						get{return (SBEqpState)eqpStateEngine.curState;}
-					}
-					public virtual SSEState prevEqpState{
-						get{return (SBEqpState)eqpStateEngine.prevState;}
-					}
-					public virtual void SetEqpState(SSEState state){
-						if(state == null || state is SBEqpState)
-							eqpStateEngine.SetState(state);
-						else
-							throw new System.ArgumentException("Slottable.SetEqpState: something other than SBEqpState is trying to be assinged");
-					}
-				public static SBEqpState equippedState{
-					get{
-						if(m_equippedState != null)
+					}ISSEStateEngine<ISBEqpState> m_eqpStateEngine;
+				public void SetEqpStateEngine(ISSEStateEngine<ISBEqpState> engine){m_eqpStateEngine = engine;}
+				public virtual ISBEqpState curEqpState{
+					get{return eqpStateEngine.curState;}
+				}
+				public virtual ISBEqpState prevEqpState{
+					get{return eqpStateEngine.prevState;}
+				}
+				public virtual void SetEqpState(ISBEqpState state){
+					eqpStateEngine.SetState(state);
+				}
+				/* Static states */
+					public static ISBEqpState equippedState{
+						get{
+							if(m_equippedState == null)
+								m_equippedState = new SBEquippedState();
 							return m_equippedState;
-						else{
-							m_equippedState = new SBEquippedState();
-							return m_equippedState;
-						}
-					}
-					}static SBEqpState m_equippedState;
-				public static SBEqpState unequippedState{
+							}
+						}static ISBEqpState m_equippedState;
+					public static ISBEqpState unequippedState{
 					get{
-						if(m_unequippedState != null)
-							return m_unequippedState;
-						else{
+						if(m_unequippedState == null)
 							m_unequippedState = new SBUnequippedState();
-							return m_unequippedState;
-						}
+						return m_unequippedState;
 					}
-					}static SBEqpState m_unequippedState;
+					}static ISBEqpState m_unequippedState;
 			/*	Mark state	*/
-				public ISSEStateEngine mrkStateEngine{
+				public ISSEStateEngine<ISBMrkState> mrkStateEngine{
 					get{
 						if(m_markStateEngine == null)
-							m_markStateEngine = new SSEStateEngine(this);
+							m_markStateEngine = new SSEStateEngine<ISBMrkState>(this);
 						return m_markStateEngine;
 					}
-					}ISSEStateEngine m_markStateEngine;
-					public void SetMrkStateEngine(ISSEStateEngine engine){m_markStateEngine = engine;}
-					public virtual SSEState curMrkState{
-						get{return (SBMrkState)mrkStateEngine.curState;}
-					}
-					public virtual SSEState prevMrkState{
-						get{return (SBMrkState)mrkStateEngine.prevState;}
-					}
-					public virtual void SetMrkState(SSEState state){
-						if(state == null || state is SBMrkState)
-							mrkStateEngine.SetState(state);
-						else
-							throw new System.ArgumentException("Slottable.SetMrkState: something other than SBMrkState is trying to be assinged");
-					}
-				public static SBMrkState markedState{
-					get{
-						if(m_markedState != null)
-							return m_markedState;
-						else{
-							m_markedState = new SBMarkedState();
+					}ISSEStateEngine<ISBMrkState> m_markStateEngine;
+				public void SetMrkStateEngine(ISSEStateEngine<ISBMrkState> engine){m_markStateEngine = engine;}
+				public virtual ISBMrkState curMrkState{
+					get{return mrkStateEngine.curState;}
+				}
+				public virtual ISBMrkState prevMrkState{
+					get{return mrkStateEngine.prevState;}
+				}
+				public virtual void SetMrkState(ISBMrkState state){
+					mrkStateEngine.SetState(state);
+				}
+				/* Static states */
+					public static ISBMrkState markedState{
+						get{
+							if(m_markedState == null)
+								m_markedState = new SBMarkedState();
 							return m_markedState;
 						}
-					}
-					}static SBMrkState m_markedState;
-				public static SBMrkState unmarkedState{
-					get{
-						if(m_unmarkedState != null)
-							return m_unmarkedState;
-						else{
-							m_unmarkedState = new SBUnmarkedState();
+						}static ISBMrkState m_markedState;
+					public static ISBMrkState unmarkedState{
+						get{
+							if(m_unmarkedState == null)
+								m_unmarkedState = new SBUnmarkedState();
 							return m_unmarkedState;
 						}
-					}
-					}static SBMrkState m_unmarkedState;
+						}static ISBMrkState m_unmarkedState;
 		/*	processes	*/
 			/*	Selection Process	*/
-				public override ISSEProcess selProcess{
-					get{return (ISBSelProcess)selProcEngine.process;}
-				}
-				public override void SetAndRunSelProcess(ISSEProcess process){
-					if(process ==null || process is ISBSelProcess)
-						selProcEngine.SetAndRunProcess(process);
-					else throw new System.ArgumentException("Slottable.SetAndRunSelProcess: argument is not of type ISBSelProcess");
-				}
+				/* Coroutines */
 				public override IEnumeratorFake deactivateCoroutine(){return null;}
 				public override IEnumeratorFake focusCoroutine(){return null;}
 				public override IEnumeratorFake defocusCoroutine(){return null;}
 				public override IEnumeratorFake selectCoroutine(){return null;}
 			/*	Action Process	*/
-				public override ISSEProcess actProcess{
-					get{return (ISBActProcess)actProcEngine.process;}
+				public ISSEProcessEngine<ISBActProcess> actProcEngine{
+					get{
+						if(m_actProcEngine == null)
+							m_actProcEngine = new SSEProcessEngine<ISBActProcess>();
+						return m_actProcEngine;
+					}
+					}ISSEProcessEngine<ISBActProcess> m_actProcEngine;
+				public virtual void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine){m_actProcEngine = engine;}
+				public virtual ISBActProcess actProcess{
+					get{return actProcEngine.process;}
 				}
-				public override void SetAndRunActProcess(ISSEProcess process){
-					if(process == null || process is ISBActProcess)
-						actProcEngine.SetAndRunProcess(process);
-					else throw new System.ArgumentException("Slottable.SetAndRunActProcess: argument is not of type ISBActProcess");
+				public virtual void SetAndRunActProcess(ISBActProcess process){
+					actProcEngine.SetAndRunProcess(process);
 				}
-				public IEnumeratorFake WaitForPointerUpCoroutine(){return null;}
-				public IEnumeratorFake WaitForPickUpCoroutine(){return null;}
-				public IEnumeratorFake PickUpCoroutine(){return null;}
-				public IEnumeratorFake WaitForNextTouchCoroutine(){return null;}
-				public IEnumeratorFake RemoveCoroutine(){return null;}
-				public IEnumeratorFake AddCorouine(){return null;}
-				public IEnumeratorFake MoveWithinCoroutine(){
-					if(slotID == newSlotID)
-						ExpireActionProcess();
-					return null;
-				}
+				/* Coroutine */
+					public IEnumeratorFake WaitForPointerUpCoroutine(){return null;}
+					public IEnumeratorFake WaitForPickUpCoroutine(){return null;}
+					public IEnumeratorFake PickUpCoroutine(){return null;}
+					public IEnumeratorFake WaitForNextTouchCoroutine(){return null;}
+					public IEnumeratorFake RemoveCoroutine(){return null;}
+					public IEnumeratorFake AddCorouine(){return null;}
+					public IEnumeratorFake MoveWithinCoroutine(){
+						if(slotID == newSlotID)
+							ExpireActionProcess();
+						return null;
+					}
 			/*	Equip Process	*/
-				public ISSEProcessEngine eqpProcEngine{
+				public ISSEProcessEngine<ISBEqpProcess> eqpProcEngine{
 					get{
 						if(m_eqpProcEngine == null)
-							m_eqpProcEngine = new SSEProcessEngine();
+							m_eqpProcEngine = new SSEProcessEngine<ISBEqpProcess>();
 						return m_eqpProcEngine;
 					}
-					}ISSEProcessEngine m_eqpProcEngine;
-					public void SetEqpProcessEngine(ISSEProcessEngine engine){m_eqpProcEngine = engine;}
-					public virtual ISSEProcess eqpProcess{
-						get{return (ISBEqpProcess)eqpProcEngine.process;}
-					}
-					public virtual void SetAndRunEqpProcess(ISSEProcess process){
-						if(process == null || process is ISBEqpProcess)
-							eqpProcEngine.SetAndRunProcess(process);
-						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type ISBEqpProcess");
-					}
-				public IEnumeratorFake UnequipCoroutine(){return null;}
-				public IEnumeratorFake EquipCoroutine(){return null;}
+					}ISSEProcessEngine<ISBEqpProcess> m_eqpProcEngine;
+				public void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine){m_eqpProcEngine = engine;}
+				public virtual ISBEqpProcess eqpProcess{
+					get{return eqpProcEngine.process;}
+				}
+				public virtual void SetAndRunEqpProcess(ISBEqpProcess process){
+					eqpProcEngine.SetAndRunProcess(process);
+				}
+				/* Coroutine */
+					public IEnumeratorFake UnequipCoroutine(){return null;}
+					public IEnumeratorFake EquipCoroutine(){return null;}
 			/*	Mark Process	*/
-				public ISSEProcessEngine mrkProcEngine{
+				public ISSEProcessEngine<ISBMrkProcess> mrkProcEngine{
 					get{
 						if(m_mrkProcEngine == null)
-							m_mrkProcEngine = new SSEProcessEngine();
+							m_mrkProcEngine = new SSEProcessEngine<ISBMrkProcess>();
 						return m_mrkProcEngine;
 					}
-					}ISSEProcessEngine m_mrkProcEngine;
-					public void SetMrkProcessEngine(ISSEProcessEngine engine){m_mrkProcEngine = engine;}
-					public virtual ISSEProcess mrkProcess{
-						get{return (ISBMrkProcess)mrkProcEngine.process;}
-					}
-					public virtual void SetAndRunMrkProcess(ISSEProcess process){
-						if(process == null || process is ISBMrkProcess)
-							mrkProcEngine.SetAndRunProcess(process);
-						else throw new System.ArgumentException("Slottable.SetAndRunEquipProcess: argument is not of type ISBMrkProcess");
-					}
-				public IEnumeratorFake unmarkCoroutine(){return null;}
-				public IEnumeratorFake markCoroutine(){return null;}
+					}ISSEProcessEngine<ISBMrkProcess> m_mrkProcEngine;
+				public void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine){m_mrkProcEngine = engine;}
+				public virtual ISBMrkProcess mrkProcess{
+					get{return mrkProcEngine.process;}
+				}
+				public virtual void SetAndRunMrkProcess(ISBMrkProcess process){
+					mrkProcEngine.SetAndRunProcess(process);
+				}
+				/* Coroutine */
+					public IEnumeratorFake unmarkCoroutine(){return null;}
+					public IEnumeratorFake markCoroutine(){return null;}
 		/*	commands	*/
 			static public SlottableCommand TapCommand{
 				get{return m_tapCommand;}
@@ -481,7 +454,7 @@ namespace SlotSystem{
 			public virtual void SetPickedSB(){
 				ssm.SetPickedSB((ISlottable)this);
 			}
-			public virtual void SetSSMActState(SSMActState ssmState){
+			public virtual void SetSSMActState(ISSMActState ssmState){
 				ssm.SetActState(ssmState);
 			}
 			public virtual void SetDIcon1(){
@@ -508,35 +481,46 @@ namespace SlotSystem{
 	}
 	public interface ISlottable: IAbsSlotSystemElement ,IComparable<ISlottable>, IComparable{
 		/*	States and Processes	*/
-			ISSEStateEngine eqpStateEngine{get;}
-			void SetEqpStateEngine(ISSEStateEngine engine);
-			SSEState curEqpState{get;}
-			SSEState prevEqpState{get;}
-			void SetEqpState(SSEState state);
-			ISSEStateEngine mrkStateEngine{get;}
-			void SetMrkStateEngine(ISSEStateEngine engine);
-			SSEState curMrkState{get;}
-			SSEState prevMrkState{get;}
-			void SetMrkState(SSEState state);
-			IEnumeratorFake WaitForPointerUpCoroutine();
-			IEnumeratorFake WaitForPickUpCoroutine();
-			IEnumeratorFake PickUpCoroutine();
-			IEnumeratorFake WaitForNextTouchCoroutine();
-			IEnumeratorFake RemoveCoroutine();
-			IEnumeratorFake AddCorouine();
-			IEnumeratorFake MoveWithinCoroutine();
-			ISSEProcessEngine eqpProcEngine{get;}
-			void SetEqpProcessEngine(ISSEProcessEngine engine);
-			ISSEProcess eqpProcess{get;}
-			void SetAndRunEqpProcess(ISSEProcess process);
-			IEnumeratorFake UnequipCoroutine();
-			IEnumeratorFake EquipCoroutine();
-			ISSEProcessEngine mrkProcEngine{get;}
-			void SetMrkProcessEngine(ISSEProcessEngine engine);
-			ISSEProcess mrkProcess{get;}
-			void SetAndRunMrkProcess(ISSEProcess process);
-			IEnumeratorFake unmarkCoroutine();
-			IEnumeratorFake markCoroutine();
+			/* States */
+				ISSEStateEngine<ISBActState> actStateEngine{get;}
+					void SetActStateEngine(ISSEStateEngine<ISBActState> engine);
+					ISBActState curActState{get;}
+					ISBActState prevActState{get;}
+					void SetActState(ISBActState state);
+				ISSEStateEngine<ISBEqpState> eqpStateEngine{get;}
+					void SetEqpStateEngine(ISSEStateEngine<ISBEqpState> engine);
+					ISBEqpState curEqpState{get;}
+					ISBEqpState prevEqpState{get;}
+					void SetEqpState(ISBEqpState state);
+				ISSEStateEngine<ISBMrkState> mrkStateEngine{get;}
+					void SetMrkStateEngine(ISSEStateEngine<ISBMrkState> engine);
+					ISBMrkState curMrkState{get;}
+					ISBMrkState prevMrkState{get;}
+					void SetMrkState(ISBMrkState state);
+			/* Process */
+				ISSEProcessEngine<ISBActProcess> actProcEngine{get;}
+					void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine);
+					ISBActProcess actProcess{get;}
+					void SetAndRunActProcess(ISBActProcess process);
+						IEnumeratorFake WaitForPointerUpCoroutine();
+						IEnumeratorFake WaitForPickUpCoroutine();
+						IEnumeratorFake PickUpCoroutine();
+						IEnumeratorFake WaitForNextTouchCoroutine();
+						IEnumeratorFake RemoveCoroutine();
+						IEnumeratorFake AddCorouine();
+						IEnumeratorFake MoveWithinCoroutine();
+				ISSEProcessEngine<ISBEqpProcess> eqpProcEngine{get;}
+					void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine);
+					ISBEqpProcess eqpProcess{get;}
+					void SetAndRunEqpProcess(ISBEqpProcess process);
+						IEnumeratorFake UnequipCoroutine();
+						IEnumeratorFake EquipCoroutine();
+				ISSEProcessEngine<ISBMrkProcess> mrkProcEngine{get;}
+					void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine);
+					ISBMrkProcess mrkProcess{get;}
+					void SetAndRunMrkProcess(ISBMrkProcess process);
+						IEnumeratorFake unmarkCoroutine();
+						IEnumeratorFake markCoroutine();
 		/*	Commands	*/
 			void Tap();
 		/*	fields	*/
@@ -583,7 +567,7 @@ namespace SlotSystem{
 			void Destroy();
 		/*	Forward	*/
 			void SetPickedSB();
-			void SetSSMActState(SSMActState ssmState);
+			void SetSSMActState(ISSMActState ssmState);
 			void SetDIcon1();
 			void SetDIcon2();
 			void CreateTAResult();

@@ -32,7 +32,7 @@ namespace SlotSystemTests{
 					}
 				}
 			[TestCaseSource(typeof(Various_EnterState_FromVariousNonNullCases))]
-			public void Various_EnterState_FromVariousNonNull_CallsSSESetAndRunProcessAccordingly<T>(ISSESelState fromState, ISSESelState toState, T process) where T: ISSEProcess{
+			public void Various_EnterState_FromVariousNonNull_CallsSSESetAndRunProcessAccordingly<T>(ISSESelState fromState, ISSESelState toState, T process) where T: ISSESelProcess{
 				ISlotSystemElement mockSSE = MakeSubSSE();
 				mockSSE.prevSelState.Returns(fromState);
 
@@ -41,14 +41,14 @@ namespace SlotSystemTests{
 				mockSSE.Received(1).SetAndRunSelProcess(Arg.Any<T>());
 			}
 				class Various_EnterState_FromVariousNonNullCases: IEnumerable{
-					SSEState deactivated = AbsSlotSystemElement.deactivatedState;
-					SSEState defocused = AbsSlotSystemElement.defocusedState;
-					SSEState focused = AbsSlotSystemElement.focusedState;
-					SSEState selected = AbsSlotSystemElement.selectedState;
-					ISSEProcess deaProc = new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine);
-					ISSEProcess focProc = new SSEFocusProcess(MakeSubSSE(), FakeCoroutine);
-					ISSEProcess defoProc = new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine);
-					ISSEProcess selectProc = new SSESelectProcess(MakeSubSSE(), FakeCoroutine);
+					ISSESelState deactivated = AbsSlotSystemElement.deactivatedState;
+					ISSESelState defocused = AbsSlotSystemElement.defocusedState;
+					ISSESelState focused = AbsSlotSystemElement.focusedState;
+					ISSESelState selected = AbsSlotSystemElement.selectedState;
+					ISSESelProcess deaProc = new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine);
+					ISSESelProcess focProc = new SSEFocusProcess(MakeSubSSE(), FakeCoroutine);
+					ISSESelProcess defoProc = new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine);
+					ISSESelProcess selectProc = new SSESelectProcess(MakeSubSSE(), FakeCoroutine);
 					public IEnumerator GetEnumerator(){
 						yield return new object[]{deactivated, deactivated, deaProc};
 						yield return new object[]{focused, deactivated, deaProc};

@@ -3,44 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public interface ISSEProcess{
-		bool isRunning{get;set;}
-		System.Func<IEnumeratorFake> coroutineFake{set;}
-		void Start();
-		void Stop();
-		void Expire();
-	}
-	public class AbsSSEProcess: ISSEProcess{
-		public virtual bool isRunning{
-			get{return m_isRunning;}
-			set{}
-			}bool m_isRunning;
-		public System.Func<IEnumeratorFake> coroutineFake{
-			set{m_coroutineMock = value;}
-			}System.Func<IEnumeratorFake> m_coroutineMock;
-		protected ISlotSystemElement sse{
-			get{return m_sse;}
-			set{m_sse = value;}
-			} ISlotSystemElement m_sse;
+	public class SSEProcess: ISSEProcess{
+		public virtual bool isRunning{ get{return m_isRunning;} }bool m_isRunning;
+		public System.Func<IEnumeratorFake> coroutineFake{ set{m_coroutineMock = value;}} System.Func<IEnumeratorFake> m_coroutineMock;
+		protected ISlotSystemElement sse{ get{return m_sse;} set{m_sse = value;}} ISlotSystemElement m_sse;
 		public virtual void Start(){
 			m_isRunning = true;
 			m_coroutineMock();
 		}
-		public virtual void Stop(){
-			if(isRunning)
-				m_isRunning = false;
-		}
-		public virtual void Expire(){
-			if(isRunning)
-				m_isRunning = false;
-		}
+		public virtual void Stop(){ if(isRunning) m_isRunning = false; }
+		public virtual void Expire(){if(isRunning) m_isRunning = false; }
 	}
-	public class SSEProcessEngine: ISSEProcessEngine{
-		public virtual ISSEProcess process{
-			get{return m_process;}
-			// set{m_process = value;}
-			}protected ISSEProcess m_process;
-		public virtual void SetAndRunProcess(ISSEProcess process){
+		public interface ISSEProcess{
+			bool isRunning{get;}
+			System.Func<IEnumeratorFake> coroutineFake{set;}
+			void Start();
+			void Stop();
+			void Expire();
+		}
+	public class SSEProcessEngine<T>: ISSEProcessEngine<T> where T: ISSEProcess{
+		public virtual T process{ get{return m_process;}}protected T m_process;
+		public virtual void SetAndRunProcess(T process){
 			if(process != null)
 				process.Stop();
 			m_process = process;
@@ -48,11 +31,12 @@ namespace SlotSystem{
 				process.Start();
 		}
 	}
-		public interface ISSEProcessEngine{
-			ISSEProcess process{get;}
-			void SetAndRunProcess(ISSEProcess process);
+		public interface ISSEProcessEngine<T> where T: ISSEProcess{
+			T process{get;}
+			void SetAndRunProcess(T process);
 		}
-		public abstract class SSESelProcess: AbsSSEProcess{}
+		public abstract class SSESelProcess: SSEProcess, ISSESelProcess{}
+		public interface ISSESelProcess: ISSEProcess{}
 			public class SSEDeactivateProcess: SSESelProcess{
 				/* 	Change color, alpha etc from whatever to deactivated value (probably make it disappear)
 					if any indicator for selection is there, fade it out
@@ -116,5 +100,4 @@ namespace SlotSystem{
 					this.coroutineFake = coroutineMock;
 				}
 			}
-		public abstract class SSEActProcess: AbsSSEProcess{}
 }

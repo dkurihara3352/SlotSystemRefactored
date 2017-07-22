@@ -1122,7 +1122,7 @@ namespace SlotSystemTests{
 					ssm.Equip(mockSB, bow);
 
 					Received.InOrder(() => {
-						mockSB.SetEqpState((SSEState) null);
+						mockSB.SetEqpState((ISBEqpState)null);
 						mockSB.SetEqpState(Slottable.equippedState);
 					});
 				}
@@ -1155,7 +1155,7 @@ namespace SlotSystemTests{
 					ssm.Unequip(mockSB, bow);
 
 					Received.InOrder(() => {
-						mockSB.SetEqpState((SSEState) null);
+						mockSB.SetEqpState((ISBEqpState)null);
 						mockSB.SetEqpState(Slottable.unequippedState);
 					});
 				}

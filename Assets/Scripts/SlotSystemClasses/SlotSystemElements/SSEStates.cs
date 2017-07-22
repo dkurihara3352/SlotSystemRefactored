@@ -4,27 +4,25 @@ using UnityEngine;
 using Utility;
 
 namespace SlotSystem{
-	public abstract class SSEState: SwitchableState{
+	public abstract class SSEState: ISSEState{
 		protected ISlotSystemElement sse;
 		public virtual void EnterState(IStateHandler handler){
 			sse = (ISlotSystemElement)handler;
 		}
 		public virtual void ExitState(IStateHandler handler){}
 	}
-	public class SSEStateEngine: SwitchableStateEngine, ISSEStateEngine{
+	public interface ISSEState: ISwitchableState{}
+	public class SSEStateEngine<T>: SwitchableStateEngine<T>, ISSEStateEngine<T> where T: ISSEState{
 		public SSEStateEngine(ISlotSystemElement sse){
 			this.handler = sse;
 		}
-		public virtual void SetState(SSEState state){
-			base.SetState(state);
-		}
 	}
-		public interface ISSEStateEngine: ISwitchableStateEngine{}
+		public interface ISSEStateEngine<T>: ISwitchableStateEngine<T> where T: ISSEState{}
 		public abstract class SSESelState: SSEState, ISSESelState{
 			public void OnHoverEnterMock(ISlotSystemElement element, PointerEventDataFake eventData){}
 			public void OnHoverExitMock(ISlotSystemElement element, PointerEventDataFake eventData){}
 		}
-		public interface ISSESelState: SwitchableState{
+		public interface ISSESelState: ISSEState{
 			void OnHoverEnterMock(ISlotSystemElement element, PointerEventDataFake eventData);
 			void OnHoverExitMock(ISlotSystemElement element, PointerEventDataFake eventData);
 		}
@@ -63,12 +61,5 @@ namespace SlotSystem{
 						sse.InstantSelect();
 				}
 			
-			}
-		public abstract class SSEActState: SSEState{}
-			public class SSEWaitForActionState: SSEActState{
-				public override void EnterState(IStateHandler sh){
-					base.EnterState(sh);
-					sse.SetAndRunActProcess(null);
-				}
 			}
 }

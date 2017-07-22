@@ -11,7 +11,8 @@ namespace SlotSystem{
 			}
 		}
 	}
-        public abstract class SGActState: SGState{}
+        public abstract class SGActState: SGState, ISGActState{}
+        public interface ISGActState: ISSEState{}
             public class SGWaitForActionState: SGActState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);

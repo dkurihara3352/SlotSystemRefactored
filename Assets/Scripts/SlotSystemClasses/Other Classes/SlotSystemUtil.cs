@@ -47,19 +47,10 @@ namespace SlotSystem{
 						selProc = "";
 					else
 						selProc = SSEProcessName(sse.selProcess) + " running? " + (sse.selProcess.isRunning?Blue("true"):Red("false"));
-				string prevAct = SSEStateNamePlain(sse.prevActState);
-				string curAct = SSEStateName(sse.curActState);
-				string actProc;
-					if(sse.actProcess == null)
-						actProc = "";
-					else
-						actProc = SSEProcessName(sse.actProcess) + " running " + (sse.actProcess.isRunning?Blue("true"):Red("false"));
 				res =
 					sse.eName + " " +
 					Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
-						" proc, " + selProc + ", " +
-					Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
-						" proc, " + actProc;
+						" proc, " + selProc + ", ";
 				return res;
 			}
 			public static string SSEStateName(SSEState state){
@@ -73,8 +64,6 @@ namespace SlotSystem{
 					res = SlotSystemUtil.Blue("SSEFocused");
 				}else if(state is SSESelectedState){
 					res = SlotSystemUtil.Aqua("SSESelected");
-				}else if(state is SSEWaitForActionState){
-					res = SlotSystemUtil.Sangria("SSEWFA");
 				}
 				return res;
 			}
@@ -89,8 +78,6 @@ namespace SlotSystem{
 					res = "SSEFocused";
 				}else if(state is SSESelectedState){
 					res = "SSESelected";
-				}else if(state is SSEWaitForActionState){
-					res = "SSEWFA";
 				}
 				return res;
 			}

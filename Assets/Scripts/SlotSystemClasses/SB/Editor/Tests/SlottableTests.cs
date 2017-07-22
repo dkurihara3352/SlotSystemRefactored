@@ -31,28 +31,11 @@ namespace SlotSystemTests{
 
 						Assert.That(sb.curActState, Is.SameAs(stubActState));
 					}
-					[TestCaseSource(typeof(SetActStateInvalidStateCases))]
-					public void SetActState_InvalidState_ThrowsException(SSEState state){
-						Slottable sb = MakeSB();
-
-						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetActState(state));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetActState: something other than SBActionState is being attempted to be assigned"));
-					}
-						class SetActStateInvalidStateCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<SSESelState>();
-								yield return MakeSubSBEqpState();
-								yield return MakeSubSBMrkState();
-								yield return MakeSubSGActState();
-								yield return MakeSubSSMActState();
-							}
-						}
 				/*	EqpState	*/
 					[Test]
 					public void SetEqpState_Null_CallsEqpStateEngineSetState(){
 						Slottable sb = MakeSB();
-						ISSEStateEngine mockEngine = MakeSubSSEStateEngine();
+						ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
 						sb.SetEqpStateEngine(mockEngine);
 						sb.SetEqpState(null);
 
@@ -61,37 +44,18 @@ namespace SlotSystemTests{
 					[Test]
 					public void SetEqpState_SBEqpState_CallsEqpStateEngineSetState(){
 						Slottable sb = MakeSB();
-						ISSEStateEngine mockEngine = MakeSubSSEStateEngine();
+						ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
 						sb.SetEqpStateEngine(mockEngine);
 						SBEqpState stubEqpState = MakeSubSBEqpState();
 						sb.SetEqpState(stubEqpState);
 
 						mockEngine.Received().SetState(stubEqpState);
 					}
-					[TestCaseSource(typeof(SetEqpStateInvalidStateCases))]
-					public void SetEqpState_InvalidState_ThrowsException(SSEState state){
-						Slottable sb = MakeSB();
-						ISSEStateEngine mockEngine = MakeSubSSEStateEngine();
-						sb.SetEqpStateEngine(mockEngine);
-
-						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetEqpState(state));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetEqpState: something other than SBEqpState is trying to be assinged"));
-					}
-						class SetEqpStateInvalidStateCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<SSESelState>();
-								yield return MakeSubSBActState();
-								yield return MakeSubSBMrkState();
-								yield return MakeSubSGActState();
-								yield return MakeSubSSMActState();
-							}
-						}
-				/*	EqpState	*/
+				/*	Mrk State */
 					[Test]
 					public void SetMrkState_Null_CallsMrkStateEngineSetState(){
 						Slottable sb = MakeSB();
-						ISSEStateEngine mockEngine = MakeSubSSEStateEngine();
+						ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
 						sb.SetMrkStateEngine(mockEngine);
 						sb.SetMrkState(null);
 
@@ -100,68 +64,14 @@ namespace SlotSystemTests{
 					[Test]
 					public void SetMrkState_SBMrkState_CallsMrkStateEngineSetState(){
 						Slottable sb = MakeSB();
-						ISSEStateEngine mockEngine = MakeSubSSEStateEngine();
+						ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
 						sb.SetMrkStateEngine(mockEngine);
 						SBMrkState stubMrkState = MakeSubSBMrkState();
 						sb.SetMrkState(stubMrkState);
 
 						mockEngine.Received().SetState(stubMrkState);
 					}
-					[TestCaseSource(typeof(SetMrkStateInvalidStateCases))]
-					public void SetMrkState_InvalidState_ThrowsException(SSEState state){
-						Slottable sb = MakeSB();
-						ISSEStateEngine mockEngine = MakeSubSSEStateEngine();
-						sb.SetMrkStateEngine(mockEngine);
-
-						Exception ex = Assert.Catch<ArgumentException>(() => sb.SetMrkState(state));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetMrkState: something other than SBMrkState is trying to be assinged"));
-					}
-						class SetMrkStateInvalidStateCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<SSESelState>();
-								yield return MakeSubSBActState();
-								yield return MakeSubSBEqpState();
-								yield return MakeSubSGActState();
-								yield return MakeSubSSMActState();
-							}
-						}
 			/*	Process	*/
-				/*	SelProc	*/
-					[Test]
-					public void SetAndRunSelState_Null_SetsSelProcNull(){
-						Slottable sb = MakeSB();
-						sb.SetAndRunSelProcess(null);
-
-						Assert.That(sb.selProcess, Is.Null);
-					}
-					[Test]
-					public void SetAndRunSelProcess_SBSelProcess_SetsSelProc(){
-						Slottable sb = MakeSB();
-						ISBSelProcess stubProc = MakeSubSBSelProc();
-						sb.SetAndRunSelProcess(stubProc);
-
-						Assert.That(sb.selProcess, Is.SameAs(stubProc));
-					}
-					[TestCaseSource(typeof(SetAndRunSelProcessInvalidProcessCases))]
-					public void SetAndRunSelProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
-						Slottable sb = MakeSB();
-						
-						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunSelProcess(proc));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetAndRunSelProcess: argument is not of type ISBSelProcess"));
-					}
-						class SetAndRunSelProcessInvalidProcessCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBActProc();
-								yield return MakeSubSBEqpProc();
-								yield return MakeSubSBMrkProc();
-								yield return MakeSubSGSelProc();
-								yield return MakeSubSGActProc();
-								yield return MakeSubSSMSelProc();
-								yield return MakeSubSSMActProc();
-							}
-						}
 				/*	ActProc	*/
 					[Test]
 					public void SetAndRunActState_Null_SetsActProcNull(){
@@ -180,30 +90,11 @@ namespace SlotSystemTests{
 
 						Assert.That(sb.actProcess, Is.SameAs(stubProc));
 					}
-					[TestCaseSource(typeof(SetAndRunActProcessInvalidProcessCases))]
-					public void SetAndRunActProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
-						Slottable sb = MakeSB();
-						
-						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunActProcess(proc));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetAndRunActProcess: argument is not of type ISBActProcess"));
-					}
-						class SetAndRunActProcessInvalidProcessCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBSelProc();
-								yield return MakeSubSBEqpProc();
-								yield return MakeSubSBMrkProc();
-								yield return MakeSubSGSelProc();
-								yield return MakeSubSGActProc();
-								yield return MakeSubSSMSelProc();
-								yield return MakeSubSSMActProc();
-							}
-						}
 				/*	EqpProc	*/
 					[Test]
 					public void SetAndRunEqpState_Null_CallsEngineWithNull(){
 						Slottable sb = MakeSB();
-						ISSEProcessEngine mockEngine = MakeSubSSEProcEngine();
+						ISSEProcessEngine<ISBEqpProcess> mockEngine = MakeSubSBEqpProcessEngine();
 						sb.SetEqpProcessEngine(mockEngine);
 						sb.SetAndRunEqpProcess(null);
 
@@ -212,39 +103,18 @@ namespace SlotSystemTests{
 					[Test]
 					public void SetAndRunEqpProcess_ISBEqpProcess_CallsEqpProcEngineWithTheProc(){
 						Slottable sb = MakeSB();
-						ISSEProcessEngine mockEngine = MakeSubSSEProcEngine();
+						ISSEProcessEngine<ISBEqpProcess> mockEngine = MakeSubSBEqpProcessEngine();
 						sb.SetEqpProcessEngine(mockEngine);
 						ISBEqpProcess stubProc = MakeSubSBEqpProc();
 						sb.SetAndRunEqpProcess(stubProc);
 
 						mockEngine.Received().SetAndRunProcess(stubProc);
 					}
-					[TestCaseSource(typeof(SetAndRunEqpProcessInvalidProcessCases))]
-					public void SetAndRunEqpProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
-						Slottable sb = MakeSB();
-						ISSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.SetEqpProcessEngine(mockEngine);
-						
-						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunEqpProcess(proc));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetAndRunEquipProcess: argument is not of type ISBEqpProcess"));
-					}
-						class SetAndRunEqpProcessInvalidProcessCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBSelProc();
-								yield return MakeSubSBActProc();
-								yield return MakeSubSBMrkProc();
-								yield return MakeSubSGSelProc();
-								yield return MakeSubSGActProc();
-								yield return MakeSubSSMSelProc();
-								yield return MakeSubSSMActProc();
-							}
-						}
 				/*	MrkProc	*/
 					[Test]
 					public void SetAndRunMrkState_Null_CallsEngineWithNull(){
 						Slottable sb = MakeSB();
-						ISSEProcessEngine mockEngine = MakeSubSSEProcEngine();
+						ISSEProcessEngine<ISBMrkProcess> mockEngine = MakeSubSBMrkProcessEngine();
 						sb.SetMrkProcessEngine(mockEngine);
 						sb.SetAndRunMrkProcess(null);
 
@@ -253,34 +123,13 @@ namespace SlotSystemTests{
 					[Test]
 					public void SetAndRunMrkProcess_ISBMrkProcess_CallsMrkProcEngineWithTheProc(){
 						Slottable sb = MakeSB();
-						ISSEProcessEngine mockEngine = MakeSubSSEProcEngine();
+						ISSEProcessEngine<ISBMrkProcess> mockEngine = MakeSubSBMrkProcessEngine();
 						sb.SetMrkProcessEngine(mockEngine);
 						ISBMrkProcess stubProc = MakeSubSBMrkProc();
 						sb.SetAndRunMrkProcess(stubProc);
 
 						mockEngine.Received().SetAndRunProcess(stubProc);
 					}
-					[TestCaseSource(typeof(SetAndRunMrkProcessInvalidProcessCases))]
-					public void SetAndRunMrkProcess_InvalidProcess_ThrowsException(ISSEProcess proc){
-						Slottable sb = MakeSB();
-						ISSEProcessEngine mockEngine = MakeSubSSEProcEngine();
-						sb.SetMrkProcessEngine(mockEngine);
-						Exception ex = Assert.Catch<ArgumentException>( () => sb.SetAndRunMrkProcess(proc));
-
-						Assert.That(ex.Message, Is.StringContaining("Slottable.SetAndRunEquipProcess: argument is not of type ISBMrkProcess"));
-					}
-						class SetAndRunMrkProcessInvalidProcessCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return MakeSubSBSelProc();
-								yield return MakeSubSBActProc();
-								yield return MakeSubSBEqpProc();
-								yield return MakeSubSGSelProc();
-								yield return MakeSubSGActProc();
-								yield return MakeSubSSMSelProc();
-								yield return MakeSubSSMActProc();
-							}
-						}
-
 			/*	Methods	*/
 				[Test][Category("Methods")]
 				public void InitializeStates_WhenCalled_InitializesStates(){
@@ -383,7 +232,7 @@ namespace SlotSystemTests{
 				[Category("Methods")]
 				public void ExpireActionProcess_actProcIsRunning_CallsActProcExpire(){
 					ISBActProcess mockProc = Substitute.For<ISBActProcess>();
-					mockProc.isRunning = true;
+					mockProc.isRunning.Returns(true);
 					Slottable stubSB = MakeSB();
 					stubSB.SetAndRunActProcess(mockProc);
 
@@ -528,11 +377,23 @@ namespace SlotSystemTests{
 					}
 			/*	Forward	*/
 			/*	helper	*/
-			ISSEStateEngine MakeSubSSEStateEngine(){
-				return Substitute.For<ISSEStateEngine>();
+			ISSEStateEngine<ISBActState> MakeSubSBActStateEngine(){
+				return Substitute.For<ISSEStateEngine<ISBActState>>();
 			}
-			ISSEProcessEngine MakeSubSSEProcEngine(){
-				return Substitute.For<ISSEProcessEngine>();
+			ISSEStateEngine<ISBEqpState> MakeSubSBEqpStateEngine(){
+				return Substitute.For<ISSEStateEngine<ISBEqpState>>();
+			}
+			ISSEStateEngine<ISBMrkState> MakeSubSBMrkStateEngine(){
+				return Substitute.For<ISSEStateEngine<ISBMrkState>>();
+			}
+			ISSEProcessEngine<ISBActProcess> MakeSubSBActProcessEngine(){
+				return Substitute.For<ISSEProcessEngine<ISBActProcess>>();
+			}
+			ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){
+				return Substitute.For<ISSEProcessEngine<ISBEqpProcess>>();
+			}
+			ISSEProcessEngine<ISBMrkProcess> MakeSubSBMrkProcessEngine(){
+				return Substitute.For<ISSEProcessEngine<ISBMrkProcess>>();
 			}
 		}
 	}

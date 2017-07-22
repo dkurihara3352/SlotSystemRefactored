@@ -11,11 +11,17 @@ namespace SlotSystem{
 			}
 		}
 	}
-        public abstract class SBActState: SBState{
+        public abstract class SBActState: SBState, ISBActState{
             public abstract void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock);
             public abstract void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock);
             public abstract void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock);
             public abstract void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock);
+        }
+        public interface ISBActState: ISSEState{
+            void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock);
+            void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock);
+            void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock);
+            void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock);
         }
             public class WaitForActionState: SBActState{
                 public override void EnterState(IStateHandler sh){
@@ -186,7 +192,8 @@ namespace SlotSystem{
                     public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){}
                     public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){}
             }
-        public abstract class SBEqpState: SBState{}
+        public abstract class SBEqpState: SBState, ISBEqpState{}
+        public interface ISBEqpState: ISSEState{}
             public class SBEquippedState: SBEqpState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
@@ -219,7 +226,8 @@ namespace SlotSystem{
                     base.ExitState(sh);
                 }
             }
-        public abstract class SBMrkState: SBState{}
+        public abstract class SBMrkState: SBState, ISBMrkState{}
+        public interface ISBMrkState: ISSEState{}
             public class SBMarkedState: SBMrkState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
