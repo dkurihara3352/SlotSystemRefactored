@@ -12,7 +12,7 @@ namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
 		[Category("SB")]
-		public class SlottableTests: AbsSlotSystemTest {
+		public class SlottableTests: SlotSystemTest {
 				/*	ActState	*/
 					[Test]
 					public void SetActState_Null_SetsActStateNull(){
@@ -137,7 +137,7 @@ namespace SlotSystemTests{
 
 					sb.InitializeStates();
 
-					Assert.That(sb.curSelState, Is.SameAs(AbsSlotSystemElement.deactivatedState));
+					Assert.That(sb.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
 					Assert.That(sb.prevSelState, Is.Null);
 					Assert.That(sb.curActState, Is.SameAs(Slottable.sbWaitForActionState));
 					Assert.That(sb.prevActState, Is.Null);

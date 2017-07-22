@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
-		public class SlotSystemBundleTests: AbsSlotSystemTest {
+		public class SlotSystemBundleTests: SlotSystemTest {
 			[TestCaseSource(typeof(SetFocusedBundleElementMemberCases))]
 			public void SetFocusedBundleElement_Member_SetsItAsTheFocused(IEnumerable<ISlotSystemElement> eles, ISlotSystemElement member){
 				SlotSystemBundle bun = MakeSSBundle();

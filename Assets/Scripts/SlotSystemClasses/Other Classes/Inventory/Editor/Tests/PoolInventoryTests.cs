@@ -9,7 +9,7 @@ namespace SlotSystemTests{
     namespace OtherClassesTests{
         namespace InventoryTests{
 			[TestFixture]
-			public class PoolInventoryTests: AbsSlotSystemTest {
+			public class PoolInventoryTests: SlotSystemTest {
 				/*	Add	*/
 					[TestCaseSource(typeof(AddNonStackableCases))]
 					public void Add_NonStackable_IncreaseEntries(IEnumerable<InventoryItemInstance> addedItems, List<InventoryItemInstance> expected){

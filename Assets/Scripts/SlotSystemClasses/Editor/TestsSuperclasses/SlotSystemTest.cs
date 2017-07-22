@@ -6,7 +6,7 @@ using NUnit.Framework;
 using SlotSystem;
 using NSubstitute;
 
-public class AbsSlotSystemTest{
+public class SlotSystemTest{
 	[TearDown]
 	public void CleanupScene(){
 		Object[] gos = GameObject.FindGameObjectsWithTag("TestGO");

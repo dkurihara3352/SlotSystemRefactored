@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
-		public class GenericPageTests: AbsSlotSystemTest {
+		public class GenericPageTests: SlotSystemTest {
 			[Test][Category("Methods")]
 			public void SetElements_WhenCalled_SetsFields(){
 				GenericPage gPage = MakeGenPage();
@@ -77,7 +77,7 @@ namespace SlotSystemTests{
 
 				gPage.Focus();
 
-				Assert.That(gPage.curSelState, Is.SameAs(AbsSlotSystemElement.focusedState));
+				Assert.That(gPage.curSelState, Is.SameAs(SlotSystemElement.focusedState));
 			}
 			[TestCase(true, true)]
 			[TestCase(true, false)]
@@ -126,7 +126,7 @@ namespace SlotSystemTests{
 
 				gPage.Deactivate();
 				
-				Assert.That(gPage.curSelState, Is.SameAs(AbsSlotSystemElement.deactivatedState));
+				Assert.That(gPage.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
 			}
 			[TestCase(
 				true, true,

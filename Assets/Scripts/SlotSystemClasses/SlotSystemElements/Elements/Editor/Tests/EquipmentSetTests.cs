@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
-		public class EquipmentSetTests: AbsSlotSystemTest {
+		public class EquipmentSetTests: SlotSystemTest {
 			[Test][Category("Methods")]
 			public void SetElements_WhenCalled_SetsElementsAndSGs(){
 				EquipmentSet eSet = MakeEquipmentSet();
@@ -131,7 +131,7 @@ namespace SlotSystemTests{
 
 				eSet.Focus();
 
-				Assert.That(eSet.curSelState, Is.SameAs(AbsSlotSystemElement.focusedState));
+				Assert.That(eSet.curSelState, Is.SameAs(SlotSystemElement.focusedState));
 			}
 			[Test]
 			public void Focus_WhenCalled_CallsPElesAccordingly(){
@@ -170,7 +170,7 @@ namespace SlotSystemTests{
 
 				eSet.Deactivate();
 
-				Assert.That(eSet.curSelState, Is.SameAs(AbsSlotSystemElement.deactivatedState));
+				Assert.That(eSet.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
 			}
 			[Test]
 			public void Deactivate_WhenCalled_SetsSelStateDeactivatedRecursively(){

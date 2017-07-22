@@ -9,7 +9,7 @@ namespace SlotSystemTests{
     namespace OtherClassesTests{
         namespace InventoryTests{
             [TestFixture]
-            public class EquipInventoryTests: AbsSlotSystemTest{
+            public class EquipInventoryTests: SlotSystemTest{
                 /*  Add */
                     [TestCaseSource(typeof(AddBowCases))]
                     public void Add_BowInst_EquipsBow(IEnumerable<BowInstance> added, BowInstance expected){

@@ -9,7 +9,7 @@ using NSubstitute;
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
-		public class SGStatesTests: AbsSlotSystemTest{
+		public class SGStatesTests: SlotSystemTest{
 			/*	ActState	*/
 				[TestCaseSource(typeof(VariousSGActStateEnterStateCases))]
 				public void VariousSGActState_EnterState_FromWFAState_SetsSGActProcSGTransactionProces(SGActState toState){

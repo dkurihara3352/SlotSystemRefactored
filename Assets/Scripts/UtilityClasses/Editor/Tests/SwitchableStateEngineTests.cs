@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace UtilityClassTests{
 	[TestFixture]
 	[Category("Utility")]
-	public class SwitchableStateEngineTests: AbsSlotSystemTest{
+	public class SwitchableStateEngineTests: SlotSystemTest{
 		[TestCaseSource(typeof(SetState_VariousCases))]
 		public void SetState_Various_Various(
 			ISwitchableState from, 

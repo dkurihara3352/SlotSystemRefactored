@@ -9,7 +9,7 @@ namespace SlotSystemTests{
 	namespace SSEElementsTests{
 		[TestFixture]
 		[Category("OtherElements")]
-		public class SSEStatesTests : AbsSlotSystemTest{
+		public class SSEStatesTests : SlotSystemTest{
 			[TestCaseSource(typeof(VariousStates_EnterStateCases))]
 			public void VariousStates_EnterState_FromNull_CallsInstantMethods(SSEState state){
 				ISlotSystemElement mockSSE = MakeSubSSE();
@@ -17,18 +17,18 @@ namespace SlotSystemTests{
 				
 				state.EnterState(mockSSE);
 				
-				if(state == AbsSlotSystemElement.focusedState)
+				if(state == SlotSystemElement.focusedState)
 					mockSSE.Received().InstantFocus();
-				else if(state == AbsSlotSystemElement.defocusedState)
+				else if(state == SlotSystemElement.defocusedState)
 					mockSSE.Received().InstantDefocus();
-				else if(state == AbsSlotSystemElement.selectedState)
+				else if(state == SlotSystemElement.selectedState)
 					mockSSE.Received().InstantSelect();
 			}
 				class VariousStates_EnterStateCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
-						yield return AbsSlotSystemElement.focusedState;
-						yield return AbsSlotSystemElement.defocusedState;
-						yield return AbsSlotSystemElement.selectedState;
+						yield return SlotSystemElement.focusedState;
+						yield return SlotSystemElement.defocusedState;
+						yield return SlotSystemElement.selectedState;
 					}
 				}
 			[TestCaseSource(typeof(Various_EnterState_FromVariousNonNullCases))]
@@ -41,10 +41,10 @@ namespace SlotSystemTests{
 				mockSSE.Received(1).SetAndRunSelProcess(Arg.Any<T>());
 			}
 				class Various_EnterState_FromVariousNonNullCases: IEnumerable{
-					ISSESelState deactivated = AbsSlotSystemElement.deactivatedState;
-					ISSESelState defocused = AbsSlotSystemElement.defocusedState;
-					ISSESelState focused = AbsSlotSystemElement.focusedState;
-					ISSESelState selected = AbsSlotSystemElement.selectedState;
+					ISSESelState deactivated = SlotSystemElement.deactivatedState;
+					ISSESelState defocused = SlotSystemElement.defocusedState;
+					ISSESelState focused = SlotSystemElement.focusedState;
+					ISSESelState selected = SlotSystemElement.selectedState;
 					ISSESelProcess deaProc = new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine);
 					ISSESelProcess focProc = new SSEFocusProcess(MakeSubSSE(), FakeCoroutine);
 					ISSESelProcess defoProc = new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine);

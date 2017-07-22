@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace SlotSystem{
-	public class SlotGroup : AbsSlotSystemElement, ISlotGroup{
+	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		/*	states	*/
 			/*	Engines	*/
 				/*	Action State	*/
@@ -391,7 +391,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void FocusSelf(){
-					SetSelState(AbsSlotSystemElement.focusedState);
+					SetSelState(SlotSystemElement.focusedState);
 				}
 				public virtual void FocusSBs(){
 					foreach(ISlottable sb in this){
@@ -410,7 +410,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void DefocusSelf(){
-					SetSelState(AbsSlotSystemElement.defocusedState);
+					SetSelState(SlotSystemElement.defocusedState);
 				}
 				public virtual void DefocusSBs(){
 					foreach(ISlottable sb in this){
@@ -421,7 +421,7 @@ namespace SlotSystem{
 					}
 				}
 				public override void Deactivate(){
-					SetSelState(AbsSlotSystemElement.deactivatedState);
+					SetSelState(SlotSystemElement.deactivatedState);
 					foreach(ISlottable sb in this){
 						if(sb != null){
 							sb.Deactivate();
@@ -448,7 +448,7 @@ namespace SlotSystem{
 				}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(AbsSlotSystemElement.deactivatedState);
+				SetSelState(SlotSystemElement.deactivatedState);
 				SetActState(SlotGroup.sgWaitForActionState);
 			}
 			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
@@ -794,7 +794,7 @@ namespace SlotSystem{
 				ssm.AcceptSGTAComp(this);
 			}
 	}
-	public interface ISlotGroup: IAbsSlotSystemElement{
+	public interface ISlotGroup: ISlotSystemElement{
 		/* States and Processes */
 			ISSEStateEngine<ISGActState> actStateEngine{get;}
 				void SetActStateEngine(ISSEStateEngine<ISGActState> engine);

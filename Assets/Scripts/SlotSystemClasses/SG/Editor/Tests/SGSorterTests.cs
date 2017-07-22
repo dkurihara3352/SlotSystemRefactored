@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
-		public class SGSorterTests: AbsSlotSystemTest {
+		public class SGSorterTests: SlotSystemTest {
 
 			[TestCaseSource(typeof(VariousSGSorterOSBWRSCases))]
 			public void VariousSGSorter_OrderSBsWithRetainedSize_WhenCalled_SetsSBsAccordingly(SGSorter targetSorter,List<ISlottable> original, List<ISlottable> expected){

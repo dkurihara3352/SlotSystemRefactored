@@ -11,7 +11,7 @@ namespace SlotSystemTests{
 	namespace SBTests{
 
 		[TestFixture]
-		public class SBStatesTest: AbsSlotSystemTest{
+		public class SBStatesTest: SlotSystemTest{
 			/*	SBActStates	*/
 				/*	WaitForActionState	*/
 					[Test]
@@ -67,7 +67,7 @@ namespace SlotSystemTests{
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().SetActState(Slottable.waitForPickUpState);
-						mockSB.Received().SetSelState(AbsSlotSystemElement.selectedState);
+						mockSB.Received().SetSelState(SlotSystemElement.selectedState);
 					}
 
 				/*	WaitForPickUpState	*/

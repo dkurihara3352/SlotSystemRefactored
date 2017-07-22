@@ -28,7 +28,7 @@ namespace SlotSystem{
 			m_pageElements = pEles;
 		}
 		public override void Focus(){
-			SetSelState(AbsSlotSystemElement.focusedState);
+			SetSelState(SlotSystemElement.focusedState);
 			PageFocus();
 		}
 		public override void Deactivate(){

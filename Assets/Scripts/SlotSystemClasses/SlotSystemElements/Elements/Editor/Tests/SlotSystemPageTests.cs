@@ -10,7 +10,7 @@ namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
 		[Category("OtherElements")]
-		public class SlotSystemPageTests: AbsSlotSystemTest {
+		public class SlotSystemPageTests: SlotSystemTest {
 			[Test]
 			public void SetElements_WhenCalled_SetsElementsAndPageElements(){
 				TestSlotSystemPage page = MakeTestSSPage();

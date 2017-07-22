@@ -7,7 +7,7 @@ using NSubstitute;
 namespace SlotSystemTests{
 	namespace OtherClassesTests{
 		[TestFixture]
-		public class SlotSystemUtilTests: AbsSlotSystemTest{
+		public class SlotSystemUtilTests: SlotSystemTest{
 
 			[Test]
 			public void AreSwappable_DifferentSGsAndMutuallyAcceptingAndNotStackable_ReturnsTrue(){

@@ -6,7 +6,7 @@ using SlotSystem;
 namespace SlotSystemTests{
 	namespace OtherClassesTests{
 		[TestFixture]
-		public class InventoryItemInstanceTests: AbsSlotSystemTest {
+		public class InventoryItemInstanceTests: SlotSystemTest {
 
 			[Test]
 			public void Equals_ToSameStackableItem_ReturnsTrue(){

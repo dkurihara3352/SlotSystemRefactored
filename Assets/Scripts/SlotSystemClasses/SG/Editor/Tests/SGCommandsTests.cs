@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
-		public class SGCommandsTests: AbsSlotSystemTest {
+		public class SGCommandsTests: SlotSystemTest {
 
 			[Test]
 			public void SGInitItemsCommand_Execute_IsNotAutoSort_CallsSGVariousButInstantSort(){

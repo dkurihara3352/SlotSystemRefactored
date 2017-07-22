@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace SlotSystem{
-	public abstract class AbsSlotSystemElement :MonoBehaviour, IAbsSlotSystemElement{
+	public abstract class SlotSystemElement :MonoBehaviour, ISlotSystemElement{
 		/*	state	*/
 			public ISSEStateEngine<ISSESelState> selStateEngine{
 				get{
@@ -146,13 +146,13 @@ namespace SlotSystem{
 				}
 			}
 			public virtual bool isFocused{
-				get{return curSelState == AbsSlotSystemElement.focusedState;}
+				get{return curSelState == SlotSystemElement.focusedState;}
 			}
 			public virtual bool isDefocused{
-				get{return curSelState == AbsSlotSystemElement.defocusedState;}
+				get{return curSelState == SlotSystemElement.defocusedState;}
 			}
 			public virtual bool isDeactivated{
-				get{return curSelState == AbsSlotSystemElement.deactivatedState;}
+				get{return curSelState == SlotSystemElement.deactivatedState;}
 			}
 			public bool isFocusedInHierarchy{
 				get{
@@ -178,7 +178,7 @@ namespace SlotSystem{
 			}public bool m_isInitiallyFocusedInPage = true;
 		/*	methods	*/
 			public virtual void InitializeStates(){
-				SetSelState(AbsSlotSystemElement.deactivatedState);
+				SetSelState(SlotSystemElement.deactivatedState);
 			}
 			public virtual IEnumerator<ISlotSystemElement> GetEnumerator(){
 				foreach(ISlotSystemElement ele in elements)
@@ -206,7 +206,7 @@ namespace SlotSystem{
 					}
 			}
 			public virtual void Deactivate(){
-				SetSelState(AbsSlotSystemElement.deactivatedState);
+				SetSelState(SlotSystemElement.deactivatedState);
 				if(elements != null){
 					foreach(ISlotSystemElement ele in this){
 						ele.Deactivate();
@@ -214,14 +214,14 @@ namespace SlotSystem{
 				}
 			}
 			public virtual void Focus(){
-				SetSelState(AbsSlotSystemElement.focusedState);
+				SetSelState(SlotSystemElement.focusedState);
 				if(elements != null)
 					foreach(ISlotSystemElement ele in this){
 						ele.Focus();
 					}
 			}
 			public virtual void Defocus(){
-				SetSelState(AbsSlotSystemElement.defocusedState);
+				SetSelState(SlotSystemElement.defocusedState);
 				if(elements != null)
 					foreach(ISlotSystemElement ele in this){
 						ele.Defocus();
@@ -270,12 +270,11 @@ namespace SlotSystem{
 			public virtual void InstantFocus(){}
 			public virtual void InstantSelect(){}
 	}
-	public interface IAbsSlotSystemElement: ISlotSystemElement{
+	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
 		ISSEStateEngine<ISSESelState> selStateEngine{get;}
+		void SetSelStateEngine(ISSEStateEngine<ISSESelState> engine);
 		void SetSelState(ISSESelState state);
 		ISSEProcessEngine<ISSESelProcess> selProcEngine{get;}
-	}
-	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
 		ISSESelState curSelState{get;}
 		ISSESelState prevSelState{get;}
 		void SetAndRunSelProcess(ISSESelProcess process);

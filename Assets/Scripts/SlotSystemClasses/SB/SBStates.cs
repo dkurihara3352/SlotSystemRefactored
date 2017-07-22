@@ -40,7 +40,7 @@ namespace SlotSystem{
                 }
                 public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     if(sb.isFocused){
-                        sb.SetSelState(AbsSlotSystemElement.selectedState);
+                        sb.SetSelState(SlotSystemElement.selectedState);
                         sb.SetActState(Slottable.waitForPickUpState);
                     }
                     else

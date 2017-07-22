@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class TestSlotSystemElement: AbsSlotSystemElement{
+	public class TestSlotSystemElement: SlotSystemElement{
 		public void SetElements(IEnumerable<ISlotSystemElement> elements){
 			m_elements = elements;
 		}

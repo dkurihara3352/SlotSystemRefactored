@@ -9,7 +9,7 @@ using NSubstitute;
 namespace SlotSystemTests{
 	namespace SBTests{
 		[TestFixture]
-		public class SBProcessesTests: AbsSlotSystemTest{
+		public class SBProcessesTests: SlotSystemTest{
 
 			[Test]
 			public void WaitForPickUpProcess_Expire_WhenCalled_CallsSBPickUp(){
@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 
 				wfpuProc.Expire();
 
-				mockSB.Received().SetSelState(AbsSlotSystemElement.defocusedState);
+				mockSB.Received().SetSelState(SlotSystemElement.defocusedState);
 			}
 			[Test]
 			public void WaitForNextTouchProcess_Expire_SBIsPickedUp_CallsSBExecuteTransaction(){

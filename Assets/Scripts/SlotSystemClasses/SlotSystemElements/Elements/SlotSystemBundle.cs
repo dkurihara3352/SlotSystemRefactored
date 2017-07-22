@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public class SlotSystemBundle : AbsSlotSystemElement, ISlotSystemBundle{
+	public class SlotSystemBundle : SlotSystemElement, ISlotSystemBundle{
 		/*	fields	*/
 		public ISlotSystemElement focusedElement{
 			get{return m_focusedElement;}
@@ -20,7 +20,7 @@ namespace SlotSystem{
 			InitializeStates();
 		}
 		public override void Focus(){
-			SetSelState(AbsSlotSystemElement.focusedState);
+			SetSelState(SlotSystemElement.focusedState);
 			if(m_focusedElement != null)
 				m_focusedElement.Focus();
 			foreach(ISlotSystemElement ele in this){
@@ -29,13 +29,13 @@ namespace SlotSystem{
 			}
 		}
 		public override void Defocus(){
-			SetSelState(AbsSlotSystemElement.defocusedState);
+			SetSelState(SlotSystemElement.defocusedState);
 			foreach(ISlotSystemElement ele in this){
 				ele.Defocus();
 			}
 		}	
 	}
-	public interface ISlotSystemBundle: IAbsSlotSystemElement{
+	public interface ISlotSystemBundle: ISlotSystemElement{
 		ISlotSystemElement focusedElement{get;}
 		void SetFocusedBundleElement(ISlotSystemElement element);
 	}

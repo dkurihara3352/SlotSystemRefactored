@@ -8,7 +8,7 @@ using SlotSystem;
 namespace SlotSystemTests{
 	namespace SSEElementsTests{
 		[TestFixture]
-		public class AbsSlotSystemElementTests: AbsSlotSystemTest{
+		public class AbsSlotSystemElementTests: SlotSystemTest{
 			/*	State and process */
 				/* States */
 					[Test]
@@ -52,10 +52,10 @@ namespace SlotSystemTests{
 								public IEnumerator GetEnumerator(){
 									ISlotSystemElement sse = Substitute.For<ISlotSystemElement>();
 
-									ISSESelState deactivated = AbsSlotSystemElement.deactivatedState;
-									ISSESelState focused = AbsSlotSystemElement.focusedState;
-									ISSESelState defocused = AbsSlotSystemElement.defocusedState;
-									ISSESelState selected = AbsSlotSystemElement.selectedState;
+									ISSESelState deactivated = SlotSystemElement.deactivatedState;
+									ISSESelState focused = SlotSystemElement.focusedState;
+									ISSESelState defocused = SlotSystemElement.defocusedState;
+									ISSESelState selected = SlotSystemElement.selectedState;
 									
 									ISSEProcess deactProc = new SSEDeactivateProcess(sse, FakeCoroutine);
 									ISSEProcess focusProc = new SSEFocusProcess(sse, FakeCoroutine);
@@ -116,10 +116,10 @@ namespace SlotSystemTests{
 							public enum InstantMethods{none, focus, defocus, select};
 							class FromToMethodCases: IEnumerable{
 								public IEnumerator GetEnumerator(){
-									ISSESelState deactivated = AbsSlotSystemElement.deactivatedState;
-									ISSESelState focused = AbsSlotSystemElement.focusedState;
-									ISSESelState defocused = AbsSlotSystemElement.defocusedState;
-									ISSESelState selected = AbsSlotSystemElement.selectedState;
+									ISSESelState deactivated = SlotSystemElement.deactivatedState;
+									ISSESelState focused = SlotSystemElement.focusedState;
+									ISSESelState defocused = SlotSystemElement.defocusedState;
+									ISSESelState selected = SlotSystemElement.selectedState;
 
 									yield return new object[]{null, null, InstantMethods.none};
 									yield return new object[]{null, deactivated, InstantMethods.none};
@@ -353,7 +353,7 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isFocused_CurSelStateIsFocused_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeTestSSE();
-					testSSE.SetSelState(AbsSlotSystemElement.focusedState);
+					testSSE.SetSelState(SlotSystemElement.focusedState);
 
 					Assert.That(testSSE.isFocused, Is.True);
 					Assert.That(testSSE.isDefocused, Is.False);
@@ -363,7 +363,7 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isDefocused_CurSelStateIsDefocused_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeTestSSE();
-					testSSE.SetSelState(AbsSlotSystemElement.defocusedState);
+					testSSE.SetSelState(SlotSystemElement.defocusedState);
 
 					Assert.That(testSSE.isFocused, Is.False);
 					Assert.That(testSSE.isDefocused, Is.True);
@@ -373,7 +373,7 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isDeactivated_CurSelStateIsDeactivated_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeTestSSE();
-					testSSE.SetSelState(AbsSlotSystemElement.deactivatedState);
+					testSSE.SetSelState(SlotSystemElement.deactivatedState);
 
 					Assert.That(testSSE.isFocused, Is.False);
 					Assert.That(testSSE.isDefocused, Is.False);
@@ -531,7 +531,7 @@ namespace SlotSystemTests{
 					
 					sse.InitializeStates();
 
-					mockSelStateEg.Received().SetState(AbsSlotSystemElement.deactivatedState);
+					mockSelStateEg.Received().SetState(SlotSystemElement.deactivatedState);
 				}
 				[Test][Category("Methods")]
 				public void ContainsInHierarchy_Various_ReturnsAccordingly(){
@@ -650,7 +650,7 @@ namespace SlotSystemTests{
 					
 					testSSE.Deactivate();
 
-					Assert.That(testSSE.curSelState, Is.SameAs(AbsSlotSystemElement.deactivatedState));
+					Assert.That(testSSE.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
 				}
 				[Test]
 				[Category("Methods")]
@@ -674,7 +674,7 @@ namespace SlotSystemTests{
 					
 					testSSE.Focus();
 
-					Assert.That(testSSE.curSelState, Is.SameAs(AbsSlotSystemElement.focusedState));
+					Assert.That(testSSE.curSelState, Is.SameAs(SlotSystemElement.focusedState));
 				}
 				[Test]
 				[Category("Methods")]
@@ -698,7 +698,7 @@ namespace SlotSystemTests{
 					
 					testSSE.Defocus();
 
-					Assert.That(testSSE.curSelState, Is.SameAs(AbsSlotSystemElement.defocusedState));
+					Assert.That(testSSE.curSelState, Is.SameAs(SlotSystemElement.defocusedState));
 				}
 				[Test][Category("Methods")]
 				public void PerformInHierarchyVer1_Various_PerformsAccordingly(){

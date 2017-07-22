@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public abstract class SlotSystemPage : AbsSlotSystemElement, ISlotSystemPage{
+	public abstract class SlotSystemPage : SlotSystemElement, ISlotSystemPage{
 		public void PageFocus(){
 			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.isFocusToggleOn)
@@ -56,7 +56,7 @@ namespace SlotSystem{
 			return null;
 		}
 	}
-	public interface ISlotSystemPage: IAbsSlotSystemElement{
+	public interface ISlotSystemPage: ISlotSystemElement{
 		IEnumerable<ISlotSystemPageElement> pageElements{get;set;}
 		void PageFocus();
 		void ToggleBack();

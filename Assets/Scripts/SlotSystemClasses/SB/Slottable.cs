@@ -5,7 +5,7 @@ using System;
 using Utility;
 
 namespace SlotSystem{
-	public class Slottable : AbsSlotSystemElement, ISlottable{
+	public class Slottable : SlotSystemElement, ISlottable{
 		/*	States	*/
 			/*	Action State	*/
 				public ISSEStateEngine<ISBActState> actStateEngine{
@@ -261,13 +261,13 @@ namespace SlotSystem{
 				}
 			}
 			public override bool isFocused{
-				get{return curSelState == AbsSlotSystemElement.focusedState;}
+				get{return curSelState == SlotSystemElement.focusedState;}
 			}
 			public override bool isDefocused{
-				get{return curSelState == AbsSlotSystemElement.defocusedState;}
+				get{return curSelState == SlotSystemElement.defocusedState;}
 			}
 			public override bool isDeactivated{
-				get{return curSelState == AbsSlotSystemElement.deactivatedState;}
+				get{return curSelState == SlotSystemElement.deactivatedState;}
 			}
 			public virtual bool isPickedUp{
 				get{
@@ -337,13 +337,13 @@ namespace SlotSystem{
 				}
 				public override void Activate(){}
 				public override void Deactivate(){
-					SetSelState(AbsSlotSystemElement.deactivatedState);
+					SetSelState(SlotSystemElement.deactivatedState);
 				}
 				public override void Focus(){
-					SetSelState(AbsSlotSystemElement.focusedState);
+					SetSelState(SlotSystemElement.focusedState);
 				}
 				public override void Defocus(){
-					SetSelState(AbsSlotSystemElement.defocusedState);
+					SetSelState(SlotSystemElement.defocusedState);
 				}
 				public override bool ContainsInHierarchy(ISlotSystemElement element){
 					return false;
@@ -397,7 +397,7 @@ namespace SlotSystem{
 			}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(AbsSlotSystemElement.deactivatedState);
+				SetSelState(SlotSystemElement.deactivatedState);
 				SetActState(Slottable.sbWaitForActionState);
 				SetEqpState(null);
 				SetMrkState(Slottable.unmarkedState);
@@ -479,7 +479,7 @@ namespace SlotSystem{
 				ssm.SetHovered((ISlottable)this);
 			}
 	}
-	public interface ISlottable: IAbsSlotSystemElement ,IComparable<ISlottable>, IComparable{
+	public interface ISlottable: ISlotSystemElement ,IComparable<ISlottable>, IComparable{
 		/*	States and Processes	*/
 			/* States */
 				ISSEStateEngine<ISBActState> actStateEngine{get;}

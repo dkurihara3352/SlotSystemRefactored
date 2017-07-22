@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
-		public class SGFilterTests: AbsSlotSystemTest {
+		public class SGFilterTests: SlotSystemTest {
 
 			[TestCaseSource(typeof(SGBowFilterCases))]
 			public void SGBowFilter_Filter_WhenCalled_SetsItemsAccordingly(SGFilter targFilter, List<SlottableItem> target, List<SlottableItem> expected){
