@@ -8,62 +8,102 @@ using SlotSystem;
 namespace SlotSystemTests{
 	namespace SSEElementsTests{
 		[TestFixture]
-		public class SSEProcessTests {
-
-			[Test]
-			public void proces_ByDefault_IsNull(){
-				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
-
-				Assert.That(engine.process, Is.Null);
-			}
-			[Test]
-			public void SetAndRunProcess_NullToAny_SetsProcess(){
-				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
-				ISSEProcess process = Substitute.For<ISSEProcess>();
-
-				engine.SetAndRunProcess(process);
+		[Category("OtherElements")]
+		public class SSEProcessTests: SlotSystemTest {
+			[TestCaseSource(typeof(SetAndRunProcess_VariousCases))]
+			public void SetAndRunProcess_Various_Various(
+				ISSEProcess from, 
+				ISSEProcess to, 
+				ISSEProcess expectedProcess,
+				bool isStopCalled, 
+				bool isStartCalled)
+			{
+				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngineWithDefaultProc(from);
 				
-				Assert.That(engine.process, Is.SameAs(process));
-			}
-			[Test]
-			public void SetAndRunProcess_ToAnother_SetsProcess(){
-				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
-				ISSEProcess another = Substitute.For<ISSEProcess>();
+				engine.SetAndRunProcess(to);
 
-				engine.SetAndRunProcess(another);
-				
-				Assert.That(engine.process, Is.SameAs(another));
+				if(from != null)
+					if(isStopCalled) 
+						from.Received().Stop();
+					else 
+						from.DidNotReceive().Stop();
+				if(to != null)
+					if(isStartCalled) 
+						to.Received().Start();
+					else 
+						to.DidNotReceive().Start();
+				Assert.That(engine.process, Is.SameAs(expectedProcess));
 			}
-			[Test]
-			public void SetAndRunProcess_AnyToNull_SetsNull(){
-				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
-				ISSEProcess process = Substitute.For<ISSEProcess>();
+				class SetAndRunProcess_VariousCases: IEnumerable{
+					public IEnumerator GetEnumerator(){
+						object[] nullToNull;
+							nullToNull =  SetAndRunProcess_VariousCase(
+								from:null, to:null, 
+								expectedProcess:null, 
+								isStopCalled:false, isStartCalled:false
+							);
+							yield return nullToNull;
+						object[] nullToSome;
+								ISSEProcess procA_c2 = Substitute.For<ISSEProcess>();
+								procA_c2.Equals(procA_c2).Returns(true);
+							nullToSome = SetAndRunProcess_VariousCase(
+								from:null, to:procA_c2, 
+								expectedProcess:procA_c2, 
+								isStopCalled:false, isStartCalled:true
+							);
+							yield return nullToSome;
+						object[] someToSame;
+								ISSEProcess procA_c3 = Substitute.For<ISSEProcess>();
+								procA_c3.Equals(procA_c3).Returns(true);
+							someToSame = SetAndRunProcess_VariousCase(
+								from:procA_c3, to:procA_c3, 
+								expectedProcess:procA_c3, 
+								isStopCalled:false, isStartCalled:false
+							);
+							yield return someToSame;
+						object[] someToSame2;
+							ISSEProcess procB_c4 = Substitute.For<ISSEProcess>();
+							procB_c4.Equals(procB_c4).Returns(true);
 
-				engine.SetAndRunProcess(process);
-				engine.SetAndRunProcess(null);
-				
-				Assert.That(engine.process, Is.Null);
-			}
-			[Test]
-			public void SetAndRunProcess_ToAny_StartsProcess(){
-				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
-				ISSEProcess mockProcess = Substitute.For<ISSEProcess>();
-
-				engine.SetAndRunProcess(mockProcess);
-				
-				mockProcess.Received().Start();
-			}
-			[Test]
-			public void SetAndRunProcess_AnyToAnother_StopsProcess(){
-				SSEProcessEngine<ISSEProcess> engine = MakeProcessEngine();
-				ISSEProcess mockProcess = Substitute.For<ISSEProcess>();
-				ISSEProcess another = Substitute.For<ISSEProcess>();
-
-				engine.SetAndRunProcess(mockProcess);
-				engine.SetAndRunProcess(another);
-				
-				mockProcess.Received().Stop();
-			}
+							someToSame2 = SetAndRunProcess_VariousCase(
+								from:procB_c4, to:procB_c4, 
+								expectedProcess:procB_c4, 
+								isStopCalled:false, isStartCalled:false
+							);
+							yield return someToSame2;
+						object[] someToNull;
+								ISSEProcess procA_c5 = Substitute.For<ISSEProcess>();
+								procA_c5.Equals(procA_c5).Returns(true);
+							someToNull =  SetAndRunProcess_VariousCase(
+								from:procA_c5, to:null, 
+								expectedProcess:null, 
+								isStopCalled:true, isStartCalled:false
+							);
+							yield return someToNull;
+						object[] someToDiff;
+								ISSEProcess procA_c6 = Substitute.For<ISSEProcess>();
+								ISSEProcess procB_c6 = Substitute.For<ISSEProcess>();
+									procA_c6.Equals(procB_c6).Returns(false);
+									procA_c6.Equals(procA_c6).Returns(true);
+									procB_c6.Equals(procA_c6).Returns(false);
+									procB_c6.Equals(procB_c6).Returns(true);
+							someToDiff = SetAndRunProcess_VariousCase(
+								from:procA_c6, to:procB_c6, 
+								expectedProcess:procB_c6, 
+								isStopCalled:true, isStartCalled:true
+							);
+							yield return someToDiff;
+					}
+				}
+				static object[] SetAndRunProcess_VariousCase(
+					ISSEProcess from, 
+					ISSEProcess to, 
+					ISSEProcess expectedProcess,
+					bool isStopCalled, 
+					bool isStartCalled)
+				{
+					return new object[]{from, to, expectedProcess, isStopCalled, isStartCalled};
+				}
 			[Test]
 			public void SSEProcessIsRunning_ByDefault_ReturnsFalse(){
 				FakeAbsSSEProcess process = MakeProcess(MakeCoroutine());
@@ -93,20 +133,21 @@ namespace SlotSystemTests{
 
 				Assert.That(process.isRunning, Is.False);
 			}
-			SSEProcessEngine<ISSEProcess> MakeProcessEngine(){
-				return new SSEProcessEngine<ISSEProcess>();
-			}
-			System.Func<IEnumeratorFake> MakeCoroutine(){
-				return () => {return new IEnumeratorFake();};
-			}
-			class FakeAbsSSEProcess: SSEProcess{
-				public FakeAbsSSEProcess(System.Func<IEnumeratorFake> coroutine){
-					coroutineFake = coroutine;
+			/* Helper */
+				SSEProcessEngine<ISSEProcess> MakeProcessEngineWithDefaultProc(ISSEProcess from){
+					return new SSEProcessEngine<ISSEProcess>(from);
 				}
-			}
-			FakeAbsSSEProcess MakeProcess(System.Func<IEnumeratorFake> coroutine){
-				return new FakeAbsSSEProcess(coroutine);
-			}
+				System.Func<IEnumeratorFake> MakeCoroutine(){
+					return () => {return new IEnumeratorFake();};
+				}
+				class FakeAbsSSEProcess: SSEProcess{
+					public FakeAbsSSEProcess(System.Func<IEnumeratorFake> coroutine){
+						coroutineFake = coroutine;
+					}
+				}
+				FakeAbsSSEProcess MakeProcess(System.Func<IEnumeratorFake> coroutine){
+					return new FakeAbsSSEProcess(coroutine);
+				}
 		}
 	}
 }

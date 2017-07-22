@@ -26,9 +26,14 @@ namespace SlotSystemTests{
 			}
 				class VariousStates_EnterStateCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
-						yield return SlotSystemElement.focusedState;
-						yield return SlotSystemElement.defocusedState;
-						yield return SlotSystemElement.selectedState;
+						ISSESelState focusedState = SlotSystemElement.focusedState;
+							yield return focusedState;
+
+						ISSESelState defocusedState = SlotSystemElement.defocusedState;
+							yield return defocusedState;
+							
+						ISSESelState selectedState = SlotSystemElement.selectedState;
+							yield return selectedState;
 					}
 				}
 			[TestCaseSource(typeof(Various_EnterState_FromVariousNonNullCases))]

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace SlotSystem{
 	public class SSEProcess: ISSEProcess{
@@ -13,8 +14,11 @@ namespace SlotSystem{
 		}
 		public virtual void Stop(){ if(isRunning) m_isRunning = false; }
 		public virtual void Expire(){if(isRunning) m_isRunning = false; }
+		public bool Equals(ISSEProcess other){
+			return this.GetType().Equals(other.GetType());
+		}
 	}
-		public interface ISSEProcess{
+		public interface ISSEProcess: IEquatable<ISSEProcess>{
 			bool isRunning{get;}
 			System.Func<IEnumeratorFake> coroutineFake{set;}
 			void Start();
@@ -22,13 +26,19 @@ namespace SlotSystem{
 			void Expire();
 		}
 	public class SSEProcessEngine<T>: ISSEProcessEngine<T> where T: ISSEProcess{
+		public SSEProcessEngine(){}
+		public SSEProcessEngine(T from){
+			m_process = from;
+		}
 		public virtual T process{ get{return m_process;}}protected T m_process;
-		public virtual void SetAndRunProcess(T process){
-			if(process != null)
-				process.Stop();
-			m_process = process;
-			if(process != null)
-				process.Start();
+		public virtual void SetAndRunProcess(T p){
+			if(p == null || !p.Equals(process)){
+				if(process != null)
+					process.Stop();
+				m_process = p;
+				if(process != null)
+					process.Start();
+			}
 		}
 	}
 		public interface ISSEProcessEngine<T> where T: ISSEProcess{
