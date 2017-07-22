@@ -15,7 +15,9 @@ namespace SlotSystem{
 		public virtual void Stop(){ if(isRunning) m_isRunning = false; }
 		public virtual void Expire(){if(isRunning) m_isRunning = false; }
 		public bool Equals(ISSEProcess other){
-			return this.GetType().Equals(other.GetType());
+			if(other != null)
+				return this.GetType().Equals(other.GetType());
+			else return false;
 		}
 	}
 		public interface ISSEProcess: IEquatable<ISSEProcess>{

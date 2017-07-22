@@ -137,7 +137,7 @@ namespace SlotSystemTests{
 
 					sb.InitializeStates();
 
-					Assert.That(sb.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
+					Assert.That(sb.curSelState, Is.SameAs(sb.deactivatedState));
 					Assert.That(sb.prevSelState, Is.Null);
 					Assert.That(sb.curActState, Is.SameAs(Slottable.sbWaitForActionState));
 					Assert.That(sb.prevActState, Is.Null);

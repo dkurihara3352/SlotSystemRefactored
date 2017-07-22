@@ -77,7 +77,7 @@ namespace SlotSystemTests{
 
 				gPage.Focus();
 
-				Assert.That(gPage.curSelState, Is.SameAs(SlotSystemElement.focusedState));
+				Assert.That(gPage.curSelState, Is.SameAs(gPage.focusedState));
 			}
 			[TestCase(true, true)]
 			[TestCase(true, false)]
@@ -126,7 +126,7 @@ namespace SlotSystemTests{
 
 				gPage.Deactivate();
 				
-				Assert.That(gPage.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
+				Assert.That(gPage.curSelState, Is.SameAs(gPage.deactivatedState));
 			}
 			[TestCase(
 				true, true,

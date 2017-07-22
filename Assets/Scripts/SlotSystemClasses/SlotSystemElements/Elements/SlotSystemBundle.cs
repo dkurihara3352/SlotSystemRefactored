@@ -20,7 +20,7 @@ namespace SlotSystem{
 			InitializeStates();
 		}
 		public override void Focus(){
-			SetSelState(SlotSystemElement.focusedState);
+			SetSelState(focusedState);
 			if(m_focusedElement != null)
 				m_focusedElement.Focus();
 			foreach(ISlotSystemElement ele in this){
@@ -29,7 +29,7 @@ namespace SlotSystem{
 			}
 		}
 		public override void Defocus(){
-			SetSelState(SlotSystemElement.defocusedState);
+			SetSelState(defocusedState);
 			foreach(ISlotSystemElement ele in this){
 				ele.Defocus();
 			}

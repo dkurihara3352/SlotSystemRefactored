@@ -131,7 +131,7 @@ namespace SlotSystemTests{
 
 				ssm.Initialize();
 
-				Assert.That(ssm.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
+				Assert.That(ssm.curSelState, Is.SameAs(ssm.deactivatedState));
 				Assert.That(ssm.prevSelState, Is.Null);
 				Assert.That(ssm.curActState, Is.SameAs(SlotSystemManager.ssmWaitForActionState));
 				Assert.That(ssm.prevActState, Is.Null);
@@ -785,7 +785,7 @@ namespace SlotSystemTests{
 
 					ssm.ResetAndFocus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemElement.focusedState));
+					Assert.That(ssm.curSelState, Is.SameAs(ssm.focusedState));
 				}
 				[Test][Category("Methods")]
 				public void UpdateEquipStatesOnAll_WhenCalled_CallsEInvRemoveWithItemNotInAllEquippedItems(){
@@ -1318,7 +1318,7 @@ namespace SlotSystemTests{
 
 					ssm.Focus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemElement.focusedState));
+					Assert.That(ssm.curSelState, Is.SameAs(ssm.focusedState));
 				}
 				[TestCase(true, true, true, true, true)]
 				[TestCase(false, false, false, false, false)]
@@ -1374,7 +1374,7 @@ namespace SlotSystemTests{
 
 					ssm.Defocus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemElement.defocusedState));
+					Assert.That(ssm.curSelState, Is.SameAs(ssm.defocusedState));
 				}
 				[Test][Category("Methods")]
 				public void Defocus_WhenCalled_CallsAllBundlesDefocus(){
@@ -1393,7 +1393,7 @@ namespace SlotSystemTests{
 
 					ssm.Deactivate();
 
-					Assert.That(ssm.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
+					Assert.That(ssm.curSelState, Is.SameAs(ssm.deactivatedState));
 				}
 				[Test][Category("Methods")]
 				public void Deactivate_WhenCalled_CallsAllBundlesDeactivate(){
@@ -2219,7 +2219,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.Received().SetSelState(SlotSystemElement.selectedState);
+					mockSB.Received().SetSelState(mockSB.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_FromNullToSome_SetsItTargetSB(){
@@ -2239,7 +2239,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 					
-					mockSB.Received().SetSelState(SlotSystemElement.selectedState);
+					mockSB.Received().SetSelState(mockSB.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_FromOtherToSome_SetsItTargetSB(){
@@ -2261,7 +2261,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(stubSB);
 					
-					mockSB.Received().SetSelState(SlotSystemElement.focusedState);
+					mockSB.Received().SetSelState(mockSB.focusedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_SomeToNull_CallSBSetSelStateFocused(){
@@ -2271,7 +2271,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(null);
 
-					mockSB.Received().SetSelState(SlotSystemElement.focusedState);
+					mockSB.Received().SetSelState(mockSB.focusedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_SomeToNull_SetsNull(){
@@ -2291,7 +2291,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.Received(1).SetSelState(SlotSystemElement.selectedState);
+					mockSB.Received(1).SetSelState(mockSB.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetTargetSB_SomeToSame_DoesNotCallSetSelStateFocused(){
@@ -2301,7 +2301,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.DidNotReceive().SetSelState(SlotSystemElement.focusedState);
+					mockSB.DidNotReceive().SetSelState(mockSB.focusedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetSG1_NullToSome_SetsSG1(){
@@ -2388,7 +2388,7 @@ namespace SlotSystemTests{
 
 					ssm.SetSG2(mockSG);
 
-					mockSG.Received().SetSelState(SlotSystemElement.selectedState);
+					mockSG.Received().SetSelState(mockSG.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetSG2_OtherToSome_SetsSG2(){
@@ -2421,7 +2421,7 @@ namespace SlotSystemTests{
 					ssm.SetSG2(prevSG);
 					ssm.SetSG2(mockSG);
 
-					mockSG.Received().SetSelState(SlotSystemElement.selectedState);
+					mockSG.Received().SetSelState(mockSG.selectedState);
 				}
 				[Test][Category("Transaction")]
 				public void SetSG2_SomeToNull_SetsSG2Null(){
@@ -2803,12 +2803,11 @@ namespace SlotSystemTests{
 
 					ssm.ReferToTAAndUpdateSelState(mockSG);
 
-					mockSG.Received().SetSelState(SlotSystemElement.focusedState);
+					mockSG.Received().SetSelState(mockSG.focusedState);
 				}
 				[TestCaseSource(typeof(ReferToTAAndUpdateSelState_VariousTAsCases))][Category("Transaction")]
-				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotSystemTransaction ta, ISSESelState state){
+				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotGroup mockSG, ISlotSystemTransaction ta, ISSESelState state){
 					SlotSystemManager ssm = MakeSSM();
-						ISlotGroup mockSG = MakeSubSG();
 					Dictionary<ISlotSystemElement, ISlotSystemTransaction> dict = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 						dict.Add(mockSG, ta);
 						ssm.transactionResults = dict;
@@ -2818,12 +2817,42 @@ namespace SlotSystemTests{
 				}
 					class ReferToTAAndUpdateSelState_VariousTAsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							yield return new object[]{Substitute.For<IRevertTransaction>(), SlotSystemElement.defocusedState};
-							yield return new object[]{Substitute.For<IReorderTransaction>(), SlotSystemElement.focusedState};
-							yield return new object[]{Substitute.For<ISortTransaction>(), SlotSystemElement.focusedState};
-							yield return new object[]{Substitute.For<IFillTransaction>(), SlotSystemElement.focusedState};
-							yield return new object[]{Substitute.For<ISwapTransaction>(), SlotSystemElement.focusedState};
-							yield return new object[]{Substitute.For<IStackTransaction>(), SlotSystemElement.focusedState};
+							object[] revert_def;
+								ISlotGroup mockSG_0 = MakeSubSG();
+								ISSESelState def_0 = Substitute.For<ISSESelState>();
+								mockSG_0.defocusedState.Returns(def_0);
+								revert_def = new object[]{mockSG_0, Substitute.For<IRevertTransaction>(), def_0};
+								yield return revert_def;
+							object[] reorder_foc;
+								ISlotGroup mockSG_1 = MakeSubSG();
+								ISSESelState foc_1 = Substitute.For<ISSESelState>();
+								mockSG_1.focusedState.Returns(foc_1);
+								reorder_foc = new object[]{mockSG_1, Substitute.For<IReorderTransaction>(), foc_1};
+								yield return reorder_foc;
+							object[] sort_foc;
+								ISlotGroup mockSG_2 = MakeSubSG();
+								ISSESelState foc_2 = Substitute.For<ISSESelState>();
+								mockSG_2.focusedState.Returns(foc_2);
+								sort_foc = new object[]{mockSG_2, Substitute.For<ISortTransaction>(), foc_2};
+								yield return sort_foc;
+							object[] fill_foc;
+								ISlotGroup mockSG_3 = MakeSubSG();
+								ISSESelState foc_3 = Substitute.For<ISSESelState>();
+								mockSG_3.focusedState.Returns(foc_3);
+								fill_foc = new object[]{mockSG_3, Substitute.For<IFillTransaction>(), foc_3};
+								yield return fill_foc;
+							object[] swap_foc;
+								ISlotGroup mockSG_4 = MakeSubSG();
+								ISSESelState foc_4 = Substitute.For<ISSESelState>();
+								mockSG_4.focusedState.Returns(foc_4);
+								swap_foc = new object[]{mockSG_4, Substitute.For<ISwapTransaction>(), foc_4};
+								yield return swap_foc;
+							object[] stack_foc;
+								ISlotGroup mockSG_5 = MakeSubSG();
+								ISSESelState foc_5 = Substitute.For<ISSESelState>();
+								mockSG_5.focusedState.Returns(foc_5);
+								stack_foc = new object[]{mockSG_5, Substitute.For<IStackTransaction>(), foc_5};
+								yield return stack_foc;
 						}
 					}
 			/*	helper	*/

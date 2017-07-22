@@ -131,7 +131,7 @@ namespace SlotSystemTests{
 
 				eSet.Focus();
 
-				Assert.That(eSet.curSelState, Is.SameAs(SlotSystemElement.focusedState));
+				Assert.That(eSet.curSelState, Is.SameAs(eSet.focusedState));
 			}
 			[Test]
 			public void Focus_WhenCalled_CallsPElesAccordingly(){
@@ -170,7 +170,7 @@ namespace SlotSystemTests{
 
 				eSet.Deactivate();
 
-				Assert.That(eSet.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
+				Assert.That(eSet.curSelState, Is.SameAs(eSet.deactivatedState));
 			}
 			[Test]
 			public void Deactivate_WhenCalled_SetsSelStateDeactivatedRecursively(){

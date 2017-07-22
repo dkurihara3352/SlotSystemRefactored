@@ -391,7 +391,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void FocusSelf(){
-					SetSelState(SlotSystemElement.focusedState);
+					SetSelState(focusedState);
 				}
 				public virtual void FocusSBs(){
 					foreach(ISlottable sb in this){
@@ -410,7 +410,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void DefocusSelf(){
-					SetSelState(SlotSystemElement.defocusedState);
+					SetSelState(defocusedState);
 				}
 				public virtual void DefocusSBs(){
 					foreach(ISlottable sb in this){
@@ -421,7 +421,7 @@ namespace SlotSystem{
 					}
 				}
 				public override void Deactivate(){
-					SetSelState(SlotSystemElement.deactivatedState);
+					SetSelState(deactivatedState);
 					foreach(ISlottable sb in this){
 						if(sb != null){
 							sb.Deactivate();
@@ -448,7 +448,7 @@ namespace SlotSystem{
 				}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(SlotSystemElement.deactivatedState);
+				SetSelState(deactivatedState);
 				SetActState(SlotGroup.sgWaitForActionState);
 			}
 			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){

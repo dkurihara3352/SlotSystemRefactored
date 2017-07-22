@@ -36,67 +36,13 @@ namespace SlotSystemTests{
 								}
 							}
 						[TestCaseSource(typeof(FromToProcCases))][Category("State and Process")]
-						public void SetSelState_Various_SetsSelProcAccordingly(ISSESelState from, ISSESelState to, ISSEProcess proc){
-							TestSlotSystemElement sse = MakeTestSSE();
-							sse.SetSelState(from);
-
-							sse.SetSelState(to);
-
-							ISSEProcess actual = sse.selProcess;
-							if(proc != null)
-								Assert.That(actual, Is.TypeOf(proc.GetType()));
-							else
-								Assert.That(actual, Is.Null);
-						}
-							class FromToProcCases: IEnumerable{
-								public IEnumerator GetEnumerator(){
-									ISlotSystemElement sse = Substitute.For<ISlotSystemElement>();
-
-									ISSESelState deactivated = SlotSystemElement.deactivatedState;
-									ISSESelState focused = SlotSystemElement.focusedState;
-									ISSESelState defocused = SlotSystemElement.defocusedState;
-									ISSESelState selected = SlotSystemElement.selectedState;
-									
-									ISSEProcess deactProc = new SSEDeactivateProcess(sse, FakeCoroutine);
-									ISSEProcess focusProc = new SSEFocusProcess(sse, FakeCoroutine);
-									ISSEProcess defocusProc = new SSEDefocusProcess(sse, FakeCoroutine);
-									ISSEProcess selectProc = new SSESelectProcess(sse, FakeCoroutine);
-
-									yield return new object[]{null, null, null};
-									yield return new object[]{null, deactivated, null};
-									yield return new object[]{null, focused, null};
-									yield return new object[]{null, defocused, null};
-									yield return new object[]{null, selected, null};
-
-									yield return new object[]{deactivated, null, null};
-									yield return new object[]{deactivated, deactivated, null};
-									yield return new object[]{deactivated, focused, focusProc};
-									yield return new object[]{deactivated, defocused, defocusProc};
-									yield return new object[]{deactivated, selected, selectProc};
-									
-									yield return new object[]{focused, null, null};
-									yield return new object[]{focused, deactivated, deactProc};
-									yield return new object[]{focused, focused, null};
-									yield return new object[]{focused, defocused, defocusProc};
-									yield return new object[]{focused, selected, selectProc};
-									
-									yield return new object[]{defocused, null, null};
-									yield return new object[]{defocused, deactivated, deactProc};
-									yield return new object[]{defocused, focused, focusProc};
-									yield return new object[]{defocused, defocused, null};
-									yield return new object[]{defocused, selected, selectProc};
-
-									yield return new object[]{selected, null, null};
-									yield return new object[]{selected, deactivated, deactProc};
-									yield return new object[]{selected, focused, focusProc};
-									yield return new object[]{selected, defocused, defocusProc};
-									yield return new object[]{selected, selected, null};
-									
-								}
-							}
-						[TestCaseSource(typeof(FromToMethodCases))][Category("State and Process")]
-						public void SetSelState_Various_CallsInstantMethods(ISSESelState from, ISSESelState to, InstantMethods method){
-							TestSlotSystemElement sse = MakeTestSSE();
+						public void SetSelState_Various_SetsSelProcAccordingly(
+							TestSlotSystemElement sse, 
+							ISSESelState from, 
+							ISSESelState to, 
+							ISSEProcess proc,
+							InstantMethods method)
+						{
 							string expected = "default";
 							switch(method){
 								case InstantMethods.none: expected = ""; break;
@@ -108,50 +54,203 @@ namespace SlotSystemTests{
 							sse.SetSelState(from);
 
 							sse.SetSelState(to);
-							
-							string actual = sse.message;
 
-							Assert.That(actual, Is.StringContaining(expected));
+							ISSEProcess actualProc = sse.selProcess;
+								if(proc != null)
+									Assert.That(actualProc, Is.TypeOf(proc.GetType()));
+								else
+									Assert.That(actualProc, Is.Null);
+							string actualMethod = sse.message;
+								Assert.That(actualMethod, Is.StringContaining(expected));
 						}
-							public enum InstantMethods{none, focus, defocus, select};
-							class FromToMethodCases: IEnumerable{
+							class FromToProcCases: IEnumerable{
+									ISSEProcess deaProc = new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine);
+									ISSEProcess focProc = new SSEFocusProcess(MakeSubSSE(), FakeCoroutine);
+									ISSEProcess defProc = new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine);
+									ISSEProcess selProc = new SSESelectProcess(MakeSubSSE(), FakeCoroutine);
 								public IEnumerator GetEnumerator(){
-									ISSESelState deactivated = SlotSystemElement.deactivatedState;
-									ISSESelState focused = SlotSystemElement.focusedState;
-									ISSESelState defocused = SlotSystemElement.defocusedState;
-									ISSESelState selected = SlotSystemElement.selectedState;
-
-									yield return new object[]{null, null, InstantMethods.none};
-									yield return new object[]{null, deactivated, InstantMethods.none};
-									yield return new object[]{null, focused, InstantMethods.focus};
-									yield return new object[]{null, defocused, InstantMethods.defocus};
-									yield return new object[]{null, selected, InstantMethods.select};
-
-									yield return new object[]{deactivated, null, InstantMethods.none};
-									yield return new object[]{deactivated, deactivated, InstantMethods.none};
-									yield return new object[]{deactivated, focused, InstantMethods.none};
-									yield return new object[]{deactivated, defocused, InstantMethods.none};
-									yield return new object[]{deactivated, selected, InstantMethods.none};
+									ISlotSystemElement sse = Substitute.For<ISlotSystemElement>();
+									object[] n_n_n_none;
+										TestSlotSystemElement sse_0 = MakeTestSSE();
+										n_n_n_none = new object[]{sse_0, null, null, null, InstantMethods.none};
+										yield return n_n_n_none;
+									object[] n_dea_n_none;
+										TestSlotSystemElement sse_1 = MakeTestSSE();
+										ISSESelState dea_1 = Substitute.For<ISSESelState>();
+										sse_1.deactivatedState.Returns(dea_1);
+										n_dea_n_none = new object[]{sse_1, null, dea_1, null, InstantMethods.none};
+										yield return n_dea_n_none;
+									object[] n_foc_n_foc;
+										TestSlotSystemElement sse_2 = MakeTestSSE();
+										ISSESelState foc_2 = Substitute.For<ISSESelState>();
+										sse_2.focusedState.Returns(foc_2);
+										n_foc_n_foc = new object[]{sse_2, null, foc_2, null, InstantMethods.focus};
+										yield return n_foc_n_foc;
+									object[] n_def_n_def;
+										TestSlotSystemElement sse_3 = MakeTestSSE();
+										ISSESelState def_3 = Substitute.For<ISSESelState>();
+										sse_3.defocusedState.Returns(def_3);
+										n_def_n_def = new object[]{sse_3, null, def_3, null, InstantMethods.defocus};
+										yield return n_def_n_def;
+									object[] n_sel_n_sel;
+										TestSlotSystemElement sse_4 = MakeTestSSE();
+										ISSESelState sel_4 = Substitute.For<ISSESelState>();
+										sse_4.selectedState.Returns(sel_4);
+										n_sel_n_sel = new object[]{sse_4, null, sel_4, null, InstantMethods.select};
+										yield return n_sel_n_sel;
 									
-									yield return new object[]{focused, null, InstantMethods.none};
-									yield return new object[]{focused, deactivated, InstantMethods.none};
-									yield return new object[]{focused, focused, InstantMethods.none};
-									yield return new object[]{focused, defocused, InstantMethods.none};
-									yield return new object[]{focused, selected, InstantMethods.none};
+									object[] dea_n_n_none;
+										TestSlotSystemElement sse_5 = MakeTestSSE();
+										ISSESelState dea_5 = Substitute.For<ISSESelState>();
+										sse_5.deactivatedState.Returns(dea_5);
+										dea_n_n_none = new object[]{sse_5, dea_5, null, null, InstantMethods.none};
+										yield return dea_n_n_none;
+									object[] dea_dea_n_none;
+										TestSlotSystemElement sse_6 = MakeTestSSE();
+										ISSESelState dea_6 = Substitute.For<ISSESelState>();
+										sse_6.deactivatedState.Returns(dea_6);
+										dea_dea_n_none = new object[]{sse_6, dea_6, dea_6, null, InstantMethods.none};
+										yield return dea_dea_n_none;
+									object[] dea_foc_foc_none;
+										TestSlotSystemElement sse_7 = MakeTestSSE();
+										ISSESelState dea_7 = Substitute.For<ISSESelState>();
+										ISSESelState foc_7 = Substitute.For<ISSESelState>();
+										sse_7.deactivatedState.Returns(dea_7);
+										sse_7.focusedState.Returns(foc_7);
+										dea_foc_foc_none = new object[]{sse_7, dea_7, foc_7, focProc, InstantMethods.none};
+										yield return dea_foc_foc_none;
+									object[] dea_def_def_none;
+										TestSlotSystemElement sse_8 = MakeTestSSE();
+										ISSESelState dea_8 = Substitute.For<ISSESelState>();
+										ISSESelState def_8 = Substitute.For<ISSESelState>();
+										sse_8.deactivatedState.Returns(dea_8);
+										sse_8.defocusedState.Returns(def_8);
+										dea_def_def_none = new object[]{sse_8, dea_8, def_8, defProc, InstantMethods.none};
+										yield return dea_def_def_none;
+									object[] dea_sel_sel_none;
+										TestSlotSystemElement sse_9 = MakeTestSSE();
+										ISSESelState dea_9 = Substitute.For<ISSESelState>();
+										ISSESelState sel_9 = Substitute.For<ISSESelState>();
+										sse_9.deactivatedState.Returns(dea_9);
+										sse_9.selectedState.Returns(sel_9);
+										dea_sel_sel_none = new object[]{sse_9, dea_9, sel_9, selProc, InstantMethods.none};
+										yield return dea_sel_sel_none;
 									
-									yield return new object[]{defocused, null, InstantMethods.none};
-									yield return new object[]{defocused, deactivated, InstantMethods.none};
-									yield return new object[]{defocused, focused, InstantMethods.none};
-									yield return new object[]{defocused, defocused, InstantMethods.none};
-									yield return new object[]{defocused, selected, InstantMethods.none};
+									object[] foc_n_n_none;
+										TestSlotSystemElement sse_10 = MakeTestSSE();
+										ISSESelState foc_10 = Substitute.For<ISSESelState>();
+										sse_10.focusedState.Returns(foc_10);
+										foc_n_n_none = new object[]{sse_10, foc_10, null, null, InstantMethods.none};
+										yield return foc_n_n_none;
+									object[] foc_dea_dea_none;
+										TestSlotSystemElement sse_11 = MakeTestSSE();
+										ISSESelState foc_11 = Substitute.For<ISSESelState>();
+										ISSESelState dea_11 = Substitute.For<ISSESelState>();
+										sse_11.focusedState.Returns(foc_11);
+										sse_11.deactivatedState.Returns(dea_11);
+										foc_dea_dea_none = new object[]{sse_11, foc_11, dea_11, deaProc, InstantMethods.none};
+										yield return foc_dea_dea_none;
+									object[] foc_foc_n_none;
+										TestSlotSystemElement sse_12 = MakeTestSSE();
+										ISSESelState foc_12 = Substitute.For<ISSESelState>();
+										sse_12.focusedState.Returns(foc_12);
+										foc_foc_n_none = new object[]{sse_12, foc_12, foc_12, null, InstantMethods.none};
+										yield return foc_foc_n_none;
+									object[] foc_def_def_none;
+										TestSlotSystemElement sse_13 = MakeTestSSE();
+										ISSESelState foc_13 = Substitute.For<ISSESelState>();
+										ISSESelState def_13 = Substitute.For<ISSESelState>();
+										sse_13.focusedState.Returns(foc_13);
+										sse_13.defocusedState.Returns(def_13);
+										foc_def_def_none = new object[]{sse_13, foc_13, def_13, defProc, InstantMethods.none};
+										yield return foc_def_def_none;
+									object[] foc_sel_sel_none;
+										TestSlotSystemElement sse_14 = MakeTestSSE();
+										ISSESelState foc_14 = Substitute.For<ISSESelState>();
+										ISSESelState sel_14 = Substitute.For<ISSESelState>();
+										sse_14.focusedState.Returns(foc_14);
+										sse_14.selectedState.Returns(sel_14);
+										foc_sel_sel_none = new object[]{sse_14, foc_14, sel_14, selProc, InstantMethods.none};
+										yield return foc_sel_sel_none;
 									
-									yield return new object[]{selected, null, InstantMethods.none};
-									yield return new object[]{selected, deactivated, InstantMethods.none};
-									yield return new object[]{selected, focused, InstantMethods.none};
-									yield return new object[]{selected, defocused, InstantMethods.none};
-									yield return new object[]{selected, selected, InstantMethods.none};
+									object[] def_n_n_none;
+										TestSlotSystemElement sse_15 = MakeTestSSE();
+										ISSESelState def_15 = Substitute.For<ISSESelState>();
+										sse_15.defocusedState.Returns(def_15);
+										def_n_n_none = new object[]{sse_15, def_15, null, null, InstantMethods.none};
+										yield return def_n_n_none;
+									object[] def_dea_dea_none;
+										TestSlotSystemElement sse_16 = MakeTestSSE();
+										ISSESelState def_16 = Substitute.For<ISSESelState>();
+										ISSESelState dea_16 = Substitute.For<ISSESelState>();
+										sse_16.defocusedState.Returns(def_16);
+										sse_16.deactivatedState.Returns(dea_16);
+										def_dea_dea_none = new object[]{sse_16, def_16, dea_16, deaProc, InstantMethods.none};
+										yield return def_dea_dea_none;
+									object[] def_foc_foc_none;
+										TestSlotSystemElement sse_17 = MakeTestSSE();
+										ISSESelState def_17 = Substitute.For<ISSESelState>();
+										ISSESelState foc_17 = Substitute.For<ISSESelState>();
+										sse_17.defocusedState.Returns(def_17);
+										sse_17.focusedState.Returns(foc_17);
+										def_foc_foc_none = new object[]{sse_17, def_17, foc_17, focProc, InstantMethods.none};
+										yield return def_foc_foc_none;
+									object[] def_def_n_none;
+										TestSlotSystemElement sse_18 = MakeTestSSE();
+										ISSESelState def_18 = Substitute.For<ISSESelState>();
+										sse_18.defocusedState.Returns(def_18);
+										def_def_n_none = new object[]{sse_18, def_18, def_18, null, InstantMethods.none};
+										yield return def_def_n_none;
+									object[] def_sel_sel_none;
+										TestSlotSystemElement sse_19 = MakeTestSSE();
+										ISSESelState def_19 = Substitute.For<ISSESelState>();
+										ISSESelState sel_19 = Substitute.For<ISSESelState>();
+										sse_19.defocusedState.Returns(def_19);
+										sse_19.selectedState.Returns(sel_19);
+										def_sel_sel_none = new object[]{sse_19, def_19, sel_19, selProc, InstantMethods.none};
+										yield return def_sel_sel_none;
+									
+									object[] sel_n_n_none;
+										TestSlotSystemElement sse_20 = MakeTestSSE();
+										ISSESelState sel_20 = Substitute.For<ISSESelState>();
+										sse_20.selectedState.Returns(sel_20);
+										sel_n_n_none = new object[]{sse_20, sel_20, null, null, InstantMethods.none};
+										yield return sel_n_n_none;
+									object[] sel_dea_dea_none;
+										TestSlotSystemElement sse_21 = MakeTestSSE();
+										ISSESelState sel_21 = Substitute.For<ISSESelState>();
+										ISSESelState dea_21 = Substitute.For<ISSESelState>();
+										sse_21.selectedState.Returns(sel_21);
+										sse_21.deactivatedState.Returns(dea_21);
+										sel_dea_dea_none = new object[]{sse_21, sel_21, dea_21, deaProc, InstantMethods.none};
+										yield return sel_dea_dea_none;
+									object[] sel_foc_foc_none;
+										TestSlotSystemElement sse_22 = MakeTestSSE();
+										ISSESelState sel_22 = Substitute.For<ISSESelState>();
+										ISSESelState foc_22 = Substitute.For<ISSESelState>();
+										sse_22.selectedState.Returns(sel_22);
+										sse_22.focusedState.Returns(foc_22);
+										sel_foc_foc_none = new object[]{sse_22, sel_22, foc_22, focProc, InstantMethods.none};
+										yield return sel_foc_foc_none;
+									object[] sel_def_def_none;
+										TestSlotSystemElement sse_23 = MakeTestSSE();
+										ISSESelState sel_23 = Substitute.For<ISSESelState>();
+										ISSESelState def_23 = Substitute.For<ISSESelState>();
+										sse_23.selectedState.Returns(sel_23);
+										sse_23.defocusedState.Returns(def_23);
+										sel_def_def_none = new object[]{sse_23, sel_23, def_23, defProc, InstantMethods.none};
+										yield return sel_def_def_none;
+									object[] sel_sel_n_none;
+										TestSlotSystemElement sse_24 = MakeTestSSE();
+										ISSESelState sel_24 = Substitute.For<ISSESelState>();
+										sse_24.selectedState.Returns(sel_24);
+										sel_sel_n_none = new object[]{sse_24, sel_24, sel_24, null, InstantMethods.none};
+										yield return sel_sel_n_none;
+									
 								}
 							}
+							public enum InstantMethods{none, focus, defocus, select};
+						
 				/* Process */
 					[TestCaseSource(typeof(SetAndRunSelProcess_ISSESelProcessOrNullCases))][Category("State and Process")]
 					public void SetAndRunSelProcess_ISSESelProcessOrNull_CallsSelProcEngineSAR(ISSESelProcess process){
@@ -353,7 +452,7 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isFocused_CurSelStateIsFocused_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeTestSSE();
-					testSSE.SetSelState(SlotSystemElement.focusedState);
+					testSSE.SetSelState(testSSE.focusedState);
 
 					Assert.That(testSSE.isFocused, Is.True);
 					Assert.That(testSSE.isDefocused, Is.False);
@@ -363,7 +462,7 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isDefocused_CurSelStateIsDefocused_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeTestSSE();
-					testSSE.SetSelState(SlotSystemElement.defocusedState);
+					testSSE.SetSelState(testSSE.defocusedState);
 
 					Assert.That(testSSE.isFocused, Is.False);
 					Assert.That(testSSE.isDefocused, Is.True);
@@ -373,7 +472,7 @@ namespace SlotSystemTests{
 				[Category("Fields")]
 				public void isDeactivated_CurSelStateIsDeactivated_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeTestSSE();
-					testSSE.SetSelState(SlotSystemElement.deactivatedState);
+					testSSE.SetSelState(testSSE.deactivatedState);
 
 					Assert.That(testSSE.isFocused, Is.False);
 					Assert.That(testSSE.isDefocused, Is.False);
@@ -531,7 +630,7 @@ namespace SlotSystemTests{
 					
 					sse.InitializeStates();
 
-					mockSelStateEg.Received().SetState(SlotSystemElement.deactivatedState);
+					mockSelStateEg.Received().SetState(sse.deactivatedState);
 				}
 				[Test][Category("Methods")]
 				public void ContainsInHierarchy_Various_ReturnsAccordingly(){
@@ -650,7 +749,7 @@ namespace SlotSystemTests{
 					
 					testSSE.Deactivate();
 
-					Assert.That(testSSE.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
+					Assert.That(testSSE.curSelState, Is.SameAs(testSSE.deactivatedState));
 				}
 				[Test]
 				[Category("Methods")]
@@ -674,7 +773,7 @@ namespace SlotSystemTests{
 					
 					testSSE.Focus();
 
-					Assert.That(testSSE.curSelState, Is.SameAs(SlotSystemElement.focusedState));
+					Assert.That(testSSE.curSelState, Is.SameAs(testSSE.focusedState));
 				}
 				[Test]
 				[Category("Methods")]
@@ -698,7 +797,7 @@ namespace SlotSystemTests{
 					
 					testSSE.Defocus();
 
-					Assert.That(testSSE.curSelState, Is.SameAs(SlotSystemElement.defocusedState));
+					Assert.That(testSSE.curSelState, Is.SameAs(testSSE.defocusedState));
 				}
 				[Test][Category("Methods")]
 				public void PerformInHierarchyVer1_Various_PerformsAccordingly(){

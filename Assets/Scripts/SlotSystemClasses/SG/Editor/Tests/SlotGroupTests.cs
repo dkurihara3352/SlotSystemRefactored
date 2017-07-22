@@ -379,7 +379,7 @@ namespace SlotSystemTests{
 
 					sg.FocusSelf();
 
-					Assert.That(sg.curSelState, Is.SameAs(SlotSystemElement.focusedState));
+					Assert.That(sg.curSelState, Is.SameAs(sg.focusedState));
 				}
 				[Test][Category("Methods")]
 				public void FocusSBs_WhenCalled_CallsSBReset(){
@@ -460,7 +460,7 @@ namespace SlotSystemTests{
 
 					sg.DefocusSelf();
 
-					Assert.That(sg.curSelState, Is.SameAs(SlotSystemElement.defocusedState));
+					Assert.That(sg.curSelState, Is.SameAs(sg.defocusedState));
 				}
 				[Test][Category("Methods")]
 				public void DefocusSBs_WhenCalled_CallsSBDefocus(){
@@ -506,7 +506,7 @@ namespace SlotSystemTests{
 					
 					sg.PerformInHierarchy(TestMethodV1);
 
-					Assert.That(sg.curSelState, Is.SameAs(SlotSystemElement.focusedState));
+					Assert.That(sg.curSelState, Is.SameAs(sg.focusedState));
 					sbA.Received().Focus();
 					sbB.Received().Focus();
 					sbC.Received().Focus();
@@ -612,7 +612,7 @@ namespace SlotSystemTests{
 
 					sg.InitializeStates();
 
-					Assert.That(sg.curSelState, Is.SameAs(SlotSystemElement.deactivatedState));
+					Assert.That(sg.curSelState, Is.SameAs(sg.deactivatedState));
 					Assert.That(sg.prevSelState, Is.Null);
 					Assert.That(sg.curActState, Is.SameAs(SlotGroup.sgWaitForActionState));
 					Assert.That(sg.prevActState, Is.Null);
@@ -1399,11 +1399,11 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
 						sg.SetSSM(ssm);
-					CreateNewSBAndFillTestData expected = new CreateNewSBAndFillTestData(added.itemInst, ssm, SlotSystemElement.defocusedState, Slottable.unequippedState);
 					List<ISlottable> targetList = new List<ISlottable>(list);
 					sg.CreateNewSBAndFill(added.itemInst, targetList);
 
 					ISlottable actualAdded = targetList[addedIndex];
+					CreateNewSBAndFillTestData expected = new CreateNewSBAndFillTestData(added.itemInst, ssm, actualAdded.defocusedState, Slottable.unequippedState);
 					CreateNewSBAndFillTestData actual = new CreateNewSBAndFillTestData(actualAdded.itemInst, actualAdded.ssm, actualAdded.curSelState, actualAdded.curEqpState);
 					Assert.That(actualAdded, Is.Not.Null.And.InstanceOf(typeof(Slottable)));
 					bool equality = actual.Equals(expected);
@@ -1513,12 +1513,12 @@ namespace SlotSystemTests{
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(isAutoSort);
-					FillAndUpdateSBsTestData expected = new FillAndUpdateSBsTestData(ssm, SlotSystemElement.defocusedState, Slottable.unequippedState);
 					
 					sg.FillAndUpdateSBs();
 
 					ISlottable added = sg.toList[sbs.Count];
 					Assert.That(added, Is.Not.Null);
+					FillAndUpdateSBsTestData expected = new FillAndUpdateSBsTestData(ssm, added.defocusedState, Slottable.unequippedState);
 					FillAndUpdateSBsTestData actual = new FillAndUpdateSBsTestData(added.ssm, added.curSelState, added.curEqpState);
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
@@ -1880,11 +1880,11 @@ namespace SlotSystemTests{
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(false);
-					CreatedNewSBData expected = new CreatedNewSBData(bow, ssm, SlotSystemElement.defocusedState, Slottable.unequippedState);
 					
 					sg.SwapAndUpdateSBs();
 
 					ISlottable actualAdded = sg.toList[sg.toList.Count -1];
+					CreatedNewSBData expected = new CreatedNewSBData(bow, ssm, actualAdded.defocusedState, Slottable.unequippedState);
 					CreatedNewSBData actual = new CreatedNewSBData(actualAdded.itemInst, actualAdded.ssm, actualAdded.curSelState, actualAdded.curEqpState);
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
@@ -1906,11 +1906,11 @@ namespace SlotSystemTests{
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(false);
-					CreatedNewSBData expected = new CreatedNewSBData(bow, ssm, SlotSystemElement.defocusedState, Slottable.unequippedState);
 					
 					sg.SwapAndUpdateSBs();
 
 					ISlottable actualAdded = sg.toList[sg.toList.Count -1];
+					CreatedNewSBData expected = new CreatedNewSBData(bow, ssm, actualAdded.defocusedState, Slottable.unequippedState);
 					CreatedNewSBData actual = new CreatedNewSBData(actualAdded.itemInst, actualAdded.ssm, actualAdded.curSelState, actualAdded.curEqpState);
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
@@ -2612,7 +2612,7 @@ namespace SlotSystemTests{
 						}
 					}
 				[TestCaseSource(typeof(InitSBs_WhenCalledCases))][Category("Methods")]
-				public void InitSBs_WhenCalled_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<SlottableItem> items, List<CreatedNewSBData> expected){
+				public void InitSBs_WhenCalled_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<SlottableItem> items){
 					SlotGroup sg = MakeSG();
 						sg.SetSSM(ssm);
 						sg.SetSlots(slots);
@@ -2621,9 +2621,10 @@ namespace SlotSystemTests{
 
 					for(int i = 0; i< slots.Count; i++){
 						ISlottable sb = slots[i].sb;
-						CreatedNewSBData actual = new CreatedNewSBData(sb.itemInst, sb.ssm, SlotSystemElement.deactivatedState, Slottable.unequippedState);
-						bool equality = actual.Equals(expected[i]);
-						Assert.That(equality, Is.True);
+						Assert.That(sb.ssm, Is.SameAs(ssm));
+						Assert.That(sb.itemInst, Is.SameAs(items[i]));
+						Assert.That(sb.curSelState, Is.SameAs(sb.deactivatedState));
+						Assert.That(sb.curEqpState, Is.Null);
 					}
 				}
 					class InitSBs_WhenCalledCases: IEnumerable{
@@ -2636,18 +2637,8 @@ namespace SlotSystemTests{
 								BowInstance bowC = MakeBowInstance(2);
 								BowInstance bowD = MakeBowInstance(3);
 								items = new List<SlottableItem>(new SlottableItem[]{bowA, bowB, bowC, bowD});
-							ISSESelState deaState = SlotSystemElement.deactivatedState;
-							ISBEqpState uneState = Slottable.unequippedState;
-							List<CreatedNewSBData> expected;
-								CreatedNewSBData bowAData = new CreatedNewSBData(bowA, ssm, deaState, uneState);
-								CreatedNewSBData bowBData = new CreatedNewSBData(bowB, ssm, deaState, uneState);
-								CreatedNewSBData bowCData = new CreatedNewSBData(bowC, ssm, deaState, uneState);
-								CreatedNewSBData bowDData = new CreatedNewSBData(bowD, ssm, deaState, uneState);
-								expected = new List<CreatedNewSBData>(new CreatedNewSBData[]{
-									bowAData, bowBData, bowCData, bowDData
-								});
 							yield return new object[]{
-								ssm, slots, items, expected
+								ssm, slots, items
 							};
 						}
 					}

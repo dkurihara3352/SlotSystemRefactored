@@ -61,7 +61,7 @@ namespace SlotSystem{
 			}
 		}
 		public override void Focus(){
-			SetSelState(SlotSystemElement.focusedState);
+			SetSelState(focusedState);
 			PageFocus();
 		}
 		public override void Deactivate(){

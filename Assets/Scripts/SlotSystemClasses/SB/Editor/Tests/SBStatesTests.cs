@@ -67,7 +67,7 @@ namespace SlotSystemTests{
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().SetActState(Slottable.waitForPickUpState);
-						mockSB.Received().SetSelState(SlotSystemElement.selectedState);
+						mockSB.Received().SetSelState(mockSB.selectedState);
 					}
 
 				/*	WaitForPickUpState	*/

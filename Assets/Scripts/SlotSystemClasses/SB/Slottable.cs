@@ -261,13 +261,13 @@ namespace SlotSystem{
 				}
 			}
 			public override bool isFocused{
-				get{return curSelState == SlotSystemElement.focusedState;}
+				get{return curSelState == focusedState;}
 			}
 			public override bool isDefocused{
-				get{return curSelState == SlotSystemElement.defocusedState;}
+				get{return curSelState == defocusedState;}
 			}
 			public override bool isDeactivated{
-				get{return curSelState == SlotSystemElement.deactivatedState;}
+				get{return curSelState == deactivatedState;}
 			}
 			public virtual bool isPickedUp{
 				get{
@@ -337,13 +337,13 @@ namespace SlotSystem{
 				}
 				public override void Activate(){}
 				public override void Deactivate(){
-					SetSelState(SlotSystemElement.deactivatedState);
+					SetSelState(deactivatedState);
 				}
 				public override void Focus(){
-					SetSelState(SlotSystemElement.focusedState);
+					SetSelState(focusedState);
 				}
 				public override void Defocus(){
-					SetSelState(SlotSystemElement.defocusedState);
+					SetSelState(defocusedState);
 				}
 				public override bool ContainsInHierarchy(ISlotSystemElement element){
 					return false;
@@ -397,7 +397,7 @@ namespace SlotSystem{
 			}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(SlotSystemElement.deactivatedState);
+				SetSelState(deactivatedState);
 				SetActState(Slottable.sbWaitForActionState);
 				SetEqpState(null);
 				SetMrkState(Slottable.unmarkedState);

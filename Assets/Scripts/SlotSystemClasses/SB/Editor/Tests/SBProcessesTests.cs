@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 
 				wfpuProc.Expire();
 
-				mockSB.Received().SetSelState(SlotSystemElement.defocusedState);
+				mockSB.Received().SetSelState(mockSB.defocusedState);
 			}
 			[Test]
 			public void WaitForNextTouchProcess_Expire_SBIsPickedUp_CallsSBExecuteTransaction(){

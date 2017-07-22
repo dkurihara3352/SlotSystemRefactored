@@ -452,13 +452,13 @@ namespace SlotSystem{
 					}
 				}
 				public override bool isFocused{
-					get{return curSelState == SlotSystemElement.focusedState;}
+					get{return curSelState == focusedState;}
 				}
 				public override bool isDefocused{
-					get{return curSelState == SlotSystemElement.defocusedState;}
+					get{return curSelState == defocusedState;}
 				}
 				public override bool isDeactivated{
-					get{return curSelState == SlotSystemElement.deactivatedState;}
+					get{return curSelState == deactivatedState;}
 				}
 				public override ISlotSystemManager ssm{get{return this;}}
 			/*	methods	*/
@@ -485,7 +485,7 @@ namespace SlotSystem{
 					PerformInHierarchy(InitStatesInHi);
 				}
 				public override void InitializeStates(){
-					SetSelState(SlotSystemElement.deactivatedState);
+					SetSelState(deactivatedState);
 					SetActState(SlotSystemManager.ssmWaitForActionState);
 				}
 				public void InitStatesInHi(ISlotSystemElement element){
@@ -523,18 +523,18 @@ namespace SlotSystem{
 					Focus();
 				}
 				public override void Deactivate(){
-					SetSelState(SlotSystemElement.deactivatedState);
+					SetSelState(deactivatedState);
 					foreach(ISlotSystemElement ele in this){
 						ele.Deactivate();
 					}
 					ToggleBack();
 				}
 				public override void Focus(){
-					SetSelState(SlotSystemElement.focusedState);
+					SetSelState(focusedState);
 					PageFocus();
 				}
 				public override void Defocus(){
-					SetSelState(SlotSystemElement.defocusedState);
+					SetSelState(defocusedState);
 					foreach(ISlotSystemElement ele in this){
 						ele.Defocus();
 					}
@@ -605,10 +605,10 @@ namespace SlotSystem{
 				public void SetTargetSB(ISlottable sb){
 					if(sb == null || sb != targetSB){
 						if(targetSB != null)
-							targetSB.SetSelState(SlotSystemElement.focusedState);
+							targetSB.SetSelState(targetSB.focusedState);
 						this.m_targetSB = sb;
 						if(targetSB != null)
-							targetSB.SetSelState(SlotSystemElement.selectedState);
+							targetSB.SetSelState(targetSB.selectedState);
 					}
 				}
 			public ISlotGroup sg1{get{return m_sg1;}} ISlotGroup m_sg1;
@@ -631,7 +631,7 @@ namespace SlotSystem{
 							ReferToTAAndUpdateSelState(sg2);
 						this.m_sg2 = sg;
 						if(sg2 != null)
-							sg2.SetSelState(SlotSystemElement.selectedState);
+							sg2.SetSelState(sg2.selectedState);
 						if(sg2 != null)
 							m_sg2Done = false;
 						else
@@ -713,12 +713,12 @@ namespace SlotSystem{
 					ISlotSystemTransaction ta = null;
 					if(transactionResults.TryGetValue(sg, out ta)){
 						if(ta is IRevertTransaction)
-							sg.SetSelState(SlotSystemElement.defocusedState);
+							sg.SetSelState(sg.defocusedState);
 						else
-							sg.SetSelState(SlotSystemElement.focusedState);
+							sg.SetSelState(sg.focusedState);
 					}
 				}else
-					sg.SetSelState(SlotSystemElement.focusedState);
+					sg.SetSelState(sg.focusedState);
 			}
 			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
 				return taFactory.MakeTransaction(pickedSB, hovered);
