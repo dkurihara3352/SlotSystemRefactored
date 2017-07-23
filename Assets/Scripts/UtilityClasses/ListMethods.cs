@@ -94,6 +94,36 @@ namespace Utility{
 			}
 			list.Add(element);
 		}
+		public static int Count<T>(this IEnumerable<T> coll){
+			IEnumerator rator = coll.GetEnumerator();
+			int count = 0;
+			while(rator.MoveNext())
+				count++;
+			return count;
+		}
+		public static bool MemberEquals<T>(this IEnumerable<T> coll, IEnumerable<T> other){
+			if(coll.Count() != other.Count()) return false;
+			IEnumerator rator = coll.GetEnumerator();
+			IEnumerator otherRator = other.GetEnumerator();
+			while(rator.MoveNext()&& otherRator.MoveNext()){
+				if(rator.Current == null){
+					if(otherRator.Current == null)
+						continue;
+					else
+						return false;
+				}
+				else{
+					if(otherRator.Current == null)
+						return false;
+					else
+						if(rator.Current.Equals(otherRator.Current))
+							continue;
+						else
+							return false;
+				}
+			}
+			return true;
+		}
 	}
 }
 	

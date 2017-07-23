@@ -9,6 +9,7 @@ using NSubstitute;
 namespace SlotSystemTests{
 	namespace SBTests{
 		[TestFixture]
+		[Category("SB")]
 		public class SBProcessesTests: SlotSystemTest{
 
 			[Test]
@@ -19,7 +20,7 @@ namespace SlotSystemTests{
 				wfpuProc.Expire();
 
 				mockSB.Received().PickUp();
-			}
+				}
 			[Test]
 			public void WaitForPointerUpProcess_Expire_WhenCalled_SetsSBSelStateDefocused(){
 				ISlottable mockSB = MakeSubSB();
@@ -28,7 +29,7 @@ namespace SlotSystemTests{
 				wfpuProc.Expire();
 
 				mockSB.Received().SetSelState(mockSB.defocusedState);
-			}
+				}
 			[Test]
 			public void WaitForNextTouchProcess_Expire_SBIsPickedUp_CallsSBExecuteTransaction(){
 				ISlottable mockSB = MakeSubSB();
@@ -38,7 +39,7 @@ namespace SlotSystemTests{
 				wfntProc.Expire();
 
 				mockSB.Received().ExecuteTransaction();
-			}
+				}
 			[Test]
 			public void WaitForNextTouchProcess_Expire_SBIsNOTPickedUp_CallsSBVarious(){
 				ISlottable mockSB = MakeSubSB();
@@ -50,7 +51,7 @@ namespace SlotSystemTests{
 				mockSB.Received().Tap();
 				mockSB.Received().Reset();
 				mockSB.Received().Focus();
-			}
+				}
 			/*	helper	*/
 		}
 	}

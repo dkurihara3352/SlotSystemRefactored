@@ -11,6 +11,7 @@ namespace SlotSystemTests{
 	namespace SBTests{
 
 		[TestFixture]
+		[Category("SB")]
 		public class SBStatesTest: SlotSystemTest{
 			/*	SBActStates	*/
 				/*	WaitForActionState	*/
@@ -22,7 +23,7 @@ namespace SlotSystemTests{
 						wfaState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(null);
-					}
+						}
 					[Test]
 					public void WaitForActionState_OnPointerUpMock_WhenCalled_CallsSBMethods(){
 						WaitForActionState wfaState = new WaitForActionState();
@@ -35,7 +36,7 @@ namespace SlotSystemTests{
 							mockSB.Reset();
 							mockSB.Defocus();
 						});
-					}
+						}
 					[Test]
 					public void WaitForActionState_OnEndDrag_WhenCalled_CallsSBMethods(){
 						WaitForActionState wfaState = new WaitForActionState();
@@ -47,7 +48,7 @@ namespace SlotSystemTests{
 							mockSB.Reset();
 							mockSB.Defocus();
 						});
-					}
+						}
 					[Test]
 					public void WaitForActionState_OnPointerDown_IsNotFocused_SetsActStateWFPointerUpState(){
 						WaitForActionState wfaState = new WaitForActionState();
@@ -57,7 +58,7 @@ namespace SlotSystemTests{
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().SetActState(Slottable.waitForPointerUpState);
-					}
+						}
 					[Test]
 					public void WaitForActionState_OnPointerDown_IsFocused_SetsComplexStates(){
 						WaitForActionState wfaState = new WaitForActionState();
@@ -68,7 +69,7 @@ namespace SlotSystemTests{
 
 						mockSB.Received().SetActState(Slottable.waitForPickUpState);
 						mockSB.Received().SetSelState(mockSB.selectedState);
-					}
+						}
 
 				/*	WaitForPickUpState	*/
 					[Test]
@@ -79,7 +80,7 @@ namespace SlotSystemTests{
 						wfpuState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForPickUpProcess>());
-					}
+						}
 					[Test]
 					public void WaitForPickUpState_OnPointerUp_WhenCalled_SetsActStateWFNTState(){
 						WaitForPickUpState wfpuState = new WaitForPickUpState();
@@ -88,7 +89,7 @@ namespace SlotSystemTests{
 						wfpuState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().SetActState(Slottable.waitForNextTouchState);
-					}
+						}
 					[Test]
 					public void WaitForPickUpState_OnEndDrag_WhenCalled_CallsSBMethods(){
 						WaitForPickUpState wfpuState = new WaitForPickUpState();
@@ -100,7 +101,7 @@ namespace SlotSystemTests{
 							mockSB.Reset();
 							mockSB.Focus();
 						});
-					}
+						}
 				/*	WaitForPointerUpState	*/
 					[Test]
 					public void WaitForPointerUpState_EnterState_WhenCalled_SetsSBActProcWFPtUProcess(){
@@ -110,7 +111,7 @@ namespace SlotSystemTests{
 						wfptuState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForPointerUpProcess>());
-					}
+						}
 					[Test]
 					public void WaitForPointerUpState_OnPointerUp_WhenCalled_CallsSB(){
 						WaitForPointerUpState wfptuState = new WaitForPointerUpState();
@@ -123,7 +124,7 @@ namespace SlotSystemTests{
 							mockSB.Reset();
 							mockSB.Defocus();
 						});
-					}
+						}
 					[Test]
 					public void WaitForPointerUpState_OnEndDrag_WhenCalled_CallsSB(){
 						WaitForPointerUpState wfptuState = new WaitForPointerUpState();
@@ -135,7 +136,7 @@ namespace SlotSystemTests{
 							mockSB.Reset();
 							mockSB.Defocus();
 						});
-					}
+						}
 				/*	WaitForNextTouchState	*/
 					[Test]
 					public void WaitForNextTouchState_EnterState_WhenCalled_SetsSBActProcWFNTProcess(){
@@ -145,7 +146,7 @@ namespace SlotSystemTests{
 						wfntState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForNextTouchProcess>());
-					}
+						}
 					[Test]
 					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_SetsActStatePickedUpState(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
@@ -155,7 +156,7 @@ namespace SlotSystemTests{
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().SetActState(Slottable.pickedUpState);
-					}
+						}
 					[Test]
 					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_CallSBIncrement(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
@@ -165,7 +166,7 @@ namespace SlotSystemTests{
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().Increment();
-					}
+						}
 					[Test]
 					public void WaitForNextTouchState_OnPointerDown_IsNotPickedUp_CallSBPickUp(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
@@ -175,7 +176,7 @@ namespace SlotSystemTests{
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().PickUp();
-					}
+						}
 					[Test]
 					public void WaitForNextTouchState_OnDeselected_IsNotPickedUp_CallSB(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
@@ -188,7 +189,7 @@ namespace SlotSystemTests{
 							mockSB.Reset();
 							mockSB.Focus();
 						});
-					}
+						}
 				/*	PickedUpState	*/
 					[Test]
 					public void PickedUpState_EnterState_WhenCalled_CallSB(){
@@ -206,7 +207,7 @@ namespace SlotSystemTests{
 							mockSB.OnHoverEnterMock();
 							mockSB.UpdateTA();
 						});
-					}
+						}
 					[Test]
 					public void PickedUpState_EnterState_WhenCalled_SetsSSMActStateProbing(){
 						PickedUpState puState = new PickedUpState();
@@ -217,7 +218,7 @@ namespace SlotSystemTests{
 						puState.EnterState(mockSB);
 
 						mockSB.Received().SetSSMActState(SlotSystemManager.ssmProbingState);
-					}
+						}
 					[Test]
 					public void PickedUpState_EnterState_WhenCalled_SetsActProcPickedUpProcess(){
 						PickedUpState puState = new PickedUpState();
@@ -228,7 +229,7 @@ namespace SlotSystemTests{
 						puState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(Arg.Any<SBPickedUpProcess>());
-					}
+						}
 					[Test]
 					public void PickedUpState_OnDeselected_WhenCalled_CallSB(){
 						PickedUpState puState = new PickedUpState();
@@ -240,7 +241,7 @@ namespace SlotSystemTests{
 							mockSB.Reset();
 							mockSB.Focus();
 						});
-					}
+						}
 					[Test]
 					public void PickedUpState_OnPointerUp_IsHoveredAndIsStackable_SetsActStateWFNTState(){
 						PickedUpState puState = new PickedUpState();
@@ -251,7 +252,7 @@ namespace SlotSystemTests{
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().SetActState(Slottable.waitForNextTouchState);
-					}
+						}
 					[Test]
 					public void PickedUpState_OnPointerUp_NOTIsHoveredAndIsStackable_CallSB(){
 						PickedUpState puState = new PickedUpState();
@@ -262,7 +263,7 @@ namespace SlotSystemTests{
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().ExecuteTransaction();
-					}
+						}
 					[Test]
 					public void PickedUpState_OnEndDrag_WhenCalled_CallSB(){
 						PickedUpState puState = new PickedUpState();
@@ -271,7 +272,7 @@ namespace SlotSystemTests{
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
 						mockSB.Received().ExecuteTransaction();
-					}
+						}
 				/*	SBMoveWithinState	*/
 					[Test]
 					public void SBMoveWithinState_EnterState_WhenCalled_SetsActProcSBMWProcess(){
@@ -281,7 +282,7 @@ namespace SlotSystemTests{
 						mwState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(Arg.Any<SBMoveWithinProcess>());
-					}
+						}
 				/*	SBAddedState	*/
 					[Test]
 					public void SBAddedState_EnterState_WhenCalled_SetsActProcAddedProcess(){
@@ -291,7 +292,7 @@ namespace SlotSystemTests{
 						addedState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(Arg.Any<SBAddProcess>());
-					}
+						}
 				/*	SBRemovedState	*/
 					[Test]
 					public void SBRemovedState_EnterState_WhenCalled_SetsActProcRemovedProcess(){
@@ -301,7 +302,7 @@ namespace SlotSystemTests{
 						remState.EnterState(mockSB);
 
 						mockSB.Received().SetAndRunActProcess(Arg.Any<SBRemoveProcess>());
-					}
+						}
 
 			/*	SBEqpStates	*/
 				[Test]
@@ -313,7 +314,7 @@ namespace SlotSystemTests{
 					eqState.EnterState(mockSB);
 
 					mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
-				}
+					}
 			/*	SBUnequipState	*/
 				[Test]
 				public void SBUnequippedState_EnterState_IsPoolAndPrevEqpStateEquipped_SetsEqpProcUnequipProc(){
@@ -325,7 +326,7 @@ namespace SlotSystemTests{
 					unequipeedState.EnterState(mockSB);
 
 					mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
-				}
+					}
 			/*	SBMarkedState	*/
 				[Test]
 				public void SBMarkedState_EnterState_IsPoolAndPrevEqpStateUnmarked_SetsMrkProcMarkProcess(){
@@ -337,7 +338,7 @@ namespace SlotSystemTests{
 					markedState.EnterState(mockSB);
 
 					mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
-				}
+					}
 			/*	SBUnmarkedState	*/
 				[Test]
 				public void SBUnmarkedState_EnterState_IsPoolAndPrevMrkStateMarked_SetsMrkProcUnmarkProcess(){
@@ -349,7 +350,7 @@ namespace SlotSystemTests{
 					unmarkedState.EnterState(mockSB);
 
 					mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
-				}
+					}
 			/*	Helper */
 		}
 	}

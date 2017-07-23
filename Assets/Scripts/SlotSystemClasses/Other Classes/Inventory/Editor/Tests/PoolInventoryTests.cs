@@ -9,6 +9,7 @@ namespace SlotSystemTests{
     namespace OtherClassesTests{
         namespace InventoryTests{
 			[TestFixture]
+			[Category("Other")]
 			public class PoolInventoryTests: SlotSystemTest {
 				/*	Add	*/
 					[TestCaseSource(typeof(AddNonStackableCases))]
@@ -22,17 +23,20 @@ namespace SlotSystemTests{
 							InventoryItemInstance itemInst = (InventoryItemInstance)item;
 							Assert.That(itemInst.quantity, Is.EqualTo(1));
 						}
-					}
+						}
 						class AddNonStackableCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
-								BowInstance bowInst_A = MakeBowInstance(0);
-								BowInstance bowInst_A_1 = MakeBowInstance(0);
-								BowInstance bowInst_A_2 = MakeBowInstance(0);
-								object[] case1 = new object[]{
-									new InventoryItemInstance[]{bowInst_A, bowInst_A_1, bowInst_A_2},
-									new List<InventoryItemInstance>(new InventoryItemInstance[]{bowInst_A, bowInst_A_1, bowInst_A_2})
-								};
-								yield return case1;
+								object[] addNonStackables;
+									BowInstance bow_1 = MakeBowInstance(0);
+									WearInstance wear_1 = MakeWearInstance(0);
+									ShieldInstance shield_1 = MakeShieldInstance(0);
+									MeleeWeaponInstance mWeapon_1 = MakeMeleeWeaponInstance(0);
+									QuiverInstance quiver_1 = MakeQuiverInstance(0);
+									PackInstance pack_1 = MakePackInstance(0);
+									IEnumerable<InventoryItemInstance> added_1 = new InventoryItemInstance[]{bow_1, wear_1, shield_1, mWeapon_1, quiver_1, pack_1};
+									List<InventoryItemInstance> expected_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{bow_1, wear_1, shield_1, mWeapon_1, quiver_1, pack_1});
+									addNonStackables = new object[]{added_1, expected_1};
+									yield return addNonStackables;
 							}
 						}
 					
@@ -46,7 +50,7 @@ namespace SlotSystemTests{
 
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 						Assert.That(expected[0].quantity, Is.EqualTo(expectedCount));
-					}
+						}
 						class AddSameStackableCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								PartsInstance stubPartsInst_A = MakePartsInstance(0, 2);
@@ -74,7 +78,7 @@ namespace SlotSystemTests{
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 						Assert.That(partsInst_A.quantity, Is.EqualTo(1));
 						Assert.That(partsInst_B.quantity, Is.EqualTo(1));
-					}
+						}
 					[Test]
 					public void Add_NonStackableSameInst_ThrowsException(){
 						PoolInventory inv = MakePoolInventory();
@@ -84,7 +88,7 @@ namespace SlotSystemTests{
 						System.Exception ex = Assert.Catch<System.InvalidOperationException>(() => inv.Add(bowInst));
 						
 						Assert.That(ex.Message, Is.StringContaining("cannot add multiple same InventoryItemInstances. Try instantiate another instance with the same InventoryItem instead"));
-					}
+						}
 					[Test]
 					public void Add_StackableSameInst_ThrowsException(){
 						PoolInventory poolInv = MakePoolInventory();
@@ -94,14 +98,14 @@ namespace SlotSystemTests{
 
 						System.Exception ex = Assert.Catch<System.InvalidOperationException>(() => poolInv.Add(partsInst));
 						Assert.That(ex.Message, Is.StringContaining("cannot add multiple same InventoryItemInstances. Try instantiate another instance with the same InventoryItem instead"));
-					}
+						}
 					[Test]
 					[ExpectedException(typeof(System.ArgumentNullException))]
 					public void Add_Null_ThrowsException(){
 						PoolInventory poolInv = MakePoolInventory();
 						
 						poolInv.Add(null);
-					}
+						}
 					[TestCaseSource(typeof(AddVariousCases))]
 					public void Add_Various_PerformComplexBehaviour(IEnumerable<InventoryItemInstance> addedItems, List<InventoryItemInstance> expected, Dictionary<InventoryItemInstance, int> itemQuantityDict){
 						PoolInventory poolInv = MakePoolInventory();
@@ -116,7 +120,7 @@ namespace SlotSystemTests{
 						}
 
 						RevertQuant(addedItems, origQuant);
-					}
+						}
 						class AddVariousCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								BowInstance bowInst_A = MakeBowInstance(0);
@@ -160,7 +164,7 @@ namespace SlotSystemTests{
 								poolInv.Remove(item);
 							
 							Assert.That(ItemList(poolInv), Is.EqualTo(expectedResult));
-					}
+						}
 						class RemoveNonStackableCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								BowInstance bowInst_A_1 = MakeBowInstance(0);
@@ -192,7 +196,7 @@ namespace SlotSystemTests{
 						PoolInventory poolInv = MakePoolInventory();
 						
 						poolInv.Remove(null);
-					}
+						}
 					[TestCaseSource(typeof(RemoveNonMemberCases))]
 					public void Remove_NonMember_IgnoresUpdate(IEnumerable<InventoryItemInstance> added, IEnumerable<InventoryItemInstance> removed, List<InventoryItemInstance> expected){
 						PoolInventory poolInv = MakePoolInventory();
@@ -203,7 +207,7 @@ namespace SlotSystemTests{
 							poolInv.Remove(item);
 						
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
-					}
+						}
 						class RemoveNonMemberCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								BowInstance bowInst_A_1 = MakeBowInstance(0);
@@ -246,7 +250,7 @@ namespace SlotSystemTests{
 
 						RevertQuant(added, origAddedQuants);
 						RevertQuant(removed, origRemovedQuants);
-					}
+						}
 						class RemoveStackableDownToOneCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								PartsInstance partsInst_A_1 = MakePartsInstance(0, 3);
@@ -292,7 +296,7 @@ namespace SlotSystemTests{
 
 						RevertQuant(added, origAddedQuants);
 						RevertQuant(removed, origRemovedQuants);
-					}
+						}
 						class RemoveStackableDownToZeroCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								PartsInstance partsInst_A_1 = MakePartsInstance(0, 3);
@@ -324,7 +328,7 @@ namespace SlotSystemTests{
 
 						System.Exception ex = Assert.Catch<System.InvalidOperationException>(() => poolInv.Remove(partsInst_r));
 						Assert.That(ex.Message, Is.StringContaining("PoolInventory.Remove: cannot remove by greater quantity than there is"));
-					}
+						}
 					[TestCaseSource(typeof(RemoveVariousCases))]
 					public void Remove_Various_PerformComplexBehaviour(IEnumerable<InventoryItemInstance> added, IEnumerable<InventoryItemInstance> removed, List<InventoryItemInstance> expected, Dictionary<InventoryItemInstance, int> quantDict){
 						PoolInventory poolInv = MakePoolInventory();
@@ -343,7 +347,7 @@ namespace SlotSystemTests{
 
 						RevertQuant(added, origAddedQuants);
 						RevertQuant(removed, origRemovedQuants);
-					}
+						}
 						class RemoveVariousCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								BowInstance bowInst_A_1 = MakeBowInstance(0);
@@ -397,61 +401,72 @@ namespace SlotSystemTests{
 						}
 						RevertQuant(added, origAddedQuants);
 						RevertQuant(removed, origRemovedQuants);
-					}
+						}
 						class IndexItemCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
-								BowInstance bowInst_A_1 = MakeBowInstance(0);
-								BowInstance bowInst_A_2 = MakeBowInstance(0);
-								BowInstance bowInst_B_1 = MakeBowInstance(1);
-								BowInstance bowInst_B_2 = MakeBowInstance(1);
-								PartsInstance partsInst_A_1 = MakePartsInstance(0, 3);
-								PartsInstance partsInst_A_2 = MakePartsInstance(0, 4);
-								PartsInstance partsInst_B_1 = MakePartsInstance(1, 5);
-								PartsInstance partsInst_B_2 = MakePartsInstance(1, 2);
-								IEnumerable<InventoryItemInstance> case1Added = new InventoryItemInstance[]{
-									partsInst_A_1, partsInst_A_2, partsInst_B_1, partsInst_B_2,
-									bowInst_A_1, bowInst_A_2, bowInst_B_1, bowInst_B_2
-								};
-								PartsInstance partsInst_A_r = MakePartsInstance(0, 7);
-								PartsInstance partsInst_B_r = MakePartsInstance(1, 3);
-								IEnumerable<InventoryItemInstance> case1Removed = new InventoryItemInstance[]{
-									partsInst_A_r, partsInst_B_r,
-									bowInst_A_2, bowInst_B_2
-								};
-								List<InventoryItemInstance> case1Exp = new List<InventoryItemInstance>(new InventoryItemInstance[]{
-									partsInst_B_1,
-									bowInst_A_1, bowInst_B_1
-								});
-								Dictionary<InventoryItemInstance, int> case1Dict = new Dictionary<InventoryItemInstance, int>();
-								case1Dict.Add(partsInst_B_1, 0);
-								case1Dict.Add(bowInst_A_1, 1);
-								case1Dict.Add(bowInst_B_1, 2);
-								object case1  = new object[]{
-									case1Added, case1Removed, case1Exp, case1Dict
-								};
-								yield return case1;
-
-								IEnumerable<InventoryItemInstance> case2Added = new InventoryItemInstance[]{
-									partsInst_A_1, partsInst_A_2, partsInst_B_1, partsInst_B_2,
-									bowInst_A_1, bowInst_A_2, bowInst_B_1, bowInst_B_2
-								};
-								IEnumerable<InventoryItemInstance> case2Removed = new InventoryItemInstance[]{};
-								List<InventoryItemInstance> case2Exp = new List<InventoryItemInstance>(new InventoryItemInstance[]{
-									partsInst_A_1, partsInst_B_1,
-									bowInst_A_1, bowInst_A_2, bowInst_B_1, bowInst_B_2
-								});
-								Dictionary<InventoryItemInstance, int> case2Dict = new Dictionary<InventoryItemInstance, int>();
-								case2Dict.Add(partsInst_A_1, 0);
-								case2Dict.Add(partsInst_B_1, 1);
-								case2Dict.Add(bowInst_A_1, 2);
-								case2Dict.Add(bowInst_A_2, 3);
-								case2Dict.Add(bowInst_B_1, 4);
-								case2Dict.Add(bowInst_B_2, 5);
-								object case2  = new object[]{
-									case2Added, case2Removed, case2Exp, case2Dict
-								};
-								yield return case2;
-							}
+								object[] removeComplex;
+									BowInstance bowA_1 = MakeBowInstance(0);
+									BowInstance bowA_r_1 = MakeBowInstance(0);
+									BowInstance bowB_1 = MakeBowInstance(1);
+									BowInstance bowB_r_1 = MakeBowInstance(1);
+									PartsInstance partsA_1 = MakePartsInstance(0, 3);
+									PartsInstance partsAA_1 = MakePartsInstance(0, 4);
+									PartsInstance partsB_1 = MakePartsInstance(1, 5);
+									PartsInstance partsBB_1 = MakePartsInstance(1, 2);
+									PartsInstance partsA_r_1 = MakePartsInstance(0, 7);
+									PartsInstance partsB_r_1 = MakePartsInstance(1, 3);
+									IEnumerable<InventoryItemInstance> added_1 = new InventoryItemInstance[]{
+										partsA_1, partsAA_1, partsB_1, partsBB_1,
+										bowA_1, bowA_r_1, bowB_1, bowB_r_1
+									};
+									IEnumerable<InventoryItemInstance> removed_1 = new InventoryItemInstance[]{
+										partsA_r_1, partsB_r_1,
+										bowA_r_1, bowB_r_1
+									};
+									List<InventoryItemInstance> expItems_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+										partsB_1,
+										bowA_1, bowB_1
+									});
+									Dictionary<InventoryItemInstance, int> ids_1 = new Dictionary<InventoryItemInstance, int>();
+									ids_1.Add(partsB_1, 0);
+									ids_1.Add(bowA_1, 1);
+									ids_1.Add(bowB_1, 2);
+									removeComplex  = new object[]{
+										added_1, removed_1, expItems_1, ids_1
+									};
+									yield return removeComplex;
+								object[] removeNone;
+									BowInstance bowA_2 = MakeBowInstance(0);
+									BowInstance bowA_r_2 = MakeBowInstance(0);
+									BowInstance bowB_2 = MakeBowInstance(1);
+									BowInstance bowB_r_2 = MakeBowInstance(1);
+									PartsInstance partsA_2 = MakePartsInstance(0, 3);
+									PartsInstance partsAA_2 = MakePartsInstance(0, 4);
+									PartsInstance partsB_2 = MakePartsInstance(1, 5);
+									PartsInstance partsBB_2 = MakePartsInstance(1, 2);
+									PartsInstance partsA_r_2 = MakePartsInstance(0, 7);
+									PartsInstance partsB_r_2 = MakePartsInstance(1, 3);
+									IEnumerable<InventoryItemInstance> added_2 = new InventoryItemInstance[]{
+										partsA_2, partsAA_2, partsB_2, partsBB_2,
+										bowA_2, bowA_r_2, bowB_2, bowB_r_2
+									};
+									IEnumerable<InventoryItemInstance> removed_2 = new InventoryItemInstance[]{};
+									List<InventoryItemInstance> expItems_2 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+										partsA_2, partsB_2,
+										bowA_2, bowA_r_2, bowB_2, bowB_r_2
+									});
+									Dictionary<InventoryItemInstance, int> ids_2 = new Dictionary<InventoryItemInstance, int>();
+									ids_2.Add(partsA_2, 0);
+									ids_2.Add(partsB_2, 1);
+									ids_2.Add(bowA_2, 2);
+									ids_2.Add(bowA_r_2, 3);
+									ids_2.Add(bowB_2, 4);
+									ids_2.Add(bowB_r_2, 5);
+									removeNone  = new object[]{
+										added_2, removed_2, expItems_2, ids_2
+									};
+									yield return removeNone;
+								}
 						}
 				/*	helpers */
 					int[] CacheOrigQuant(IEnumerable<InventoryItemInstance> items){

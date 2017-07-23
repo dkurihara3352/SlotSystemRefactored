@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using NSubstitute;
 using SlotSystem;
+using Utility;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture][Category("SG")]
@@ -25,9 +26,9 @@ namespace SlotSystemTests{
 				sg.TransactionCoroutine();
 				
 				sgActProc.Received().Expire();
-			}
+				}
 			/*	Fields	*/
-				[Test][Category("Fields")]
+				[Test]
 				public void isPool_SSMPBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager stubSSM = MakeSSMWithPBunContaining(sg);
@@ -36,8 +37,8 @@ namespace SlotSystemTests{
 					bool actual = sg.isPool;
 
 					Assert.That(actual, Is.True);
-				}
-				[Test][Category("Fields")]
+					}
+				[Test]
 				public void isSGE_SSMEBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager stubSSM = MakeSSMWithEBunContaining(sg);
@@ -46,8 +47,8 @@ namespace SlotSystemTests{
 					bool actual = sg.isSGE;
 
 					Assert.That(actual, Is.True);
-				}
-				[Test][Category("Fields")]
+					}
+				[Test]
 				public void isSGG_SSMGBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager stubSSM = MakeSSMWithGBunContaining(sg);
@@ -56,8 +57,8 @@ namespace SlotSystemTests{
 					bool actual = sg.isSGG;
 
 					Assert.That(actual, Is.True);
-				}
-				[Test][Category("Fields")]
+					}
+				[Test]
 				public void hasEmptySlot_SlotsWithNullMember_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
 					List<Slot> slots;
@@ -75,8 +76,8 @@ namespace SlotSystemTests{
 					bool actual = sg.hasEmptySlot;
 
 					Assert.That(actual, Is.True);
-				}
-				[Test][Category("Fields")]
+					}
+				[Test]
 				public void hasEmptySlot_SlotsWithNoNullMember_ReturnsFalse(){
 					SlotGroup sg = MakeSG();
 					List<Slot> slots;
@@ -95,8 +96,8 @@ namespace SlotSystemTests{
 					bool actual = sg.hasEmptySlot;
 
 					Assert.That(actual, Is.False);
-				}
-				[TestCaseSource(typeof(EquippedSBsCases))][Category("Fields")]
+					}
+				[TestCaseSource(typeof(EquippedSBsCases))]
 				public void equippedSBs_WhenCalled_ReturnsAllSBsIsEquipped(List<ISlottable> sbs, List<ISlottable> expected){
 					SlotGroup sg = MakeSG();
 					sg.SetSBs(sbs);
@@ -104,7 +105,7 @@ namespace SlotSystemTests{
 					List<ISlottable> actual = sg.equippedSBs;
 
 					Assert.That(actual, Is.EqualTo(expected));
-				}
+					}
 					class EquippedSBsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable eSBA = MakeSubSB();
@@ -128,7 +129,7 @@ namespace SlotSystemTests{
 							yield return new object[]{case1SBs, case1Exp};
 						}
 					}
-				[TestCaseSource(typeof(IsAllSBsActProcDoneCases))][Category("Fields")]
+				[TestCaseSource(typeof(IsAllSBsActProcDoneCases))]
 				public void isAllSBsActProcDone_Various_ReturnsAccordingly(List<ISlottable> sbs, bool expected){
 					SlotGroup sg = MakeSG();
 					sg.SetSBs(sbs);
@@ -136,143 +137,267 @@ namespace SlotSystemTests{
 					bool actual = sg.isAllSBActProcDone;
 
 					Assert.That(actual, Is.EqualTo(expected));
-				}
+					}
 					class IsAllSBsActProcDoneCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							ISlottable vSBA = MakeSBWithActProc(false);
-							ISlottable vSBB = MakeSBWithActProc(false);
-							ISlottable vSBC = MakeSBWithActProc(false);
-							ISlottable iSBA = MakeSBWithActProc(true);
-							ISlottable iSBB = MakeSBWithActProc(true);
-							ISlottable iSBC = MakeSBWithActProc(true);
-							List<ISlottable> case1SBs = new List<ISlottable>(new ISlottable[]{
-								vSBA, vSBB, vSBC, iSBA, iSBB, iSBC
-							});
-							yield return new object[]{case1SBs, false};
-							List<ISlottable> case2SBs = new List<ISlottable>(new ISlottable[]{
-								vSBA, vSBB, vSBC
-							});
-							yield return new object[]{case2SBs, true};
-							List<ISlottable> case3SBs = new List<ISlottable>(new ISlottable[]{
-								iSBA, iSBB, iSBC
-							});
-							yield return new object[]{case3SBs, false};
-							List<ISlottable> case4SBs = new List<ISlottable>(new ISlottable[]{
-								vSBA
-							});
-							yield return new object[]{case4SBs, true};
-							
+							object[] mixed_F;
+								ISlottable vSBA_0 = MakeSBWithActProc(false);
+								ISlottable vSBB_0 = MakeSBWithActProc(false);
+								ISlottable vSBC_0 = MakeSBWithActProc(false);
+								ISlottable iSBA_0 = MakeSBWithActProc(true);
+								ISlottable iSBB_0 = MakeSBWithActProc(true);
+								ISlottable iSBC_0 = MakeSBWithActProc(true);
+								List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{
+									vSBA_0, vSBB_0, vSBC_0, iSBA_0, iSBB_0, iSBC_0
+								});
+								mixed_F = new object[]{sbs_0, false};
+								yield return mixed_F;
+							object[] allDone_T;
+								ISlottable vSBA_1 = MakeSBWithActProc(false);
+								ISlottable vSBB_1 = MakeSBWithActProc(false);
+								ISlottable vSBC_1 = MakeSBWithActProc(false);
+								List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{
+									vSBA_1, vSBB_1, vSBC_1
+								});
+								allDone_T = new object[]{sbs_1, true};
+								yield return allDone_T;
+							object[] allNotDone_F;
+								ISlottable iSBA_2 = MakeSBWithActProc(true);
+								ISlottable iSBB_2 = MakeSBWithActProc(true);
+								ISlottable iSBC_2 = MakeSBWithActProc(true);
+								List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{
+									iSBA_2, iSBB_2, iSBC_2
+								});
+								allNotDone_F = new object[]{sbs_2, false};
+								yield return allNotDone_F;
 						}
 					}
 			/*	Methods	*/
-				[TestCaseSource(typeof(InstantSortCases))][Category("Methods")]
+				[TestCaseSource(typeof(InstantSortCases))]
 				public void InstantSort_WhenCalled_ReorderSlotSBs(List<ISlottable> sbs, SGSorter sorter, List<ISlottable> expected){
 					List<ISlottable> orig = new List<ISlottable>(sbs);
 					SlotGroup sg = MakeSG();
 					sg.SetSorter(sorter);
 					sg.SetSBs(orig);
 					List<Slot> slots = new List<Slot>();
-					for(int i = 0; i< sbs.Count; i++)
-						slots.Add(new Slot());
+						for(int i = 0; i< sbs.Count; i++)
+							slots.Add(new Slot());
 					sg.SetSlots(slots);
 
 					sg.InstantSort();
 
 					List<ISlottable> actual = new List<ISlottable>();
-					foreach(var slot in sg.slots){
+					foreach(var slot in sg.slots)
 						actual.Add(slot.sb);
+					bool equality = actual.MemberEquals(expected);
+					Assert.That(equality, Is.True);
 					}
-					Assert.That(actual, Is.EqualTo(expected));
-				}
 					class InstantSortCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							PartsInstance parts2 = MakePartsInstance(1, 1);
-							BowInstance bow = MakeBowInstance(0);
-							ShieldInstance shield = MakeShieldInstance(0);
-							PartsInstance parts = MakePartsInstance(0, 2);
-							BowInstance bow2 = MakeBowInstance(1);
-							WearInstance wear = MakeWearInstance(0);
-							QuiverInstance quiver = MakeQuiverInstance(0);
-							MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
-							PackInstance pack = MakePackInstance(0);
-							WearInstance wear2 = MakeWearInstance(1);
-								parts2.SetAcquisitionOrder(0);
-								bow.SetAcquisitionOrder(1);
-								shield.SetAcquisitionOrder(2);
-								parts.SetAcquisitionOrder(3);
-								bow2.SetAcquisitionOrder(4);
-								wear.SetAcquisitionOrder(5);
-								quiver.SetAcquisitionOrder(6);
-								mWeapon.SetAcquisitionOrder(7);
-								pack.SetAcquisitionOrder(8);
-								wear2.SetAcquisitionOrder(9);
-							ISlottable parts2SB = MakeSB();
-								parts2SB.SetItem(parts2);
-							ISlottable bowSB = MakeSB();
-								bowSB.SetItem(bow);
-							ISlottable shieldSB = MakeSB();
-								shieldSB.SetItem(shield);
-							ISlottable partsSB = MakeSB();
-								partsSB.SetItem(parts);
-							ISlottable bow2SB = MakeSB();
-								bow2SB.SetItem(bow2);
-							ISlottable wearSB = MakeSB();
-								wearSB.SetItem(wear);
-							ISlottable quiverSB = MakeSB();
-								quiverSB.SetItem(quiver);
-							ISlottable mWeaponSB = MakeSB();
-								mWeaponSB.SetItem(mWeapon);
-							ISlottable packSB = MakeSB();
-								packSB.SetItem(pack);
-							ISlottable wear2SB = MakeSB();
-								wear2SB.SetItem(wear);
-							
-							List<ISlottable> sbs = new List<ISlottable>(new ISlottable[]{
-								parts2SB, bowSB, shieldSB, partsSB, bow2SB, wearSB, quiverSB, mWeaponSB, packSB, wear2SB
-							});
-							List<ISlottable> itemIDCaseExp = new List<ISlottable>(new ISlottable[]{
-								bowSB
-								,bow2SB
-								,wearSB
-								,wear2SB
-								,shieldSB
-								,mWeaponSB
-								,quiverSB
-								,packSB
-								,partsSB
-								,parts2SB
-							});
-							yield return new object[]{sbs, new SGItemIDSorter(), itemIDCaseExp};
-							List<ISlottable> inverseItemIDCaseExp = new List<ISlottable>(new ISlottable[]{
-								parts2SB
-								,partsSB
-								,packSB
-								,quiverSB
-								,mWeaponSB
-								,shieldSB
-								,wear2SB
-								,wearSB
-								,bow2SB
-								,bowSB
-							});
-							yield return new object[]{sbs, new SGInverseItemIDSorter(), inverseItemIDCaseExp};
-							List<ISlottable> acquisitionOrderCase = new List<ISlottable>(new ISlottable[]{
-								parts2SB
-								,bowSB
-								,shieldSB
-								,partsSB
-								,bow2SB
-								,wearSB
-								,quiverSB
-								,mWeaponSB
-								,packSB
-								,wear2SB
-							});
-							yield return new object[]{sbs, new SGAcquisitionOrderSorter(), acquisitionOrderCase};
-							
+							object[] itemIDSorter;
+								PartsInstance partsB_0 = MakePartsInstance(1, 1);
+								BowInstance bowA_0 = MakeBowInstance(0);
+								ShieldInstance shieldA_0 = MakeShieldInstance(0);
+								PartsInstance partsA_0 = MakePartsInstance(0, 2);
+								BowInstance bowB_0 = MakeBowInstance(1);
+								WearInstance wearA_0 = MakeWearInstance(0);
+								QuiverInstance quiverA_0 = MakeQuiverInstance(0);
+								MeleeWeaponInstance mWeaponA_0 = MakeMeleeWeaponInstance(0);
+								PackInstance packA_0 = MakePackInstance(0);
+								WearInstance wearB_0 = MakeWearInstance(1);
+								partsB_0.SetAcquisitionOrder(0);
+								bowA_0.SetAcquisitionOrder(1);
+								shieldA_0.SetAcquisitionOrder(2);
+								partsA_0.SetAcquisitionOrder(3);
+								bowB_0.SetAcquisitionOrder(4);
+								wearA_0.SetAcquisitionOrder(5);
+								quiverA_0.SetAcquisitionOrder(6);
+								mWeaponA_0.SetAcquisitionOrder(7);
+								packA_0.SetAcquisitionOrder(8);
+								wearB_0.SetAcquisitionOrder(9);
+								ISlottable partsBSB_0 = MakeSB();
+									partsBSB_0.SetItem(partsB_0);
+								ISlottable bowASB_0 = MakeSB();
+									bowASB_0.SetItem(bowA_0);
+								ISlottable shieldASB_0 = MakeSB();
+									shieldASB_0.SetItem(shieldA_0);
+								ISlottable partsASB_0 = MakeSB();
+									partsASB_0.SetItem(partsA_0);
+								ISlottable bowBSB_0 = MakeSB();
+									bowBSB_0.SetItem(bowB_0);
+								ISlottable wearASB_0 = MakeSB();
+									wearASB_0.SetItem(wearA_0);
+								ISlottable quiverASB_0 = MakeSB();
+									quiverASB_0.SetItem(quiverA_0);
+								ISlottable mWeaponASB_0 = MakeSB();
+									mWeaponASB_0.SetItem(mWeaponA_0);
+								ISlottable packASB_0 = MakeSB();
+									packASB_0.SetItem(packA_0);
+								ISlottable wearBSB_0 = MakeSB();
+									wearBSB_0.SetItem(wearA_0);
+								List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{
+									partsBSB_0, 
+									bowASB_0, 
+									shieldASB_0, 
+									partsASB_0, 
+									bowBSB_0, 
+									wearASB_0, 
+									quiverASB_0, 
+									mWeaponASB_0, 
+									packASB_0, 
+									wearBSB_0
+								});
+								List<ISlottable> expected_0 = new List<ISlottable>(new ISlottable[]{
+									bowASB_0,
+									bowBSB_0,
+									wearASB_0,
+									wearBSB_0,
+									shieldASB_0,
+									mWeaponASB_0,
+									quiverASB_0,
+									packASB_0,
+									partsASB_0,
+									partsBSB_0
+								});
+								itemIDSorter = new object[]{sbs_0, new SGItemIDSorter(), expected_0};
+								yield return itemIDSorter;
+							object[] inverseIDSorter;
+								PartsInstance partsB_1 = MakePartsInstance(1, 1);
+								BowInstance bowA_1 = MakeBowInstance(0);
+								ShieldInstance shieldA_1 = MakeShieldInstance(0);
+								PartsInstance partsA_1 = MakePartsInstance(0, 2);
+								BowInstance bowB_1 = MakeBowInstance(1);
+								WearInstance wearA_1 = MakeWearInstance(0);
+								QuiverInstance quiverA_1 = MakeQuiverInstance(0);
+								MeleeWeaponInstance mWeaponA_1 = MakeMeleeWeaponInstance(0);
+								PackInstance packA_1 = MakePackInstance(0);
+								WearInstance wearB_1 = MakeWearInstance(1);
+								partsB_1.SetAcquisitionOrder(0);
+								bowA_1.SetAcquisitionOrder(1);
+								shieldA_1.SetAcquisitionOrder(2);
+								partsA_1.SetAcquisitionOrder(3);
+								bowB_1.SetAcquisitionOrder(4);
+								wearA_1.SetAcquisitionOrder(5);
+								quiverA_1.SetAcquisitionOrder(6);
+								mWeaponA_1.SetAcquisitionOrder(7);
+								packA_1.SetAcquisitionOrder(8);
+								wearB_1.SetAcquisitionOrder(9);
+								ISlottable partsBSB_1 = MakeSB();
+									partsBSB_1.SetItem(partsB_1);
+								ISlottable bowASB_1 = MakeSB();
+									bowASB_1.SetItem(bowA_1);
+								ISlottable shieldASB_1 = MakeSB();
+									shieldASB_1.SetItem(shieldA_1);
+								ISlottable partsASB_1 = MakeSB();
+									partsASB_1.SetItem(partsA_1);
+								ISlottable bowBSB_1 = MakeSB();
+									bowBSB_1.SetItem(bowB_1);
+								ISlottable wearASB_1 = MakeSB();
+									wearASB_1.SetItem(wearA_1);
+								ISlottable quiverASB_1 = MakeSB();
+									quiverASB_1.SetItem(quiverA_1);
+								ISlottable mWeaponASB_1 = MakeSB();
+									mWeaponASB_1.SetItem(mWeaponA_1);
+								ISlottable packASB_1 = MakeSB();
+									packASB_1.SetItem(packA_1);
+								ISlottable wearBSB_1 = MakeSB();
+									wearBSB_1.SetItem(wearA_1);
+								List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{
+									partsBSB_1, 
+									bowASB_1, 
+									shieldASB_1, 
+									partsASB_1, 
+									bowBSB_1, 
+									wearASB_1, 
+									quiverASB_1, 
+									mWeaponASB_1, 
+									packASB_1, 
+									wearBSB_1
+								});
+								List<ISlottable> expected_1 = new List<ISlottable>(new ISlottable[]{
+									partsBSB_1,
+									partsASB_1,
+									packASB_1,
+									quiverASB_1,
+									mWeaponASB_1,
+									shieldASB_1,
+									wearBSB_1,
+									wearASB_1,
+									bowBSB_1,
+									bowASB_1
+								});
+								inverseIDSorter = new object[]{sbs_1, new SGInverseItemIDSorter(), expected_1};
+								yield return inverseIDSorter;
+							object[] acqOrderSorter;
+								PartsInstance partsB_2 = MakePartsInstance(1, 1);
+								BowInstance bowA_2 = MakeBowInstance(0);
+								ShieldInstance shieldA_2 = MakeShieldInstance(0);
+								PartsInstance partsA_2 = MakePartsInstance(0, 2);
+								BowInstance bowB_2 = MakeBowInstance(1);
+								WearInstance wearA_2 = MakeWearInstance(0);
+								QuiverInstance quiverA_2 = MakeQuiverInstance(0);
+								MeleeWeaponInstance mWeaponA_2 = MakeMeleeWeaponInstance(0);
+								PackInstance packA_2 = MakePackInstance(0);
+								WearInstance wearB_2 = MakeWearInstance(1);
+								partsB_2.SetAcquisitionOrder(0);
+								bowA_2.SetAcquisitionOrder(1);
+								shieldA_2.SetAcquisitionOrder(2);
+								partsA_2.SetAcquisitionOrder(3);
+								bowB_2.SetAcquisitionOrder(4);
+								wearA_2.SetAcquisitionOrder(5);
+								quiverA_2.SetAcquisitionOrder(6);
+								mWeaponA_2.SetAcquisitionOrder(7);
+								packA_2.SetAcquisitionOrder(8);
+								wearB_2.SetAcquisitionOrder(9);
+								ISlottable partsBSB_2 = MakeSB();
+									partsBSB_2.SetItem(partsB_2);
+								ISlottable bowASB_2 = MakeSB();
+									bowASB_2.SetItem(bowA_2);
+								ISlottable shieldASB_2 = MakeSB();
+									shieldASB_2.SetItem(shieldA_2);
+								ISlottable partsASB_2 = MakeSB();
+									partsASB_2.SetItem(partsA_2);
+								ISlottable bowBSB_2 = MakeSB();
+									bowBSB_2.SetItem(bowB_2);
+								ISlottable wearASB_2 = MakeSB();
+									wearASB_2.SetItem(wearA_2);
+								ISlottable quiverASB_2 = MakeSB();
+									quiverASB_2.SetItem(quiverA_2);
+								ISlottable mWeaponASB_2 = MakeSB();
+									mWeaponASB_2.SetItem(mWeaponA_2);
+								ISlottable packASB_2 = MakeSB();
+									packASB_2.SetItem(packA_2);
+								ISlottable wearBSB_2 = MakeSB();
+									wearBSB_2.SetItem(wearB_2);
+								List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{
+									partsBSB_2, 
+									bowASB_2, 
+									shieldASB_2, 
+									partsASB_2, 
+									bowBSB_2, 
+									wearASB_2, 
+									quiverASB_2, 
+									mWeaponASB_2, 
+									packASB_2, 
+									wearBSB_2
+								});
+								List<ISlottable> expected_2 = new List<ISlottable>(new ISlottable[]{
+									partsBSB_2,
+									bowASB_2,
+									shieldASB_2,
+									partsASB_2,
+									bowBSB_2,
+									wearASB_2,
+									quiverASB_2,
+									mWeaponASB_2,
+									packASB_2,
+									wearBSB_2
+								});
+								acqOrderSorter = new object[]{sbs_2, new SGAcquisitionOrderSorter(), expected_2};
+								yield return acqOrderSorter;
 						}
 					}
-				[TestCaseSource(typeof(AcceptsFilterCases))][Category("Methods")]
+				[TestCaseSource(typeof(AcceptsFilterCases))]
 				public void AcceptsFilter_Various_ReturnsAccordingly(SGFilter filter, ISlottable sb, bool expected){
 					SlotGroup sg = MakeSG();
 					sg.SetFilter(filter);
@@ -280,7 +405,7 @@ namespace SlotSystemTests{
 					bool actual = sg.AcceptsFilter(sb);
 
 					Assert.That(actual, Is.EqualTo(expected));
-				}
+					}
 					class AcceptsFilterCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable bowSB = MakeSubSB();
@@ -343,7 +468,7 @@ namespace SlotSystemTests{
 							yield return new object[]{partsFilter, partsSB, true};
 						}
 					}
-				[TestCaseSource(typeof(ContainsCases))][Category("Methods")]
+				[TestCaseSource(typeof(ContainsCases))]
 				public void Contains_Vairous_ReturnsAccordingly(List<ISlottable> sbs, ISlotSystemElement ele, bool expected){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -351,7 +476,7 @@ namespace SlotSystemTests{
 					bool actual = sg.Contains(ele);
 
 					Assert.That(actual, Is.EqualTo(expected));
-				}
+					}
 					class ContainsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable vSBA = MakeSubSB();
@@ -373,15 +498,15 @@ namespace SlotSystemTests{
 							yield return new object[]{sbs, MakeSubSSE(), false};
 						}
 					}
-				[Test][Category("Methods")]
+				[Test]
 				public void FocusSelf_WhenCalled_SetsSelStateFocused(){
 					SlotGroup sg = MakeSG();
 
 					sg.FocusSelf();
 
 					Assert.That(sg.curSelState, Is.SameAs(sg.focusedState));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void FocusSBs_WhenCalled_CallsSBReset(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -396,8 +521,8 @@ namespace SlotSystemTests{
 					sbA.Received().Reset();
 					sbB.Received().Reset();
 					sbC.Received().Reset();
-				}
-				[TestCaseSource(typeof(FocusSBsVariousCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(FocusSBsVariousCases))]
 				public void FocusSBs_Various_CallsSBFocusOrDefocus(List<ISlottable> sbs, Dictionary<ISlotSystemElement, bool> dict){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -410,7 +535,7 @@ namespace SlotSystemTests{
 						else
 							e.Received().Defocus();
 					}
-				}
+					}
 					class FocusSBsVariousCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable fSBA = MakeSubSB();
@@ -438,7 +563,7 @@ namespace SlotSystemTests{
 							yield return new object[]{ sbs, dict};
 						}
 					}
-				[Test][Category("Methods")]
+				[Test]
 				public void DefocusSBs_WhenCalled_CallsSBReset(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -453,16 +578,16 @@ namespace SlotSystemTests{
 					sbA.Received().Reset();
 					sbB.Received().Reset();
 					sbC.Received().Reset();
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void DefocusSelf_WhenCalled_SetsSelStateDefocused(){
 					SlotGroup sg = MakeSG();
 
 					sg.DefocusSelf();
 
 					Assert.That(sg.curSelState, Is.SameAs(sg.defocusedState));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void DefocusSBs_WhenCalled_CallsSBDefocus(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -477,8 +602,8 @@ namespace SlotSystemTests{
 					sbA.Received().Defocus();
 					sbB.Received().Defocus();
 					sbC.Received().Defocus();
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void Deactivate_WhenCalled_CallsSBDeactivate(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -493,8 +618,8 @@ namespace SlotSystemTests{
 					sbA.Received().Deactivate();
 					sbB.Received().Deactivate();
 					sbC.Received().Deactivate();
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void PerformInHierarchyV1_WhenCalled_ActsOnSelfAndAllSBs(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -510,11 +635,11 @@ namespace SlotSystemTests{
 					sbA.Received().Focus();
 					sbB.Received().Focus();
 					sbC.Received().Focus();
-				}
+					}
 					void TestMethodV1(ISlotSystemElement ele){
 						ele.Focus();
 					}
-				[Test][Category("Methods")]
+				[Test]
 				public void PerformInHierarchyV2_WhenCalled_ActsOnSelfAndAllSBs(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -530,12 +655,12 @@ namespace SlotSystemTests{
 					sbA.Received().SetParent(stubEle);
 					sbB.Received().SetParent(stubEle);
 					sbC.Received().SetParent(stubEle);
-				}
+					}
 					void TestMethodV2(ISlotSystemElement ele, object o){
 						ISlotSystemElement e = (ISlotSystemElement)o;
 						ele.SetParent(e);
 					}
-				[Test][Category("Methods")]
+				[Test]
 				public void PerformInHierarchyV3_WhenCalled_ActsOnSelfAndAllSBs(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -552,11 +677,11 @@ namespace SlotSystemTests{
 					sg.PerformInHierarchy(TestMethodV3, list);
 
 					Assert.That(list, Is.EqualTo(expected));
-				}
+					}
 					void TestMethodV3(ISlotSystemElement ele, IList<ISlotSystemElement> list){
 						list.Add(ele);
 					}
-				[Test][Category("Methods")]
+				[Test]
 				public void SetElements_WhenCalled_SetsElements(){
 					SlotGroup sg = MakeSG();
 						GenericInventory inventory = new GenericInventory();
@@ -576,8 +701,8 @@ namespace SlotSystemTests{
 
 					List<ISlotSystemElement> actualEles = new List<ISlotSystemElement>(sg);
 					Assert.That(actualEles.Count, Is.EqualTo(4));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void SetElements_WhenCalled_SetsSBsAndSlots(){
 					SlotGroup sg = MakeSG();
 						GenericInventory inventory = new GenericInventory();
@@ -605,8 +730,8 @@ namespace SlotSystemTests{
 					int count = 0;
 					foreach(ISlottable sb in sg)
 						Assert.That(sb.slotID, Is.EqualTo(count ++));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void InitializeState_WhenCalled_InitializesStates(){
 					SlotGroup sg = MakeSG();
 
@@ -616,10 +741,9 @@ namespace SlotSystemTests{
 					Assert.That(sg.prevSelState, Is.Null);
 					Assert.That(sg.curActState, Is.SameAs(SlotGroup.sgWaitForActionState));
 					Assert.That(sg.prevActState, Is.Null);
-				}
+					}
 				[TestCase(0)]
 				[TestCase(10)]
-				[Category("Methods")]
 				public void InspectorSetUp_WhenCalled_SetsFields(int initSlotsCount){
 					SlotGroup sg = MakeSG();
 						GenericInventory genInv = Substitute.For<GenericInventory>();
@@ -633,7 +757,7 @@ namespace SlotSystemTests{
 					Assert.That(sg.sorter, Is.SameAs(sorter));
 					Assert.That(sg.initSlotsCount, Is.EqualTo(initSlotsCount));
 					Assert.That(sg.isExpandable, Is.EqualTo(initSlotsCount == 0));
-				}
+					}
 				class SGSetUpFieldsData: IEquatable<SGSetUpFieldsData>{
 					public string name;
 					public SGFilter filter;
@@ -672,7 +796,7 @@ namespace SlotSystemTests{
 					}
 
 				}
-				[TestCaseSource(typeof(GetSBCases))][Category("Methods")]
+				[TestCaseSource(typeof(GetSBCases))]
 				public void GetSB_Various_ReturnsSBorNull(List<ISlottable> sbs, InventoryItemInstance item, ISlottable expected){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -680,7 +804,7 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetSB(item);
 
 					Assert.That(actual, Is.SameAs(expected));
-				}
+					}
 					class GetSBCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable vSBA = MakeSubSB();
@@ -712,7 +836,7 @@ namespace SlotSystemTests{
 						}
 					}
 				
-				[TestCaseSource(typeof(GetSBCases))][Category("Methods")]
+				[TestCaseSource(typeof(GetSBCases))]
 				public void HasItem_Various_ReturnsTrueOrFalse(List<ISlottable> sbs, InventoryItemInstance item, ISlottable returnedSB){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -721,11 +845,10 @@ namespace SlotSystemTests{
 					bool actual = sg.HasItem(item);
 
 					Assert.That(actual, Is.EqualTo(expected));
-				}
+					}
 				[TestCase(1)]
 				[TestCase(10)]
 				[TestCase(0)]
-				[Category("Methods")]
 				public void UpdateSBs_WhenCalled_SetsNewSlotsWithTheSameNumberAsSBs(int count){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs = new List<ISlottable>();
@@ -736,8 +859,8 @@ namespace SlotSystemTests{
 
 					Assert.That(sg.newSlots.Count, Is.EqualTo(count));
 					Assert.That(sg.newSlots, Is.All.InstanceOf(typeof(Slot)));
-				}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void UpdateSBs_NewSBsContainsSB_CallsSetNewSlotIDWithNewSBsID(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -747,7 +870,7 @@ namespace SlotSystemTests{
 					foreach(ISlottable sb in sg)
 						if(newSBs.Contains(sb))
 							sb.Received().SetNewSlotID(newSBs.IndexOf(sb));
-				}
+					}
 					class UpdateSBsNewSBsContainsSBCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable oSBA = MakeSubSB();
@@ -773,7 +896,7 @@ namespace SlotSystemTests{
 							yield return new object[]{case1SBs, case1NewSBs};
 						}
 					}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void UpdateSBs_NewSBsAndSBsContainsSB_CallsSBSetActStateMoveWithin(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -785,8 +908,8 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.moveWithinState);
 						else
 							sb.DidNotReceive().SetActState(Slottable.moveWithinState);
-				}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void UpdateSBs_NewSBNotContainsSB_CallsSetNewSlotIDMinus1(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -798,8 +921,8 @@ namespace SlotSystemTests{
 							sb.Received().SetNewSlotID(-1);
 						else
 							sb.DidNotReceive().SetNewSlotID(-1);
-				}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void UpdateSBs_NewSBNotContainsSB_CallsSBSetActStateRemoved(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -811,8 +934,8 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.removedState);
 						else
 							sb.DidNotReceive().SetActState(Slottable.removedState);
-				}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void UpdateSBs_SBsNotContainsSB_CallsSBSetActStateAdded(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -824,11 +947,10 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.addedState);
 						else
 							sb.DidNotReceive().SetActState(Slottable.addedState);
-				}
+					}
 				[TestCase(0)]
 				[TestCase(1)]
 				[TestCase(10)]
-				[Category("Methods")]
 				public void CreateNewSlots_WhenCalled_SetsNewSlotsWithSameCountAsNewSBs(int count){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs = new List<ISlottable>();
@@ -841,8 +963,8 @@ namespace SlotSystemTests{
 					Assert.That(sg.newSlots.Count, Is.EqualTo(count));
 					foreach(var slot in sg.newSlots)
 						Assert.That(slot.sb, Is.Null);
-				}
-				[TestCaseSource(typeof(GetNewSlotCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(GetNewSlotCases))]
 				public void GetNewSlot_itemFound_ReturnsNewSlot(List<ISlottable> sbs ,List<Slot> newSlots, InventoryItemInstance item, Slot expected){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -851,7 +973,7 @@ namespace SlotSystemTests{
 					Slot actual = sg.GetNewSlot(item);
 
 					Assert.That(actual, Is.SameAs(expected));
-				}
+					}
 					class GetNewSlotCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable sbA = MakeSubSB();
@@ -881,7 +1003,7 @@ namespace SlotSystemTests{
 
 						}
 					}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void SetSBsActStates_NewSbsAndSBsContainsSB_CallsSBSetActStateMoveWithin(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -896,8 +1018,8 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.moveWithinState);
 						else
 							sb.DidNotReceive().SetActState(Slottable.moveWithinState);
-				}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void SetSBsActStates_NewSBsNotContainsSB_CallsSBSetActStateRemoved(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -912,8 +1034,8 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.removedState);
 						else
 							sb.DidNotReceive().SetActState(Slottable.removedState);
-				}
-				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(UpdateSBsNewSBsContainsSBCases))]
 				public void SetSBsActStates_SBsNotContainsSB_CallsSBSetActStateAdded(List<ISlottable> sbs, List<ISlottable> newSBs){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -928,8 +1050,8 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.addedState);
 						else
 							sb.DidNotReceive().SetActState(Slottable.addedState);
-				}
-				[TestCaseSource(typeof(SyncSBsToSlotsCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(SyncSBsToSlotsCases))]
 				public void SyncSBsToSlots_WhenCalled_SyncSBsToSlots(List<Slot> slots, List<ISlottable> expected){
 					SlotGroup sg = MakeSG();
 						sg.SetSlots(slots);
@@ -941,7 +1063,7 @@ namespace SlotSystemTests{
 						if(sb != null)
 							sb.Received().SetSlotID(sg.toList.IndexOf(sb));
 					}
-				}
+					}
 					class SyncSBsToSlotsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							List<Slot> slots;
@@ -972,7 +1094,6 @@ namespace SlotSystemTests{
 					}
 				[TestCase(true, true)]
 				[TestCase(false, false)]
-				[Category("Methods")]
 				public void OnCompleteSlotMovements_NewSlotIDMinus1_CallsSBDestory(bool removed, bool expected){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -989,8 +1110,8 @@ namespace SlotSystemTests{
 						sb.Received().Destroy();
 					else
 						sb.DidNotReceive().Destroy();
-				}
-				[TestCaseSource(typeof(OnCompleteSlotMovementsCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(OnCompleteSlotMovementsCases))]
 				public void OnCompleteSlotMovements_WhenCalledAfterNewSlotsAreSet_SyncSBsToSlotsWithNewSlotIDs(List<ISlottable> sbs, List<ISlottable> expected){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -1005,7 +1126,7 @@ namespace SlotSystemTests{
 					foreach(var sb in sg)
 						if(sb != null)
 							((ISlottable)sb).Received().SetSlotID(sg.toList.IndexOf((ISlottable)sb));
-				}
+					}
 					class OnCompleteSlotMovementsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable rsbA = MakeSubSB();
@@ -1042,12 +1163,12 @@ namespace SlotSystemTests{
 							yield return new object[]{sbs, expected};
 						}
 					}
-				[TestCaseSource(typeof(SwappableSBsCases))][Category("Methods")]
+				[TestCaseSource(typeof(SwappableSBsCases))]
 				public void SwappableSBs_SBAreSwappable_ReturnsList(SlotGroup sg, ISlottable sb, List<ISlottable> expected){
 					List<ISlottable> actual = sg.SwappableSBs(sb);
 
 					Assert.That(actual, Is.EqualTo(expected));
-				}
+					}
 					class SwappableSBsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							SlotGroup sg = MakeSG();
@@ -1098,15 +1219,15 @@ namespace SlotSystemTests{
 							yield return new object[]{sg, oPartsSBB, new List<ISlottable>(new ISlottable[]{partsSBA})};
 						}
 					}
-				[Test][Category("Methods")]
+				[Test]
 				public void Reset_WhenCalled_SetActStateWFA(){
 					SlotGroup sg = MakeSG();
 
 					sg.Reset();
 					
 					Assert.That(sg.curActState, Is.SameAs(SlotGroup.sgWaitForActionState));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void Reset_WhenCalled_SetsFields(){
 					SlotGroup sg = MakeSG();
 						sg.SetNewSBs(new List<ISlottable>());
@@ -1116,8 +1237,8 @@ namespace SlotSystemTests{
 
 					Assert.That(sg.newSBs, Is.Null);
 					Assert.That(sg.newSlots, Is.Null);
-				}
-				[TestCaseSource(typeof(ReorderAndUpdateSBsCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(ReorderAndUpdateSBsCases))]
 				public void ReorderAndUpdateSBs_WhenCalled_CallsSBsSetNewSlotIDAndSetActStateMoveWithin(ISlottable picked, ISlottable target, List<ISlottable> sbs, Dictionary<ISlottable, int> newSlotIDs){
 					ISlotSystemManager ssm = MakeSubSSM();
 						ssm.pickedSB.Returns(picked);
@@ -1132,7 +1253,7 @@ namespace SlotSystemTests{
 						sb.Received().SetActState(Slottable.moveWithinState);
 						sb.Received().SetNewSlotID(newSlotIDs[sb]);
 					}
-				}
+					}
 					class ReorderAndUpdateSBsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable sbA = MakeSubSB();
@@ -1161,7 +1282,7 @@ namespace SlotSystemTests{
 							yield return new object[]{case2Picked, case2Target, sbs, case2IDs};
 						}
 					}				
-				[Test][Category("Methods")]
+				[Test]
 				public void UpdateToRevert_WhenCalled_SetsNewSBsWithSBs(){
 					List<ISlottable> sbs = CreateSBs(3);
 					SlotGroup sg = MakeSG();
@@ -1170,11 +1291,10 @@ namespace SlotSystemTests{
 					sg.UpdateToRevert();
 
 					Assert.That(sg.newSBs, Is.EqualTo(sbs));
-				}
+					}
 				[TestCase(1)]
 				[TestCase(3)]
 				[TestCase(10)]
-				[Category("Methods")]
 				public void UpdateToRevert_WhenCalled_SetsNewSlotsBySBsCount(int count){
 					List<ISlottable> sbs = CreateSBs(count);
 					SlotGroup sg = MakeSG();
@@ -1185,8 +1305,8 @@ namespace SlotSystemTests{
 					Assert.That(sg.newSlots.Count, Is.EqualTo(count));
 					foreach(var slot in sg.newSlots)
 						Assert.That(slot.sb, Is.Null);
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void UpdateToRevert_WhenCalled_DoesNotChangeSBs(){
 					List<ISlottable> sbs = CreateSBs(3);
 					SlotGroup sg = MakeSG();
@@ -1195,8 +1315,8 @@ namespace SlotSystemTests{
 					sg.UpdateToRevert();
 
 					Assert.That(sg.toList, Is.EqualTo(sbs));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void UpdateToRevert_WhenCalled_CallSBsSetActStateMoveWithin(){
 					List<ISlottable> sbs = CreateSBs(3);
 					SlotGroup sg = MakeSG();
@@ -1206,8 +1326,8 @@ namespace SlotSystemTests{
 
 					foreach(ISlottable sb in sg)
 						sb.Received().SetActState(Slottable.moveWithinState);
-				}
-				[TestCaseSource(typeof(SortAndUpdateSBsCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(SortAndUpdateSBsCases))]
 				public void SortAndUpdateSBs_SGIsNotExpandable_SortsAndCallsSBsSetNewSlotIDs(SGSorter sorter, List<ISlottable> sbs, List<ISlottable> expOrder){
 					SlotGroup sg = MakeSG();
 						// sg.Initialize("someSG", new SGNullFilter(), new PoolInventory(), true, 10, new SGEmptyCommand(), new SGEmptyCommand());/* this makes isExpandable false */
@@ -1222,86 +1342,141 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.moveWithinState);
 						}
 					}
-				}
+					}
 					class SortAndUpdateSBsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							ISlottable partsSBB = MakeSubSBWithItem(MakePartsInstWithOrder(1, 1, 0));
-							ISlottable bowSBA = MakeSubSBWithItem(MakeBowInstWithOrder(0, 1));
-							ISlottable wearSBA = MakeSubSBWithItem(MakeWearInstWithOrder(0, 2));
-							ISlottable quiverSBA = MakeSubSBWithItem(MakeQuiverInstWithOrder(0, 3));
-							ISlottable bowSBC = MakeSubSBWithItem(MakeBowInstWithOrder(0, 4));
-							ISlottable packSBA = MakeSubSBWithItem(MakePackInstWithOrder(0, 5));
-							ISlottable shieldSBA = MakeSubSBWithItem(MakeShieldInstWithOrder(0, 6));
-							ISlottable partsSBA = MakeSubSBWithItem(MakePartsInstWithOrder(0, 1, 7));
-							ISlottable bowSBB = MakeSubSBWithItem(MakeBowInstWithOrder(0, 8));
-							ISlottable mWeaponSBA = MakeSubSBWithItem(MakeMeleeWeaponInstWithOrder(0, 9));
-
-							List<ISlottable> sbs = new List<ISlottable>(new ISlottable[]{
-								quiverSBA,
-								partsSBB,
-								null,
-								null,
-								partsSBA,
-								bowSBB,
-								wearSBA,
-								bowSBA,
-								packSBA,
-								null,
-								shieldSBA,
-								bowSBC,
-								mWeaponSBA
-							});
-							List<ISlottable> itemIDOrdered = new List<ISlottable>(new ISlottable[]{
-								bowSBA,
-								bowSBC,
-								bowSBB,
-								wearSBA,
-								shieldSBA,
-								mWeaponSBA,
-								quiverSBA,
-								packSBA,
-								partsSBA,
-								partsSBB,
-								null,
-								null,
-								null
-							});
-							List<ISlottable> invIDOrdered = new List<ISlottable>(new ISlottable[]{
-								partsSBB,
-								partsSBA,
-								packSBA,
-								quiverSBA,
-								mWeaponSBA,
-								shieldSBA,
-								wearSBA,
-								bowSBB,
-								bowSBC,
-								bowSBA,
-								null,
-								null,
-								null
-							});
-							List<ISlottable> acqOrdered = new List<ISlottable>(new ISlottable[]{
-								partsSBB,
-								bowSBA,
-								wearSBA,
-								quiverSBA,
-								bowSBC,
-								packSBA,
-								shieldSBA,
-								partsSBA,
-								bowSBB,
-								mWeaponSBA,
-								null,
-								null,
-								null
-							});
-							yield return new object[]{new SGItemIDSorter(), sbs, itemIDOrdered};
-							yield return new object[]{new SGInverseItemIDSorter(), sbs, invIDOrdered};
-							yield return new object[]{new SGAcquisitionOrderSorter(), sbs, acqOrdered};
+							object[] itemIDOrder;
+								ISlottable partsSBB_0 = MakeSubSBWithItem(MakePartsInstWithOrder(1, 1, 0));
+								ISlottable bowSBA_0 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 1));
+								ISlottable wearSBA_0 = MakeSubSBWithItem(MakeWearInstWithOrder(0, 2));
+								ISlottable quiverSBA_0 = MakeSubSBWithItem(MakeQuiverInstWithOrder(0, 3));
+								ISlottable bowSBC_0 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 4));
+								ISlottable packSBA_0 = MakeSubSBWithItem(MakePackInstWithOrder(0, 5));
+								ISlottable shieldSBA_0 = MakeSubSBWithItem(MakeShieldInstWithOrder(0, 6));
+								ISlottable partsSBA_0 = MakeSubSBWithItem(MakePartsInstWithOrder(0, 1, 7));
+								ISlottable bowSBB_0 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 8));
+								ISlottable mWeaponSBA_0 = MakeSubSBWithItem(MakeMeleeWeaponInstWithOrder(0, 9));
+								List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{
+									quiverSBA_0,
+									partsSBB_0,
+									null,
+									null,
+									partsSBA_0,
+									bowSBB_0,
+									wearSBA_0,
+									bowSBA_0,
+									packSBA_0,
+									null,
+									shieldSBA_0,
+									bowSBC_0,
+									mWeaponSBA_0
+								});
+								List<ISlottable> expected_0 = new List<ISlottable>(new ISlottable[]{
+									bowSBA_0,
+									bowSBC_0,
+									bowSBB_0,
+									wearSBA_0,
+									shieldSBA_0,
+									mWeaponSBA_0,
+									quiverSBA_0,
+									packSBA_0,
+									partsSBA_0,
+									partsSBB_0,
+									null,
+									null,
+									null
+								});
+								itemIDOrder = new object[]{new SGItemIDSorter() ,sbs_0, expected_0};
+								yield return itemIDOrder;
+							object[] inverseIDOrder;
+								ISlottable partsSBB_1 = MakeSubSBWithItem(MakePartsInstWithOrder(1, 1, 0));
+								ISlottable bowSBA_1 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 1));
+								ISlottable wearSBA_1 = MakeSubSBWithItem(MakeWearInstWithOrder(0, 2));
+								ISlottable quiverSBA_1 = MakeSubSBWithItem(MakeQuiverInstWithOrder(0, 3));
+								ISlottable bowSBC_1 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 4));
+								ISlottable packSBA_1 = MakeSubSBWithItem(MakePackInstWithOrder(0, 5));
+								ISlottable shieldSBA_1 = MakeSubSBWithItem(MakeShieldInstWithOrder(0, 6));
+								ISlottable partsSBA_1 = MakeSubSBWithItem(MakePartsInstWithOrder(0, 1, 7));
+								ISlottable bowSBB_1 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 8));
+								ISlottable mWeaponSBA_1 = MakeSubSBWithItem(MakeMeleeWeaponInstWithOrder(0, 9));
+								List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{
+									quiverSBA_1,
+									partsSBB_1,
+									null,
+									null,
+									partsSBA_1,
+									bowSBB_1,
+									wearSBA_1,
+									bowSBA_1,
+									packSBA_1,
+									null,
+									shieldSBA_1,
+									bowSBC_1,
+									mWeaponSBA_1
+								});
+								List<ISlottable> expected_1 = new List<ISlottable>(new ISlottable[]{
+									partsSBB_1,
+									partsSBA_1,
+									packSBA_1,
+									quiverSBA_1,
+									mWeaponSBA_1,
+									shieldSBA_1,
+									wearSBA_1,
+									bowSBB_1,
+									bowSBC_1,
+									bowSBA_1,
+									null,
+									null,
+									null
+								});
+								inverseIDOrder = new object[]{new SGInverseItemIDSorter() ,sbs_1, expected_1};
+								yield return inverseIDOrder;
+							object[] acquisitionOrder;
+								ISlottable partsSBB_2 = MakeSubSBWithItem(MakePartsInstWithOrder(1, 1, 0));
+								ISlottable bowSBA_2 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 1));
+								ISlottable wearSBA_2 = MakeSubSBWithItem(MakeWearInstWithOrder(0, 2));
+								ISlottable quiverSBA_2 = MakeSubSBWithItem(MakeQuiverInstWithOrder(0, 3));
+								ISlottable bowSBC_2 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 4));
+								ISlottable packSBA_2 = MakeSubSBWithItem(MakePackInstWithOrder(0, 5));
+								ISlottable shieldSBA_2 = MakeSubSBWithItem(MakeShieldInstWithOrder(0, 6));
+								ISlottable partsSBA_2 = MakeSubSBWithItem(MakePartsInstWithOrder(0, 1, 7));
+								ISlottable bowSBB_2 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 8));
+								ISlottable mWeaponSBA_2 = MakeSubSBWithItem(MakeMeleeWeaponInstWithOrder(0, 9));
+								List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{
+									quiverSBA_2,
+									partsSBB_2,
+									null,
+									null,
+									partsSBA_2,
+									bowSBB_2,
+									wearSBA_2,
+									bowSBA_2,
+									packSBA_2,
+									null,
+									shieldSBA_2,
+									bowSBC_2,
+									mWeaponSBA_2
+								});
+								List<ISlottable> expected_2 = new List<ISlottable>(new ISlottable[]{
+									partsSBB_2,
+									bowSBA_2,
+									wearSBA_2,
+									quiverSBA_2,
+									bowSBC_2,
+									packSBA_2,
+									shieldSBA_2,
+									partsSBA_2,
+									bowSBB_2,
+									mWeaponSBA_2,
+									null,
+									null,
+									null
+								});
+								acquisitionOrder = new object[]{new SGAcquisitionOrderSorter() ,sbs_1, expected_1};
+								yield return acquisitionOrder;
 						}
 					}
-				[TestCaseSource(typeof(SortAndUpdateSBsCases))][Category("Methods")]
+				[TestCaseSource(typeof(SortAndUpdateSBsCases))]
 				public void SortAndUpdateSBs_SGIsNotExpandable_SGNewSBsRetainsSize(SGSorter sorter, List<ISlottable> sbs, List<ISlottable> expOrder){
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
@@ -1310,8 +1485,8 @@ namespace SlotSystemTests{
 					sg.SortAndUpdateSBs();
 
 					Assert.That(sg.newSBs.Count, Is.EqualTo(sbs.Count));
-				}
-				[TestCaseSource(typeof(SortAndUpdateSBsCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(SortAndUpdateSBsCases))]
 				public void SortAndUpdateSBs_SGIsExpandableAndContainsNull_SGnewSBsSizeShrinks(SGSorter sorter, List<ISlottable> sbs, List<ISlottable> expOrder){
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, 0);
@@ -1324,8 +1499,8 @@ namespace SlotSystemTests{
 						foreach(var sb in sbs)
 							if(sb ==null) nullCount++;
 					Assert.That(sg.newSBs.Count, Is.EqualTo(sbs.Count - nullCount));
-				}
-				[TestCaseSource(typeof(SortAndUpdateSBsCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(SortAndUpdateSBsCases))]
 				public void SortAndUpdateSBs_SGIsExpandable_SortsAndCallsSBsSetNewSlotIDs(SGSorter sorter, List<ISlottable> sbs, List<ISlottable> expOrder){
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, 0);
@@ -1339,8 +1514,8 @@ namespace SlotSystemTests{
 							sb.Received().SetActState(Slottable.moveWithinState);
 						}
 					}
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void GetAddedForFill_SSMSG1NotThis_ReturnsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1353,8 +1528,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetAddedForFill();
 
 					Assert.That(actual, Is.SameAs(pickedSB));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void GetAddedForFill_SSMSG1IsThis_ReturnsNull(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1366,8 +1541,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetAddedForFill();
 
 					Assert.That(actual, Is.Null);
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void GetRemovedForFill_SSMSG1NotThis_ReturnsNull(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1380,8 +1555,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetRemovedForFill();
 
 					Assert.That(actual, Is.Null);
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void GetRemovedForFill_SSMSG1IsThis_RetunsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1393,8 +1568,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetRemovedForFill();
 
 					Assert.That(actual, Is.SameAs(pickedSB));
-				}
-				[TestCaseSource(typeof(CreateNewSBAndFillCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(CreateNewSBAndFillCases))]
 				public void CreateNewSBAndFill_WhenCalled_UpdateList(List<ISlottable> list, ISlottable added, int addedIndex){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1408,7 +1583,7 @@ namespace SlotSystemTests{
 					Assert.That(actualAdded, Is.Not.Null.And.InstanceOf(typeof(Slottable)));
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
-				}
+					}
 					class CreateNewSBAndFillTestData: IEquatable<CreateNewSBAndFillTestData>{
 						public InventoryItemInstance item;
 						public ISlotSystemManager ssm;
@@ -1453,7 +1628,7 @@ namespace SlotSystemTests{
 							yield return new object[]{hasEmptyB, added, 3};
 						}
 					}
-				[TestCaseSource(typeof(NullifyIndexOfCases))][Category("Methods")]
+				[TestCaseSource(typeof(NullifyIndexOfCases))]
 				public void NullifyIndexOf_WhenCalled_FindByItemAndReplaceWithNull(List<ISlottable> list, ISlottable item, int nulledIndex){
 					SlotGroup sg = MakeSG();
 					List<ISlottable> targetList = new List<ISlottable>(list);
@@ -1463,7 +1638,7 @@ namespace SlotSystemTests{
 					ISlottable actual = targetList[nulledIndex];
 
 					Assert.That(actual, Is.Null);
-				}
+					}
 					class NullifyIndexOfCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable sbA = MakeSubSB();
@@ -1496,7 +1671,7 @@ namespace SlotSystemTests{
 
 						}	
 					}
-				[TestCaseSource(typeof(FillAndUpdateSBs_SGNotPoolAndSSMSG1NotThisCases))][Category("Methods")]
+				[TestCaseSource(typeof(FillAndUpdateSBs_SGNotPoolAndSSMSG1NotThisCases))]
 				public void FillAndUpdateSBs_AddedNotNull_CreateAndSetsNewSBAndAddItToTheEndOfSGSBs(bool isExpandable, bool isAutoSort, List<ISlottable> sbs){
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), Substitute.For<SGSorter>(), isExpandable?0: 10);
@@ -1522,7 +1697,7 @@ namespace SlotSystemTests{
 					FillAndUpdateSBsTestData actual = new FillAndUpdateSBsTestData(added.ssm, added.curSelState, added.curEqpState);
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
-				}
+					}
 					class FillAndUpdateSBs_SGNotPoolAndSSMSG1NotThisCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable sbA = MakeSubSB();
@@ -1564,7 +1739,7 @@ namespace SlotSystemTests{
 						}
 
 					}
-				[TestCaseSource(typeof(FillAndUpdateSBs_VariousCases))][Category("Methods")]
+				[TestCaseSource(typeof(FillAndUpdateSBs_VariousCases))]
 				public void FillAndUpdateSBs_Various_SetsNewSBsAccordingly(
 					bool added, 
 					ISlottable pickedSB, 
@@ -1575,7 +1750,7 @@ namespace SlotSystemTests{
 					List<ISlottable> sbs, 
 					List<ISlottable> expNewSBs, 
 					int idAtAdded)
-				{
+					{
 					SlotGroup sg = MakeSG();
 						ISlotGroup otherSG = MakeSubSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1603,7 +1778,7 @@ namespace SlotSystemTests{
 						expected[idAtAdded] = addedActual;
 					}
 					Assert.That(sg.newSBs, Is.EqualTo(expected));
-				}
+					}
 					class FillAndUpdateSBs_VariousCases:IEnumerable{
 						public IEnumerator GetEnumerator(){
 							/* Sbs */
@@ -1810,7 +1985,7 @@ namespace SlotSystemTests{
 								yield return RemovSortResize_isPoolFalse_isAutoSortTrue_isExpandableTrue;
 						}
 					}
-				[Test][Category("Methods")]
+				[Test]
 				public void GetAddedForSwap_SSMSG1This_ReturnsSSMTargetSB(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1822,8 +1997,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetAddedForSwap();
 
 					Assert.That(actual, Is.SameAs(targetSB));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void GetAddedForSwap_SSMSG1NotThis_ReturnsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1836,8 +2011,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetAddedForSwap();
 
 					Assert.That(actual, Is.SameAs(pickedSB));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void GetRemovedForSwap_SSMSG1This_ReturnsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1849,8 +2024,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetRemovedForSwap();
 
 					Assert.That(actual, Is.SameAs(pickedSB));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void GetRemovedForSwap_SSMSG1NotThis_ReturnsSSMTargetSB(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1863,8 +2038,8 @@ namespace SlotSystemTests{
 					ISlottable actual = sg.GetRemovedForSwap();
 
 					Assert.That(actual, Is.SameAs(targetSB));
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void SwapAndUpdateSBs_SSMSG1This_CreateAndAddNewSBFromSSMTargetSBToTheEndOfSBs(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1888,8 +2063,8 @@ namespace SlotSystemTests{
 					CreatedNewSBData actual = new CreatedNewSBData(actualAdded.itemInst, actualAdded.ssm, actualAdded.curSelState, actualAdded.curEqpState);
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
-				}
-				[Test][Category("Methods")]
+					}
+				[Test]
 				public void SwapAndUpdateSBs_SSMSG1NotThis_CreateAndAddNewSBFromSSMPickedSBToTheEndOfSBs(){
 					SlotGroup sg = MakeSG();
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1914,7 +2089,7 @@ namespace SlotSystemTests{
 					CreatedNewSBData actual = new CreatedNewSBData(actualAdded.itemInst, actualAdded.ssm, actualAdded.curSelState, actualAdded.curEqpState);
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
-				}
+					}
 					public class CreatedNewSBData: IEquatable<CreatedNewSBData>{
 						public InventoryItemInstance item;
 						public ISlotSystemManager ssm;
@@ -1935,7 +2110,7 @@ namespace SlotSystemTests{
 							return flag;
 						}
 					}
-				[TestCaseSource(typeof(SwapAndUpdateSBsCases))][Category("Methods")]
+				[TestCaseSource(typeof(SwapAndUpdateSBsCases))]
 				public void SwapAndUpadteSBs_Various_SetsNewSBsAccordingly(
 					bool isPool, 
 					bool isAutoSort, 
@@ -1946,7 +2121,7 @@ namespace SlotSystemTests{
 					List<ISlottable> sbs, 
 					List<ISlottable> expected, 
 					int indexAtAdded)
-				{
+					{
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 10);
 						ISlotSystemManager ssm = MakeSubSSM();
@@ -1980,7 +2155,7 @@ namespace SlotSystemTests{
 					List<ISlottable> actual = sg.newSBs;
 					
 					Assert.That(actual, Is.EqualTo(expList));
-				}
+					}
 					class SwapAndUpdateSBsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							SGSorter idSorter = new SGItemIDSorter();
@@ -2137,7 +2312,7 @@ namespace SlotSystemTests{
 								yield return SG1NotThisSortResize_isPoolFalse_isAutoSorTrue_isExpandableTrue;
 						}
 					}
-				[TestCaseSource(typeof(TryChangeStackableQuantity_MatchAndIsStackableCases))][Category("Methods")]
+				[TestCaseSource(typeof(TryChangeStackableQuantity_MatchAndIsStackableCases))]
 				public void TryChangeStackableQuantity_Various_ReturnsAccordingly(List<ISlottable> target, InventoryItemInstance delta, bool added, bool expected){
 					SlotGroup sg = MakeSG();
 
@@ -2146,7 +2321,7 @@ namespace SlotSystemTests{
 					bool actual = sg.TryChangeStackableQuantity(actualTarget, delta, added);
 
 					Assert.That(actual, Is.EqualTo(expected));
-				}
+					}
 					class TryChangeStackableQuantity_MatchAndIsStackableCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable bowSB = MakeSubSBWithItem(MakeBowInstance(0));
@@ -2166,7 +2341,7 @@ namespace SlotSystemTests{
 							yield return new object[]{target, bowSB_changed.itemInst, false, false};
 						}
 					}
-				[TestCaseSource(typeof(TryChangeStackableQuantity_AddedCases))][Category("Methods")]
+				[TestCaseSource(typeof(TryChangeStackableQuantity_AddedCases))]
 				public void TryChangeStackableQuantity_Added_IncreaseQuantity(List<ISlottable> sbs, InventoryItemInstance addedItem, int indexAtAdded, int expectedQua){
 					SlotGroup sg = MakeSG();
 
@@ -2176,7 +2351,7 @@ namespace SlotSystemTests{
 
 					ISlottable actualAdded = actualTarget[indexAtAdded];
 					actualAdded.Received().SetQuantity(expectedQua);
-				}
+					}
 					class TryChangeStackableQuantity_AddedCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable bowSB = MakeSubSBWithItem(MakeBowInstance(0));
@@ -2196,7 +2371,7 @@ namespace SlotSystemTests{
 							yield return new object[]{target, partsSBB_added.itemInst, 3, 6};
 						}
 					}
-				[TestCaseSource(typeof(TryChangeStackableQuantity_DecreaseCases))][Category("Methods")]
+				[TestCaseSource(typeof(TryChangeStackableQuantity_DecreaseCases))]
 				public void TryChangeStackableQuantity_Decrease_DecreasesQuantity(List<ISlottable> sbs, InventoryItemInstance decreasedItem, int indexAtDecreased, int expectedQua){
 					SlotGroup sg = MakeSG();
 					List<ISlottable> actualTarget = new List<ISlottable>(sbs);
@@ -2205,7 +2380,7 @@ namespace SlotSystemTests{
 
 					ISlottable actualDecreased = actualTarget[indexAtDecreased];
 					actualDecreased.Received().SetQuantity(expectedQua);
-				}
+					}
 					class TryChangeStackableQuantity_DecreaseCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable bowSB = MakeSubSBWithItem(MakeBowInstance(0));
@@ -2225,7 +2400,7 @@ namespace SlotSystemTests{
 							yield return new object[]{target, partsSBB_removed.itemInst, 3, 4};
 						}
 					}
-				[TestCaseSource(typeof(TryChangeStackableQuantity_DecreasedDownToZeroCases))][Category("Methods")]
+				[TestCaseSource(typeof(TryChangeStackableQuantity_DecreasedDownToZeroCases))]
 				public void TryChangeStackableQuantity_DecreasedDownToZero_NullifiesAtTheIndexAndCallsSBDestory(List<ISlottable> sbs, InventoryItemInstance removedItem, int indexAtNullified){
 					SlotGroup sg = MakeSG();
 					List<ISlottable> actualTarget = new List<ISlottable>(sbs);
@@ -2235,7 +2410,7 @@ namespace SlotSystemTests{
 
 					Assert.That(actualTarget[indexAtNullified], Is.Null);
 					sbCache.Received().Destroy();
-				}
+					}
 					class TryChangeStackableQuantity_DecreasedDownToZeroCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable bowSB = MakeSubSBWithItem(MakeBowInstance(0));
@@ -2255,7 +2430,7 @@ namespace SlotSystemTests{
 							yield return new object[]{sbs, partsSBB_removed.itemInst, 3};
 						}
 					}
-				[TestCaseSource(typeof(AddAndUpdateSBs_VariousCases))][Category("Methods")]
+				[TestCaseSource(typeof(AddAndUpdateSBs_VariousCases))]
 				public void AddAndUpdateSBs_Various_Various(
 					bool isAutoSort, 
 					bool isExpandable, 
@@ -2267,45 +2442,45 @@ namespace SlotSystemTests{
 					Dictionary<InventoryItemInstance, int> sbsAddedIDDict, 
 					Dictionary<InventoryItemInstance, int> newSBsAddedIDDict, 
 					Dictionary<InventoryItemInstance, int> quantDict)
-				{
-					List<ISlottable> expectedSBs = new List<ISlottable>(expSBs);
-					List<ISlottable> expectedNewSBs = new List<ISlottable>(expNewSBs);
-					SlotGroup sg = MakeSG();
-					sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
-						ISlotSystemManager ssm = MakeSubSSM();
-							ssm.moved.Returns(added);
-						sg.SetSSM(ssm);
-						sg.SetSBs(sbs);
-						sg.ToggleAutoSort(isAutoSort);
-					
-					sg.AddAndUpdateSBs();
-					
-					foreach(ISlottable sb in sg){
-						if(sb != null){
-							int id;
-							if(sbsAddedIDDict.TryGetValue(sb.itemInst, out id))
-								expectedSBs[id] = sb;
-						}
-					}
-					Assert.That(sg.toList, Is.EqualTo(expectedSBs));
-					foreach(ISlottable sb in sg){
-						if(sb != null){
-							int qua;
-							if(quantDict.TryGetValue(sb.itemInst, out qua)){
-								sb.Received().SetQuantity(qua);
+					{
+						List<ISlottable> expectedSBs = new List<ISlottable>(expSBs);
+						List<ISlottable> expectedNewSBs = new List<ISlottable>(expNewSBs);
+						SlotGroup sg = MakeSG();
+						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
+							ISlotSystemManager ssm = MakeSubSSM();
+								ssm.moved.Returns(added);
+							sg.SetSSM(ssm);
+							sg.SetSBs(sbs);
+							sg.ToggleAutoSort(isAutoSort);
+						
+						sg.AddAndUpdateSBs();
+						
+						foreach(ISlottable sb in sg){
+							if(sb != null){
+								int id;
+								if(sbsAddedIDDict.TryGetValue(sb.itemInst, out id))
+									expectedSBs[id] = sb;
 							}
 						}
-					}
-					foreach(ISlottable sb in sg.newSBs){
-						if(sb != null){
-							int id;
-							if(newSBsAddedIDDict.TryGetValue(sb.itemInst, out id)){
-								expectedNewSBs[id] = sg.newSBs[sg.newSBs.IndexOf(sb)];
+						Assert.That(sg.toList, Is.EqualTo(expectedSBs));
+						foreach(ISlottable sb in sg){
+							if(sb != null){
+								int qua;
+								if(quantDict.TryGetValue(sb.itemInst, out qua)){
+									sb.Received().SetQuantity(qua);
+								}
 							}
 						}
+						foreach(ISlottable sb in sg.newSBs){
+							if(sb != null){
+								int id;
+								if(newSBsAddedIDDict.TryGetValue(sb.itemInst, out id)){
+									expectedNewSBs[id] = sg.newSBs[sg.newSBs.IndexOf(sb)];
+								}
+							}
+						}
+						Assert.That(sg.newSBs, Is.EqualTo(expectedNewSBs));
 					}
-					Assert.That(sg.newSBs, Is.EqualTo(expectedNewSBs));
-				}
 					class AddAndUpdateSBs_VariousCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							/* SBs */
@@ -2425,7 +2600,7 @@ namespace SlotSystemTests{
 								yield return addedSortResize_isAutoSortTrue_isExpandableTrue;
 						}
 					}
-				[TestCaseSource(typeof(RemoveAndUpdateSGsCases))][Category("Methods")]
+				[TestCaseSource(typeof(RemoveAndUpdateSGsCases))]
 				public void RemoveAndUpdateSGs_Various_DoesNotChangeSBsAndSetsNewSBsAccordingly(
 					bool isAutoSort, 
 					bool isExpandable, 
@@ -2434,28 +2609,28 @@ namespace SlotSystemTests{
 					List<InventoryItemInstance> removed, 
 					List<ISlottable> expectedNewSBs, 
 					Dictionary<InventoryItemInstance, int> removedQuantDict)
-				{
-					SlotGroup sg = MakeSG();
-						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
-							ISlotSystemManager ssm = MakeSubSSM();
-								ssm.moved.Returns(removed);
-							sg.SetSSM(ssm);
-							sg.SetSBs(sbs);
-							sg.ToggleAutoSort(isAutoSort);
+					{
+						SlotGroup sg = MakeSG();
+							sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
+								ISlotSystemManager ssm = MakeSubSSM();
+									ssm.moved.Returns(removed);
+								sg.SetSSM(ssm);
+								sg.SetSBs(sbs);
+								sg.ToggleAutoSort(isAutoSort);
 
-						sg.RemoveAndUpdateSBs();
+							sg.RemoveAndUpdateSBs();
 
-						Assert.That(sg.toList, Is.EqualTo(sbs));
-						Assert.That(sg.newSBs, Is.EqualTo(expectedNewSBs));
-						foreach(ISlottable sb in sbs){
-							if(sb != null){
-								int quantity;
-								if(removedQuantDict.TryGetValue(sb.itemInst, out quantity)){
-									sb.Received().SetQuantity(quantity);
+							Assert.That(sg.toList, Is.EqualTo(sbs));
+							Assert.That(sg.newSBs, Is.EqualTo(expectedNewSBs));
+							foreach(ISlottable sb in sbs){
+								if(sb != null){
+									int quantity;
+									if(removedQuantDict.TryGetValue(sb.itemInst, out quantity)){
+										sb.Received().SetQuantity(quantity);
+									}
 								}
-							}
-						}	
-				}
+							}	
+					}
 					class RemoveAndUpdateSGsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							SGItemIDSorter sorter = new SGItemIDSorter();
@@ -2558,7 +2733,6 @@ namespace SlotSystemTests{
 					}
 				[TestCase(1)]
 				[TestCase(10)]
-				[Category("Methods")]
 				public void InitSlots_InitSlotsCountNonZero_SetsSlotsByInitSlotsCount(int initSlotsCount){
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), new SGItemIDSorter() , initSlotsCount);
@@ -2570,10 +2744,9 @@ namespace SlotSystemTests{
 					Assert.That(actual, Is.EqualTo(initSlotsCount));
 					foreach(Slot slot in sg.slots)
 						Assert.That(slot.sb, Is.Null);
-				}
+					}
 				[TestCase(4)]
 				[TestCase(40)]
-				[Category("Methods")]
 				public void InitSlots_InitSlotsCountZero_SetsSlotsByItemsCount(int itemsCount){
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), new SGItemIDSorter() , 0);
@@ -2585,8 +2758,8 @@ namespace SlotSystemTests{
 					Assert.That(actual, Is.EqualTo(itemsCount));
 					foreach(Slot slot in sg.slots)
 						Assert.That(slot.sb, Is.Null);
-				}
-				[TestCaseSource(typeof(InitSBs_SlotsNotEnoughCases))][Category("Methods")]
+					}
+				[TestCaseSource(typeof(InitSBs_SlotsNotEnoughCases))]
 				public void InitSBs_SlotsNotEnough_RemoveNonFittableItems(List<Slot> slots, List<SlottableItem> items, List<SlottableItem> expected){
 					SlotGroup sg = MakeSG();
 						sg.SetSlots(slots);
@@ -2594,7 +2767,7 @@ namespace SlotSystemTests{
 					sg.InitSBs(items);
 
 					Assert.That(items, Is.EqualTo(expected));
-				}
+					}
 					class InitSBs_SlotsNotEnoughCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							List<Slot> slots = CreateSlots(4);
@@ -2611,7 +2784,7 @@ namespace SlotSystemTests{
 
 						}
 					}
-				[TestCaseSource(typeof(InitSBs_WhenCalledCases))][Category("Methods")]
+				[TestCaseSource(typeof(InitSBs_WhenCalledCases))]
 				public void InitSBs_WhenCalled_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<SlottableItem> items){
 					SlotGroup sg = MakeSG();
 						sg.SetSSM(ssm);
@@ -2626,7 +2799,7 @@ namespace SlotSystemTests{
 						Assert.That(sb.curSelState, Is.SameAs(sb.deactivatedState));
 						Assert.That(sb.curEqpState, Is.Null);
 					}
-				}
+					}
 					class InitSBs_WhenCalledCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlotSystemManager ssm = MakeSubSSM();
@@ -2642,8 +2815,7 @@ namespace SlotSystemTests{
 							};
 						}
 					}
-				[Test][Category("Methods")]
-				public void empty(){}
+				
 			/*	helper */
 				static ISlottable MakeSubSBWithItemAndSG(InventoryItemInstance item, SlotGroup sg){
 					ISlottable sb = MakeSubSB();

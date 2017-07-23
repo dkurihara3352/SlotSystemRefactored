@@ -21,7 +21,7 @@ namespace SlotSystemTests{
 						sb.SetActState(null);
 
 						Assert.That(sb.curActState, Is.Null);
-					}
+						}
 					[Test]
 					public void SetActState_SBActState_SetsActState(){
 						Slottable sb = MakeSB();
@@ -30,7 +30,7 @@ namespace SlotSystemTests{
 						sb.SetActState(stubActState);
 
 						Assert.That(sb.curActState, Is.SameAs(stubActState));
-					}
+						}
 				/*	EqpState	*/
 					[Test]
 					public void SetEqpState_Null_CallsEqpStateEngineSetState(){
@@ -40,7 +40,7 @@ namespace SlotSystemTests{
 						sb.SetEqpState(null);
 
 						mockEngine.Received().SetState(null);
-					}
+						}
 					[Test]
 					public void SetEqpState_SBEqpState_CallsEqpStateEngineSetState(){
 						Slottable sb = MakeSB();
@@ -50,7 +50,7 @@ namespace SlotSystemTests{
 						sb.SetEqpState(stubEqpState);
 
 						mockEngine.Received().SetState(stubEqpState);
-					}
+						}
 				/*	Mrk State */
 					[Test]
 					public void SetMrkState_Null_CallsMrkStateEngineSetState(){
@@ -60,7 +60,7 @@ namespace SlotSystemTests{
 						sb.SetMrkState(null);
 
 						mockEngine.Received().SetState(null);
-					}
+						}
 					[Test]
 					public void SetMrkState_SBMrkState_CallsMrkStateEngineSetState(){
 						Slottable sb = MakeSB();
@@ -70,7 +70,7 @@ namespace SlotSystemTests{
 						sb.SetMrkState(stubMrkState);
 
 						mockEngine.Received().SetState(stubMrkState);
-					}
+						}
 			/*	Process	*/
 				/*	ActProc	*/
 					[Test]
@@ -80,7 +80,7 @@ namespace SlotSystemTests{
 						sb.SetAndRunActProcess(null);
 
 						Assert.That(sb.actProcess, Is.Null);
-					}
+						}
 					[Test]
 					public void SetAndRunActProcess_ISBActProcess_SetsActProc(){
 						Slottable sb = MakeSB();
@@ -89,7 +89,7 @@ namespace SlotSystemTests{
 						sb.SetAndRunActProcess(stubProc);
 
 						Assert.That(sb.actProcess, Is.SameAs(stubProc));
-					}
+						}
 				/*	EqpProc	*/
 					[Test]
 					public void SetAndRunEqpState_Null_CallsEngineWithNull(){
@@ -99,7 +99,7 @@ namespace SlotSystemTests{
 						sb.SetAndRunEqpProcess(null);
 
 						mockEngine.Received().SetAndRunProcess(null);
-					}
+						}
 					[Test]
 					public void SetAndRunEqpProcess_ISBEqpProcess_CallsEqpProcEngineWithTheProc(){
 						Slottable sb = MakeSB();
@@ -109,7 +109,7 @@ namespace SlotSystemTests{
 						sb.SetAndRunEqpProcess(stubProc);
 
 						mockEngine.Received().SetAndRunProcess(stubProc);
-					}
+						}
 				/*	MrkProc	*/
 					[Test]
 					public void SetAndRunMrkState_Null_CallsEngineWithNull(){
@@ -119,7 +119,7 @@ namespace SlotSystemTests{
 						sb.SetAndRunMrkProcess(null);
 
 						mockEngine.Received().SetAndRunProcess(null);
-					}
+						}
 					[Test]
 					public void SetAndRunMrkProcess_ISBMrkProcess_CallsMrkProcEngineWithTheProc(){
 						Slottable sb = MakeSB();
@@ -129,9 +129,9 @@ namespace SlotSystemTests{
 						sb.SetAndRunMrkProcess(stubProc);
 
 						mockEngine.Received().SetAndRunProcess(stubProc);
-					}
+						}
 			/*	Methods	*/
-				[Test][Category("Methods")]
+				[Test]
 				public void InitializeStates_WhenCalled_InitializesStates(){
 					Slottable sb = MakeSB();
 
@@ -145,9 +145,8 @@ namespace SlotSystemTests{
 					Assert.That(sb.prevEqpState, Is.Null);
 					Assert.That(sb.curMrkState, Is.SameAs(Slottable.unmarkedState));
 					Assert.That(sb.prevMrkState, Is.Null);
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void Pickup_WhenCalled_SetsPickedUpState(){
 					Slottable sb = MakeSB();
 					sb.SetSSM(MakeSubSSM());
@@ -156,9 +155,8 @@ namespace SlotSystemTests{
 					sb.PickUp();
 
 					Assert.That(sb.curActState, Is.SameAs(Slottable.pickedUpState));
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void Pickup_WhenCalled_SetsPickedAmountOne(){
 					Slottable sb = MakeSB();
 					sb.SetSSM(MakeSubSSM());
@@ -167,12 +165,10 @@ namespace SlotSystemTests{
 					sb.PickUp();
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(1));
-				}
+					}
 				[TestCaseSource(typeof(IncrementCases))]
-				[Category("Methods")]
-				public void Increment_Stackable_IncrementsPickedAmountUpToQuanity(InventoryItemInstance item, int expected){
+				public void Increment_StackableToMoreThanQuantity_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
 					Slottable sb = MakeSB();
-					
 					sb.SetItem(item);
 
 					for(int i =0; i< expected *2; i++){
@@ -180,7 +176,7 @@ namespace SlotSystemTests{
 					}
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(expected));
-				}
+					}
 					class IncrementCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] case1 = new object[]{
@@ -194,11 +190,9 @@ namespace SlotSystemTests{
 								10
 							};
 							yield return case2;
-
 						}
 					}
 				[TestCaseSource(typeof(IncrementNonStackableCases))]
-				[Category("Methods")]
 				public void Increment_NonStackable_DoesNotIncrement(InventoryItemInstance item){
 					Slottable sb = MakeSB();
 					sb.SetItem(item);
@@ -206,7 +200,7 @@ namespace SlotSystemTests{
 						sb.Increment();
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(0));
-				}
+					}
 					class IncrementNonStackableCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							yield return MakeBowInstance(0);
@@ -218,7 +212,6 @@ namespace SlotSystemTests{
 						}
 					}
 				[Test]
-				[Category("Methods")]
 				public void ExecuteTransaction_WhenCalled_CallsSSMExecuteTransaction(){
 					ISlotSystemManager mockSSM = MakeSubSSM();
 					Slottable stubSB = MakeSB();
@@ -227,9 +220,8 @@ namespace SlotSystemTests{
 					stubSB.ExecuteTransaction();
 
 					mockSSM.Received().ExecuteTransaction();
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void ExpireActionProcess_actProcIsRunning_CallsActProcExpire(){
 					ISBActProcess mockProc = Substitute.For<ISBActProcess>();
 					mockProc.isRunning.Returns(true);
@@ -239,9 +231,8 @@ namespace SlotSystemTests{
 					stubSB.ExpireActionProcess();
 
 					mockProc.Received().Expire();
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void UpdateEquipState_ItemInstIsEquipped_SetsEqpStateEquipped(){
 					Slottable testSB = MakeSB();
 					BowInstance stubBow = MakeBowInstance(0);
@@ -255,9 +246,8 @@ namespace SlotSystemTests{
 					testSB.UpdateEquipState();
 
 					Assert.That(testSB.curEqpState, Is.SameAs(Slottable.equippedState));
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void UpdateEquipState_ItemInstIsNotEquipped_SetsEqpStateUnequipped(){
 					Slottable testSB = MakeSB();
 					BowInstance stubBow = MakeBowInstance(0);
@@ -271,36 +261,32 @@ namespace SlotSystemTests{
 					testSB.UpdateEquipState();
 
 					Assert.That(testSB.curEqpState, Is.SameAs(Slottable.unequippedState));
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void Reset_WhenCalled_SetsActStateWFAState(){
 					Slottable sb = MakeSB();
 					
 					sb.Reset();
 
 					Assert.That(sb.curActState, Is.SameAs(Slottable.sbWaitForActionState));
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void Reset_WhenCalled_SetsPickedAmountZero(){
 					Slottable sb = MakeSB();
 					sb.pickedAmount = 10;
 					sb.Reset();
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(0));
-				}
+					}
 				[Test]
-				[Category("Methods")]
 				public void Reset_WhenCalled_SetsNewSlotIDMinus2(){
 					Slottable sb = MakeSB();
 					sb.SetNewSlotID(3);
 					sb.Reset();
 
 					Assert.That(sb.newSlotID, Is.EqualTo(-2));
-				}
+					}
 				[TestCaseSource(typeof(ShareSGAndItemCases))]
-				[Category("Methods")]
 				public void ShareSGAndItem_VariousCombo_ReturnsAccordingly(ISlotGroup sg, ISlotGroup otherSG, InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
 					Slottable sb = MakeSB();
 					Slottable otherSB = MakeSB();
@@ -313,35 +299,61 @@ namespace SlotSystemTests{
 					otherSB.SetItem(otherIInst);
 
 					Assert.That(sb.ShareSGAndItem(otherSB), Is.EqualTo(expected));
-				}
+					}
 					class ShareSGAndItemCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							ISlotGroup sgA = MakeSubSG();
-							ISlotGroup sgB = MakeSubSG();
-							BowInstance bowA = MakeBowInstance(0);
-							BowInstance bowA_1 = MakeBowInstance(0);
-							PartsInstance partsA = MakePartsInstance(0, 1);
-							PartsInstance partsA_1 = MakePartsInstance(0, 2);
-							object[] valid1 = new object[]{
-								sgA, sgA, bowA, bowA, true
-							};
-							yield return valid1;
-							object[] valid2 = new object[]{
-								sgA, sgA, partsA, partsA_1, true
-							};
-							yield return valid2;
-							object[] invalid1 = new object[]{
-								sgA, sgA, bowA, bowA_1, false
-							};
-							yield return invalid1;
-							object[] invalid2 = new object[]{
-								sgA, sgB, bowA, bowA, false
-							};
-							yield return invalid2;
+							object[] sameSG_sameNonStackable_T;
+								ISlotGroup sgA_1 = MakeSubSG();
+								BowInstance bowA_1 = MakeBowInstance(0);
+								sameSG_sameNonStackable_T = new object[]{
+									sgA_1, sgA_1, bowA_1, bowA_1, true
+								};
+								yield return sameSG_sameNonStackable_T;
+							object[] sameSG_sameStackable_T;
+								ISlotGroup sgA_2 = MakeSubSG();
+								PartsInstance partsA_2 = MakePartsInstance(0, 1);
+								PartsInstance partsAA_2 = MakePartsInstance(0, 19);
+								sameSG_sameStackable_T = new object[]{
+									sgA_2, sgA_2, partsA_2, partsAA_2, true
+								};
+								yield return sameSG_sameStackable_T;
+							object[] sameSG_DiffNonStackable_F;
+								ISlotGroup sgA_3 = MakeSubSG();
+								BowInstance bowA_3 = MakeBowInstance(0);
+								BowInstance bowB_3 = MakeBowInstance(1);
+								sameSG_DiffNonStackable_F = new object[]{
+									sgA_3, sgA_3, bowA_3, bowB_3, false
+								};
+								yield return sameSG_DiffNonStackable_F;
+							object[] sameSG_DiffStackable_F;
+								ISlotGroup sgA_4 = MakeSubSG();
+								PartsInstance partsA_4 = MakePartsInstance(0, 1);
+								PartsInstance partsB_4 = MakePartsInstance(1, 19);
+								sameSG_DiffStackable_F = new object[]{
+									sgA_4, sgA_4, partsA_4, partsB_4, false
+								};
+								yield return sameSG_DiffStackable_F;
+							object[] diffSG_sameNonStackable_F;
+								ISlotGroup sgA_5 = MakeSubSG();
+								ISlotGroup sgB_5 = MakeSubSG();
+								BowInstance bowA_5 = MakeBowInstance(0);
+								BowInstance bowAA_5 = MakeBowInstance(0);
+								diffSG_sameNonStackable_F = new object[]{
+									sgA_5, sgB_5, bowA_5, bowAA_5, false
+								};
+								yield return diffSG_sameNonStackable_F;
+							object[] diffSG_sameStackable_F;
+								ISlotGroup sgA_6 = MakeSubSG();
+								ISlotGroup sgB_6 = MakeSubSG();
+								PartsInstance partsA_6 = MakePartsInstance(0, 1);
+								PartsInstance partsAA_6 = MakePartsInstance(0, 19);
+								diffSG_sameStackable_F = new object[]{
+									sgA_6, sgB_6, partsA_6, partsAA_6, false
+								};
+								yield return diffSG_sameStackable_F;
 						}
 					}
 				[TestCaseSource(typeof(HaveCommonItemFamilyCases))]
-				[Category("Methods")]
 				public void HaveCommonItemFamily_Various_ReturnsAccordingly(InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
 					Slottable sb = MakeSB();
 					Slottable otherSB = MakeSB();
@@ -349,52 +361,69 @@ namespace SlotSystemTests{
 					otherSB.SetItem(otherIInst);
 
 					Assert.That(sb.HaveCommonItemFamily(otherSB), Is.EqualTo(expected));
-				}
+					}
 					class HaveCommonItemFamilyCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							BowInstance bow = MakeBowInstance(0);
-							WearInstance wear = MakeWearInstance(0);
-							ShieldInstance shield = MakeShieldInstance(0);
-							MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
-							QuiverInstance quiver = MakeQuiverInstance(0);
-							PackInstance pack = MakePackInstance(0);
-							PartsInstance parts = MakePartsInstance(0, 1);
-							yield return new object[]{bow, bow, true};
-							yield return new object[]{wear, wear, true};
-							yield return new object[]{shield, shield, true};
-							yield return new object[]{mWeapon, mWeapon, true};
-							yield return new object[]{quiver, quiver, true};
-							yield return new object[]{pack, pack, true};
-							yield return new object[]{parts, parts, true};
-
-							yield return new object[]{bow, wear, false};
-							yield return new object[]{bow, shield, false};
-							yield return new object[]{bow, mWeapon, false};
-							yield return new object[]{bow, quiver, false};
-							yield return new object[]{bow, pack, false};
-							yield return new object[]{bow, parts, false};
+							object[] bow_bow_T;
+								BowInstance bow_1 = MakeBowInstance(0);
+								bow_bow_T = new object[]{bow_1, bow_1, true};
+								yield return bow_bow_T;
+							object[] wear_wear_T;
+								WearInstance wear_2 = MakeWearInstance(0);
+								wear_wear_T = new object[]{wear_2, wear_2, true};
+								yield return wear_wear_T;
+							object[] shield_mWeapon_T;
+								ShieldInstance shield_3 = MakeShieldInstance(0);
+								MeleeWeaponInstance mWeapon_3 = MakeMeleeWeaponInstance(0);
+								shield_mWeapon_T = new object[]{shield_3, mWeapon_3, true};
+								yield return shield_mWeapon_T;
+							object[] parts_parts_T;
+								PartsInstance partsA_4 = MakePartsInstance(0, 1);
+								PartsInstance partsB_4 = MakePartsInstance(1, 3);
+								parts_parts_T = new object[]{partsA_4, partsB_4, true};
+								yield return parts_parts_T;
+							object[] bow_wear_F;
+								BowInstance bow_5 = MakeBowInstance(0);
+								WearInstance wear_5 = MakeWearInstance(0);
+								bow_wear_F = new object[]{bow_5, wear_5, false};
+								yield return bow_wear_F;
+							object[] wear_quiver_F;
+								WearInstance wear_6 = MakeWearInstance(0);
+								QuiverInstance quiver_6 = MakeQuiverInstance(0);
+								wear_quiver_F = new object[]{wear_6, quiver_6, false};
+								yield return wear_quiver_F;
+							object[] shield_parts_F;
+								ShieldInstance shield_7 = MakeShieldInstance(0);
+								PartsInstance parts_7 = MakePartsInstance(0, 1);
+								shield_parts_F = new object[]{shield_7, parts_7, false};
+								yield return shield_parts_F;
+							object[] parts_pack_F;
+								PartsInstance partsA_8 = MakePartsInstance(0, 1);
+								PackInstance pack_8 = MakePackInstance(0);
+								parts_pack_F = new object[]{partsA_8, pack_8, false};
+								yield return parts_pack_F;
 						}
 					}
-			/*	Forward	*/
+			
 			/*	helper	*/
-			ISSEStateEngine<ISBActState> MakeSubSBActStateEngine(){
-				return Substitute.For<ISSEStateEngine<ISBActState>>();
-			}
-			ISSEStateEngine<ISBEqpState> MakeSubSBEqpStateEngine(){
-				return Substitute.For<ISSEStateEngine<ISBEqpState>>();
-			}
-			ISSEStateEngine<ISBMrkState> MakeSubSBMrkStateEngine(){
-				return Substitute.For<ISSEStateEngine<ISBMrkState>>();
-			}
-			ISSEProcessEngine<ISBActProcess> MakeSubSBActProcessEngine(){
-				return Substitute.For<ISSEProcessEngine<ISBActProcess>>();
-			}
-			ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){
-				return Substitute.For<ISSEProcessEngine<ISBEqpProcess>>();
-			}
-			ISSEProcessEngine<ISBMrkProcess> MakeSubSBMrkProcessEngine(){
-				return Substitute.For<ISSEProcessEngine<ISBMrkProcess>>();
-			}
+				ISSEStateEngine<ISBActState> MakeSubSBActStateEngine(){
+					return Substitute.For<ISSEStateEngine<ISBActState>>();
+				}
+				ISSEStateEngine<ISBEqpState> MakeSubSBEqpStateEngine(){
+					return Substitute.For<ISSEStateEngine<ISBEqpState>>();
+				}
+				ISSEStateEngine<ISBMrkState> MakeSubSBMrkStateEngine(){
+					return Substitute.For<ISSEStateEngine<ISBMrkState>>();
+				}
+				ISSEProcessEngine<ISBActProcess> MakeSubSBActProcessEngine(){
+					return Substitute.For<ISSEProcessEngine<ISBActProcess>>();
+				}
+				ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){
+					return Substitute.For<ISSEProcessEngine<ISBEqpProcess>>();
+				}
+				ISSEProcessEngine<ISBMrkProcess> MakeSubSBMrkProcessEngine(){
+					return Substitute.For<ISSEProcessEngine<ISBMrkProcess>>();
+				}
 		}
 	}
 }

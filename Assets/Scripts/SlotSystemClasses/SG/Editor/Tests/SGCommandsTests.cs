@@ -9,6 +9,7 @@ using System.Collections.Generic;
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
+		[Category("SG")]
 		public class SGCommandsTests: SlotSystemTest {
 
 			[Test]
@@ -35,7 +36,7 @@ namespace SlotSystemTests{
 					mockSG.SyncSBsToSlots();
 				});
 				mockSG.DidNotReceive().InstantSort();
-			}
+				}
 				IEnumerator<SlottableItem> SlottableItemRator(IEnumerable<InventoryItemInstance> items){
 					foreach(var item in items)
 						yield return (SlottableItem)item;
@@ -48,7 +49,7 @@ namespace SlotSystemTests{
 				comm.Execute(mockSG);
 
 				mockSG.Received().InstantSort();
-			}
+				}
 			[Test]
 			public void SGUpdateEquipAtExecutionCommand_Execute_VariousSBIDs_CallsSGAccordingly(){
 				SGUpdateEquipAtExecutionCommand comm = new SGUpdateEquipAtExecutionCommand();
@@ -76,7 +77,7 @@ namespace SlotSystemTests{
 				mockSG.Received().SyncEquipped(Arg.Is<InventoryItemInstance>(bow), false);
 				mockSG.Received().SyncEquipped(Arg.Is<InventoryItemInstance>(wear), true);
 				mockSG.DidNotReceive().SyncEquipped(Arg.Is<InventoryItemInstance>(shield), Arg.Any<bool>());
-			}
+				}
 				IEnumerator<ISlotSystemElement> SSERator(IEnumerable<ISlottable> sbs){
 					foreach(var sb in sbs) yield return sb;
 				}

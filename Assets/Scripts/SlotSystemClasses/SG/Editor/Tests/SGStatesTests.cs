@@ -9,6 +9,7 @@ using NSubstitute;
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
+		[Category("SG")]
 		public class SGStatesTests: SlotSystemTest{
 			/*	ActState	*/
 				[TestCaseSource(typeof(VariousSGActStateEnterStateCases))]
@@ -19,7 +20,7 @@ namespace SlotSystemTests{
 					toState.EnterState(mockSG);
 
 					mockSG.Received().SetAndRunActProcess(Arg.Any<SGTransactionProcess>());
-				}
+					}
 					class VariousSGActStateEnterStateCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							yield return SlotGroup.revertState;
@@ -39,7 +40,7 @@ namespace SlotSystemTests{
 					sgwfaState.EnterState(mockSG);
 
 					mockSG.Received().SetAndRunActProcess(null);
-				}
+					}
 				[Test]
 				public void SGRevertState_EnterState_WhenCalled_CallsSGUpdateToRevert(){
 					SGRevertState revState = new SGRevertState();
@@ -49,7 +50,7 @@ namespace SlotSystemTests{
 
 					mockSG.Received().UpdateToRevert();
 
-				}
+					}
 				[Test]
 				public void SGReorderState_EnterState_WhenCalled_CallsSGReorderAndUpdateSBs(){
 					SGReorderState roState = new SGReorderState();
@@ -58,7 +59,7 @@ namespace SlotSystemTests{
 					roState.EnterState(mockSG);
 
 					mockSG.Received().ReorderAndUpdateSBs();
-				}
+					}
 				[Test]
 				public void SGSortState_EnterState_WhenCalled_CallsSGSortAndUpdateSBs(){
 					SGSortState sortState = new SGSortState();
@@ -67,7 +68,7 @@ namespace SlotSystemTests{
 					sortState.EnterState(mockSG);
 
 					mockSG.Received().SortAndUpdateSBs();
-				}
+					}
 				[Test]
 				public void SGFillState_EnterState_WhenCalled_CallsSGFillAndUpdateSBs(){
 					SGFillState fillState = new SGFillState();
@@ -76,7 +77,7 @@ namespace SlotSystemTests{
 					fillState.EnterState(mockSG);
 
 					mockSG.Received().FillAndUpdateSBs();
-				}
+					}
 				[Test]
 				public void SGSwapState_EnterState_WhenCalled_CallsSGSwapAndUpdateSBs(){
 					SGSwapState fillState = new SGSwapState();
@@ -85,7 +86,7 @@ namespace SlotSystemTests{
 					fillState.EnterState(mockSG);
 
 					mockSG.Received().SwapAndUpdateSBs();
-				}
+					}
 				[Test]
 				public void SGAddState_EnterState_WhenCalled_CallsSGAddAndUpdateSBs(){
 					SGAddState fillState = new SGAddState();
@@ -94,7 +95,7 @@ namespace SlotSystemTests{
 					fillState.EnterState(mockSG);
 
 					mockSG.Received().AddAndUpdateSBs();
-				}
+					}
 				[Test]
 				public void SGRemoveState_EnterState_WhenCalled_CallsSGRemoveAndUpdateSBs(){
 					SGRemoveState fillState = new SGRemoveState();
@@ -103,7 +104,7 @@ namespace SlotSystemTests{
 					fillState.EnterState(mockSG);
 
 					mockSG.Received().RemoveAndUpdateSBs();
-				}
+					}
 		}
 	}
 }

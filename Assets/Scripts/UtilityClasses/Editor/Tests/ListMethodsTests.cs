@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections;
 namespace UtilityClassTests{
 	[TestFixture]
+	[Category("Utility")]
 	// [Ignore]
 	public class ListMethodsTests {
 		[Test]
@@ -13,13 +14,13 @@ namespace UtilityClassTests{
 			List<int> orderedList = MakeOrderedList(4);
 
 			Assert.That(orderedList, Is.Ordered);
-		}
+			}
 		[Test]
 		public void MakeOrderedList_WhenCalled_ReturnsNonEmptyList(){
 			List<int> orderedList = MakeOrderedList(4);
 
 			Assert.That(orderedList, Is.Not.Empty);
-		}
+			}
 		[TestCase(0, 3, new int[]{1, 2, 3, 0})]
 		[TestCase(7, 2, new int[]{0, 1, 7, 2, 3, 4, 5, 6})]
 		[TestCase(12, 0, new int[]{12, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11})]
@@ -30,7 +31,7 @@ namespace UtilityClassTests{
 			orderedList.Reorder(i, j);
 
 			Assert.That(orderedList, Is.EqualTo(expected));
-		}
+			}
 		[TestCase(0, 1, new int[]{1, 0, 2})]
 		[TestCase(2, 0, new int[]{2, 1, 0})]
 		[TestCase(4, 1, new int[]{0, 4, 2, 3, 1})]
@@ -42,14 +43,14 @@ namespace UtilityClassTests{
 			result = ListMethods.SwappedList(orderedList, i, j);
 
 			Assert.That(result, Is.EqualTo(expected));
-		}
+			}
 		[TestCaseSource(typeof(PermCases))]
 		public void Permutations_WhenCalled_ReturnsPermutations(IEnumerable<int> orig, IEnumerable<IEnumerable<int>> expected){
 			
 			List<IEnumerable<int>> perms = ListMethods.Permutations(orig);
 
 			Assert.That(perms, Is.EquivalentTo(expected));
-		}
+			}
 			class PermCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
 					IEnumerable<int> case1Orig = new int[]{0, 1, 2};
@@ -98,7 +99,7 @@ namespace UtilityClassTests{
 			List<List<int>> result = ListMethods.Combinations(n, orig);
 
 			Assert.That(result, Is.EquivalentTo(expected));
-		}
+			}
 			class CombCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
 					int n_case1 = 2;
@@ -141,7 +142,7 @@ namespace UtilityClassTests{
 		public void Trim_WhenCalled_SetsExpected(List<TestElement> list, List<TestElement> expected){
 			list.Trim();
 			Assert.That(list, Is.EqualTo(expected));
-		}
+			}
 			class TrimCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
 					TestElement ele_1 = new TestElement();
@@ -159,7 +160,7 @@ namespace UtilityClassTests{
 			testList.Fill(added);
 
 			Assert.That(testList, Is.EqualTo(expected));
-		}
+			}
 			class FillCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
 					TestElement ele_1 = new TestElement();
@@ -183,7 +184,326 @@ namespace UtilityClassTests{
 					yield return new object[]{case3List, ele_4, case3Exp};
 				}
 			}
-		public class TestElement{}
+		[TestCaseSource(typeof(Count_AlwaysCases))]
+		public void Count_Always_ReturnsNumberOfEntriesIncludingNull(IEnumerable<TestElement> eles, int expectedCount){
+			Assert.That(eles.Count, Is.EqualTo(expectedCount));
+			}
+			class Count_AlwaysCases: IEnumerable{
+				public IEnumerator GetEnumerator(){
+					object[] allTestElements;
+						IEnumerable<TestElement> eles_0 = new TestElement[]{
+							new TestElement(),
+							new TestElement(),
+							new TestElement(),
+							new TestElement()
+						};
+						allTestElements = new object[]{eles_0, 4};
+						yield return allTestElements;
+					object[] withSomeNulls;
+						IEnumerable<TestElement> eles_1 = new TestElement[]{
+							new TestElement(),
+							null,
+							new TestElement(),
+							new TestElement(),
+							null,
+							null,
+							new TestElement()
+						};
+						withSomeNulls = new object[]{eles_1, 7};
+						yield return withSomeNulls;
+					object[] allNull;
+						IEnumerable<TestElement> eles_2 = new TestElement[]{
+							null,
+							null,
+							null,
+							null
+						};
+						allNull = new object[]{eles_2, 4};
+						yield return allNull;
+				}
+			}
+		[TestCaseSource(typeof(MemberEquals_ValueTypeCases))]
+		public void MemberEquals_ValueType_ReturnsAccordingly(IEnumerable<int> coll, IEnumerable<int> other, bool expected){
+			bool actual = coll.MemberEquals(other);
+
+			Assert.That(actual, Is.EqualTo(expected));
+		}
+			class MemberEquals_ValueTypeCases: IEnumerable{
+				public IEnumerator GetEnumerator(){
+					object[] identical_T;
+						IEnumerable<int> coll_0 = new int[]{0, 1, 2, 5, 7};
+						IEnumerable<int> other_0 = new int[]{0, 1, 2, 5, 7};
+						identical_T = new object[]{coll_0, other_0, true};
+						yield return identical_T;
+					object[] partial_F;
+						IEnumerable<int> coll_1 = new int[]{0, 1, 2};
+						IEnumerable<int> other_1 = new int[]{0, 1, 2, 5, 7};
+						partial_F = new object[]{coll_1, other_1, false};
+						yield return partial_F;
+					object[] equivalent_F;
+						IEnumerable<int> coll_2 = new int[]{2, 7, 5, 1, 0};
+						IEnumerable<int> other_2 = new int[]{0, 1, 2, 5, 7};
+						equivalent_F = new object[]{coll_2, other_2, false};
+						yield return equivalent_F;
+					object[] bothEmpty_T;
+						IEnumerable<int> coll_3 = new int[]{};
+						IEnumerable<int> other_3 = new int[]{};
+						bothEmpty_T = new object[]{coll_3, other_3, true};
+						yield return bothEmpty_T;
+					object[] eitherEmpty_F;
+						IEnumerable<int> coll_4 = new int[]{};
+						IEnumerable<int> other_4 = new int[]{0, 1, 2, 5, 7};
+						eitherEmpty_F = new object[]{coll_4, other_4, false};
+						yield return eitherEmpty_F;
+				}
+			}
+		[TestCaseSource(typeof(MemberEquals_CustomClassCases))]
+		public void MemberEquals_CustomClass_ReturnsAccordingly(IEnumerable<MemEqClass> coll, IEnumerable<MemEqClass> other, bool expected){
+			bool actual = coll.MemberEquals(other);
+
+			Assert.That(actual, Is.EqualTo(expected));
+		}
+			class MemberEquals_CustomClassCases: IEnumerable{
+				public IEnumerator GetEnumerator(){
+					object[] identical_T;
+						MemEqClass me0_0 = new MemEqClass();
+						MemEqClass me1_0 = new MemEqClass();
+						MemEqClass me2_0 = new MemEqClass();
+						MemEqClass me3_0 = new MemEqClass();
+						MemEqClass me4_0 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_0 = new MemEqClass[]{
+							me0_0, 
+							me1_0, 
+							me2_0, 
+							me3_0, 
+							me4_0
+						};
+						IEnumerable<MemEqClass> other_0 = new MemEqClass[]{
+							me0_0, 
+							me1_0, 
+							me2_0, 
+							me3_0, 
+							me4_0
+						};
+						identical_T = new object[]{coll_0, other_0, true};
+						yield return identical_T;
+					object[] partial_F;
+						MemEqClass me0_1 = new MemEqClass();
+						MemEqClass me1_1 = new MemEqClass();
+						MemEqClass me2_1 = new MemEqClass();
+						MemEqClass me3_1 = new MemEqClass();
+						MemEqClass me4_1 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_1 = new MemEqClass[]{
+							me0_1, 
+							me1_1, 
+							me2_1
+						};
+						IEnumerable<MemEqClass> other_1 = new MemEqClass[]{
+							me0_1, 
+							me1_1, 
+							me2_1, 
+							me3_1, 
+							me4_1
+						};
+						partial_F = new object[]{coll_1, other_1, false};
+						yield return partial_F;
+					object[] equivalent_F;
+						MemEqClass me0_2 = new MemEqClass();
+						MemEqClass me1_2 = new MemEqClass();
+						MemEqClass me2_2 = new MemEqClass();
+						MemEqClass me3_2 = new MemEqClass();
+						MemEqClass me4_2 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_2 = new MemEqClass[]{
+							me0_2,
+							me1_2,
+							me2_2,
+							me3_2,
+							me4_2
+						};
+						IEnumerable<MemEqClass> other_2 = new MemEqClass[]{
+							me0_2, 
+							me1_2, 
+							me4_2,
+							me3_2, 
+							me2_2 
+						};
+						equivalent_F = new object[]{coll_2, other_2, false};
+						yield return equivalent_F;
+					object[] bothEmpty_T;
+						IEnumerable<MemEqClass> coll_3 = new MemEqClass[]{
+						};
+						IEnumerable<MemEqClass> other_3 = new MemEqClass[]{
+						};
+						bothEmpty_T = new object[]{coll_3, other_3, true};
+						yield return bothEmpty_T;
+					object[] nullSameSize_T;
+						IEnumerable<MemEqClass> coll_4 = new MemEqClass[]{
+							null,
+							null,
+							null,
+							null
+						};
+						IEnumerable<MemEqClass> other_4 = new MemEqClass[]{
+							null,
+							null,
+							null,
+							null
+						};
+						nullSameSize_T = new object[]{coll_4, other_4, true};
+						yield return nullSameSize_T;
+					object[] nullDifSize_F;
+						IEnumerable<MemEqClass> coll_5 = new MemEqClass[]{
+							null,
+							null
+						};
+						IEnumerable<MemEqClass> other_5 = new MemEqClass[]{
+							null,
+							null,
+							null,
+							null
+						};
+						nullDifSize_F = new object[]{coll_5, other_5, false};
+						yield return nullDifSize_F;
+					object[] someToEmpty_F;
+						MemEqClass me0_6 = new MemEqClass();
+						MemEqClass me1_6 = new MemEqClass();
+						MemEqClass me2_6 = new MemEqClass();
+						MemEqClass me3_6 = new MemEqClass();
+						MemEqClass me4_6 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_6 = new MemEqClass[]{
+							me0_6,
+							me1_6,
+							me2_6,
+							me3_6,
+							me4_6
+						};
+						IEnumerable<MemEqClass> other_6 = new MemEqClass[]{
+						};
+						someToEmpty_F = new object[]{coll_6, other_6, false};
+						yield return someToEmpty_F;
+					object[] someToNull_F;
+						MemEqClass me0_7 = new MemEqClass();
+						MemEqClass me1_7 = new MemEqClass();
+						MemEqClass me2_7 = new MemEqClass();
+						MemEqClass me3_7 = new MemEqClass();
+						MemEqClass me4_7 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_7 = new MemEqClass[]{
+							me0_7,
+							me1_7,
+							me2_7,
+							me3_7,
+							me4_7
+						};
+						IEnumerable<MemEqClass> other_7 = new MemEqClass[]{
+							null,
+							null,
+							null,
+							null,
+							null
+						};
+						someToNull_F = new object[]{coll_7, other_7, false};
+						yield return someToNull_F;
+					object[] identicalWithNull_T;
+						MemEqClass me0_8 = new MemEqClass();
+						MemEqClass me1_8 = new MemEqClass();
+						MemEqClass me2_8 = new MemEqClass();
+						MemEqClass me3_8 = new MemEqClass();
+						MemEqClass me4_8 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_8 = new MemEqClass[]{
+							me0_8,
+							null,
+							me1_8,
+							me2_8,
+							me3_8,
+							null,
+							null,
+							me4_8
+						};
+						IEnumerable<MemEqClass> other_8 = new MemEqClass[]{
+							me0_8,
+							null,
+							me1_8,
+							me2_8,
+							me3_8,
+							null,
+							null,
+							me4_8
+						};
+						identicalWithNull_T = new object[]{coll_8, other_8, true};
+						yield return identicalWithNull_T;
+					object[] partialWithNull_F;
+						MemEqClass me0_9 = new MemEqClass();
+						MemEqClass me1_9 = new MemEqClass();
+						MemEqClass me2_9 = new MemEqClass();
+						MemEqClass me3_9 = new MemEqClass();
+						MemEqClass me4_9 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_9 = new MemEqClass[]{
+							me0_9,
+							null,
+							me1_9,
+							me2_9,
+							me3_9,
+							null,
+							null,
+							me4_9
+						};
+						IEnumerable<MemEqClass> other_9 = new MemEqClass[]{
+							me0_9,
+							null,
+							me1_9,
+							me2_9,
+							null,
+							null,
+							null,
+							me4_9
+						};
+						partialWithNull_F = new object[]{coll_9, other_9, false};
+						yield return partialWithNull_F;
+					object[] equivalentWithNull_F;
+						MemEqClass me0_10 = new MemEqClass();
+						MemEqClass me1_10 = new MemEqClass();
+						MemEqClass me2_10 = new MemEqClass();
+						MemEqClass me3_10 = new MemEqClass();
+						MemEqClass me4_10 = new MemEqClass();
+						IEnumerable<MemEqClass> coll_10 = new MemEqClass[]{
+							me0_10,
+							null,
+							me1_10,
+							me2_10,
+							me3_10,
+							null,
+							null,
+							me4_10
+						};
+						IEnumerable<MemEqClass> other_10 = new MemEqClass[]{
+							me1_10,
+							null,
+							null,
+							me3_10,
+							null,
+							me2_10,
+							me4_10,
+							me0_10,
+						};
+						equivalentWithNull_F = new object[]{coll_10, other_10, false};
+						yield return equivalentWithNull_F;
+					object[] nullToEmpty_F;
+						IEnumerable<MemEqClass> coll_11 = new MemEqClass[]{
+							null,
+							null
+						};
+						IEnumerable<MemEqClass> other_11 = new MemEqClass[]{
+						};
+						nullToEmpty_F = new object[]{coll_11, other_11, false};
+						yield return nullToEmpty_F;
+				}
+			}
+			public class MemEqClass{
+
+			}
+			
+		public class TestElement{
+		}
 		public List<int> MakeOrderedList(){
 			List<int> result = new List<int>();
 			System.Random rng = new System.Random();
@@ -192,14 +512,14 @@ namespace UtilityClassTests{
 				result.Add(i);
 			}
 			return result;
-		}
+			}
 		public List<int> MakeOrderedList(int count){
 			List<int> result = new List<int>();
 			for(int i = 0; i < count; i++){
 				result.Add(i);
 			}
 			return result;
-		}
+			}
 	}
 }
 
