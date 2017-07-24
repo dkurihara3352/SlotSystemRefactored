@@ -5,6 +5,7 @@ using UnityEditor;
 using NUnit.Framework;
 using NSubstitute;
 using SlotSystem;
+using Utility;
 namespace SlotSystemTests{
     namespace OtherClassesTests{
         namespace InventoryTests{
@@ -63,7 +64,8 @@ namespace SlotSystemTests{
                         foreach(var item in added)
                             equipInv.Add(item);
                         
-                        Assert.That(equipInv.equippedCGears, Is.EqualTo(expected));
+                        bool equality = equipInv.equippedCGears.MemberEquals(expected);
+                        Assert.That(equality, Is.True);
                         }
                         class AddCGearsNotExceedingLimitCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
@@ -95,7 +97,6 @@ namespace SlotSystemTests{
                                     yield return fits_4;
                             }
                         }
-
                     [Test]
                     [ExpectedException(typeof(System.ArgumentNullException))]
                     public void Add_Null_ThrowsException(){
@@ -167,7 +168,8 @@ namespace SlotSystemTests{
                         
                         Assert.That(esi.equippedBow, Is.EqualTo(bow));
                         Assert.That(esi.equippedWear, Is.EqualTo(wear));
-                        Assert.That(esi.equippedCGears, Is.EqualTo(cgs));
+                        bool equality = esi.equippedCGears.MemberEquals(cgs);
+                        Assert.That(equality, Is.True);
                      }
                         class RemoveNonMemberCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
@@ -198,7 +200,8 @@ namespace SlotSystemTests{
                         
                         Assert.That(equipInv.equippedBow, Is.EqualTo(expBow));
                         Assert.That(equipInv.equippedWear, Is.EqualTo(expWear));
-                        Assert.That(equipInv.equippedCGears, Is.EqualTo(expCGears));
+                        bool equality = equipInv.equippedCGears.MemberEquals(expCGears);
+                        Assert.That(equality, Is.True);
                         }
                         class RemoveMemberCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
@@ -232,54 +235,82 @@ namespace SlotSystemTests{
                         foreach(var item in removed)
                             equipInv.Remove(item);
                         
-                        Assert.That(equipInv.Items, Is.EqualTo(expected));
+                        bool equality = equipInv.Items.MemberEquals(expected);
+                        Assert.That(equality, Is.True);
                     }
                         class ItemsCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
-                                BowInstance bow_A = MakeBowInstance(0);
-                                WearInstance wear_A = MakeWearInstance(0);
-                                ShieldInstance shield_A = MakeShieldInstance(0);
-                                MeleeWeaponInstance mWeapon_A = MakeMeleeWeaponInstance(0);
-                                QuiverInstance quiver_A = MakeQuiverInstance(0);
-                                PackInstance pack_A = MakePackInstance(0);
-
-                                List<InventoryItemInstance> added = new List<InventoryItemInstance>(new InventoryItemInstance[]{
-                                    bow_A, wear_A, shield_A, mWeapon_A, quiver_A, pack_A
-                                });
-                                IEnumerable<InventoryItemInstance> case1Removed = new InventoryItemInstance[]{
-                                    bow_A
-                                };
-                                IEnumerable<InventoryItemInstance> case1Exp = new InventoryItemInstance[]{
-                                    wear_A, shield_A, mWeapon_A, quiver_A, pack_A
-                                };
-                                object[] case1 = new object[]{added, case1Removed, case1Exp};
-                                yield return case1;
-
-                                IEnumerable<InventoryItemInstance> case2Removed = new InventoryItemInstance[]{
-                                    wear_A
-                                };
-                                IEnumerable<InventoryItemInstance> case2Exp = new InventoryItemInstance[]{
-                                    bow_A, shield_A, mWeapon_A, quiver_A, pack_A
-                                };
-                                object[] case2 = new object[]{added, case2Removed, case2Exp};
-                                yield return case2;
-
-                                IEnumerable<InventoryItemInstance> case3Removed = new InventoryItemInstance[]{
-                                    shield_A, quiver_A
-                                };
-                                IEnumerable<InventoryItemInstance> case3Exp = new InventoryItemInstance[]{
-                                    bow_A, wear_A, mWeapon_A, pack_A
-                                };
-                                object[] case3 = new object[]{added, case3Removed, case3Exp};
-                                yield return case3;
-
-                                IEnumerable<InventoryItemInstance> case4Removed = new InventoryItemInstance[]{
-                                    bow_A, wear_A,shield_A, mWeapon_A, quiver_A, pack_A
-                                };
-                                IEnumerable<InventoryItemInstance> case4Exp = new InventoryItemInstance[]{
-                                };
-                                object[] case4 = new object[]{added, case4Removed, case4Exp};
-                                yield return case4;
+                                object[] case0;
+                                    BowInstance bowA_0 = MakeBowInstance(0);
+                                    WearInstance wearA_0 = MakeWearInstance(0);
+                                    ShieldInstance shieldA_0 = MakeShieldInstance(0);
+                                    MeleeWeaponInstance mWeaponA_0 = MakeMeleeWeaponInstance(0);
+                                    QuiverInstance quiverA_0 = MakeQuiverInstance(0);
+                                    PackInstance packA_0 = MakePackInstance(0);
+                                    List<InventoryItemInstance> added_0 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+                                        bowA_0, wearA_0, shieldA_0, mWeaponA_0, quiverA_0, packA_0
+                                    });
+                                    IEnumerable<InventoryItemInstance> removed_0 = new InventoryItemInstance[]{
+                                        bowA_0
+                                    };
+                                    IEnumerable<InventoryItemInstance> exp_0 = new InventoryItemInstance[]{
+                                        wearA_0, shieldA_0, mWeaponA_0, quiverA_0, packA_0
+                                    };
+                                    case0 = new object[]{added_0, removed_0, exp_0};
+                                    yield return case0;
+                                object[] case1;
+                                    BowInstance bowA_1 = MakeBowInstance(0);
+                                    WearInstance wearA_1 = MakeWearInstance(0);
+                                    ShieldInstance shieldA_1 = MakeShieldInstance(0);
+                                    MeleeWeaponInstance mWeaponA_1 = MakeMeleeWeaponInstance(0);
+                                    QuiverInstance quiverA_1 = MakeQuiverInstance(0);
+                                    PackInstance packA_1 = MakePackInstance(0);
+                                    List<InventoryItemInstance> added_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+                                        bowA_1, wearA_1, shieldA_1, mWeaponA_1, quiverA_1, packA_1
+                                    });
+                                    IEnumerable<InventoryItemInstance> removed_1 = new InventoryItemInstance[]{
+                                        wearA_1
+                                    };
+                                    IEnumerable<InventoryItemInstance> exp_1 = new InventoryItemInstance[]{
+                                        bowA_1, shieldA_1, mWeaponA_1, quiverA_1, packA_1
+                                    };
+                                    case1 = new object[]{added_1, removed_1, exp_1};
+                                    yield return case1;
+                                object[] case2;
+                                    BowInstance bowA_2 = MakeBowInstance(0);
+                                    WearInstance wearA_2 = MakeWearInstance(0);
+                                    ShieldInstance shieldA_2 = MakeShieldInstance(0);
+                                    MeleeWeaponInstance mWeaponA_2 = MakeMeleeWeaponInstance(0);
+                                    QuiverInstance quiverA_2 = MakeQuiverInstance(0);
+                                    PackInstance packA_2 = MakePackInstance(0);
+                                    List<InventoryItemInstance> added_2 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+                                        bowA_2, wearA_2, shieldA_2, mWeaponA_2, quiverA_2, packA_2
+                                    });
+                                    IEnumerable<InventoryItemInstance> removed_2 = new InventoryItemInstance[]{
+                                        shieldA_2, quiverA_2
+                                    };
+                                    IEnumerable<InventoryItemInstance> exp_2 = new InventoryItemInstance[]{
+                                        bowA_2, wearA_2, mWeaponA_2, packA_2
+                                    };
+                                    case2 = new object[]{added_2, removed_2, exp_2};
+                                    yield return case2;
+                                object[] case3;
+                                    BowInstance bowA_3 = MakeBowInstance(0);
+                                    WearInstance wearA_3 = MakeWearInstance(0);
+                                    ShieldInstance shieldA_3 = MakeShieldInstance(0);
+                                    MeleeWeaponInstance mWeaponA_3 = MakeMeleeWeaponInstance(0);
+                                    QuiverInstance quiverA_3 = MakeQuiverInstance(0);
+                                    PackInstance packA_3 = MakePackInstance(0);
+                                    List<InventoryItemInstance> added_3 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+                                        bowA_3, wearA_3, shieldA_3, mWeaponA_3, quiverA_3, packA_3
+                                    });
+                                    IEnumerable<InventoryItemInstance> removed_3 = new InventoryItemInstance[]{
+                                        bowA_3, wearA_3, shieldA_3, mWeaponA_3, quiverA_3, packA_3
+                                    };
+                                    IEnumerable<InventoryItemInstance> exp_3 = new InventoryItemInstance[]{
+                                    };
+                                    case3 = new object[]{added_3, removed_3, exp_3};
+                                    yield return case3;
                             }
                         }
                 /*  Helpers */

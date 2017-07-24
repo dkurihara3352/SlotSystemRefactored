@@ -6,6 +6,7 @@ using SlotSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Utility;
 
 namespace SlotSystemTests{
 	namespace SGTests{
@@ -14,13 +15,14 @@ namespace SlotSystemTests{
 		public class SGFilterTests: SlotSystemTest {
 
 			[TestCaseSource(typeof(SGFilterCases))]
-			public void SGFilter_Filter_WhenCalled_SetsItemsAccordingly(SGFilter targFilter, List<SlottableItem> list, IEnumerable<SlottableItem> expected){
+			public void SGFilter_Filter_WhenCalled_SetsItemsAccordingly(SGFilter targFilter, List<SlottableItem> targList, IEnumerable<SlottableItem> expected){
 				SGFilter filter = targFilter;
-                List<SlottableItem> target = list;
+                List<SlottableItem> list = targList;
 
-				filter.Filter(ref target);
+				filter.Filter(ref list);
 
-				Assert.That(target, Is.EqualTo(expected));
+				bool equality = list.MemberEquals(expected);
+				Assert.That(equality, Is.True);
 				}
 				class SGFilterCases: IEnumerable{
 					public IEnumerator GetEnumerator(){

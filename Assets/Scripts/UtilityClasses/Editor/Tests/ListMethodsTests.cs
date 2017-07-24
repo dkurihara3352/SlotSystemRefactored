@@ -7,7 +7,6 @@ using System.Collections;
 namespace UtilityClassTests{
 	[TestFixture]
 	[Category("Utility")]
-	// [Ignore]
 	public class ListMethodsTests {
 		[Test]
 		public void MakeOrderedList_WhenCalled_ReturnsOrderedList(){
@@ -30,7 +29,8 @@ namespace UtilityClassTests{
 			
 			orderedList.Reorder(i, j);
 
-			Assert.That(orderedList, Is.EqualTo(expected));
+			bool equality = orderedList.MemberEquals(expected);
+			Assert.That(equality, Is.True);
 			}
 		[TestCase(0, 1, new int[]{1, 0, 2})]
 		[TestCase(2, 0, new int[]{2, 1, 0})]
@@ -42,7 +42,8 @@ namespace UtilityClassTests{
 
 			result = ListMethods.SwappedList(orderedList, i, j);
 
-			Assert.That(result, Is.EqualTo(expected));
+			bool equality = result.MemberEquals(expected);
+			Assert.That(equality, Is.True);
 			}
 		[TestCaseSource(typeof(PermCases))]
 		public void Permutations_WhenCalled_ReturnsPermutations(IEnumerable<int> orig, IEnumerable<IEnumerable<int>> expected){
@@ -54,42 +55,48 @@ namespace UtilityClassTests{
 			class PermCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
 					IEnumerable<int> case1Orig = new int[]{0, 1, 2};
-					List<IEnumerable<int>> case1Exp = new List<IEnumerable<int>>();
-					case1Exp.Add(new int[]{0, 1, 2});
-					case1Exp.Add(new int[]{0, 2, 1});
-					case1Exp.Add(new int[]{1, 0, 2});
-					case1Exp.Add(new int[]{1, 2, 0});
-					case1Exp.Add(new int[]{2, 0, 1});
-					case1Exp.Add(new int[]{2, 1, 0});
+					List<IEnumerable<int>> case1Exp = new List<IEnumerable<int>>(
+						new IEnumerable<int>[]{
+							new int[]{0, 1, 2},
+							new int[]{0, 2, 1},
+							new int[]{1, 0, 2},
+							new int[]{1, 2, 0},
+							new int[]{2, 0, 1},
+							new int[]{2, 1, 0}
+						}
+					);
 					object[] case1 = new object[]{case1Orig, case1Exp};
 					yield return case1;
 
 					IEnumerable<int> case2Orig = new int[]{0, 1, 2, 3};
-					List<IEnumerable<int>> case2Exp = new List<IEnumerable<int>>();
-					case2Exp.Add(new int[]{0, 1, 2, 3});
-					case2Exp.Add(new int[]{0, 1, 3, 2});
-					case2Exp.Add(new int[]{0, 2, 1, 3});
-					case2Exp.Add(new int[]{0, 2, 3, 1});
-					case2Exp.Add(new int[]{0, 3, 1, 2});
-					case2Exp.Add(new int[]{0, 3, 2, 1});
-					case2Exp.Add(new int[]{1, 0, 2, 3});
-					case2Exp.Add(new int[]{1, 0, 3, 2});
-					case2Exp.Add(new int[]{1, 2, 0, 3});
-					case2Exp.Add(new int[]{1, 2, 3, 0});
-					case2Exp.Add(new int[]{1, 3, 0, 2});
-					case2Exp.Add(new int[]{1, 3, 2, 0});
-					case2Exp.Add(new int[]{2, 0, 1, 3});
-					case2Exp.Add(new int[]{2, 0, 3, 1});
-					case2Exp.Add(new int[]{2, 1, 0, 3});
-					case2Exp.Add(new int[]{2, 1, 3, 0});
-					case2Exp.Add(new int[]{2, 3, 0, 1});
-					case2Exp.Add(new int[]{2, 3, 1, 0});
-					case2Exp.Add(new int[]{3, 0, 1, 2});
-					case2Exp.Add(new int[]{3, 0, 2, 1});
-					case2Exp.Add(new int[]{3, 1, 0, 2});
-					case2Exp.Add(new int[]{3, 1, 2, 0});
-					case2Exp.Add(new int[]{3, 2, 0, 1});
-					case2Exp.Add(new int[]{3, 2, 1, 0});
+					List<IEnumerable<int>> case2Exp = new List<IEnumerable<int>>(
+						new IEnumerable<int>[]{
+							new int[]{0, 1, 2, 3},
+							new int[]{0, 1, 3, 2},
+							new int[]{0, 2, 1, 3},
+							new int[]{0, 2, 3, 1},
+							new int[]{0, 3, 1, 2},
+							new int[]{0, 3, 2, 1},
+							new int[]{1, 0, 2, 3},
+							new int[]{1, 0, 3, 2},
+							new int[]{1, 2, 0, 3},
+							new int[]{1, 2, 3, 0},
+							new int[]{1, 3, 0, 2},
+							new int[]{1, 3, 2, 0},
+							new int[]{2, 0, 1, 3},
+							new int[]{2, 0, 3, 1},
+							new int[]{2, 1, 0, 3},
+							new int[]{2, 1, 3, 0},
+							new int[]{2, 3, 0, 1},
+							new int[]{2, 3, 1, 0},
+							new int[]{3, 0, 1, 2},
+							new int[]{3, 0, 2, 1},
+							new int[]{3, 1, 0, 2},
+							new int[]{3, 1, 2, 0},
+							new int[]{3, 2, 0, 1},
+							new int[]{3, 2, 1, 0}
+						}
+					);
 					object[] case2 = new object[]{case2Orig, case2Exp};
 					yield return case2;
 				}
@@ -141,7 +148,9 @@ namespace UtilityClassTests{
 		[TestCaseSource(typeof(TrimCases))]
 		public void Trim_WhenCalled_SetsExpected(List<TestElement> list, List<TestElement> expected){
 			list.Trim();
-			Assert.That(list, Is.EqualTo(expected));
+
+			bool equality = list.MemberEquals(expected);
+			Assert.That(equality, Is.True);
 			}
 			class TrimCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
@@ -158,30 +167,39 @@ namespace UtilityClassTests{
 		public void Fill_WhenCalled_SetsExpected(List<TestElement> list, TestElement added, List<TestElement> expected){
 			List<TestElement> testList = new List<TestElement>(list);
 			testList.Fill(added);
-
-			Assert.That(testList, Is.EqualTo(expected));
+			
+			bool equality = testList.MemberEquals(expected);
+			Assert.That(equality, Is.True);
 			}
 			class FillCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
-					TestElement ele_1 = new TestElement();
-					TestElement ele_2 = new TestElement();
-					TestElement ele_3 = new TestElement();
-					TestElement ele_4 = new TestElement();
-
-					List<TestElement> case1List = new List<TestElement>(new TestElement[]{null, ele_1, ele_2, null, ele_3});
-					List<TestElement> case1Exp = new List<TestElement>(new TestElement[]{ele_4, ele_1, ele_2, null, ele_3});
-
-					yield return new object[]{case1List, ele_4, case1Exp};
-					
-					List<TestElement> case2List = new List<TestElement>(new TestElement[]{ele_1, ele_2, null, ele_3});
-					List<TestElement> case2Exp = new List<TestElement>(new TestElement[]{ele_1, ele_2, ele_4, ele_3});
-
-					yield return new object[]{case2List, ele_4, case2Exp};
-					
-					List<TestElement> case3List = new List<TestElement>(new TestElement[]{ele_1, ele_2, ele_3});
-					List<TestElement> case3Exp = new List<TestElement>(new TestElement[]{ele_1, ele_2, ele_3, ele_4});
-
-					yield return new object[]{case3List, ele_4, case3Exp};
+					object[] fillInTheFirstEmpty;
+						TestElement ele1_0 = new TestElement();
+						TestElement ele2_0 = new TestElement();
+						TestElement ele3_0 = new TestElement();
+						TestElement ele4_0 = new TestElement();
+						List<TestElement> list_0 = new List<TestElement>(new TestElement[]{null, ele1_0, ele2_0, null, ele3_0});
+						List<TestElement> exp_0 = new List<TestElement>(new TestElement[]{ele4_0, ele1_0, ele2_0, null, ele3_0});
+						fillInTheFirstEmpty = new object[]{list_0, ele4_0, exp_0};
+						yield return fillInTheFirstEmpty;
+					object[] fillOut;
+						TestElement ele1_1 = new TestElement();
+						TestElement ele2_1 = new TestElement();
+						TestElement ele3_1 = new TestElement();
+						TestElement ele4_1 = new TestElement();
+						List<TestElement> list_1 = new List<TestElement>(new TestElement[]{ele1_1, ele2_1, null, ele3_1});
+						List<TestElement> exp_1 = new List<TestElement>(new TestElement[]{ele1_1, ele2_1, ele4_1, ele3_1});
+						fillOut = new object[]{list_1, ele4_1, exp_1};
+						yield return fillOut;
+					object[] contatenate;
+						TestElement ele1_2 = new TestElement();
+						TestElement ele2_2 = new TestElement();
+						TestElement ele3_2 = new TestElement();
+						TestElement ele4_2 = new TestElement();
+						List<TestElement> list_2 = new List<TestElement>(new TestElement[]{ele1_2, ele2_2, ele3_2});
+					List<TestElement> exp_2 = new List<TestElement>(new TestElement[]{ele1_2, ele2_2, ele3_2, ele4_2});
+						contatenate = new object[]{list_2, ele4_2, exp_2};
+						yield return contatenate;
 				}
 			}
 		[TestCaseSource(typeof(Count_AlwaysCases))]
@@ -498,12 +516,8 @@ namespace UtilityClassTests{
 						yield return nullToEmpty_F;
 				}
 			}
-			public class MemEqClass{
-
-			}
-			
-		public class TestElement{
-		}
+		public class MemEqClass{}	
+		public class TestElement{}
 		public List<int> MakeOrderedList(){
 			List<int> result = new List<int>();
 			System.Random rng = new System.Random();

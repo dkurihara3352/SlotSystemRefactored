@@ -54,7 +54,7 @@ namespace SlotSystemTests{
 			public void SGUpdateEquipAtExecutionCommand_Execute_VariousSBIDs_CallsSGAccordingly(){
 				SGUpdateEquipAtExecutionCommand comm = new SGUpdateEquipAtExecutionCommand();
 				ISlotGroup mockSG = MakeSubSG();
-					List<ISlottable> sbs;
+					IEnumerable<ISlotSystemElement> sbs;
 						ISlottable stubSB_A = MakeSubSB();
 							BowInstance bow = MakeBowInstance(0);
 							stubSB_A.newSlotID.Returns(-1);
@@ -69,17 +69,14 @@ namespace SlotSystemTests{
 							ShieldInstance shield = MakeShieldInstance(0);
 							stubSB_C.slotID.Returns(0);
 							stubSB_C.itemInst.Returns(shield);
-						sbs = new List<ISlottable>(new ISlottable[]{stubSB_A, stubSB_B, stubSB_C});
-				mockSG.GetEnumerator().Returns(SSERator(sbs));
+						sbs = new ISlotSystemElement[]{stubSB_A, stubSB_B, stubSB_C};
+				mockSG.GetEnumerator().Returns(sbs.GetEnumerator());
 
 				comm.Execute(mockSG);
 
 				mockSG.Received().SyncEquipped(Arg.Is<InventoryItemInstance>(bow), false);
 				mockSG.Received().SyncEquipped(Arg.Is<InventoryItemInstance>(wear), true);
 				mockSG.DidNotReceive().SyncEquipped(Arg.Is<InventoryItemInstance>(shield), Arg.Any<bool>());
-				}
-				IEnumerator<ISlotSystemElement> SSERator(IEnumerable<ISlottable> sbs){
-					foreach(var sb in sbs) yield return sb;
 				}
 		}
 	}

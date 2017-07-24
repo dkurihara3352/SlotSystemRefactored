@@ -6,6 +6,8 @@ using SlotSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Utility;
+
 namespace SlotSystemTests{
 	namespace SGTests{
 		[TestFixture]
@@ -19,7 +21,8 @@ namespace SlotSystemTests{
 
 				sorter.OrderSBsWithRetainedSize(ref list);
 
-				Assert.That(list, Is.EqualTo(expected));
+				bool equality = list.MemberEquals(expected);
+				Assert.That(equality, Is.True);
 				}
 				class VariousSGSorterOSBWRSCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
@@ -227,7 +230,8 @@ namespace SlotSystemTests{
 
 				sorter.TrimAndOrderSBs(ref list);
 
-				Assert.That(list, Is.EqualTo(expected));
+				bool equality = list.MemberEquals(expected);
+				Assert.That(equality, Is.True);
 				}
 				class VariousSGSorterTrimCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
