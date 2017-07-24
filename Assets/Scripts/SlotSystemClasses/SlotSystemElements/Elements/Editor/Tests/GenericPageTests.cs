@@ -6,9 +6,11 @@ using SlotSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Utility;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
+		[Category("OtherElements")]
 		public class GenericPageTests: SlotSystemTest {
 			[Test][Category("Methods")]
 			public void SetElements_WhenCalled_SetsFields(){
@@ -28,7 +30,8 @@ namespace SlotSystemTests{
 				gPage.SetElements();
 
 				IEnumerable<ISlotSystemElement> actual = gPage;
-				Assert.That(actual, Is.EqualTo(expected));
+				bool equality = actual.MemberEquals(expected);
+				Assert.That(equality, Is.True);
 			}
 			[Test]
 			public void Initialize_WhenCalled_SetsFields(){

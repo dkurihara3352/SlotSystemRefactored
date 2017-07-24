@@ -102,27 +102,38 @@ namespace Utility{
 			return count;
 		}
 		public static bool MemberEquals<T>(this IEnumerable<T> coll, IEnumerable<T> other){
-			if(coll.Count() != other.Count()) return false;
-			IEnumerator rator = coll.GetEnumerator();
-			IEnumerator otherRator = other.GetEnumerator();
-			while(rator.MoveNext()&& otherRator.MoveNext()){
-				if(rator.Current == null){
-					if(otherRator.Current == null)
-						continue;
-					else
-						return false;
-				}
+			if(coll ==null){
+				if(other == null)
+					return true;
+				else
+					return false;
+			}
+			else{
+				if(other == null) return false;
 				else{
-					if(otherRator.Current == null)
-						return false;
-					else
-						if(rator.Current.Equals(otherRator.Current))
-							continue;
-						else
-							return false;
+					if(coll.Count() != other.Count()) return false;
+					IEnumerator rator = coll.GetEnumerator();
+					IEnumerator otherRator = other.GetEnumerator();
+					while(rator.MoveNext()&& otherRator.MoveNext()){
+						if(rator.Current == null){
+							if(otherRator.Current == null)
+								continue;
+							else
+								return false;
+						}
+						else{
+							if(otherRator.Current == null)
+								return false;
+							else
+								if(rator.Current.Equals(otherRator.Current))
+									continue;
+								else
+									return false;
+						}
+					}
+					return true;
 				}
 			}
-			return true;
 		}
 	}
 }

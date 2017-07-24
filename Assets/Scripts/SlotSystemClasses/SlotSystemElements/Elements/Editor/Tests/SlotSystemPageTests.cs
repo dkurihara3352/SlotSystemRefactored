@@ -6,6 +6,7 @@ using SlotSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Utility;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
@@ -26,6 +27,8 @@ namespace SlotSystemTests{
 
 				IEnumerable<ISlotSystemElement> actualEles = page;
 				Assert.That(actualEles, Is.EqualTo(sses));
+				bool equality = actualEles.MemberEquals(sses);
+				Assert.That(equality, Is.True);
 				IEnumerable<ISlotSystemPageElement> actualPEs;
 					ISlotSystemPageElement sseAPE = page.GetPageElement(sseA);
 					ISlotSystemPageElement sseBPE = page.GetPageElement(sseB);

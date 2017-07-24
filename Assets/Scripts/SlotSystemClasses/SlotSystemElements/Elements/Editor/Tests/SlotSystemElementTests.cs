@@ -5,10 +5,12 @@ using UnityEditor;
 using NUnit.Framework;
 using NSubstitute;
 using SlotSystem;
+using Utility;
 namespace SlotSystemTests{
 	namespace SSEElementsTests{
 		[TestFixture]
-		public class AbsSlotSystemElementTests: SlotSystemTest{
+		[Category("OtherElements")]
+		public class SlotSystemElementTests: SlotSystemTest{
 			/*	State and process */
 				/* States */
 					[Test]
@@ -69,7 +71,6 @@ namespace SlotSystemTests{
 									ISSEProcess defProc = new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine);
 									ISSEProcess selProc = new SSESelectProcess(MakeSubSSE(), FakeCoroutine);
 								public IEnumerator GetEnumerator(){
-									ISlotSystemElement sse = Substitute.For<ISlotSystemElement>();
 									object[] n_n_n_none;
 										TestSlotSystemElement sse_0 = MakeTestSSE();
 										n_n_n_none = new object[]{sse_0, null, null, null, InstantMethods.none};
@@ -611,7 +612,8 @@ namespace SlotSystemTests{
 					
 					sse.SetElements();
 
-					Assert.That(sse, Is.EqualTo(expectedEles));
+					bool equality = sse.MemberEquals(expectedEles);
+					Assert.That(equality, Is.True);
 				}
 				[Test][Category("Methods")]
 				public void InitializeStates_WhenCalled_CallsStateEnginesSetState(){
@@ -1161,31 +1163,31 @@ namespace SlotSystemTests{
 					};
 					List<ISlotSystemElement> down_0List = new List<ISlotSystemElement>();
 						sse_0.PerformInHierarchy(PutInList, down_0List);
-						Assert.That(down_0List, Is.EqualTo(down_0));
+						Assert.That(down_0List.MemberEquals(down_0), Is.True);
 					List<ISlotSystemElement> down_0_0List = new List<ISlotSystemElement>();
 						sse_0_0.PerformInHierarchy(PutInList, down_0_0List);
-						Assert.That(down_0_0List, Is.EqualTo(down_0_0));
+						Assert.That(down_0_0List.MemberEquals(down_0_0), Is.True);
 					List<ISlotSystemElement> down_0_0_0List = new List<ISlotSystemElement>();
 						sse_0_0_0.PerformInHierarchy(PutInList, down_0_0_0List);
-						Assert.That(down_0_0_0List, Is.EqualTo(down_0_0_0));
+						Assert.That(down_0_0_0List.MemberEquals(down_0_0_0), Is.True);
 					List<ISlotSystemElement> down_0_0_0_0List = new List<ISlotSystemElement>();
 						sse_0_0_0_0.PerformInHierarchy(PutInList, down_0_0_0_0List);
-						Assert.That(down_0_0_0_0List, Is.EqualTo(down_0_0_0_0));
+						Assert.That(down_0_0_0_0List.MemberEquals(down_0_0_0_0), Is.True);
 					List<ISlotSystemElement> down_0_0_0_0_0List = new List<ISlotSystemElement>();
 						sse_0_0_0_0_0.PerformInHierarchy(PutInList, down_0_0_0_0_0List);
-						Assert.That(down_0_0_0_0_0List, Is.EqualTo(new ISlotSystemElement[]{sse_0_0_0_0_0}));
+						Assert.That(down_0_0_0_0_0List.MemberEquals(new ISlotSystemElement[]{sse_0_0_0_0_0}), Is.True);
 					List<ISlotSystemElement> down_0_1List = new List<ISlotSystemElement>();
 						sse_0_1.PerformInHierarchy(PutInList, down_0_1List);
-						Assert.That(down_0_1List, Is.EqualTo(down_0_1));
+						Assert.That(down_0_1List.MemberEquals(down_0_1), Is.True);
 					List<ISlotSystemElement> down_0_1_0List = new List<ISlotSystemElement>();
 						sse_0_1_0.PerformInHierarchy(PutInList, down_0_1_0List);
-						Assert.That(down_0_1_0List, Is.EqualTo(down_0_1_0));
+						Assert.That(down_0_1_0List.MemberEquals(down_0_1_0), Is.True);
 					List<ISlotSystemElement> down_0_1_0_0List = new List<ISlotSystemElement>();
 						sse_0_1_0_0.PerformInHierarchy(PutInList, down_0_1_0_0List);
-						Assert.That(down_0_1_0_0List, Is.EqualTo(down_0_1_0_0));
+						Assert.That(down_0_1_0_0List.MemberEquals(down_0_1_0_0), Is.True);
 					List<ISlotSystemElement> down_0_1_0_0_0List = new List<ISlotSystemElement>();
 						sse_0_1_0_0_0.PerformInHierarchy(PutInList, down_0_1_0_0_0List);
-						Assert.That(down_0_1_0_0_0List, Is.EqualTo(new ISlotSystemElement[]{sse_0_1_0_0_0}));
+						Assert.That(down_0_1_0_0_0List.MemberEquals(new ISlotSystemElement[]{sse_0_1_0_0_0}), Is.True);
 				}
 					void PutInList<ISlotSystemElement>(ISlotSystemElement ele, IList<ISlotSystemElement> list){
 						list.Add(ele);

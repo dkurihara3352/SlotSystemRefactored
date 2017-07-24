@@ -45,8 +45,6 @@ namespace SlotSystemTests{
 							mockSSE.selectedState.Returns(selectedState);
 						selectedCase = new object[]{mockSSE_c3, selectedState};
 							yield return selectedCase;
-
-
 					}
 				}
 			[TestCaseSource(typeof(Various_EnterState_FromVariousNonNullCases))]

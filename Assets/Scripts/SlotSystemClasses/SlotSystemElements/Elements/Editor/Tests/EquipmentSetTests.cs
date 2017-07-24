@@ -6,9 +6,11 @@ using SlotSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Utility;
 namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture]
+		[Category("OtherElements")]
 		public class EquipmentSetTests: SlotSystemTest {
 			[Test][Category("Methods")]
 			public void SetElements_WhenCalled_SetsElementsAndSGs(){
@@ -32,7 +34,8 @@ namespace SlotSystemTests{
 				eSet.SetElements();
 				
 				IEnumerable<ISlotSystemElement> actual = eSet;
-					Assert.That(actual, Is.EqualTo(expectedEles));
+					bool equality = actual.MemberEquals(expectedEles);
+					Assert.That(equality, Is.True);
 				Assert.That(eSet.bowSG, Is.SameAs(sgeBow));
 				Assert.That(eSet.wearSG, Is.SameAs(sgeWear));
 				Assert.That(eSet.cGearsSG, Is.SameAs(sgeCGears));

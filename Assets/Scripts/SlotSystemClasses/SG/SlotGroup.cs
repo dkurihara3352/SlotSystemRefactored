@@ -507,7 +507,10 @@ namespace SlotSystem{
 							index = sb.newSlotID;
 					}
 				}
-				return newSlots[index];
+				if(index != -3)
+					return newSlots[index];
+				else 
+					return null;
 			}
 			public virtual void SetSBsActStates(){
 				List<ISlottable> moveWithins = new List<ISlottable>();

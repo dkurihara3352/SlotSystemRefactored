@@ -21,6 +21,7 @@ namespace SlotSystemTests{
 						
 						Assert.That(ItemList(poolInv), Is.EqualTo(expected));
 						bool equality = ItemList(poolInv).MemberEquals(expected);
+						Assert.That(equality, Is.True);
 						foreach(var item in poolInv){
 							InventoryItemInstance itemInst = (InventoryItemInstance)item;
 							Assert.That(itemInst.quantity, Is.EqualTo(1));
@@ -455,8 +456,6 @@ namespace SlotSystemTests{
 									PartsInstance partsAA_2 = MakePartsInstance(0, 4);
 									PartsInstance partsB_2 = MakePartsInstance(1, 5);
 									PartsInstance partsBB_2 = MakePartsInstance(1, 2);
-									PartsInstance partsA_r_2 = MakePartsInstance(0, 7);
-									PartsInstance partsB_r_2 = MakePartsInstance(1, 3);
 									IEnumerable<InventoryItemInstance> added_2 = new InventoryItemInstance[]{
 										partsA_2, partsAA_2, partsB_2, partsBB_2,
 										bowA_2, bowA_r_2, bowB_2, bowB_r_2
