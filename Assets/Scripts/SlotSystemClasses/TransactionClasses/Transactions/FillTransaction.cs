@@ -21,8 +21,8 @@ namespace SlotSystem{
 		public override ISlotGroup sg2{get{return m_selectedSG;}}
 		public override void Indicate(){}
 		public override void Execute(){
-			sg1.SetActState(SlotGroup.fillState);
-			sg2.SetActState(SlotGroup.fillState);
+			sg1.Fill();
+			sg2.Fill();
 			ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();

@@ -135,10 +135,10 @@ namespace SlotSystemTests{
 
 				ssm.Initialize();
 
-				Assert.That(ssm.curSelState, Is.SameAs(ssm.deactivatedState));
-				Assert.That(ssm.prevSelState, Is.Null);
-				Assert.That(ssm.curActState, Is.SameAs(SlotSystemManager.ssmWaitForActionState));
-				Assert.That(ssm.prevActState, Is.Null);
+				Assert.That(ssm.isDeactivated, Is.True);
+				Assert.That(ssm.isSelStateInit, Is.True);
+				Assert.That(ssm.isWaitingForAction, Is.True);
+				Assert.That(ssm.isActStateInit, Is.True);
 				pBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				eBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				foreach(var gBun in gBuns)
@@ -734,7 +734,7 @@ namespace SlotSystemTests{
 
 					ssm.Reset();
 
-					Assert.That(ssm.curActState, Is.SameAs(SlotSystemManager.ssmWaitForActionState));
+					Assert.That(ssm.isWaitingForAction, Is.True);
 					}
 				[Test]
 				public void Reset_WhenCalled_SetsFieldsNull(){
@@ -790,7 +790,7 @@ namespace SlotSystemTests{
 
 					ssm.ResetAndFocus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(ssm.focusedState));
+					Assert.That(ssm.isFocused, Is.True);
 					}
 				[Test]
 				public void UpdateEquipStatesOnAll_WhenCalled_CallsEInvRemoveWithItemNotInAllEquippedItems(){
@@ -1150,7 +1150,7 @@ namespace SlotSystemTests{
 
 					}
 				[Test]
-				public void Equip_MatchesAndSGFocusedInBundleAndSBNewSlotIDNotMinus1_CallsSBSetEqpStateEquippedState(){
+				public void Equip_MatchesAndSGFocusedInBundleAndSBNewSlotIDNotMinus1_CallsSBEquip(){
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
@@ -1162,7 +1162,7 @@ namespace SlotSystemTests{
 					
 					ssm.Equip(mockSB, bow);
 
-					mockSB.Received().SetEqpState(Slottable.equippedState);
+					mockSB.Received().Equip();
 					}
 				[Test]
 				public void Equip_MatchesAndSGNOTFocusedInBundleAndSGIsPool_CallsSBInOrder(){
@@ -1178,12 +1178,12 @@ namespace SlotSystemTests{
 					ssm.Equip(mockSB, bow);
 
 					Received.InOrder(() => {
-						mockSB.SetEqpState((ISBEqpState)null);
-						mockSB.SetEqpState(Slottable.equippedState);
+						mockSB.ClearEqpState();
+						mockSB.Equip();
 					});
 					}
 				[Test]
-				public void Unequip_MatchesAndSGFocusedInBundleAndSBSlotIDNotMinus1_CallsSBSetEqpStateUnequippedState(){
+				public void Unequip_MatchesAndSGFocusedInBundleAndSBSlotIDNotMinus1_CallsSBUnequip(){
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
@@ -1195,7 +1195,7 @@ namespace SlotSystemTests{
 					
 					ssm.Unequip(mockSB, bow);
 
-					mockSB.Received().SetEqpState(Slottable.unequippedState);
+					mockSB.Received().Unequip();
 					}
 				[Test]
 				public void Unequip_MatchesAndSGNOTFocusedInBundleAndSGIsPool_CallsSBInOrder(){
@@ -1211,8 +1211,8 @@ namespace SlotSystemTests{
 					ssm.Unequip(mockSB, bow);
 
 					Received.InOrder(() => {
-						mockSB.SetEqpState((ISBEqpState)null);
-						mockSB.SetEqpState(Slottable.unequippedState);
+						mockSB.ClearEqpState();
+						mockSB.Unequip();
 					});
 					}
 				[TestCaseSource(typeof(transactionCoroutineCases))]
@@ -1399,55 +1399,7 @@ namespace SlotSystemTests{
 
 					ssm.Focus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(ssm.focusedState));
-					}
-				[TestCase(true, true, true, true, true)]
-				[TestCase(false, false, false, false, false)]
-				[TestCase(false, true, false, true, true)]
-				public void Focus_WhenCalled_CallsPEsAccordingly(bool pBunPEOn, bool eBunPEOn, bool gBunAPEOn, bool gBunBPEOn, bool gBunCPEOn){
-					SlotSystemManager ssm = MakeSSM();
-						ISlotSystemBundle pBun = MakeSubBundle();
-						ISlotSystemBundle eBun = MakeSubBundle();
-						IEnumerable<ISlotSystemBundle> gBuns;
-							ISlotSystemBundle gBunA = MakeSubBundle();
-							ISlotSystemBundle gBunB = MakeSubBundle();
-							ISlotSystemBundle gBunC = MakeSubBundle();
-							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};
-					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
-					ISlotSystemPageElement pBunPE = ssm.GetPageElement(pBun);
-					ISlotSystemPageElement eBunPE = ssm.GetPageElement(eBun);
-					ISlotSystemPageElement gBunAPE = ssm.GetPageElement(gBunA);
-					ISlotSystemPageElement gBunBPE = ssm.GetPageElement(gBunB);
-					ISlotSystemPageElement gBunCPE = ssm.GetPageElement(gBunC);
-						pBunPE.isFocusToggleOn = pBunPEOn;
-						eBunPE.isFocusToggleOn = eBunPEOn;
-						gBunAPE.isFocusToggleOn = gBunAPEOn;
-						gBunBPE.isFocusToggleOn = gBunBPEOn;
-						gBunCPE.isFocusToggleOn = gBunCPEOn;
-						
-					ssm.Focus();
-
-					if(pBunPEOn)
-						pBun.Received().Focus();
-					else
-						pBun.Received().Defocus();
-					if(eBunPEOn)
-						eBun.Received().Focus();
-					else
-						eBun.Received().Defocus();
-					if(gBunAPEOn)
-						gBunA.Received().Focus();
-					else
-						gBunA.Received().Defocus();
-					if(gBunBPEOn)
-						gBunB.Received().Focus();
-					else
-						gBunB.Received().Defocus();
-					if(gBunCPEOn)
-						gBunC.Received().Focus();
-					else
-						gBunC.Received().Defocus();
+					Assert.That(ssm.isFocused, Is.True);
 					}
 				[Test]
 				public void Defocus_WhenCalled_SetsSelStateDefocused(){
@@ -1455,18 +1407,7 @@ namespace SlotSystemTests{
 
 					ssm.Defocus();
 
-					Assert.That(ssm.curSelState, Is.SameAs(ssm.defocusedState));
-					}
-				[Test]
-				public void Defocus_WhenCalled_CallsAllBundlesDefocus(){
-					SlotSystemManager ssm = MakeSetUpSSM();
-
-					ssm.Defocus();
-
-					ssm.poolBundle.Received().Defocus();
-					ssm.equipBundle.Received().Defocus();
-					foreach(var bun in ssm.otherBundles)
-						bun.Received().Defocus();
+					Assert.That(ssm.isDefocused, Is.True);
 					}
 				[Test]
 				public void Deactivate_WhenCalled_SetsSelStateDeactivateed(){
@@ -1474,18 +1415,7 @@ namespace SlotSystemTests{
 
 					ssm.Deactivate();
 
-					Assert.That(ssm.curSelState, Is.SameAs(ssm.deactivatedState));
-					}
-				[Test]
-				public void Deactivate_WhenCalled_CallsAllBundlesDeactivate(){
-					SlotSystemManager ssm = MakeSetUpSSM();
-
-					ssm.Deactivate();
-
-					ssm.poolBundle.Received().Deactivate();
-					ssm.equipBundle.Received().Deactivate();
-					foreach(var bun in ssm.otherBundles)
-						bun.Received().Deactivate();
+					Assert.That(ssm.isDeactivated, Is.True);
 					}
 				[TestCase(true, true, true, true, true)]
 				[TestCase(false, false, false, false, false)]
@@ -1530,7 +1460,6 @@ namespace SlotSystemTests{
 
 					}
 				[Test]
-				[Ignore]
 				public void FocusInBundle_sbeBShield_CallsElementsAccordingly(){
 					/*	out fields	*/
 						ISlotSystemBundle pBun;
@@ -1640,7 +1569,6 @@ namespace SlotSystemTests{
 					});				
 					}
 				[Test]
-				[Ignore]
 				public void FocusInBundle_sggPA2_CallsElementsAccordingly(){
 					/*	out fields	*/
 						ISlotSystemBundle pBun;
@@ -2332,16 +2260,17 @@ namespace SlotSystemTests{
 					
 					ssm.ExecuteTransaction();
 
-					Assert.That(ssm.curActState, Is.SameAs(SlotSystemManager.ssmTransactionState));
+					Assert.That(ssm.isTransacting, Is.True);
 					}
 				[Test]
-				public void SetTargetSB_FromNullToSome_CallsSBSetSelStateSelected(){
+				public void SetTargetSB_FromNullToSome_CallsSBSelect(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable mockSB = MakeSubSB();
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.Received().SetSelState(mockSB.selectedState);
+
+					mockSB.Received().Select();
 					}
 				[Test]
 				public void SetTargetSB_FromNullToSome_SetsItTargetSB(){
@@ -2353,7 +2282,7 @@ namespace SlotSystemTests{
 					Assert.That(ssm.targetSB, Is.SameAs(stubSB));
 					}
 				[Test]
-				public void SetTargetSB_FromOtherToSome_CallsSBSetSelStateSelected(){
+				public void SetTargetSB_FromOtherToSome_CallsSBSelect(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable stubSB = MakeSubSB();
 					ISlottable mockSB = MakeSubSB();
@@ -2361,7 +2290,7 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(mockSB);
 					
-					mockSB.Received().SetSelState(mockSB.selectedState);
+					mockSB.Received().Select();
 					}
 				[Test]
 				public void SetTargetSB_FromOtherToSome_SetsItTargetSB(){
@@ -2375,7 +2304,7 @@ namespace SlotSystemTests{
 					Assert.That(ssm.targetSB, Is.SameAs(stubSB));
 					}
 				[Test]
-				public void SetTargetSB_FromOtherToSome_CallOtherSBSetSelStateFocused(){
+				public void SetTargetSB_FromOtherToSome_CallOtherSBFocus(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable mockSB = MakeSubSB();
 					ISlottable stubSB = MakeSubSB();
@@ -2383,17 +2312,17 @@ namespace SlotSystemTests{
 
 					ssm.SetTargetSB(stubSB);
 					
-					mockSB.Received().SetSelState(mockSB.focusedState);
+					mockSB.Received().Focus();
 					}
 				[Test]
-				public void SetTargetSB_SomeToNull_CallSBSetSelStateFocused(){
+				public void SetTargetSB_SomeToNull_CallSBFocus(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable mockSB = MakeSubSB();
 					ssm.SetTargetSB(mockSB);
 
 					ssm.SetTargetSB(null);
 
-					mockSB.Received().SetSelState(mockSB.focusedState);
+					mockSB.Received().Focus();
 					}
 				[Test]
 				public void SetTargetSB_SomeToNull_SetsNull(){
@@ -2406,24 +2335,24 @@ namespace SlotSystemTests{
 					Assert.That(ssm.targetSB, Is.Null);
 					}
 				[Test]
-				public void SetTargetSB_SomeToSame_DoesNotCallSetSelStateTwice(){
+				public void SetTargetSB_SomeToSame_DoesNotCallSelectTwice(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable mockSB = MakeSubSB();
 					ssm.SetTargetSB(mockSB);
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.Received(1).SetSelState(mockSB.selectedState);
+					mockSB.Received(1).Select();
 					}
 				[Test]
-				public void SetTargetSB_SomeToSame_DoesNotCallSetSelStateFocused(){
+				public void SetTargetSB_SomeToSame_DoesNotCallFocus(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable mockSB = MakeSubSB();
 					ssm.SetTargetSB(mockSB);
 
 					ssm.SetTargetSB(mockSB);
 
-					mockSB.DidNotReceive().SetSelState(mockSB.focusedState);
+					mockSB.DidNotReceive().Focus();
 					}
 				[Test]
 				public void SetSG1_NullToSome_SetsSG1(){
@@ -2504,13 +2433,13 @@ namespace SlotSystemTests{
 					Assert.That(ssm.sg2Done, Is.False);
 					}
 				[Test]
-				public void SetSG2_NullToSome_CallSG2SetSelStateSelected(){
+				public void SetSG2_NullToSome_CallSG2Select(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup mockSG = MakeSubSG();
 
 					ssm.SetSG2(mockSG);
 
-					mockSG.Received().SetSelState(mockSG.selectedState);
+					mockSG.Received().Select();
 					}
 				[Test]
 				public void SetSG2_OtherToSome_SetsSG2(){
@@ -2535,7 +2464,7 @@ namespace SlotSystemTests{
 					Assert.That(ssm.sg2Done, Is.False);
 					}
 				[Test]
-				public void SetSG2_OtherToSome_CallsSG2SetSelStateSelected(){
+				public void SetSG2_OtherToSome_CallsSG2Select(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup prevSG = MakeSubSG();
 					ISlotGroup mockSG = MakeSubSG();
@@ -2543,7 +2472,7 @@ namespace SlotSystemTests{
 					ssm.SetSG2(prevSG);
 					ssm.SetSG2(mockSG);
 
-					mockSG.Received().SetSelState(mockSG.selectedState);
+					mockSG.Received().Select();
 					}
 				[Test]
 				public void SetSG2_SomeToNull_SetsSG2Null(){
@@ -2935,13 +2864,13 @@ namespace SlotSystemTests{
 						}
 					}
 				[Test]
-				public void ReferToTAAndUpdateSelState_TAResultsNull_CallsSGSetSelStateFocused(){
+				public void ReferToTAAndUpdateSelState_TAResultsNull_CallsSGFocus(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup mockSG = MakeSubSG();
 
 					ssm.ReferToTAAndUpdateSelState(mockSG);
 
-					mockSG.Received().SetSelState(mockSG.focusedState);
+					mockSG.Received().Focus();
 					}
 				[TestCaseSource(typeof(ReferToTAAndUpdateSelState_VariousTAsCases))]
 				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotGroup mockSG, ISlotSystemTransaction ta, ISSESelState state){
@@ -2950,44 +2879,46 @@ namespace SlotSystemTests{
 						dict.Add(mockSG, ta);
 						ssm.transactionResults = dict;
 					ssm.ReferToTAAndUpdateSelState(mockSG);
-
-					mockSG.Received().SetSelState(state);
+					if(state is SSEDefocusedState)
+						mockSG.Received().Defocus();
+					else if(state is SSEFocusedState)
+						mockSG.Received().Focus();
 					}
 					class ReferToTAAndUpdateSelState_VariousTAsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] revert_def;
 								ISlotGroup mockSG_0 = MakeSubSG();
-								ISSESelState def_0 = Substitute.For<ISSESelState>();
+								SSEDefocusedState def_0 = Substitute.For<SSEDefocusedState>();
 								mockSG_0.defocusedState.Returns(def_0);
 								revert_def = new object[]{mockSG_0, Substitute.For<IRevertTransaction>(), def_0};
 								yield return revert_def;
 							object[] reorder_foc;
 								ISlotGroup mockSG_1 = MakeSubSG();
-								ISSESelState foc_1 = Substitute.For<ISSESelState>();
+								SSEFocusedState foc_1 = Substitute.For<SSEFocusedState>();
 								mockSG_1.focusedState.Returns(foc_1);
 								reorder_foc = new object[]{mockSG_1, Substitute.For<IReorderTransaction>(), foc_1};
 								yield return reorder_foc;
 							object[] sort_foc;
 								ISlotGroup mockSG_2 = MakeSubSG();
-								ISSESelState foc_2 = Substitute.For<ISSESelState>();
+								SSEFocusedState foc_2 = Substitute.For<SSEFocusedState>();
 								mockSG_2.focusedState.Returns(foc_2);
 								sort_foc = new object[]{mockSG_2, Substitute.For<ISortTransaction>(), foc_2};
 								yield return sort_foc;
 							object[] fill_foc;
 								ISlotGroup mockSG_3 = MakeSubSG();
-								ISSESelState foc_3 = Substitute.For<ISSESelState>();
+								SSEFocusedState foc_3 = Substitute.For<SSEFocusedState>();
 								mockSG_3.focusedState.Returns(foc_3);
 								fill_foc = new object[]{mockSG_3, Substitute.For<IFillTransaction>(), foc_3};
 								yield return fill_foc;
 							object[] swap_foc;
 								ISlotGroup mockSG_4 = MakeSubSG();
-								ISSESelState foc_4 = Substitute.For<ISSESelState>();
+								SSEFocusedState foc_4 = Substitute.For<SSEFocusedState>();
 								mockSG_4.focusedState.Returns(foc_4);
 								swap_foc = new object[]{mockSG_4, Substitute.For<ISwapTransaction>(), foc_4};
 								yield return swap_foc;
 							object[] stack_foc;
 								ISlotGroup mockSG_5 = MakeSubSG();
-								ISSESelState foc_5 = Substitute.For<ISSESelState>();
+								SSEFocusedState foc_5 = Substitute.For<SSEFocusedState>();
 								mockSG_5.focusedState.Returns(foc_5);
 								stack_foc = new object[]{mockSG_5, Substitute.For<IStackTransaction>(), foc_5};
 								yield return stack_foc;

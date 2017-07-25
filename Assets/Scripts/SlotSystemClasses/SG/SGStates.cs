@@ -26,7 +26,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sg.UpdateToRevert();
-                    if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
+                    if(sg.wasWaitingForAction){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
                     }
@@ -39,7 +39,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sg.ReorderAndUpdateSBs();
-                    if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
+                    if(sg.wasWaitingForAction){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
                     }
@@ -52,7 +52,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sg.SortAndUpdateSBs();
-                    if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
+                    if(sg.wasWaitingForAction){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
                     }
@@ -65,7 +65,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sg.FillAndUpdateSBs();
-                    if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
+                    if(sg.wasWaitingForAction){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
                     }
@@ -78,7 +78,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sg.SwapAndUpdateSBs();
-                    if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
+                    if(sg.wasWaitingForAction){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
                     }
@@ -91,7 +91,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sg.AddAndUpdateSBs();
-                    if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
+                    if(sg.wasWaitingForAction){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
                     }
@@ -104,7 +104,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sg.RemoveAndUpdateSBs();
-                    if(sg.prevActState != null && sg.prevActState == SlotGroup.sgWaitForActionState){
+                    if(sg.wasWaitingForAction){
                         SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                         sg.SetAndRunActProcess(process);
                     }

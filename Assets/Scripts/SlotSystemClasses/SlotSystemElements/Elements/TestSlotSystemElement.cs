@@ -4,9 +4,6 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class TestSlotSystemElement: SlotSystemElement{
-		public void SetElements(IEnumerable<ISlotSystemElement> elements){
-			m_elements = elements;
-		}
 		public string message = "";
 		public override void InstantDefocus(){
 			message = "InstantDefocus called";

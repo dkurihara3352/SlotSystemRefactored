@@ -59,12 +59,12 @@ namespace SlotSystemTests{
 							BowInstance bow = MakeBowInstance(0);
 							stubSB_A.newSlotID.Returns(-1);
 							stubSB_A.itemInst.Returns(bow);
-							stubSB_A.isRemoved.Returns(true);
+							stubSB_A.isToBeRemoved.Returns(true);
 						ISlottable stubSB_B = MakeSubSB();
 							WearInstance wear = MakeWearInstance(0);
 							stubSB_B.slotID.Returns(-1);
 							stubSB_B.itemInst.Returns(wear);
-							stubSB_B.isAdded.Returns(true);
+							stubSB_B.isToBeAdded.Returns(true);
 						ISlottable stubSB_C = MakeSubSB();
 							ShieldInstance shield = MakeShieldInstance(0);
 							stubSB_C.slotID.Returns(0);

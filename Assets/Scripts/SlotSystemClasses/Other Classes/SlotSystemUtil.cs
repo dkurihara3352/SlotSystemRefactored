@@ -40,8 +40,8 @@ namespace SlotSystem{
 		/*	SSE	*/
 			public static string SSEDebug(ISlotSystemElement sse){
 				string res = "";
-				string prevSel = SSEStateNamePlain((SSEState)sse.prevSelState);
-				string curSel = SSEStateName((SSEState)sse.curSelState);
+				string prevSel = SSEPrevSelStateNamePlain(sse);
+				string curSel = SSECurSelStateNamePlain(sse);
 				string selProc;
 					if(sse.selProcess == null)
 						selProc = "";
@@ -67,19 +67,57 @@ namespace SlotSystem{
 				}
 				return res;
 			}
-			public static string SSEStateNamePlain(SSEState state){
+			public static string SSECurSelStateNamePlain(ISlotSystemElement sse){
 				string res = "";
-
-				if(state is SSEDeactivatedState){
+				if(sse.isDeactivated)
 					res = "SSEDeactivated";
-				}else if(state is SSEDefocusedState){
+				else if(sse.isDefocused)
 					res = "SSEDefocused";
-				}else if(state is SSEFocusedState){
+				else if(sse.isFocused)
 					res = "SSEFocused";
-				}else if(state is SSESelectedState){
+				else if(sse.isSelected)
 					res = "SSESelected";
-				}
 				return res;
+
+			}
+			public static string SSEPrevSelStateNamePlain(ISlotSystemElement sse){
+				string res = "";
+				if(sse.wasDeactivated)
+					res = "SSEDeactivated";
+				else if(sse.wasDefocused)
+					res = "SSEDefocused";
+				else if(sse.wasFocused)
+					res = "SSEFocused";
+				else if(sse.wasSelected)
+					res = "SSESelected";
+				return res;
+
+			}
+			public static string SSECurSelStateName(ISlotSystemElement sse){
+				string res = "";
+				if(sse.isDeactivated)
+					res = SlotSystemUtil.Red("SSEDeactivated");
+				else if(sse.isDefocused)
+					res = SlotSystemUtil.Green("SSEDefocused");
+				else if(sse.isFocused)
+					res = SlotSystemUtil.Blue("SSEFocused");
+				else if(sse.isSelected)
+					res = SlotSystemUtil.Aqua("SSESelected");
+				return res;
+
+			}
+			public static string SSEPrevSelStateName(ISlotSystemElement sse){
+				string res = "";
+				if(sse.wasDeactivated)
+					res = SlotSystemUtil.Red("SSEDeactivated");
+				else if(sse.wasDefocused)
+					res = SlotSystemUtil.Green("SSEDefocused");
+				else if(sse.wasFocused)
+					res = SlotSystemUtil.Blue("SSEFocused");
+				else if(sse.wasSelected)
+					res = SlotSystemUtil.Aqua("SSESelected");
+				return res;
+
 			}
 			public static string SSEProcessName(ISSEProcess process){
 				string res = "";
@@ -94,24 +132,44 @@ namespace SlotSystem{
 				return res;
 			}
 		/*	SSM	*/
-			public static string SSMStateName(SSMState state){
+			public static string SSMCurStateNamePlain(ISlotSystemManager ssm){
 				string res = "";
-				if(state is SSMWaitForActionState)
+				if(ssm.isWaitingForAction)
+					res = "WaitForAction";
+				else if(ssm.isProbing)
+					res = "Probing";
+				else if(ssm.isTransacting)
+					res = "Transaction";
+				return res;
+			}
+			public static string SSMPrevStateNamePlain(ISlotSystemManager ssm){
+				string res = "";
+				if(ssm.wasWaitingForAction)
+					res = "WaitForAction";
+				else if(ssm.wasProbing)
+					res = "Probing";
+				else if(ssm.wasTransacting)
+					res = "Transaction";
+				return res;
+			}
+			public static string SSMCurStateName(ISlotSystemManager ssm){
+				string res = "";
+				if(ssm.isWaitingForAction)
 					res = SlotSystemUtil.Green("WaitForAction");
-				else if(state is SSMProbingState)
+				else if(ssm.isProbing)
 					res = SlotSystemUtil.Ciel("Probing");
-				else if(state is SSMTransactionState)
+				else if(ssm.isTransacting)
 					res = SlotSystemUtil.Terra("Transaction");
 				return res;
 			}
-			public static string SSMStateNamePlain(SSMState state){
+			public static string SSMPrevStateName(ISlotSystemManager ssm){
 				string res = "";
-				if(state is SSMWaitForActionState)
-					res = "WaitForAction";
-				else if(state is SSMProbingState)
-					res = "Probing";
-				else if(state is SSMTransactionState)
-					res = "Transaction";
+				if(ssm.wasWaitingForAction)
+					res = SlotSystemUtil.Green("WaitForAction");
+				else if(ssm.wasProbing)
+					res = SlotSystemUtil.Ciel("Probing");
+				else if(ssm.wasTransacting)
+					res = SlotSystemUtil.Terra("Transaction");
 				return res;
 			}
 			public static string TransactionName(ISlotSystemTransaction ta){
@@ -166,15 +224,15 @@ namespace SlotSystem{
 				
 				string sg1 = ssm.sg1 == null?"null":ssm.sg1.eName;
 				string sg2 = ssm.sg2 == null?"null":ssm.sg2.eName;
-				string prevSel = SlotSystemUtil.SSEStateNamePlain((SSEState)ssm.prevSelState);
-				string curSel = SlotSystemUtil.SSEStateName((SSEState)ssm.curSelState);
+				string prevSel = SlotSystemUtil.SSEPrevSelStateNamePlain(ssm);
+				string curSel = SlotSystemUtil.SSECurSelStateNamePlain(ssm);
 				string selProc;
 					if(ssm.selProcess == null)
 						selProc = "";
 					else
 						selProc = SlotSystemUtil.SSMProcessName((ISSMProcess)ssm.selProcess) + " running? " + (ssm.selProcess.isRunning?Blue("true"):Red("false"));
-				string prevAct = SlotSystemUtil.SSMStateNamePlain((SSMActState)ssm.prevActState);
-				string curAct = SlotSystemUtil.SSMStateName((SSMActState)ssm.curActState);
+				string prevAct = SSMPrevStateNamePlain(ssm);
+				string curAct = SSMCurStateName(ssm);
 				string actProc;
 					if((ISSMProcess)ssm.actProcess == null)
 						actProc = "";
@@ -223,23 +281,44 @@ namespace SlotSystem{
 				}
 				return res;
 			}
-			public static string SGStateNamePlain(SGState state){
+			public static string SGCurActStateNamePlain(ISlotGroup sg){
 				string res = "";
-				if(state is SGWaitForActionState){
+				if(sg.isWaitingForAction){
 					res = "SGWFA";
-				}else if(state is SGRevertState){
+				}else if(sg.isReverting){
 					res = "SGRevert";
-				}else if(state is SGReorderState){
+				}else if(sg.isReordering){
 					res = "SGReorder";
-				}else if(state is SGFillState){
+				}else if(sg.isFilling){
 					res = "SGFill";
-				}else if(state is SGSwapState){
+				}else if(sg.isSwapping){
 					res = "SGSwap";
-				}else if(state is SGAddState){
+				}else if(sg.isAdding){
 					res = "SGAdd";
-				}else if(state is SGRemoveState){
+				}else if(sg.isRemoving){
 					res = "SGRemove";
-				}else if(state is SGSortState){
+				}else if(sg.isSorting){
+					res = "SGSort";
+				}
+				return res;
+			}
+			public static string SGPrevActStateNamePlain(ISlotGroup sg){
+				string res = "";
+				if(sg.wasWaitingForAction){
+					res = "SGWFA";
+				}else if(sg.wasReverting){
+					res = "SGRevert";
+				}else if(sg.wasReordering){
+					res = "SGReorder";
+				}else if(sg.wasFilling){
+					res = "SGFill";
+				}else if(sg.wasSwapping){
+					res = "SGSwap";
+				}else if(sg.wasAdding){
+					res = "SGAdd";
+				}else if(sg.wasRemoving){
+					res = "SGRemove";
+				}else if(sg.wasSorting){
 					res = "SGSort";
 				}
 				return res;
@@ -260,15 +339,15 @@ namespace SlotSystem{
 			}
 			public static string SGDebug(ISlotGroup sg){
 				string res = "";
-				string prevSel = SSEStateNamePlain((SSEState)sg.prevSelState);
-				string curSel = SSEStateName((SSEState)sg.curSelState);
+				string prevSel = SSEPrevSelStateNamePlain(sg);
+				string curSel = SSECurSelStateNamePlain(sg);
 				string selProc;
 					if(sg.selProcess == null)
 						selProc = "";
 					else
 						selProc = SGProcessName((ISGProcess)sg.selProcess) + " running? " + (sg.selProcess.isRunning?Blue("true"):Red("false"));
-				string prevAct = SGStateNamePlain((SGActState)sg.prevActState);
-				string curAct = SGStateName((SGActState)sg.curActState);
+				string prevAct = SGPrevActStateNamePlain(sg);
+				string curAct = SGCurActStateNamePlain(sg);
 				string actProc;
 					if(sg.actProcess == null)
 						actProc = "";
@@ -384,36 +463,149 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public static string SBStateNamePlain(SBState state){
+
+			public static string SBCurActStateNamePlain(ISlottable sb){
 				string result = "";
-				if(state is SBActState){
-					if(state is WaitForActionState)
+					if(sb.isWaitingForAction)
 						result = "WFAction";
-					else if(state is WaitForPointerUpState)
+					else if(sb.isWaitingForPointerUp)
 						result = "WFPointerUp";
-					else if(state is WaitForPickUpState)
+					else if(sb.isWaitingForPickUp)
 						result = "WFPickUp";
-					else if(state is WaitForNextTouchState)
+					else if(sb.isWaitingForNextTouch)
 						result = "WFNextTouch";
-					else if(state is PickedUpState)
+					else if(sb.isPickingUp)
 						result = "PickedUp";
-					else if(state is SBRemovedState)
+					else if(sb.isRemoving)
 						result = "Removed";
-					else if(state is SBAddedState)
+					else if(sb.isAdding)
 						result = "Added";
-					else if(state is SBMoveWithinState)
+					else if(sb.isMovingWithin)
 						result = "MoveWithin";
-				}else if(state is SBEqpState){
-					if(state is SBEquippedState)
-						result = "Equipped";
-					else if(state is SBUnequippedState)
-						result = "Unequipped";
-				}else if(state is SBMrkState){
-					if(state is SBMarkedState)
-						result = "Marked";
-					else if(state is SBUnmarkedState)
-						result = "Unmarked";
-				}
+				return result;
+			}
+			public static string SBPrevActStateNamePlain(ISlottable sb){
+				string result = "";
+					if(sb.wasWaitingForAction)
+						result = "WFAction";
+					else if(sb.wasWaitingForPointerUp)
+						result = "WFPointerUp";
+					else if(sb.wasWaitingForPickUp)
+						result = "WFPickUp";
+					else if(sb.wasWaitingForNextTouch)
+						result = "WFNextTouch";
+					else if(sb.wasPickingUp)
+						result = "PickedUp";
+					else if(sb.wasRemoving)
+						result = "Removed";
+					else if(sb.wasAdding)
+						result = "Added";
+					else if(sb.wasMovingWithin)
+						result = "MoveWithin";
+				return result;
+			}
+			public static string SBCurActStateName(ISlottable sb){
+				string result = "";
+					if(sb.isWaitingForAction)
+						result = Aqua("WFAction");
+					else if(sb.isWaitingForPointerUp)
+						result = Forest("WFPointerUp");
+					else if(sb.isWaitingForPickUp)
+						result = Brown("WFPickUp");
+					else if(sb.isWaitingForNextTouch)
+						result = Terra("WFNextTouch");
+					else if(sb.isPickingUp)
+						result = Berry("PickedUp");
+					else if(sb.isRemoving)
+						result = Violet("Removed");
+					else if(sb.isAdding)
+						result = Khaki("Added");
+					else if(sb.isMovingWithin)
+						result = Midnight("MoveWithin");
+				return result;
+			}
+			public static string SBPrevActStateName(ISlottable sb){
+				string result = "";
+					if(sb.wasWaitingForAction)
+						result = Aqua("WFAction");
+					else if(sb.wasWaitingForPointerUp)
+						result = Forest("WFPointerUp");
+					else if(sb.wasWaitingForPickUp)
+						result = Brown("WFPickUp");
+					else if(sb.wasWaitingForNextTouch)
+						result = Terra("WFNextTouch");
+					else if(sb.wasPickingUp)
+						result = Berry("PickedUp");
+					else if(sb.wasRemoving)
+						result = Violet("Removed");
+					else if(sb.wasAdding)
+						result = Khaki("Added");
+					else if(sb.wasMovingWithin)
+						result = Midnight("MoveWithin");
+				return result;
+			}
+			public static string SBCurEqpStateNamePlain(ISlottable sb){
+				string result = "";
+				if(sb.isEquipped)
+					result = "Equipped";
+				else if(sb.isUnequipped)
+					result = "Unequipped";
+				return result;
+			}
+			public static string SBPrevEqpStateNamePlain(ISlottable sb){
+				string result = "";
+				if(sb.wasEquipped)
+					result = "Equipped";
+				else if(sb.wasUnequipped)
+					result = "Unequipped";
+				return result;
+			}
+			public static string SBCurEqpStateName(ISlottable sb){
+				string result = "";
+				if(sb.isEquipped)
+					result = Red("Equipped");
+				else if(sb.isUnequipped)
+					result = Blue("Unequipped");
+				return result;
+			}
+			public static string SBPrevEqpStateName(ISlottable sb){
+				string result = "";
+				if(sb.wasEquipped)
+					result = Red("Equipped");
+				else if(sb.wasUnequipped)
+					result = Blue("Unequipped");
+				return result;
+			}
+			public static string SBCurMrkStateNamePlain(ISlottable sb){
+				string result = "";
+				if(sb.isMarked)
+					result = "Marked";
+				else if (sb.isUnmarked)
+					result = "Unmarked";
+				return result;
+			}
+			public static string SBPrevMrkStateNamePlain(ISlottable sb){
+				string result = "";
+				if(sb.wasMarked)
+					result = "Marked";
+				else if (sb.wasUnmarked)
+					result = "Unmarked";
+				return result;
+			}
+			public static string SBCurMrkStateName(ISlottable sb){
+				string result = "";
+				if(sb.isMarked)
+					result = Red("Marked");
+				else if (sb.isUnmarked)
+					result = Blue("Unmarked");
+				return result;
+			}
+			public static string SBPrevMrkStateName(ISlottable sb){
+				string result = "";
+				if(sb.wasMarked)
+					result = Red("Marked");
+				else if (sb.wasUnmarked)
+					result = Blue("Unmarked");
 				return result;
 			}
 			public static string SBProcessName(ISBProcess process){
@@ -456,29 +648,29 @@ namespace SlotSystem{
 					res = "null";
 				else{	
 					string sbName = SBofSG(sb);
-					string prevSel = SSEStateNamePlain((SSEState)sb.prevSelState);
-					string curSel = SSEStateName((SSEState)sb.curSelState);
+					string prevSel = SSEPrevSelStateNamePlain(sb);
+					string curSel = SSECurSelStateName(sb);
 					string selProc;
 						if(sb.selProcess == null)
 							selProc = "";
 						else
 							selProc = SBProcessName((ISBProcess)sb.selProcess) + " running? " + (sb.selProcess.isRunning?Blue("true"):Red("false"));
-					string prevAct = SBStateNamePlain((SBActState)sb.prevActState);
-					string curAct = SBStateName((SBActState)sb.curActState);
+					string prevAct = SBPrevActStateNamePlain(sb);
+					string curAct = SBCurActStateName(sb);
 					string actProc;
 						if(sb.actProcess == null)
 							actProc = "";
 						else
 							actProc = SBProcessName((ISBProcess)sb.actProcess) + " running? " + (sb.actProcess.isRunning?Blue("true"):Red("false"));
-					string prevEqp = SBStateNamePlain((SBEqpState)sb.prevEqpState);
-					string curEqp = SBStateName((SBEqpState)sb.curEqpState);
+					string prevEqp = SBPrevEqpStateNamePlain(sb);
+					string curEqp = SBCurEqpStateName(sb);
 					string eqpProc;
 						if(sb.eqpProcess == null)
 							eqpProc = "";
 						else
 							eqpProc = SBProcessName((ISBProcess)sb.eqpProcess) + " running? " + (sb.eqpProcess.isRunning?Blue("true"):Red("false"));
-					string prevMrk = SBStateNamePlain((SBMrkState)sb.prevMrkState);
-					string curMrk = SBStateName((SBMrkState)sb.curMrkState);
+					string prevMrk = SBPrevMrkStateNamePlain(sb);
+					string curMrk = SBCurMrkStateName(sb);
 					string mrkProc;
 						if(sb.mrkProcess == null)
 							mrkProc = "";

@@ -21,7 +21,7 @@ namespace SlotSystem{
 		public override ISlotGroup sg1{get{return m_origSG;}}
 		public override void Indicate(){}
 		public override void Execute(){
-			sg1.SetActState(SlotGroup.reorderState);
+			sg1.Reorder();
 			ssm.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.itemInst));
 			sg1.OnActionExecute();
 			base.Execute();

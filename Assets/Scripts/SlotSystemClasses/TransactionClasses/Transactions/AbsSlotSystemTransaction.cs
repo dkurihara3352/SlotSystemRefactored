@@ -13,7 +13,7 @@ namespace SlotSystem{
 		public virtual List<InventoryItemInstance> moved{get{return null;}}
 		public virtual void Indicate(){}
 		public virtual void Execute(){
-			ssm.SetActState(SlotSystemManager.ssmTransactionState);
+			ssm.Transact();
 		}
 		public virtual void OnComplete(){
 			ssm.ResetAndFocus();

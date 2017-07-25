@@ -8,146 +8,201 @@ namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
 		/*	States	*/
 			/*	Action State	*/
-				public ISSEStateEngine<ISBActState> actStateEngine{
+				ISSEStateEngine<ISBActState> actStateEngine{
 					get{
 						if(m_actStateEngine == null)
 							m_actStateEngine = new SSEStateEngine<ISBActState>(this);
 						return m_actStateEngine;
 					}
 					}ISSEStateEngine<ISBActState> m_actStateEngine;
-				public void SetActStateEngine(ISSEStateEngine<ISBActState> engine){m_actStateEngine = engine;}
-				public virtual ISBActState curActState{
+				void SetActStateEngine(ISSEStateEngine<ISBActState> engine){m_actStateEngine = engine;}
+				ISBActState curActState{
 					get{return actStateEngine.curState;}
 				}
-				public virtual ISBActState prevActState{
+				ISBActState prevActState{
 					get{return actStateEngine.prevState;}
 				}
-				public virtual void SetActState(ISBActState state){
+				void SetActState(ISBActState state){
 					actStateEngine.SetState(state);
 				}
-				/* static states */
-					public static ISBActState sbWaitForActionState{
+				/* Act states */
+					public virtual bool isActStateInit{get{return prevActState == null;}}
+					public virtual void ClearActState(){
+						SetActState(null);
+						SetActState(null);
+					}
+					public ISBActState waitForActionState{
 						get{
-							if(m_sbWaitForActionState == null)
-								m_sbWaitForActionState = new WaitForActionState();
-							return m_sbWaitForActionState;
+							if(m_waitForActionState == null)
+								m_waitForActionState = new WaitForActionState();
+							return m_waitForActionState;
 						}
-						}static ISBActState m_sbWaitForActionState;
-					public static ISBActState waitForPointerUpState{
+						}ISBActState m_waitForActionState;
+						public virtual void WaitForAction(){SetActState(waitForActionState);}
+						public virtual bool isWaitingForAction{get{return curActState == waitForActionState;}}
+						public virtual bool wasWaitingForAction{get{return prevActState == waitForActionState;}}
+					public ISBActState waitForPointerUpState{
 						get{
 							if(m_waitForPointerUpState == null)
 								m_waitForPointerUpState = new WaitForPointerUpState();
 							return m_waitForPointerUpState;
 						}
-						}static ISBActState m_waitForPointerUpState;
-					public static ISBActState waitForPickUpState{
+						}ISBActState m_waitForPointerUpState;
+						public virtual void WaitForPointerUp(){SetActState(waitForPointerUpState);}
+						public virtual bool isWaitingForPointerUp{get{return curActState == waitForPointerUpState;}}
+						public virtual bool wasWaitingForPointerUp{get{return prevActState == waitForPointerUpState;}}
+					public ISBActState waitForPickUpState{
 						get{
 							if(m_waitForPickUpState == null)
 								m_waitForPickUpState = new WaitForPickUpState();
 							return m_waitForPickUpState;
 						}
-						}static ISBActState m_waitForPickUpState;
-					public static ISBActState waitForNextTouchState{
+						}ISBActState m_waitForPickUpState;
+						public virtual void WaitForPickUp(){SetActState(waitForPickUpState);}
+						public virtual bool isWaitingForPickUp{get{return curActState == waitForPickUpState;}}
+						public virtual bool wasWaitingForPickUp{get{return prevActState == waitForPickUpState;}}
+					public ISBActState waitForNextTouchState{
 						get{
 							if(m_waitForNextTouchState == null)
 								m_waitForNextTouchState = new WaitForNextTouchState();
 							return m_waitForNextTouchState;
 						}
-						}static ISBActState m_waitForNextTouchState;
-					public static ISBActState pickedUpState{
+						}ISBActState m_waitForNextTouchState;
+						public virtual void WaitForNextTouch(){SetActState(waitForNextTouchState);}
+						public virtual bool isWaitingForNextTouch{get{return curActState == waitForNextTouchState;}}
+						public virtual bool wasWaitingForNextTouch{get{return prevActState == waitForNextTouchState;}}
+					public ISBActState pickedUpState{
 						get{
 							if(m_pickedUpState == null)
 								m_pickedUpState = new PickedUpState();
 							return m_pickedUpState;
 						}
-						}static ISBActState m_pickedUpState;
-					public static ISBActState removedState{
+						}ISBActState m_pickedUpState;
+						public virtual void PickUp(){
+							SetActState(pickedUpState);
+							m_pickedAmount = 1;
+						}
+						public virtual bool isPickingUp{get{return curActState == pickedUpState;}}
+						public virtual bool wasPickingUp{get{return prevActState == pickedUpState;}}
+					public ISBActState removedState{
 						get{
 							if(m_removedState == null)
 								m_removedState = new SBRemovedState();
 							return m_removedState;			
 						}
-						}static ISBActState m_removedState;
-					public static ISBActState addedState{
+						}ISBActState m_removedState;
+						public virtual void Remove(){SetActState(removedState);}
+						public virtual bool isRemoving{get{return curActState == removedState;}}
+						public virtual bool wasRemoving{get{return prevActState == removedState;}}
+					public ISBActState addedState{
 						get{
 							if(m_addedState == null)
 								m_addedState = new SBAddedState();
 							return m_addedState;			
 						}
-						}static ISBActState m_addedState;
-					public static ISBActState moveWithinState{
-							get{
-								if(m_moveWithinState == null)
-									m_moveWithinState = new SBMoveWithinState();
-								return m_moveWithinState;			
-							}
-							}static ISBActState m_moveWithinState;
+						}ISBActState m_addedState;
+						public virtual void Add(){SetActState(addedState);}
+						public virtual bool isAdding{get{return curActState == addedState;}}
+						public virtual bool wasAdding{get{return prevActState == addedState;}}
+					public ISBActState moveWithinState{
+						get{
+							if(m_moveWithinState == null)
+								m_moveWithinState = new SBMoveWithinState();
+							return m_moveWithinState;			
+						}
+						}ISBActState m_moveWithinState;
+						public virtual void MoveWithin(){SetActState(moveWithinState);}
+						public virtual bool isMovingWithin{get{return curActState == moveWithinState;}}
+						public virtual bool wasMovingWithin{get{return prevActState == moveWithinState;}}
 			/*	Equip State	*/
-				public ISSEStateEngine<ISBEqpState> eqpStateEngine{
+				ISSEStateEngine<ISBEqpState> eqpStateEngine{
 					get{
 						if(m_eqpStateEngine == null)
 							m_eqpStateEngine = new SSEStateEngine<ISBEqpState>(this);
 						return m_eqpStateEngine;
 					}
 					}ISSEStateEngine<ISBEqpState> m_eqpStateEngine;
-				public void SetEqpStateEngine(ISSEStateEngine<ISBEqpState> engine){m_eqpStateEngine = engine;}
-				public virtual ISBEqpState curEqpState{
+				void SetEqpStateEngine(ISSEStateEngine<ISBEqpState> engine){m_eqpStateEngine = engine;}
+				ISBEqpState curEqpState{
 					get{return eqpStateEngine.curState;}
 				}
-				public virtual ISBEqpState prevEqpState{
+				ISBEqpState prevEqpState{
 					get{return eqpStateEngine.prevState;}
 				}
-				public virtual void SetEqpState(ISBEqpState state){
+				void SetEqpState(ISBEqpState state){
 					eqpStateEngine.SetState(state);
 				}
-				/* Static states */
-					public static ISBEqpState equippedState{
+				public virtual bool isEqpStateInit{get{return prevEqpState == null;}}
+				public virtual void ClearEqpState(){
+					SetEqpState(null);
+					SetEqpState(null);
+				}
+				
+				/* Eqp states */
+					public ISBEqpState equippedState{
 						get{
 							if(m_equippedState == null)
 								m_equippedState = new SBEquippedState();
 							return m_equippedState;
 							}
-						}static ISBEqpState m_equippedState;
-					public static ISBEqpState unequippedState{
-					get{
-						if(m_unequippedState == null)
-							m_unequippedState = new SBUnequippedState();
-						return m_unequippedState;
-					}
-					}static ISBEqpState m_unequippedState;
+						}ISBEqpState m_equippedState;
+						public virtual void Equip(){SetEqpState(equippedState);}
+						public virtual bool isEquipped{get{ return curEqpState == equippedState;}}
+						public virtual bool wasEquipped{get{return prevEqpState == equippedState;}}
+					public ISBEqpState unequippedState{
+						get{
+							if(m_unequippedState == null)
+								m_unequippedState = new SBUnequippedState();
+							return m_unequippedState;
+						}
+						}ISBEqpState m_unequippedState;
+						public virtual void Unequip(){SetEqpState(unequippedState);}
+						public virtual bool isUnequipped{get{ return curEqpState == unequippedState;}}
+						public virtual bool wasUnequipped{get{ return prevEqpState == unequippedState;}}
 			/*	Mark state	*/
-				public ISSEStateEngine<ISBMrkState> mrkStateEngine{
+				ISSEStateEngine<ISBMrkState> mrkStateEngine{
 					get{
 						if(m_markStateEngine == null)
 							m_markStateEngine = new SSEStateEngine<ISBMrkState>(this);
 						return m_markStateEngine;
 					}
 					}ISSEStateEngine<ISBMrkState> m_markStateEngine;
-				public void SetMrkStateEngine(ISSEStateEngine<ISBMrkState> engine){m_markStateEngine = engine;}
-				public virtual ISBMrkState curMrkState{
+				void SetMrkStateEngine(ISSEStateEngine<ISBMrkState> engine){m_markStateEngine = engine;}
+				ISBMrkState curMrkState{
 					get{return mrkStateEngine.curState;}
 				}
-				public virtual ISBMrkState prevMrkState{
+				ISBMrkState prevMrkState{
 					get{return mrkStateEngine.prevState;}
 				}
-				public virtual void SetMrkState(ISBMrkState state){
+				void SetMrkState(ISBMrkState state){
 					mrkStateEngine.SetState(state);
 				}
-				/* Static states */
-					public static ISBMrkState markedState{
+				public virtual bool isMrkStateInit{get{return prevMrkState == null;}}
+				public virtual void ClearMrkState(){
+					SetMrkState(null);
+					SetMrkState(null);
+				}
+				/* Mrk states */
+					public ISBMrkState markedState{
 						get{
 							if(m_markedState == null)
 								m_markedState = new SBMarkedState();
 							return m_markedState;
 						}
-						}static ISBMrkState m_markedState;
-					public static ISBMrkState unmarkedState{
+						}ISBMrkState m_markedState;
+						public virtual void Mark(){SetMrkState(markedState);}
+						public virtual bool isMarked{get{return curMrkState == markedState;}}
+						public virtual bool wasMarked{get{return prevMrkState == markedState;}}
+					public ISBMrkState unmarkedState{
 						get{
 							if(m_unmarkedState == null)
 								m_unmarkedState = new SBUnmarkedState();
 							return m_unmarkedState;
 						}
-						}static ISBMrkState m_unmarkedState;
+						}ISBMrkState m_unmarkedState;
+						public virtual void Unmark(){SetMrkState(unmarkedState);}
+						public virtual bool isUnmarked{get{return curMrkState == unmarkedState;}}
+						public virtual bool wasUnmarked{get{return prevMrkState == markedState;}}
 		/*	processes	*/
 			/*	Selection Process	*/
 				/* Coroutines */
@@ -219,13 +274,18 @@ namespace SlotSystem{
 					public IEnumeratorFake unmarkCoroutine(){return null;}
 					public IEnumeratorFake markCoroutine(){return null;}
 		/*	commands	*/
-			static public SlottableCommand TapCommand{
+			public SlottableCommand TapCommand{
 				get{return m_tapCommand;}
-				}static SlottableCommand m_tapCommand = new SBTapCommand();
+				}SlottableCommand m_tapCommand = new SBTapCommand();
 				public virtual void Tap(){
 					m_tapCommand.Execute(this);
 				}
 		/*	public fields	*/
+			public bool isHierarchySetUp{
+				get{
+					return sg != null;
+				}
+			}
 			public bool delayed{
 				get{return m_delayed;}
 				set{m_delayed = value;}
@@ -253,43 +313,20 @@ namespace SlotSystem{
 				public void SetNewSlotID(int id){
 					m_newSlotID = id;
 				}
-			public bool isAdded{get{return slotID == -1;}}
-			public bool isRemoved{get{return newSlotID == -1;}}
+			public bool isToBeAdded{get{return slotID == -1;}}
+			public bool isToBeRemoved{get{return newSlotID == -1;}}
 			public ISlotGroup sg{
 				get{
-					return (ISlotGroup)parent;
+					if(parent != null)
+						return parent as ISlotGroup;
+					return null;
 				}
-			}
-			public override bool isFocused{
-				get{return curSelState == focusedState;}
-			}
-			public override bool isDefocused{
-				get{return curSelState == defocusedState;}
-			}
-			public override bool isDeactivated{
-				get{return curSelState == deactivatedState;}
 			}
 			public virtual bool isPickedUp{
 				get{
 					return ssm.pickedSB == (ISlottable)this;
 				}
 			}
-			public bool isEquipped{
-				get{ return itemInst.isEquipped;}
-				}public void Equip(){
-					SetEqpState(Slottable.equippedState);
-				}
-				public void Unequip(){
-					SetEqpState(Slottable.unequippedState);
-				}
-			public bool isMarked{
-				get{return itemInst.isMarked;}
-				}public void Mark(){
-					SetMrkState(Slottable.markedState);
-				}
-				public void Unmark(){
-					SetMrkState(Slottable.unmarkedState);
-				}
 			public virtual bool isStackable{
 				get{return itemInst.Item.IsStackable;}
 			}
@@ -315,7 +352,10 @@ namespace SlotSystem{
 				}
 				public override ISlotSystemElement parent{
 					get{
-						return ssm.FindParent(this);
+						if(ssm != null)
+							return ssm.FindParent(this);
+						else
+							throw new System.InvalidOperationException("Slottable.parent: ssm is not set");
 					}
 				}
 				public override ISlotSystemBundle immediateBundle{
@@ -336,15 +376,6 @@ namespace SlotSystem{
 					return false;
 				}
 				public override void Activate(){}
-				public override void Deactivate(){
-					SetSelState(deactivatedState);
-				}
-				public override void Focus(){
-					SetSelState(focusedState);
-				}
-				public override void Defocus(){
-					SetSelState(defocusedState);
-				}
 				public override bool ContainsInHierarchy(ISlotSystemElement element){
 					return false;
 				}
@@ -358,27 +389,18 @@ namespace SlotSystem{
 					act(this, obj);
 				}
 		/*	Event methods	*/
-			/*	Selection event	*/
-				public virtual void OnHoverEnterMock(){
-					PointerEventDataFake eventData = new PointerEventDataFake();
-					curSelState.OnHoverEnterMock(this, eventData);
-				}
-				public virtual void OnHoverExitMock(){
-					PointerEventDataFake eventData = new PointerEventDataFake();
-					curSelState.OnHoverExitMock(this, eventData);
-				}
 			/*	Action Event	*/
 				public void OnPointerDownMock(PointerEventDataFake eventDataMock){
-					((SBActState)curActState).OnPointerDownMock(this, eventDataMock);
+					curActState.OnPointerDownMock(this, eventDataMock);
 				}
 				public void OnPointerUpMock(PointerEventDataFake eventDataMock){
-					((SBActState)curActState).OnPointerUpMock(this, eventDataMock);
+					curActState.OnPointerUpMock(this, eventDataMock);
 				}
 				public void OnDeselectedMock(PointerEventDataFake eventDataMock){
-					((SBActState)curActState).OnDeselectedMock(this, eventDataMock);
+					curActState.OnDeselectedMock(this, eventDataMock);
 				}
 				public void OnEndDragMock(PointerEventDataFake eventDataMock){
-					((SBActState)curActState).OnEndDragMock(this, eventDataMock);
+					curActState.OnEndDragMock(this, eventDataMock);
 				}
 		/*	other Interface implementation	*/
 			int IComparable.CompareTo(object other){
@@ -397,17 +419,14 @@ namespace SlotSystem{
 			}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(deactivatedState);
-				SetActState(Slottable.sbWaitForActionState);
+				Deactivate();
+				SetActState(waitForActionState);
 				SetEqpState(null);
-				SetMrkState(Slottable.unmarkedState);
+				SetMrkState(unmarkedState);
 			}
 			public override void SetElements(){}
-			public virtual void PickUp(){
-				SetActState(Slottable.pickedUpState);
-				m_pickedAmount = 1;
-			}
 			public virtual void Increment(){
+				SetActState(pickedUpState);
 				if(m_item.IsStackable && quantity > m_pickedAmount){
 					m_pickedAmount ++;
 				}
@@ -424,7 +443,7 @@ namespace SlotSystem{
 				else Unequip();
 			}
 			public virtual void Reset(){
-				SetActState(Slottable.sbWaitForActionState);
+				SetActState(waitForActionState);
 				pickedAmount = 0;
 				SetNewSlotID(-2);
 			}
@@ -452,10 +471,13 @@ namespace SlotSystem{
 			}
 		/*	Forward	*/
 			public virtual void SetPickedSB(){
-				ssm.SetPickedSB((ISlottable)this);
+				if(ssm != null){
+					ssm.SetPickedSB((ISlottable)this);
+				}else
+					throw new System.InvalidOperationException("Slottable.SetPickedSB: ssm not set");
 			}
-			public virtual void SetSSMActState(ISSMActState ssmState){
-				ssm.SetActState(ssmState);
+			public virtual void Probe(){
+				ssm.Probe();
 			}
 			public virtual void SetDIcon1(){
 				DraggedIcon dIcon = new DraggedIcon(this);
@@ -474,7 +496,15 @@ namespace SlotSystem{
 			public virtual bool isHovered{
 				get{return ssm.hovered == (ISlotSystemElement)this;}
 			}
-			public virtual bool isPool{get{return sg.isPool;}}
+			// public virtual bool isPool{get{return sg.isPool;}}
+			public virtual bool isPool{
+				get{
+					if(sg != null){
+						return sg.isPool;
+					}else
+						throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
+				}
+			}
 			public void SetHovered(){
 				ssm.SetHovered((ISlottable)this);
 			}
@@ -482,21 +512,76 @@ namespace SlotSystem{
 	public interface ISlottable: ISlotSystemElement ,IComparable<ISlottable>, IComparable{
 		/*	States and Processes	*/
 			/* States */
-				ISSEStateEngine<ISBActState> actStateEngine{get;}
-					void SetActStateEngine(ISSEStateEngine<ISBActState> engine);
-					ISBActState curActState{get;}
-					ISBActState prevActState{get;}
-					void SetActState(ISBActState state);
-				ISSEStateEngine<ISBEqpState> eqpStateEngine{get;}
-					void SetEqpStateEngine(ISSEStateEngine<ISBEqpState> engine);
-					ISBEqpState curEqpState{get;}
-					ISBEqpState prevEqpState{get;}
-					void SetEqpState(ISBEqpState state);
-				ISSEStateEngine<ISBMrkState> mrkStateEngine{get;}
-					void SetMrkStateEngine(ISSEStateEngine<ISBMrkState> engine);
-					ISBMrkState curMrkState{get;}
-					ISBMrkState prevMrkState{get;}
-					void SetMrkState(ISBMrkState state);
+				// ISSEStateEngine<ISBActState> actStateEngine{get;}
+				// 	void SetActStateEngine(ISSEStateEngine<ISBActState> engine);
+				// 	ISBActState curActState{get;}
+				// 	ISBActState prevActState{get;}
+					// void SetActState(ISBActState state);
+						bool isActStateInit{get;}
+						void ClearActState();
+						ISBActState waitForActionState{get;}
+						void WaitForAction();
+						bool isWaitingForAction{get;}
+						bool wasWaitingForAction{get;}
+						ISBActState waitForPointerUpState{get;}
+						void WaitForPointerUp();
+						bool isWaitingForPointerUp{get;}
+						bool wasWaitingForPointerUp{get;}
+						ISBActState waitForPickUpState{get;}
+						void WaitForPickUp();
+						bool isWaitingForPickUp{get;}
+						bool wasWaitingForPickUp{get;}
+						ISBActState waitForNextTouchState{get;}
+						void WaitForNextTouch();
+						bool isWaitingForNextTouch{get;}
+						bool wasWaitingForNextTouch{get;}
+						ISBActState pickedUpState{get;}
+						void PickUp();
+						bool isPickingUp{get;}
+						bool wasPickingUp{get;}
+						ISBActState removedState{get;}
+						void Remove();
+						bool isRemoving{get;}
+						bool wasRemoving{get;}
+						ISBActState addedState{get;}
+						void Add();
+						bool isAdding{get;}
+						bool wasAdding{get;}
+						ISBActState moveWithinState{get;}
+						void MoveWithin();
+						bool isMovingWithin{get;}
+						bool wasMovingWithin{get;}
+
+				// ISSEStateEngine<ISBEqpState> eqpStateEngine{get;}
+				// 	void SetEqpStateEngine(ISSEStateEngine<ISBEqpState> engine);
+				// 	ISBEqpState curEqpState{get;}
+				// 	ISBEqpState prevEqpState{get;}
+					// void SetEqpState(ISBEqpState state);
+						bool isEqpStateInit{get;}
+						void ClearEqpState();
+						ISBEqpState equippedState{get;}
+						void Equip();
+						bool isEquipped{get;}
+						bool wasEquipped{get;}
+						ISBEqpState unequippedState{get;}
+						void Unequip();
+						bool isUnequipped{get;}
+						bool wasUnequipped{get;}
+				// ISSEStateEngine<ISBMrkState> mrkStateEngine{get;}
+				// 	void SetMrkStateEngine(ISSEStateEngine<ISBMrkState> engine);
+				// 	ISBMrkState curMrkState{get;}
+				// 	ISBMrkState prevMrkState{get;}
+					// void SetMrkState(ISBMrkState state);
+						bool isMrkStateInit{get;}
+						void ClearMrkState();
+						ISBMrkState	markedState{get;}
+						void Mark();
+						bool isMarked{get;}
+						bool wasMarked{get;}
+						ISBMrkState unmarkedState{get;}
+						void Unmark();
+						bool isUnmarked{get;}
+						bool wasUnmarked{get;}
 			/* Process */
 				ISSEProcessEngine<ISBActProcess> actProcEngine{get;}
 					void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine);
@@ -524,6 +609,7 @@ namespace SlotSystem{
 		/*	Commands	*/
 			void Tap();
 		/*	fields	*/
+			bool isHierarchySetUp{get;}
 			bool delayed{get;set;}
 			int pickedAmount{get;set;}
 			void SetItem(SlottableItem item);
@@ -532,23 +618,15 @@ namespace SlotSystem{
 			void SetSlotID(int i);
 			int newSlotID{get;}
 			void SetNewSlotID(int id);
-			bool isAdded{get;}
-			bool isRemoved{get;}
+			bool isToBeAdded{get;}
+			bool isToBeRemoved{get;}
 			ISlotGroup sg{get;}
 			bool isPickedUp{get;}
-			bool isEquipped{get;}
-			void Equip();
-			void Unequip();
-			bool isMarked{get;}
-			void Mark();
-			void Unmark();
 			bool isStackable{get;}
 			bool passesPrePickFilter{get;}
 			int quantity{get;}
 			void SetQuantity(int quant);
 		/*	Event Methods	*/
-			void OnHoverEnterMock();
-			void OnHoverExitMock();
 			void OnPointerDownMock(PointerEventDataFake eventDataMock);
 			void OnPointerUpMock(PointerEventDataFake eventDataMock);
 			void OnDeselectedMock(PointerEventDataFake eventDataMock);
@@ -556,7 +634,7 @@ namespace SlotSystem{
 
 
 		/*	Methods	*/
-			void PickUp();
+			// void PickUp();
 			void Increment();
 			void ExecuteTransaction();
 			void ExpireActionProcess();
@@ -567,7 +645,6 @@ namespace SlotSystem{
 			void Destroy();
 		/*	Forward	*/
 			void SetPickedSB();
-			void SetSSMActState(ISSMActState ssmState);
 			void SetDIcon1();
 			void SetDIcon2();
 			void CreateTAResult();
@@ -575,5 +652,6 @@ namespace SlotSystem{
 			bool isHovered{get;}
 			bool isPool{get;}
 			void SetHovered();
+			void Probe();
 	}
 }

@@ -33,8 +33,8 @@ namespace SlotSystem{
 		public override List<InventoryItemInstance> moved{get{return itemCache;}}
 		public override void Indicate(){}
 		public override void Execute(){
-			sg1.SetActState(SlotGroup.removeState);
-			sg2.SetActState(SlotGroup.addState);
+			sg1.Remove();
+			sg2.Add();
 			ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 			base.Execute();
 		}

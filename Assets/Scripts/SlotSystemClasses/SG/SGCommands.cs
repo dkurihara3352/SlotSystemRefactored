@@ -28,9 +28,9 @@ namespace SlotSystem{
 			foreach(ISlottable sb in sg){
 				if(sb != null){
 					InventoryItemInstance item = sb.itemInst;
-					if(sb.isRemoved){
+					if(sb.isToBeRemoved){
 						sg.SyncEquipped(item, false);
-					}else if(sb.isAdded){
+					}else if(sb.isToBeAdded){
 						sg.SyncEquipped(item, true);
 					}
 				}

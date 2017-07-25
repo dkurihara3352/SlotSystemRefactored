@@ -5,24 +5,25 @@ using Utility;
 namespace SlotSystem{
 	public abstract class SlotSystemElement :MonoBehaviour, ISlotSystemElement{
 		/*	state	*/
-			public ISSEStateEngine<ISSESelState> selStateEngine{
+			ISSEStateEngine<ISSESelState> selStateEngine{
 				get{
 					if(m_selStateEngine == null)
 						m_selStateEngine = new SSEStateEngine<ISSESelState>(this);
 					return m_selStateEngine;
 				}
 				}ISSEStateEngine<ISSESelState> m_selStateEngine;
-			public void SetSelStateEngine(ISSEStateEngine<ISSESelState> engine){m_selStateEngine = engine;}
-			public virtual ISSESelState prevSelState{
+			void SetSelStateEngine(ISSEStateEngine<ISSESelState> engine){m_selStateEngine = engine;}
+			ISSESelState prevSelState{
 				get{return selStateEngine.prevState;}
 			}
-			public virtual ISSESelState curSelState{
+			ISSESelState curSelState{
 				get{return selStateEngine.curState;}
 			}
-			public virtual void SetSelState(ISSESelState state){
+			void SetSelState(ISSESelState state){
 				selStateEngine.SetState(state);
 			}
 			/*	selStates	*/
+				public bool isSelStateInit{get{return prevSelState ==null;}}
 				public ISSESelState deactivatedState{
 					get{
 						if(m_deactivatedState == null)
@@ -30,6 +31,11 @@ namespace SlotSystem{
 						return m_deactivatedState;
 					}
 					}ISSESelState m_deactivatedState;
+					public virtual void Deactivate(){
+						SetSelState(deactivatedState);
+					}
+					public virtual bool isDeactivated{get{return curSelState == deactivatedState;}}
+					public virtual bool wasDeactivated{get{return prevSelState == deactivatedState;}}
 				public ISSESelState defocusedState{
 					get{
 						if(m_defocusedState == null)
@@ -37,6 +43,11 @@ namespace SlotSystem{
 						return m_defocusedState;
 					}
 					}ISSESelState m_defocusedState;
+					public virtual void Defocus(){
+						SetSelState(defocusedState);
+					}
+					public virtual bool isDefocused{get{return curSelState == defocusedState;}}
+					public virtual bool wasDefocused{get{return prevSelState == defocusedState;}}
 				public ISSESelState focusedState{
 					get{
 						if(m_focusedState == null)
@@ -44,6 +55,11 @@ namespace SlotSystem{
 						return m_focusedState;
 					}
 					}ISSESelState m_focusedState;
+					public virtual void Focus(){
+						SetSelState(focusedState);
+					}
+					public virtual bool isFocused{get{return curSelState == focusedState;}}
+					public virtual bool wasFocused{get{return prevSelState == focusedState;}}
 				public ISSESelState selectedState{
 					get{
 						if(m_selectedState == null)
@@ -51,6 +67,11 @@ namespace SlotSystem{
 						return m_selectedState;
 					}
 					}ISSESelState m_selectedState;
+					public virtual void Select(){
+						SetSelState(selectedState);
+					}
+					public virtual bool isSelected{get{return curSelState == selectedState;}}
+					public virtual bool wasSelected{get{return prevSelState == selectedState;}}
 		/*	process	*/
 			/*	Selection Processs	*/
 				public ISSEProcessEngine<ISSESelProcess> selProcEngine{
@@ -82,6 +103,19 @@ namespace SlotSystem{
 					public virtual IEnumeratorFake selectCoroutine(){
 						return null;
 					}
+		/* Events */
+			public virtual void OnHoverEnterMock(){
+				if(curSelState != null)
+					curSelState.OnHoverEnterMock(this, new PointerEventDataFake());
+				else
+					throw new System.InvalidOperationException("SlotSystemElement.OnHoverEnterMock: curSelState not set");
+			}
+			public virtual void OnHoverExitMock(){
+				if(curSelState != null)
+					curSelState.OnHoverExitMock(this, new PointerEventDataFake());
+				else
+					throw new System.InvalidOperationException("SlotSystemElement.OnHoverEnterMock: curSelState not set");
+			}
 		/*	public fields	*/
 			public virtual ISlotSystemElement this[int i]{
 				get{
@@ -145,15 +179,6 @@ namespace SlotSystem{
 					return false;
 				}
 			}
-			public virtual bool isFocused{
-				get{return curSelState == focusedState;}
-			}
-			public virtual bool isDefocused{
-				get{return curSelState == defocusedState;}
-			}
-			public virtual bool isDeactivated{
-				get{return curSelState == deactivatedState;}
-			}
 			public bool isFocusedInHierarchy{
 				get{
 					ISlotSystemElement inspected = this;
@@ -178,7 +203,7 @@ namespace SlotSystem{
 			}public bool m_isInitiallyFocusedInPage = true;
 		/*	methods	*/
 			public virtual void InitializeStates(){
-				SetSelState(deactivatedState);
+				Deactivate();
 			}
 			public virtual IEnumerator<ISlotSystemElement> GetEnumerator(){
 				foreach(ISlotSystemElement ele in elements)
@@ -205,29 +230,6 @@ namespace SlotSystem{
 						ele.Activate();
 					}
 			}
-			public virtual void Deactivate(){
-				SetSelState(deactivatedState);
-				if(elements != null){
-					foreach(ISlotSystemElement ele in this){
-						ele.Deactivate();
-					}
-				}
-			}
-			public virtual void Focus(){
-				SetSelState(focusedState);
-				if(elements != null)
-					foreach(ISlotSystemElement ele in this){
-						ele.Focus();
-					}
-			}
-			public virtual void Defocus(){
-				SetSelState(defocusedState);
-				if(elements != null)
-					foreach(ISlotSystemElement ele in this){
-						ele.Defocus();
-					}
-			}
-			public virtual void Select(){}
 			public virtual void Deselect(){}
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement> act){
 				act(this);
@@ -236,6 +238,9 @@ namespace SlotSystem{
 						ele.PerformInHierarchy(act);
 					}
 			}
+				public virtual void FocusInHi(ISlotSystemElement sse){
+					sse.Focus();
+				}
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
 				act(this, obj);
 				if(elements != null)
@@ -269,24 +274,36 @@ namespace SlotSystem{
 			public virtual void InstantDefocus(){}
 			public virtual void InstantFocus(){}
 			public virtual void InstantSelect(){}
+			public void SetElements(IEnumerable<ISlotSystemElement> elements){m_elements = elements;}
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
-		ISSEStateEngine<ISSESelState> selStateEngine{get;}
-			void SetSelStateEngine(ISSEStateEngine<ISSESelState> engine);
-			void SetSelState(ISSESelState state);
-			ISSEProcessEngine<ISSESelProcess> selProcEngine{get;}
-			ISSESelState curSelState{get;}
-			ISSESelState prevSelState{get;}
-				ISSESelState deactivatedState{get;}
-				ISSESelState focusedState{get;}
-				ISSESelState defocusedState{get;}
-				ISSESelState selectedState{get;}
-		void SetAndRunSelProcess(ISSESelProcess process);
+		/* Sel states */
+			ISSESelState deactivatedState{get;}
+			bool isSelStateInit{get;}
+			void Deactivate();
+			bool isDeactivated{get;}
+			bool wasDeactivated{get;}
+			ISSESelState focusedState{get;}
+			void Focus();
+			bool isFocused{get;}
+			bool wasFocused{get;}
+			ISSESelState defocusedState{get;}
+			void Defocus();
+			bool isDefocused{get;}
+			bool wasDefocused{get;}
+			ISSESelState selectedState{get;}
+			void Select();
+			bool isSelected{get;}
+			bool wasSelected{get;}
+		ISSEProcessEngine<ISSESelProcess> selProcEngine{get;}
+			void SetAndRunSelProcess(ISSESelProcess process);
 			ISSESelProcess selProcess{get;}
 			IEnumeratorFake deactivateCoroutine();
 			IEnumeratorFake focusCoroutine();
 			IEnumeratorFake defocusCoroutine();
 			IEnumeratorFake selectCoroutine();
+		void OnHoverEnterMock();
+		void OnHoverExitMock();
 		void InstantFocus();
 		void InstantDefocus();
 		void InstantSelect();
@@ -294,17 +311,10 @@ namespace SlotSystem{
 		bool isBundleElement{get;}
 		bool isPageElement{get;}
 		bool isToggledOn{get;}
-		bool isFocused{get;}
-		bool isDefocused{get;}
-		bool isDeactivated{get;}
 		bool isFocusedInHierarchy{get;}
 		bool isToggledOnInPageByDefault{get;set;}
 		void InitializeStates();
 		void Activate();
-		void Deactivate();
-		void Focus();
-		void Defocus();
-		void Select();
 		void Deselect();
 		ISlotSystemBundle immediateBundle{get;}
 		ISlotSystemElement parent{get;}
@@ -315,11 +325,13 @@ namespace SlotSystem{
 		void SetElements();
 		bool ContainsInHierarchy(ISlotSystemElement ele);
 		void PerformInHierarchy(System.Action<ISlotSystemElement> act);
+			void FocusInHi(ISlotSystemElement sse);
 		void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj);
 		void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list);
 		int level{get;}
 		bool Contains(ISlotSystemElement element);
 		ISlotSystemElement this[int i]{get;}
 		void ToggleOnPageElement();
+		void SetElements(IEnumerable<ISlotSystemElement> elements);
 	}
 }

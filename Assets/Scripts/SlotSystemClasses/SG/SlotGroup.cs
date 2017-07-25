@@ -7,80 +7,105 @@ namespace SlotSystem{
 		/*	states	*/
 			/*	Engines	*/
 				/*	Action State	*/
-					public virtual ISSEStateEngine<ISGActState> actStateEngine{
+					ISSEStateEngine<ISGActState> actStateEngine{
 						get{
 							if(m_actStateEngine == null)
 								m_actStateEngine = new SSEStateEngine<ISGActState>(this);
 							return m_actStateEngine;
 						}
 						}ISSEStateEngine<ISGActState> m_actStateEngine;
-					public virtual void SetActStateEngine(ISSEStateEngine<ISGActState> engine){m_actStateEngine = engine;}
-					public virtual ISGActState curActState{
+					void SetActStateEngine(ISSEStateEngine<ISGActState> engine){m_actStateEngine = engine;}
+					ISGActState curActState{
 						get{return actStateEngine.curState;}
 					}
-					public virtual ISGActState prevActState{
+					ISGActState prevActState{
 						get{return actStateEngine.prevState;}
 					}
-					public virtual void SetActState(ISGActState state){
+					public bool isActStateInit{get{return prevActState == null;}}
+					void SetActState(ISGActState state){
 						actStateEngine.SetState(state);
 					}
-					/* Static states */
-						public static ISGActState sgWaitForActionState{
+					/* act states */
+						public ISGActState waitForActionState{
 							get{
-								if(m_sgWaitForActionState == null)
-									m_sgWaitForActionState = new SGWaitForActionState();
-								return m_sgWaitForActionState;
+								if(m_waitForActionState == null)
+									m_waitForActionState = new SGWaitForActionState();
+								return m_waitForActionState;
 							}
-							}private static ISGActState m_sgWaitForActionState;
-						public static ISGActState revertState{
+							}private ISGActState m_waitForActionState;
+							public void WaitForAction(){SetActState(waitForActionState);}
+							public virtual bool isWaitingForAction{get{return curActState == waitForActionState;}}
+							public virtual bool wasWaitingForAction{get{return prevActState == waitForActionState;}}
+						public ISGActState revertState{
 							get{
 								if(m_revertState == null)
 									m_revertState = new SGRevertState();
 								return m_revertState;
 							}
-							}private static ISGActState m_revertState;
-						public static ISGActState reorderState{
+							}private ISGActState m_revertState;
+							public void Revert(){SetActState(revertState);}
+							public virtual bool isReverting{get{return curActState == revertState;}}
+							public virtual bool wasReverting{get{return prevActState == revertState;}}
+						public ISGActState reorderState{
 							get{
 								if(m_reorderState == null)
 									m_reorderState = new SGReorderState();
 								return m_reorderState;
 							}
-							}private static ISGActState m_reorderState;
-						public static ISGActState addState{
+							}private ISGActState m_reorderState;
+							public void Reorder(){SetActState(reorderState);}
+							public virtual bool isReordering{get{return curActState == reorderState;}}
+							public virtual bool wasReordering{get{return prevActState == reorderState;}}
+						public ISGActState addState{
 							get{
 								if(m_addState == null)
 									m_addState = new SGAddState();
 								return m_addState;
 							}
-							}private static ISGActState m_addState;
-						public static ISGActState removeState{
+							}private ISGActState m_addState;
+							public void Add(){SetActState(addState);}
+							public virtual bool isAdding{get{return curActState == addState;}}
+							public virtual bool wasAdding{get{return prevActState == addState;}}
+						public ISGActState removeState{
 							get{
 								if(m_removeState == null)
 									m_removeState = new SGRemoveState();
 								return m_removeState;
 							}
-							}private static ISGActState m_removeState;
-						public static ISGActState swapState{
+							}private ISGActState m_removeState;
+							public void Remove(){SetActState(removeState);}
+							public virtual bool isRemoving{get{return curActState == removeState;}}
+							public virtual bool wasRemoving{get{return prevActState == removeState;}}
+						public ISGActState swapState{
 							get{
 								if(m_swapState == null)
 									m_swapState = new SGSwapState();
 								return m_swapState;
 							}
-							}private static ISGActState m_swapState;
-						public static ISGActState fillState{
+							}private ISGActState m_swapState;
+							public void Swap(){SetActState(swapState);}
+							public virtual bool isSwapping{get{return curActState == swapState;}}
+							public virtual bool wasSwapping{get{return prevActState == swapState;}}
+						public ISGActState fillState{
 							get{
 								if(m_fillState == null)
 									m_fillState = new SGFillState();
 								return m_fillState;
 							}
-							}private static ISGActState m_fillState;
-						public static ISGActState sortState{
+							}private ISGActState m_fillState;
+							public void Fill(){SetActState(fillState);}
+							public virtual bool isFilling{get{return curActState == fillState;}}
+							public virtual bool wasFilling{get{return prevActState == fillState;}}
+						public ISGActState sortState{
 						get{
 							if(m_sortState == null)
 								m_sortState = new SGSortState();
 							return m_sortState;
 						}
-						}private static ISGActState m_sortState;			
+						}private ISGActState m_sortState;			
+							public void Sort(){SetActState(sortState);}
+							public virtual bool isSorting{get{return curActState == sortState;}}
+							public virtual bool wasSorting{get{return prevActState == sortState;}}
 		/*	process	*/
 			/*	Selection Process	*/
 				/* Coroutine */
@@ -243,38 +268,38 @@ namespace SlotSystem{
 				}
 				public SlotGroupCommand onActionExecuteCommand{get{return m_onActionExecuteCommand;}} SlotGroupCommand m_onActionExecuteCommand;
 
-			/*	static	commands	*/
-				public static SlotGroupCommand updateEquippedStatusCommand{
+			/*	commands	*/
+				public SlotGroupCommand updateEquippedStatusCommand{
 					get{
 						return m_updateEquippedStatusCommand;
 					}
-					}static SlotGroupCommand m_updateEquippedStatusCommand = new SGUpdateEquipStatusCommand();
-				public static SlotGroupCommand emptyCommand{
+					}SlotGroupCommand m_updateEquippedStatusCommand = new SGUpdateEquipStatusCommand();
+				public SlotGroupCommand emptyCommand{
 					get{
 						return m_emptyCommand;
 					}
-					}static SlotGroupCommand m_emptyCommand = new SGEmptyCommand();
-				public static SlotGroupCommand updateEquipAtExecutionCommand{
+					}SlotGroupCommand m_emptyCommand = new SGEmptyCommand();
+				public SlotGroupCommand updateEquipAtExecutionCommand{
 					get{
 						return m_updateEquipAtExecutionCommand;
 					}
-					}static SlotGroupCommand m_updateEquipAtExecutionCommand = new SGUpdateEquipAtExecutionCommand();
+					}SlotGroupCommand m_updateEquipAtExecutionCommand = new SGUpdateEquipAtExecutionCommand();
 		/*	sorter	*/
-			public static SGSorter ItemIDSorter{
+			public SGSorter itemIDSorter{
 				get{
 					return m_itemIDSorter;
 				}
-				}static SGSorter m_itemIDSorter = new SGItemIDSorter();
-			public static SGSorter InverseItemIDSorter{
+				}SGSorter m_itemIDSorter = new SGItemIDSorter();
+			public SGSorter inverseIDSorter{
 				get{
 					return m_inverseItemIDSorter;
 				}
-				}static SGSorter m_inverseItemIDSorter = new SGInverseItemIDSorter();
-			public static SGSorter AcquisitionOrderSorter{
+				}SGSorter m_inverseItemIDSorter = new SGInverseItemIDSorter();
+			public SGSorter acquisitionOrderSorter{
 				get{
 					return m_acquisitionOrderSorter;
 				}
-				}static SGSorter m_acquisitionOrderSorter = new SGAcquisitionOrderSorter();
+				}SGSorter m_acquisitionOrderSorter = new SGAcquisitionOrderSorter();
 			
 			public virtual SGSorter sorter{
 				get{return m_sorter;}
@@ -290,41 +315,41 @@ namespace SlotSystem{
 				}
 			}
 		/*	filter	*/
-			public static SGFilter NullFilter{
+			public SGFilter nullFilter{
 				get{
 					if(m_nullFilter == null)
 						m_nullFilter = new SGNullFilter();
 					return m_nullFilter;
 				}
-				}static SGFilter m_nullFilter;
-			public static SGFilter BowFilter{
+				}SGFilter m_nullFilter;
+			public SGFilter bowFilter{
 				get{
 					if(m_bowFilter == null)
 						m_bowFilter = new SGBowFilter();
 					return m_bowFilter;
 				}
-				}static SGFilter m_bowFilter;
-			public static SGFilter WearFilter{
+				}SGFilter m_bowFilter;
+			public SGFilter wearFilter{
 				get{
 					if(m_wearFilter == null)
 						m_wearFilter = new SGWearFilter();
 					return m_wearFilter;
 				}
-				}static SGFilter m_wearFilter;
-			public static SGFilter CGearsFilter{
+				}SGFilter m_wearFilter;
+			public SGFilter cGearsFilter{
 				get{
 					if(m_cGearsFilter == null)
 						m_cGearsFilter = new SGCGearsFilter();
 					return m_cGearsFilter;
 				}
-				}static SGFilter m_cGearsFilter;
-			public static SGFilter PartsFilter{
+				}SGFilter m_cGearsFilter;
+			public SGFilter partsFilter{
 				get{
 					if(m_partsFilter == null)
 						m_partsFilter = new SGPartsFilter();
 					return m_partsFilter;
 				}
-				}static SGFilter m_partsFilter;
+				}SGFilter m_partsFilter;
 			public virtual SGFilter filter{
 				get{return m_filter;}
 				}SGFilter m_filter;
@@ -343,15 +368,6 @@ namespace SlotSystem{
 					else
 						return this.filter is SGPartsFilter;
 				}
-			}
-		/*	events	*/
-			public virtual void OnHoverEnterMock(){
-				PointerEventDataFake eventData = new PointerEventDataFake();
-				curSelState.OnHoverEnterMock(this, eventData);
-			}
-			public virtual void OnHoverExitMock(){
-				PointerEventDataFake eventData = new PointerEventDataFake();
-				curSelState.OnHoverExitMock(this, eventData);
 			}
 		/*	SlotSystemElement implementation	*/
 			/* fields	*/
@@ -391,7 +407,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void FocusSelf(){
-					SetSelState(focusedState);
+					base.Focus();
 				}
 				public virtual void FocusSBs(){
 					foreach(ISlottable sb in this){
@@ -410,7 +426,7 @@ namespace SlotSystem{
 					Reset();
 				}
 				public virtual void DefocusSelf(){
-					SetSelState(defocusedState);
+					base.Defocus();
 				}
 				public virtual void DefocusSBs(){
 					foreach(ISlottable sb in this){
@@ -421,12 +437,7 @@ namespace SlotSystem{
 					}
 				}
 				public override void Deactivate(){
-					SetSelState(deactivatedState);
-					foreach(ISlottable sb in this){
-						if(sb != null){
-							sb.Deactivate();
-						}
-					}
+					base.Deactivate();
 				}
 				public override void PerformInHierarchy(System.Action<ISlotSystemElement> act){
 					act(this);
@@ -448,8 +459,8 @@ namespace SlotSystem{
 				}
 		/*	methods	*/
 			public override void InitializeStates(){
-				SetSelState(deactivatedState);
-				SetActState(SlotGroup.sgWaitForActionState);
+				Deactivate();
+				SetActState(waitForActionState);
 			}
 			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
 				SetInventory(inv);
@@ -532,21 +543,21 @@ namespace SlotSystem{
 				}
 				foreach(ISlottable sb in moveWithins){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
-					sb.SetActState(Slottable.moveWithinState);
+					sb.MoveWithin();
 				}
 				foreach(ISlottable sb in removed){
 					sb.SetNewSlotID(-1);
-					sb.SetActState(Slottable.removedState);
+					sb.Remove();
 				}
 				foreach(ISlottable sb in added){
 					sb.SetNewSlotID(newSBs.IndexOf(sb));
-					sb.SetActState(Slottable.addedState);
+					sb.Add();
 				}
 			}
 			public virtual void OnCompleteSlotMovements(){
 				foreach(ISlottable sb in this){
 					if(sb != null){
-						if(sb.isRemoved){
+						if(sb.isToBeRemoved){
 							sb.Destroy();
 						}else{
 							newSlots[sb.newSlotID].sb = sb;
@@ -578,7 +589,7 @@ namespace SlotSystem{
 				return result;
 			}
 			public virtual void Reset(){
-				SetActState(SlotGroup.sgWaitForActionState);
+				SetActState(waitForActionState);
 				SetNewSBs(null);
 				SetNewSlots(null);
 			}
@@ -640,7 +651,7 @@ namespace SlotSystem{
 					newSB.SetItem(addedItem);
 					newSB.SetSSM(ssm);
 					newSB.Defocus();
-					newSB.SetEqpState(Slottable.unequippedState);
+					newSB.Unequip();
 					list.Fill(newSB);
 				}
 				public void NullifyIndexOf(InventoryItemInstance removedItem, List<ISlottable> list){
@@ -693,7 +704,7 @@ namespace SlotSystem{
 						ISlottable newSB = newSBGO.AddComponent<Slottable>();
 						newSB.SetItem(added.itemInst);
 						newSB.SetSSM(ssm);
-						newSB.SetEqpState(Slottable.unequippedState);
+						newSB.Unequip();
 						newSB.Defocus();
 						list[list.IndexOf(removed)] = newSB;
 					}
@@ -777,7 +788,7 @@ namespace SlotSystem{
 					GameObject newSBGO = new GameObject("newSBGO");
 					ISlottable newSB = newSBGO.AddComponent<Slottable>();
 					newSB.SetItem(item);
-					newSB.InitializeStates();
+					// newSB.InitializeStates();
 					newSB.SetSSM(ssm);
 					slots[items.IndexOf(item)].sb = newSB;
 				}
@@ -799,11 +810,44 @@ namespace SlotSystem{
 	}
 	public interface ISlotGroup: ISlotSystemElement{
 		/* States and Processes */
-			ISSEStateEngine<ISGActState> actStateEngine{get;}
-				void SetActStateEngine(ISSEStateEngine<ISGActState> engine);
-				void SetActState(ISGActState state);
-				ISGActState curActState{get;}
-				ISGActState prevActState{get;}
+			// ISSEStateEngine<ISGActState> actStateEngine{get;}
+			// 	void SetActStateEngine(ISSEStateEngine<ISGActState> engine);
+				// void SetActState(ISGActState state);
+				// ISGActState curActState{get;}
+				// ISGActState prevActState{get;}
+				bool isActStateInit{get;}
+				ISGActState waitForActionState{get;}
+				void WaitForAction();
+				bool isWaitingForAction{get;}
+				bool wasWaitingForAction{get;}
+				ISGActState revertState{get;}
+				void Revert();
+				bool isReverting{get;}
+				bool wasReverting{get;}
+				ISGActState reorderState{get;}
+				void Reorder();
+				bool isReordering{get;}
+				bool wasReordering{get;}
+				ISGActState addState{get;}
+				void Add();
+				bool isAdding{get;}
+				bool wasAdding{get;}
+				ISGActState removeState{get;}
+				void Remove();
+				bool isRemoving{get;}
+				bool wasRemoving{get;}
+				ISGActState swapState{get;}
+				void Swap();
+				bool isSwapping{get;}
+				bool wasSwapping{get;}
+				ISGActState fillState{get;}
+				void Fill();
+				bool isFilling{get;}
+				bool wasFilling{get;}
+				ISGActState sortState{get;}
+				void Sort();
+				bool isSorting{get;}
+				bool wasSorting{get;}
 			ISSEProcessEngine<ISGActProcess> actProcEngine{get;}
 				void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine);
 				ISGActProcess actProcess{get;}
@@ -840,17 +884,25 @@ namespace SlotSystem{
 				SlotGroupCommand onActionCompleteCommand{get;}
 			void OnActionExecute();
 				SlotGroupCommand onActionExecuteCommand{get;}
+			SlotGroupCommand updateEquippedStatusCommand{get;}
+			SlotGroupCommand emptyCommand{get;}
+			SlotGroupCommand updateEquipAtExecutionCommand{get;}
 		/*	Sorter	*/
 			SGSorter sorter{get;}
 				void SetSorter(SGSorter sorter);
 			void InstantSort();
+				SGSorter itemIDSorter{get;}
+				SGSorter inverseIDSorter{get;}
+				SGSorter acquisitionOrderSorter{get;}
 		/*	Filter	*/
 			SGFilter filter{get;}
 				void SetFilter(SGFilter filter);
 			bool AcceptsFilter(ISlottable pickedSB);
-		/*	Events	*/
-			void OnHoverEnterMock();
-			void OnHoverExitMock();
+				SGFilter nullFilter{get;}
+				SGFilter bowFilter{get;}
+				SGFilter wearFilter{get;}
+				SGFilter cGearsFilter{get;}
+				SGFilter partsFilter{get;}
 		/*	SSE */
 			List<ISlottable> toList{get;}
 			void FocusSelf();

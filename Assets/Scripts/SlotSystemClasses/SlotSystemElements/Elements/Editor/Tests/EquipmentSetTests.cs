@@ -130,11 +130,11 @@ namespace SlotSystemTests{
 			public void Focus_WhenCalled_SetsSelStateFocused(){
 				EquipmentSet eSet = MakeEquipmentSet();
 				IEnumerable<ISlotSystemPageElement> pEles = new ISlotSystemPageElement[]{};
-				eSet.pageElements = pEles;
+				eSet.SetPageElements(pEles);
 
 				eSet.Focus();
 
-				Assert.That(eSet.curSelState, Is.SameAs(eSet.focusedState));
+				Assert.That(eSet.isFocused, Is.True);
 			}
 			[Test]
 			public void Focus_WhenCalled_CallsPElesAccordingly(){
@@ -148,7 +148,7 @@ namespace SlotSystemTests{
 				IEnumerable<ISlotSystemPageElement> pEles = new ISlotSystemPageElement[]{
 					bowSGPE, wearSGPE, cGearsSGPE
 				};
-				eSet.pageElements = pEles;
+				eSet.SetPageElements(pEles);
 
 				eSet.Focus();
 
@@ -173,28 +173,7 @@ namespace SlotSystemTests{
 
 				eSet.Deactivate();
 
-				Assert.That(eSet.curSelState, Is.SameAs(eSet.deactivatedState));
-			}
-			[Test]
-			public void Deactivate_WhenCalled_SetsSelStateDeactivatedRecursively(){
-				EquipmentSet eSet = MakeEquipmentSet();
-				ISlotSystemPageElement bowSGPE = MakeSubPageElement();
-					ISlotGroup bowSG = MakeSubSG();
-					bowSGPE.element.Returns(bowSG);
-				ISlotSystemPageElement wearSGPE = MakeSubPageElement();
-					ISlotGroup wearSG = MakeSubSG();
-					wearSGPE.element.Returns(wearSG);
-				ISlotSystemPageElement cGearsSGPE = MakeSubPageElement();
-					ISlotGroup cGearsSG = MakeSubSG();
-					cGearsSGPE.element.Returns(cGearsSG);
-				eSet.Initialize(bowSGPE, wearSGPE, cGearsSGPE);
-				eSet.Focus();
-
-				eSet.Deactivate();
-
-				bowSG.Received().Deactivate();
-				wearSG.Received().Deactivate();
-				cGearsSG.Received().Deactivate();
+				Assert.That(eSet.isDeactivated, Is.True);
 			}
 			[TestCase(true, true, true, false, false, false, true, true, true)]
 			[TestCase(false, false, false, false, false, false, false, false, false)]

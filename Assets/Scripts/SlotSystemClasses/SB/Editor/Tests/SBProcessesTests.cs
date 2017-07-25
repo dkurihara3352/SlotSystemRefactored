@@ -22,13 +22,13 @@ namespace SlotSystemTests{
 				mockSB.Received().PickUp();
 				}
 			[Test]
-			public void WaitForPointerUpProcess_Expire_WhenCalled_SetsSBSelStateDefocused(){
+			public void WaitForPointerUpProcess_Expire_WhenCalled_CallsSBDefocus(){
 				ISlottable mockSB = MakeSubSB();
 				WaitForPointerUpProcess wfpuProc = new WaitForPointerUpProcess(mockSB, FakeCoroutine);
 
 				wfpuProc.Expire();
 
-				mockSB.Received().SetSelState(mockSB.defocusedState);
+				mockSB.Received().Defocus();
 				}
 			[Test]
 			public void WaitForNextTouchProcess_Expire_SBIsPickedUp_CallsSBExecuteTransaction(){

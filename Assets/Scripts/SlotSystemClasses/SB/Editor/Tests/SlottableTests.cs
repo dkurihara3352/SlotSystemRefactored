@@ -14,63 +14,63 @@ namespace SlotSystemTests{
 		[Category("SB")]
 		public class SlottableTests: SlotSystemTest {
 				/*	ActState	*/
-					[Test]
-					public void SetActState_Null_SetsActStateNull(){
-						Slottable sb = MakeSB();
+					// [Test]
+					// public void SetActState_Null_SetsActStateNull(){
+					// 	Slottable sb = MakeSB();
 
-						sb.SetActState(null);
+					// 	sb.SetActState(null);
 
-						Assert.That(sb.curActState, Is.Null);
-						}
-					[Test]
-					public void SetActState_SBActState_SetsActState(){
-						Slottable sb = MakeSB();
-						SBActState stubActState = MakeSubSBActState();
+					// 	Assert.That(sb.curActState, Is.Null);
+					// 	}
+					// [Test]
+					// public void SetActState_SBActState_SetsActState(){
+					// 	Slottable sb = MakeSB();
+					// 	SBActState stubActState = MakeSubSBActState();
 
-						sb.SetActState(stubActState);
+					// 	sb.SetActState(stubActState);
 
-						Assert.That(sb.curActState, Is.SameAs(stubActState));
-						}
+					// 	Assert.That(sb.curActState, Is.SameAs(stubActState));
+					// 	}
 				/*	EqpState	*/
-					[Test]
-					public void SetEqpState_Null_CallsEqpStateEngineSetState(){
-						Slottable sb = MakeSB();
-						ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
-						sb.SetEqpStateEngine(mockEngine);
-						sb.SetEqpState(null);
+				// 	[Test]
+				// 	public void SetEqpState_Null_CallsEqpStateEngineSetState(){
+				// 		Slottable sb = MakeSB();
+				// 		ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
+				// 		sb.SetEqpStateEngine(mockEngine);
+				// 		sb.SetEqpState(null);
 
-						mockEngine.Received().SetState(null);
-						}
-					[Test]
-					public void SetEqpState_SBEqpState_CallsEqpStateEngineSetState(){
-						Slottable sb = MakeSB();
-						ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
-						sb.SetEqpStateEngine(mockEngine);
-						SBEqpState stubEqpState = MakeSubSBEqpState();
-						sb.SetEqpState(stubEqpState);
+				// 		mockEngine.Received().SetState(null);
+				// 		}
+				// 	[Test]
+				// 	public void SetEqpState_SBEqpState_CallsEqpStateEngineSetState(){
+				// 		Slottable sb = MakeSB();
+				// 		ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
+				// 		sb.SetEqpStateEngine(mockEngine);
+				// 		SBEqpState stubEqpState = MakeSubSBEqpState();
+				// 		sb.SetEqpState(stubEqpState);
 
-						mockEngine.Received().SetState(stubEqpState);
-						}
-				/*	Mrk State */
-					[Test]
-					public void SetMrkState_Null_CallsMrkStateEngineSetState(){
-						Slottable sb = MakeSB();
-						ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
-						sb.SetMrkStateEngine(mockEngine);
-						sb.SetMrkState(null);
+				// 		mockEngine.Received().SetState(stubEqpState);
+				// 		}
+				// /*	Mrk State */
+				// 	[Test]
+				// 	public void SetMrkState_Null_CallsMrkStateEngineSetState(){
+				// 		Slottable sb = MakeSB();
+				// 		ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
+				// 		sb.SetMrkStateEngine(mockEngine);
+				// 		sb.SetMrkState(null);
 
-						mockEngine.Received().SetState(null);
-						}
-					[Test]
-					public void SetMrkState_SBMrkState_CallsMrkStateEngineSetState(){
-						Slottable sb = MakeSB();
-						ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
-						sb.SetMrkStateEngine(mockEngine);
-						SBMrkState stubMrkState = MakeSubSBMrkState();
-						sb.SetMrkState(stubMrkState);
+				// 		mockEngine.Received().SetState(null);
+				// 		}
+				// 	[Test]
+				// 	public void SetMrkState_SBMrkState_CallsMrkStateEngineSetState(){
+				// 		Slottable sb = MakeSB();
+				// 		ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
+				// 		sb.SetMrkStateEngine(mockEngine);
+				// 		SBMrkState stubMrkState = MakeSubSBMrkState();
+				// 		sb.SetMrkState(stubMrkState);
 
-						mockEngine.Received().SetState(stubMrkState);
-						}
+				// 		mockEngine.Received().SetState(stubMrkState);
+				// 		}
 			/*	Process	*/
 				/*	ActProc	*/
 					[Test]
@@ -130,37 +130,56 @@ namespace SlotSystemTests{
 
 						mockEngine.Received().SetAndRunProcess(stubProc);
 						}
+			
+			/*	Fields	*/
+				[Test]
+				public void isHierarchySetUp_SGIsSet_ReturnsTrue(){
+					Slottable sb = MakeSB();
+						ISlotSystemManager ssm = MakeSubSSM();
+							ISlotGroup sg = MakeSubSG();
+							ssm.FindParent(sb).Returns(sg);
+						sb.SetSSM(ssm);
+
+					bool actual = sb.isHierarchySetUp;
+
+					Assert.That(actual, Is.True);
+				}
 			/*	Methods	*/
 				[Test]
-				public void InitializeStates_WhenCalled_InitializesStates(){
+				public void InitializeStates_AfterSGIsSet_InitializesStates(){
 					Slottable sb = MakeSB();
+					ISlotSystemManager ssm = MakeSubSSM();
+						ISlotGroup sg = MakeSubSG();
+						ssm.FindParent(sb).Returns(sg);
+					sb.SetSSM(ssm);
 
 					sb.InitializeStates();
 
-					Assert.That(sb.curSelState, Is.SameAs(sb.deactivatedState));
-					Assert.That(sb.prevSelState, Is.Null);
-					Assert.That(sb.curActState, Is.SameAs(Slottable.sbWaitForActionState));
-					Assert.That(sb.prevActState, Is.Null);
-					Assert.That(sb.curEqpState, Is.Null);
-					Assert.That(sb.prevEqpState, Is.Null);
-					Assert.That(sb.curMrkState, Is.SameAs(Slottable.unmarkedState));
-					Assert.That(sb.prevMrkState, Is.Null);
+					Assert.That(sb.isDeactivated, Is.True);
+					Assert.That(sb.isSelStateInit, Is.True);
+					Assert.That(sb.isWaitingForAction, Is.True);
+					Assert.That(sb.isActStateInit, Is.True);
+					Assert.That(sb.isEqpStateInit, Is.True);
+					Assert.That(sb.isEquipped, Is.False);
+					Assert.That(sb.isUnequipped, Is.False);
+					Assert.That(sb.isUnmarked, Is.True);
+					Assert.That(sb.isMrkStateInit, Is.True);
 					}
 				[Test]
-				public void Pickup_WhenCalled_SetsPickedUpState(){
+				public void Pickup_SelStateNotNull_SetsPickedUpState(){
 					Slottable sb = MakeSB();
 					sb.SetSSM(MakeSubSSM());
-					sb.SetSelState(Substitute.For<ISSESelState>());
+					sb.Deactivate();
 					
 					sb.PickUp();
 
-					Assert.That(sb.curActState, Is.SameAs(Slottable.pickedUpState));
+					Assert.That(sb.isPickingUp, Is.True);
 					}
 				[Test]
-				public void Pickup_WhenCalled_SetsPickedAmountOne(){
+				public void Pickup_SelStateNotNull_SetsPickedAmountOne(){
 					Slottable sb = MakeSB();
 					sb.SetSSM(MakeSubSSM());
-					sb.SetSelState(Substitute.For<ISSESelState>());
+					sb.Deactivate();
 					
 					sb.PickUp();
 
@@ -170,6 +189,9 @@ namespace SlotSystemTests{
 				public void Increment_StackableToMoreThanQuantity_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
 					Slottable sb = MakeSB();
 					sb.SetItem(item);
+					ISlotSystemManager ssm = MakeSubSSM();
+					sb.SetSSM(ssm);
+					sb.Deactivate();
 
 					for(int i =0; i< expected *2; i++){
 						sb.Increment();
@@ -193,9 +215,13 @@ namespace SlotSystemTests{
 						}
 					}
 				[TestCaseSource(typeof(IncrementNonStackableCases))]
-				public void Increment_NonStackable_DoesNotIncrement(InventoryItemInstance item){
+				public void Increment_NonStackableAndAfterSSMAndSelStateSet_DoesNotIncrement(InventoryItemInstance item){
 					Slottable sb = MakeSB();
+					ISlotSystemManager ssm = MakeSubSSM();
+					sb.SetSSM(ssm);
+					sb.Deactivate();
 					sb.SetItem(item);
+
 					for(int i = 0; i < 10; i++)
 						sb.Increment();
 
@@ -233,7 +259,7 @@ namespace SlotSystemTests{
 					mockProc.Received().Expire();
 					}
 				[Test]
-				public void UpdateEquipState_ItemInstIsEquipped_SetsEqpStateEquipped(){
+				public void UpdateEquipState_ItemInstIsEquipped_SetsSBEquipped(){
 					Slottable testSB = MakeSB();
 					BowInstance stubBow = MakeBowInstance(0);
 					stubBow.isEquipped = true;
@@ -245,10 +271,10 @@ namespace SlotSystemTests{
 
 					testSB.UpdateEquipState();
 
-					Assert.That(testSB.curEqpState, Is.SameAs(Slottable.equippedState));
+					Assert.That(testSB.isEquipped, Is.True);
 					}
 				[Test]
-				public void UpdateEquipState_ItemInstIsNotEquipped_SetsEqpStateUnequipped(){
+				public void UpdateEquipState_ItemInstIsNotEquipped_SetsSBUnequipped(){
 					Slottable testSB = MakeSB();
 					BowInstance stubBow = MakeBowInstance(0);
 					stubBow.isEquipped = false;
@@ -260,7 +286,7 @@ namespace SlotSystemTests{
 
 					testSB.UpdateEquipState();
 
-					Assert.That(testSB.curEqpState, Is.SameAs(Slottable.unequippedState));
+					Assert.That(testSB.isUnequipped, Is.True);
 					}
 				[Test]
 				public void Reset_WhenCalled_SetsActStateWFAState(){
@@ -268,7 +294,7 @@ namespace SlotSystemTests{
 					
 					sb.Reset();
 
-					Assert.That(sb.curActState, Is.SameAs(Slottable.sbWaitForActionState));
+					Assert.That(sb.isWaitingForAction, Is.True);
 					}
 				[Test]
 				public void Reset_WhenCalled_SetsPickedAmountZero(){

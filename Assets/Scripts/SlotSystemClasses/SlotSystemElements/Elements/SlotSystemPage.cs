@@ -46,8 +46,8 @@ namespace SlotSystem{
 				get{
 					return m_pageElements;
 				}
-				set{m_pageElements = value;}
 			}protected IEnumerable<ISlotSystemPageElement> m_pageElements;
+			public virtual void SetPageElements(IEnumerable<ISlotSystemPageElement> pes){m_pageElements = pes;}
 		public virtual ISlotSystemPageElement GetPageElement(ISlotSystemElement element){
 			foreach(ISlotSystemPageElement pageEle in pageElements){
 				if(pageEle.element == element)
@@ -57,7 +57,8 @@ namespace SlotSystem{
 		}
 	}
 	public interface ISlotSystemPage: ISlotSystemElement{
-		IEnumerable<ISlotSystemPageElement> pageElements{get;set;}
+		IEnumerable<ISlotSystemPageElement> pageElements{get;}
+		void SetPageElements(IEnumerable<ISlotSystemPageElement> pes);
 		void PageFocus();
 		void ToggleBack();
 		void TogglePageElementFocus(ISlotSystemElement ele, bool toggle);

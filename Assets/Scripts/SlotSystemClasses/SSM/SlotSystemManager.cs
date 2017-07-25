@@ -202,7 +202,7 @@ namespace SlotSystem{
 					}
 			/*	methods	*/
 				public void Reset(){
-					SetActState(SlotSystemManager.ssmWaitForActionState);
+					SetActState(waitForActionState);
 					ClearFields();
 				}
 				public void ResetAndFocus(){
@@ -304,10 +304,10 @@ namespace SlotSystem{
 						if(sb.itemInst == item){
 							if(sb.sg.isFocusedInHierarchy){/*	focused sgp or sge	*/
 								if(sb.newSlotID != -1)/*	not being removed	*/
-									sb.SetEqpState(Slottable.equippedState);
+									sb.Equip();
 							}else if(sb.sg.isPool){/*	defocused sgp, setting equipped w/o transition	*/
-								sb.SetEqpState(null);
-								sb.SetEqpState(Slottable.equippedState);
+								sb.ClearEqpState();
+								sb.Equip();
 							}
 						}
 					}
@@ -320,10 +320,10 @@ namespace SlotSystem{
 						if(sb.itemInst == item){
 							if(sb.sg.isFocusedInHierarchy){
 								if(sb.slotID != -1)/*	not being added	*/
-									sb.SetEqpState(Slottable.unequippedState);
+									sb.Unequip();
 							}else if(sb.sg.isPool){/*	defocused sgp	*/
-								sb.SetEqpState(null);
-								sb.SetEqpState(Slottable.unequippedState);
+								sb.ClearEqpState();
+								sb.Unequip();
 							}
 						}
 					}
@@ -351,45 +351,56 @@ namespace SlotSystem{
 		/*	SlotSystemElement	*/
 			/*	States	*/
 				/*	Action state	*/
-					public ISSEStateEngine<ISSMActState> actStateEngine{
+					ISSEStateEngine<ISSMActState> actStateEngine{
 						get{
 							if(m_actStateEngine == null)
 								m_actStateEngine = new SSEStateEngine<ISSMActState>(this);
 							return m_actStateEngine;
 						}
 						}ISSEStateEngine<ISSMActState> m_actStateEngine;
-					public void SetActStateEngine(ISSEStateEngine<ISSMActState> engine){m_actStateEngine = engine;}
-					public virtual ISSMActState curActState{
+					void SetActStateEngine(ISSEStateEngine<ISSMActState> engine){m_actStateEngine = engine;}
+					ISSMActState curActState{
 						get{return actStateEngine.curState;}
 					}
-					public virtual ISSMActState prevActState{
+					ISSMActState prevActState{
 						get{return actStateEngine.prevState;}
 					}
-					public virtual void SetActState(ISSMActState state){
+					void SetActState(ISSMActState state){
 						actStateEngine.SetState(state);
 					}
+					public virtual bool isActStateInit{get{return prevActState == null;}}
+					public virtual void ClearActState(){SetActState(null); SetActState(null);}
 					/* Static states */
-						public static ISSMActState ssmWaitForActionState{
+						public ISSMActState waitForActionState{
 							get{
-								if(m_ssmWaitForActionState == null)
-									m_ssmWaitForActionState = new SSMWaitForActionState();
-								return m_ssmWaitForActionState;
+								if(m_waitForActionState == null)
+									m_waitForActionState = new SSMWaitForActionState();
+								return m_waitForActionState;
 							}
-							}static ISSMActState m_ssmWaitForActionState;
-						public static ISSMActState ssmProbingState{
+							}ISSMActState m_waitForActionState;
+							public virtual void WaitForAction(){SetActState(waitForActionState);}
+							public virtual bool isWaitingForAction{get{return curActState == waitForActionState;}}
+							public virtual bool wasWaitingForAction{get{return prevActState == waitForActionState;}}
+						public ISSMActState probingState{
 							get{
-								if(m_ssmProbingState == null)
-									m_ssmProbingState = new SSMProbingState();
-								return m_ssmProbingState;
+								if(m_probingState == null)
+									m_probingState = new SSMProbingState();
+								return m_probingState;
 							}
-							}static ISSMActState m_ssmProbingState;
-						public static ISSMActState ssmTransactionState{
+							}ISSMActState m_probingState;
+							public virtual void Probe(){SetActState(probingState);}
+							public virtual bool isProbing{get{return curActState == probingState;}}
+							public virtual bool wasProbing{get{return prevActState == probingState;}}
+						public ISSMActState transactionState{
 							get{
-								if(m_ssmTransactionState == null)
-									m_ssmTransactionState = new SSMTransactionState();
-								return m_ssmTransactionState;
+								if(m_transactionState == null)
+									m_transactionState = new SSMTransactionState();
+								return m_transactionState;
 							}
-							}static ISSMActState m_ssmTransactionState;
+							}ISSMActState m_transactionState;
+							public virtual void Transact(){SetActState(transactionState);}
+							public virtual bool isTransacting{get{return curActState == transactionState;}}
+							public virtual bool wasTransacting{get{return prevActState == transactionState;}}
 			/*	process	*/
 				/*	Selection Process	*/
 					/* Coroutine */
@@ -451,15 +462,6 @@ namespace SlotSystem{
 							yield return ele;
 					}
 				}
-				public override bool isFocused{
-					get{return curSelState == focusedState;}
-				}
-				public override bool isDefocused{
-					get{return curSelState == defocusedState;}
-				}
-				public override bool isDeactivated{
-					get{return curSelState == deactivatedState;}
-				}
 				public override ISlotSystemManager ssm{get{return this;}}
 			/*	methods	*/
 				public void InspectorSetUp(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns){
@@ -485,8 +487,8 @@ namespace SlotSystem{
 					PerformInHierarchy(InitStatesInHi);
 				}
 				public override void InitializeStates(){
-					SetSelState(deactivatedState);
-					SetActState(SlotSystemManager.ssmWaitForActionState);
+					base.Deactivate();
+					WaitForAction();
 				}
 				public void InitStatesInHi(ISlotSystemElement element){
 					element.InitializeStates();
@@ -521,23 +523,6 @@ namespace SlotSystem{
 					SetCurSSM();
 					UpdateEquipStatesOnAll();
 					Focus();
-				}
-				public override void Deactivate(){
-					SetSelState(deactivatedState);
-					foreach(ISlotSystemElement ele in this){
-						ele.Deactivate();
-					}
-					ToggleBack();
-				}
-				public override void Focus(){
-					SetSelState(focusedState);
-					PageFocus();
-				}
-				public override void Defocus(){
-					SetSelState(defocusedState);
-					foreach(ISlotSystemElement ele in this){
-						ele.Defocus();
-					}
 				}
 				public void FindAndFocusInBundle(ISlotSystemElement ele){
 					PerformInHierarchy(FocusInBundle, ele);
@@ -584,19 +569,19 @@ namespace SlotSystem{
 			public void AcceptSGTAComp(ISlotGroup sg){
 				if(sg2 != null && sg == sg2) m_sg2Done = true;
 				else if(sg1 != null && sg == sg1) m_sg1Done = true;
-				if(curActState == SlotSystemManager.ssmTransactionState){
+				if(isTransacting){
 					transactionCoroutine();
 				}
 			}
 			public void AcceptDITAComp(DraggedIcon di){
 				if(dIcon2 != null && di == dIcon2) m_dIcon2Done = true;
 				else if(dIcon1 != null && di == dIcon1) m_dIcon1Done = true;
-				if(curActState == SlotSystemManager.ssmTransactionState){
+				if(isTransacting){
 					transactionCoroutine();
 				}
 			}
 			public void ExecuteTransaction(){
-				SetActState(SlotSystemManager.ssmTransactionState);
+				Transact();
 				transaction.Execute();
 			}
 			public virtual ISlottable pickedSB{get{return m_pickedSB;}} ISlottable m_pickedSB;
@@ -605,10 +590,10 @@ namespace SlotSystem{
 				public void SetTargetSB(ISlottable sb){
 					if(sb == null || sb != targetSB){
 						if(targetSB != null)
-							targetSB.SetSelState(targetSB.focusedState);
+							targetSB.Focus();
 						this.m_targetSB = sb;
 						if(targetSB != null)
-							targetSB.SetSelState(targetSB.selectedState);
+							targetSB.Select();
 					}
 				}
 			public ISlotGroup sg1{get{return m_sg1;}} ISlotGroup m_sg1;
@@ -631,7 +616,7 @@ namespace SlotSystem{
 							ReferToTAAndUpdateSelState(sg2);
 						this.m_sg2 = sg;
 						if(sg2 != null)
-							sg2.SetSelState(sg2.selectedState);
+							sg.Select();
 						if(sg2 != null)
 							m_sg2Done = false;
 						else
@@ -713,12 +698,12 @@ namespace SlotSystem{
 					ISlotSystemTransaction ta = null;
 					if(transactionResults.TryGetValue(sg, out ta)){
 						if(ta is IRevertTransaction)
-							sg.SetSelState(sg.defocusedState);
+							sg.Defocus();
 						else
-							sg.SetSelState(sg.focusedState);
+							sg.Focus();
 					}
 				}else
-					sg.SetSelState(sg.focusedState);
+					sg.Focus();
 			}
 			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
 				return taFactory.MakeTransaction(pickedSB, hovered);
@@ -729,11 +714,25 @@ namespace SlotSystem{
 		void Initialize();
 		IEnumeratorFake probeCoroutine();
 		/* States And Process */
-			ISSEStateEngine<ISSMActState> actStateEngine{get;}
-				void SetActStateEngine(ISSEStateEngine<ISSMActState> engine);
-				void SetActState(ISSMActState state);
-				ISSMActState curActState{get;}
-				ISSMActState prevActState{get;}
+			// ISSEStateEngine<ISSMActState> actStateEngine{get;}
+			// 	void SetActStateEngine(ISSEStateEngine<ISSMActState> engine);
+			// 	void SetActState(ISSMActState state);
+			// 	ISSMActState curActState{get;}
+			// 	ISSMActState prevActState{get;}
+					bool isActStateInit{get;}
+					void ClearActState();
+					ISSMActState waitForActionState{get;}
+					void WaitForAction();
+					bool isWaitingForAction{get;}
+					bool wasWaitingForAction{get;}
+					ISSMActState probingState{get;}
+					void Probe();
+					bool isProbing{get;}
+					bool wasProbing{get;}
+					ISSMActState transactionState{get;}
+					void Transact();
+					bool isTransacting{get;}
+					bool wasTransacting{get;}
 			ISSEProcessEngine<ISSMActProcess> actProcEngine{get;}
 				void SetActProcEngine(ISSEProcessEngine<ISSMActProcess> engine);
 				void SetAndRunActProcess(ISSMActProcess process);

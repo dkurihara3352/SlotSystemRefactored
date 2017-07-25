@@ -50,25 +50,25 @@ namespace SlotSystemTests{
 						});
 						}
 					[Test]
-					public void WaitForActionState_OnPointerDown_IsNotFocused_SetsActStateWFPointerUpState(){
+					public void WaitForActionState_OnPointerDown_IsNotFocused_CallsSBWaitForPointerUp(){
 						WaitForActionState wfaState = new WaitForActionState();
 						ISlottable mockSB = MakeSubSB();
 						mockSB.isFocused.Returns(false);
 
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						mockSB.Received().SetActState(Slottable.waitForPointerUpState);
+						mockSB.Received().WaitForPointerUp();
 						}
 					[Test]
-					public void WaitForActionState_OnPointerDown_IsFocused_SetsComplexStates(){
+					public void WaitForActionState_OnPointerDown_IsFocused_CallsSBWaitForPickupAndSelect(){
 						WaitForActionState wfaState = new WaitForActionState();
 						ISlottable mockSB = MakeSubSB();
 						mockSB.isFocused.Returns(true);
 
 						wfaState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						mockSB.Received().SetActState(Slottable.waitForPickUpState);
-						mockSB.Received().SetSelState(mockSB.selectedState);
+						mockSB.Received().WaitForPickUp();
+						mockSB.Received().Select();
 						}
 
 				/*	WaitForPickUpState	*/
@@ -82,13 +82,13 @@ namespace SlotSystemTests{
 						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForPickUpProcess>());
 						}
 					[Test]
-					public void WaitForPickUpState_OnPointerUp_WhenCalled_SetsActStateWFNTState(){
+					public void WaitForPickUpState_OnPointerUp_WhenCalled_CallsSBWaitForNextTouch(){
 						WaitForPickUpState wfpuState = new WaitForPickUpState();
 						ISlottable mockSB = MakeSubSB();
 
 						wfpuState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						mockSB.Received().SetActState(Slottable.waitForNextTouchState);
+						mockSB.Received().WaitForNextTouch();
 						}
 					[Test]
 					public void WaitForPickUpState_OnEndDrag_WhenCalled_CallsSBMethods(){
@@ -148,14 +148,24 @@ namespace SlotSystemTests{
 						mockSB.Received().SetAndRunActProcess(Arg.Any<WaitForNextTouchProcess>());
 						}
 					[Test]
-					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_SetsActStatePickedUpState(){
+					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_DoesNotCallsSBPickUp(){
 						WaitForNextTouchState wfntState = new WaitForNextTouchState();
 						ISlottable mockSB = MakeSubSB();
 						mockSB.isPickedUp.Returns(true);
 
 						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
 
-						mockSB.Received().SetActState(Slottable.pickedUpState);
+						mockSB.DidNotReceive().PickUp();
+						}
+					[Test]
+					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_CallsSBIncrement(){
+						WaitForNextTouchState wfntState = new WaitForNextTouchState();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isPickedUp.Returns(true);
+
+						wfntState.OnPointerDownMock(mockSB, new PointerEventDataFake());
+
+						mockSB.Received().Increment();
 						}
 					[Test]
 					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_CallSBIncrement(){
@@ -209,7 +219,7 @@ namespace SlotSystemTests{
 						});
 						}
 					[Test]
-					public void PickedUpState_EnterState_WhenCalled_SetsSSMActStateProbing(){
+					public void PickedUpState_EnterState_WhenCalled_CallsSBProbe(){
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
 						ISlotSystemManager stubSSM = MakeSubSSM();
@@ -217,7 +227,7 @@ namespace SlotSystemTests{
 
 						puState.EnterState(mockSB);
 
-						mockSB.Received().SetSSMActState(SlotSystemManager.ssmProbingState);
+						mockSB.Received().Probe();
 						}
 					[Test]
 					public void PickedUpState_EnterState_WhenCalled_SetsActProcPickedUpProcess(){
@@ -243,7 +253,7 @@ namespace SlotSystemTests{
 						});
 						}
 					[Test]
-					public void PickedUpState_OnPointerUp_IsHoveredAndIsStackable_SetsActStateWFNTState(){
+					public void PickedUpState_OnPointerUp_IsHoveredAndIsStackable_CallsSBWaitForNextTouch(){
 						PickedUpState puState = new PickedUpState();
 						ISlottable mockSB = MakeSubSB();
 						mockSB.isHovered.Returns(true);
@@ -251,7 +261,7 @@ namespace SlotSystemTests{
 
 						puState.OnPointerUpMock(mockSB, new PointerEventDataFake());
 
-						mockSB.Received().SetActState(Slottable.waitForNextTouchState);
+						mockSB.Received().WaitForNextTouch();
 						}
 					[Test]
 					public void PickedUpState_OnPointerUp_NOTIsHoveredAndIsStackable_CallSB(){
@@ -306,10 +316,11 @@ namespace SlotSystemTests{
 
 			/*	SBEqpStates	*/
 				[Test]
-				public void SBEquippedState_EnterState_IsPoolAndPrevEqpStateUnequipped_SetsEqpProcEquipProc(){
+				public void SBEquippedState_EnterState_IsHiSetUpAndIsPoolAndIsUnequipped_SetsEqpProcEquipProc(){
 					SBEquippedState eqState = new SBEquippedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevEqpState.Returns(Slottable.unequippedState);
+					mockSB.isHierarchySetUp.Returns(true);
+					mockSB.isUnequipped.Returns(true);
 					mockSB.isPool.Returns(true);
 					eqState.EnterState(mockSB);
 
@@ -317,10 +328,11 @@ namespace SlotSystemTests{
 					}
 			/*	SBUnequipState	*/
 				[Test]
-				public void SBUnequippedState_EnterState_IsPoolAndPrevEqpStateEquipped_SetsEqpProcUnequipProc(){
+				public void SBUnequippedState_EnterState_IsHiSetUpAndIsPoolAndIsEquipped_SetsEqpProcUnequipProc(){
 					SBUnequippedState unequipeedState = new SBUnequippedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevEqpState.Returns(Slottable.equippedState);
+					mockSB.isHierarchySetUp.Returns(true);
+					mockSB.isEquipped.Returns(true);
 					mockSB.isPool.Returns(true);
 
 					unequipeedState.EnterState(mockSB);
@@ -329,10 +341,11 @@ namespace SlotSystemTests{
 					}
 			/*	SBMarkedState	*/
 				[Test]
-				public void SBMarkedState_EnterState_IsPoolAndPrevEqpStateUnmarked_SetsMrkProcMarkProcess(){
+				public void SBMarkedState_EnterState_IsHiSetUpAndIsPoolAndIsUnmarked_SetsMrkProcMarkProcess(){
 					SBMarkedState markedState = new SBMarkedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevMrkState.Returns(Slottable.unmarkedState);
+					mockSB.isHierarchySetUp.Returns(true);
+					mockSB.isUnmarked.Returns(true);
 					mockSB.isPool.Returns(true);
 
 					markedState.EnterState(mockSB);
@@ -341,10 +354,11 @@ namespace SlotSystemTests{
 					}
 			/*	SBUnmarkedState	*/
 				[Test]
-				public void SBUnmarkedState_EnterState_IsPoolAndPrevMrkStateMarked_SetsMrkProcUnmarkProcess(){
+				public void SBUnmarkedState_EnterState_IsHiSetUpAndIsPoolAndIsMarked_SetsMrkProcUnmarkProcess(){
 					SBUnmarkedState unmarkedState = new SBUnmarkedState();
 					ISlottable mockSB = MakeSubSB();
-					mockSB.prevMrkState.Returns(Slottable.markedState);
+					mockSB.isHierarchySetUp.Returns(true);
+					mockSB.isMarked.Returns(true);
 					mockSB.isPool.Returns(true);
 
 					unmarkedState.EnterState(mockSB);

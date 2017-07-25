@@ -80,7 +80,7 @@ namespace SlotSystemTests{
 
 				gPage.Focus();
 
-				Assert.That(gPage.curSelState, Is.SameAs(gPage.focusedState));
+				Assert.That(gPage.isFocused, Is.True);
 			}
 			[TestCase(true, true)]
 			[TestCase(true, false)]
@@ -90,17 +90,15 @@ namespace SlotSystemTests{
 				bool isON_A, bool isON_B){
 				GenericPage gPage = MakeGenPage();
 				ISlotSystemPageElement pEle_A = MakeSubPageElement();
-					ISlotSystemElement ele_A = MakeSubSSE();
-					pEle_A.element.Returns(ele_A);
 					pEle_A.isFocusToggleOn.Returns(isON_A);
+					pEle_A.isFocusedOnActivate.Returns(isON_A);
 				ISlotSystemPageElement pEle_B = MakeSubPageElement();
-					ISlotSystemElement ele_B = MakeSubSSE();
-					pEle_B.element.Returns(ele_B);
 					pEle_B.isFocusToggleOn.Returns(isON_B);
+					pEle_B.isFocusedOnActivate.Returns(isON_B);
 				IEnumerable<ISlotSystemPageElement> pEles = new ISlotSystemPageElement[]{
 					pEle_A, pEle_B
 				};
-				gPage.Initialize("someName", pEles);
+				gPage.Initialize("gPage", pEles);
 
 				gPage.Focus();
 				if(isON_A)
@@ -129,7 +127,7 @@ namespace SlotSystemTests{
 
 				gPage.Deactivate();
 				
-				Assert.That(gPage.curSelState, Is.SameAs(gPage.deactivatedState));
+				Assert.That(gPage.isDeactivated, Is.True);
 			}
 			[TestCase(
 				true, true,

@@ -40,11 +40,11 @@ namespace SlotSystem{
                 }
                 public override void OnPointerDownMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     if(sb.isFocused){
-                        sb.SetSelState(sb.selectedState);
-                        sb.SetActState(Slottable.waitForPickUpState);
+                        sb.Select();
+                        sb.WaitForPickUp();
                     }
                     else
-                        sb.SetActState(Slottable.waitForPointerUpState);
+                        sb.WaitForPointerUp();
                 }
                 public override void OnDeselectedMock(ISlottable sb, PointerEventDataFake eventDataMock){}
                 public override void ExitState(IStateHandler sh){
@@ -58,7 +58,7 @@ namespace SlotSystem{
                     sb.SetAndRunActProcess(wfpuProcess);
                 }
                 public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
-                    sb.SetActState(Slottable.waitForNextTouchState);
+                    sb.WaitForNextTouch();
                 }
                 public override void OnEndDragMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     sb.Reset();
@@ -101,7 +101,6 @@ namespace SlotSystem{
                     if(!sb.isPickedUp)
                         sb.PickUp();
                     else{
-                        sb.SetActState(Slottable.pickedUpState);
                         sb.Increment();
                     }
                 }
@@ -120,7 +119,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     sb.SetPickedSB();
-                    sb.SetSSMActState(SlotSystemManager.ssmProbingState);
+                    sb.Probe();
                     sb.SetDIcon1();
                     sb.CreateTAResult();
                     sb.OnHoverEnterMock();
@@ -134,7 +133,7 @@ namespace SlotSystem{
                 }
                 public override void OnPointerUpMock(ISlottable sb, PointerEventDataFake eventDataMock){
                     if(sb.isHovered && sb.isStackable)
-                        sb.SetActState(Slottable.waitForNextTouchState);
+                        sb.WaitForNextTouch();
                     else
                         sb.ExecuteTransaction();
                 }
@@ -197,8 +196,10 @@ namespace SlotSystem{
             public class SBEquippedState: SBEqpState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
+                    if(!sb.isHierarchySetUp)
+                        return;
                     if(sb.isPool){
-                        if(sb.prevEqpState != null && sb.prevEqpState == Slottable.unequippedState){
+                        if(sb.isUnequipped){
                             ISBEqpProcess process = new SBEquipProcess(sb, sb.EquipCoroutine);
                             sb.SetAndRunEqpProcess(process);
                         }
@@ -211,12 +212,10 @@ namespace SlotSystem{
             public class SBUnequippedState: SBEqpState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    if(sb.prevEqpState == null || sb.prevEqpState == Slottable.unequippedState){
-                        /*	when initialized	*/
+                    if(!sb.isHierarchySetUp) 
                         return;
-                    }
                     if(sb.isPool){
-                        if(sb.prevEqpState != null && sb.prevEqpState == Slottable.equippedState){
+                        if(sb.isEquipped){
                             ISBEqpProcess process = new SBUnequipProcess(sb, sb.UnequipCoroutine);
                             sb.SetAndRunEqpProcess(process);
                         }
@@ -231,8 +230,10 @@ namespace SlotSystem{
             public class SBMarkedState: SBMrkState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
+                    if(!sb.isHierarchySetUp)
+                        return;
                     if(sb.isPool){
-                        if(sb.prevMrkState != null && sb.prevMrkState == Slottable.unmarkedState){
+                        if(sb.isUnmarked){
                             ISBMrkProcess process = new SBMarkProcess(sb, sb.markCoroutine);
                             sb.SetAndRunMrkProcess(process);
                         }
@@ -245,12 +246,10 @@ namespace SlotSystem{
             public class SBUnmarkedState: SBMrkState{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    if(sb.prevMrkState == null || sb.prevMrkState == Slottable.unmarkedState){
-                        /*	when initialized	*/
+                    if(!sb.isHierarchySetUp)
                         return;
-                    }
                     if(sb.isPool){
-                        if(sb.prevMrkState != null && sb.prevMrkState == Slottable.markedState){
+                        if(sb.isMarked){
                             ISBMrkProcess process = new SBUnmarkProcess(sb, sb.unmarkCoroutine);
                             sb.SetAndRunMrkProcess(process);
                         }

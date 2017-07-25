@@ -18,7 +18,7 @@ namespace SlotSystem{
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1.SetSorter(m_sorter);
-			sg1.SetActState(SlotGroup.sortState);
+			sg1.Sort();
 			sg1.OnActionExecute();
 			base.Execute();
 		}
