@@ -65,6 +65,14 @@ namespace SlotSystem{
 			m_isRemoving = orig.isRemoving;
 			m_isAdding = orig.isAdding;
 			m_isMovingWithin = orig.isMovingWithin;
+			m_wasWaitingForAction = orig.wasWaitingForAction;
+			m_wasWaitingForPointerUp = orig.wasWaitingForPointerUp;
+			m_wasWaitingForPickUp = orig.wasWaitingForPickUp;
+			m_wasWaitingForNextTouch = orig.wasWaitingForNextTouch;
+			m_wasPickingUp = orig.wasPickingUp;
+			m_wasRemoving = orig.wasRemoving;
+			m_wasAdding = orig.wasAdding;
+			m_wasMovingWithin = orig.wasMovingWithin;
 
 			m_isEquipped = orig.isEquipped;
 			m_isUnequipped = orig.isUnequipped;

@@ -2873,54 +2873,37 @@ namespace SlotSystemTests{
 					mockSG.Received().Focus();
 					}
 				[TestCaseSource(typeof(ReferToTAAndUpdateSelState_VariousTAsCases))]
-				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotGroup mockSG, ISlotSystemTransaction ta, ISSESelState state){
+				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotSystemTransaction ta, bool focused){
+					ISlotGroup mockSG = MakeSubSG();
 					SlotSystemManager ssm = MakeSSM();
 					Dictionary<ISlotSystemElement, ISlotSystemTransaction> dict = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 						dict.Add(mockSG, ta);
 						ssm.transactionResults = dict;
 					ssm.ReferToTAAndUpdateSelState(mockSG);
-					if(state is SSEDefocusedState)
-						mockSG.Received().Defocus();
-					else if(state is SSEFocusedState)
+					if(focused)
 						mockSG.Received().Focus();
+					else
+						mockSG.Received().Defocus();
 					}
 					class ReferToTAAndUpdateSelState_VariousTAsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] revert_def;
-								ISlotGroup mockSG_0 = MakeSubSG();
-								SSEDefocusedState def_0 = Substitute.For<SSEDefocusedState>();
-								mockSG_0.defocusedState.Returns(def_0);
-								revert_def = new object[]{mockSG_0, Substitute.For<IRevertTransaction>(), def_0};
+								revert_def = new object[]{Substitute.For<IRevertTransaction>(), false};
 								yield return revert_def;
 							object[] reorder_foc;
-								ISlotGroup mockSG_1 = MakeSubSG();
-								SSEFocusedState foc_1 = Substitute.For<SSEFocusedState>();
-								mockSG_1.focusedState.Returns(foc_1);
-								reorder_foc = new object[]{mockSG_1, Substitute.For<IReorderTransaction>(), foc_1};
+								reorder_foc = new object[]{Substitute.For<IReorderTransaction>(), true};
 								yield return reorder_foc;
 							object[] sort_foc;
-								ISlotGroup mockSG_2 = MakeSubSG();
-								SSEFocusedState foc_2 = Substitute.For<SSEFocusedState>();
-								mockSG_2.focusedState.Returns(foc_2);
-								sort_foc = new object[]{mockSG_2, Substitute.For<ISortTransaction>(), foc_2};
+								sort_foc = new object[]{Substitute.For<ISortTransaction>(), true};
 								yield return sort_foc;
 							object[] fill_foc;
-								ISlotGroup mockSG_3 = MakeSubSG();
-								SSEFocusedState foc_3 = Substitute.For<SSEFocusedState>();
-								mockSG_3.focusedState.Returns(foc_3);
-								fill_foc = new object[]{mockSG_3, Substitute.For<IFillTransaction>(), foc_3};
+								fill_foc = new object[]{Substitute.For<IFillTransaction>(), true};
 								yield return fill_foc;
 							object[] swap_foc;
-								ISlotGroup mockSG_4 = MakeSubSG();
-								SSEFocusedState foc_4 = Substitute.For<SSEFocusedState>();
-								mockSG_4.focusedState.Returns(foc_4);
-								swap_foc = new object[]{mockSG_4, Substitute.For<ISwapTransaction>(), foc_4};
+								swap_foc = new object[]{Substitute.For<ISwapTransaction>(), true};
 								yield return swap_foc;
 							object[] stack_foc;
-								ISlotGroup mockSG_5 = MakeSubSG();
-								SSEFocusedState foc_5 = Substitute.For<SSEFocusedState>();
-								mockSG_5.focusedState.Returns(foc_5);
-								stack_foc = new object[]{mockSG_5, Substitute.For<IStackTransaction>(), foc_5};
+								stack_foc = new object[]{Substitute.For<IStackTransaction>(), true};
 								yield return stack_foc;
 						}
 					}

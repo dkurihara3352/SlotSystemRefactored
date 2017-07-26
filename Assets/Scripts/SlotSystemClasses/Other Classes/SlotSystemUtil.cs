@@ -121,14 +121,14 @@ namespace SlotSystem{
 			}
 			public static string SSEProcessName(ISSEProcess process){
 				string res = "";
-				if(process is SSEGreyinProcess)
-					res = SlotSystemUtil.Blue("Greyin");
-				else if(process is SSEGreyoutProcess)
-					res = SlotSystemUtil.Green("Greyout");
-				else if(process is SSEHighlightProcess)
-					res = SlotSystemUtil.Red("Highlight");
-				else if(process is SSEDehighlightProcess)
-					res = SlotSystemUtil.Brown("Dehighlight");
+				if(process is SSEDeactivateProcess)
+					res = SlotSystemUtil.Blue("DeactivateProc");
+				else if(process is SSEFocusProcess)
+					res = SlotSystemUtil.Green("FocusProc");
+				else if(process is SSEDefocusProcess)
+					res = SlotSystemUtil.Red("DefocusProc");
+				else if(process is SSESelectProcess)
+					res = SlotSystemUtil.Brown("SelectProc");
 				return res;
 			}
 		/*	SSM	*/

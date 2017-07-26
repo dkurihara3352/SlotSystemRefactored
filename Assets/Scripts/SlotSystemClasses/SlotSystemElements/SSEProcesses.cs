@@ -6,11 +6,11 @@ using System;
 namespace SlotSystem{
 	public class SSEProcess: ISSEProcess{
 		public virtual bool isRunning{ get{return m_isRunning;} }bool m_isRunning;
-		public System.Func<IEnumeratorFake> coroutineFake{ set{m_coroutineMock = value;}} System.Func<IEnumeratorFake> m_coroutineMock;
-		protected ISlotSystemElement sse{ get{return m_sse;} set{m_sse = value;}} ISlotSystemElement m_sse;
+		public System.Func<IEnumeratorFake> coroutineFake{get{return m_coroutineFake;} set{m_coroutineFake = value;}} System.Func<IEnumeratorFake> m_coroutineFake;
+		public ISlotSystemElement sse{ get{return m_sse;} set{m_sse = value;}} ISlotSystemElement m_sse;
 		public virtual void Start(){
 			m_isRunning = true;
-			m_coroutineMock();
+			m_coroutineFake();
 		}
 		public virtual void Stop(){ if(isRunning) m_isRunning = false; }
 		public virtual void Expire(){if(isRunning) m_isRunning = false; }
@@ -19,10 +19,16 @@ namespace SlotSystem{
 				return this.GetType().Equals(other.GetType());
 			else return false;
 		}
+		public SSEProcess(){}
+		public SSEProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutine){
+			m_sse = sse;
+			m_coroutineFake = coroutine;
+		}
 	}
 		public interface ISSEProcess: IEquatable<ISSEProcess>{
 			bool isRunning{get;}
-			System.Func<IEnumeratorFake> coroutineFake{set;}
+			System.Func<IEnumeratorFake> coroutineFake{get; set;}
+			ISlotSystemElement sse{get;}
 			void Start();
 			void Stop();
 			void Expire();
@@ -84,30 +90,6 @@ namespace SlotSystem{
 					if any indicator for selection is not there, fade it in
 				*/
 				public SSESelectProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
-			}
-			public class SSEGreyinProcess: SSESelProcess{
-				public SSEGreyinProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
-			}
-			public class SSEGreyoutProcess: SSESelProcess{
-				public SSEGreyoutProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
-			}
-			public class SSEHighlightProcess: SSESelProcess{
-				public SSEHighlightProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
-			}
-			public class SSEDehighlightProcess: SSESelProcess{
-				public SSEDehighlightProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
 					this.sse = sse;
 					this.coroutineFake = coroutineMock;
 				}

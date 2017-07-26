@@ -22,51 +22,55 @@ namespace SlotSystem{
 			void SetSelState(ISSESelState state){
 				selStateEngine.SetState(state);
 			}
+			public bool isSelStateInit{get{return prevSelState ==null;}}
 			/*	selStates	*/
-				public bool isSelStateInit{get{return prevSelState ==null;}}
-				public ISSESelState deactivatedState{
+				ISSESelState deactivatedState{
 					get{
 						if(m_deactivatedState == null)
 							m_deactivatedState = new SSEDeactivatedState();
 						return m_deactivatedState;
 					}
 					}ISSESelState m_deactivatedState;
+					public void SetDeactivatedState(ISSESelState state){m_deactivatedState = state;}
 					public virtual void Deactivate(){
 						SetSelState(deactivatedState);
 					}
 					public virtual bool isDeactivated{get{return curSelState == deactivatedState;}}
 					public virtual bool wasDeactivated{get{return prevSelState == deactivatedState;}}
-				public ISSESelState defocusedState{
+				ISSESelState defocusedState{
 					get{
 						if(m_defocusedState == null)
 							m_defocusedState = new SSEDefocusedState();
 						return m_defocusedState;
 					}
 					}ISSESelState m_defocusedState;
+					public void SetDefocusedState(ISSESelState state){m_defocusedState = state;}
 					public virtual void Defocus(){
 						SetSelState(defocusedState);
 					}
 					public virtual bool isDefocused{get{return curSelState == defocusedState;}}
 					public virtual bool wasDefocused{get{return prevSelState == defocusedState;}}
-				public ISSESelState focusedState{
+				ISSESelState focusedState{
 					get{
 						if(m_focusedState == null)
 							m_focusedState = new SSEFocusedState();
 						return m_focusedState;
 					}
 					}ISSESelState m_focusedState;
+					public void SetFocusedState(ISSESelState state){m_focusedState = state;}
 					public virtual void Focus(){
 						SetSelState(focusedState);
 					}
 					public virtual bool isFocused{get{return curSelState == focusedState;}}
 					public virtual bool wasFocused{get{return prevSelState == focusedState;}}
-				public ISSESelState selectedState{
+				ISSESelState selectedState{
 					get{
 						if(m_selectedState == null)
 							m_selectedState = new SSESelectedState();
 						return m_selectedState;
 					}
 					}ISSESelState m_selectedState;
+					public void SetSelectedState(ISSESelState state){m_selectedState = state;}
 					public virtual void Select(){
 						SetSelState(selectedState);
 					}
@@ -74,14 +78,14 @@ namespace SlotSystem{
 					public virtual bool wasSelected{get{return prevSelState == selectedState;}}
 		/*	process	*/
 			/*	Selection Processs	*/
-				public ISSEProcessEngine<ISSESelProcess> selProcEngine{
+				public virtual ISSEProcessEngine<ISSESelProcess> selProcEngine{
 					get{
 						if(m_selProcEngine == null)
 							m_selProcEngine = new SSEProcessEngine<ISSESelProcess>();
 						return m_selProcEngine;
 					}
 					}ISSEProcessEngine<ISSESelProcess> m_selProcEngine;
-				public void SetSelProcEngine(ISSEProcessEngine<ISSESelProcess> engine){
+				public virtual void SetSelProcEngine(ISSEProcessEngine<ISSESelProcess> engine){
 					m_selProcEngine = engine;
 				}
 				public virtual ISSESelProcess selProcess{
@@ -271,30 +275,52 @@ namespace SlotSystem{
 						pageEle.isFocusToggleOn = true;
 				}
 			}
-			public virtual void InstantDefocus(){}
-			public virtual void InstantFocus(){}
-			public virtual void InstantSelect(){}
+			public virtual void InstantDefocus(){instantDefocusCommand.Execute();}
+				public virtual ISSECommand instantDefocusCommand{
+					get{if(m_instantDefocusCommand == null)
+							m_instantDefocusCommand = new InstantDefocusCommand();
+						return m_instantDefocusCommand;
+					}
+					}ISSECommand m_instantDefocusCommand;
+					public virtual void SetInstantDefocusCommand(ISSECommand comm){m_instantDefocusCommand = comm;}
+			public virtual void InstantFocus(){instantFocusCommand.Execute();}
+				public virtual ISSECommand instantFocusCommand{
+					get{if(m_instantFocusCommand == null)
+							m_instantFocusCommand = new InstantFocusCommand();
+						return m_instantFocusCommand;
+					}
+					}ISSECommand m_instantFocusCommand;
+					public virtual void SetInstantFocusCommand(ISSECommand comm){m_instantFocusCommand = comm;}
+					
+			public virtual void InstantSelect(){instantSelectCommand.Execute();}
+				public virtual ISSECommand instantSelectCommand{
+					get{if(m_instantSelectCommand == null)
+							m_instantSelectCommand = new InstantSelectCommand();
+						return m_instantSelectCommand;
+					}
+					}ISSECommand m_instantSelectCommand;
+					public virtual void SetInstantSelectCommand(ISSECommand comm){m_instantSelectCommand = comm;}
 			public void SetElements(IEnumerable<ISlotSystemElement> elements){m_elements = elements;}
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
 		/* Sel states */
-			ISSESelState deactivatedState{get;}
 			bool isSelStateInit{get;}
 			void Deactivate();
-			bool isDeactivated{get;}
-			bool wasDeactivated{get;}
-			ISSESelState focusedState{get;}
+				bool isDeactivated{get;}
+				bool wasDeactivated{get;}
+				void SetDeactivatedState(ISSESelState state);
 			void Focus();
-			bool isFocused{get;}
-			bool wasFocused{get;}
-			ISSESelState defocusedState{get;}
+				bool isFocused{get;}
+				bool wasFocused{get;}
+				void SetFocusedState(ISSESelState state);
 			void Defocus();
-			bool isDefocused{get;}
-			bool wasDefocused{get;}
-			ISSESelState selectedState{get;}
+				bool isDefocused{get;}
+				bool wasDefocused{get;}
+				void SetDefocusedState(ISSESelState state);
 			void Select();
-			bool isSelected{get;}
-			bool wasSelected{get;}
+				bool isSelected{get;}
+				bool wasSelected{get;}
+				void SetSelectedState(ISSESelState state);
 		ISSEProcessEngine<ISSESelProcess> selProcEngine{get;}
 			void SetAndRunSelProcess(ISSESelProcess process);
 			ISSESelProcess selProcess{get;}
@@ -305,8 +331,14 @@ namespace SlotSystem{
 		void OnHoverEnterMock();
 		void OnHoverExitMock();
 		void InstantFocus();
+			ISSECommand instantFocusCommand{get;}
+			void SetInstantFocusCommand(ISSECommand comm);
 		void InstantDefocus();
+			ISSECommand instantDefocusCommand{get;}
+			void SetInstantDefocusCommand(ISSECommand comm);
 		void InstantSelect();
+			ISSECommand instantSelectCommand{get;}
+			void SetInstantSelectCommand(ISSECommand comm);
 		string eName{get;}
 		bool isBundleElement{get;}
 		bool isPageElement{get;}

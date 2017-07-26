@@ -14,39 +14,32 @@ namespace SlotSystemTests{
 			/*	State and process */
 				/* States */
 					[Test]
-					public void isFocused_CurSelStateIsFocused_ReturnsTrue(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						testSSE.Focus();
-
-						Assert.That(testSSE.isFocused, Is.True);
-						Assert.That(testSSE.isDefocused, Is.False);
-						Assert.That(testSSE.isDeactivated, Is.False);
-						}
-					[Test]
-					public void isDefocused_CurSelStateIsDefocused_ReturnsTrue(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						testSSE.Defocus();
-
-						Assert.That(testSSE.isFocused, Is.False);
-						Assert.That(testSSE.isDefocused, Is.True);
-						Assert.That(testSSE.isDeactivated, Is.False);
-						}
-					[Test]
-					public void isDeactivated_CurSelStateIsDeactivated_ReturnsTrue(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						testSSE.Deactivate();
-
-						Assert.That(testSSE.isFocused, Is.False);
-						Assert.That(testSSE.isDefocused, Is.False);
-						Assert.That(testSSE.isDeactivated, Is.True);
-						}
-					[Test]
 					public void Deactivate_WhenCalled_SetsCurSelStateDeactivated(){
 						TestSlotSystemElement testSSE = MakeTestSSE();
 						
 						testSSE.Deactivate();
 
 						Assert.That(testSSE.isDeactivated, Is.True);
+						Assert.That(testSSE.isDefocused, Is.False);
+						Assert.That(testSSE.isFocused, Is.False);
+						Assert.That(testSSE.isSelected, Is.False);
+						}
+					[Test]
+					public void Deactivate_IsSelStateInit_DoesNotSetSelProc(){
+						TestSlotSystemElement testSSE = MakeTestSSE();
+
+						testSSE.Deactivate();
+
+						Assert.That(testSSE.selProcess, Is.Null);
+						}
+					[Test]
+					public void Deactivate_IsNotSelStateInit_SetsSelProcDeactivateProc(){
+						TestSlotSystemElement testSSE = MakeTestSSE();
+						testSSE.Defocus();
+
+						testSSE.Deactivate();
+
+						Assert.That(testSSE.selProcess, Is.TypeOf(typeof(SSEDeactivateProcess)));
 						}
 					[Test]
 					public void Focus_WhenCalled_SetsCurSelStateFocused(){
@@ -54,7 +47,37 @@ namespace SlotSystemTests{
 						
 						testSSE.Focus();
 
+						Assert.That(testSSE.isDeactivated, Is.False);
+						Assert.That(testSSE.isDefocused, Is.False);
 						Assert.That(testSSE.isFocused, Is.True);
+						Assert.That(testSSE.isSelected, Is.False);
+						}
+					[Test]
+					public void Focus_IsSelStateInit_DoesNotSetSelProc(){
+						TestSlotSystemElement sse = MakeTestSSE();
+
+						sse.Focus();
+
+						Assert.That(sse.selProcess, Is.Null);
+						}
+					[Test]
+					public void Focus_IsSelStateInit_CallsInstantFocus(){
+						TestSlotSystemElement sse = MakeTestSSE();
+							ISSECommand mockComm = Substitute.For<ISSECommand>();
+							sse.SetInstantFocusCommand(mockComm);
+
+						sse.Focus();
+
+						mockComm.Received().Execute();
+						}
+					[Test]
+					public void Focus_IsNotSelStateInit_SetsSelProcFocus(){
+						TestSlotSystemElement sse = MakeTestSSE();
+						sse.Deactivate();
+
+						sse.Focus();
+
+						Assert.That(sse.selProcess, Is.TypeOf(typeof(SSEFocusProcess)));
 						}
 					[Test]
 					public void Defocus_WhenCalled_SetCurStateToDefocusd(){
@@ -62,7 +85,37 @@ namespace SlotSystemTests{
 						
 						testSSE.Defocus();
 
+						Assert.That(testSSE.isDeactivated, Is.False);
 						Assert.That(testSSE.isDefocused, Is.True);
+						Assert.That(testSSE.isFocused, Is.False);
+						Assert.That(testSSE.isSelected, Is.False);
+						}
+					[Test]
+					public void Defocus_IsSelStateInit_DoesNotSetSelProc(){
+						TestSlotSystemElement sse = MakeTestSSE();
+
+						sse.Defocus();
+
+						Assert.That(sse.selProcess, Is.Null);
+						}
+					[Test]
+					public void Defocus_IsSelStateInit_CallsInstantDefocus(){
+						TestSlotSystemElement sse = MakeTestSSE();
+							ISSECommand mockComm = Substitute.For<ISSECommand>();
+							sse.SetInstantDefocusCommand(mockComm);
+
+						sse.Defocus();
+
+						mockComm.Received().Execute();
+						}
+					[Test]
+					public void Defocus_IsNotSelStateInit_SetsSelProcDefocus(){
+						TestSlotSystemElement sse = MakeTestSSE();
+						sse.Deactivate();
+
+						sse.Defocus();
+
+						Assert.That(sse.selProcess, Is.TypeOf(typeof(SSEDefocusProcess)));
 						}
 					[Test]
 					public void Select_WhenCalled_SetCurStateToSelected(){
@@ -70,10 +123,40 @@ namespace SlotSystemTests{
 						
 						testSSE.Select();
 
+						Assert.That(testSSE.isDeactivated, Is.False);
+						Assert.That(testSSE.isDefocused, Is.False);
+						Assert.That(testSSE.isFocused, Is.False);
 						Assert.That(testSSE.isSelected, Is.True);
 						}
+					[Test]
+					public void Select_IsSelStateInit_DoesNotSetSelProc(){
+						TestSlotSystemElement sse = MakeTestSSE();
+
+						sse.Select();
+
+						Assert.That(sse.selProcess, Is.Null);
+						}
+					[Test]
+					public void Select_IsSelStateInit_CallsInstantSelect(){
+						TestSlotSystemElement sse = MakeTestSSE();
+							ISSECommand mockComm = Substitute.For<ISSECommand>();
+							sse.SetInstantSelectCommand(mockComm);
+
+						sse.Select();
+
+						mockComm.Received().Execute();
+						}
+					[Test]
+					public void Select_IsNotSelStateInit_SetsSelProcSelect(){
+						TestSlotSystemElement sse = MakeTestSSE();
+						sse.Deactivate();
+
+						sse.Select();
+
+						Assert.That(sse.selProcess, Is.TypeOf(typeof(SSESelectProcess)));
+						}
 				/* Process */
-					[TestCaseSource(typeof(SetAndRunSelProcess_ISSESelProcessOrNullCases))][Category("State and Process")]
+					[TestCaseSource(typeof(SetAndRunSelProcess_ISSESelProcessOrNullCases))]
 					public void SetAndRunSelProcess_ISSESelProcessOrNull_CallsSelProcEngineSAR(ISSESelProcess process){
 						TestSlotSystemElement sse = MakeTestSSE();
 							ISSEProcessEngine<ISSESelProcess> engine = Substitute.For<ISSEProcessEngine<ISSESelProcess>>();
@@ -89,6 +172,43 @@ namespace SlotSystemTests{
 								yield return null;
 							}
 						}
+			/* Events */
+				[Test]
+				[ExpectedException(typeof(System.InvalidOperationException))]
+				public void OnHoverEnterMock_curSelStateNull_ThrowsException(){
+					TestSlotSystemElement sse = MakeTestSSE();
+
+					sse.OnHoverEnterMock();
+				}
+				[Test]
+				public void OnHoverEnterMock_curSelStateNotNull_CallsCurSelStateOnHoverEnterMock(){
+					TestSlotSystemElement sse = MakeTestSSE();
+					ISSESelState mockState = Substitute.For<ISSESelState>();
+					sse.SetDeactivatedState(mockState);
+					sse.Deactivate();
+
+					sse.OnHoverEnterMock();
+
+					mockState.Received().OnHoverEnterMock(sse, Arg.Any<PointerEventDataFake>());
+				}
+				[Test]
+				[ExpectedException(typeof(System.InvalidOperationException))]
+				public void OnHoverExitMock_curSelStateNull_ThrowsException(){
+					TestSlotSystemElement sse = MakeTestSSE();
+
+					sse.OnHoverExitMock();
+				}
+				[Test]
+				public void OnHoverExitMock_curSelStateNotNull_CallsCurSelStateOnHoverExitMock(){
+					TestSlotSystemElement sse = MakeTestSSE();
+					ISSESelState mockState = Substitute.For<ISSESelState>();
+					sse.SetDeactivatedState(mockState);
+					sse.Deactivate();
+
+					sse.OnHoverExitMock();
+
+					mockState.Received().OnHoverExitMock(sse, Arg.Any<PointerEventDataFake>());
+				}
 			/*	Fields	*/
 				[TestCase(1)]
 				[TestCase(10)]
