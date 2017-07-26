@@ -779,30 +779,27 @@ namespace SlotSystem{
 		void Initialize();
 		IEnumeratorFake probeCoroutine();
 		/* States And Process */
-			// ISSEStateEngine<ISSMActState> actStateEngine{get;}
-			// 	void SetActStateEngine(ISSEStateEngine<ISSMActState> engine);
-			// 	void SetActState(ISSMActState state);
-			// 	ISSMActState curActState{get;}
-			// 	ISSMActState prevActState{get;}
-					bool isActStateInit{get;}
-					void ClearActState();
-					ISSMActState waitForActionState{get;}
+			/* ActState */
+				bool isActStateInit{get;}
+				void ClearActState();
+				ISSMActState waitForActionState{get;}
 					void WaitForAction();
 					bool isWaitingForAction{get;}
 					bool wasWaitingForAction{get;}
-					ISSMActState probingState{get;}
+				ISSMActState probingState{get;}
 					void Probe();
 					bool isProbing{get;}
 					bool wasProbing{get;}
-					ISSMActState transactionState{get;}
+				ISSMActState transactionState{get;}
 					void Transact();
 					bool isTransacting{get;}
 					bool wasTransacting{get;}
-			ISSEProcessEngine<ISSMActProcess> actProcEngine{get;}
-				void SetActProcEngine(ISSEProcessEngine<ISSMActProcess> engine);
-				void SetAndRunActProcess(ISSMActProcess process);
-				ISSMActProcess actProcess{get;}
-					IEnumeratorFake transactionCoroutine();
+			/* Process */
+				ISSEProcessEngine<ISSMActProcess> actProcEngine{get;}
+					void SetActProcEngine(ISSEProcessEngine<ISSMActProcess> engine);
+					void SetAndRunActProcess(ISSMActProcess process);
+					ISSMActProcess actProcess{get;}
+						IEnumeratorFake transactionCoroutine();
 		/*	Managerial */
 			List<ISlotGroup> allSGs{get;}
 			List<ISlotGroup> allSGPs{get;}

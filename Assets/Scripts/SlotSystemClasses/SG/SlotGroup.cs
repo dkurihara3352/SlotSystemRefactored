@@ -460,7 +460,7 @@ namespace SlotSystem{
 		/*	methods	*/
 			public override void InitializeStates(){
 				Deactivate();
-				SetActState(waitForActionState);
+				WaitForAction();
 			}
 			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
 				SetInventory(inv);
@@ -589,7 +589,7 @@ namespace SlotSystem{
 				return result;
 			}
 			public virtual void Reset(){
-				SetActState(waitForActionState);
+				WaitForAction();
 				SetNewSBs(null);
 				SetNewSlots(null);
 			}
@@ -788,7 +788,6 @@ namespace SlotSystem{
 					GameObject newSBGO = new GameObject("newSBGO");
 					ISlottable newSB = newSBGO.AddComponent<Slottable>();
 					newSB.SetItem(item);
-					// newSB.InitializeStates();
 					newSB.SetSSM(ssm);
 					slots[items.IndexOf(item)].sb = newSB;
 				}
@@ -810,44 +809,41 @@ namespace SlotSystem{
 	}
 	public interface ISlotGroup: ISlotSystemElement{
 		/* States and Processes */
-			// ISSEStateEngine<ISGActState> actStateEngine{get;}
-			// 	void SetActStateEngine(ISSEStateEngine<ISGActState> engine);
-				// void SetActState(ISGActState state);
-				// ISGActState curActState{get;}
-				// ISGActState prevActState{get;}
+			/* ActStates */
 				bool isActStateInit{get;}
 				ISGActState waitForActionState{get;}
-				void WaitForAction();
-				bool isWaitingForAction{get;}
-				bool wasWaitingForAction{get;}
+					void WaitForAction();
+					bool isWaitingForAction{get;}
+					bool wasWaitingForAction{get;}
 				ISGActState revertState{get;}
-				void Revert();
-				bool isReverting{get;}
-				bool wasReverting{get;}
+					void Revert();
+					bool isReverting{get;}
+					bool wasReverting{get;}
 				ISGActState reorderState{get;}
-				void Reorder();
-				bool isReordering{get;}
-				bool wasReordering{get;}
+					void Reorder();
+					bool isReordering{get;}
+					bool wasReordering{get;}
 				ISGActState addState{get;}
-				void Add();
-				bool isAdding{get;}
-				bool wasAdding{get;}
+					void Add();
+					bool isAdding{get;}
+					bool wasAdding{get;}
 				ISGActState removeState{get;}
-				void Remove();
-				bool isRemoving{get;}
-				bool wasRemoving{get;}
+					void Remove();
+					bool isRemoving{get;}
+					bool wasRemoving{get;}
 				ISGActState swapState{get;}
-				void Swap();
-				bool isSwapping{get;}
-				bool wasSwapping{get;}
+					void Swap();
+					bool isSwapping{get;}
+					bool wasSwapping{get;}
 				ISGActState fillState{get;}
-				void Fill();
-				bool isFilling{get;}
-				bool wasFilling{get;}
+					void Fill();
+					bool isFilling{get;}
+					bool wasFilling{get;}
 				ISGActState sortState{get;}
-				void Sort();
-				bool isSorting{get;}
-				bool wasSorting{get;}
+					void Sort();
+					bool isSorting{get;}
+					bool wasSorting{get;}
+			/* Proc */
 			ISSEProcessEngine<ISGActProcess> actProcEngine{get;}
 				void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine);
 				ISGActProcess actProcess{get;}

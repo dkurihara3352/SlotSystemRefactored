@@ -103,7 +103,7 @@ namespace SlotSystemTests{
                         TestEquipmentSetInventory equipInv = MakeEquipInventory();
 
                         equipInv.Add(null);
-                    }
+                        }
                     [TestCaseSource(typeof(AddCGExeedingCases))]
                     public void Add_CGearsExceedingLimit_ThrowsException(List<CarriedGearInstance> fitted, CarriedGearInstance exceeded){
                         EquipmentSetInventory equipInv = MakeEquipInventory(fitted.Count);
@@ -237,7 +237,7 @@ namespace SlotSystemTests{
                         
                         bool equality = equipInv.Items.MemberEquals(expected);
                         Assert.That(equality, Is.True);
-                    }
+                        }
                         class ItemsCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
                                 object[] case0;

@@ -314,58 +314,59 @@ namespace SlotSystemTests{
 						mockSB.Received().SetAndRunActProcess(Arg.Any<SBRemoveProcess>());
 						}
 
-			/*	SBEqpStates	*/
-				[Test]
-				public void SBEquippedState_EnterState_IsHiSetUpAndIsPoolAndIsUnequipped_SetsEqpProcEquipProc(){
-					SBEquippedState eqState = new SBEquippedState();
-					ISlottable mockSB = MakeSubSB();
-					mockSB.isHierarchySetUp.Returns(true);
-					mockSB.isUnequipped.Returns(true);
-					mockSB.isPool.Returns(true);
-					eqState.EnterState(mockSB);
+			/* Eqp States */
+				/*	SBEqpStates	*/
+					[Test]
+					public void SBEquippedState_EnterState_IsHiSetUpAndIsPoolAndIsUnequipped_SetsEqpProcEquipProc(){
+						SBEquippedState eqState = new SBEquippedState();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isHierarchySetUp.Returns(true);
+						mockSB.isUnequipped.Returns(true);
+						mockSB.isPool.Returns(true);
+						eqState.EnterState(mockSB);
 
-					mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
-					}
-			/*	SBUnequipState	*/
-				[Test]
-				public void SBUnequippedState_EnterState_IsHiSetUpAndIsPoolAndIsEquipped_SetsEqpProcUnequipProc(){
-					SBUnequippedState unequipeedState = new SBUnequippedState();
-					ISlottable mockSB = MakeSubSB();
-					mockSB.isHierarchySetUp.Returns(true);
-					mockSB.isEquipped.Returns(true);
-					mockSB.isPool.Returns(true);
+						mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
+						}
+				/*	SBUnequipState	*/
+					[Test]
+					public void SBUnequippedState_EnterState_IsHiSetUpAndIsPoolAndIsEquipped_SetsEqpProcUnequipProc(){
+						SBUnequippedState unequipeedState = new SBUnequippedState();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isHierarchySetUp.Returns(true);
+						mockSB.isEquipped.Returns(true);
+						mockSB.isPool.Returns(true);
 
-					unequipeedState.EnterState(mockSB);
+						unequipeedState.EnterState(mockSB);
 
-					mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
-					}
-			/*	SBMarkedState	*/
-				[Test]
-				public void SBMarkedState_EnterState_IsHiSetUpAndIsPoolAndIsUnmarked_SetsMrkProcMarkProcess(){
-					SBMarkedState markedState = new SBMarkedState();
-					ISlottable mockSB = MakeSubSB();
-					mockSB.isHierarchySetUp.Returns(true);
-					mockSB.isUnmarked.Returns(true);
-					mockSB.isPool.Returns(true);
+						mockSB.Received().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
+						}
+			/* Mrk States */
+				/*	SBMarkedState	*/
+					[Test]
+					public void SBMarkedState_EnterState_IsHiSetUpAndIsPoolAndIsUnmarked_SetsMrkProcMarkProcess(){
+						SBMarkedState markedState = new SBMarkedState();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isHierarchySetUp.Returns(true);
+						mockSB.isUnmarked.Returns(true);
+						mockSB.isPool.Returns(true);
 
-					markedState.EnterState(mockSB);
+						markedState.EnterState(mockSB);
 
-					mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
-					}
-			/*	SBUnmarkedState	*/
-				[Test]
-				public void SBUnmarkedState_EnterState_IsHiSetUpAndIsPoolAndIsMarked_SetsMrkProcUnmarkProcess(){
-					SBUnmarkedState unmarkedState = new SBUnmarkedState();
-					ISlottable mockSB = MakeSubSB();
-					mockSB.isHierarchySetUp.Returns(true);
-					mockSB.isMarked.Returns(true);
-					mockSB.isPool.Returns(true);
+						mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
+						}
+				/*	SBUnmarkedState	*/
+					[Test]
+					public void SBUnmarkedState_EnterState_IsHiSetUpAndIsPoolAndIsMarked_SetsMrkProcUnmarkProcess(){
+						SBUnmarkedState unmarkedState = new SBUnmarkedState();
+						ISlottable mockSB = MakeSubSB();
+						mockSB.isHierarchySetUp.Returns(true);
+						mockSB.isMarked.Returns(true);
+						mockSB.isPool.Returns(true);
 
-					unmarkedState.EnterState(mockSB);
+						unmarkedState.EnterState(mockSB);
 
-					mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
-					}
-			/*	Helper */
+						mockSB.Received().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
+						}
 		}
 	}
 }

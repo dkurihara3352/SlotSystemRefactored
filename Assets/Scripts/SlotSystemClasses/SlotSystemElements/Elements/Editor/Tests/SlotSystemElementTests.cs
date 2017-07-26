@@ -14,6 +14,15 @@ namespace SlotSystemTests{
 			/*	State and process */
 				/* States */
 					[Test]
+					public void SelStateFields_ByDefault_AreSetDefault(){
+						TestSlotSystemElement sse = MakeTestSSE();
+
+						Assert.That(sse.isDeactivated, Is.False);
+						Assert.That(sse.isFocused, Is.False);
+						Assert.That(sse.isDefocused, Is.False);
+						Assert.That(sse.isSelected, Is.False);
+					}
+					[Test]
 					public void Deactivate_WhenCalled_SetsCurSelStateDeactivated(){
 						TestSlotSystemElement testSSE = MakeTestSSE();
 						
@@ -426,7 +435,6 @@ namespace SlotSystemTests{
 					stubPar2.SetElements(new ISlotSystemElement[]{stubPar3});
 					stubPar2.SetParent(stubPar1);
 					stubPar1.SetElements(new ISlotSystemElement[]{stubPar2});
-					// stubPar1.Focus();
 					stubPar1.PerformInHierarchy(stubPar1.FocusInHi);
 					
 					Assert.That(testSSE.isFocusedInHierarchy, Is.True);
@@ -1055,6 +1063,173 @@ namespace SlotSystemTests{
 					testSSE.SetElements(new ISlotSystemElement[]{stubMember});
 					
 					Assert.That(testSSE.Contains(stubMember), Is.True);
+					}
+			//
+				[TestCaseSource(typeof(ActivateRecursivelyCases))]
+				public void ActivateRecursively_WhenCalled_FocusSelfAndAllMatchInHi(TestSlotSystemElement sse, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
+					sse.PerformInHierarchy(sse.SetElementsInHi);
+					sse.PerformInHierarchy(sse.SetParentInHi);
+
+					sse.ActivateRecursively();
+					
+					foreach(ISlotSystemElement ele in xOn)
+						Assert.That(ele.isFocused, Is.True);
+					foreach(ISlotSystemElement ele in xOff)
+						Assert.That(ele.isFocused, Is.False);
+					}
+					class ActivateRecursivelyCases: IEnumerable{
+						public IEnumerator GetEnumerator(){
+							object[] case0;
+								TestSlotSystemElement sse_0 = MakeTestSSE();
+									TestSlotSystemElement sse0_0 = MakeTestSSE();//off
+										TestSlotSystemElement sse00_0 = MakeTestSSE();
+										TestSlotSystemElement sse01_0 = MakeTestSSE();
+									TestSlotSystemElement sse1_0 = MakeTestSSE();
+										TestSlotSystemElement sse10_0 = MakeTestSSE();
+											TestSlotSystemElement sse100_0 = MakeTestSSE();//off
+												TestSlotSystemElement sse1000_0 = MakeTestSSE();
+											TestSlotSystemElement sse101_0 = MakeTestSSE();
+										TestSlotSystemElement sse11_0 = MakeTestSSE();
+										sse0_0.transform.SetParent(sse_0.transform);
+											sse0_0.isActivatedOnDefault = false;
+										sse00_0.transform.SetParent(sse0_0.transform);
+										sse01_0.transform.SetParent(sse0_0.transform);
+										sse1_0.transform.SetParent(sse_0.transform);
+										sse10_0.transform.SetParent(sse1_0.transform);
+										sse100_0.transform.SetParent(sse10_0.transform);
+											sse100_0.isActivatedOnDefault = false;
+										sse1000_0.transform.SetParent(sse100_0.transform);
+										sse101_0.transform.SetParent(sse10_0.transform);
+										sse11_0.transform.SetParent(sse1_0.transform);
+								IEnumerable<ISlotSystemElement> xOn_0 = new ISlotSystemElement[]{
+									sse_0,
+									sse1_0,
+									sse10_0,
+									sse101_0,
+									sse11_0
+								};
+								IEnumerable<ISlotSystemElement> xOff_0 = new ISlotSystemElement[]{
+									sse0_0,
+									sse00_0,
+									sse01_0,
+									sse100_0,
+									sse1000_0,
+								};
+								case0 = new object[]{sse_0, xOn_0, xOff_0};
+								yield return case0;
+							object[] case1;
+								TestSlotSystemElement sse_1 = MakeTestSSE();//off
+									TestSlotSystemElement sse0_1 = MakeTestSSE();
+										TestSlotSystemElement sse00_1 = MakeTestSSE();
+										TestSlotSystemElement sse01_1 = MakeTestSSE();
+									TestSlotSystemElement sse1_1 = MakeTestSSE();
+										TestSlotSystemElement sse10_1 = MakeTestSSE();
+											TestSlotSystemElement sse100_1 = MakeTestSSE();
+												TestSlotSystemElement sse1000_1 = MakeTestSSE();
+											TestSlotSystemElement sse101_1 = MakeTestSSE();
+										TestSlotSystemElement sse11_1 = MakeTestSSE();
+										sse_1.isActivatedOnDefault = false;
+										sse0_1.transform.SetParent(sse_1.transform);
+										sse00_1.transform.SetParent(sse0_1.transform);
+										sse01_1.transform.SetParent(sse0_1.transform);
+										sse1_1.transform.SetParent(sse_1.transform);
+										sse10_1.transform.SetParent(sse1_1.transform);
+										sse100_1.transform.SetParent(sse10_1.transform);
+										sse1000_1.transform.SetParent(sse100_1.transform);
+										sse101_1.transform.SetParent(sse10_1.transform);
+										sse11_1.transform.SetParent(sse1_1.transform);
+								IEnumerable<ISlotSystemElement> xOn_1 = new ISlotSystemElement[]{
+								};
+								IEnumerable<ISlotSystemElement> xOff_1 = new ISlotSystemElement[]{
+									sse_1,
+									sse1_1,
+									sse10_1,
+									sse101_1,
+									sse11_1,
+									sse0_1,
+									sse00_1,
+									sse01_1,
+									sse100_1,
+									sse1000_1,
+								};
+								case1 = new object[]{sse_1, xOn_1, xOff_1};
+								yield return case1;
+							object[] case2;
+								TestSlotSystemElement sse_2 = MakeTestSSE();
+									TestSlotSystemElement sse0_2 = MakeTestSSE();
+										TestSlotSystemElement sse00_2 = MakeTestSSE();
+										TestSlotSystemElement sse01_2 = MakeTestSSE();
+									TestSlotSystemElement sse1_2 = MakeTestSSE();
+										TestSlotSystemElement sse10_2 = MakeTestSSE();
+											TestSlotSystemElement sse100_2 = MakeTestSSE();
+												TestSlotSystemElement sse1000_2 = MakeTestSSE();
+											TestSlotSystemElement sse101_2 = MakeTestSSE();
+										TestSlotSystemElement sse11_2 = MakeTestSSE();
+										sse0_2.transform.SetParent(sse_2.transform);
+										sse00_2.transform.SetParent(sse0_2.transform);
+										sse01_2.transform.SetParent(sse0_2.transform);
+										sse1_2.transform.SetParent(sse_2.transform);
+										sse10_2.transform.SetParent(sse1_2.transform);
+										sse100_2.transform.SetParent(sse10_2.transform);
+										sse1000_2.transform.SetParent(sse100_2.transform);
+										sse101_2.transform.SetParent(sse10_2.transform);
+										sse11_2.transform.SetParent(sse1_2.transform);
+								IEnumerable<ISlotSystemElement> xOn_2 = new ISlotSystemElement[]{
+									sse_2,
+									sse0_2,
+									sse00_2,
+									sse01_2,
+									sse1_2,
+									sse10_2,
+									sse100_2,
+									sse1000_2,
+									sse101_2,
+									sse11_2
+								};
+								IEnumerable<ISlotSystemElement> xOff_2 = new ISlotSystemElement[]{
+								};
+								case2 = new object[]{sse_2, xOn_2, xOff_2};
+								yield return case2;
+							object[] case3;
+								TestSlotSystemElement sse_3 = MakeTestSSE();
+									TestSlotSystemElement sse0_3 = MakeTestSSE();
+										TestSlotSystemElement sse00_3 = MakeTestSSE();
+										TestSlotSystemElement sse01_3 = MakeTestSSE();
+									TestSlotSystemElement sse1_3 = MakeTestSSE();//off
+										TestSlotSystemElement sse10_3 = MakeTestSSE();//on
+											TestSlotSystemElement sse100_3 = MakeTestSSE();//off
+												TestSlotSystemElement sse1000_3 = MakeTestSSE();
+											TestSlotSystemElement sse101_3 = MakeTestSSE();
+										TestSlotSystemElement sse11_3 = MakeTestSSE();
+										sse0_3.transform.SetParent(sse_3.transform);
+										sse00_3.transform.SetParent(sse0_3.transform);
+										sse01_3.transform.SetParent(sse0_3.transform);
+										sse1_3.transform.SetParent(sse_3.transform);
+											sse1_3.isActivatedOnDefault = false;
+										sse10_3.transform.SetParent(sse1_3.transform);
+											sse10_3.isActivatedOnDefault = true;
+										sse100_3.transform.SetParent(sse10_3.transform);
+											sse100_3.isActivatedOnDefault = false;
+										sse1000_3.transform.SetParent(sse100_3.transform);
+										sse101_3.transform.SetParent(sse10_3.transform);
+										sse11_3.transform.SetParent(sse1_3.transform);
+								IEnumerable<ISlotSystemElement> xOn_3 = new ISlotSystemElement[]{
+									sse_3,
+									sse0_3,
+									sse00_3,
+									sse01_3
+								};
+								IEnumerable<ISlotSystemElement> xOff_3 = new ISlotSystemElement[]{
+									sse1_3,
+									sse10_3,
+									sse100_3,
+									sse1000_3,
+									sse101_3,
+									sse11_3
+								};
+								case3 = new object[]{sse_3, xOn_3, xOff_3};
+								yield return case3;
+						}
 					}
 			/*	helpers */
 				SlotSystemBundle MakeSlotSystemBundle(){

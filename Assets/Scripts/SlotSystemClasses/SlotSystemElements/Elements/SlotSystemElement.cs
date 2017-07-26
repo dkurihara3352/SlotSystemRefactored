@@ -223,6 +223,28 @@ namespace SlotSystem{
 				public virtual void FocusInHi(ISlotSystemElement sse){
 					sse.Focus();
 				}
+				public bool isActivatedOnDefault{
+					get{
+						ISlotSystemElement inspected = parent;
+						while(true){
+							if(inspected　== null)
+								break;
+							if(inspected.isActivatedOnDefault)
+								inspected = inspected.parent;
+							else
+								return false;
+						}
+						return m_isActivatedOnDefault;
+					}
+					set{m_isActivatedOnDefault = value;}
+				}bool m_isActivatedOnDefault = true;
+				public void ActivateRecursively(){
+					PerformInHierarchy(FocusSelectively);
+				}
+					void FocusSelectively(ISlotSystemElement ele){
+						if(ele.isActivatedOnDefault)
+							ele.Focus();
+					}
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
 				act(this, obj);
 				if(elements != null)
@@ -331,5 +353,6 @@ namespace SlotSystem{
 		bool Contains(ISlotSystemElement element);
 		ISlotSystemElement this[int i]{get;}
 		void SetElements(IEnumerable<ISlotSystemElement> elements);
+		bool isActivatedOnDefault{get;set;}
 	}
 }

@@ -13,64 +13,6 @@ namespace SlotSystemTests{
 		[TestFixture]
 		[Category("SB")]
 		public class SlottableTests: SlotSystemTest {
-				/*	ActState	*/
-					// [Test]
-					// public void SetActState_Null_SetsActStateNull(){
-					// 	Slottable sb = MakeSB();
-
-					// 	sb.SetActState(null);
-
-					// 	Assert.That(sb.curActState, Is.Null);
-					// 	}
-					// [Test]
-					// public void SetActState_SBActState_SetsActState(){
-					// 	Slottable sb = MakeSB();
-					// 	SBActState stubActState = MakeSubSBActState();
-
-					// 	sb.SetActState(stubActState);
-
-					// 	Assert.That(sb.curActState, Is.SameAs(stubActState));
-					// 	}
-				/*	EqpState	*/
-				// 	[Test]
-				// 	public void SetEqpState_Null_CallsEqpStateEngineSetState(){
-				// 		Slottable sb = MakeSB();
-				// 		ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
-				// 		sb.SetEqpStateEngine(mockEngine);
-				// 		sb.SetEqpState(null);
-
-				// 		mockEngine.Received().SetState(null);
-				// 		}
-				// 	[Test]
-				// 	public void SetEqpState_SBEqpState_CallsEqpStateEngineSetState(){
-				// 		Slottable sb = MakeSB();
-				// 		ISSEStateEngine<ISBEqpState> mockEngine = MakeSubSBEqpStateEngine();
-				// 		sb.SetEqpStateEngine(mockEngine);
-				// 		SBEqpState stubEqpState = MakeSubSBEqpState();
-				// 		sb.SetEqpState(stubEqpState);
-
-				// 		mockEngine.Received().SetState(stubEqpState);
-				// 		}
-				// /*	Mrk State */
-				// 	[Test]
-				// 	public void SetMrkState_Null_CallsMrkStateEngineSetState(){
-				// 		Slottable sb = MakeSB();
-				// 		ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
-				// 		sb.SetMrkStateEngine(mockEngine);
-				// 		sb.SetMrkState(null);
-
-				// 		mockEngine.Received().SetState(null);
-				// 		}
-				// 	[Test]
-				// 	public void SetMrkState_SBMrkState_CallsMrkStateEngineSetState(){
-				// 		Slottable sb = MakeSB();
-				// 		ISSEStateEngine<ISBMrkState> mockEngine = MakeSubSBMrkStateEngine();
-				// 		sb.SetMrkStateEngine(mockEngine);
-				// 		SBMrkState stubMrkState = MakeSubSBMrkState();
-				// 		sb.SetMrkState(stubMrkState);
-
-				// 		mockEngine.Received().SetState(stubMrkState);
-				// 		}
 			/*	Process	*/
 				/*	ActProc	*/
 					[Test]
@@ -432,18 +374,6 @@ namespace SlotSystemTests{
 					}
 			
 			/*	helper	*/
-				ISSEStateEngine<ISBActState> MakeSubSBActStateEngine(){
-					return Substitute.For<ISSEStateEngine<ISBActState>>();
-				}
-				ISSEStateEngine<ISBEqpState> MakeSubSBEqpStateEngine(){
-					return Substitute.For<ISSEStateEngine<ISBEqpState>>();
-				}
-				ISSEStateEngine<ISBMrkState> MakeSubSBMrkStateEngine(){
-					return Substitute.For<ISSEStateEngine<ISBMrkState>>();
-				}
-				ISSEProcessEngine<ISBActProcess> MakeSubSBActProcessEngine(){
-					return Substitute.For<ISSEProcessEngine<ISBActProcess>>();
-				}
 				ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){
 					return Substitute.For<ISSEProcessEngine<ISBEqpProcess>>();
 				}

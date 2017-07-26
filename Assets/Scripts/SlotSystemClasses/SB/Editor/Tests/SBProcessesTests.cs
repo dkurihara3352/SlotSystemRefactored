@@ -11,7 +11,6 @@ namespace SlotSystemTests{
 		[TestFixture]
 		[Category("SB")]
 		public class SBProcessesTests: SlotSystemTest{
-
 			[Test]
 			public void WaitForPickUpProcess_Expire_WhenCalled_CallsSBPickUp(){
 				ISlottable mockSB = MakeSubSB();

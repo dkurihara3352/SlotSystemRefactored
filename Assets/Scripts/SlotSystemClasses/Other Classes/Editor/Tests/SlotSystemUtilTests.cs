@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 				stubSG_B.filter.Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.True);
-			}
+				}
 			[Test]
 			public void AreSwappable_SameSGsAndMutuallyAcceptingAndNotStackable_ReturnsFalse(){
 				BowInstance stubBowInst_A = MakeBowInstance(0);
@@ -45,7 +45,7 @@ namespace SlotSystemTests{
 				stubSG.filter.Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.False);
-			}
+				}
 			[Test]
 			public void AreSwappable_DiffSGsAndMutuallyNOTAcceptingAndNOTStackable_ReturnsFalse(){
 				BowInstance stubBowInst_A = MakeBowInstance(0);
@@ -64,7 +64,7 @@ namespace SlotSystemTests{
 				stubSG_B.filter.Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.False);
-			}
+				}
 			[Test]
 			public void AreSwappable_DiffSGsAndMutuallyNOTAcceptingAndISStackable_ReturnsFalse(){
 				PartsInstance stubParts_A = MakePartsInstance(0, 1);
@@ -83,7 +83,7 @@ namespace SlotSystemTests{
 				stubSG_B.filter.Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.False);
-			}
+				}
 		}
 	}
 }

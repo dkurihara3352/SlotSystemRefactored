@@ -496,7 +496,6 @@ namespace SlotSystem{
 			public virtual bool isHovered{
 				get{return ssm.hovered == (ISlotSystemElement)this;}
 			}
-			// public virtual bool isPool{get{return sg.isPool;}}
 			public virtual bool isPool{
 				get{
 					if(sg != null){
@@ -512,73 +511,60 @@ namespace SlotSystem{
 	public interface ISlottable: ISlotSystemElement ,IComparable<ISlottable>, IComparable{
 		/*	States and Processes	*/
 			/* States */
-				// ISSEStateEngine<ISBActState> actStateEngine{get;}
-				// 	void SetActStateEngine(ISSEStateEngine<ISBActState> engine);
-				// 	ISBActState curActState{get;}
-				// 	ISBActState prevActState{get;}
-					// void SetActState(ISBActState state);
-						bool isActStateInit{get;}
-						void ClearActState();
-						ISBActState waitForActionState{get;}
+				/* ActStates */
+					bool isActStateInit{get;}
+					void ClearActState();
+					ISBActState waitForActionState{get;}
 						void WaitForAction();
 						bool isWaitingForAction{get;}
 						bool wasWaitingForAction{get;}
-						ISBActState waitForPointerUpState{get;}
+					ISBActState waitForPointerUpState{get;}
 						void WaitForPointerUp();
 						bool isWaitingForPointerUp{get;}
 						bool wasWaitingForPointerUp{get;}
-						ISBActState waitForPickUpState{get;}
+					ISBActState waitForPickUpState{get;}
 						void WaitForPickUp();
 						bool isWaitingForPickUp{get;}
 						bool wasWaitingForPickUp{get;}
-						ISBActState waitForNextTouchState{get;}
+					ISBActState waitForNextTouchState{get;}
 						void WaitForNextTouch();
 						bool isWaitingForNextTouch{get;}
 						bool wasWaitingForNextTouch{get;}
-						ISBActState pickedUpState{get;}
+					ISBActState pickedUpState{get;}
 						void PickUp();
 						bool isPickingUp{get;}
 						bool wasPickingUp{get;}
-						ISBActState removedState{get;}
+					ISBActState removedState{get;}
 						void Remove();
 						bool isRemoving{get;}
 						bool wasRemoving{get;}
-						ISBActState addedState{get;}
+					ISBActState addedState{get;}
 						void Add();
 						bool isAdding{get;}
 						bool wasAdding{get;}
-						ISBActState moveWithinState{get;}
+					ISBActState moveWithinState{get;}
 						void MoveWithin();
 						bool isMovingWithin{get;}
 						bool wasMovingWithin{get;}
-
-				// ISSEStateEngine<ISBEqpState> eqpStateEngine{get;}
-				// 	void SetEqpStateEngine(ISSEStateEngine<ISBEqpState> engine);
-				// 	ISBEqpState curEqpState{get;}
-				// 	ISBEqpState prevEqpState{get;}
-					// void SetEqpState(ISBEqpState state);
-						bool isEqpStateInit{get;}
-						void ClearEqpState();
-						ISBEqpState equippedState{get;}
+				/* Eqp States */
+					bool isEqpStateInit{get;}
+					void ClearEqpState();
+					ISBEqpState equippedState{get;}
 						void Equip();
 						bool isEquipped{get;}
 						bool wasEquipped{get;}
-						ISBEqpState unequippedState{get;}
+					ISBEqpState unequippedState{get;}
 						void Unequip();
 						bool isUnequipped{get;}
 						bool wasUnequipped{get;}
-				// ISSEStateEngine<ISBMrkState> mrkStateEngine{get;}
-				// 	void SetMrkStateEngine(ISSEStateEngine<ISBMrkState> engine);
-				// 	ISBMrkState curMrkState{get;}
-				// 	ISBMrkState prevMrkState{get;}
-					// void SetMrkState(ISBMrkState state);
-						bool isMrkStateInit{get;}
-						void ClearMrkState();
-						ISBMrkState	markedState{get;}
+				/* Mrk States */
+					bool isMrkStateInit{get;}
+					void ClearMrkState();
+					ISBMrkState	markedState{get;}
 						void Mark();
 						bool isMarked{get;}
 						bool wasMarked{get;}
-						ISBMrkState unmarkedState{get;}
+					ISBMrkState unmarkedState{get;}
 						void Unmark();
 						bool isUnmarked{get;}
 						bool wasUnmarked{get;}
@@ -631,10 +617,7 @@ namespace SlotSystem{
 			void OnPointerUpMock(PointerEventDataFake eventDataMock);
 			void OnDeselectedMock(PointerEventDataFake eventDataMock);
 			void OnEndDragMock(PointerEventDataFake eventDataMock);
-
-
 		/*	Methods	*/
-			// void PickUp();
 			void Increment();
 			void ExecuteTransaction();
 			void ExpireActionProcess();
