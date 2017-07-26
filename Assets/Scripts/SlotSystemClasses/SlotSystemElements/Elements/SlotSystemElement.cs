@@ -169,20 +169,6 @@ namespace SlotSystem{
 					return parent is ISlotSystemBundle;
 				}
 			}
-			public bool isPageElement{
-				get{
-					return (parent is ISlotSystemPage);
-				}
-			}
-			public bool isToggledOn{
-				get{
-					if(isPageElement){
-						ISlotSystemPage page = (ISlotSystemPage)parent;
-						return (page.GetPageElement(this).isFocusToggleOn);
-					}
-					return false;
-				}
-			}
 			public bool isFocusedInHierarchy{
 				get{
 					ISlotSystemElement inspected = this;
@@ -197,14 +183,6 @@ namespace SlotSystem{
 					return true;
 				}
 			}
-			public bool isToggledOnInPageByDefault{
-				get{
-					if(isPageElement){
-						return m_isInitiallyFocusedInPage;
-					}else return false;
-				}
-				set{m_isInitiallyFocusedInPage = value;}
-			}public bool m_isInitiallyFocusedInPage = true;
 		/*	methods	*/
 			public virtual void InitializeStates(){
 				Deactivate();
@@ -266,14 +244,6 @@ namespace SlotSystem{
 							return true;
 					}
 				return false;
-			}
-			public void ToggleOnPageElement(){
-				if(isPageElement){
-					ISlotSystemPage page = (ISlotSystemPage)parent;
-					ISlotSystemPageElement pageEle = page.GetPageElement(this);
-					if(!pageEle.isFocusToggleOn)
-						pageEle.isFocusToggleOn = true;
-				}
 			}
 			public virtual void InstantDefocus(){instantDefocusCommand.Execute();}
 				public virtual ISSECommand instantDefocusCommand{
@@ -341,10 +311,7 @@ namespace SlotSystem{
 			void SetInstantSelectCommand(ISSECommand comm);
 		string eName{get;}
 		bool isBundleElement{get;}
-		bool isPageElement{get;}
-		bool isToggledOn{get;}
 		bool isFocusedInHierarchy{get;}
-		bool isToggledOnInPageByDefault{get;set;}
 		void InitializeStates();
 		void Activate();
 		void Deselect();
@@ -363,7 +330,6 @@ namespace SlotSystem{
 		int level{get;}
 		bool Contains(ISlotSystemElement element);
 		ISlotSystemElement this[int i]{get;}
-		void ToggleOnPageElement();
 		void SetElements(IEnumerable<ISlotSystemElement> elements);
 	}
 }

@@ -29,21 +29,6 @@ public class SlotSystemTest{
 		protected static ISlotSystemManager MakeSubSSM(){
 			return Substitute.For<ISlotSystemManager>();
 		}
-		protected static ISlotSystemPage MakeSubSSPage(){
-			return Substitute.For<ISlotSystemPage>();
-		}
-		protected static TestSlotSystemPage MakeTestSSPage(){
-			GameObject testSSPageGO = new GameObject("testSSPageGO");
-			TestSlotSystemPage testSSPage = testSSPageGO.AddComponent<TestSlotSystemPage>();
-			testSSPageGO.tag = "TestGO";
-			return testSSPage;
-		}
-		protected static GenericPage MakeGenPage(){
-			GameObject go = new GameObject("genPageGO");
-			go.tag = "TestGO";
-			GenericPage gPage = go.AddComponent<GenericPage>();
-			return gPage;
-		}
 		protected static EquipmentSet MakeEquipmentSet(){
 			GameObject go = new GameObject("eSetGO");
 			go.tag = "TestGO";
@@ -56,14 +41,8 @@ public class SlotSystemTest{
 		protected static IEquipmentSet MakeSubEquipmentSetInitWithSGs(){
 			IEquipmentSet eSet = Substitute.For<IEquipmentSet>();
 			ISlotGroup bowSG = MakeSubSGWithEmptySBs();
-				ISlotSystemPageElement bowSGPE = MakeSubPageElement();
-				bowSGPE.element.Returns(bowSG);
 			ISlotGroup wearSG = MakeSubSGWithEmptySBs();
-				ISlotSystemPageElement wearSGPE = MakeSubPageElement();
-				wearSGPE.element.Returns(wearSG);
 			ISlotGroup cGearsSG = MakeSubSGWithEmptySBs();
-				ISlotSystemPageElement cGearsSGPE = MakeSubPageElement();
-				cGearsSGPE.element.Returns(cGearsSG);
 			IEnumerable<ISlotSystemElement> eles = new ISlotSystemElement[]{
 				bowSG, wearSG, cGearsSG
 			};
@@ -119,12 +98,6 @@ public class SlotSystemTest{
 		}
 		protected static ISlotSystemElement MakeSubSSE(){
 			return Substitute.For<ISlotSystemElement>();
-		}
-		protected static ISlotSystemPageElement MakeSubPageElement(){
-			return Substitute.For<ISlotSystemPageElement>();
-		}
-		protected static SlotSystemPageElement MakePageElement(ISlotSystemElement ele, bool isOnByDef){
-			return new SlotSystemPageElement(ele, isOnByDef);
 		}
 	/*	Non elements	*/
 		protected static List<Slot> CreateSlots(int count){

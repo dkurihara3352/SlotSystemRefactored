@@ -6,7 +6,7 @@ namespace SlotSystem{
 		/*	fields	*/
 		public ISlotSystemElement focusedElement{
 			get{return m_focusedElement;}
-			}ISlotSystemElement m_focusedElement;
+			}ISlotSystemElement m_focusedElement = null;
 			public void SetFocusedBundleElement(ISlotSystemElement element){
 				if(this.Contains(element))
 					m_focusedElement = element;

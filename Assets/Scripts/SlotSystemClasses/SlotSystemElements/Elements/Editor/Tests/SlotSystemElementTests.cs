@@ -336,48 +336,6 @@ namespace SlotSystemTests{
 					Assert.That(testSSE.isBundleElement, Is.False);
 					}
 				[Test]
-				public void isPageElement_ParentIsPage_ReturnsTrue(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
-					testSSE.SetParent(stubPage);
-
-					Assert.That(testSSE.isPageElement, Is.True);
-					}
-				[Test]
-				public void isPageElement_ParentIsNotPage_ReturnsFalse(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					TestSlotSystemElement stubSSE = MakeTestSSE();
-					testSSE.SetParent(stubSSE);
-
-					Assert.That(testSSE.isPageElement, Is.False);
-					}
-				[Test]
-				public void isToggledOn_ParentNotPage_ReturnsFalse(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					TestSlotSystemElement stubSSE = MakeTestSSE();
-					testSSE.SetParent(stubSSE);
-
-					Assert.That(testSSE.isToggledOn, Is.False);
-					}
-				[Test]
-				public void isToggledOn_ParentIsPageAndElementToggledOn_ReturnsTrue(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
-					stubPage.GetPageElement(testSSE).isFocusToggleOn.Returns(true);
-					testSSE.SetParent(stubPage);
-
-					Assert.That(testSSE.isToggledOn, Is.True);
-					}
-				[Test]
-				public void isToggledOn_ParentIsPageAndElementToggledOff_ReturnsFalse(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
-					stubPage.GetPageElement(testSSE).isFocusToggleOn.Returns(false);
-					testSSE.SetParent(stubPage);
-
-					Assert.That(testSSE.isToggledOn, Is.False);
-					}
-				[Test]
 				public void isFocusedInHierarchy_Various_ReturnsAccordingly(){
 					TestSlotSystemElement sseF_0 = MakeTestSSE();
 						TestSlotSystemElement sseF_0_0 = MakeTestSSE();
@@ -495,13 +453,10 @@ namespace SlotSystemTests{
 					TestSlotSystemElement sse = MakeTestSSE();
 						TestSlotSystemElement childA = MakeTestSSE();
 							childA.transform.SetParent(sse.transform);
-							childA.isToggledOnInPageByDefault = true;
 						TestSlotSystemElement childB = MakeTestSSE();
 							childB.transform.SetParent(sse.transform);
-							childB.isToggledOnInPageByDefault = true;
 						TestSlotSystemElement childC = MakeTestSSE();
 							childC.transform.SetParent(sse.transform);
-							childC.isToggledOnInPageByDefault = true;
 						IEnumerable<ISlotSystemElement> expectedEles = new ISlotSystemElement[]{childA, childB, childC};
 					
 					sse.SetElements();
@@ -1100,23 +1055,6 @@ namespace SlotSystemTests{
 					testSSE.SetElements(new ISlotSystemElement[]{stubMember});
 					
 					Assert.That(testSSE.Contains(stubMember), Is.True);
-					}
-				[TestCase(true)]
-				[TestCase(false)]
-				public void ToggleOnPageElement_Various_CallsPageEleAccordingly(bool called){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					ISlotSystemPage stubPage = Substitute.For<ISlotSystemPage>();
-					ISlotSystemPageElement mockPageEle = Substitute.For<ISlotSystemPageElement>();
-					mockPageEle.isFocusToggleOn.Returns(!called);
-					stubPage.GetPageElement(testSSE).Returns(mockPageEle);
-					testSSE.SetParent(stubPage);
-
-					testSSE.ToggleOnPageElement();
-					
-					if(called)
-						mockPageEle.Received().isFocusToggleOn = true;
-					else
-						mockPageEle.DidNotReceive().isFocusToggleOn = true;
 					}
 			/*	helpers */
 				SlotSystemBundle MakeSlotSystemBundle(){

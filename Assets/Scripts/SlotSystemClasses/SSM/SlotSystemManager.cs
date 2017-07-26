@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public class SlotSystemManager : SlotSystemPage, ISlotSystemManager{
+	public class SlotSystemManager : SlotSystemElement, ISlotSystemManager{
 		public static ISlotSystemManager curSSM;
 			public void SetCurSSM(){
 				if(curSSM != null){
@@ -68,28 +68,50 @@ namespace SlotSystem{
 				}
 				public ISlotGroup focusedSGP{
 					get{
-						if(poolBundle.isToggledOn){
+						if(poolBundle != null){
 							ISlotSystemElement focusedEle = poolBundle.focusedElement;
-							return (ISlotGroup)focusedEle;
-						}
-						return null;
+							if(focusedEle != null){
+								ISlotGroup result = focusedEle as ISlotGroup;
+								if(result != null)
+									return result;
+								else
+									throw new System.InvalidOperationException("SlotSystemManger.focusedSGP: poolBundle.focusedElement is not of valid type or substitute with null");
+							}else
+								throw new System.InvalidOperationException("SlotSystemManager.focusedSGP: poolBundle.focusedElement is not set");
+						}else
+							throw new System.InvalidOperationException("SlotSystemManager.focusedSGP: poolBundle is not set");
 					}
 				}
 				public IEquipmentSet focusedEqSet{
 					get{
-						if(equipBundle.isToggledOn)
-							return (IEquipmentSet)equipBundle.focusedElement;
-						return null;
+						if(equipBundle != null){
+							ISlotSystemElement focEle = equipBundle.focusedElement;
+							if(focEle != null){
+								IEquipmentSet result = focEle as IEquipmentSet;
+								if(result != null) return result;
+								throw new System.InvalidOperationException("SlotSystemManger.focusedEqSet: equipBundle.focusedElement is not of valid type or substitute with null");
+							}
+							else
+								throw new System.InvalidOperationException("SlotSystemManager.focusedEqpSet: equipBundle.focusedElement is not set");
+						}else
+							throw new System.InvalidOperationException("SlotSystemManager.focusedEqSet: equipBundle is not set");
+						
 					}
 				}
 				public List<ISlotGroup> focusedSGEs{
 					get{
-						List<ISlotGroup> result = new List<ISlotGroup>();
-						IEquipmentSet focusedEquipSet = focusedEqSet;
-						foreach(ISlotSystemElement ele in focusedEquipSet){
-							result.Add((ISlotGroup)ele);
-						}
-						return result;
+						if(focusedEqSet != null){
+							List<ISlotGroup> result = new List<ISlotGroup>();
+								foreach(ISlotSystemElement ele in focusedEqSet){
+									if(ele != null)
+										result.Add((ISlotGroup)ele);
+								}
+							if(result.Count != 0)
+								return result;
+							else
+								throw new System.InvalidOperationException("SlotSystemManager.focusedSGEs: focusedEqSet empty");
+						}else
+							throw new System.InvalidOperationException("SlotSystemManager.focusedSGEs: focusedEqSet not set");
 					}
 				}
 				public List<ISlotGroup> focusedSGGs{
@@ -113,7 +135,7 @@ namespace SlotSystem{
 						while(true){
 							if(inspected.parent == null)
 								break;
-							if((inspected.isPageElement && !inspected.isToggledOn)||(inspected.isBundleElement && inspected != ((ISlotSystemBundle)inspected.parent).focusedElement)){
+							if((inspected.isBundleElement && inspected != ((ISlotSystemBundle)inspected.parent).focusedElement)){
 								isF = false;
 								break;
 							}else{
@@ -143,44 +165,100 @@ namespace SlotSystem{
 				}
 				public IPoolInventory poolInv{
 					get{
-						return (IPoolInventory)focusedSGP.inventory;
+						if(focusedSGP != null){
+							if(focusedSGP.inventory != null)
+								return (IPoolInventory)focusedSGP.inventory;
+							throw new System.InvalidOperationException("SlotSystemManager.poolInv: focusedSGP.inventory is not set");
+						}
+						throw new System.InvalidOperationException("SlotSystemManager.poolInv: focusedSGP is not set");
 					}
 				}
 				public IEquipmentSetInventory equipInv{
 					get{
-						return (IEquipmentSetInventory)focusedSGEs[0].inventory;
+						foreach(ISlotGroup sge in focusedSGEs){
+							if(sge != null){
+								IEquipmentSetInventory result = (IEquipmentSetInventory)sge.inventory;
+								if(result == null)
+									throw new System.InvalidOperationException("SlotSystemManager.equipInv: someSGEs not set with an inv is found");
+								else return result;
+							}
+						}
+						return null;
+					}
+				}
+				public ISlotGroup focusedSGEBow{
+					get{
+						if(focusedSGEs != null){
+							foreach(ISlotGroup sg in focusedSGEs){
+								if(sg.filter is SGBowFilter)
+									return sg;
+							}
+							throw new System.InvalidOperationException("SlotSystemManager.focusedSGEBow: there's no sg set with SGBowFilter in focusedSGEs");
+						}
+						throw new System.InvalidOperationException("SlotSystemManager.focusedSGEBow: focusedSGEs not set");
+					}
+				}
+				public ISlotGroup focusedSGEWear{
+					get{
+						if(focusedSGEs != null){
+							foreach(ISlotGroup sg in focusedSGEs){
+								if(sg.filter is SGWearFilter)
+									return sg;
+							}
+							throw new System.InvalidOperationException("SlotSystemManager.focusedSGEWear: there's no sg set with SGWearFilter in focusedSGEs");
+						}
+						throw new System.InvalidOperationException("SlotSystemManager.focusedSGEWear: focusedSGEs not set");
+					}
+				}
+				public ISlotGroup focusedSGECGears{
+					get{
+						if(focusedSGEs != null){
+							foreach(ISlotGroup sg in focusedSGEs){
+								if(sg.filter is SGCGearsFilter)
+									return sg;
+							}
+							throw new System.InvalidOperationException("SlotSystemManager.focusedSGECGears: there's no sg set with SGCGearsFilter in focusedSGEs");
+						}
+						throw new System.InvalidOperationException("SlotSystemManager.focusedSGECGears: focusedSGEs not set");
 					}
 				}
 				public BowInstance equippedBowInst{
 					get{
-						foreach(ISlotGroup sge in focusedSGEs){
-							if(sge.filter is SGBowFilter)
-								return (BowInstance)sge.slots[0].sb.itemInst;
+						if(focusedSGEBow != null){
+							ISlottable sb = focusedSGEBow[0] as ISlottable;
+							if(sb != null){
+								BowInstance result = sb.itemInst as BowInstance;
+								if(result != null) return result;
+								throw new System.InvalidOperationException("SlotSystemManager.equippedBowInst: focusedSGEBow's sb item is not set right");
+							}
+							throw new System.InvalidOperationException("SlotSystemManager.equippedBowInst: focusedSGEBow's indexer not set right");
 						}
-						return null;
+						throw new System.InvalidOperationException("SlotSystemManager.equippedBowInst: focusedSGEBow is not set");
 					}
 				}
 				public WearInstance equippedWearInst{
 					get{
-						foreach(ISlotGroup sge in focusedSGEs){
-							if(sge.filter is SGWearFilter)
-								return (WearInstance)sge.slots[0].sb.itemInst;
+						if(focusedSGEWear != null){
+							ISlottable sb = focusedSGEWear[0] as ISlottable;
+							if(sb!=null){
+								WearInstance result = ((ISlottable)focusedSGEWear[0]).itemInst as WearInstance;
+								if(result != null) return result;
+								throw new System.InvalidOperationException("SlotSystemManager.equippedWearInst: focusedSGEWear's sb item is not set right");
+							}
+							throw new System.InvalidOperationException("SlotSystemManager.equippedWearInst: focusedSGEWear's indexer not set right");
 						}
-						return null;
+						throw new System.InvalidOperationException("SlotSystemManager.equippedWearInst: focusedSGEWear is not set");
 					}
 				}
 				public List<CarriedGearInstance> equippedCarriedGears{
 					get{
-						List<CarriedGearInstance> result = new List<CarriedGearInstance>();
-						foreach(ISlotGroup sge in focusedSGEs){
-							if(sge.filter is SGCGearsFilter){
-								foreach(ISlottable sb in sge){
-									if(sb != null)
-										result.Add((CarriedGearInstance)sb.itemInst);
-								}
-							}
+						if(focusedSGECGears != null){
+							List<CarriedGearInstance> result = new List<CarriedGearInstance>();
+							foreach(ISlottable sb in focusedSGECGears)
+								if(sb != null) result.Add((CarriedGearInstance)sb.itemInst);
+							return result;
 						}
-						return result;
+						throw new System.InvalidOperationException("SlotSystemManager.equippedCGearsInst: focusedSGECGears is not set");
 					}
 				}
 				public List<PartsInstance> equippedParts{
@@ -469,18 +547,7 @@ namespace SlotSystem{
 					m_equipBundle = eBun;
 					m_otherBundles = gBuns;
 				}
-				public override void SetElements(){
-					List<ISlotSystemPageElement> pEles = new List<ISlotSystemPageElement>();
-					ISlotSystemPageElement pBunPE = new SlotSystemPageElement(poolBundle, poolBundle.isToggledOnInPageByDefault);
-						pEles.Add(pBunPE);
-					ISlotSystemPageElement eBunPE = new SlotSystemPageElement(equipBundle, equipBundle.isToggledOnInPageByDefault);
-						pEles.Add(eBunPE);
-					foreach(var gBun in otherBundles){
-						ISlotSystemPageElement gBunPE = new SlotSystemPageElement(gBun, gBun.isToggledOnInPageByDefault);
-						pEles.Add(gBunPE);
-					}
-					m_pageElements = pEles;
-				}
+				public override void SetElements(){}
 				public void Initialize(){
 					PerformInHierarchy(SetSSMInH);
 					PerformInHierarchy(SetParent);
@@ -541,8 +608,6 @@ namespace SlotSystem{
 										containingEle = e;
 								}
 								immBundle.SetFocusedBundleElement(containingEle);
-								if(immBundle.isPageElement && !immBundle.isToggledOn)
-									immBundle.ToggleOnPageElement();
 								tested = tested.immediateBundle;
 							}
 							this.Focus();
@@ -743,6 +808,9 @@ namespace SlotSystem{
 			List<ISlotGroup> allSGPs{get;}
 			List<ISlotGroup> allSGEs{get;}
 			List<ISlotGroup> allSGGs{get;}
+			ISlotGroup focusedSGEBow{get;}
+			ISlotGroup focusedSGEWear{get;}
+			ISlotGroup focusedSGECGears{get;}
 			void AddInSGList(ISlotSystemElement ele, IList<ISlotGroup> sgs);
 			List<InventoryItemInstance> allEquippedItems{get;}
 			ISlotGroup focusedSGP{get;}
