@@ -5,13 +5,19 @@ using UnityEngine;
 namespace SlotSystem{
 	public class TestSlotSystemElement: SlotSystemElement{
 		public string message = "";
-		public void SetElementsInHi(ISlotSystemElement ele){
-			ele.SetElements();
+		public void SetElementsRecursively(){
+			PerformInHierarchy(SetElementsInHi);
 		}
-		public void SetParentInHi(ISlotSystemElement ele){
-			foreach(var e in ele)
-				e.SetParent(ele);
+			void SetElementsInHi(ISlotSystemElement ele){
+				ele.SetElements();
+			}
+		public void SetParentRecursively(){
+			PerformInHierarchy(SetParentInHi);
 		}
+			void SetParentInHi(ISlotSystemElement ele){
+				foreach(var e in ele)
+					e.SetParent(ele);
+			}
 		public void RecursiveTestMethod(){
 			PerformInHierarchy(FocusIfAOD);
 		}
@@ -19,5 +25,25 @@ namespace SlotSystem{
 				if(ele.isActivatedOnDefault)
 					ele.Focus();
 			}
+		public void FocusRecursively(){
+			PerformInHierarchy(FocusInHi);
+			}
+			void FocusInHi(ISlotSystemElement sse){
+				if(sse.isFocusableInHierarchy)
+					sse.Focus();
+				else
+					sse.Defocus();
+			}
+		public void InitializeStatesRecursively(){
+			PerformInHierarchy(InitializeStateInHi);
+		}
+			void InitializeStateInHi(ISlotSystemElement ele){
+				ele.InitializeStates();
+			}
+		public bool isCurSelStateNull{
+			get{
+				return !(isDeactivated || isFocused || isDefocused || isSelected);
+			}
+		}
 	}
 }

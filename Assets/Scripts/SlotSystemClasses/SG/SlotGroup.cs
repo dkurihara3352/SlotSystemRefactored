@@ -110,12 +110,6 @@ namespace SlotSystem{
 							public virtual bool isSorting{get{return curActState == sortState;}}
 							public virtual bool wasSorting{get{return prevActState == sortState;}}
 		/*	process	*/
-			/*	Selection Process	*/
-				/* Coroutine */
-					public override IEnumeratorFake deactivateCoroutine(){return null;}
-					public override IEnumeratorFake focusCoroutine(){return null;}
-					public override IEnumeratorFake defocusCoroutine(){return null;}
-					public override IEnumeratorFake selectCoroutine(){return null;}
 			/*	Action Process	*/
 				public virtual ISSEProcessEngine<ISGActProcess> actProcEngine{
 					get{

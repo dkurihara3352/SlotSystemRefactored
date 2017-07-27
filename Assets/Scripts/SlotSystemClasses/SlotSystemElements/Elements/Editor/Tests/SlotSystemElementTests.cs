@@ -51,6 +51,15 @@ namespace SlotSystemTests{
 						Assert.That(testSSE.selProcess, Is.TypeOf(typeof(SSEDeactivateProcess)));
 						}
 					[Test]
+					public void Deactivate_FromNullToDeaToDea_DoesNotSetSelProc(){
+						TestSlotSystemElement testSSE = MakeTestSSE();
+						testSSE.Deactivate();
+
+						testSSE.Deactivate();
+
+						Assert.That(testSSE.selProcess, Is.Null);
+					}
+					[Test]
 					public void Focus_WhenCalled_SetsCurSelStateFocused(){
 						TestSlotSystemElement testSSE = MakeTestSSE();
 						
@@ -435,7 +444,7 @@ namespace SlotSystemTests{
 					stubPar2.SetElements(new ISlotSystemElement[]{stubPar3});
 					stubPar2.SetParent(stubPar1);
 					stubPar1.SetElements(new ISlotSystemElement[]{stubPar2});
-					stubPar1.PerformInHierarchy(stubPar1.FocusInHi);
+					stubPar1.FocusRecursively();
 					
 					Assert.That(testSSE.isFocusedInHierarchy, Is.True);
 					}
@@ -1051,6 +1060,159 @@ namespace SlotSystemTests{
 					Assert.That(testSSE.Contains(stubMember), Is.True);
 					}
 			//
+				[TestCaseSource(typeof(isFocusableInHierarchyCases))]
+				public void isFocusableInHierarchy_AllAncestorsContainedInBundleFocusedElement_ReturnsTrue(TestSlotSystemElement top, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
+					foreach(var e in xOn)
+						Assert.That(e.isFocusableInHierarchy, Is.True);
+					foreach(var e in xOff)
+						Assert.That(e.isFocusableInHierarchy, Is.False);
+					}
+					class isFocusableInHierarchyCases: IEnumerable{
+						public IEnumerator GetEnumerator(){
+							object[] case0;
+								TestSlotSystemElement top_0 = MakeTestSSE();
+									SlotSystemBundle bun0_0 = MakeSSBundle();
+										TestSlotSystemElement sse00_0 = MakeTestSSE();
+										TestSlotSystemElement sse01_0 = MakeTestSSE();//foc
+										TestSlotSystemElement sse02_0 = MakeTestSSE();
+										SlotSystemBundle bun03_0 = MakeSSBundle();
+											TestSlotSystemElement sse030_0 = MakeTestSSE();//foc
+											TestSlotSystemElement sse031_0 = MakeTestSSE();
+									SlotSystemBundle bun1_0 = MakeSSBundle();
+										SlotSystemBundle bun10_0 = MakeSSBundle();
+											TestSlotSystemElement sse100_0 = MakeTestSSE();//foc
+											TestSlotSystemElement sse101_0 = MakeTestSSE();
+										SlotSystemBundle bun11_0 = MakeSSBundle();//foc
+											SlotSystemBundle bun110_0 = MakeSSBundle();//foc
+												TestSlotSystemElement sse1100_0 = MakeTestSSE();//foc
+												TestSlotSystemElement sse1101_0 = MakeTestSSE();
+											SlotSystemBundle bun111_0 = MakeSSBundle();
+											SlotSystemBundle bun112_0 = MakeSSBundle();
+								bun0_0.transform.SetParent(top_0.transform);
+									sse00_0.transform.SetParent(bun0_0.transform);
+									sse01_0.transform.SetParent(bun0_0.transform);
+									sse02_0.transform.SetParent(bun0_0.transform);
+									bun03_0.transform.SetParent(bun0_0.transform);
+										sse030_0.transform.SetParent(bun03_0.transform);
+										sse031_0.transform.SetParent(bun03_0.transform);
+								bun1_0.transform.SetParent(top_0.transform);
+									bun10_0.transform.SetParent(bun1_0.transform);
+										sse100_0.transform.SetParent(bun10_0.transform);
+										sse101_0.transform.SetParent(bun10_0.transform);
+									bun11_0.transform.SetParent(bun1_0.transform);
+										bun110_0.transform.SetParent(bun11_0.transform);
+											sse1100_0.transform.SetParent(bun110_0.transform);
+											sse1101_0.transform.SetParent(bun110_0.transform);
+										bun111_0.transform.SetParent(bun11_0.transform);
+										bun112_0.transform.SetParent(bun11_0.transform);
+
+								top_0.SetElementsRecursively();
+								top_0.SetParentRecursively();
+
+								bun0_0.SetFocusedBundleElement(sse01_0);
+								bun03_0.SetFocusedBundleElement(sse030_0);
+								bun1_0.SetFocusedBundleElement(bun11_0);
+								bun10_0.SetFocusedBundleElement(sse100_0);
+								bun11_0.SetFocusedBundleElement(bun110_0);
+								bun110_0.SetFocusedBundleElement(sse1100_0);
+
+								IEnumerable<ISlotSystemElement> xOn_0 = new ISlotSystemElement[]{
+									top_0,
+									bun0_0,
+									sse01_0,
+									bun1_0,
+									bun11_0,
+									bun110_0,
+									sse1100_0
+								};
+								IEnumerable<ISlotSystemElement> xOff_0 = new ISlotSystemElement[]{
+									sse00_0,
+									sse02_0,
+									bun03_0,
+									sse030_0,
+									sse031_0,
+									bun10_0,
+									sse100_0,
+									sse101_0,
+									sse1101_0,
+									bun111_0,
+									bun112_0
+								};
+								case0 = new object[]{top_0, xOn_0, xOff_0};
+								yield return case0;
+							object[] case1;
+								TestSlotSystemElement top_1 = MakeTestSSE();
+									SlotSystemBundle bun0_1 = MakeSSBundle();
+										TestSlotSystemElement sse00_1 = MakeTestSSE();
+										TestSlotSystemElement sse01_1 = MakeTestSSE();
+										TestSlotSystemElement sse02_1 = MakeTestSSE();
+										SlotSystemBundle bun03_1 = MakeSSBundle();//foc
+											TestSlotSystemElement sse030_1 = MakeTestSSE();//foc
+											TestSlotSystemElement sse031_1 = MakeTestSSE();
+									SlotSystemBundle bun1_1 = MakeSSBundle();
+										SlotSystemBundle bun10_1 = MakeSSBundle();//foc
+											TestSlotSystemElement sse100_1 = MakeTestSSE();//foc
+											TestSlotSystemElement sse101_1 = MakeTestSSE();
+										SlotSystemBundle bun11_1 = MakeSSBundle();
+											SlotSystemBundle bun110_1 = MakeSSBundle();//foc
+												TestSlotSystemElement sse1100_1 = MakeTestSSE();//foc
+												TestSlotSystemElement sse1101_1 = MakeTestSSE();
+											SlotSystemBundle bun111_1 = MakeSSBundle();
+											SlotSystemBundle bun112_1 = MakeSSBundle();
+								bun0_1.transform.SetParent(top_1.transform);
+									sse00_1.transform.SetParent(bun0_1.transform);
+									sse01_1.transform.SetParent(bun0_1.transform);
+									sse02_1.transform.SetParent(bun0_1.transform);
+									bun03_1.transform.SetParent(bun0_1.transform);
+										sse030_1.transform.SetParent(bun03_1.transform);
+										sse031_1.transform.SetParent(bun03_1.transform);
+								bun1_1.transform.SetParent(top_1.transform);
+									bun10_1.transform.SetParent(bun1_1.transform);
+										sse100_1.transform.SetParent(bun10_1.transform);
+										sse101_1.transform.SetParent(bun10_1.transform);
+									bun11_1.transform.SetParent(bun1_1.transform);
+										bun110_1.transform.SetParent(bun11_1.transform);
+											sse1100_1.transform.SetParent(bun110_1.transform);
+											sse1101_1.transform.SetParent(bun110_1.transform);
+										bun111_1.transform.SetParent(bun11_1.transform);
+										bun112_1.transform.SetParent(bun11_1.transform);
+
+								top_1.SetElementsRecursively();
+								top_1.SetParentRecursively();
+
+								bun0_1.SetFocusedBundleElement(bun03_1);
+								bun03_1.SetFocusedBundleElement(sse030_1);
+								bun1_1.SetFocusedBundleElement(bun10_1);
+								bun10_1.SetFocusedBundleElement(sse100_1);
+								bun11_1.SetFocusedBundleElement(bun110_1);
+								bun110_1.SetFocusedBundleElement(sse1100_1);
+
+								IEnumerable<ISlotSystemElement> xOn_1 = new ISlotSystemElement[]{
+									top_1,
+									bun0_1,
+									bun03_1,
+									sse030_1,
+									bun1_1,
+									bun10_1,
+									sse100_1
+								};
+								IEnumerable<ISlotSystemElement> xOff_1 = new ISlotSystemElement[]{
+									sse00_1,
+									sse01_1,
+									sse02_1,
+									sse031_1,
+									sse101_1,
+									bun11_1,
+									bun110_1,
+									sse1100_1,
+									sse1101_1,
+									bun111_1,
+									bun112_1
+								};
+								case1 = new object[]{top_1, xOn_1, xOff_1};
+								yield return case1;
+						}
+					}
 				[Test]
 				public void Activate_WhenCalled_ActivateAccordingly(){
 					/* 	"Spot" activation: sets focused or defocused according to rule
@@ -1063,14 +1225,232 @@ namespace SlotSystemTests{
 
 					Assert.That(sse.isFocused, Is.True);
 				}
-				[Test]
-				public void ActivateRecursively_WhenCalled_FocusOrDefocusElementsAccordingly(){
-					
+				[TestCaseSource(typeof(ActivateRecursivelyCases))]
+				public void ActivateRecursively_WhenCalled_FocusIfIsAOFAndFocusable_DefocusIfIsAODAndNotFocusable(TestSlotSystemElement top, IEnumerable<ISlotSystemElement> xFocused, IEnumerable<ISlotSystemElement> xDefocused, IEnumerable<ISlotSystemElement> xDeactivated){
+
+					top.ActivateRecursively();
+
+					foreach(var e in xFocused)
+						Assert.That(e.isFocused, Is.True);
+					foreach(var e in xDefocused)
+						Assert.That(e.isDefocused, Is.True);
+					foreach(var e in xDeactivated)
+						Assert.That(e.isDeactivated, Is.True);
 				}
+					class ActivateRecursivelyCases: IEnumerable{
+						public IEnumerator GetEnumerator(){
+							object[] case0;
+								TestSlotSystemElement top_0 = MakeTestSSE();
+									SlotSystemBundle bun0_0 = MakeSSBundle();
+										TestSlotSystemElement sse00_0 = MakeTestSSE();
+											SlotSystemBundle bun000_0 = MakeSSBundle();
+												TestSlotSystemElement sse0000_0 = MakeTestSSE();
+												TestSlotSystemElement sse0001_0 = MakeTestSSE();
+											TestSlotSystemElement sse001_0 = MakeTestSSE();
+												TestSlotSystemElement sse0010_0 = MakeTestSSE();
+												TestSlotSystemElement sse0011_0 = MakeTestSSE();
+										TestSlotSystemElement sse01_0 = MakeTestSSE();
+										TestSlotSystemElement sse02_0 = MakeTestSSE();
+									SlotSystemBundle bun1_0 = MakeSSBundle();
+										SlotSystemBundle bun10_0 = MakeSSBundle();
+											TestSlotSystemElement sse100_0 = MakeTestSSE();
+											TestSlotSystemElement sse101_0 = MakeTestSSE();
+												SlotSystemBundle bun1010_0 = MakeSSBundle();
+													TestSlotSystemElement sse10100_0 = MakeTestSSE();
+													TestSlotSystemElement sse10101_0 = MakeTestSSE();
+										SlotSystemBundle bun11_0 = MakeSSBundle();
+											TestSlotSystemElement sse110_0 = MakeTestSSE();
+											TestSlotSystemElement sse111_0 = MakeTestSSE();
+									SlotSystemBundle bun2_0 = MakeSSBundle();
+										SlotSystemBundle bun20_0 = MakeSSBundle();
+										SlotSystemBundle bun21_0 = MakeSSBundle();
+									bun0_0.transform.SetParent(top_0.transform);
+										sse00_0.transform.SetParent(bun0_0.transform);/* foc */
+											bun000_0.transform.SetParent(sse00_0.transform);
+												sse0000_0.transform.SetParent(bun000_0.transform);/* foc */
+												sse0001_0.transform.SetParent(bun000_0.transform);
+											/* !isAOD */
+											sse001_0.transform.SetParent(sse00_0.transform);
+												sse0010_0.transform.SetParent(sse001_0.transform);
+												sse0011_0.transform.SetParent(sse001_0.transform);
+											/* ****** */
+										sse01_0.transform.SetParent(bun0_0.transform);
+										sse02_0.transform.SetParent(bun0_0.transform);
+									bun1_0.transform.SetParent(top_0.transform);
+										bun10_0.transform.SetParent(bun1_0.transform);/* foc */
+											sse100_0.transform.SetParent(bun10_0.transform);
+											sse101_0.transform.SetParent(bun10_0.transform);/* foc */
+												bun1010_0.transform.SetParent(sse101_0.transform);
+													sse10100_0.transform.SetParent(bun1010_0.transform);
+													sse10101_0.transform.SetParent(bun1010_0.transform);/* foc */
+										/* !isAOD */
+										bun11_0.transform.SetParent(bun1_0.transform);
+											sse110_0.transform.SetParent(bun11_0.transform);//foc
+											sse111_0.transform.SetParent(bun11_0.transform);
+										/* ****** */
+									/* !isAOD */
+									bun2_0.transform.SetParent(top_0.transform);
+										bun20_0.transform.SetParent(bun2_0.transform);
+										bun21_0.transform.SetParent(bun2_0.transform);//foc
+									/* ****** */
+								
+								top_0.SetElementsRecursively();
+								top_0.SetParentRecursively();
+								top_0.InitializeStatesRecursively();
+
+								bun0_0.SetFocusedBundleElement(sse00_0);
+								bun000_0.SetFocusedBundleElement(sse0000_0);
+								bun1_0.SetFocusedBundleElement(bun10_0);
+								bun10_0.SetFocusedBundleElement(sse101_0);
+								bun1010_0.SetFocusedBundleElement(sse10101_0);
+								bun11_0.SetFocusedBundleElement(sse110_0);
+								bun2_0.SetFocusedBundleElement(bun21_0);
+
+								sse001_0.isActivatedOnDefault = false;
+								bun11_0.isActivatedOnDefault = false;
+								bun2_0.isActivatedOnDefault = false;
+
+								IEnumerable<ISlotSystemElement> xFocused_0 = new ISlotSystemElement[]{
+									top_0,
+									bun0_0,
+									sse00_0,
+									bun000_0,
+									sse0000_0,
+									bun1_0,
+									bun10_0,
+									sse101_0,
+									bun1010_0,
+									sse10101_0
+								};
+								IEnumerable<ISlotSystemElement> xDefocused_0 = new ISlotSystemElement[]{
+									sse0001_0,
+									sse01_0,
+									sse02_0,
+									sse100_0,
+									sse10100_0
+								};
+								IEnumerable<ISlotSystemElement> xDeactivated_0 = new ISlotSystemElement[]{
+									sse001_0,
+									sse0010_0,
+									sse0011_0,
+									bun11_0,
+									sse110_0,
+									sse111_0,
+									bun2_0,
+									bun20_0,
+									bun21_0
+								};
+								case0 = new object[]{top_0, xFocused_0, xDefocused_0, xDeactivated_0};
+								yield return case0;
+							object[] case1;
+								TestSlotSystemElement top_1 = MakeTestSSE();
+									SlotSystemBundle bun0_1 = MakeSSBundle();
+										TestSlotSystemElement sse00_1 = MakeTestSSE();
+											SlotSystemBundle bun000_1 = MakeSSBundle();
+												TestSlotSystemElement sse0000_1 = MakeTestSSE();
+												TestSlotSystemElement sse0001_1 = MakeTestSSE();
+											TestSlotSystemElement sse001_1 = MakeTestSSE();
+												TestSlotSystemElement sse0010_1 = MakeTestSSE();
+												TestSlotSystemElement sse0011_1 = MakeTestSSE();
+										TestSlotSystemElement sse01_1 = MakeTestSSE();
+										TestSlotSystemElement sse02_1 = MakeTestSSE();
+									SlotSystemBundle bun1_1 = MakeSSBundle();
+										SlotSystemBundle bun10_1 = MakeSSBundle();
+											TestSlotSystemElement sse100_1 = MakeTestSSE();
+											TestSlotSystemElement sse101_1 = MakeTestSSE();
+												SlotSystemBundle bun1010_1 = MakeSSBundle();
+													TestSlotSystemElement sse10100_1 = MakeTestSSE();
+													TestSlotSystemElement sse10101_1 = MakeTestSSE();
+										SlotSystemBundle bun11_1 = MakeSSBundle();
+											TestSlotSystemElement sse110_1 = MakeTestSSE();
+											TestSlotSystemElement sse111_1 = MakeTestSSE();
+									SlotSystemBundle bun2_1 = MakeSSBundle();
+										SlotSystemBundle bun20_1 = MakeSSBundle();
+										SlotSystemBundle bun21_1 = MakeSSBundle();
+									/* !isAOD */
+									bun0_1.transform.SetParent(top_1.transform);
+										sse00_1.transform.SetParent(bun0_1.transform);/* foc */
+											bun000_1.transform.SetParent(sse00_1.transform);
+												sse0000_1.transform.SetParent(bun000_1.transform);/* foc */
+												sse0001_1.transform.SetParent(bun000_1.transform);
+											sse001_1.transform.SetParent(sse00_1.transform);
+												sse0010_1.transform.SetParent(sse001_1.transform);
+												sse0011_1.transform.SetParent(sse001_1.transform);
+										sse01_1.transform.SetParent(bun0_1.transform);
+										sse02_1.transform.SetParent(bun0_1.transform);
+									/******* */
+									bun1_1.transform.SetParent(top_1.transform);
+										bun10_1.transform.SetParent(bun1_1.transform);/* foc */
+											sse100_1.transform.SetParent(bun10_1.transform);
+											sse101_1.transform.SetParent(bun10_1.transform);/* foc */
+												bun1010_1.transform.SetParent(sse101_1.transform);
+													sse10100_1.transform.SetParent(bun1010_1.transform);
+													sse10101_1.transform.SetParent(bun1010_1.transform);/* foc */
+										/* !isAOD */
+										bun11_1.transform.SetParent(bun1_1.transform);
+											sse110_1.transform.SetParent(bun11_1.transform);//foc
+											sse111_1.transform.SetParent(bun11_1.transform);
+										/* ****** */
+									/* !isAOD */
+									bun2_1.transform.SetParent(top_1.transform);
+										bun20_1.transform.SetParent(bun2_1.transform);
+										bun21_1.transform.SetParent(bun2_1.transform);//foc
+									/* ****** */
+								
+								top_1.SetElementsRecursively();
+								top_1.SetParentRecursively();
+								top_1.InitializeStatesRecursively();
+
+								bun0_1.SetFocusedBundleElement(sse00_1);
+								bun000_1.SetFocusedBundleElement(sse0000_1);
+								bun1_1.SetFocusedBundleElement(bun10_1);
+								bun10_1.SetFocusedBundleElement(sse101_1);
+								bun1010_1.SetFocusedBundleElement(sse10101_1);
+								bun11_1.SetFocusedBundleElement(sse110_1);
+								bun2_1.SetFocusedBundleElement(bun21_1);
+
+								bun0_1.isActivatedOnDefault = false;
+								bun11_1.isActivatedOnDefault = false;
+								bun2_1.isActivatedOnDefault = false;
+
+								IEnumerable<ISlotSystemElement> xFocused_1 = new ISlotSystemElement[]{
+									top_1,
+									bun1_1,
+									bun10_1,
+									sse101_1,
+									bun1010_1,
+									sse10101_1
+								};
+								IEnumerable<ISlotSystemElement> xDefocused_1 = new ISlotSystemElement[]{
+									sse100_1,
+									sse10100_1
+								};
+								IEnumerable<ISlotSystemElement> xDeactivated_1 = new ISlotSystemElement[]{
+									bun0_1,
+									sse00_1,
+									bun000_1,
+									sse0000_1,
+									sse0001_1,
+									sse001_1,
+									sse0010_1,
+									sse0011_1,
+									sse01_1,
+									sse02_1,
+									bun11_1,
+									sse110_1,
+									sse111_1,
+									bun2_1,
+									bun20_1,
+									bun21_1
+								};
+								case1 = new object[]{top_1, xFocused_1, xDefocused_1, xDeactivated_1};
+								yield return case1;
+						}
+					}
 				[TestCaseSource(typeof(isActivatedOnDefaultCases))]
 				public void isActivatedOnDefault_Always_ReturnsAccordingly(TestSlotSystemElement sse, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
-					sse.PerformInHierarchy(sse.SetElementsInHi);
-					sse.PerformInHierarchy(sse.SetParentInHi);
+					sse.SetElementsRecursively();
+					sse.SetParentRecursively();
 
 					sse.RecursiveTestMethod();
 					

@@ -19,21 +19,6 @@ namespace SlotSystem{
 			m_elements = elements;
 			InitializeStates();
 		}
-		public override void Focus(){
-			base.Focus();
-			if(m_focusedElement != null)
-				m_focusedElement.Focus();
-			foreach(ISlotSystemElement ele in this){
-				if(ele != m_focusedElement)
-				ele.Defocus();
-			}
-		}
-		public override void Defocus(){
-			base.Defocus();
-			foreach(ISlotSystemElement ele in this){
-				ele.Defocus();
-			}
-		}	
 	}
 	public interface ISlotSystemBundle: ISlotSystemElement{
 		ISlotSystemElement focusedElement{get;}

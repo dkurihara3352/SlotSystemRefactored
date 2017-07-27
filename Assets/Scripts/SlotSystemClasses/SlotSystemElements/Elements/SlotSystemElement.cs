@@ -21,8 +21,11 @@ namespace SlotSystem{
 			}
 			void SetSelState(ISSESelState state){
 				selStateEngine.SetState(state);
+				if(state == null && selProcess != null)
+					SetAndRunSelProcess(null);
 			}
 			public bool isSelStateInit{get{return prevSelState ==null;}}
+			public void ClearCurSelState(){SetSelState(null);}
 			/*	selStates	*/
 				ISSESelState deactivatedState{
 					get{
@@ -95,18 +98,43 @@ namespace SlotSystem{
 					selProcEngine.SetAndRunProcess(process);
 				}
 				/* Coroutines */
-					public virtual IEnumeratorFake deactivateCoroutine(){
-						return null;
-					}
-					public virtual IEnumeratorFake focusCoroutine(){
-						return null;
-					}
-					public virtual IEnumeratorFake defocusCoroutine(){
-						return null;
-					}
-					public virtual IEnumeratorFake selectCoroutine(){
-						return null;
-					}
+					public System.Func<IEnumeratorFake> deactivateCoroutine{
+						get{
+							if(m_deactivateCoroutine == null)
+								return defDeaCoroutine;
+							return m_deactivateCoroutine;
+						}
+						}System.Func<IEnumeratorFake> m_deactivateCoroutine;
+						public void SetDeaCoroutine(System.Func<IEnumeratorFake> func){m_deactivateCoroutine = func;}
+						IEnumeratorFake defDeaCoroutine(){return null;}
+					public System.Func<IEnumeratorFake> focusCoroutine{
+						get{
+							if(m_focusCoroutine == null)
+								return defFocCoroutine;
+							return m_focusCoroutine;
+						}
+						}System.Func<IEnumeratorFake> m_focusCoroutine;
+						public void SetFocCoroutine(System.Func<IEnumeratorFake> func){m_focusCoroutine = func;}
+						IEnumeratorFake defFocCoroutine(){return null;}
+					public System.Func<IEnumeratorFake> defocusCoroutine{
+						get{
+							if(m_defocusCoroutine == null)
+								return defDefocusCoroutine;
+							return m_defocusCoroutine;
+						}
+						}System.Func<IEnumeratorFake> m_defocusCoroutine;
+						public void SetDefCoroutine(System.Func<IEnumeratorFake> func){m_defocusCoroutine = func;}
+						IEnumeratorFake defDefocusCoroutine(){return null;}
+					public System.Func<IEnumeratorFake> selectCoroutine{
+						get{
+							if(m_selectCoroutine == null)
+								return defSelCoroutine;
+							return m_selectCoroutine;
+						}
+						}System.Func<IEnumeratorFake> m_selectCoroutine;
+						public void SetSelCoroutine(System.Func<IEnumeratorFake> func){m_selectCoroutine = func;}
+						IEnumeratorFake defSelCoroutine(){return null;}
+					
 		/* Events */
 			public virtual void OnHoverEnterMock(){
 				if(curSelState != null)
@@ -206,10 +234,6 @@ namespace SlotSystem{
 				}
 				throw new System.ArgumentNullException();
 			}
-			public virtual void Activate(){
-				Focus();
-			}
-			public virtual void Deselect(){}
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement> act){
 				act(this);
 				if(elements != null)
@@ -217,35 +241,6 @@ namespace SlotSystem{
 						ele.PerformInHierarchy(act);
 					}
 			}
-				public virtual void FocusInHi(ISlotSystemElement sse){
-					sse.Focus();
-				}
-				public bool isActivatedOnDefault{
-					get{
-						ISlotSystemElement inspected = parent;
-						while(true){
-							if(inspected　== null)
-								break;
-							if(inspected.isActivatedOnDefault)
-								inspected = inspected.parent;
-							else
-								return false;
-						}
-						return m_isActivatedOnDefault;
-					}
-					set{m_isActivatedOnDefault = value;}
-				}bool m_isActivatedOnDefault = true;
-				public void FocusRecursively(){
-					PerformInHierarchy(FocusInHi);
-				}
-				public void ActivateRecursively(){
-					PerformInHierarchy(ActivateSelectively);
-				}
-					void ActivateSelectively(ISlotSystemElement ele){
-						if(ele.isActivatedOnDefault)
-							ele.Activate();
-					}
-
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
 				act(this, obj);
 				if(elements != null)
@@ -294,10 +289,57 @@ namespace SlotSystem{
 					}ISSECommand m_instantSelectCommand;
 					public virtual void SetInstantSelectCommand(ISSECommand comm){m_instantSelectCommand = comm;}
 			public void SetElements(IEnumerable<ISlotSystemElement> elements){m_elements = elements;}
+			public bool isActivatedOnDefault{
+				get{
+					ISlotSystemElement inspected = parent;
+					while(true){
+						if(inspected　== null)
+							break;
+						if(inspected.isActivatedOnDefault)
+							inspected = inspected.parent;
+						else
+							return false;
+					}
+					return m_isActivatedOnDefault;
+				}
+				set{m_isActivatedOnDefault = value;}
+				}bool m_isActivatedOnDefault = true;
+			public bool isFocusableInHierarchy{
+				get{
+					ISlotSystemElement inspected = this;
+					while(true){
+						if(inspected.immediateBundle == null)
+							break;
+						if(inspected.immediateBundle.focusedElement == inspected || inspected.immediateBundle.focusedElement.ContainsInHierarchy(inspected))
+							inspected = inspected.immediateBundle;
+						else
+							return false;
+					}
+					return true;
+				}
+			}
+			public void ActivateRecursively(){
+				PerformInHierarchy(ActivateInHi);
+			}
+				void ActivateInHi(ISlotSystemElement ele){
+					if(ele.isActivatedOnDefault){
+						if(ele.isFocusableInHierarchy)
+							ele.Activate();
+						else
+							ele.Defocus();
+					}
+				}
+			public virtual void Activate(){
+				Focus();
+			}
+			public virtual void Deselect(){
+				Focus();
+			}
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
 		/* Sel states */
 			bool isSelStateInit{get;}
+			void ClearCurSelState();
 			void Deactivate();
 				bool isDeactivated{get;}
 				bool wasDeactivated{get;}
@@ -317,10 +359,10 @@ namespace SlotSystem{
 		ISSEProcessEngine<ISSESelProcess> selProcEngine{get;}
 			void SetAndRunSelProcess(ISSESelProcess process);
 			ISSESelProcess selProcess{get;}
-			IEnumeratorFake deactivateCoroutine();
-			IEnumeratorFake focusCoroutine();
-			IEnumeratorFake defocusCoroutine();
-			IEnumeratorFake selectCoroutine();
+			System.Func<IEnumeratorFake> deactivateCoroutine{get;}
+			System.Func<IEnumeratorFake> focusCoroutine{get;}
+			System.Func<IEnumeratorFake> defocusCoroutine{get;}
+			System.Func<IEnumeratorFake> selectCoroutine{get;}
 		void OnHoverEnterMock();
 		void OnHoverExitMock();
 		void InstantFocus();
@@ -347,7 +389,6 @@ namespace SlotSystem{
 		void SetElements();
 		bool ContainsInHierarchy(ISlotSystemElement ele);
 		void PerformInHierarchy(System.Action<ISlotSystemElement> act);
-			void FocusInHi(ISlotSystemElement sse);
 		void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj);
 		void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list);
 		int level{get;}
@@ -356,6 +397,6 @@ namespace SlotSystem{
 		void SetElements(IEnumerable<ISlotSystemElement> elements);
 		bool isActivatedOnDefault{get;set;}
 		void ActivateRecursively();
-		void FocusRecursively();
+		bool isFocusableInHierarchy{get;}
 	}
 }

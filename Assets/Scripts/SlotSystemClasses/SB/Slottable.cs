@@ -28,6 +28,8 @@ namespace SlotSystem{
 				}
 				void SetActState(ISBActState state){
 					actStateEngine.SetState(state);
+					if(state == null && actProcess != null)
+						SetAndRunActProcess(null);
 				}
 				/* Act states */
 					public virtual bool isActStateInit{get{return prevActState == null;}}
@@ -135,6 +137,8 @@ namespace SlotSystem{
 				}
 				void SetEqpState(ISBEqpState state){
 					eqpStateEngine.SetState(state);
+					if(state == null && eqpProcess != null)
+						SetAndRunEqpProcess(null);
 				}
 				public virtual bool isEqpStateInit{get{return prevEqpState == null;}}
 				public virtual void ClearEqpState(){
@@ -180,6 +184,8 @@ namespace SlotSystem{
 				}
 				void SetMrkState(ISBMrkState state){
 					mrkStateEngine.SetState(state);
+					if(state == null && mrkProcess != null)
+						SetAndRunMrkProcess(null);
 				}
 				public virtual bool isMrkStateInit{get{return prevMrkState == null;}}
 				public virtual void ClearMrkState(){
@@ -208,12 +214,6 @@ namespace SlotSystem{
 						public virtual bool isUnmarked{get{return curMrkState == unmarkedState;}}
 						public virtual bool wasUnmarked{get{return prevMrkState == markedState;}}
 		/*	processes	*/
-			/*	Selection Process	*/
-				/* Coroutines */
-				public override IEnumeratorFake deactivateCoroutine(){return null;}
-				public override IEnumeratorFake focusCoroutine(){return null;}
-				public override IEnumeratorFake defocusCoroutine(){return null;}
-				public override IEnumeratorFake selectCoroutine(){return null;}
 			/*	Action Process	*/
 				public ISSEProcessEngine<ISBActProcess> actProcEngine{
 					get{

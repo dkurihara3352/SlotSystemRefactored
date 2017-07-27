@@ -480,12 +480,6 @@ namespace SlotSystem{
 							public virtual bool isTransacting{get{return curActState == transactionState;}}
 							public virtual bool wasTransacting{get{return prevActState == transactionState;}}
 			/*	process	*/
-				/*	Selection Process	*/
-					/* Coroutine */
-						public override IEnumeratorFake deactivateCoroutine(){return null;}
-						public override IEnumeratorFake focusCoroutine(){return null;}
-						public override IEnumeratorFake defocusCoroutine(){return null;}
-						public override IEnumeratorFake selectCoroutine(){return null;}
 				/*	Action Process	*/
 					public virtual ISSEProcessEngine<ISSMActProcess> actProcEngine{
 						get{
