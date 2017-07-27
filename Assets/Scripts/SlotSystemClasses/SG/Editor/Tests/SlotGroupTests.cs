@@ -12,6 +12,17 @@ namespace SlotSystemTests{
 		[TestFixture][Category("SG")]
 		public class SlotGroupTests: SlotSystemTest{
 			[Test]
+			public void Activate_WhenCalled_ReferToTAAndFocusOrDefocus(){
+				SlotGroup sg = MakeSG();
+					ISlotSystemManager ssm = Substitute.For<ISlotSystemManager>();
+					ssm.When(x => x.ReferToTAAndUpdateSelState(sg)).Do(x => {sg.Focus();});
+					sg.SetSSM(ssm);
+				
+				sg.Activate();
+
+				Assert.That(sg.isFocused, Is.True);
+			}
+			[Test]
 			public void TransactionCoroutine_AllSBsNotRunning_CallsActProcessExpire(){
 				SlotGroup sg = MakeSG();
 				List<ISlottable> sbs;
@@ -4381,7 +4392,6 @@ namespace SlotSystemTests{
 							};
 						}
 					}
-				
 			/*	helper */
 				static ISlottable MakeSubSBWithItemAndSG(InventoryItemInstance item, SlotGroup sg){
 					ISlottable sb = MakeSubSB();

@@ -758,17 +758,17 @@ namespace SlotSystem{
 					}
 				}
 			}
-			public void ReferToTAAndUpdateSelState(ISlotGroup sg){
+			public void ReferToTAAndUpdateSelState(ISlotSystemElement sse){
 				if(transactionResults != null){
 					ISlotSystemTransaction ta = null;
-					if(transactionResults.TryGetValue(sg, out ta)){
+					if(transactionResults.TryGetValue(sse, out ta)){
 						if(ta is IRevertTransaction)
-							sg.Defocus();
+							sse.Defocus();
 						else
-							sg.Focus();
+							sse.Focus();
 					}
 				}else
-					sg.Focus();
+					sse.Focus();
 			}
 			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
 				return taFactory.MakeTransaction(pickedSB, hovered);
@@ -862,7 +862,7 @@ namespace SlotSystem{
 		List<InventoryItemInstance> moved{get;}
 		void UpdateTransaction();
 		void CreateTransactionResults();
-		void ReferToTAAndUpdateSelState(ISlotGroup sg);
+		void ReferToTAAndUpdateSelState(ISlotSystemElement sse);
 		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
 		
 		void SetTransaction(ISlotSystemTransaction transaction);	

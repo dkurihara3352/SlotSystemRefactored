@@ -13,6 +13,25 @@ namespace SlotSystemTests{
 		[TestFixture]
 		[Category("SB")]
 		public class SlottableTests: SlotSystemTest {
+			/* States */
+				[TestCase(true)]
+				[TestCase(false)]
+				public void Activate_WhenCalled_ReferToTAAndFocusOrDefocus(bool focused){
+					Slottable sb = MakeSB();
+						ISlotSystemManager ssm = Substitute.For<ISlotSystemManager>();
+						ssm.When(x => x.ReferToTAAndUpdateSelState(sb)).Do(x => {if(focused) sb.Focus(); else sb.Defocus();});
+						sb.SetSSM(ssm);
+					
+					sb.Activate();
+					
+					if(focused){
+						Assert.That(sb.isFocused, Is.True);
+						Assert.That(sb.isDefocused, Is.False);
+					}else{
+						Assert.That(sb.isFocused, Is.False);
+						Assert.That(sb.isDefocused, Is.True);
+					}
+				}
 			/*	Process	*/
 				/*	ActProc	*/
 					[Test]

@@ -207,10 +207,7 @@ namespace SlotSystem{
 				throw new System.ArgumentNullException();
 			}
 			public virtual void Activate(){
-				if(elements != null)
-					foreach(ISlotSystemElement ele in this){
-						ele.Activate();
-					}
+				Focus();
 			}
 			public virtual void Deselect(){}
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement> act){
@@ -238,13 +235,17 @@ namespace SlotSystem{
 					}
 					set{m_isActivatedOnDefault = value;}
 				}bool m_isActivatedOnDefault = true;
-				public void ActivateRecursively(){
-					PerformInHierarchy(FocusSelectively);
+				public void FocusRecursively(){
+					PerformInHierarchy(FocusInHi);
 				}
-					void FocusSelectively(ISlotSystemElement ele){
+				public void ActivateRecursively(){
+					PerformInHierarchy(ActivateSelectively);
+				}
+					void ActivateSelectively(ISlotSystemElement ele){
 						if(ele.isActivatedOnDefault)
-							ele.Focus();
+							ele.Activate();
 					}
+
 			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
 				act(this, obj);
 				if(elements != null)
@@ -354,5 +355,7 @@ namespace SlotSystem{
 		ISlotSystemElement this[int i]{get;}
 		void SetElements(IEnumerable<ISlotSystemElement> elements);
 		bool isActivatedOnDefault{get;set;}
+		void ActivateRecursively();
+		void FocusRecursively();
 	}
 }

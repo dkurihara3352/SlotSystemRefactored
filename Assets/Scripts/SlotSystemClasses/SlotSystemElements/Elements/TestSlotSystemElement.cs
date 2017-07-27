@@ -12,5 +12,12 @@ namespace SlotSystem{
 			foreach(var e in ele)
 				e.SetParent(ele);
 		}
+		public void RecursiveTestMethod(){
+			PerformInHierarchy(FocusIfAOD);
+		}
+			void FocusIfAOD(ISlotSystemElement ele){
+				if(ele.isActivatedOnDefault)
+					ele.Focus();
+			}
 	}
 }

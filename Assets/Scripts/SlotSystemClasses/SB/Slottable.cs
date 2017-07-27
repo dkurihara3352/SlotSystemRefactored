@@ -7,6 +7,10 @@ using Utility;
 namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
 		/*	States	*/
+			/* Selection */
+				public override void Activate(){
+					ssm.ReferToTAAndUpdateSelState(this);
+				}
 			/*	Action State	*/
 				ISSEStateEngine<ISBActState> actStateEngine{
 					get{
@@ -375,7 +379,6 @@ namespace SlotSystem{
 				public override bool Contains(ISlotSystemElement element){
 					return false;
 				}
-				public override void Activate(){}
 				public override bool ContainsInHierarchy(ISlotSystemElement element){
 					return false;
 				}

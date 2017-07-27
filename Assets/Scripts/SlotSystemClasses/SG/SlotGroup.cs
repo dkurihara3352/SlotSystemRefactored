@@ -5,6 +5,9 @@ using Utility;
 namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		/*	states	*/
+			public override void Activate(){
+				ssm.ReferToTAAndUpdateSelState(this);
+			}
 			/*	Engines	*/
 				/*	Action State	*/
 					ISSEStateEngine<ISGActState> actStateEngine{
@@ -199,6 +202,8 @@ namespace SlotSystem{
 				}
 			List<ISlottable> slottables{
 				get{
+					if(m_slottables == null)
+						m_slottables = new List<ISlottable>();
 					return m_slottables;
 				}
 				}protected List<ISlottable> m_slottables;
@@ -376,9 +381,8 @@ namespace SlotSystem{
 				}
 				public override IEnumerable<ISlotSystemElement> elements{
 					get{
-						foreach(ISlottable sb in slottables){
+						foreach(ISlottable sb in slottables)
 							yield return (ISlotSystemElement)sb;
-						}
 					}
 				}
 				public override string eName{

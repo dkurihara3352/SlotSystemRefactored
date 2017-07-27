@@ -548,20 +548,6 @@ namespace SlotSystemTests{
 
 					Assert.That(result, Is.True);
 					}
-				[Test]	
-				public void Activate_WhenCalled_CallsChildrensActivate(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					ISlotSystemElement mockChildA = Substitute.For<ISlotSystemElement>();
-					ISlotSystemElement mockChildB = Substitute.For<ISlotSystemElement>();
-					ISlotSystemElement mockChildC = Substitute.For<ISlotSystemElement>();
-					testSSE.SetElements(new ISlotSystemElement[]{mockChildA, mockChildB, mockChildC});
-
-					testSSE.Activate();
-
-					mockChildA.Received().Activate();
-					mockChildB.Received().Activate();
-					mockChildC.Received().Activate();
-					}
 				[Test]
 				public void PerformInHierarchyVer1_Various_PerformsAccordingly(){
 					TestSlotSystemElement sse_0 = MakeTestSSE();
@@ -1065,19 +1051,35 @@ namespace SlotSystemTests{
 					Assert.That(testSSE.Contains(stubMember), Is.True);
 					}
 			//
-				[TestCaseSource(typeof(ActivateRecursivelyCases))]
-				public void ActivateRecursively_WhenCalled_FocusSelfAndAllMatchInHi(TestSlotSystemElement sse, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
+				[Test]
+				public void Activate_WhenCalled_ActivateAccordingly(){
+					/* 	"Spot" activation: sets focused or defocused according to rule
+							generic sse -> focus
+							sg or sb -> referToTA
+					*/
+					TestSlotSystemElement sse = MakeTestSSE();
+
+					sse.Activate();
+
+					Assert.That(sse.isFocused, Is.True);
+				}
+				[Test]
+				public void ActivateRecursively_WhenCalled_FocusOrDefocusElementsAccordingly(){
+					
+				}
+				[TestCaseSource(typeof(isActivatedOnDefaultCases))]
+				public void isActivatedOnDefault_Always_ReturnsAccordingly(TestSlotSystemElement sse, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
 					sse.PerformInHierarchy(sse.SetElementsInHi);
 					sse.PerformInHierarchy(sse.SetParentInHi);
 
-					sse.ActivateRecursively();
+					sse.RecursiveTestMethod();
 					
 					foreach(ISlotSystemElement ele in xOn)
 						Assert.That(ele.isFocused, Is.True);
 					foreach(ISlotSystemElement ele in xOff)
 						Assert.That(ele.isFocused, Is.False);
 					}
-					class ActivateRecursivelyCases: IEnumerable{
+					class isActivatedOnDefaultCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] case0;
 								TestSlotSystemElement sse_0 = MakeTestSSE();
