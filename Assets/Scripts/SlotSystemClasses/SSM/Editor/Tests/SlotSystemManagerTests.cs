@@ -60,7 +60,7 @@ namespace SlotSystemTests{
 					TestSlotSystemElement sseC = MakeTestSSE();
 						sseC.transform.SetParent(ssm.transform);
 				IEnumerable<ISlotSystemElement> expected = new ISlotSystemElement[]{null, null};
-				ssm.SetElements();
+				ssm.SetHierarchy();
 				
 				bool equality = ssm.MemberEquals(expected);
 				Assert.That(equality, Is.True);
@@ -76,7 +76,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 				ssm.InspectorSetUp(pBun, eBun, gBuns);
-				ssm.SetElements();
+				ssm.SetHierarchy();
 
 				ssm.Initialize();
 				
@@ -97,7 +97,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 				ssm.InspectorSetUp(pBun, eBun, gBuns);
-				ssm.SetElements();
+				ssm.SetHierarchy();
 
 				ssm.Initialize();
 				
@@ -118,7 +118,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 				ssm.InspectorSetUp(pBun, eBun, gBuns);
-				ssm.SetElements();
+				ssm.SetHierarchy();
 
 				ssm.Initialize();
 
@@ -143,7 +143,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					List<ISlotGroup> list = ssm.allSGs;
 					Received.InOrder(() => {
@@ -184,7 +184,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					List<ISlotGroup> list = ssm.allSGPs;
 					pBun.Received().PerformInHierarchy(ssm.AddInSGList, Arg.Any<List<ISlotGroup>>());
@@ -200,7 +200,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					List<ISlotGroup> list = ssm.allSGEs;
 					eBun.Received().PerformInHierarchy(ssm.AddInSGList, Arg.Any<List<ISlotGroup>>());
@@ -216,7 +216,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					List<ISlotGroup> list = ssm.allSGGs;
 
@@ -237,7 +237,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					
 					ISlotGroup actual = ssm.focusedSGP;
 
@@ -256,7 +256,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					IEquipmentSet actual = ssm.focusedEqSet;
 
@@ -283,7 +283,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					IEnumerable<ISlotGroup> actual = ssm.focusedSGEs;
 					IEnumerable<ISlotSystemElement> convertedActual = ConvertToSSEs(actual);
@@ -326,7 +326,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					
 					List<ISlotGroup> list = ssm.focusedSGGs;
 					
@@ -337,7 +337,7 @@ namespace SlotSystemTests{
 				public void FocusedSGs_Always_ReturnsAllTheFocusedSGsInPBunAndEBunAndCallAllGBunPIHAddFocusedSGTo(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns, List<ISlotGroup> expected){
 					SlotSystemManager ssm = MakeSSM();
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					ssm.Focus();
 
 					List<ISlotGroup> actual = ssm.focusedSGs;
@@ -453,7 +453,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					IEnumerable<ISlotSystemElement> actual = ConvertToSSEs(ssm.equipmentSets);
 					Assert.That(actual.MemberEquals(eBunEles), Is.True);
@@ -482,7 +482,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					IPoolInventory actual = ssm.poolInv;
 
@@ -511,7 +511,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					
 					IEquipmentSetInventory actual = ssm.equipInv;
 
@@ -549,7 +549,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					BowInstance actual = ssm.equippedBowInst;
 
@@ -587,7 +587,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					WearInstance actual = ssm.equippedWearInst;
 
@@ -630,7 +630,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					IEnumerable<CarriedGearInstance> actual = ssm.equippedCarriedGears;
 
@@ -720,7 +720,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					
 					List<ISlottable> list = ssm.allSBs;
 
@@ -868,7 +868,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					ssm.UpdateEquipStatesOnAll();
 
@@ -930,7 +930,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					ssm.UpdateEquipStatesOnAll();
 
 					eInv.Received().Add(bow);
@@ -993,7 +993,7 @@ namespace SlotSystemTests{
 						};
 						pInv.GetEnumerator().Returns(pInvEles.GetEnumerator());
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					ssm.UpdateEquipStatesOnAll();
 
@@ -1054,7 +1054,7 @@ namespace SlotSystemTests{
 							eBun.focusedElement.Returns(eSet);
 						IEnumerable<ISlotSystemBundle> gBuns = new ISlotSystemBundle[]{};
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					ISlotGroup sg = MakeSubSG();
 						sg.isExpandable.Returns(false);
 						sg.isFocused.Returns(focused);
@@ -1087,7 +1087,7 @@ namespace SlotSystemTests{
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns = new ISlotSystemBundle[]{};
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					ssm.MarkEquippedInPool(item, equipped);
 
@@ -1177,7 +1177,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 					BowInstance bow = MakeBowInstance(0);
 
 					ssm.SetEquippedOnAllSBs(bow, equipped);
@@ -1223,7 +1223,7 @@ namespace SlotSystemTests{
 					ssm.Equip(mockSB, bow);
 
 					Received.InOrder(() => {
-						mockSB.ClearEqpState();
+						mockSB.ClearCurEqpState();
 						mockSB.Equip();
 					});
 					}
@@ -1256,7 +1256,7 @@ namespace SlotSystemTests{
 					ssm.Unequip(mockSB, bow);
 
 					Received.InOrder(() => {
-						mockSB.ClearEqpState();
+						mockSB.ClearCurEqpState();
 						mockSB.Unequip();
 					});
 					}
@@ -1313,7 +1313,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle gBunC = MakeSubBundle();
 							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetElements();
+					ssm.SetHierarchy();
 
 					ISlotSystemElement ele = MakeSubSSE();
 					ssm.FindParent(ele);

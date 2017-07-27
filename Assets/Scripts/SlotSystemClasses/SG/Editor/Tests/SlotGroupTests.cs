@@ -784,7 +784,7 @@ namespace SlotSystemTests{
 						SGSorter idSorter = new SGItemIDSorter();
 					sg.InspectorSetUp(inventory, nullFilter, idSorter, 0);
 
-					sg.SetElements();
+					sg.SetHierarchy();
 
 					List<ISlotSystemElement> actualEles = new List<ISlotSystemElement>(sg);
 					Assert.That(actualEles.Count, Is.EqualTo(4));
@@ -805,7 +805,7 @@ namespace SlotSystemTests{
 						SGSorter idSorter = new SGItemIDSorter();
 					sg.InspectorSetUp(inventory, nullFilter, idSorter, 0);
 
-					sg.SetElements();
+					sg.SetHierarchy();
 
 					ISlottable bowSB = sg.GetSB(bow);
 					ISlottable wearSB = sg.GetSB(wear);

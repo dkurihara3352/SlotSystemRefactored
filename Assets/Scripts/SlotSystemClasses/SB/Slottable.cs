@@ -31,12 +31,9 @@ namespace SlotSystem{
 					if(state == null && actProcess != null)
 						SetAndRunActProcess(null);
 				}
+				public virtual bool isActStateInit{get{return prevActState == null;}}
+				public virtual void ClearCurActState(){SetActState(null);}
 				/* Act states */
-					public virtual bool isActStateInit{get{return prevActState == null;}}
-					public virtual void ClearActState(){
-						SetActState(null);
-						SetActState(null);
-					}
 					public ISBActState waitForActionState{
 						get{
 							if(m_waitForActionState == null)
@@ -141,10 +138,7 @@ namespace SlotSystem{
 						SetAndRunEqpProcess(null);
 				}
 				public virtual bool isEqpStateInit{get{return prevEqpState == null;}}
-				public virtual void ClearEqpState(){
-					SetEqpState(null);
-					SetEqpState(null);
-				}
+				public virtual void ClearCurEqpState(){SetEqpState(null);}
 				
 				/* Eqp states */
 					public ISBEqpState equippedState{
@@ -188,10 +182,7 @@ namespace SlotSystem{
 						SetAndRunMrkProcess(null);
 				}
 				public virtual bool isMrkStateInit{get{return prevMrkState == null;}}
-				public virtual void ClearMrkState(){
-					SetMrkState(null);
-					SetMrkState(null);
-				}
+				public virtual void ClearCurMrkState(){SetMrkState(null);}
 				/* Mrk states */
 					public ISBMrkState markedState{
 						get{
@@ -427,7 +418,7 @@ namespace SlotSystem{
 				SetEqpState(null);
 				SetMrkState(unmarkedState);
 			}
-			public override void SetElements(){}
+			public override void SetHierarchy(){}
 			public virtual void Increment(){
 				SetActState(pickedUpState);
 				if(m_item.IsStackable && quantity > m_pickedAmount){
@@ -516,7 +507,7 @@ namespace SlotSystem{
 			/* States */
 				/* ActStates */
 					bool isActStateInit{get;}
-					void ClearActState();
+					void ClearCurActState();
 					ISBActState waitForActionState{get;}
 						void WaitForAction();
 						bool isWaitingForAction{get;}
@@ -551,7 +542,7 @@ namespace SlotSystem{
 						bool wasMovingWithin{get;}
 				/* Eqp States */
 					bool isEqpStateInit{get;}
-					void ClearEqpState();
+					void ClearCurEqpState();
 					ISBEqpState equippedState{get;}
 						void Equip();
 						bool isEquipped{get;}
@@ -562,7 +553,7 @@ namespace SlotSystem{
 						bool wasUnequipped{get;}
 				/* Mrk States */
 					bool isMrkStateInit{get;}
-					void ClearMrkState();
+					void ClearCurMrkState();
 					ISBMrkState	markedState{get;}
 						void Mark();
 						bool isMarked{get;}

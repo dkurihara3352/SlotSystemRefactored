@@ -384,7 +384,7 @@ namespace SlotSystem{
 								if(sb.newSlotID != -1)/*	not being removed	*/
 									sb.Equip();
 							}else if(sb.sg.isPool){/*	defocused sgp, setting equipped w/o transition	*/
-								sb.ClearEqpState();
+								sb.ClearCurEqpState();
 								sb.Equip();
 							}
 						}
@@ -400,7 +400,7 @@ namespace SlotSystem{
 								if(sb.slotID != -1)/*	not being added	*/
 									sb.Unequip();
 							}else if(sb.sg.isPool){/*	defocused sgp	*/
-								sb.ClearEqpState();
+								sb.ClearCurEqpState();
 								sb.Unequip();
 							}
 						}
@@ -445,9 +445,11 @@ namespace SlotSystem{
 					}
 					void SetActState(ISSMActState state){
 						actStateEngine.SetState(state);
+						if(state ==null && actProcess != null)
+							SetAndRunActProcess(null);
 					}
 					public virtual bool isActStateInit{get{return prevActState == null;}}
-					public virtual void ClearActState(){SetActState(null); SetActState(null);}
+					public virtual void ClearCurActState(){SetActState(null);}
 					/* Static states */
 						public ISSMActState waitForActionState{
 							get{
@@ -541,7 +543,7 @@ namespace SlotSystem{
 					m_equipBundle = eBun;
 					m_otherBundles = gBuns;
 				}
-				public override void SetElements(){}
+				public override void SetHierarchy(){}
 				public void Initialize(){
 					PerformInHierarchy(SetSSMInH);
 					PerformInHierarchy(SetParent);
@@ -775,7 +777,7 @@ namespace SlotSystem{
 		/* States And Process */
 			/* ActState */
 				bool isActStateInit{get;}
-				void ClearActState();
+				void ClearCurActState();
 				ISSMActState waitForActionState{get;}
 					void WaitForAction();
 					bool isWaitingForAction{get;}

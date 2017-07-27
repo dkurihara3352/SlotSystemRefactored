@@ -159,9 +159,9 @@ namespace SlotSystem{
 					throw new System.ArgumentOutOfRangeException("AbsSlotSysElement.indexer: argument out of range");
 				}
 			}
-			public virtual string eName{get{return m_eName;}}protected string m_eName;
+			public virtual string eName{get{return m_eName;}} protected string m_eName;
 			public virtual IEnumerable<ISlotSystemElement> elements{get{return m_elements;}} protected IEnumerable<ISlotSystemElement> m_elements;
-			public virtual void SetElements(){
+			public virtual void SetHierarchy(){
 				List<ISlotSystemElement> elements = new List<ISlotSystemElement>();
 				for(int i = 0; i < transform.childCount; i++){
 					ISlotSystemElement ele = transform.GetChild(i).GetComponent<ISlotSystemElement>();
@@ -170,6 +170,8 @@ namespace SlotSystem{
 					}
 				}
 				m_elements = elements;
+				foreach(var e in this)
+					e.SetParent(this);
 			}
 			public virtual ISlotSystemElement parent{get{return m_parent;}} ISlotSystemElement m_parent;
 				public virtual void SetParent(ISlotSystemElement par){m_parent = par;}
@@ -302,7 +304,12 @@ namespace SlotSystem{
 					}
 					return m_isActivatedOnDefault;
 				}
-				set{m_isActivatedOnDefault = value;}
+				set{
+					if(isBundleElement && immediateBundle.focusedElement == (ISlotSystemElement)this)
+						m_isActivatedOnDefault = true;
+					else
+						m_isActivatedOnDefault = value;
+					}
 				}bool m_isActivatedOnDefault = true;
 			public bool isFocusableInHierarchy{
 				get{
@@ -386,7 +393,7 @@ namespace SlotSystem{
 		ISlotSystemManager ssm{get;}
 		void SetSSM(ISlotSystemElement ssm);
 		IEnumerable<ISlotSystemElement> elements{get;}
-		void SetElements();
+		void SetHierarchy();
 		bool ContainsInHierarchy(ISlotSystemElement ele);
 		void PerformInHierarchy(System.Action<ISlotSystemElement> act);
 		void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj);

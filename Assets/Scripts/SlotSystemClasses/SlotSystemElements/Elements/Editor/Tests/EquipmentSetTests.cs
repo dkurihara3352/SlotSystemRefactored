@@ -23,7 +23,7 @@ namespace SlotSystemTests{
 						sseC.transform.SetParent(eSet.transform);
 				IEnumerable<ISlotSystemElement> expected = new ISlotSystemElement[]{null, null, null};
 				
-				eSet.SetElements();
+				eSet.SetHierarchy();
 				
 				bool equality = eSet.MemberEquals(expected);
 				Assert.That(equality, Is.True);

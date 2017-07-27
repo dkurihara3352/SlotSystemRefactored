@@ -24,10 +24,13 @@ namespace SlotSystem{
 					ISGActState prevActState{
 						get{return actStateEngine.prevState;}
 					}
-					public bool isActStateInit{get{return prevActState == null;}}
 					void SetActState(ISGActState state){
 						actStateEngine.SetState(state);
+						if(state ==null && actProcess != null)
+							SetAndRunActProcess(null);
 					}
+					public bool isActStateInit{get{return prevActState == null;}}
+					public virtual void ClearCurActState(){SetActState(null);}
 					/* act states */
 						public ISGActState waitForActionState{
 							get{
@@ -467,7 +470,7 @@ namespace SlotSystem{
 				SetInitSlotsCount(initSlotsCount);
 				m_isExpandable = initSlotsCount == 0;
 			}
-			public override void SetElements(){
+			public override void SetHierarchy(){
 				InitializeItems();
 			}
 			public virtual ISlottable GetSB(InventoryItemInstance itemInst){
@@ -809,6 +812,7 @@ namespace SlotSystem{
 		/* States and Processes */
 			/* ActStates */
 				bool isActStateInit{get;}
+				void ClearCurActState();
 				ISGActState waitForActionState{get;}
 					void WaitForAction();
 					bool isWaitingForAction{get;}

@@ -5,18 +5,11 @@ using UnityEngine;
 namespace SlotSystem{
 	public class TestSlotSystemElement: SlotSystemElement{
 		public string message = "";
-		public void SetElementsRecursively(){
-			PerformInHierarchy(SetElementsInHi);
+		public void SetHierarchyRecursively(){
+			PerformInHierarchy(SetHierarchyInHi);
 		}
-			void SetElementsInHi(ISlotSystemElement ele){
-				ele.SetElements();
-			}
-		public void SetParentRecursively(){
-			PerformInHierarchy(SetParentInHi);
-		}
-			void SetParentInHi(ISlotSystemElement ele){
-				foreach(var e in ele)
-					e.SetParent(ele);
+			void SetHierarchyInHi(ISlotSystemElement ele){
+				ele.SetHierarchy();
 			}
 		public void RecursiveTestMethod(){
 			PerformInHierarchy(FocusIfAOD);

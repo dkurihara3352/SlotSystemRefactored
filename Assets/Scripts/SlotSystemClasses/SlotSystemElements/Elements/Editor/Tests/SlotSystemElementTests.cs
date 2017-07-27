@@ -476,7 +476,7 @@ namespace SlotSystemTests{
 							childC.transform.SetParent(sse.transform);
 						IEnumerable<ISlotSystemElement> expectedEles = new ISlotSystemElement[]{childA, childB, childC};
 					
-					sse.SetElements();
+					sse.SetHierarchy();
 
 					bool equality = sse.MemberEquals(expectedEles);
 					Assert.That(equality, Is.True);
@@ -1106,15 +1106,14 @@ namespace SlotSystemTests{
 										bun111_0.transform.SetParent(bun11_0.transform);
 										bun112_0.transform.SetParent(bun11_0.transform);
 
-								top_0.SetElementsRecursively();
-								top_0.SetParentRecursively();
+								top_0.SetHierarchyRecursively();
 
-								bun0_0.SetFocusedBundleElement(sse01_0);
-								bun03_0.SetFocusedBundleElement(sse030_0);
-								bun1_0.SetFocusedBundleElement(bun11_0);
-								bun10_0.SetFocusedBundleElement(sse100_0);
-								bun11_0.SetFocusedBundleElement(bun110_0);
-								bun110_0.SetFocusedBundleElement(sse1100_0);
+								bun0_0.InspectorSetUp(sse01_0);
+								bun03_0.InspectorSetUp(sse030_0);
+								bun1_0.InspectorSetUp(bun11_0);
+								bun10_0.InspectorSetUp(sse100_0);
+								bun11_0.InspectorSetUp(bun110_0);
+								bun110_0.InspectorSetUp(sse1100_0);
 
 								IEnumerable<ISlotSystemElement> xOn_0 = new ISlotSystemElement[]{
 									top_0,
@@ -1177,15 +1176,14 @@ namespace SlotSystemTests{
 										bun111_1.transform.SetParent(bun11_1.transform);
 										bun112_1.transform.SetParent(bun11_1.transform);
 
-								top_1.SetElementsRecursively();
-								top_1.SetParentRecursively();
+								top_1.SetHierarchyRecursively();
 
-								bun0_1.SetFocusedBundleElement(bun03_1);
-								bun03_1.SetFocusedBundleElement(sse030_1);
-								bun1_1.SetFocusedBundleElement(bun10_1);
-								bun10_1.SetFocusedBundleElement(sse100_1);
-								bun11_1.SetFocusedBundleElement(bun110_1);
-								bun110_1.SetFocusedBundleElement(sse1100_1);
+								bun0_1.InspectorSetUp(bun03_1);
+								bun03_1.InspectorSetUp(sse030_1);
+								bun1_1.InspectorSetUp(bun10_1);
+								bun10_1.InspectorSetUp(sse100_1);
+								bun11_1.InspectorSetUp(bun110_1);
+								bun110_1.InspectorSetUp(sse1100_1);
 
 								IEnumerable<ISlotSystemElement> xOn_1 = new ISlotSystemElement[]{
 									top_1,
@@ -1294,17 +1292,16 @@ namespace SlotSystemTests{
 										bun21_0.transform.SetParent(bun2_0.transform);//foc
 									/* ****** */
 								
-								top_0.SetElementsRecursively();
-								top_0.SetParentRecursively();
+								top_0.SetHierarchyRecursively();
 								top_0.InitializeStatesRecursively();
 
-								bun0_0.SetFocusedBundleElement(sse00_0);
-								bun000_0.SetFocusedBundleElement(sse0000_0);
-								bun1_0.SetFocusedBundleElement(bun10_0);
-								bun10_0.SetFocusedBundleElement(sse101_0);
-								bun1010_0.SetFocusedBundleElement(sse10101_0);
-								bun11_0.SetFocusedBundleElement(sse110_0);
-								bun2_0.SetFocusedBundleElement(bun21_0);
+								bun0_0.InspectorSetUp(sse00_0);
+								bun000_0.InspectorSetUp(sse0000_0);
+								bun1_0.InspectorSetUp(bun10_0);
+								bun10_0.InspectorSetUp(sse101_0);
+								bun1010_0.InspectorSetUp(sse10101_0);
+								bun11_0.InspectorSetUp(sse110_0);
+								bun2_0.InspectorSetUp(bun21_0);
 
 								sse001_0.isActivatedOnDefault = false;
 								bun11_0.isActivatedOnDefault = false;
@@ -1397,17 +1394,16 @@ namespace SlotSystemTests{
 										bun21_1.transform.SetParent(bun2_1.transform);//foc
 									/* ****** */
 								
-								top_1.SetElementsRecursively();
-								top_1.SetParentRecursively();
+								top_1.SetHierarchyRecursively();
 								top_1.InitializeStatesRecursively();
 
-								bun0_1.SetFocusedBundleElement(sse00_1);
-								bun000_1.SetFocusedBundleElement(sse0000_1);
-								bun1_1.SetFocusedBundleElement(bun10_1);
-								bun10_1.SetFocusedBundleElement(sse101_1);
-								bun1010_1.SetFocusedBundleElement(sse10101_1);
-								bun11_1.SetFocusedBundleElement(sse110_1);
-								bun2_1.SetFocusedBundleElement(bun21_1);
+								bun0_1.InspectorSetUp(sse00_1);
+								bun000_1.InspectorSetUp(sse0000_1);
+								bun1_1.InspectorSetUp(bun10_1);
+								bun10_1.InspectorSetUp(sse101_1);
+								bun1010_1.InspectorSetUp(sse10101_1);
+								bun11_1.InspectorSetUp(sse110_1);
+								bun2_1.InspectorSetUp(bun21_1);
 
 								bun0_1.isActivatedOnDefault = false;
 								bun11_1.isActivatedOnDefault = false;
@@ -1449,8 +1445,7 @@ namespace SlotSystemTests{
 					}
 				[TestCaseSource(typeof(isActivatedOnDefaultCases))]
 				public void isActivatedOnDefault_Always_ReturnsAccordingly(TestSlotSystemElement sse, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
-					sse.SetElementsRecursively();
-					sse.SetParentRecursively();
+					sse.SetHierarchyRecursively();
 
 					sse.RecursiveTestMethod();
 					
