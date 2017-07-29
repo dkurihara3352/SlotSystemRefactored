@@ -196,7 +196,7 @@ namespace SlotSystemTests{
 				public void OnHoverEnterMock_curSelStateNull_ThrowsException(){
 					TestSlotSystemElement sse = MakeTestSSE();
 
-					sse.OnHoverEnterMock();
+					sse.OnHoverEnter();
 				}
 				[Test]
 				public void OnHoverEnterMock_curSelStateNotNull_CallsCurSelStateOnHoverEnterMock(){
@@ -205,16 +205,16 @@ namespace SlotSystemTests{
 					sse.SetDeactivatedState(mockState);
 					sse.Deactivate();
 
-					sse.OnHoverEnterMock();
+					sse.OnHoverEnter();
 
-					mockState.Received().OnHoverEnterMock(sse, Arg.Any<PointerEventDataFake>());
+					mockState.Received().OnHoverEnter(sse, Arg.Any<PointerEventDataFake>());
 				}
 				[Test]
 				[ExpectedException(typeof(System.InvalidOperationException))]
 				public void OnHoverExitMock_curSelStateNull_ThrowsException(){
 					TestSlotSystemElement sse = MakeTestSSE();
 
-					sse.OnHoverExitMock();
+					sse.OnHoverExit();
 				}
 				[Test]
 				public void OnHoverExitMock_curSelStateNotNull_CallsCurSelStateOnHoverExitMock(){
@@ -223,9 +223,9 @@ namespace SlotSystemTests{
 					sse.SetDeactivatedState(mockState);
 					sse.Deactivate();
 
-					sse.OnHoverExitMock();
+					sse.OnHoverExit();
 
-					mockState.Received().OnHoverExitMock(sse, Arg.Any<PointerEventDataFake>());
+					mockState.Received().OnHoverExit(sse, Arg.Any<PointerEventDataFake>());
 				}
 			/*	Fields	*/
 				[TestCase(1)]

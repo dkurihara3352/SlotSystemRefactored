@@ -279,12 +279,12 @@ namespace SlotSystem{
 							list.Add((ISlottable)ele);
 					}
 			/*	methods	*/
-				public void Reset(){
+				public void Refresh(){
 					SetActState(waitForActionState);
 					ClearFields();
 				}
-				public void ResetAndFocus(){
-					Reset();
+				public void RefreshAndFocus(){
+					Refresh();
 					Focus();
 				}
 				public void ClearFields(){
@@ -356,7 +356,7 @@ namespace SlotSystem{
 							equipInv.SetEquippableCGearsCount(i);
 							targetSG.InitializeItems();
 							UpdateEquipStatesOnAll();
-							ResetAndFocus();
+							RefreshAndFocus();
 						}
 					}else{
 						throw new System.InvalidOperationException("ISlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
@@ -497,6 +497,7 @@ namespace SlotSystem{
 					public virtual void SetAndRunActProcess(ISSMActProcess process){
 						actProcEngine.SetAndRunProcess(process);
 					}
+					public void ExpireActProcess(){if(actProcess != null) actProcess.Expire();}
 					/* Coroutine */
 						public IEnumeratorFake probeCoroutine(){
 							return null;
@@ -708,9 +709,9 @@ namespace SlotSystem{
 					if(ele == null || ele != hovered){
 						if(hovered != null){
 							if(hovered is ISlottable)
-								((ISlottable)hovered).OnHoverExitMock();
+								((ISlottable)hovered).OnHoverExit();
 							else if(hovered is ISlotGroup)
-								((ISlotGroup)hovered).OnHoverExitMock();
+								((ISlotGroup)hovered).OnHoverExit();
 						}
 						m_hovered = ele;
 						if(hovered != null)
@@ -796,6 +797,7 @@ namespace SlotSystem{
 					void SetAndRunActProcess(ISSMActProcess process);
 					ISSMActProcess actProcess{get;}
 						IEnumeratorFake transactionCoroutine();
+					void ExpireActProcess();
 		/*	Managerial */
 			List<ISlotGroup> allSGs{get;}
 			List<ISlotGroup> allSGPs{get;}
@@ -821,8 +823,8 @@ namespace SlotSystem{
 			List<PartsInstance> equippedParts{get;}
 			List<ISlottable> allSBs{get;}
 			void AddSBToRes(ISlotSystemElement ele, IList<ISlottable> list);
-			void Reset();
-			void ResetAndFocus();
+			void Refresh();
+			void RefreshAndFocus();
 			void ClearFields();
 			void UpdateEquipStatesOnAll();
 			void SortSG(ISlotGroup sg, SGSorter sorter);

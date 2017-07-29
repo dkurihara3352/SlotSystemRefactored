@@ -33,10 +33,5 @@ namespace SlotSystem{
 			void InitializeStateInHi(ISlotSystemElement ele){
 				ele.InitializeStates();
 			}
-		public bool isCurSelStateNull{
-			get{
-				return !(isDeactivated || isFocused || isDefocused || isSelected);
-			}
-		}
 	}
 }

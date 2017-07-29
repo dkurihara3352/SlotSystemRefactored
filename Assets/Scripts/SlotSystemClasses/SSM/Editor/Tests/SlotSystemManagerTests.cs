@@ -758,30 +758,30 @@ namespace SlotSystemTests{
 					}
 			/*	methods	*/
 				[Test]
-				public void Reset_WhenCalled_SetsActStateWFA(){
+				public void Refresh_WhenCalled_SetsActStateWFA(){
 					SlotSystemManager ssm = MakeSSM();
 
-					ssm.Reset();
+					ssm.Refresh();
 
 					Assert.That(ssm.isWaitingForAction, Is.True);
 					}
 				[Test]
-				public void Reset_WhenCalled_SetsFieldsNull(){
+				public void Refresh_WhenCalled_SetsFieldsNull(){
 					SlotSystemManager ssm = MakeSSM();
-					ResetTestCase expected = new ResetTestCase(
+					RefreshTestCase expected = new RefreshTestCase(
 						null, null, null, null, null, null, null, null
 					);
 
-					ssm.Reset();
+					ssm.Refresh();
 
-					ResetTestCase actual = new ResetTestCase(
+					RefreshTestCase actual = new RefreshTestCase(
 						ssm.pickedSB, ssm.targetSB, ssm.sg1, ssm.sg2, ssm.hovered,
 						ssm.dIcon1, ssm.dIcon2, ssm.transaction
 					);
 					bool equality = actual.Equals(expected);
 					Assert.That(equality, Is.True);
 					}
-					class ResetTestCase: IEquatable<ResetTestCase>{
+					class RefreshTestCase: IEquatable<RefreshTestCase>{
 						public ISlottable pickedSB;
 						public ISlottable targetSB;
 						public ISlotGroup sg1;
@@ -790,7 +790,7 @@ namespace SlotSystemTests{
 						public DraggedIcon dIcon1;
 						public DraggedIcon dIcon2;
 						public ISlotSystemTransaction transaction;
-						public ResetTestCase(ISlottable pickedSB, ISlottable targetSB, ISlotGroup sg1, ISlotGroup sg2, ISlotSystemElement hovered, DraggedIcon dIcon1, DraggedIcon dIcon2, ISlotSystemTransaction transaction){
+						public RefreshTestCase(ISlottable pickedSB, ISlottable targetSB, ISlotGroup sg1, ISlotGroup sg2, ISlotSystemElement hovered, DraggedIcon dIcon1, DraggedIcon dIcon2, ISlotSystemTransaction transaction){
 							this.pickedSB = pickedSB;
 							this.targetSB = targetSB;
 							this.sg1 = sg1;
@@ -800,7 +800,7 @@ namespace SlotSystemTests{
 							this.dIcon2 = dIcon2;
 							this.transaction = transaction;
 						}
-						public bool Equals(ResetTestCase other){
+						public bool Equals(RefreshTestCase other){
 							bool flag = true;
 							flag &= BothNullOrReferenceEquals(this.pickedSB, other.pickedSB);
 							flag &= BothNullOrReferenceEquals(this.targetSB, other.targetSB);
@@ -814,10 +814,10 @@ namespace SlotSystemTests{
 						}
 					}
 				[Test]
-				public void ResetAndFocus_WhenCalled_SetsSelStateFocused(){
+				public void RefreshAndFocus_WhenCalled_SetsSelStateFocused(){
 					SlotSystemManager ssm = MakeSSM();
 
-					ssm.ResetAndFocus();
+					ssm.RefreshAndFocus();
 
 					Assert.That(ssm.isFocused, Is.True);
 					}
@@ -1989,7 +1989,7 @@ namespace SlotSystemTests{
 
 					ssm.SetHovered(null);
 
-					mockSB.Received().OnHoverExitMock();
+					mockSB.Received().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_SBToNull_SetsNull(){
@@ -2009,7 +2009,7 @@ namespace SlotSystemTests{
 
 					ssm.SetHovered(MakeSubSSE());
 
-					mockSB.Received().OnHoverExitMock();
+					mockSB.Received().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_SBToSame_DoesNotCallSBOnHoverExit(){
@@ -2019,7 +2019,7 @@ namespace SlotSystemTests{
 
 					ssm.SetHovered(mockSB);
 
-					mockSB.DidNotReceive().OnHoverExitMock();
+					mockSB.DidNotReceive().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_NullToSG_SetsHovered(){
@@ -2038,7 +2038,7 @@ namespace SlotSystemTests{
 
 					ssm.SetHovered(null);
 
-					mockSG.Received().OnHoverExitMock();
+					mockSG.Received().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_SGToNull_SetsNull(){
@@ -2058,7 +2058,7 @@ namespace SlotSystemTests{
 
 					ssm.SetHovered(MakeSubSSE());
 
-					mockSG.Received().OnHoverExitMock();
+					mockSG.Received().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_SGToSame_DoesNotCallSGOnHoverExit(){
@@ -2068,7 +2068,7 @@ namespace SlotSystemTests{
 
 					ssm.SetHovered(mockSG);
 
-					mockSG.DidNotReceive().OnHoverExitMock();
+					mockSG.DidNotReceive().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_WhenCalled_UpdateTransactionFields(){

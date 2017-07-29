@@ -19,12 +19,12 @@ namespace SlotSystem{
 	}
 		public interface ISSEStateEngine<T>: ISwitchableStateEngine<T> where T: ISSEState{}
 		public abstract class SSESelState: SSEState, ISSESelState{
-			public void OnHoverEnterMock(ISlotSystemElement element, PointerEventDataFake eventData){}
-			public void OnHoverExitMock(ISlotSystemElement element, PointerEventDataFake eventData){}
+			public void OnHoverEnter(ISlotSystemElement element, PointerEventDataFake eventData){}
+			public void OnHoverExit(ISlotSystemElement element, PointerEventDataFake eventData){}
 		}
 		public interface ISSESelState: ISSEState{
-			void OnHoverEnterMock(ISlotSystemElement element, PointerEventDataFake eventData);
-			void OnHoverExitMock(ISlotSystemElement element, PointerEventDataFake eventData);
+			void OnHoverEnter(ISlotSystemElement element, PointerEventDataFake eventData);
+			void OnHoverExit(ISlotSystemElement element, PointerEventDataFake eventData);
 		}
 			public class SSEDeactivatedState: SSESelState{
 				public override void EnterState(IStateHandler sh){

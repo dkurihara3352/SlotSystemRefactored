@@ -119,12 +119,12 @@ namespace SlotSystemTests{
 					Assert.That(sb.isDeactivated, Is.True);
 					Assert.That(sb.isSelStateInit, Is.True);
 					Assert.That(sb.isWaitingForAction, Is.True);
-					Assert.That(sb.isActStateInit, Is.True);
-					Assert.That(sb.isEqpStateInit, Is.True);
+					Assert.That(sb.isPrevActStateNull, Is.True);
+					Assert.That(sb.isPrevEqpStateNull, Is.True);
 					Assert.That(sb.isEquipped, Is.False);
 					Assert.That(sb.isUnequipped, Is.False);
 					Assert.That(sb.isUnmarked, Is.True);
-					Assert.That(sb.isMrkStateInit, Is.True);
+					Assert.That(sb.isPrevMrkStateNull, Is.True);
 					}
 				[Test]
 				public void Pickup_SelStateNotNull_SetsPickedUpState(){
@@ -215,7 +215,7 @@ namespace SlotSystemTests{
 					Slottable stubSB = MakeSB();
 					stubSB.SetAndRunActProcess(mockProc);
 
-					stubSB.ExpireActionProcess();
+					stubSB.ExpireActProcess();
 
 					mockProc.Received().Expire();
 					}
@@ -250,26 +250,26 @@ namespace SlotSystemTests{
 					Assert.That(testSB.isUnequipped, Is.True);
 					}
 				[Test]
-				public void Reset_WhenCalled_SetsActStateWFAState(){
+				public void Refresh_WhenCalled_SetsActStateWFAState(){
 					Slottable sb = MakeSB();
 					
-					sb.Reset();
+					((ISlottable)sb).Refresh();
 
 					Assert.That(sb.isWaitingForAction, Is.True);
 					}
 				[Test]
-				public void Reset_WhenCalled_SetsPickedAmountZero(){
+				public void Refresh_WhenCalled_SetsPickedAmountZero(){
 					Slottable sb = MakeSB();
 					sb.pickedAmount = 10;
-					sb.Reset();
+					((ISlottable)sb).Refresh();
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(0));
 					}
 				[Test]
-				public void Reset_WhenCalled_SetsNewSlotIDMinus2(){
+				public void Refresh_WhenCalled_SetsNewSlotIDMinus2(){
 					Slottable sb = MakeSB();
 					sb.SetNewSlotID(3);
-					sb.Reset();
+					((ISlottable)sb).Refresh();
 
 					Assert.That(sb.newSlotID, Is.EqualTo(-2));
 					}

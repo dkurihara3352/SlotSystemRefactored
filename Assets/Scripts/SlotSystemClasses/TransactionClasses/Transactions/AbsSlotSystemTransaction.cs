@@ -16,7 +16,7 @@ namespace SlotSystem{
 			ssm.Transact();
 		}
 		public virtual void OnComplete(){
-			ssm.ResetAndFocus();
+			ssm.RefreshAndFocus();
 		}
 	}
 }

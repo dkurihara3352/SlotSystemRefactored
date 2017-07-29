@@ -48,7 +48,7 @@ namespace SlotSystemTests{
 				wfntProc.Expire();
 
 				mockSB.Received().Tap();
-				mockSB.Received().Reset();
+				mockSB.Received().Refresh();
 				mockSB.Received().Focus();
 				}
 			/*	helper	*/

@@ -442,13 +442,13 @@ namespace SlotSystem{
 						result = Brown("WFPickUp");
 					else if(state is WaitForNextTouchState)
 						result = Terra("WFNextTouch");
-					else if(state is PickedUpState)
+					else if(state is PickingUpState)
 						result = Berry("PickedUp");
 					else if(state is SBRemovedState)
 						result = Violet("Removed");
 					else if(state is SBAddedState)
 						result = Khaki("Added");
-					else if(state is SBMoveWithinState)
+					else if(state is MoveWithinState)
 						result = Midnight("MoveWithin");
 				}else if(state is SBEqpState){
 					if(state is SBEquippedState)
@@ -622,7 +622,7 @@ namespace SlotSystem{
 					res = Aqua("WFPointerUp");
 				else if(process is WaitForPickUpProcess)
 					res = Forest("WFPickUp");
-				else if(process is SBPickedUpProcess)
+				else if(process is PickUpProcess)
 					res = Brown("PickedUp");
 				else if(process is WaitForNextTouchProcess)
 					res = Terra("WFNextTouch");

@@ -47,7 +47,7 @@ namespace SlotSystem{
 					base.Expire();
 					sb.PickUp();
 				}
-			}
+				}
 			public class WaitForPointerUpProcess: SBProcess, ISBActProcess{
 				public WaitForPointerUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
@@ -57,7 +57,7 @@ namespace SlotSystem{
 					base.Expire();
 					sb.Defocus();
 				}
-			}
+				}
 			public class WaitForNextTouchProcess: SBProcess, ISBActProcess{
 				public WaitForNextTouchProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
@@ -67,15 +67,15 @@ namespace SlotSystem{
 					base.Expire();
 					if(!sb.isPickedUp){
 						sb.Tap();
-						sb.Reset();
+						sb.Refresh();
 						sb.Focus();
 					}else{
 						sb.ExecuteTransaction();
 					}
 				}
 			}
-			public class SBPickedUpProcess: SBProcess, ISBActProcess{
-				public SBPickedUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
+			public class PickUpProcess: SBProcess, ISBActProcess{
+				public PickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutineMock){
 					sse = sb;
 					this.coroutineFake = coroutineMock;
 				}

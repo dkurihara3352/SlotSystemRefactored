@@ -128,6 +128,7 @@ namespace SlotSystem{
 				public virtual void SetAndRunActProcess(ISGActProcess process){
 					actProcEngine.SetAndRunProcess(process);
 				}
+				public void ExpireActProcess(){if(actProcess != null) actProcess.Expire();}
 				/* Coroutine */
 					public IEnumeratorFake TransactionCoroutine(){
 						bool flag = true;
@@ -405,7 +406,7 @@ namespace SlotSystem{
 				public override void Focus(){
 					FocusSelf();
 					FocusSBs();
-					Reset();
+					Refresh();
 				}
 				public virtual void FocusSelf(){
 					base.Focus();
@@ -413,7 +414,7 @@ namespace SlotSystem{
 				public virtual void FocusSBs(){
 					foreach(ISlottable sb in this){
 						if(sb != null){
-							sb.Reset();
+							sb.Refresh();
 							if(sb.passesPrePickFilter)
 								sb.Focus();
 							else
@@ -424,7 +425,7 @@ namespace SlotSystem{
 				public override void Defocus(){
 					DefocusSelf();
 					DefocusSBs();
-					Reset();
+					Refresh();
 				}
 				public virtual void DefocusSelf(){
 					base.Defocus();
@@ -432,7 +433,7 @@ namespace SlotSystem{
 				public virtual void DefocusSBs(){
 					foreach(ISlottable sb in this){
 						if(sb != null){
-							sb.Reset();
+							sb.Refresh();
 							sb.Defocus();
 						}
 					}
@@ -589,7 +590,7 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public virtual void Reset(){
+			public virtual void Refresh(){
 				WaitForAction();
 				SetNewSBs(null);
 				SetNewSlots(null);
@@ -850,6 +851,7 @@ namespace SlotSystem{
 				void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine);
 				ISGActProcess actProcess{get;}
 				void SetAndRunActProcess(ISGActProcess process);
+				void ExpireActProcess();
 				IEnumeratorFake TransactionCoroutine();
 		/*	fields	*/
 			AxisScrollerMock scroller{get;}
@@ -917,7 +919,7 @@ namespace SlotSystem{
 			void OnCompleteSlotMovements();
 			void SyncSBsToSlots();
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
-			void Reset();
+			void Refresh();
 			void ReorderAndUpdateSBs();
 			void UpdateToRevert();
 			void SortAndUpdateSBs();

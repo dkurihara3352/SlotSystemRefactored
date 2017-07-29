@@ -19,11 +19,10 @@ namespace SlotSystem{
 						return m_actStateEngine;
 					}
 					}ISSEStateEngine<ISBActState> m_actStateEngine;
-				void SetActStateEngine(ISSEStateEngine<ISBActState> engine){m_actStateEngine = engine;}
-				ISBActState curActState{
+				public ISBActState curActState{
 					get{return actStateEngine.curState;}
 				}
-				ISBActState prevActState{
+				public ISBActState prevActState{
 					get{return actStateEngine.prevState;}
 				}
 				void SetActState(ISBActState state){
@@ -31,8 +30,9 @@ namespace SlotSystem{
 					if(state == null && actProcess != null)
 						SetAndRunActProcess(null);
 				}
-				public virtual bool isActStateInit{get{return prevActState == null;}}
-				public virtual void ClearCurActState(){SetActState(null);}
+				public bool isPrevActStateNull{get{return prevActState == null;}}
+				public bool isCurActStateNull{get{return curActState == null;}}
+				public  void ClearCurActState(){SetActState(null);}
 				/* Act states */
 					public ISBActState waitForActionState{
 						get{
@@ -77,7 +77,7 @@ namespace SlotSystem{
 					public ISBActState pickedUpState{
 						get{
 							if(m_pickedUpState == null)
-								m_pickedUpState = new PickedUpState();
+								m_pickedUpState = new PickingUpState();
 							return m_pickedUpState;
 						}
 						}ISBActState m_pickedUpState;
@@ -110,7 +110,7 @@ namespace SlotSystem{
 					public ISBActState moveWithinState{
 						get{
 							if(m_moveWithinState == null)
-								m_moveWithinState = new SBMoveWithinState();
+								m_moveWithinState = new MoveWithinState();
 							return m_moveWithinState;			
 						}
 						}ISBActState m_moveWithinState;
@@ -137,7 +137,8 @@ namespace SlotSystem{
 					if(state == null && eqpProcess != null)
 						SetAndRunEqpProcess(null);
 				}
-				public virtual bool isEqpStateInit{get{return prevEqpState == null;}}
+				public virtual bool isCurEqpStateNull{get{return curEqpState == null;}}
+				public virtual bool isPrevEqpStateNull{get{return prevEqpState == null;}}
 				public virtual void ClearCurEqpState(){SetEqpState(null);}
 				
 				/* Eqp states */
@@ -181,7 +182,8 @@ namespace SlotSystem{
 					if(state == null && mrkProcess != null)
 						SetAndRunMrkProcess(null);
 				}
-				public virtual bool isMrkStateInit{get{return prevMrkState == null;}}
+				public virtual bool isCurMrkStateNull{get{return curMrkState == null;}}
+				public virtual bool isPrevMrkStateNull{get{return prevMrkState == null;}}
 				public virtual void ClearCurMrkState(){SetMrkState(null);}
 				/* Mrk states */
 					public ISBMrkState markedState{
@@ -205,6 +207,14 @@ namespace SlotSystem{
 						public virtual bool isUnmarked{get{return curMrkState == unmarkedState;}}
 						public virtual bool wasUnmarked{get{return prevMrkState == markedState;}}
 		/*	processes	*/
+			ISBCoroutineFactory coroutineFactory{
+				get{
+					if(m_coroutineFactory == null)
+						m_coroutineFactory = new SBCoroutineFactory(this);
+					return m_coroutineFactory;
+				}
+				}ISBCoroutineFactory m_coroutineFactory;
+				public void SetCoroutineFactory(ISBCoroutineFactory factory){m_coroutineFactory = factory;}
 			/*	Action Process	*/
 				public ISSEProcessEngine<ISBActProcess> actProcEngine{
 					get{
@@ -220,18 +230,15 @@ namespace SlotSystem{
 				public virtual void SetAndRunActProcess(ISBActProcess process){
 					actProcEngine.SetAndRunProcess(process);
 				}
+				public void ExpireActProcess(){if(actProcess != null) actProcess.Expire();}
 				/* Coroutine */
-					public IEnumeratorFake WaitForPointerUpCoroutine(){return null;}
-					public IEnumeratorFake WaitForPickUpCoroutine(){return null;}
-					public IEnumeratorFake PickUpCoroutine(){return null;}
-					public IEnumeratorFake WaitForNextTouchCoroutine(){return null;}
-					public IEnumeratorFake RemoveCoroutine(){return null;}
-					public IEnumeratorFake AddCorouine(){return null;}
-					public IEnumeratorFake MoveWithinCoroutine(){
-						if(slotID == newSlotID)
-							ExpireActionProcess();
-						return null;
-					}
+					public System.Func<IEnumeratorFake> waitForPointerUpCoroutine{get{return coroutineFactory.MakeWaitForPointerUpCoroutine();}}
+					public System.Func<IEnumeratorFake> waitForPickUpCoroutine{get{return coroutineFactory.MakeWaitForPickUpCoroutine();}}
+					public System.Func<IEnumeratorFake> pickUpCoroutine{get{return coroutineFactory.MakePickUpCoroutine();}}
+					public System.Func<IEnumeratorFake> waitForNextTouchCoroutine{get{return coroutineFactory.MakeWaitForNextTouchCoroutine();}}
+					public System.Func<IEnumeratorFake> removeCoroutine{get{return coroutineFactory.MakeRemoveCoroutine();}}
+					public System.Func<IEnumeratorFake> addCoroutine{get{return coroutineFactory.MakeAddCoroutine();}}
+					public System.Func<IEnumeratorFake> moveWithinCoroutine{get{return coroutineFactory.MakeMoveWithinCoroutine();}}
 			/*	Equip Process	*/
 				public ISSEProcessEngine<ISBEqpProcess> eqpProcEngine{
 					get{
@@ -247,9 +254,10 @@ namespace SlotSystem{
 				public virtual void SetAndRunEqpProcess(ISBEqpProcess process){
 					eqpProcEngine.SetAndRunProcess(process);
 				}
+				public void ExpireEqpProcess(){if(eqpProcess != null) eqpProcess.Expire();}
 				/* Coroutine */
-					public IEnumeratorFake UnequipCoroutine(){return null;}
-					public IEnumeratorFake EquipCoroutine(){return null;}
+					public System.Func<IEnumeratorFake> equipCoroutine{get{return coroutineFactory.MakeEquipCoroutine();}}
+					public System.Func<IEnumeratorFake> unequipCoroutine{get{return coroutineFactory.MakeUnequipCoroutine();}}
 			/*	Mark Process	*/
 				public ISSEProcessEngine<ISBMrkProcess> mrkProcEngine{
 					get{
@@ -265,13 +273,19 @@ namespace SlotSystem{
 				public virtual void SetAndRunMrkProcess(ISBMrkProcess process){
 					mrkProcEngine.SetAndRunProcess(process);
 				}
+				public void ExpireMrkProcess(){if(mrkProcess != null) mrkProcess.Expire();}
 				/* Coroutine */
-					public IEnumeratorFake unmarkCoroutine(){return null;}
-					public IEnumeratorFake markCoroutine(){return null;}
+					public System.Func<IEnumeratorFake> markCoroutine{get{return coroutineFactory.MakeMarkCoroutine();}}
+					public System.Func<IEnumeratorFake> unmarkCoroutine{get{return coroutineFactory.MakeUnmarkCoroutine();}}
 		/*	commands	*/
 			public SlottableCommand TapCommand{
-				get{return m_tapCommand;}
+				get{
+					if(m_tapCommand == null)
+						m_tapCommand = new SBTapCommand();
+					return m_tapCommand;
+				}
 				}SlottableCommand m_tapCommand = new SBTapCommand();
+				public void SetTapCommand(SlottableCommand comm){m_tapCommand = comm;}
 				public virtual void Tap(){
 					m_tapCommand.Execute(this);
 				}
@@ -384,17 +398,17 @@ namespace SlotSystem{
 				}
 		/*	Event methods	*/
 			/*	Action Event	*/
-				public void OnPointerDownMock(PointerEventDataFake eventDataMock){
-					curActState.OnPointerDownMock(this, eventDataMock);
+				public void OnPointerDown(PointerEventDataFake eventDataMock){
+					curActState.OnPointerDown(this, eventDataMock);
 				}
-				public void OnPointerUpMock(PointerEventDataFake eventDataMock){
-					curActState.OnPointerUpMock(this, eventDataMock);
+				public void OnPointerUp(PointerEventDataFake eventDataMock){
+					curActState.OnPointerUp(this, eventDataMock);
 				}
-				public void OnDeselectedMock(PointerEventDataFake eventDataMock){
-					curActState.OnDeselectedMock(this, eventDataMock);
+				public void OnDeselected(PointerEventDataFake eventDataMock){
+					curActState.OnDeselected(this, eventDataMock);
 				}
-				public void OnEndDragMock(PointerEventDataFake eventDataMock){
-					curActState.OnEndDragMock(this, eventDataMock);
+				public void OnEndDrag(PointerEventDataFake eventDataMock){
+					curActState.OnEndDrag(this, eventDataMock);
 				}
 		/*	other Interface implementation	*/
 			int IComparable.CompareTo(object other){
@@ -414,33 +428,31 @@ namespace SlotSystem{
 		/*	methods	*/
 			public override void InitializeStates(){
 				Deactivate();
-				SetActState(waitForActionState);
+				WaitForAction();
 				SetEqpState(null);
 				SetMrkState(unmarkedState);
 			}
 			public override void SetHierarchy(){}
 			public virtual void Increment(){
 				SetActState(pickedUpState);
-				if(m_item.IsStackable && quantity > m_pickedAmount){
+				if(isStackable && quantity > m_pickedAmount){
 					m_pickedAmount ++;
 				}
 			}
 			public virtual void ExecuteTransaction(){
 				ssm.ExecuteTransaction();
 			}
-			public void ExpireActionProcess(){
-				if(actProcess.isRunning)
-					actProcess.Expire();
-			}
 			public void UpdateEquipState(){
 				if(itemInst.isEquipped) Equip();
 				else Unequip();
 			}
-			public virtual void Reset(){
-				SetActState(waitForActionState);
+			public void Refresh(){
+				WaitForAction();
 				pickedAmount = 0;
 				SetNewSlotID(-2);
 			}
+
+			
 			public bool ShareSGAndItem(ISlottable other){
 				bool flag = true;
 				flag &= this.sg == other.sg;
@@ -506,7 +518,8 @@ namespace SlotSystem{
 		/*	States and Processes	*/
 			/* States */
 				/* ActStates */
-					bool isActStateInit{get;}
+					bool isPrevActStateNull{get;}
+					bool isCurActStateNull{get;}
 					void ClearCurActState();
 					ISBActState waitForActionState{get;}
 						void WaitForAction();
@@ -541,7 +554,8 @@ namespace SlotSystem{
 						bool isMovingWithin{get;}
 						bool wasMovingWithin{get;}
 				/* Eqp States */
-					bool isEqpStateInit{get;}
+					bool isCurEqpStateNull{get;}
+					bool isPrevEqpStateNull{get;}
 					void ClearCurEqpState();
 					ISBEqpState equippedState{get;}
 						void Equip();
@@ -552,7 +566,8 @@ namespace SlotSystem{
 						bool isUnequipped{get;}
 						bool wasUnequipped{get;}
 				/* Mrk States */
-					bool isMrkStateInit{get;}
+					bool isCurMrkStateNull{get;}
+					bool isPrevMrkStateNull{get;}
 					void ClearCurMrkState();
 					ISBMrkState	markedState{get;}
 						void Mark();
@@ -567,25 +582,29 @@ namespace SlotSystem{
 					void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine);
 					ISBActProcess actProcess{get;}
 					void SetAndRunActProcess(ISBActProcess process);
-						IEnumeratorFake WaitForPointerUpCoroutine();
-						IEnumeratorFake WaitForPickUpCoroutine();
-						IEnumeratorFake PickUpCoroutine();
-						IEnumeratorFake WaitForNextTouchCoroutine();
-						IEnumeratorFake RemoveCoroutine();
-						IEnumeratorFake AddCorouine();
-						IEnumeratorFake MoveWithinCoroutine();
+					void ExpireActProcess();
+						System.Func<IEnumeratorFake> waitForPointerUpCoroutine{get;}
+						System.Func<IEnumeratorFake> waitForPickUpCoroutine{get;}
+						System.Func<IEnumeratorFake> pickUpCoroutine{get;}
+						System.Func<IEnumeratorFake> waitForNextTouchCoroutine{get;}
+						System.Func<IEnumeratorFake> removeCoroutine{get;}
+						System.Func<IEnumeratorFake> addCoroutine{get;}
+						System.Func<IEnumeratorFake> moveWithinCoroutine{get;}
 				ISSEProcessEngine<ISBEqpProcess> eqpProcEngine{get;}
 					void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine);
 					ISBEqpProcess eqpProcess{get;}
 					void SetAndRunEqpProcess(ISBEqpProcess process);
-						IEnumeratorFake UnequipCoroutine();
-						IEnumeratorFake EquipCoroutine();
+					void ExpireEqpProcess();
+						System.Func<IEnumeratorFake> unequipCoroutine{get;}
+						System.Func<IEnumeratorFake> equipCoroutine{get;}
+
 				ISSEProcessEngine<ISBMrkProcess> mrkProcEngine{get;}
 					void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine);
 					ISBMrkProcess mrkProcess{get;}
 					void SetAndRunMrkProcess(ISBMrkProcess process);
-						IEnumeratorFake unmarkCoroutine();
-						IEnumeratorFake markCoroutine();
+					void ExpireMrkProcess();
+						System.Func<IEnumeratorFake> unmarkCoroutine{get;}
+						System.Func<IEnumeratorFake> markCoroutine{get;}
 		/*	Commands	*/
 			void Tap();
 		/*	fields	*/
@@ -607,16 +626,15 @@ namespace SlotSystem{
 			int quantity{get;}
 			void SetQuantity(int quant);
 		/*	Event Methods	*/
-			void OnPointerDownMock(PointerEventDataFake eventDataMock);
-			void OnPointerUpMock(PointerEventDataFake eventDataMock);
-			void OnDeselectedMock(PointerEventDataFake eventDataMock);
-			void OnEndDragMock(PointerEventDataFake eventDataMock);
+			void OnPointerDown(PointerEventDataFake eventDataMock);
+			void OnPointerUp(PointerEventDataFake eventDataMock);
+			void OnDeselected(PointerEventDataFake eventDataMock);
+			void OnEndDrag(PointerEventDataFake eventDataMock);
 		/*	Methods	*/
 			void Increment();
 			void ExecuteTransaction();
-			void ExpireActionProcess();
 			void UpdateEquipState();
-			void Reset();
+			void Refresh();
 			bool ShareSGAndItem(ISlottable other);
 			bool HaveCommonItemFamily(ISlottable other);
 			void Destroy();
@@ -630,5 +648,71 @@ namespace SlotSystem{
 			bool isPool{get;}
 			void SetHovered();
 			void Probe();
+	}
+	public class SBCoroutineFactory: ISBCoroutineFactory{
+		ISlottable sb;
+		public SBCoroutineFactory(ISlottable sb){this.sb = sb;}
+
+		public System.Func<IEnumeratorFake> MakeWaitForPointerUpCoroutine(){
+			return DefaultWaitForPointerUpCoroutine;
+			}
+			IEnumeratorFake DefaultWaitForPointerUpCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeWaitForPickUpCoroutine(){
+			return DefaultWaitForPickUpCoroutine;
+			}
+			IEnumeratorFake DefaultWaitForPickUpCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakePickUpCoroutine(){
+			return DefaultPickUpCoroutine;
+			}
+			IEnumeratorFake DefaultPickUpCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeWaitForNextTouchCoroutine(){
+			return DefaultWaitForNextTouchCoroutine;
+			}
+			IEnumeratorFake DefaultWaitForNextTouchCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeRemoveCoroutine(){
+			return DefaultRemoveCoroutine;
+			}
+			IEnumeratorFake DefaultRemoveCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeAddCoroutine(){
+			return DefaultAddCoroutine;
+			}
+			IEnumeratorFake DefaultAddCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeMoveWithinCoroutine(){
+			return DefaultMoveWithinCoroutine;
+			}
+			IEnumeratorFake DefaultMoveWithinCoroutine(){return null;}
+
+		public System.Func<IEnumeratorFake> MakeEquipCoroutine(){
+			return DefaultEquipCoroutine;
+			}
+			IEnumeratorFake DefaultEquipCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeUnequipCoroutine(){
+			return DefaultUnequipCoroutine;
+			}
+			IEnumeratorFake DefaultUnequipCoroutine(){return null;}
+
+		public System.Func<IEnumeratorFake> MakeMarkCoroutine(){
+			return DefaultMarkCoroutine;
+			}
+			IEnumeratorFake DefaultMarkCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeUnmarkCoroutine(){
+			return DefaultUnmarkCoroutine;
+			}
+			IEnumeratorFake DefaultUnmarkCoroutine(){return null;}
+	}
+	public interface ISBCoroutineFactory{
+		System.Func<IEnumeratorFake> MakeWaitForPointerUpCoroutine();
+		System.Func<IEnumeratorFake> MakeWaitForPickUpCoroutine();
+		System.Func<IEnumeratorFake> MakePickUpCoroutine();
+		System.Func<IEnumeratorFake> MakeWaitForNextTouchCoroutine();
+		System.Func<IEnumeratorFake> MakeRemoveCoroutine();
+		System.Func<IEnumeratorFake> MakeAddCoroutine();
+		System.Func<IEnumeratorFake> MakeMoveWithinCoroutine();
+
+		System.Func<IEnumeratorFake> MakeEquipCoroutine();
+		System.Func<IEnumeratorFake> MakeUnequipCoroutine();
+
+		System.Func<IEnumeratorFake> MakeMarkCoroutine();
+		System.Func<IEnumeratorFake> MakeUnmarkCoroutine();		
 	}
 }

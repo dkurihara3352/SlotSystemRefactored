@@ -607,7 +607,7 @@ namespace SlotSystemTests{
 					Assert.That(sg.isFocused, Is.True);
 					}
 				[Test]
-				public void FocusSBs_WhenCalled_CallsSBReset(){
+				public void FocusSBs_WhenCalled_CallsSBRefresh(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
 							ISlottable sbA = MakeSubSB();
@@ -618,9 +618,9 @@ namespace SlotSystemTests{
 					
 					sg.FocusSBs();
 
-					sbA.Received().Reset();
-					sbB.Received().Reset();
-					sbC.Received().Reset();
+					sbA.Received().Refresh();
+					sbB.Received().Refresh();
+					sbC.Received().Refresh();
 					}
 				[TestCaseSource(typeof(FocusSBsVariousCases))]
 				public void FocusSBs_Various_CallsSBFocusOrDefocus(List<ISlottable> sbs, Dictionary<ISlotSystemElement, bool> dict){
@@ -664,7 +664,7 @@ namespace SlotSystemTests{
 						}
 					}
 				[Test]
-				public void DefocusSBs_WhenCalled_CallsSBReset(){
+				public void DefocusSBs_WhenCalled_CallsSBRefresh(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
 							ISlottable sbA = MakeSubSB();
@@ -675,9 +675,9 @@ namespace SlotSystemTests{
 					
 					sg.DefocusSBs();
 
-					sbA.Received().Reset();
-					sbB.Received().Reset();
-					sbC.Received().Reset();
+					sbA.Received().Refresh();
+					sbB.Received().Refresh();
+					sbC.Received().Refresh();
 					}
 				[Test]
 				public void DefocusSelf_WhenCalled_SetsSelStateDefocused(){
@@ -1705,20 +1705,20 @@ namespace SlotSystemTests{
 						}
 					}
 				[Test]
-				public void Reset_WhenCalled_SetActStateWFA(){
+				public void Refresh_WhenCalled_SetActStateWFA(){
 					SlotGroup sg = MakeSG();
 
-					sg.Reset();
+					sg.Refresh();
 					
 					Assert.That(sg.isWaitingForAction, Is.True);
 					}
 				[Test]
-				public void Reset_WhenCalled_SetsFields(){
+				public void Refresh_WhenCalled_SetsFields(){
 					SlotGroup sg = MakeSG();
 						sg.SetNewSBs(new List<ISlottable>());
 						sg.SetNewSlots(new List<Slot>());
 
-					sg.Reset();
+					sg.Refresh();
 
 					Assert.That(sg.newSBs, Is.Null);
 					Assert.That(sg.newSlots, Is.Null);

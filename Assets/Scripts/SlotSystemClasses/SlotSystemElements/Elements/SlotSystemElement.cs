@@ -16,7 +16,7 @@ namespace SlotSystem{
 			ISSESelState prevSelState{
 				get{return selStateEngine.prevState;}
 			}
-			ISSESelState curSelState{
+			public ISSESelState curSelState{
 				get{return selStateEngine.curState;}
 			}
 			void SetSelState(ISSESelState state){
@@ -25,6 +25,8 @@ namespace SlotSystem{
 					SetAndRunSelProcess(null);
 			}
 			public bool isSelStateInit{get{return prevSelState ==null;}}
+			public bool isCurSelStateNull{get{return curSelState == null;}}
+			public bool isPrevSelStateNull{get{return curSelState == null;}}
 			public void ClearCurSelState(){SetSelState(null);}
 			/*	selStates	*/
 				ISSESelState deactivatedState{
@@ -136,18 +138,28 @@ namespace SlotSystem{
 						IEnumeratorFake defSelCoroutine(){return null;}
 					
 		/* Events */
-			public virtual void OnHoverEnterMock(){
-				if(curSelState != null)
-					curSelState.OnHoverEnterMock(this, new PointerEventDataFake());
-				else
-					throw new System.InvalidOperationException("SlotSystemElement.OnHoverEnterMock: curSelState not set");
+			public virtual void OnHoverEnter(){
+				onHoverEnterCommand.Execute();
 			}
-			public virtual void OnHoverExitMock(){
-				if(curSelState != null)
-					curSelState.OnHoverExitMock(this, new PointerEventDataFake());
-				else
-					throw new System.InvalidOperationException("SlotSystemElement.OnHoverEnterMock: curSelState not set");
+			ISSECommand onHoverEnterCommand{
+				get{
+					if(m_onHoverEnterCommand == null)
+						m_onHoverEnterCommand = new OnHoverEnterCommand(this);
+					return m_onHoverEnterCommand;
+				}
+				}ISSECommand m_onHoverEnterCommand;
+				public void SetOnHoverEnterCommand(ISSECommand comm){m_onHoverEnterCommand = comm;}
+			public virtual void OnHoverExit(){
+				onHoverExitCommand.Execute();
 			}
+			ISSECommand onHoverExitCommand{
+				get{
+					if(m_onHoverExitCommand == null)
+						m_onHoverExitCommand = new OnHoverExitCommand(this);
+					return m_onHoverExitCommand;
+				}
+				}ISSECommand m_onHoverExitCommand;
+				public void SetOnHoverExitCommand(ISSECommand comm){m_onHoverExitCommand = comm;}
 		/*	public fields	*/
 			public virtual ISlotSystemElement this[int i]{
 				get{
@@ -345,7 +357,10 @@ namespace SlotSystem{
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
 		/* Sel states */
+			ISSESelState curSelState{get;}
 			bool isSelStateInit{get;}
+			bool isCurSelStateNull{get;}
+			bool isPrevSelStateNull{get;}
 			void ClearCurSelState();
 			void Deactivate();
 				bool isDeactivated{get;}
@@ -370,8 +385,10 @@ namespace SlotSystem{
 			System.Func<IEnumeratorFake> focusCoroutine{get;}
 			System.Func<IEnumeratorFake> defocusCoroutine{get;}
 			System.Func<IEnumeratorFake> selectCoroutine{get;}
-		void OnHoverEnterMock();
-		void OnHoverExitMock();
+		void OnHoverEnter();
+		void SetOnHoverEnterCommand(ISSECommand comm);
+		void OnHoverExit();
+		void SetOnHoverExitCommand(ISSECommand comm);
 		void InstantFocus();
 			ISSECommand instantFocusCommand{get;}
 			void SetInstantFocusCommand(ISSECommand comm);
