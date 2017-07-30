@@ -8,8 +8,21 @@ namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
 		/*	States	*/
 			/* Selection */
+				public override ISSESelStateFactory selStateFactory{
+					get{
+						if(m_selStateFactory == null)
+							m_selStateFactory = new SBSelStateFactory();
+						return m_selStateFactory;
+					}
+				}
 				public override void Activate(){
-					ssm.ReferToTAAndUpdateSelState(this);
+					if(tam.IsTransactionResultRevertFor(this) == false)
+						Focus();
+					else
+						Defocus();
+				}
+				public override void Deselect(){
+					Activate();
 				}
 			/*	Action State	*/
 				ISSEStateEngine<ISBActState> actStateEngine{
@@ -30,8 +43,8 @@ namespace SlotSystem{
 					if(state == null && actProcess != null)
 						SetAndRunActProcess(null);
 				}
-				public bool isPrevActStateNull{get{return prevActState == null;}}
-				public bool isCurActStateNull{get{return curActState == null;}}
+				public bool wasActStateNull{get{return prevActState == null;}}
+				public bool isActStateNull{get{return curActState == null;}}
 				public  void ClearCurActState(){SetActState(null);}
 				/* Act states */
 					public ISBActState waitForActionState{
@@ -137,8 +150,8 @@ namespace SlotSystem{
 					if(state == null && eqpProcess != null)
 						SetAndRunEqpProcess(null);
 				}
-				public virtual bool isCurEqpStateNull{get{return curEqpState == null;}}
-				public virtual bool isPrevEqpStateNull{get{return prevEqpState == null;}}
+				public virtual bool isEqpStateNull{get{return curEqpState == null;}}
+				public virtual bool wasEqpStateNull{get{return prevEqpState == null;}}
 				public virtual void ClearCurEqpState(){SetEqpState(null);}
 				
 				/* Eqp states */
@@ -182,8 +195,8 @@ namespace SlotSystem{
 					if(state == null && mrkProcess != null)
 						SetAndRunMrkProcess(null);
 				}
-				public virtual bool isCurMrkStateNull{get{return curMrkState == null;}}
-				public virtual bool isPrevMrkStateNull{get{return prevMrkState == null;}}
+				public virtual bool isMrkStateNull{get{return curMrkState == null;}}
+				public virtual bool wasMrkStateNull{get{return prevMrkState == null;}}
 				public virtual void ClearCurMrkState(){SetMrkState(null);}
 				/* Mrk states */
 					public ISBMrkState markedState{
@@ -333,7 +346,7 @@ namespace SlotSystem{
 			}
 			public virtual bool isPickedUp{
 				get{
-					return ssm.pickedSB == (ISlottable)this;
+					return tam.pickedSB == (ISlottable)this;
 				}
 			}
 			public virtual bool isStackable{
@@ -342,7 +355,7 @@ namespace SlotSystem{
 			public bool passesPrePickFilter{
 				get{
 					bool isFilteredIn = false;
-					ssm.PrePickFilter(this, out isFilteredIn);
+					tam.PrePickFilter(this, out isFilteredIn);
 					return isFilteredIn;
 				}
 			}
@@ -440,7 +453,7 @@ namespace SlotSystem{
 				}
 			}
 			public virtual void ExecuteTransaction(){
-				ssm.ExecuteTransaction();
+				tam.ExecuteTransaction();
 			}
 			public void UpdateEquipState(){
 				if(itemInst.isEquipped) Equip();
@@ -477,30 +490,30 @@ namespace SlotSystem{
 			}
 		/*	Forward	*/
 			public virtual void SetPickedSB(){
-				if(ssm != null){
-					ssm.SetPickedSB((ISlottable)this);
+				if(tam != null){
+					tam.SetPickedSB((ISlottable)this);
 				}else
 					throw new System.InvalidOperationException("Slottable.SetPickedSB: ssm not set");
 			}
 			public virtual void Probe(){
-				ssm.Probe();
+				tam.Probe();
 			}
 			public virtual void SetDIcon1(){
 				DraggedIcon dIcon = new DraggedIcon(this);
-				ssm.SetDIcon1(dIcon);
+				tam.SetDIcon1(dIcon);
 			}
 			public virtual void SetDIcon2(){
 				DraggedIcon dIcon = new DraggedIcon(this);
-				ssm.SetDIcon2(dIcon);
+				tam.SetDIcon2(dIcon);
 			}
 			public virtual void CreateTAResult(){
-				ssm.CreateTransactionResults();
+				tam.CreateTransactionResults();
 			}
 			public virtual void UpdateTA(){
-				ssm.UpdateTransaction();
+				tam.UpdateTransaction();
 			}
 			public virtual bool isHovered{
-				get{return ssm.hovered == (ISlotSystemElement)this;}
+				get{return tam.hovered == (ISlotSystemElement)this;}
 			}
 			public virtual bool isPool{
 				get{
@@ -511,15 +524,27 @@ namespace SlotSystem{
 				}
 			}
 			public void SetHovered(){
-				ssm.SetHovered((ISlottable)this);
+				tam.SetHovered((ISlottable)this);
 			}
+			public void UnsetHovered(){
+				tam.SetHovered(null);
+			}
+			public ITransactionManager tam{
+				get{
+					if(m_tam != null)
+						return m_tam;
+					else
+						throw new InvalidOperationException("tam not set");
+				}
+			}ITransactionManager m_tam;
+			public void SetTAM(ITransactionManager tam){m_tam = tam;}
 	}
 	public interface ISlottable: ISlotSystemElement ,IComparable<ISlottable>, IComparable{
 		/*	States and Processes	*/
 			/* States */
 				/* ActStates */
-					bool isPrevActStateNull{get;}
-					bool isCurActStateNull{get;}
+					bool wasActStateNull{get;}
+					bool isActStateNull{get;}
 					void ClearCurActState();
 					ISBActState waitForActionState{get;}
 						void WaitForAction();
@@ -554,8 +579,8 @@ namespace SlotSystem{
 						bool isMovingWithin{get;}
 						bool wasMovingWithin{get;}
 				/* Eqp States */
-					bool isCurEqpStateNull{get;}
-					bool isPrevEqpStateNull{get;}
+					bool isEqpStateNull{get;}
+					bool wasEqpStateNull{get;}
 					void ClearCurEqpState();
 					ISBEqpState equippedState{get;}
 						void Equip();
@@ -566,8 +591,8 @@ namespace SlotSystem{
 						bool isUnequipped{get;}
 						bool wasUnequipped{get;}
 				/* Mrk States */
-					bool isCurMrkStateNull{get;}
-					bool isPrevMrkStateNull{get;}
+					bool isMrkStateNull{get;}
+					bool wasMrkStateNull{get;}
 					void ClearCurMrkState();
 					ISBMrkState	markedState{get;}
 						void Mark();
@@ -647,72 +672,13 @@ namespace SlotSystem{
 			bool isHovered{get;}
 			bool isPool{get;}
 			void SetHovered();
+			void UnsetHovered();
 			void Probe();
+			ITransactionManager tam{get;}
+			void SetTAM(ITransactionManager tam);
 	}
-	public class SBCoroutineFactory: ISBCoroutineFactory{
-		ISlottable sb;
-		public SBCoroutineFactory(ISlottable sb){this.sb = sb;}
-
-		public System.Func<IEnumeratorFake> MakeWaitForPointerUpCoroutine(){
-			return DefaultWaitForPointerUpCoroutine;
-			}
-			IEnumeratorFake DefaultWaitForPointerUpCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakeWaitForPickUpCoroutine(){
-			return DefaultWaitForPickUpCoroutine;
-			}
-			IEnumeratorFake DefaultWaitForPickUpCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakePickUpCoroutine(){
-			return DefaultPickUpCoroutine;
-			}
-			IEnumeratorFake DefaultPickUpCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakeWaitForNextTouchCoroutine(){
-			return DefaultWaitForNextTouchCoroutine;
-			}
-			IEnumeratorFake DefaultWaitForNextTouchCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakeRemoveCoroutine(){
-			return DefaultRemoveCoroutine;
-			}
-			IEnumeratorFake DefaultRemoveCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakeAddCoroutine(){
-			return DefaultAddCoroutine;
-			}
-			IEnumeratorFake DefaultAddCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakeMoveWithinCoroutine(){
-			return DefaultMoveWithinCoroutine;
-			}
-			IEnumeratorFake DefaultMoveWithinCoroutine(){return null;}
-
-		public System.Func<IEnumeratorFake> MakeEquipCoroutine(){
-			return DefaultEquipCoroutine;
-			}
-			IEnumeratorFake DefaultEquipCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakeUnequipCoroutine(){
-			return DefaultUnequipCoroutine;
-			}
-			IEnumeratorFake DefaultUnequipCoroutine(){return null;}
-
-		public System.Func<IEnumeratorFake> MakeMarkCoroutine(){
-			return DefaultMarkCoroutine;
-			}
-			IEnumeratorFake DefaultMarkCoroutine(){return null;}
-		public System.Func<IEnumeratorFake> MakeUnmarkCoroutine(){
-			return DefaultUnmarkCoroutine;
-			}
-			IEnumeratorFake DefaultUnmarkCoroutine(){return null;}
-	}
-	public interface ISBCoroutineFactory{
-		System.Func<IEnumeratorFake> MakeWaitForPointerUpCoroutine();
-		System.Func<IEnumeratorFake> MakeWaitForPickUpCoroutine();
-		System.Func<IEnumeratorFake> MakePickUpCoroutine();
-		System.Func<IEnumeratorFake> MakeWaitForNextTouchCoroutine();
-		System.Func<IEnumeratorFake> MakeRemoveCoroutine();
-		System.Func<IEnumeratorFake> MakeAddCoroutine();
-		System.Func<IEnumeratorFake> MakeMoveWithinCoroutine();
-
-		System.Func<IEnumeratorFake> MakeEquipCoroutine();
-		System.Func<IEnumeratorFake> MakeUnequipCoroutine();
-
-		System.Func<IEnumeratorFake> MakeMarkCoroutine();
-		System.Func<IEnumeratorFake> MakeUnmarkCoroutine();		
+	public interface IHoverable{
+		void SetHovered();
+		void UnsetHovered();
 	}
 }

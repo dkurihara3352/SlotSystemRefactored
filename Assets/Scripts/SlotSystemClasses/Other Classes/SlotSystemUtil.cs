@@ -131,44 +131,44 @@ namespace SlotSystem{
 					res = SlotSystemUtil.Brown("SelectProc");
 				return res;
 			}
-		/*	SSM	*/
-			public static string SSMCurStateNamePlain(ISlotSystemManager ssm){
+		/* TAM */
+		public static string TAMCurStateNamePlain(ITransactionManager tam){
 				string res = "";
-				if(ssm.isWaitingForAction)
+				if(tam.isWaitingForAction)
 					res = "WaitForAction";
-				else if(ssm.isProbing)
+				else if(tam.isProbing)
 					res = "Probing";
-				else if(ssm.isTransacting)
+				else if(tam.isTransacting)
 					res = "Transaction";
 				return res;
 			}
-			public static string SSMPrevStateNamePlain(ISlotSystemManager ssm){
+			public static string TAMPrevStateNamePlain(ITransactionManager tam){
 				string res = "";
-				if(ssm.wasWaitingForAction)
+				if(tam.wasWaitingForAction)
 					res = "WaitForAction";
-				else if(ssm.wasProbing)
+				else if(tam.wasProbing)
 					res = "Probing";
-				else if(ssm.wasTransacting)
+				else if(tam.wasTransacting)
 					res = "Transaction";
 				return res;
 			}
-			public static string SSMCurStateName(ISlotSystemManager ssm){
+			public static string TAMCurStateName(ITransactionManager tam){
 				string res = "";
-				if(ssm.isWaitingForAction)
+				if(tam.isWaitingForAction)
 					res = SlotSystemUtil.Green("WaitForAction");
-				else if(ssm.isProbing)
+				else if(tam.isProbing)
 					res = SlotSystemUtil.Ciel("Probing");
-				else if(ssm.isTransacting)
+				else if(tam.isTransacting)
 					res = SlotSystemUtil.Terra("Transaction");
 				return res;
 			}
-			public static string SSMPrevStateName(ISlotSystemManager ssm){
+			public static string TAMPrevStateName(ITransactionManager tam){
 				string res = "";
-				if(ssm.wasWaitingForAction)
+				if(tam.wasWaitingForAction)
 					res = SlotSystemUtil.Green("WaitForAction");
-				else if(ssm.wasProbing)
+				else if(tam.wasProbing)
 					res = SlotSystemUtil.Ciel("Probing");
-				else if(ssm.wasTransacting)
+				else if(tam.wasTransacting)
 					res = SlotSystemUtil.Terra("Transaction");
 				return res;
 			}
@@ -190,73 +190,83 @@ namespace SlotSystem{
 					res = SlotSystemUtil.Beni("Empty");
 				return res;
 			}
-			public static string SSMProcessName(ISSMProcess proc){
+			public static string TAMProcessName(ITAMProcess proc){
 				string res = "";
-				if(proc is SSMGreyinProcess)
-					res = SlotSystemUtil.Red("Greyin");
-				else if(proc is SSMGreyoutProcess)
-					res = SlotSystemUtil.Red("Greyout");
-				else if(proc is SSMProbeProcess)
+				if(proc is TAMProbeProcess)
 					res = SlotSystemUtil.Red("Probe");
-				else if(proc is SSMTransactionProcess)
+				else if(proc is TAMTransactionProcess)
 					res = SlotSystemUtil.Blue("Transaction");
+				return res;
+			}
+		/*	SSM	*/
+			public static string TAMDebug(ITransactionManager tam){
+				string res = "";
+				string pSB = SlotSystemUtil.SBofSG(tam.pickedSB);
+				string tSB = SlotSystemUtil.SBofSG(tam.targetSB);
+				string hovered = "";
+					if(tam.hovered is ISlottable)
+						hovered = SBofSG((ISlottable)tam.hovered);
+					else if(tam.hovered is ISlotGroup)
+						hovered = tam.hovered.eName;
+				string di1;
+					if(tam.dIcon1 == null)
+						di1 = "null";
+					else
+						di1 = SlotSystemUtil.SBofSG(tam.dIcon1.sb);
+				string di2;
+					if(tam.dIcon2 == null)
+						di2 = "null";
+					else
+						di2 = SlotSystemUtil.SBofSG(tam.dIcon2.sb);
+				
+				string sg1 = tam.sg1 == null?"null":tam.sg1.eName;
+				string sg2 = tam.sg2 == null?"null":tam.sg2.eName;
+				string prevSel = SSEPrevSelStateName(tam);
+				string curSel = SSECurSelStateName(tam);
+				string selProc;
+					if(tam.selProcess == null)
+						selProc = "";
+					else
+						selProc = SlotSystemUtil.SSEProcessName(tam.selProcess) + " running? " + (tam.selProcess.isRunning?Blue("true"):Red("false"));
+				string prevAct = TAMPrevStateNamePlain(tam);
+				string curAct = TAMCurStateName(tam);
+				string actProc;
+					if((ITAMProcess)tam.actProcess == null)
+						actProc = "";
+					else
+						actProc = SlotSystemUtil.TAMProcessName((ITAMProcess)tam.actProcess) + " running? " + (tam.actProcess.isRunning?Blue("true"):Red("false"));
+				string ta = SlotSystemUtil.TransactionName(tam.transaction);
+				string d1Done = "d1Done: " + (tam.dIcon1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				string d2Done = "d2Done: " + (tam.dIcon2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				string sg1Done = "sg1Done: " + (tam.sg1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				string sg2Done = "sg2Done: " + (tam.sg2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+
+				res = SlotSystemUtil.Bold("SSM:") +
+					" pSB " + pSB +
+					", tSB " + tSB +
+					", hovered " + hovered +
+					", di1 " + di1 +
+					", di2 " + di2 +
+					", sg1 " + sg1 +
+					", sg2 " + sg2 + ", " +
+					SlotSystemUtil.Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
+					"proc " + selProc + ", " +
+					SlotSystemUtil.Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
+					"proc " + actProc + ", " +
+					SlotSystemUtil.Bold("TA ") + ta + ", " + 
+					SlotSystemUtil.Bold("TAComp ") + d1Done + " " + d2Done + " " + sg1Done + " " + sg2Done;
 				return res;
 			}
 			public static string SSMDebug(ISlotSystemManager ssm){
 				string res = "";
-				string pSB = SlotSystemUtil.SBofSG(ssm.pickedSB);
-				string tSB = SlotSystemUtil.SBofSG(ssm.targetSB);
-				string hovered = "";
-					if(ssm.hovered is ISlottable)
-						hovered = SBofSG((ISlottable)ssm.hovered);
-					else if(ssm.hovered is ISlotGroup)
-						hovered = ssm.hovered.eName;
-				string di1;
-					if(ssm.dIcon1 == null)
-						di1 = "null";
-					else
-						di1 = SlotSystemUtil.SBofSG(ssm.dIcon1.sb);
-				string di2;
-					if(ssm.dIcon2 == null)
-						di2 = "null";
-					else
-						di2 = SlotSystemUtil.SBofSG(ssm.dIcon2.sb);
-				
-				string sg1 = ssm.sg1 == null?"null":ssm.sg1.eName;
-				string sg2 = ssm.sg2 == null?"null":ssm.sg2.eName;
-				string prevSel = SlotSystemUtil.SSEPrevSelStateNamePlain(ssm);
-				string curSel = SlotSystemUtil.SSECurSelStateNamePlain(ssm);
+				string prevSel = SSEPrevSelStateNamePlain(ssm);
+				string curSel = SSECurSelStateNamePlain(ssm);
 				string selProc;
 					if(ssm.selProcess == null)
 						selProc = "";
 					else
-						selProc = SlotSystemUtil.SSMProcessName((ISSMProcess)ssm.selProcess) + " running? " + (ssm.selProcess.isRunning?Blue("true"):Red("false"));
-				string prevAct = SSMPrevStateNamePlain(ssm);
-				string curAct = SSMCurStateName(ssm);
-				string actProc;
-					if((ISSMProcess)ssm.actProcess == null)
-						actProc = "";
-					else
-						actProc = SlotSystemUtil.SSMProcessName((ISSMProcess)ssm.actProcess) + " running? " + (ssm.actProcess.isRunning?Blue("true"):Red("false"));
-				string ta = SlotSystemUtil.TransactionName(ssm.transaction);
-				string d1Done = "d1Done: " + (ssm.dIcon1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
-				string d2Done = "d2Done: " + (ssm.dIcon2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
-				string sg1Done = "sg1Done: " + (ssm.sg1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
-				string sg2Done = "sg2Done: " + (ssm.sg2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
-				res = SlotSystemUtil.Bold("SSM:") +
-						" pSB " + pSB +
-						", tSB " + tSB +
-						", hovered " + hovered +
-						", di1 " + di1 +
-						", di2 " + di2 +
-						", sg1 " + sg1 +
-						", sg2 " + sg2 + ", " +
-					SlotSystemUtil.Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +
-						"proc " + selProc + ", " +
-					SlotSystemUtil.Bold("Act ") + "from " + prevAct + " to " + curAct + " " +
-						"proc " + actProc + ", " +
-					SlotSystemUtil.Bold("TA ") + ta + ", " + 
-					SlotSystemUtil.Bold("TAComp ") + d1Done + " " + d2Done + " " + sg1Done + " " + sg2Done;
+						selProc = SlotSystemUtil.SSEProcessName(ssm.selProcess) + " running? " + (ssm.selProcess.isRunning?Blue("true"):Red("false"));
+				res = SlotSystemUtil.Bold("SSM:") + SlotSystemUtil.Bold("Sel ") + "from " + prevSel + " to " + curSel + " " +"proc " + selProc;
 				return res;
 			}
 		/*	SG	*/
@@ -688,7 +698,8 @@ namespace SlotSystem{
 			}
 		/*	Debug	*/
 			public static string TADebug(ISlottable testSB, ISlotSystemElement hovered){
-				ISlotSystemTransaction ta = testSB.ssm.MakeTransaction(testSB, hovered);
+				ITransactionManager tam = TransactionManager.curTAM;
+				ISlotSystemTransaction ta = tam.MakeTransaction(testSB, hovered);
 				string taStr = TransactionName(ta);
 				string taTargetSB = SlotSystemUtil.SBofSG(ta.targetSB);
 				string taSG1 = ta.sg1==null?"null":ta.sg1.eName;

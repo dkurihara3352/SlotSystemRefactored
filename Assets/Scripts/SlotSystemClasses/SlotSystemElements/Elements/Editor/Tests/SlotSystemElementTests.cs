@@ -201,8 +201,10 @@ namespace SlotSystemTests{
 				[Test]
 				public void OnHoverEnterMock_curSelStateNotNull_CallsCurSelStateOnHoverEnterMock(){
 					TestSlotSystemElement sse = MakeTestSSE();
-					ISSESelState mockState = Substitute.For<ISSESelState>();
-					sse.SetDeactivatedState(mockState);
+						ISSESelState mockState = Substitute.For<ISSESelState>();
+						ISSESelStateFactory stubFactory = Substitute.For<ISSESelStateFactory>();
+						stubFactory.MakeDeactivatedState().Returns(mockState);
+						sse.SetSelStateFactory(stubFactory);
 					sse.Deactivate();
 
 					sse.OnHoverEnter();
@@ -220,7 +222,9 @@ namespace SlotSystemTests{
 				public void OnHoverExitMock_curSelStateNotNull_CallsCurSelStateOnHoverExitMock(){
 					TestSlotSystemElement sse = MakeTestSSE();
 					ISSESelState mockState = Substitute.For<ISSESelState>();
-					sse.SetDeactivatedState(mockState);
+						ISSESelStateFactory stubFactory = Substitute.For<ISSESelStateFactory>();
+						stubFactory.MakeDeactivatedState().Returns(mockState);
+						sse.SetSelStateFactory(stubFactory);
 					sse.Deactivate();
 
 					sse.OnHoverExit();

@@ -17,7 +17,7 @@ namespace SlotSystem{
 		public override void Indicate(){}
 		public override void Execute(){
 			m_origSG.Revert();
-			ssm.dIcon1.SetDestination(m_origSG, m_origSG.GetNewSlot(m_pickedSB.itemInst));
+			tam.dIcon1.SetDestination(m_origSG, m_origSG.GetNewSlot(m_pickedSB.itemInst));
 			m_origSG.OnActionExecute();
 			base.Execute();
 		}

@@ -12,6 +12,80 @@ namespace SlotSystem{
 			}
 		}
 	}
+    /* SelState */
+        public class SBSelStateFactory: ISSESelStateFactory{
+            public ISSESelState MakeDeactivatedState(){return deactivatedState;}
+            ISSESelState deactivatedState{
+                get{
+                    if(m_deactivatedState == null)
+                        m_deactivatedState = new SBDeactivatedState();
+                    return m_deactivatedState;
+                }
+                }ISSESelState m_deactivatedState;
+            public ISSESelState MakeDefocusedState(){return defocusedState;}
+            ISSESelState defocusedState{
+                get{
+                    if(m_defocusedState == null)
+                        m_defocusedState = new SBDefocusedState();
+                    return m_defocusedState;
+                }
+                }ISSESelState m_defocusedState;
+            public ISSESelState MakeFocusedState(){return focusedState;}
+            ISSESelState focusedState{
+                get{
+                    if(m_focusedState == null)
+                        m_focusedState = new SBFocusedState();
+                    return m_focusedState;
+                }
+                }ISSESelState m_focusedState;
+            public ISSESelState MakeSelectedState(){return selectedState;}
+            ISSESelState selectedState{
+                get{
+                    if(m_selectedState == null)
+                        m_selectedState = new SBSelectedState();
+                    return m_selectedState;
+                }
+                }ISSESelState m_selectedState;
+            
+        }
+            public class SBDeactivatedState: SSEDeactivatedState{
+            }
+            public class SBDefocusedState: SSEDefocusedState{
+                public override void OnHoverEnter(ISlotSystemElement sse, PointerEventDataFake eventData){
+                    ISlottable sb = (ISlottable)sse;
+                    sb.SetHovered();
+                }
+                public override void OnHoverExit(ISlotSystemElement element, PointerEventDataFake eventData){
+                    ISlottable sb = (ISlottable)element;
+                    if(sb.isHovered)
+                        sb.UnsetHovered();
+                    else
+                        throw new InvalidOperationException("sb is not set hovered");
+                }
+            }
+            public class SBFocusedState: SSEFocusedState{
+                public override void OnHoverEnter(ISlotSystemElement sse, PointerEventDataFake eventData){
+                    ISlottable sb = (ISlottable)sse;
+                    sb.SetHovered();
+                }
+                public override void OnHoverExit(ISlotSystemElement element, PointerEventDataFake eventData){
+                    ISlottable sb = (ISlottable)element;
+                    if(sb.isHovered)
+                        sb.UnsetHovered();
+                    else
+                        throw new InvalidOperationException("sb is not set hovered");
+                }
+            }
+            public class SBSelectedState: SSESelectedState{
+                public override void OnHoverExit(ISlotSystemElement element, PointerEventDataFake eventData){
+                    ISlottable sb = (ISlottable)element;
+                    if(sb.isHovered)
+                        sb.UnsetHovered();
+                    else
+                        throw new InvalidOperationException("sb is not set hovered");
+                }
+            }
+    /* ActState */
         public abstract class SBActState: SBState, ISBActState{
             public virtual void OnPointerDown(ISlottable sb, PointerEventDataFake eventDataMock){}
             public virtual void OnPointerUp(ISlottable sb, PointerEventDataFake eventDataMock){}
@@ -27,7 +101,7 @@ namespace SlotSystem{
             public class WaitForActionState: SBActState{//up state
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
-                    if(!sb.isPrevActStateNull)
+                    if(!sb.wasActStateNull)
                         sb.SetAndRunActProcess(null);
                 }
                 public override void OnPointerDown(ISlottable sb, PointerEventDataFake eventDataMock){
@@ -100,7 +174,7 @@ namespace SlotSystem{
                 public override void EnterState(IStateHandler sh){
                     base.EnterState(sh);
                     if(sb.wasWaitingForPickUp || sb.wasWaitingForNextTouch){
-                        if(!sb.isCurSelStateNull)
+                        if(!sb.isSelStateNull)
                             sb.OnHoverEnter();
                         if(sb.ssm != null){
                             sb.SetPickedSB();

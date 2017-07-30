@@ -6,7 +6,13 @@ namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		/*	states	*/
 			public override void Activate(){
-				ssm.ReferToTAAndUpdateSelState(this);
+				if(tam.IsTransactionResultRevertFor(this) == false)
+					Focus();
+				else
+					Defocus();
+			}
+			public override void Deselect(){
+				Activate();
 			}
 			/*	Engines	*/
 				/*	Action State	*/
@@ -29,7 +35,7 @@ namespace SlotSystem{
 						if(state ==null && actProcess != null)
 							SetAndRunActProcess(null);
 					}
-					public bool isActStateInit{get{return prevActState == null;}}
+					public bool wasActStateNull{get{return prevActState == null;}}
 					public virtual void ClearCurActState(){SetActState(null);}
 					/* act states */
 						public ISGActState waitForActionState{
@@ -633,16 +639,16 @@ namespace SlotSystem{
 			}
 				public ISlottable GetAddedForFill(){
 					ISlottable added;
-					if(ssm.sg1 == (ISlotGroup)this)
+					if(tam.sg1 == (ISlotGroup)this)
 						added = null;
 					else
-						added = ssm.pickedSB;
+						added = tam.pickedSB;
 					return added;
 				}
 				public ISlottable GetRemovedForFill(){
 					ISlottable removed;
-					if(ssm.sg1 == (ISlotGroup)this)
-						removed = ssm.pickedSB;
+					if(tam.sg1 == (ISlotGroup)this)
+						removed = tam.pickedSB;
 					else
 						removed = null;
 					return removed;
@@ -686,18 +692,18 @@ namespace SlotSystem{
 			}
 				public ISlottable GetAddedForSwap(){
 					ISlottable added = null;
-					if(ssm.sg1 == (ISlotGroup)this)
-						added = ssm.targetSB;
+					if(tam.sg1 == (ISlotGroup)this)
+						added = tam.targetSB;
 					else
-						added = ssm.pickedSB;
+						added = tam.pickedSB;
 					return added;
 				}
 				public ISlottable GetRemovedForSwap(){
 					ISlottable removed;
-					if(ssm.sg1 == (ISlotGroup)this)
-						removed = ssm.pickedSB;
+					if(tam.sg1 == (ISlotGroup)this)
+						removed = tam.pickedSB;
 					else
-						removed = ssm.targetSB;
+						removed = tam.targetSB;
 					return removed;
 				}
 				public void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list){
@@ -712,7 +718,7 @@ namespace SlotSystem{
 					}
 				}
 			public virtual void AddAndUpdateSBs(){
-				List<InventoryItemInstance> added = ssm.moved;
+				List<InventoryItemInstance> added = tam.moved;
 				List<ISlottable> newSBs = new List<ISlottable>(toList);
 
 				foreach(InventoryItemInstance itemInst in added){
@@ -751,7 +757,7 @@ namespace SlotSystem{
 					return changed;
 				}
 			public virtual void RemoveAndUpdateSBs(){
-				List<InventoryItemInstance> removed = ssm.moved;
+				List<InventoryItemInstance> removed = tam.moved;
 				List<ISlottable> thisNewSBs = toList;
 				
 				foreach(InventoryItemInstance item in removed){
@@ -765,10 +771,10 @@ namespace SlotSystem{
 			}
 		/*	Forward	*/
 			public virtual void SetHovered(){
-				ssm.SetHovered((ISlotGroup)this);
+				tam.SetHovered((ISlotGroup)this);
 			}
-			public virtual ISlottable pickedSB{get{return ssm.pickedSB;}}
-			public virtual ISlottable targetSB{get{return ssm.targetSB;}}
+			public virtual ISlottable pickedSB{get{return tam.pickedSB;}}
+			public virtual ISlottable targetSB{get{return tam.targetSB;}}
 			public List<SlottableItem> FilterItem(List<SlottableItem> items){
 				filter.Filter(ref items);
 				return items;
@@ -806,13 +812,22 @@ namespace SlotSystem{
 				ssm.UpdateEquipStatesOnAll();
 			}
 			public void ReportTAComp(){
-				ssm.AcceptSGTAComp(this);
+				tam.AcceptSGTAComp(this);
 			}
+			public ITransactionManager tam{
+				get{
+					if(m_tam != null)
+						return m_tam;
+					else
+						throw new System.InvalidOperationException("tam not set");
+				}
+			}ITransactionManager m_tam;
+			public void SetTAM(ITransactionManager tam){m_tam = tam;}
 	}
 	public interface ISlotGroup: ISlotSystemElement{
 		/* States and Processes */
 			/* ActStates */
-				bool isActStateInit{get;}
+				bool wasActStateNull{get;}
 				void ClearCurActState();
 				ISGActState waitForActionState{get;}
 					void WaitForAction();
@@ -946,5 +961,7 @@ namespace SlotSystem{
 			void SyncEquipped(InventoryItemInstance item, bool equipped);
 			void UpdateEquipStatesOnAll();
 			void ReportTAComp();
+			ITransactionManager tam{get;}
+			void SetTAM(ITransactionManager tam);
 	}
 }

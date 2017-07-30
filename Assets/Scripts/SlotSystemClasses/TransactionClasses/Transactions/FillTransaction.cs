@@ -23,7 +23,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1.Fill();
 			sg2.Fill();
-			ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
+			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();
 			base.Execute();

@@ -27,10 +27,10 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1.Swap();
 			sg2.Swap();
-			ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
+			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 			DraggedIcon di2 = new DraggedIcon(targetSB);
-			ssm.SetDIcon2(di2);
-			ssm.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.itemInst));
+			tam.SetDIcon2(di2);
+			tam.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.itemInst));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();
 			base.Execute();

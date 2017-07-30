@@ -35,7 +35,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1.Remove();
 			sg2.Add();
-			ssm.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
+			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
 			base.Execute();
 		}
 		public override void OnComplete(){

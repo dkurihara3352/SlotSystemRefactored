@@ -15,62 +15,46 @@ namespace SlotSystemTests{
 		[Test]
 		public void Deactivate_FromNonNullNorDea_SetsDeactivatedProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
-				System.Func<IEnumeratorFake> mockFunc = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetDeaCoroutine(mockFunc);
+				System.Func<IEnumeratorFake> mockDeaCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+				sse.SetDeaCoroutine(mockDeaCoroutine);
 			sse.Defocus();
 
 			sse.Deactivate();
 
-			ISSESelProcess actual = sse.selProcess;
-			Assert.That(actual, Is.TypeOf(typeof(SSEDeactivateProcess)));
-			Assert.That(actual.sse, Is.SameAs(sse));
-			mockFunc.Received().Invoke();
-			Assert.That(actual.isRunning, Is.True);
+			AssertSSESelProcIsSetAndIsRunning(sse, typeof(SSEDeactivateProcess), mockDeaCoroutine);
 		}
 		[Test]
 		public void Defocus_FromNonNullNorDef_SetsDefocusdProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
-				System.Func<IEnumeratorFake> mockFunc = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetDefCoroutine(mockFunc);
+				System.Func<IEnumeratorFake> mockDefCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+				sse.SetDefCoroutine(mockDefCoroutine);
 			sse.Deactivate();
 
 			sse.Defocus();
 
-			ISSESelProcess actual = sse.selProcess;
-			Assert.That(actual, Is.TypeOf(typeof(SSEDefocusProcess)));
-			Assert.That(actual.sse, Is.SameAs(sse));
-			mockFunc.Received().Invoke();
-			Assert.That(actual.isRunning, Is.True);
+			AssertSSESelProcIsSetAndIsRunning(sse, typeof(SSEDefocusProcess), mockDefCoroutine);
 		}
 		[Test]
 		public void Focus_FromNonNullNorFoc_SetsFocusdProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
-				System.Func<IEnumeratorFake> mockFunc = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetFocCoroutine(mockFunc);
+				System.Func<IEnumeratorFake> mockFocCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+				sse.SetFocCoroutine(mockFocCoroutine);
 			sse.Deactivate();
 
 			sse.Focus();
 
-			ISSESelProcess actual = sse.selProcess;
-			Assert.That(actual, Is.TypeOf(typeof(SSEFocusProcess)));
-			Assert.That(actual.sse, Is.SameAs(sse));
-			mockFunc.Received().Invoke();
-			Assert.That(actual.isRunning, Is.True);
+			AssertSSESelProcIsSetAndIsRunning(sse, typeof(SSEFocusProcess), mockFocCoroutine);
 		}
 		[Test]
 		public void Select_FromNonNullNorSel_SetsSelectdProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
-				System.Func<IEnumeratorFake> mockFunc = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetSelCoroutine(mockFunc);
+				System.Func<IEnumeratorFake> mockSelCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+				sse.SetSelCoroutine(mockSelCoroutine);
 			sse.Deactivate();
 
 			sse.Select();
 
-			ISSESelProcess actual = sse.selProcess;
-			Assert.That(actual, Is.TypeOf(typeof(SSESelectProcess)));
-			Assert.That(actual.sse, Is.SameAs(sse));
-			mockFunc.Received().Invoke();
-			Assert.That(actual.isRunning, Is.True);
+			AssertSSESelProcIsSetAndIsRunning(sse, typeof(SSESelectProcess), mockSelCoroutine);
 		}
 		[Test]
 		public void SelStateSeqence(){
@@ -87,22 +71,22 @@ namespace SlotSystemTests{
 			ISSESelProcess prevProc = null;
 
 				Assert.That(selProc, Is.Null);
-				Assert.That(sse.isCurSelStateNull, Is.True);
-				Assert.That(sse.isSelStateInit, Is.True);
+				Assert.That(sse.isSelStateNull, Is.True);
+				Assert.That(sse.wasSelStateNull, Is.True);
 
 			sse.Deactivate();
 
 				selProc = sse.selProcess;
 				Assert.That(selProc, Is.Null);
 				Assert.That(sse.isDeactivated, Is.True);
-				Assert.That(sse.isSelStateInit, Is.True);
+				Assert.That(sse.wasSelStateNull, Is.True);
 			
 			sse.Deactivate();
 
 				selProc = sse.selProcess;
 				Assert.That(selProc, Is.Null);
 				Assert.That(sse.isDeactivated, Is.True);
-				Assert.That(sse.isSelStateInit, Is.True);
+				Assert.That(sse.wasSelStateNull, Is.True);
 			
 			sse.Defocus();
 
@@ -176,7 +160,7 @@ namespace SlotSystemTests{
 				selProc = sse.selProcess;
 				Assert.That(selProc, Is.Null);
 				mockDeaCor.Received(1).Invoke();
-				Assert.That(sse.isCurSelStateNull, Is.True);
+				Assert.That(sse.isSelStateNull, Is.True);
 				Assert.That(sse.wasDeactivated, Is.True);
 				Assert.That(prevProc, Is.TypeOf(typeof(SSEDeactivateProcess)));
 				Assert.That(prevProc.sse, Is.SameAs(sse));
@@ -189,9 +173,17 @@ namespace SlotSystemTests{
 				Assert.That(selProc, Is.Null);
 				mockSelCor.DidNotReceive().Invoke();
 				Assert.That(sse.isSelected, Is.True);
-				Assert.That(sse.isSelStateInit, Is.True);
+				Assert.That(sse.wasSelStateNull, Is.True);
 				Assert.That(prevProc, Is.Null);
 				prevProc = selProc;
 		}
+		/* Helpers */
+			public void AssertSSESelProcIsSetAndIsRunning(ISlotSystemElement sse, Type procType, Func<IEnumeratorFake> mockCoroutine){
+				ISSESelProcess actual = sse.selProcess;
+				Assert.That(actual, Is.TypeOf(procType));
+				Assert.That(actual.sse, Is.SameAs(sse));
+				mockCoroutine.Received().Invoke();
+				Assert.That(actual.isRunning, Is.True);
+			}
 	}
 }

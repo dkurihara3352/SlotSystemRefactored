@@ -14,23 +14,27 @@ namespace SlotSystemTests{
 		[Category("SB")]
 		public class SlottableTests: SlotSystemTest {
 			/* States */
-				[TestCase(true)]
-				[TestCase(false)]
-				public void Activate_WhenCalled_ReferToTAAndFocusOrDefocus(bool focused){
+				[Test]
+				public void Activate_SSMIsTAResultRevertForFalse_SetIsFocused(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = Substitute.For<ISlotSystemManager>();
-						ssm.When(x => x.ReferToTAAndUpdateSelState(sb)).Do(x => {if(focused) sb.Focus(); else sb.Defocus();});
-						sb.SetSSM(ssm);
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						stubTAM.IsTransactionResultRevertFor(sb).Returns(false);
+						sb.SetTAM(stubTAM);
 					
 					sb.Activate();
+
+					Assert.That(sb.isFocused, Is.True);
+				}
+				[Test]
+				public void Activate_SSMIsTAResultRevertForTrue_SetIsDefocused(){
+					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						stubTAM.IsTransactionResultRevertFor(sb).Returns(true);
+						sb.SetTAM(stubTAM);
 					
-					if(focused){
-						Assert.That(sb.isFocused, Is.True);
-						Assert.That(sb.isDefocused, Is.False);
-					}else{
-						Assert.That(sb.isFocused, Is.False);
-						Assert.That(sb.isDefocused, Is.True);
-					}
+					sb.Activate();
+
+					Assert.That(sb.isDefocused, Is.True);
 				}
 			/*	Process	*/
 				/*	ActProc	*/
@@ -117,42 +121,43 @@ namespace SlotSystemTests{
 					sb.InitializeStates();
 
 					Assert.That(sb.isDeactivated, Is.True);
-					Assert.That(sb.isSelStateInit, Is.True);
+					Assert.That(sb.wasSelStateNull, Is.True);
 					Assert.That(sb.isWaitingForAction, Is.True);
-					Assert.That(sb.isPrevActStateNull, Is.True);
-					Assert.That(sb.isPrevEqpStateNull, Is.True);
-					Assert.That(sb.isEquipped, Is.False);
-					Assert.That(sb.isUnequipped, Is.False);
+					Assert.That(sb.wasActStateNull, Is.True);
+					Assert.That(sb.isEqpStateNull, Is.True);
+					Assert.That(sb.wasEqpStateNull, Is.True);
 					Assert.That(sb.isUnmarked, Is.True);
-					Assert.That(sb.isPrevMrkStateNull, Is.True);
+					Assert.That(sb.wasMrkStateNull, Is.True);
 					}
 				[Test]
-				public void Pickup_SelStateNotNull_SetsPickedUpState(){
+				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
 					Slottable sb = MakeSB();
-					sb.SetSSM(MakeSubSSM());
-					sb.Deactivate();
+					sb.WaitForAction();
+					sb.WaitForPickUp();
 					
 					sb.PickUp();
 
 					Assert.That(sb.isPickingUp, Is.True);
 					}
 				[Test]
-				public void Pickup_SelStateNotNull_SetsPickedAmountOne(){
+				public void Pickup_FromValidPrevActState_SetsPickedAmountOne(){
 					Slottable sb = MakeSB();
-					sb.SetSSM(MakeSubSSM());
-					sb.Deactivate();
+					sb.WaitForAction();
+					sb.WaitForPickUp();
 					
 					sb.PickUp();
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(1));
 					}
 				[TestCaseSource(typeof(IncrementCases))]
-				public void Increment_StackableToMoreThanQuantity_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
+				public void Increment_StackableToMoreThanQuantityAndValidPrevActState_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
 					Slottable sb = MakeSB();
 					sb.SetItem(item);
 					ISlotSystemManager ssm = MakeSubSSM();
 					sb.SetSSM(ssm);
 					sb.Deactivate();
+					sb.WaitForAction();
+					sb.WaitForPickUp();
 
 					for(int i =0; i< expected *2; i++){
 						sb.Increment();
@@ -176,12 +181,14 @@ namespace SlotSystemTests{
 						}
 					}
 				[TestCaseSource(typeof(IncrementNonStackableCases))]
-				public void Increment_NonStackableAndAfterSSMAndSelStateSet_DoesNotIncrement(InventoryItemInstance item){
+				public void Increment_NonStackableAndAfterSSMAndSelStateSetAndFromValidPrevActState_DoesNotIncrement(InventoryItemInstance item){
 					Slottable sb = MakeSB();
 					ISlotSystemManager ssm = MakeSubSSM();
 					sb.SetSSM(ssm);
 					sb.Deactivate();
 					sb.SetItem(item);
+					sb.WaitForAction();
+					sb.WaitForPickUp();
 
 					for(int i = 0; i < 10; i++)
 						sb.Increment();
@@ -200,13 +207,13 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void ExecuteTransaction_WhenCalled_CallsSSMExecuteTransaction(){
-					ISlotSystemManager mockSSM = MakeSubSSM();
+					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
 					Slottable stubSB = MakeSB();
-					stubSB.SetSSM(mockSSM);
+					stubSB.SetTAM(mockTAM);
 
 					stubSB.ExecuteTransaction();
 
-					mockSSM.Received().ExecuteTransaction();
+					mockTAM.Received().ExecuteTransaction();
 					}
 				[Test]
 				public void ExpireActionProcess_actProcIsRunning_CallsActProcExpire(){

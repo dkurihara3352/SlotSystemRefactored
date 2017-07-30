@@ -5,6 +5,14 @@ using Utility;
 namespace SlotSystem{
 	public abstract class SlotSystemElement :MonoBehaviour, ISlotSystemElement{
 		/*	state	*/
+			public virtual ISSESelStateFactory selStateFactory{
+				get{
+					if(m_selStateFactory == null)
+						m_selStateFactory = new SSESelStateFacotory();
+					return m_selStateFactory;
+				}
+			}protected ISSESelStateFactory m_selStateFactory;
+			public void SetSelStateFactory(ISSESelStateFactory factory){m_selStateFactory = factory;}
 			ISSEStateEngine<ISSESelState> selStateEngine{
 				get{
 					if(m_selStateEngine == null)
@@ -16,7 +24,7 @@ namespace SlotSystem{
 			ISSESelState prevSelState{
 				get{return selStateEngine.prevState;}
 			}
-			public ISSESelState curSelState{
+			ISSESelState curSelState{
 				get{return selStateEngine.curState;}
 			}
 			void SetSelState(ISSESelState state){
@@ -24,58 +32,29 @@ namespace SlotSystem{
 				if(state == null && selProcess != null)
 					SetAndRunSelProcess(null);
 			}
-			public bool isSelStateInit{get{return prevSelState ==null;}}
-			public bool isCurSelStateNull{get{return curSelState == null;}}
-			public bool isPrevSelStateNull{get{return curSelState == null;}}
+			public bool isSelStateNull{get{return curSelState == null;}}
+			public bool wasSelStateNull{get{return prevSelState == null;}}
 			public void ClearCurSelState(){SetSelState(null);}
 			/*	selStates	*/
-				ISSESelState deactivatedState{
-					get{
-						if(m_deactivatedState == null)
-							m_deactivatedState = new SSEDeactivatedState();
-						return m_deactivatedState;
-					}
-					}ISSESelState m_deactivatedState;
-					public void SetDeactivatedState(ISSESelState state){m_deactivatedState = state;}
+				ISSESelState deactivatedState{get{return selStateFactory.MakeDeactivatedState();}}
 					public virtual void Deactivate(){
 						SetSelState(deactivatedState);
 					}
 					public virtual bool isDeactivated{get{return curSelState == deactivatedState;}}
 					public virtual bool wasDeactivated{get{return prevSelState == deactivatedState;}}
-				ISSESelState defocusedState{
-					get{
-						if(m_defocusedState == null)
-							m_defocusedState = new SSEDefocusedState();
-						return m_defocusedState;
-					}
-					}ISSESelState m_defocusedState;
-					public void SetDefocusedState(ISSESelState state){m_defocusedState = state;}
+				ISSESelState defocusedState{get{return selStateFactory.MakeDefocusedState();}}
 					public virtual void Defocus(){
 						SetSelState(defocusedState);
 					}
 					public virtual bool isDefocused{get{return curSelState == defocusedState;}}
 					public virtual bool wasDefocused{get{return prevSelState == defocusedState;}}
-				ISSESelState focusedState{
-					get{
-						if(m_focusedState == null)
-							m_focusedState = new SSEFocusedState();
-						return m_focusedState;
-					}
-					}ISSESelState m_focusedState;
-					public void SetFocusedState(ISSESelState state){m_focusedState = state;}
+				ISSESelState focusedState{get{return selStateFactory.MakeFocusedState();}}
 					public virtual void Focus(){
 						SetSelState(focusedState);
 					}
 					public virtual bool isFocused{get{return curSelState == focusedState;}}
 					public virtual bool wasFocused{get{return prevSelState == focusedState;}}
-				ISSESelState selectedState{
-					get{
-						if(m_selectedState == null)
-							m_selectedState = new SSESelectedState();
-						return m_selectedState;
-					}
-					}ISSESelState m_selectedState;
-					public void SetSelectedState(ISSESelState state){m_selectedState = state;}
+				ISSESelState selectedState{get{return selStateFactory.MakeSelectedState();}}
 					public virtual void Select(){
 						SetSelState(selectedState);
 					}
@@ -139,27 +118,17 @@ namespace SlotSystem{
 					
 		/* Events */
 			public virtual void OnHoverEnter(){
-				onHoverEnterCommand.Execute();
+				if(curSelState != null)
+					curSelState.OnHoverEnter(this, new PointerEventDataFake());
+				else
+					throw new System.InvalidOperationException("curSelState is not set");
 			}
-			ISSECommand onHoverEnterCommand{
-				get{
-					if(m_onHoverEnterCommand == null)
-						m_onHoverEnterCommand = new OnHoverEnterCommand(this);
-					return m_onHoverEnterCommand;
-				}
-				}ISSECommand m_onHoverEnterCommand;
-				public void SetOnHoverEnterCommand(ISSECommand comm){m_onHoverEnterCommand = comm;}
 			public virtual void OnHoverExit(){
-				onHoverExitCommand.Execute();
+				if(curSelState != null)
+					curSelState.OnHoverExit(this, new PointerEventDataFake());
+				else
+					throw new System.InvalidOperationException("curSelState is not set");
 			}
-			ISSECommand onHoverExitCommand{
-				get{
-					if(m_onHoverExitCommand == null)
-						m_onHoverExitCommand = new OnHoverExitCommand(this);
-					return m_onHoverExitCommand;
-				}
-				}ISSECommand m_onHoverExitCommand;
-				public void SetOnHoverExitCommand(ISSECommand comm){m_onHoverExitCommand = comm;}
 		/*	public fields	*/
 			public virtual ISlotSystemElement this[int i]{
 				get{
@@ -206,12 +175,12 @@ namespace SlotSystem{
 					return parent.level + 1;
 				}
 			}
-			public bool isBundleElement{
+			public virtual bool isBundleElement{
 				get{
 					return parent is ISlotSystemBundle;
 				}
 			}
-			public bool isFocusedInHierarchy{
+			public virtual bool isFocusedInHierarchy{
 				get{
 					ISlotSystemElement inspected = this;
 					while(true){
@@ -303,7 +272,7 @@ namespace SlotSystem{
 					}ISSECommand m_instantSelectCommand;
 					public virtual void SetInstantSelectCommand(ISSECommand comm){m_instantSelectCommand = comm;}
 			public void SetElements(IEnumerable<ISlotSystemElement> elements){m_elements = elements;}
-			public bool isActivatedOnDefault{
+			public virtual bool isActivatedOnDefault{
 				get{
 					ISlotSystemElement inspected = parent;
 					while(true){
@@ -323,7 +292,7 @@ namespace SlotSystem{
 						m_isActivatedOnDefault = value;
 					}
 				}bool m_isActivatedOnDefault = true;
-			public bool isFocusableInHierarchy{
+			public virtual bool isFocusableInHierarchy{
 				get{
 					ISlotSystemElement inspected = this;
 					while(true){
@@ -357,27 +326,22 @@ namespace SlotSystem{
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
 		/* Sel states */
-			ISSESelState curSelState{get;}
-			bool isSelStateInit{get;}
-			bool isCurSelStateNull{get;}
-			bool isPrevSelStateNull{get;}
+			ISSESelStateFactory selStateFactory{get;}
+			bool isSelStateNull{get;}
+			bool wasSelStateNull{get;}
 			void ClearCurSelState();
 			void Deactivate();
 				bool isDeactivated{get;}
 				bool wasDeactivated{get;}
-				void SetDeactivatedState(ISSESelState state);
 			void Focus();
 				bool isFocused{get;}
 				bool wasFocused{get;}
-				void SetFocusedState(ISSESelState state);
 			void Defocus();
 				bool isDefocused{get;}
 				bool wasDefocused{get;}
-				void SetDefocusedState(ISSESelState state);
 			void Select();
 				bool isSelected{get;}
 				bool wasSelected{get;}
-				void SetSelectedState(ISSESelState state);
 		ISSEProcessEngine<ISSESelProcess> selProcEngine{get;}
 			void SetAndRunSelProcess(ISSESelProcess process);
 			ISSESelProcess selProcess{get;}
@@ -386,9 +350,7 @@ namespace SlotSystem{
 			System.Func<IEnumeratorFake> defocusCoroutine{get;}
 			System.Func<IEnumeratorFake> selectCoroutine{get;}
 		void OnHoverEnter();
-		void SetOnHoverEnterCommand(ISSECommand comm);
 		void OnHoverExit();
-		void SetOnHoverExitCommand(ISSECommand comm);
 		void InstantFocus();
 			ISSECommand instantFocusCommand{get;}
 			void SetInstantFocusCommand(ISSECommand comm);

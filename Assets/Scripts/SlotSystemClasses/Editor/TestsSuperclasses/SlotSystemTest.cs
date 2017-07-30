@@ -125,8 +125,8 @@ public class SlotSystemTest{
 			protected static SGActState MakeSubSGActState(){
 				return Substitute.For<SGActState>();
 			}
-			protected static SSMActState MakeSubSSMActState(){
-				return Substitute.For<SSMActState>();
+			protected static TAMActState MakeSubSSMActState(){
+				return Substitute.For<TAMActState>();
 			}
 		/* Process */
 			protected static ISBSelProcess MakeSubSBSelProc(){
@@ -147,11 +147,8 @@ public class SlotSystemTest{
 			protected static ISGActProcess MakeSubSGActProc(){
 				return Substitute.For<ISGActProcess>();
 			}
-			protected static ISSMSelProcess MakeSubSSMSelProc(){
-				return Substitute.For<ISSMSelProcess>();
-			}
-			protected static ISSMActProcess MakeSubSSMActProc(){
-				return Substitute.For<ISSMActProcess>();
+			protected static ITAMActProcess MakeSubTAMActProc(){
+				return Substitute.For<ITAMActProcess>();
 			}
 		/* ItemInstance */
 		protected static BowInstance MakeBowInstance(int id){

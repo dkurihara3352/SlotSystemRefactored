@@ -124,4 +124,70 @@ namespace SlotSystem{
 					this.coroutineFake = coroutineMock;
 				}
 			}
+	public class SBCoroutineFactory: ISBCoroutineFactory{
+		ISlottable sb;
+		public SBCoroutineFactory(ISlottable sb){this.sb = sb;}
+
+		public System.Func<IEnumeratorFake> MakeWaitForPointerUpCoroutine(){
+			return DefaultWaitForPointerUpCoroutine;
+			}
+			IEnumeratorFake DefaultWaitForPointerUpCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeWaitForPickUpCoroutine(){
+			return DefaultWaitForPickUpCoroutine;
+			}
+			IEnumeratorFake DefaultWaitForPickUpCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakePickUpCoroutine(){
+			return DefaultPickUpCoroutine;
+			}
+			IEnumeratorFake DefaultPickUpCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeWaitForNextTouchCoroutine(){
+			return DefaultWaitForNextTouchCoroutine;
+			}
+			IEnumeratorFake DefaultWaitForNextTouchCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeRemoveCoroutine(){
+			return DefaultRemoveCoroutine;
+			}
+			IEnumeratorFake DefaultRemoveCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeAddCoroutine(){
+			return DefaultAddCoroutine;
+			}
+			IEnumeratorFake DefaultAddCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeMoveWithinCoroutine(){
+			return DefaultMoveWithinCoroutine;
+			}
+			IEnumeratorFake DefaultMoveWithinCoroutine(){return null;}
+
+		public System.Func<IEnumeratorFake> MakeEquipCoroutine(){
+			return DefaultEquipCoroutine;
+			}
+			IEnumeratorFake DefaultEquipCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeUnequipCoroutine(){
+			return DefaultUnequipCoroutine;
+			}
+			IEnumeratorFake DefaultUnequipCoroutine(){return null;}
+
+		public System.Func<IEnumeratorFake> MakeMarkCoroutine(){
+			return DefaultMarkCoroutine;
+			}
+			IEnumeratorFake DefaultMarkCoroutine(){return null;}
+		public System.Func<IEnumeratorFake> MakeUnmarkCoroutine(){
+			return DefaultUnmarkCoroutine;
+			}
+			IEnumeratorFake DefaultUnmarkCoroutine(){return null;}
+	}
+	public interface ISBCoroutineFactory{
+		System.Func<IEnumeratorFake> MakeWaitForPointerUpCoroutine();
+		System.Func<IEnumeratorFake> MakeWaitForPickUpCoroutine();
+		System.Func<IEnumeratorFake> MakePickUpCoroutine();
+		System.Func<IEnumeratorFake> MakeWaitForNextTouchCoroutine();
+		System.Func<IEnumeratorFake> MakeRemoveCoroutine();
+		System.Func<IEnumeratorFake> MakeAddCoroutine();
+		System.Func<IEnumeratorFake> MakeMoveWithinCoroutine();
+
+		System.Func<IEnumeratorFake> MakeEquipCoroutine();
+		System.Func<IEnumeratorFake> MakeUnequipCoroutine();
+
+		System.Func<IEnumeratorFake> MakeMarkCoroutine();
+		System.Func<IEnumeratorFake> MakeUnmarkCoroutine();		
+	}
 }

@@ -11,28 +11,138 @@ namespace SlotSystemTests{
 	[TestFixture]
 	[Category("Integration")]
 	public class SlottableIntegrationTests : SlotSystemTest{
-		/* ActStates */
-				[Test]
-				public void areActStatesNull_ByDefault_IsTrue(){
-					Slottable sb = MakeSB();
-					Assert.That(sb.isCurActStateNull, Is.True);
-					Assert.That(sb.isPrevActStateNull, Is.True);
-					Assert.That(sb.isCurSelStateNull, Is.True);
-					Assert.That(sb.isPrevSelStateNull, Is.True);
-					Assert.That(sb.isCurEqpStateNull, Is.True);
-					Assert.That(sb.isPrevEqpStateNull, Is.True);
-					Assert.That(sb.isCurMrkStateNull, Is.True);
-					Assert.That(sb.isPrevMrkStateNull, Is.True);
-				}
-				[Test]
-				public void processes_ByDefault_isNull(){
-					Slottable sb = MakeSB();
+		[Test]
+		public void SBStates_ByDefault_AreNull(){
+			Slottable sb = MakeSB();
+			Assert.That(sb.isActStateNull, Is.True);
+			Assert.That(sb.wasActStateNull, Is.True);
+			Assert.That(sb.isSelStateNull, Is.True);
+			Assert.That(sb.wasSelStateNull, Is.True);
+			Assert.That(sb.isEqpStateNull, Is.True);
+			Assert.That(sb.wasEqpStateNull, Is.True);
+			Assert.That(sb.isMrkStateNull, Is.True);
+			Assert.That(sb.wasMrkStateNull, Is.True);
+		}
+		[Test]
+		public void processes_ByDefault_AreNull(){
+			Slottable sb = MakeSB();
 
-					Assert.That(sb.selProcess, Is.Null);
-					Assert.That(sb.actProcess, Is.Null);
-					Assert.That(sb.eqpProcess, Is.Null);
-					Assert.That(sb.mrkProcess, Is.Null);
-				}
+			Assert.That(sb.selProcess, Is.Null);
+			Assert.That(sb.actProcess, Is.Null);
+			Assert.That(sb.eqpProcess, Is.Null);
+			Assert.That(sb.mrkProcess, Is.Null);
+		}
+		/* SelStates */
+			[Test]
+			public void InFocused_OnHoverEnter_CallsSSMSetHovered(){
+				Slottable sb = MakeSB();
+					ITransactionManager tam = Substitute.For<ITransactionManager>();
+					sb.SetTAM(tam);
+				sb.Focus();
+
+				sb.OnHoverEnter();
+
+				tam.Received().SetHovered(sb);
+			}
+			[Test]
+			public void InDefocused_OnHoverEnter_CallsSSMSetHovered(){
+				Slottable sb = MakeSB();
+					ITransactionManager tam = Substitute.For<ITransactionManager>();
+					sb.SetTAM(tam);
+				sb.Defocus();
+
+				sb.OnHoverEnter();
+
+				tam.Received().SetHovered(sb);
+			}
+			[Test]
+			public void InFocused_OnHoverExit_IsHovered_CallsSSMSetHoveredNull(){
+				Slottable sb = MakeSB();
+					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+					mockTAM.hovered.Returns(sb);
+					sb.SetTAM(mockTAM);
+				sb.Focus();
+
+				sb.OnHoverExit();
+
+				mockTAM.Received().SetHovered(null);
+			}
+			[Test][ExpectedException(typeof(InvalidOperationException))]
+			public void InFocused_OnHoverExit_IsNotHovered_ThrowsException(){
+				Slottable sb = MakeSB();
+					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+					mockTAM.hovered.Returns((ISlotSystemElement)null);
+					sb.SetTAM(mockTAM);
+				sb.Focus();
+
+				sb.OnHoverExit();
+			}
+			[Test]
+			public void InDefocused_OnHoverExit_IsHovered_CallsSSMSetHoveredNull(){
+				Slottable sb = MakeSB();
+					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+					mockTAM.hovered.Returns(sb);
+					sb.SetTAM(mockTAM);
+				sb.Defocus();
+
+				sb.OnHoverExit();
+
+				mockTAM.Received().SetHovered(null);
+			}
+			[Test][ExpectedException(typeof(InvalidOperationException))]
+			public void InDefocused_OnHoverExit_IsNotHovered_ThrowsException(){
+				Slottable sb = MakeSB();
+					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+					mockTAM.hovered.Returns((ISlotSystemElement)null);
+					sb.SetTAM(mockTAM);
+				sb.Defocus();
+
+				sb.OnHoverExit();
+			}
+			[Test]
+			public void InSelected_OnHoverExit_IsHovered_CallsSSMSetHoveredNull(){
+				Slottable sb = MakeSB();
+					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+					mockTAM.hovered.Returns(sb);
+					sb.SetTAM(mockTAM);
+				sb.Select();
+
+				sb.OnHoverExit();
+
+				mockTAM.Received().SetHovered(null);
+			}
+			[Test][ExpectedException(typeof(InvalidOperationException))]
+			public void InSelected_OnHoverExit_IsNotHovered_ThrowsException(){
+				Slottable sb = MakeSB();
+					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+					mockTAM.hovered.Returns((ISlotSystemElement)null);
+					sb.SetTAM(mockTAM);
+				sb.Select();
+
+				sb.OnHoverExit();
+			}
+			[Test]
+			public void HoverSequence(){
+				ITransactionManager tam = Substitute.For<ITransactionManager>();
+				Slottable sb = MakeSB();
+				Slottable otherSB = MakeSB();
+				sb.SetTAM(tam);
+				otherSB.SetTAM(tam);
+				sb.Focus();
+				otherSB.Focus();
+
+				sb.OnHoverEnter();
+					Assert.That(sb.isHovered, Is.True);
+				
+				otherSB.OnHoverEnter();
+					Assert.That(sb.isHovered, Is.False);
+					Assert.That(otherSB.isHovered, Is.True);
+				
+				otherSB.OnHoverExit();
+					Assert.That(otherSB.isHovered, Is.False);
+					Assert.That(tam.hovered, Is.Null);
+			}
+		/* ActStates */
 			/* WaitForActionState */
 				[Test]
 				public void WaitForAction_Always_SetsIsWaitingForAction(){
@@ -43,7 +153,7 @@ namespace SlotSystemTests{
 					Assert.That(sb.isWaitingForAction, Is.True);
 					}
 				[Test]
-				public void WaitForAction_IsPrevActStateNull_DoesNotCallActEngineSetProcNull(){
+				public void WaitForAction_wasActStateNull_DoesNotCallActEngineSetProcNull(){
 					Slottable sb = MakeSB();
 						ISSEProcessEngine<ISBActProcess> mockProcEngine = Substitute.For<ISSEProcessEngine<ISBActProcess>>();
 						sb.SetActProcessEngine(mockProcEngine);
@@ -122,19 +232,15 @@ namespace SlotSystemTests{
 				[Test]
 				public void WaitForPickUp_WasWaitingForAction_SetsAndRunsWFPickUpProc(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCor = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockWFPickUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory mockCorFac = Substitute.For<ISBCoroutineFactory>();
-						mockCorFac.MakeWaitForPickUpCoroutine().Returns(mockCor);
+						mockCorFac.MakeWaitForPickUpCoroutine().Returns(mockWFPickUpCoroutine);
 						sb.SetCoroutineFactory(mockCorFac);
 					sb.WaitForAction();
 
 					sb.WaitForPickUp();
 
-					ISBActProcess actProc = sb.actProcess;
-					Assert.That(actProc, Is.TypeOf(typeof(WaitForPickUpProcess)));
-					Assert.That(actProc.sse, Is.SameAs(sb));
-					mockCor.Received().Invoke();
-					Assert.That(actProc.isRunning, Is.True);
+					AssertSBActProcessIsSetAndRunning(sb, typeof(WaitForPickUpProcess), mockWFPickUpCoroutine);
 					}
 				[Test]
 				public void ExpireProcess_WaitingForPickUpProcess_SetsIsPickingUp(){
@@ -206,19 +312,15 @@ namespace SlotSystemTests{
 				[Test]
 				public void WaitForPointerUp_WasWaitingForAction_SetsAndRunsWaitForPointerUpProcess(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockWFPointerUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory mockCorFac = Substitute.For<ISBCoroutineFactory>();
-						mockCorFac.MakeWaitForPointerUpCoroutine().Returns(mockCoroutine);
+						mockCorFac.MakeWaitForPointerUpCoroutine().Returns(mockWFPointerUpCoroutine);
 						sb.SetCoroutineFactory(mockCorFac);
 					sb.WaitForAction();
 					
 					sb.WaitForPointerUp();
 
-					ISBActProcess actualProc = sb.actProcess;
-					Assert.That(actualProc, Is.TypeOf(typeof(WaitForPointerUpProcess)));
-					Assert.That(actualProc.sse, Is.SameAs(sb));
-					mockCoroutine.Received().Invoke();
-					Assert.That(actualProc.isRunning, Is.True);
+					AssertSBActProcessIsSetAndRunning(sb, typeof(WaitForPointerUpProcess), mockWFPointerUpCoroutine);
 					}
 				[Test]
 				public void ExpireActPorcess_WaitForPointerUpProcess_SetIsDefocused(){
@@ -315,9 +417,9 @@ namespace SlotSystemTests{
 				[Test]
 				public void WaitForNextTouch_WasPickingUp_SetsAndRunsWaitForNextTouchProcess(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockWFNTCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-						stubCorFac.MakeWaitForNextTouchCoroutine().Returns(mockCoroutine);
+						stubCorFac.MakeWaitForNextTouchCoroutine().Returns(mockWFNTCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -325,38 +427,30 @@ namespace SlotSystemTests{
 					
 					sb.WaitForNextTouch();
 
-					ISBActProcess actualProc = sb.actProcess;
-					Assert.That(actualProc, Is.TypeOf(typeof(WaitForNextTouchProcess)));
-					Assert.That(actualProc.sse, Is.SameAs(sb));
-					mockCoroutine.Received().Invoke();
-					Assert.That(actualProc.isRunning, Is.True);
+					AssertSBActProcessIsSetAndRunning(sb, typeof(WaitForNextTouchProcess), mockWFNTCoroutine);
 					}
 				[Test]
 				public void WaitForNextTouch_WasWaitingForPickUp_SetsAndRunsWaitForNextTouchProcess(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockWFNTCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-						stubCorFac.MakeWaitForNextTouchCoroutine().Returns(mockCoroutine);
+						stubCorFac.MakeWaitForNextTouchCoroutine().Returns(mockWFNTCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
 					sb.WaitForNextTouch();
 
-					ISBActProcess actualProc = sb.actProcess;
-					Assert.That(actualProc, Is.TypeOf(typeof(WaitForNextTouchProcess)));
-					Assert.That(actualProc.sse, Is.SameAs(sb));
-					mockCoroutine.Received().Invoke();
-					Assert.That(actualProc.isRunning, Is.True);
+					AssertSBActProcessIsSetAndRunning(sb, typeof(WaitForNextTouchProcess), mockWFNTCoroutine);
 					}
 				[Test]
 				public void ExpireActProcess_WaitForNextTouchProcess_IsNotPickedUp_CallsTapCommandExecute(){
 					Slottable sb = MakeSB();
 						SlottableCommand mockComm = Substitute.For<SlottableCommand>();
 						sb.SetTapCommand(mockComm);
-						ISlotSystemManager mockSSM = MakeSubSSM();
-						mockSSM.pickedSB.Returns((ISlottable)null);
-						sb.SetSSM(mockSSM);
+						ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+						mockTAM.pickedSB.Returns((ISlottable)null);
+						sb.SetTAM(mockTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -369,9 +463,9 @@ namespace SlotSystemTests{
 				public void ExpireActProcess_WaitForNextTouchProcess_IsNotPickedUp_CallsRefresh(){
 					Slottable sb = MakeSB();
 						SetUpForRefreshCall(sb);
-						ISlotSystemManager mockSSM = MakeSubSSM();
-						mockSSM.pickedSB.Returns((ISlottable)null);
-						sb.SetSSM(mockSSM);
+						ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+						mockTAM.pickedSB.Returns((ISlottable)null);
+						sb.SetTAM(mockTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -383,9 +477,9 @@ namespace SlotSystemTests{
 				[Test]
 				public void ExpireActProcess_WaitForNextTouchProcess_IsNotPickedUp_SetsIsFocused(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager mockSSM = MakeSubSSM();
-						mockSSM.pickedSB.Returns((ISlottable)null);
-						sb.SetSSM(mockSSM);
+						ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+						mockTAM.pickedSB.Returns((ISlottable)null);
+						sb.SetTAM(mockTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -397,23 +491,23 @@ namespace SlotSystemTests{
 				[Test]
 				public void ExpireActProcess_WaitForNextTouchProcess_IsPickedUp_CallsSSMExecuteTransaction(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager mockSSM = MakeSubSSM();
-						mockSSM.pickedSB.Returns(sb);
-						sb.SetSSM(mockSSM);
+						ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+						mockTAM.pickedSB.Returns(sb);
+						sb.SetTAM(mockTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
 
 					sb.ExpireActProcess();
 
-					mockSSM.Received().ExecuteTransaction();
+					mockTAM.Received().ExecuteTransaction();
 					}
 				[Test]
 				public void InWaitForNextTouch_OnPointerDown_IsNotPickedUp_SetsIsPickingUp(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						ssm.pickedSB.Returns((ISlottable)null);
-						sb.SetSSM(ssm);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						tam.pickedSB.Returns((ISlottable)null);
+						sb.SetTAM(tam);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -425,9 +519,9 @@ namespace SlotSystemTests{
 				[Test]
 				public void InWaitForNextTouch_OnPointerDown_IsNotPickedUp_SetsPickedAmount1(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						ssm.pickedSB.Returns((ISlottable)null);
-						sb.SetSSM(ssm);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						tam.pickedSB.Returns((ISlottable)null);
+						sb.SetTAM(tam);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -439,9 +533,9 @@ namespace SlotSystemTests{
 				[Test]
 				public void InWaitForNextTouch_OnPointerDown_IsPickedUp_SetsIsPickingUp(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						ssm.pickedSB.Returns(sb);
-						sb.SetSSM(ssm);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						tam.pickedSB.Returns(sb);
+						sb.SetTAM(tam);
 						BowInstance bow = MakeBowInstance(0);
 						sb.SetItem(bow);
 					sb.WaitForAction();
@@ -455,9 +549,9 @@ namespace SlotSystemTests{
 				[Test]
 				public void InWaitForNextTouch_OnPointerDown_IsPickedUpIsStackableQuantityGrearterThanPickedAmount_IncrementsPickedAmount(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						ssm.pickedSB.Returns(sb);
-						sb.SetSSM(ssm);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						tam.pickedSB.Returns(sb);
+						sb.SetTAM(tam);
 						PartsInstance parts = MakePartsInstance(0, 10);
 						sb.SetItem(parts);
 						sb.pickedAmount = 8;
@@ -523,51 +617,49 @@ namespace SlotSystemTests{
 				[Test]
 				public void PickUp_IsNotCurSelStateNullAndValidPrevActState_CallsOnHoverEnterCommandExecute(){
 					Slottable sb = MakeSB();
-						ISSECommand mockComm = Substitute.For<ISSECommand>();
-						sb.SetOnHoverEnterCommand(mockComm);
+						ISSESelState mockDeactivatedState = Substitute.For<ISSESelState>();
+						ISSESelStateFactory stubStateFactory = Substitute.For<ISSESelStateFactory>();
+						stubStateFactory.MakeDeactivatedState().Returns(mockDeactivatedState);
+						sb.SetSelStateFactory(stubStateFactory);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.Deactivate();
 
 					sb.PickUp();
 
-					mockComm.Received().Execute();
+					mockDeactivatedState.Received().OnHoverEnter(sb, Arg.Any<PointerEventDataFake>());
 					}
 				[Test]
 				public void PickUp_SSMNotNullAndValidPrevActState_CallsSSMInSequence(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						sb.SetSSM(ssm);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						sb.SetTAM(tam);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
 					sb.PickUp();
 
 					Received.InOrder(()=> {
-						ssm.SetPickedSB(sb);
-						ssm.Probe();
-						ssm.SetDIcon1(Arg.Any<DraggedIcon>());
-						ssm.CreateTransactionResults();
-						ssm.UpdateTransaction();
+						tam.SetPickedSB(sb);
+						tam.Probe();
+						tam.SetDIcon1(Arg.Any<DraggedIcon>());
+						tam.CreateTransactionResults();
+						tam.UpdateTransaction();
 					});
 					}
 				[Test]
 				public void PickUp_WasWaitingForPickUpOrWaitingForNextTouch_SetsAndRunsPickUpProcess(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockPickUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-						stubCorFac.MakePickUpCoroutine().Returns(mockCoroutine);
+						stubCorFac.MakePickUpCoroutine().Returns(mockPickUpCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
 					sb.PickUp();
 
-					ISBActProcess actualProc = sb.actProcess;
-					Assert.That(actualProc, Is.TypeOf(typeof(PickUpProcess)));
-					Assert.That(actualProc.sse, Is.SameAs(sb));
-					mockCoroutine.Received().Invoke();
-					Assert.That(actualProc.isRunning, Is.True);
+					AssertSBActProcessIsSetAndRunning(sb, typeof(PickUpProcess), mockPickUpCoroutine);
 					}
 				[Test]
 				public void InPickingUp_OnDeselected_Always_CallsRefresh(){
@@ -595,11 +687,11 @@ namespace SlotSystemTests{
 				[Test]
 				public void InPickingUp_OnPointerUp_IsHoveredAndIsStackable_SetsIsWaitingForNextTouch(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						ssm.hovered.Returns(sb);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						tam.hovered.Returns(sb);
 						PartsInstance parts = MakePartsInstance(0, 2);
 						sb.SetItem(parts);
-						sb.SetSSM(ssm);
+						sb.SetTAM(tam);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.PickUp();
@@ -611,31 +703,31 @@ namespace SlotSystemTests{
 				[Test]
 				public void InPickingUp_OnPointerUp_NotIsHoveredOrNotIsStackable_CallsSSMExecuteTransaction(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						ssm.hovered.Returns(sb);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						tam.hovered.Returns(sb);
 						BowInstance bow = MakeBowInstance(0);
 						sb.SetItem(bow);
-						sb.SetSSM(ssm);
+						sb.SetTAM(tam);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.PickUp();
 
 					sb.OnPointerUp(new PointerEventDataFake());
 
-					ssm.Received().ExecuteTransaction();
+					tam.Received().ExecuteTransaction();
 					}
 				[Test]
 				public void InPickingUp_OnEndDrag_Always_CallsSSMExecuteTransaction(){
 					Slottable sb = MakeSB();
-						ISlotSystemManager ssm = MakeSubSSM();
-						sb.SetSSM(ssm);
+						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						sb.SetTAM(tam);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.PickUp();
 
 					sb.OnEndDrag(new PointerEventDataFake());
 
-					ssm.Received().ExecuteTransaction();
+					tam.Received().ExecuteTransaction();
 					}
 			/*  MoveWithinState	*/
 				[Test]
@@ -649,18 +741,14 @@ namespace SlotSystemTests{
 				[Test]
 				public void MoveWithin_Always_SetsAndRunsMoveWithinProcess(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockMoveWithinCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-						stubCorFac.MakeMoveWithinCoroutine().Returns(mockCoroutine);
+						stubCorFac.MakeMoveWithinCoroutine().Returns(mockMoveWithinCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
 
 					sb.MoveWithin();
 
-					ISBActProcess actualProc = sb.actProcess;
-					Assert.That(actualProc, Is.TypeOf(typeof(SBMoveWithinProcess)));
-					Assert.That(actualProc.sse, Is.SameAs(sb));
-					Assert.That(actualProc.isRunning, Is.True);
-					mockCoroutine.Received().Invoke();
+					AssertSBActProcessIsSetAndRunning(sb, typeof(SBMoveWithinProcess), mockMoveWithinCoroutine);
 					}
 			/*  AddedState	*/
 				[Test]
@@ -674,22 +762,18 @@ namespace SlotSystemTests{
 				[Test]
 				public void Add_Always_SetsAndRunsAddProcess(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockAddCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-						stubCorFac.MakeAddCoroutine().Returns(mockCoroutine);
+						stubCorFac.MakeAddCoroutine().Returns(mockAddCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
 
 					sb.Add();
 
-					ISBActProcess actualProc = sb.actProcess;
-					Assert.That(actualProc, Is.TypeOf(typeof(SBAddProcess)));
-					Assert.That(actualProc.sse, Is.SameAs(sb));
-					Assert.That(actualProc.isRunning, Is.True);
-					mockCoroutine.Received().Invoke();
+					AssertSBActProcessIsSetAndRunning(sb, typeof(SBAddProcess), mockAddCoroutine);
 					}
 			/*  RemovedState	*/
 				[Test]
-				public void Remov_Always_SetsIsRemoving(){
+				public void Remove_Always_SetsIsRemoving(){
 					Slottable sb = MakeSB();
 
 					sb.Remove();
@@ -697,20 +781,16 @@ namespace SlotSystemTests{
 					Assert.That(sb.isRemoving, Is.True);
 					}
 				[Test]
-				public void Remov_Always_SetsAndRunsRemovProcess(){
+				public void Remove_Always_SetsAndRunsRemovProcess(){
 					Slottable sb = MakeSB();
-						System.Func<IEnumeratorFake> mockCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
+						System.Func<IEnumeratorFake> mockRemoveCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-						stubCorFac.MakeRemoveCoroutine().Returns(mockCoroutine);
+						stubCorFac.MakeRemoveCoroutine().Returns(mockRemoveCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
 
 					sb.Remove();
 
-					ISBActProcess actualProc = sb.actProcess;
-					Assert.That(actualProc, Is.TypeOf(typeof(SBRemoveProcess)));
-					Assert.That(actualProc.sse, Is.SameAs(sb));
-					Assert.That(actualProc.isRunning, Is.True);
-					mockCoroutine.Received().Invoke();
+					AssertSBActProcessIsSetAndRunning(sb, typeof(SBRemoveProcess), mockRemoveCoroutine);
 					}
 			/* Sequence */
 				[Test]
@@ -719,15 +799,15 @@ namespace SlotSystemTests{
 						PartsInstance parts = MakePartsInstance(0, 20);
 						BowInstance bow = MakeBowInstance(0);
 						sb.SetItem(parts);
-						ISlotSystemManager mockSSM = MakeSubSSM();
-						sb.SetSSM(mockSSM);
+						ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(mockTAM);
 						SlottableCommand mockTapComm = Substitute.For<SlottableCommand>();
 						sb.SetTapCommand(mockTapComm);
 					PointerEventDataFake eventData = new PointerEventDataFake();
 					//focused !(stackable && hovered) WFA_down WFPickUp_exp PickingUp_up execTA
 							sb.Focus();
-							mockSSM.pickedSB.Returns((ISlotSystemElement)null);
-							mockSSM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((ISlotSystemElement)null);
 						sb.WaitForAction();
 							Assert.That(sb.isWaitingForAction, Is.True);
 						
@@ -736,15 +816,15 @@ namespace SlotSystemTests{
 						
 						sb.ExpireActProcess();
 							Assert.That(sb.isPickingUp, Is.True);
-							mockSSM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((ISlotSystemElement)null);
 						
 						sb.OnPointerUp(eventData);
-							mockSSM.Received(1).ExecuteTransaction();
+							mockTAM.Received(1).ExecuteTransaction();
 					//focused stackable && hovered WFA_down WFPickUp_exp PickingUp_up WFNT_exp execTA
 							sb.Focus();
 							sb.SetItem(parts);
-							mockSSM.pickedSB.Returns((ISlotSystemElement)null);
-							mockSSM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((ISlotSystemElement)null);
 						sb.WaitForAction();
 
 						sb.OnPointerDown(eventData);
@@ -752,19 +832,19 @@ namespace SlotSystemTests{
 						
 						sb.ExpireActProcess();
 							Assert.That(sb.isPickingUp, Is.True);
-							mockSSM.hovered.Returns(sb);
-							mockSSM.pickedSB.Returns(sb);
+							mockTAM.hovered.Returns(sb);
+							mockTAM.pickedSB.Returns(sb);
 						
 						sb.OnPointerUp(eventData);
 							Assert.That(sb.isWaitingForNextTouch, Is.True);
 						
 						sb.ExpireActProcess();
-							mockSSM.Received(2).ExecuteTransaction();
+							mockTAM.Received(2).ExecuteTransaction();
 					//focused stackable && hovered WFA_down WFPickUp_exp PickingUp_up WFNT_down increment
 							sb.Focus();
 							sb.SetItem(parts);
-							mockSSM.pickedSB.Returns((ISlotSystemElement)null);
-							mockSSM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((ISlotSystemElement)null);
 						sb.WaitForAction();
 
 						sb.OnPointerDown(eventData);
@@ -773,8 +853,8 @@ namespace SlotSystemTests{
 						sb.ExpireActProcess();
 							Assert.That(sb.isPickingUp, Is.True);
 							Assert.That(sb.pickedAmount, Is.EqualTo(1));
-							mockSSM.pickedSB.Returns(sb);
-							mockSSM.hovered.Returns(sb);
+							mockTAM.pickedSB.Returns(sb);
+							mockTAM.hovered.Returns(sb);
 						
 						sb.OnPointerUp(eventData);
 							Assert.That(sb.isWaitingForNextTouch, Is.True);
@@ -783,8 +863,8 @@ namespace SlotSystemTests{
 							Assert.That(sb.pickedAmount, Is.EqualTo(2));
 					//defocused WFA_down WFPointerUp_up tap
 							sb.Defocus();
-							mockSSM.pickedSB.Returns((ISlotSystemElement)null);
-							mockSSM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((ISlotSystemElement)null);
 						sb.WaitForAction();
 							Assert.That(sb.isDefocused, Is.True);
 							Assert.That(sb.isWaitingForAction, Is.True);
@@ -796,8 +876,8 @@ namespace SlotSystemTests{
 							mockTapComm.Received(1).Execute(sb);
 					//focused WFA_down WFPickUp_up WFNT_down PickingUp pickedAmount 1
 							sb.Focus();
-							mockSSM.pickedSB.Returns((ISlotSystemElement)null);
-							mockSSM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((ISlotSystemElement)null);
 						sb.WaitForAction();
 
 						sb.OnPointerDown(eventData);
@@ -809,12 +889,12 @@ namespace SlotSystemTests{
 						sb.OnPointerDown(eventData);
 							Assert.That(sb.isPickingUp, Is.True);
 							Assert.That(sb.pickedAmount, Is.EqualTo(1));
-					//
 				}
 		/* EqpStates */
 			/* EquippedState */
 				
 	/* helpers */
+		PointerEventDataFake eventData{get{return new PointerEventDataFake();}}
 		void AssertRefreshCalled(ISlottable sb){
 			Assert.That(sb.isWaitingForAction, Is.True);
 			Assert.That(sb.pickedAmount, Is.EqualTo(0));
@@ -823,6 +903,13 @@ namespace SlotSystemTests{
 		void SetUpForRefreshCall(ISlottable sb){
 			sb.pickedAmount = 20;
 			sb.SetNewSlotID(6);
+		}
+		public void AssertSBActProcessIsSetAndRunning(ISlottable sb, Type procType, System.Func<IEnumeratorFake> coroutine){
+			ISBActProcess actualProc = sb.actProcess;
+			Assert.That(actualProc, Is.TypeOf(procType));
+			Assert.That(actualProc.sse, Is.SameAs(sb));
+			Assert.That(actualProc.isRunning, Is.True);
+			coroutine.Received().Invoke();
 		}
 	}
 }

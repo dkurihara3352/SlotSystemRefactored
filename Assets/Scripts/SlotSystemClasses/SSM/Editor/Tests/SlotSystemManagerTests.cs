@@ -123,9 +123,9 @@ namespace SlotSystemTests{
 				ssm.Initialize();
 
 				Assert.That(ssm.isDeactivated, Is.True);
-				Assert.That(ssm.isSelStateInit, Is.True);
+				Assert.That(ssm.wasSelStateNull, Is.True);
 				Assert.That(ssm.isWaitingForAction, Is.True);
-				Assert.That(ssm.isActStateInit, Is.True);
+				Assert.That(ssm.wasActStateNull, Is.True);
 				pBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				eBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				foreach(var gBun in gBuns)
@@ -812,14 +812,6 @@ namespace SlotSystemTests{
 							flag &= BothNullOrReferenceEquals(this.transaction, other.transaction);
 							return flag;
 						}
-					}
-				[Test]
-				public void RefreshAndFocus_WhenCalled_SetsSelStateFocused(){
-					SlotSystemManager ssm = MakeSSM();
-
-					ssm.RefreshAndFocus();
-
-					Assert.That(ssm.isFocused, Is.True);
 					}
 				[Test]
 				public void UpdateEquipStatesOnAll_WhenCalled_CallsEInvRemoveWithItemNotInAllEquippedItems(){
@@ -1816,6 +1808,7 @@ namespace SlotSystemTests{
 				public void SetSG1_OtherToSome_SetsSG1(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup prevSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, prevSG);
 					ISlotGroup stubSG = MakeSubSG();
 
 					ssm.SetSG1(prevSG);
@@ -1823,10 +1816,16 @@ namespace SlotSystemTests{
 
 					Assert.That(ssm.sg1, Is.SameAs(stubSG));
 					}
+				void SetUpStubTransactionResults(SlotSystemManager ssm, ISlotSystemElement sse){
+					Dictionary<ISlotSystemElement, ISlotSystemTransaction> taResult = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
+					taResult.Add(sse, new RevertTransaction(MakeSubSB()));
+					ssm.SetTransactionResults(taResult);
+				}
 				[Test]
 				public void SetSG1_OtherToSome_SetsSG1DoneFalse(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup prevSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, prevSG);
 					ISlotGroup stubSG = MakeSubSG();
 
 					ssm.SetSG1(prevSG);
@@ -1838,6 +1837,7 @@ namespace SlotSystemTests{
 				public void SetSG1_SomeToNull_SetsSG1Null(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup stubSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, stubSG);
 					ssm.SetSG1(stubSG);
 
 					ssm.SetSG1(null);
@@ -1848,6 +1848,7 @@ namespace SlotSystemTests{
 				public void SetSG1_SomeToNull_SetsSG1DoneTrue(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup stubSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, stubSG);
 					ssm.SetSG1(stubSG);
 
 					ssm.SetSG1(null);
@@ -1885,6 +1886,7 @@ namespace SlotSystemTests{
 				public void SetSG2_OtherToSome_SetsSG2(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup prevSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, prevSG);
 					ISlotGroup stubSG = MakeSubSG();
 
 					ssm.SetSG2(prevSG);
@@ -1896,6 +1898,7 @@ namespace SlotSystemTests{
 				public void SetSG2_OtherToSome_SetsSG2DoneFalse(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup prevSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, prevSG);
 					ISlotGroup stubSG = MakeSubSG();
 
 					ssm.SetSG2(prevSG);
@@ -1907,6 +1910,7 @@ namespace SlotSystemTests{
 				public void SetSG2_OtherToSome_CallsSG2Select(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup prevSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, prevSG);
 					ISlotGroup mockSG = MakeSubSG();
 
 					ssm.SetSG2(prevSG);
@@ -1918,6 +1922,7 @@ namespace SlotSystemTests{
 				public void SetSG2_SomeToNull_SetsSG2Null(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup stubSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, stubSG);
 					ssm.SetSG2(stubSG);
 
 					ssm.SetSG2(null);
@@ -1928,6 +1933,7 @@ namespace SlotSystemTests{
 				public void SetSG2_SomeToNull_SetsSG2DoneTrue(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup stubSG = MakeSubSG();
+						SetUpStubTransactionResults(ssm, stubSG);
 					ssm.SetSG2(stubSG);
 
 					ssm.SetSG2(null);
@@ -1982,14 +1988,14 @@ namespace SlotSystemTests{
 					Assert.That(ssm.hovered, Is.SameAs(mockSB));
 					}
 				[Test]
-				public void SetHovered_SBToNull_CallSBOnHoverExit(){
+				public void SetHovered_SBToNull_DoesNotCallSBOnHoverExit(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable mockSB = MakeSubSB();
 					ssm.SetHovered(mockSB);
 
 					ssm.SetHovered(null);
 
-					mockSB.Received().OnHoverExit();
+					mockSB.DidNotReceive().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_SBToNull_SetsNull(){
@@ -2002,7 +2008,7 @@ namespace SlotSystemTests{
 					Assert.That(ssm.hovered, Is.Null);
 					}
 				[Test]
-				public void SetHovered_SBToSomeSSE_CallSBOnHoverExit(){
+				public void SetHovered_SBToOtherSSE_CallSBOnHoverExit(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlottable mockSB = MakeSubSB();
 					ssm.SetHovered(mockSB);
@@ -2031,14 +2037,14 @@ namespace SlotSystemTests{
 					Assert.That(ssm.hovered, Is.SameAs(mockSG));
 					}
 				[Test]
-				public void SetHovered_SGToNull_CallSGOnHoverExit(){
+				public void SetHovered_SGToNull_DoesNotCallSGOnHoverExit(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup mockSG = MakeSubSG();
 					ssm.SetHovered(mockSG);
 
 					ssm.SetHovered(null);
 
-					mockSG.Received().OnHoverExit();
+					mockSG.DidNotReceive().OnHoverExit();
 					}
 				[Test]
 				public void SetHovered_SGToNull_SetsNull(){
@@ -2051,7 +2057,7 @@ namespace SlotSystemTests{
 					Assert.That(ssm.hovered, Is.Null);
 					}
 				[Test]
-				public void SetHovered_SGToSomeSSE_CallSGOnHoverExit(){
+				public void SetHovered_SGToOther_CallSGOnHoverExit(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup mockSG = MakeSubSG();
 					ssm.SetHovered(mockSG);
@@ -2083,7 +2089,7 @@ namespace SlotSystemTests{
 						ISlottable hoveredSB = MakeSubSB();
 						Dictionary<ISlotSystemElement, ISlotSystemTransaction> taResults = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 						taResults.Add(hoveredSB, stubTA);
-						ssm.transactionResults = taResults;
+						ssm.SetTransactionResults(taResults);
 					SetHoveredTestData expected = new SetHoveredTestData(targetSB, sg1, sg2, stubTA);
 
 					ssm.SetHovered(hoveredSB);
@@ -2276,7 +2282,7 @@ namespace SlotSystemTests{
 								stubTA.sg2.Returns(sg2);
 						Dictionary<ISlotSystemElement, ISlotSystemTransaction> dict = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 							dict.Add(hovered, stubTA);
-							ssm.transactionResults = dict;
+							ssm.SetTransactionResults(dict);
 					UpdateTransactionTestCase expected = new UpdateTransactionTestCase(targetSB, sg1, sg2, stubTA);
 					
 					ssm.UpdateTransaction();
@@ -2303,47 +2309,44 @@ namespace SlotSystemTests{
 							return flag;
 						}
 					}
-				[Test]
-				public void ReferToTAAndUpdateSelState_TAResultsNull_CallsSGFocus(){
+				[Test][ExpectedException(typeof(System.InvalidOperationException))]
+				public void IsTransactionResultRevertFor_TAResultsNoMatch_ThrowsException(){
 					SlotSystemManager ssm = MakeSSM();
 					ISlotGroup mockSG = MakeSubSG();
 
-					ssm.ReferToTAAndUpdateSelState(mockSG);
-
-					mockSG.Received().Focus();
+					ssm.IsTransactionResultRevertFor(mockSG);
 					}
-				[TestCaseSource(typeof(ReferToTAAndUpdateSelState_VariousTAsCases))]
-				public void ReferToTAAndUpdateSelState_VariousTAs_CallsSGSetSelStateAccordingly(ISlotSystemTransaction ta, bool focused){
+				[TestCaseSource(typeof(IsTransactionResultRevertFor_VariousTAsCases))]
+				public void IsTransactionResultRevertFor_VariousTAs_ReturnsAccordingly(ISlotSystemTransaction ta, bool expected){
 					ISlotGroup mockSG = MakeSubSG();
 					SlotSystemManager ssm = MakeSSM();
 					Dictionary<ISlotSystemElement, ISlotSystemTransaction> dict = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
 						dict.Add(mockSG, ta);
-						ssm.transactionResults = dict;
-					ssm.ReferToTAAndUpdateSelState(mockSG);
-					if(focused)
-						mockSG.Received().Focus();
-					else
-						mockSG.Received().Defocus();
+						ssm.SetTransactionResults(dict);
+					bool actual = ssm.IsTransactionResultRevertFor(mockSG);
+
+					Assert.That(actual, Is.EqualTo(expected));
+					
 					}
-					class ReferToTAAndUpdateSelState_VariousTAsCases: IEnumerable{
+					class IsTransactionResultRevertFor_VariousTAsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] revert_def;
-								revert_def = new object[]{Substitute.For<IRevertTransaction>(), false};
+								revert_def = new object[]{Substitute.For<IRevertTransaction>(), true};
 								yield return revert_def;
 							object[] reorder_foc;
-								reorder_foc = new object[]{Substitute.For<IReorderTransaction>(), true};
+								reorder_foc = new object[]{Substitute.For<IReorderTransaction>(), false};
 								yield return reorder_foc;
 							object[] sort_foc;
-								sort_foc = new object[]{Substitute.For<ISortTransaction>(), true};
+								sort_foc = new object[]{Substitute.For<ISortTransaction>(), false};
 								yield return sort_foc;
 							object[] fill_foc;
-								fill_foc = new object[]{Substitute.For<IFillTransaction>(), true};
+								fill_foc = new object[]{Substitute.For<IFillTransaction>(), false};
 								yield return fill_foc;
 							object[] swap_foc;
-								swap_foc = new object[]{Substitute.For<ISwapTransaction>(), true};
+								swap_foc = new object[]{Substitute.For<ISwapTransaction>(), false};
 								yield return swap_foc;
 							object[] stack_foc;
-								stack_foc = new object[]{Substitute.For<IStackTransaction>(), true};
+								stack_foc = new object[]{Substitute.For<IStackTransaction>(), false};
 								yield return stack_foc;
 						}
 					}

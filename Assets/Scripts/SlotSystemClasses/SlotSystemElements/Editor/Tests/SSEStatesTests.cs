@@ -12,7 +12,7 @@ namespace SlotSystemTests{
 		public class SSEStatesTests : SlotSystemTest{
 			[TestCaseSource(typeof(VariousStates_EnterStateCases))]
 			public void VariousStates_EnterState_prevNull_CallsInstantMethods(ISlotSystemElement mockSSE, SSEState state){
-				mockSSE.isSelStateInit.Returns(true);
+				mockSSE.wasSelStateNull.Returns(true);
 				state.EnterState(mockSSE);
 				
 				if(state is SSEFocusedState)

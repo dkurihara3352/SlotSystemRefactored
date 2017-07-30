@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
-	public class SlotSystemManager : SlotSystemElement, ISlotSystemManager{
+	public class SlotSystemManager : SlotSystemRootElement, ISlotSystemManager{
 		public static ISlotSystemManager curSSM;
 			public void SetCurSSM(){
 				if(curSSM != null){
@@ -279,24 +279,6 @@ namespace SlotSystem{
 							list.Add((ISlottable)ele);
 					}
 			/*	methods	*/
-				public void Refresh(){
-					SetActState(waitForActionState);
-					ClearFields();
-				}
-				public void RefreshAndFocus(){
-					Refresh();
-					Focus();
-				}
-				public void ClearFields(){
-					SetPickedSB(null);
-					SetTargetSB(null);
-					SetSG1(null);
-					SetSG2(null);
-					SetHovered(null);
-					SetDIcon1(null);
-					SetDIcon2(null);
-					SetTransaction(null);
-				}
 				public void UpdateEquipStatesOnAll(){
 					/*	update equip inventory	*/
 						/*	remove	*/
@@ -336,27 +318,12 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void SortSG(ISlotGroup sg, SGSorter sorter){
-					ISlotSystemTransaction sortTransaction = sortFA.MakeSortTA(sg, sorter);
-					SetTargetSB(sortTransaction.targetSB);
-					SetSG1(sortTransaction.sg1);
-					SetTransaction(sortTransaction);
-					transaction.Execute();
-				}ISortTransactionFactory sortFA{
-					get{
-						if(m_sortFA == null)
-							m_sortFA = new SortTransactionFactory();
-						return m_sortFA;
-					}
-				}ISortTransactionFactory m_sortFA;
-				public void SetSortFA(ISortTransactionFactory fa){m_sortFA = fa;}
 				public void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG){
 					if(!targetSG.isExpandable){
 						if(targetSG.isFocused || targetSG.isDefocused){
 							equipInv.SetEquippableCGearsCount(i);
 							targetSG.InitializeItems();
 							UpdateEquipStatesOnAll();
-							RefreshAndFocus();
 						}
 					}else{
 						throw new System.InvalidOperationException("ISlotGroupManager.ChangeEquippableCGearsCount: the targetSG is expandable");
@@ -406,113 +373,7 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public void PrePickFilter(ISlottable sb, out bool isFilteredIn){
-					bool res = false;
-					foreach(ISlotGroup targetSG in focusedSGs){
-						ISlotSystemTransaction ta = MakeTransaction(sb, targetSG);
-						if(ta == null)
-							throw new System.InvalidOperationException("SlotSystemManager.PrePickFilter: given hoveredSSE does not yield any transaction. something's wrong baby");
-						else{
-							if(!(ta is IRevertTransaction)){
-								res = true; break;
-							}
-						}
-						foreach(ISlottable targetSB in targetSG){
-							if(sb != null)
-								if(!(MakeTransaction(sb, targetSB) is IRevertTransaction)){
-									res = true; break;
-								}
-						}
-					}
-					isFilteredIn = res;
-				}
 		/*	SlotSystemElement	*/
-			/*	States	*/
-				/*	Action state	*/
-					ISSEStateEngine<ISSMActState> actStateEngine{
-						get{
-							if(m_actStateEngine == null)
-								m_actStateEngine = new SSEStateEngine<ISSMActState>(this);
-							return m_actStateEngine;
-						}
-						}ISSEStateEngine<ISSMActState> m_actStateEngine;
-					void SetActStateEngine(ISSEStateEngine<ISSMActState> engine){m_actStateEngine = engine;}
-					ISSMActState curActState{
-						get{return actStateEngine.curState;}
-					}
-					ISSMActState prevActState{
-						get{return actStateEngine.prevState;}
-					}
-					void SetActState(ISSMActState state){
-						actStateEngine.SetState(state);
-						if(state ==null && actProcess != null)
-							SetAndRunActProcess(null);
-					}
-					public virtual bool isActStateInit{get{return prevActState == null;}}
-					public virtual void ClearCurActState(){SetActState(null);}
-					/* Static states */
-						public ISSMActState waitForActionState{
-							get{
-								if(m_waitForActionState == null)
-									m_waitForActionState = new SSMWaitForActionState();
-								return m_waitForActionState;
-							}
-							}ISSMActState m_waitForActionState;
-							public virtual void WaitForAction(){SetActState(waitForActionState);}
-							public virtual bool isWaitingForAction{get{return curActState == waitForActionState;}}
-							public virtual bool wasWaitingForAction{get{return prevActState == waitForActionState;}}
-						public ISSMActState probingState{
-							get{
-								if(m_probingState == null)
-									m_probingState = new SSMProbingState();
-								return m_probingState;
-							}
-							}ISSMActState m_probingState;
-							public virtual void Probe(){SetActState(probingState);}
-							public virtual bool isProbing{get{return curActState == probingState;}}
-							public virtual bool wasProbing{get{return prevActState == probingState;}}
-						public ISSMActState transactionState{
-							get{
-								if(m_transactionState == null)
-									m_transactionState = new SSMTransactionState();
-								return m_transactionState;
-							}
-							}ISSMActState m_transactionState;
-							public virtual void Transact(){SetActState(transactionState);}
-							public virtual bool isTransacting{get{return curActState == transactionState;}}
-							public virtual bool wasTransacting{get{return prevActState == transactionState;}}
-			/*	process	*/
-				/*	Action Process	*/
-					public virtual ISSEProcessEngine<ISSMActProcess> actProcEngine{
-						get{
-							if(m_actProcEngine == null)
-								m_actProcEngine = new SSEProcessEngine<ISSMActProcess>();
-							return m_actProcEngine;
-						}
-						}ISSEProcessEngine<ISSMActProcess> m_actProcEngine;
-					public virtual void SetActProcEngine(ISSEProcessEngine<ISSMActProcess> engine){m_actProcEngine = engine;}
-					public virtual ISSMActProcess actProcess{
-						get{return actProcEngine.process;}
-					}
-					public virtual void SetAndRunActProcess(ISSMActProcess process){
-						actProcEngine.SetAndRunProcess(process);
-					}
-					public void ExpireActProcess(){if(actProcess != null) actProcess.Expire();}
-					/* Coroutine */
-						public IEnumeratorFake probeCoroutine(){
-							return null;
-						}
-						public IEnumeratorFake transactionCoroutine(){
-							bool done = true;
-							done &= m_dIcon1Done;
-							done &= m_dIcon2Done;
-							done &= m_sg1Done;
-							done &= m_sg2Done;
-							if(done){
-								this.actProcess.Expire();
-							}
-							return null;
-						}
 			/* public fields	*/
 				public override ISlotSystemBundle immediateBundle{
 					get{return null;}
@@ -552,7 +413,6 @@ namespace SlotSystem{
 				}
 				public override void InitializeStates(){
 					base.Deactivate();
-					WaitForAction();
 				}
 				public void InitStatesInHi(ISlotSystemElement element){
 					element.InitializeStates();
@@ -610,194 +470,11 @@ namespace SlotSystem{
 							this.Focus();
 						}
 					}
-		/*	Transaction Manager	*/
-			public ITransactionFactory taFactory{
-				get{
-					if(m_taFactory == null)
-						m_taFactory = new TransactionFactory();
-					return m_taFactory;
-				}
-			}ITransactionFactory m_taFactory;
-			public void SetTAFactory(ITransactionFactory taFac){m_taFactory = taFac;}
-			public ISlotSystemTransaction transaction{get{return m_transaction;}} ISlotSystemTransaction m_transaction;
-				public void SetTransaction(ISlotSystemTransaction transaction){
-					if(m_transaction != transaction){
-						m_transaction = transaction;
-						if(m_transaction != null){
-							m_transaction.Indicate();
-						}
-					}
-				}
-			public void AcceptSGTAComp(ISlotGroup sg){
-				if(sg2 != null && sg == sg2) m_sg2Done = true;
-				else if(sg1 != null && sg == sg1) m_sg1Done = true;
-				if(isTransacting){
-					transactionCoroutine();
-				}
-			}
-			public void AcceptDITAComp(DraggedIcon di){
-				if(dIcon2 != null && di == dIcon2) m_dIcon2Done = true;
-				else if(dIcon1 != null && di == dIcon1) m_dIcon1Done = true;
-				if(isTransacting){
-					transactionCoroutine();
-				}
-			}
-			public void ExecuteTransaction(){
-				Transact();
-				transaction.Execute();
-			}
-			public virtual ISlottable pickedSB{get{return m_pickedSB;}} ISlottable m_pickedSB;
-				public virtual void SetPickedSB(ISlottable sb){this.m_pickedSB = sb;}
-			public ISlottable targetSB{get{return m_targetSB;}} ISlottable m_targetSB;
-				public void SetTargetSB(ISlottable sb){
-					if(sb == null || sb != targetSB){
-						if(targetSB != null)
-							targetSB.Focus();
-						this.m_targetSB = sb;
-						if(targetSB != null)
-							targetSB.Select();
-					}
-				}
-			public ISlotGroup sg1{get{return m_sg1;}} ISlotGroup m_sg1;
-				public void SetSG1(ISlotGroup sg){
-					if(sg == null || sg != sg1){
-						if(sg1 != null)
-							ReferToTAAndUpdateSelState(sg1);
-						this.m_sg1 = sg;
-						if(sg1 != null)
-							m_sg1Done = false;
-						else
-							m_sg1Done = true;
-					}
-				}
-				public bool sg1Done{get{return m_sg1Done;}} bool m_sg1Done = true;
-			public ISlotGroup sg2{get{return m_sg2;}} ISlotGroup m_sg2;
-				public void SetSG2(ISlotGroup sg){
-					if(sg == null || sg != sg2){
-						if(sg2 != null)
-							ReferToTAAndUpdateSelState(sg2);
-						this.m_sg2 = sg;
-						if(sg2 != null)
-							sg.Select();
-						if(sg2 != null)
-							m_sg2Done = false;
-						else
-							m_sg2Done = true;
-					}
-				}
-				public bool sg2Done{get{return m_sg2Done;}} bool m_sg2Done = true;
-			public virtual DraggedIcon dIcon1{get{return m_dIcon1;}} DraggedIcon m_dIcon1;
-				public virtual void SetDIcon1(DraggedIcon di){
-					m_dIcon1 = di;
-					if(m_dIcon1 == null)
-						m_dIcon1Done = true;
-					else
-						m_dIcon1Done = false;
-				}
-				public bool dIcon1Done{get{return m_dIcon1Done;}} bool m_dIcon1Done = true;
-			public virtual DraggedIcon dIcon2{get{return m_dIcon2;}} DraggedIcon m_dIcon2;
-				public virtual void SetDIcon2(DraggedIcon di){
-					m_dIcon2 = di;
-					if(m_dIcon2 == null)
-						m_dIcon2Done = true;
-					else
-						m_dIcon2Done = false;
-				}
-				public bool dIcon2Done{get{return m_dIcon2Done;}} bool m_dIcon2Done = true;
-			public ISlotSystemElement hovered{get{return m_hovered;}} protected ISlotSystemElement m_hovered;
-				public virtual void SetHovered(ISlotSystemElement ele){
-					if(ele == null || ele != hovered){
-						if(hovered != null){
-							if(hovered is ISlottable)
-								((ISlottable)hovered).OnHoverExit();
-							else if(hovered is ISlotGroup)
-								((ISlotGroup)hovered).OnHoverExit();
-						}
-						m_hovered = ele;
-						if(hovered != null)
-							UpdateTransaction();
-					}
-				}
-			public virtual List<InventoryItemInstance> moved{get{return m_moved;}} List<InventoryItemInstance> m_moved;
-			public virtual void SetMoved(List<InventoryItemInstance> moved){this.m_moved = moved;}
-			public Dictionary<ISlotSystemElement, ISlotSystemTransaction> transactionResults;
-			public virtual void CreateTransactionResults(){
-				Dictionary<ISlotSystemElement, ISlotSystemTransaction> result = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
-				foreach(ISlotGroup sg in focusedSGs){
-					ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg);
-					result.Add(sg, ta);
-					if(ta is IRevertTransaction)
-						sg.DefocusSelf();
-					else
-						sg.FocusSelf();
-					foreach(ISlottable sb in sg){
-						if(sb != null){
-							ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb);
-							result.Add(sb, ta2);
-							if(ta2 is IRevertTransaction || ta2 is IFillTransaction)
-								sb.Defocus();
-							else
-								sb.Focus();
-						}
-					}
-				}
-				this.transactionResults = result;
-			}
-			public virtual void UpdateTransaction(){
-				if(transactionResults != null){
-					ISlotSystemTransaction ta = null;
-					if(transactionResults.TryGetValue(hovered, out ta)){
-						SetTargetSB(ta.targetSB);
-						SetSG1(ta.sg1);
-						SetSG2(ta.sg2);
-						SetMoved(ta.moved);
-						SetTransaction(ta);
-					}
-				}
-			}
-			public void ReferToTAAndUpdateSelState(ISlotSystemElement sse){
-				if(transactionResults != null){
-					ISlotSystemTransaction ta = null;
-					if(transactionResults.TryGetValue(sse, out ta)){
-						if(ta is IRevertTransaction)
-							sse.Defocus();
-						else
-							sse.Focus();
-					}
-				}else
-					sse.Focus();
-			}
-			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
-				return taFactory.MakeTransaction(pickedSB, hovered);
-			}
+		
 	}
-	public interface ISlotSystemManager: ISlotSystemElement, TransactionManager{
+	public interface ISlotSystemManager: ISlotSystemElement{
 		void SetCurSSM();
 		void Initialize();
-		IEnumeratorFake probeCoroutine();
-		/* States And Process */
-			/* ActState */
-				bool isActStateInit{get;}
-				void ClearCurActState();
-				ISSMActState waitForActionState{get;}
-					void WaitForAction();
-					bool isWaitingForAction{get;}
-					bool wasWaitingForAction{get;}
-				ISSMActState probingState{get;}
-					void Probe();
-					bool isProbing{get;}
-					bool wasProbing{get;}
-				ISSMActState transactionState{get;}
-					void Transact();
-					bool isTransacting{get;}
-					bool wasTransacting{get;}
-			/* Process */
-				ISSEProcessEngine<ISSMActProcess> actProcEngine{get;}
-					void SetActProcEngine(ISSEProcessEngine<ISSMActProcess> engine);
-					void SetAndRunActProcess(ISSMActProcess process);
-					ISSMActProcess actProcess{get;}
-						IEnumeratorFake transactionCoroutine();
-					void ExpireActProcess();
 		/*	Managerial */
 			List<ISlotGroup> allSGs{get;}
 			List<ISlotGroup> allSGPs{get;}
@@ -823,18 +500,12 @@ namespace SlotSystem{
 			List<PartsInstance> equippedParts{get;}
 			List<ISlottable> allSBs{get;}
 			void AddSBToRes(ISlotSystemElement ele, IList<ISlottable> list);
-			void Refresh();
-			void RefreshAndFocus();
-			void ClearFields();
 			void UpdateEquipStatesOnAll();
-			void SortSG(ISlotGroup sg, SGSorter sorter);
 			void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG);
 			void MarkEquippedInPool(InventoryItemInstance item, bool equipped);
 			void SetEquippedOnAllSBs(InventoryItemInstance item, bool equipped);
 			void Equip(ISlotSystemElement ele, object obj);
 			void Unequip(ISlotSystemElement ele, object obj);
-			void PrePickFilter(ISlottable sb, out bool isFilteredIn);
-			void ExecuteTransaction();
 		/*	SlotSystemElement 	*/
 			ISlotSystemBundle poolBundle{get;}
 			ISlotSystemBundle equipBundle{get;}
@@ -844,38 +515,6 @@ namespace SlotSystem{
 			void FindAndFocusInBundle(ISlotSystemElement ele);
 			void FocusInBundle(ISlotSystemElement inspected, object target);
 			void SetSSMInH(ISlotSystemElement ele);	
-	}
-	public interface TransactionManager{
-		ITransactionFactory taFactory{get;}
-		ISlotSystemTransaction transaction{get;}
-		void AcceptSGTAComp(ISlotGroup sg);
-		void AcceptDITAComp(DraggedIcon di);
-		ISlottable pickedSB{get;}
-		ISlottable targetSB{get;}
-		ISlotGroup sg1{get;}
-		ISlotGroup sg2{get;}
-		DraggedIcon dIcon1{get;}
-		DraggedIcon dIcon2{get;}
-		ISlotSystemElement hovered{get;}
-		List<InventoryItemInstance> moved{get;}
-		void UpdateTransaction();
-		void CreateTransactionResults();
-		void ReferToTAAndUpdateSelState(ISlotSystemElement sse);
-		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
-		
-		void SetTransaction(ISlotSystemTransaction transaction);	
-		void SetPickedSB(ISlottable sb);
-		void SetTargetSB(ISlottable sb);
-		void SetSG1(ISlotGroup sg);
-		bool sg1Done{get;}
-		void SetSG2(ISlotGroup sg);
-		bool sg2Done{get;}
-		void SetDIcon1(DraggedIcon di);
-		bool dIcon1Done{get;}
-		void SetDIcon2(DraggedIcon di);
-		bool dIcon2Done{get;}
-		void SetHovered(ISlotSystemElement ele);
-		void SetMoved(List<InventoryItemInstance> moved);
 	}
 	public class FocusedSGsFactory: IFocusedSGsFactory{
 		ISlotSystemManager ssm;
@@ -892,13 +531,5 @@ namespace SlotSystem{
 	}
 	public interface IFocusedSGsFactory{
 		List<ISlotGroup> focusedSGs{get;}
-	}
-	public class SortTransactionFactory: ISortTransactionFactory{
-		public ISortTransaction MakeSortTA(ISlotGroup sg, SGSorter sorter){
-			return new SortTransaction(sg, sorter);
-		}
-	}
-	public interface ISortTransactionFactory{
-		ISortTransaction MakeSortTA(ISlotGroup sg, SGSorter sorter);
 	}
 }
