@@ -19,7 +19,11 @@ public class SlotSystemTest{
 			return object.ReferenceEquals(a, b);
 	}
 	/*	Elements	*/
-
+		protected static TransactionManager MakeTAM(){
+			GameObject go = new GameObject("tamGo");
+			go.tag = "TestGO";
+			return go.AddComponent<TransactionManager>();
+		}
 		protected static SlotSystemManager MakeSSM(){
 			GameObject go = new GameObject("go");
 			go.tag = "TestGO";

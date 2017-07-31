@@ -132,6 +132,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);					
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
@@ -142,6 +144,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedAmountOne(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);					
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
@@ -154,7 +158,9 @@ namespace SlotSystemTests{
 					Slottable sb = MakeSB();
 					sb.SetItem(item);
 					ISlotSystemManager ssm = MakeSubSSM();
+					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 					sb.SetSSM(ssm);
+					sb.SetTAM(stubTAM);
 					sb.Deactivate();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -184,7 +190,9 @@ namespace SlotSystemTests{
 				public void Increment_NonStackableAndAfterSSMAndSelStateSetAndFromValidPrevActState_DoesNotIncrement(InventoryItemInstance item){
 					Slottable sb = MakeSB();
 					ISlotSystemManager ssm = MakeSubSSM();
+					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 					sb.SetSSM(ssm);
+					sb.SetTAM(stubTAM);
 					sb.Deactivate();
 					sb.SetItem(item);
 					sb.WaitForAction();

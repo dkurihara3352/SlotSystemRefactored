@@ -16,7 +16,7 @@ namespace SlotSystemTests{
 				SlotGroup sg = MakeSG();
 					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 					stubTAM.IsTransactionResultRevertFor(sg).Returns(false);
-					sg.SetSSM(stubTAM);
+					sg.SetTAM(stubTAM);
 				
 				sg.Activate();
 
@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 				SlotGroup sg = MakeSG();
 					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 					stubTAM.IsTransactionResultRevertFor(sg).Returns(true);
-					sg.SetSSM(stubTAM);
+					sg.SetTAM(stubTAM);
 				
 				sg.Activate();
 
@@ -53,8 +53,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void isPool_SSMPBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
-						ISlotSystemManager stubTAM = MakeSSMWithPBunContaining(sg);
-						sg.SetSSM(stubTAM);
+						ISlotSystemManager stubSSM = MakeSSMWithPBunContaining(sg);
+						sg.SetSSM(stubSSM);
 
 					bool actual = sg.isPool;
 
@@ -63,8 +63,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void isSGE_SSMEBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
-						ISlotSystemManager stubTAM = MakeSSMWithEBunContaining(sg);
-						sg.SetSSM(stubTAM);
+						ISlotSystemManager stubSSM = MakeSSMWithEBunContaining(sg);
+						sg.SetSSM(stubSSM);
 
 					bool actual = sg.isSGE;
 
@@ -73,8 +73,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void isSGG_SSMGBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
-						ISlotSystemManager stubTAM = MakeSSMWithGBunContaining(sg);
-						sg.SetSSM(stubTAM);
+						ISlotSystemManager stubSSM = MakeSSMWithGBunContaining(sg);
+						sg.SetSSM(stubSSM);
 
 					bool actual = sg.isSGG;
 
@@ -2410,7 +2410,6 @@ namespace SlotSystemTests{
 						ISlotGroup otherSG = MakeSubSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
 						ISlotSystemManager ssm = MakeSubSSM();
-
 							if(added)
 								tam.sg1.Returns(otherSG);
 							else
@@ -2425,6 +2424,7 @@ namespace SlotSystemTests{
 							ssm.FindParent(Arg.Any<ISlottable>()).Returns(sg);
 					sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 10);
 					sg.SetTAM(tam);
+					sg.SetSSM(ssm);
 					sg.SetSBs(sbs);
 					sg.ToggleAutoSort(isAutoSort);
 
@@ -4115,8 +4115,10 @@ namespace SlotSystemTests{
 						SlotGroup sg = MakeSG();
 							sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
 								ITransactionManager tam = Substitute.For<ITransactionManager>();
+								ISlotSystemManager ssm = MakeSubSSM();
 									tam.moved.Returns(removed);
 								sg.SetTAM(tam);
+								sg.SetSSM(ssm);
 								sg.SetSBs(sbs);
 								sg.ToggleAutoSort(isAutoSort);
 

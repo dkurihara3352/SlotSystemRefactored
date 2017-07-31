@@ -176,7 +176,7 @@ namespace SlotSystem{
                     if(sb.wasWaitingForPickUp || sb.wasWaitingForNextTouch){
                         if(!sb.isSelStateNull)
                             sb.OnHoverEnter();
-                        if(sb.ssm != null){
+                        if(sb.tam != null){
                             sb.SetPickedSB();
                             sb.Probe();
                             sb.SetDIcon1();

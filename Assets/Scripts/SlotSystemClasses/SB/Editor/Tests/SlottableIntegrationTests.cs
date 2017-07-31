@@ -123,7 +123,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void HoverSequence(){
-				ITransactionManager tam = Substitute.For<ITransactionManager>();
+				TransactionManager tam = MakeTAM();
 				Slottable sb = MakeSB();
 				Slottable otherSB = MakeSB();
 				sb.SetTAM(tam);
@@ -245,6 +245,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void ExpireProcess_WaitingForPickUpProcess_SetsIsPickingUp(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);					
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 
@@ -255,6 +257,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void ExpireProcess_WaitingForPickUpProcess_SetsPickedAmount1(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);					
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 
@@ -396,6 +400,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void WaitForNextTouch_WasPickingUp_SetsIsWaitingForNextTouch(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);					
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.PickUp();
@@ -421,6 +427,8 @@ namespace SlotSystemTests{
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
 						stubCorFac.MakeWaitForNextTouchCoroutine().Returns(mockWFNTCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);						
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.PickUp();
@@ -596,6 +604,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void PickUp_WasWaitingForPickUp_SetsIsPickingUp(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);					
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
@@ -606,6 +616,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void PickUp_WasWaitingForNextTouch_SetsIsPickingUp(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -621,6 +633,8 @@ namespace SlotSystemTests{
 						ISSESelStateFactory stubStateFactory = Substitute.For<ISSESelStateFactory>();
 						stubStateFactory.MakeDeactivatedState().Returns(mockDeactivatedState);
 						sb.SetSelStateFactory(stubStateFactory);
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.Deactivate();
@@ -654,6 +668,8 @@ namespace SlotSystemTests{
 						ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
 						stubCorFac.MakePickUpCoroutine().Returns(mockPickUpCoroutine);
 						sb.SetCoroutineFactory(stubCorFac);
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
@@ -665,6 +681,8 @@ namespace SlotSystemTests{
 				public void InPickingUp_OnDeselected_Always_CallsRefresh(){
 					Slottable sb = MakeSB();
 						SetUpForRefreshCall(sb);
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.PickUp();
@@ -676,6 +694,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void InPickingUp_OnDeselected_Always_SetsIsFocused(){
 					Slottable sb = MakeSB();
+						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						sb.SetTAM(stubTAM);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.PickUp();
