@@ -658,7 +658,7 @@ namespace SlotSystemTests{
 						tam.Probe();
 						tam.SetDIcon1(Arg.Any<DraggedIcon>());
 						tam.CreateTransactionResults();
-						tam.UpdateTransaction();
+						tam.UpdateFields();
 					});
 					}
 				[Test]

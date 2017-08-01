@@ -104,6 +104,9 @@ public class SlotSystemTest{
 			return Substitute.For<ISlotSystemElement>();
 		}
 	/*	Non elements	*/
+		protected static ITransactionManager MakeSubTAM(){
+			return Substitute.For<ITransactionManager>();
+		}
 		protected static List<Slot> CreateSlots(int count){
 			List<Slot> slots = new List<Slot>();
 			for(int i = 0; i< count; i++)

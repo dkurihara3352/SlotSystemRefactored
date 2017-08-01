@@ -236,10 +236,10 @@ namespace SlotSystem{
 					else
 						actProc = SlotSystemUtil.TAMProcessName((ITAMProcess)tam.actProcess) + " running? " + (tam.actProcess.isRunning?Blue("true"):Red("false"));
 				string ta = SlotSystemUtil.TransactionName(tam.transaction);
-				string d1Done = "d1Done: " + (tam.dIcon1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
-				string d2Done = "d2Done: " + (tam.dIcon2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
-				string sg1Done = "sg1Done: " + (tam.sg1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
-				string sg2Done = "sg2Done: " + (tam.sg2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				string d1Done = "d1Done: " + (tam.iconHandler.dIcon1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				string d2Done = "d2Done: " + (tam.iconHandler.dIcon2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				string sg1Done = "sg1Done: " + (tam.sgHandler.sg1Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
+				string sg2Done = "sg2Done: " + (tam.sgHandler.sg2Done?SlotSystemUtil.Blue("true"):SlotSystemUtil.Red("false"));
 
 				res = SlotSystemUtil.Bold("SSM:") +
 					" pSB " + pSB +

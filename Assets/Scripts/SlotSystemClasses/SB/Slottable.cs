@@ -353,11 +353,7 @@ namespace SlotSystem{
 				get{return itemInst.Item.IsStackable;}
 			}
 			public bool passesPrePickFilter{
-				get{
-					bool isFilteredIn = false;
-					tam.PrePickFilter(this, out isFilteredIn);
-					return isFilteredIn;
-				}
+				get{return !tam.IsTransactionGoingToBeRevert(this);}
 			}
 			public int quantity{get{return itemInst.quantity;}}
 			public void SetQuantity(int quant){
@@ -510,7 +506,7 @@ namespace SlotSystem{
 				tam.CreateTransactionResults();
 			}
 			public virtual void UpdateTA(){
-				tam.UpdateTransaction();
+				tam.UpdateFields();
 			}
 			public virtual bool isHovered{
 				get{return tam.hovered == (ISlotSystemElement)this;}
