@@ -16,7 +16,9 @@ namespace SlotSystemTests{
 		public void Deactivate_FromNonNullNorDea_SetsDeactivatedProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
 				System.Func<IEnumeratorFake> mockDeaCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetDeaCoroutine(mockDeaCoroutine);
+				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
+					stubCorFactory.MakeDeactivateCoroutine().Returns(mockDeaCoroutine);
+				sse.SetCoroutineFactory(stubCorFactory);
 			sse.Defocus();
 
 			sse.Deactivate();
@@ -27,7 +29,9 @@ namespace SlotSystemTests{
 		public void Defocus_FromNonNullNorDef_SetsDefocusdProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
 				System.Func<IEnumeratorFake> mockDefCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetDefCoroutine(mockDefCoroutine);
+				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
+					stubCorFactory.MakeDefocusCoroutine().Returns(mockDefCoroutine);
+				sse.SetCoroutineFactory(stubCorFactory);
 			sse.Deactivate();
 
 			sse.Defocus();
@@ -38,7 +42,9 @@ namespace SlotSystemTests{
 		public void Focus_FromNonNullNorFoc_SetsFocusdProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
 				System.Func<IEnumeratorFake> mockFocCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetFocCoroutine(mockFocCoroutine);
+				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
+					stubCorFactory.MakeFocusCoroutine().Returns(mockFocCoroutine);
+				sse.SetCoroutineFactory(stubCorFactory);
 			sse.Deactivate();
 
 			sse.Focus();
@@ -49,7 +55,9 @@ namespace SlotSystemTests{
 		public void Select_FromNonNullNorSel_SetsSelectdProcAndCallsStart(){
 			TestSlotSystemElement sse = MakeTestSSE();
 				System.Func<IEnumeratorFake> mockSelCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetSelCoroutine(mockSelCoroutine);
+				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
+					stubCorFactory.MakeSelectCoroutine().Returns(mockSelCoroutine);
+				sse.SetCoroutineFactory(stubCorFactory);
 			sse.Deactivate();
 
 			sse.Select();
@@ -60,13 +68,15 @@ namespace SlotSystemTests{
 		public void SelStateSeqence(){
 			TestSlotSystemElement sse = MakeTestSSE();
 				System.Func<IEnumeratorFake> mockDeaCor = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetDeaCoroutine(mockDeaCor);
 				System.Func<IEnumeratorFake> mockDefCor = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetDefCoroutine(mockDefCor);
 				System.Func<IEnumeratorFake> mockFocCor = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetFocCoroutine(mockFocCor);
 				System.Func<IEnumeratorFake> mockSelCor = Substitute.For<System.Func<IEnumeratorFake>>();
-				sse.SetSelCoroutine(mockSelCor);
+				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
+					stubCorFactory.MakeDeactivateCoroutine().Returns(mockDeaCor);
+					stubCorFactory.MakeDefocusCoroutine().Returns(mockDefCor);
+					stubCorFactory.MakeFocusCoroutine().Returns(mockFocCor);
+					stubCorFactory.MakeSelectCoroutine().Returns(mockSelCor);
+				sse.SetCoroutineFactory(stubCorFactory);
 			ISSESelProcess selProc = sse.selProcess;
 			ISSESelProcess prevProc = null;
 

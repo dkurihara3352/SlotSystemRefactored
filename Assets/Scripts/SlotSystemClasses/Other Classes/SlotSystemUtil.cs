@@ -30,7 +30,7 @@ namespace SlotSystem{
 			*/
 			if(pickedSB.sg != otherSB.sg){
 				if(otherSB.sg.AcceptsFilter(pickedSB)){
-					if(!(pickedSB.itemInst == otherSB.itemInst && pickedSB.itemInst.Item.IsStackable))
+					if(!(pickedSB.item == otherSB.item && pickedSB.item.Item.IsStackable))
 						if(pickedSB.sg.AcceptsFilter(otherSB))
 						return true;
 				}
@@ -411,22 +411,22 @@ namespace SlotSystem{
 			public static string SBName(ISlottable sb){
 				string result = "null";
 				if(sb != null){
-					result = ItemInstName(sb.itemInst);
-					if(SlotSystemManager.curSSM != null){
+					result = ItemInstName(sb.item);
+					if(SlotSystemManager.CurSSM != null){
 						List<InventoryItemInstance> sameItemInsts = new List<InventoryItemInstance>();
-						foreach(InventoryItemInstance itemInst in SlotSystemManager.curSSM.poolInv){
-							if(itemInst.Item == sb.itemInst.Item)
+						foreach(InventoryItemInstance itemInst in SlotSystemManager.CurSSM.poolInv){
+							if(itemInst.Item == sb.item.Item)
 								sameItemInsts.Add(itemInst);
 						}
-						int index = sameItemInsts.IndexOf(sb.itemInst);
+						int index = sameItemInsts.IndexOf(sb.item);
 						result += "_"+index.ToString();
-						if(sb.itemInst is BowInstance)
+						if(sb.item is BowInstance)
 							result = Forest(result);
-						if(sb.itemInst is WearInstance)
+						if(sb.item is WearInstance)
 							result = Sangria(result);
-						if(sb.itemInst is CarriedGearInstance)
+						if(sb.item is CarriedGearInstance)
 							result = Terra(result);
-						if(sb.itemInst is PartsInstance)
+						if(sb.item is PartsInstance)
 							result = Midnight(result);
 					}
 				}

@@ -161,17 +161,17 @@ namespace SlotSystem{
 		void UpdateFields();
 		void ClearFields();
 		bool IsTransactionGoingToBeRevert(ISlottable sb);
-		bool IsCachedTAResultRevert(ISlotSystemElement sse);
+		bool IsCachedTAResultRevert(IHoverable hoverable);
 		void CreateTransactionResults();
-		Dictionary<ISlotSystemElement, ISlotSystemTransaction> transactionResults{get;}
+		Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{get;}
 		ITransactionFactory taFactory{get;}
-		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
+		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered);
 		ISlottable pickedSB{get;}
 		void SetPickedSB(ISlottable sb);
 		ISlottable targetSB{get;}
 		void SetTargetSB(ISlottable sb);
-		ISlotSystemElement hovered{get;}
-		void SetHovered(ISlotSystemElement to);
+		IHoverable hovered{get;}
+		void SetHovered(IHoverable to);
 		List<InventoryItemInstance> moved{get;}
 		void SetMoved(List<InventoryItemInstance> moved);
 		void InnerUpdateFieldsOfTAM(ISlotSystemTransaction ta);

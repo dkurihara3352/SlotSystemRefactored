@@ -14,7 +14,7 @@ namespace SlotSystem{
 			m_origSG = pickedSB.sg;
 			m_selectedSB = selected;
 			m_selectedSG = m_selectedSB.sg;
-			InventoryItemInstance cache = pickedSB.itemInst;
+			InventoryItemInstance cache = pickedSB.item;
 			cache.quantity = pickedSB.pickedAmount;
 			itemCache.Add(cache);
 		}
@@ -23,7 +23,7 @@ namespace SlotSystem{
 			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
 			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
 			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
-			InventoryItemInstance item = this.m_pickedSB.itemInst;
+			InventoryItemInstance item = this.m_pickedSB.item;
 			m_pickedSB.SetQuantity(orig.m_pickedSB.pickedAmount);
 			itemCache.Add(item);
 		}
@@ -35,7 +35,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1.Remove();
 			sg2.Add();
-			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.itemInst));
+			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.item));
 			base.Execute();
 		}
 		public override void OnComplete(){

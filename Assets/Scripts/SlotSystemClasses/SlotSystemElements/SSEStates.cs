@@ -65,12 +65,8 @@ namespace SlotSystem{
 		}
 		public interface ISSEState: ISwitchableState{}
 		public abstract class SSESelState: SSEState, ISSESelState{
-			public virtual void OnHoverEnter(ISlotSystemElement element, PointerEventDataFake eventData){}
-			public virtual void OnHoverExit(ISlotSystemElement element, PointerEventDataFake eventData){}
 		}
 		public interface ISSESelState: ISSEState{
-			void OnHoverEnter(ISlotSystemElement element, PointerEventDataFake eventData);
-			void OnHoverExit(ISlotSystemElement element, PointerEventDataFake eventData);
 		}
 			public class SSEDeactivatedState: SSESelState{
 				public override void EnterState(IStateHandler sh){

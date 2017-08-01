@@ -12,11 +12,11 @@ namespace SlotSystem{
 					ISlotGroup hovSG = (ISlotGroup)hovered;
 					if(hovSG.AcceptsFilter(pickedSB)){
 						if(hovSG != origSG && origSG.isShrinkable){
-							if(hovSG.HasItem(pickedSB.itemInst) && pickedSB.itemInst.Item.IsStackable)
-								return new StackTransaction(pickedSB, hovSG.GetSB(pickedSB.itemInst));
+							if(hovSG.HasItem(pickedSB.item) && pickedSB.item.Item.IsStackable)
+								return new StackTransaction(pickedSB, hovSG.GetSB(pickedSB.item));
 								
 							if(hovSG.hasEmptySlot){
-								if(!hovSG.HasItem(pickedSB.itemInst))
+								if(!hovSG.HasItem(pickedSB.item))
 									return new FillTransaction(pickedSB, hovSG);
 							}else{
 								if(hovSG.isExpandable){
@@ -24,7 +24,7 @@ namespace SlotSystem{
 								}else{
 									if(hovSG.SwappableSBs(pickedSB).Count == 1){
 										ISlottable calcedSB = hovSG.SwappableSBs(pickedSB)[0];
-										if(calcedSB.itemInst != pickedSB.itemInst)
+										if(calcedSB.item != pickedSB.item)
 											return new SwapTransaction(pickedSB, calcedSB);
 									}
 								}
@@ -43,14 +43,14 @@ namespace SlotSystem{
 					}else{
 						if(hovSBSG.AcceptsFilter(pickedSB)){
 							//swap or stack, else insert
-							if(pickedSB.itemInst == hovSB.itemInst){
+							if(pickedSB.item == hovSB.item){
 								if(hovSBSG.isPool && origSG.isShrinkable)
 									return new FillTransaction(pickedSB, hovSBSG);
-								if(pickedSB.itemInst.Item.IsStackable)
+								if(pickedSB.item.Item.IsStackable)
 									return new StackTransaction(pickedSB, hovSB);
 							}else{
-								if(hovSBSG.HasItem(pickedSB.itemInst)){
-									if(!origSG.HasItem(hovSB.itemInst)){
+								if(hovSBSG.HasItem(pickedSB.item)){
+									if(!origSG.HasItem(hovSB.item)){
 										if(hovSBSG.isPool){
 											if(origSG.AcceptsFilter(hovSB))
 												return new SwapTransaction(pickedSB, hovSB);

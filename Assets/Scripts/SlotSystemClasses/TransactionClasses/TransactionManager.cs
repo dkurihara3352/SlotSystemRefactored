@@ -52,16 +52,16 @@ namespace SlotSystem{
 			public bool IsTransactionGoingToBeRevert(ISlottable sb){
 				return transactionCache.IsTransactionGoingToBeRevert(sb);
 			}
-			public bool IsTransactionResultRevertFor(ISlotSystemElement sse){
-				return transactionCache.IsCachedTAResultRevert(sse);
+			public bool IsTransactionResultRevertFor(IHoverable hoverable){
+				return transactionCache.IsCachedTAResultRevert(hoverable);
 			}
 			public virtual void CreateTransactionResults(){
 				transactionCache.CreateTransactionResults();
 			}
-			public Dictionary<ISlotSystemElement, ISlotSystemTransaction> transactionResults{
+			public Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{
 				get{return transactionCache.transactionResults;}
 			}
-			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered){
 				return transactionCache.MakeTransaction(pickedSB, hovered);
 			}
 			public virtual ISlottable pickedSB{
@@ -76,10 +76,10 @@ namespace SlotSystem{
 				public void SetTargetSB(ISlottable sb){
 					transactionCache.SetTargetSB(sb);
 				}
-			public ISlotSystemElement hovered{
+			public IHoverable hovered{
 				get{return transactionCache.hovered;}
 			}
-				public virtual void SetHovered(ISlotSystemElement to){
+				public virtual void SetHovered(IHoverable to){
 					transactionCache.SetHovered(to);
 				}
 			public virtual List<InventoryItemInstance> moved{
@@ -323,15 +323,15 @@ namespace SlotSystem{
 			void InnerUpdateFields(ISlotSystemTransaction ta);
 			bool IsTransactionGoingToBeRevert(ISlottable sb);
 			void CreateTransactionResults();
-			Dictionary<ISlotSystemElement, ISlotSystemTransaction> transactionResults{get;}
-			bool IsTransactionResultRevertFor(ISlotSystemElement sse);
-			ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
+			Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{get;}
+			bool IsTransactionResultRevertFor(IHoverable sse);
+			ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered);
 			ISlottable pickedSB{get;}
 			void SetPickedSB(ISlottable sb);
 			ISlottable targetSB{get;}
 			void SetTargetSB(ISlottable sb);
-			ISlotSystemElement hovered{get;}
-			void SetHovered(ISlotSystemElement ele);
+			IHoverable hovered{get;}
+			void SetHovered(IHoverable ele);
 			List<InventoryItemInstance> moved{get;}
 			void SetMoved(List<InventoryItemInstance> moved);
 		/* SortEngine */

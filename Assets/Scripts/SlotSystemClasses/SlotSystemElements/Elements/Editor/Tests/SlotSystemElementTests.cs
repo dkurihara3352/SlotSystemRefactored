@@ -82,7 +82,9 @@ namespace SlotSystemTests{
 					public void Focus_IsSelStateInit_CallsInstantFocus(){
 						TestSlotSystemElement sse = MakeTestSSE();
 							ISSECommand mockComm = Substitute.For<ISSECommand>();
-							sse.SetInstantFocusCommand(mockComm);
+							IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
+							stubInstantCommands.When(x => x.ExecuteInstantFocus()).Do(x => mockComm.Execute());
+							sse.SetInstantCommands(stubInstantCommands);
 
 						sse.Focus();
 
@@ -120,7 +122,9 @@ namespace SlotSystemTests{
 					public void Defocus_IsSelStateInit_CallsInstantDefocus(){
 						TestSlotSystemElement sse = MakeTestSSE();
 							ISSECommand mockComm = Substitute.For<ISSECommand>();
-							sse.SetInstantDefocusCommand(mockComm);
+							IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
+							stubInstantCommands.When(x => x.ExecuteInstantDefocus()).Do(x => mockComm.Execute());
+							sse.SetInstantCommands(stubInstantCommands);
 
 						sse.Defocus();
 
@@ -158,7 +162,9 @@ namespace SlotSystemTests{
 					public void Select_IsSelStateInit_CallsInstantSelect(){
 						TestSlotSystemElement sse = MakeTestSSE();
 							ISSECommand mockComm = Substitute.For<ISSECommand>();
-							sse.SetInstantSelectCommand(mockComm);
+							IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
+							stubInstantCommands.When(x => x.ExecuteInstantSelect()).Do(x => mockComm.Execute());
+							sse.SetInstantCommands(stubInstantCommands);
 
 						sse.Select();
 

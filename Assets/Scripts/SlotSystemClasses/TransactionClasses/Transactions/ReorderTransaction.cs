@@ -22,7 +22,7 @@ namespace SlotSystem{
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1.Reorder();
-			tam.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.itemInst));
+			tam.dIcon1.SetDestination(sg1, sg1.GetNewSlot(m_pickedSB.item));
 			sg1.OnActionExecute();
 			base.Execute();
 		}

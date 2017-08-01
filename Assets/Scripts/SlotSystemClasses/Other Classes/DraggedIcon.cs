@@ -20,7 +20,7 @@ namespace SlotSystem{
 			}ISlottable m_sb;
 		public DraggedIcon(ISlottable sb){
 			m_sb = sb;
-			m_item = this.sb.itemInst;
+			m_item = this.sb.item;
 			tam = TransactionManager.curTAM;
 		}
 		public void CompleteMovement(){

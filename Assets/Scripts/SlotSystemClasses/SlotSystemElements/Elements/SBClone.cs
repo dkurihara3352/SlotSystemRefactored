@@ -45,7 +45,7 @@ namespace SlotSystem{
 		
 		public void Initialize(ISlottable orig){
 			this.delayed = orig.delayed;
-			this.SetItem(orig.itemInst);
+			this.SetItem(orig.item);
 			m_parent = orig.sg;
 			SetSSM(orig.ssm);
 			m_isDeactivated = orig.isDeactivated;

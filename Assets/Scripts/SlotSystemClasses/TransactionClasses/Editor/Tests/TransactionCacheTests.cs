@@ -183,6 +183,99 @@ namespace SlotSystem{
 			mockSSE.DidNotReceive().OnHoverExit();
 		}
 		[Test]
+		public void SetTargetSB_FromNullToSome_CallsSBSelect(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable mockSB = MakeSubSB();
+
+			taCache.SetTargetSB(mockSB);
+
+
+			mockSB.Received().Select();
+			}
+		[Test]
+		public void SetTargetSB_FromNullToSome_SetsItTargetSB(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable stubSB = MakeSubSB();
+
+			taCache.SetTargetSB(stubSB);
+
+			Assert.That(taCache.targetSB, Is.SameAs(stubSB));
+			}
+		[Test]
+		public void SetTargetSB_FromOtherToSome_CallsSBSelect(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable stubSB = MakeSubSB();
+			ISlottable mockSB = MakeSubSB();
+			taCache.SetTargetSB(stubSB);
+
+			taCache.SetTargetSB(mockSB);
+			
+			mockSB.Received().Select();
+			}
+		[Test]
+		public void SetTargetSB_FromOtherToSome_SetsItTargetSB(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable prevSB = MakeSubSB();
+			ISlottable stubSB = MakeSubSB();
+			taCache.SetTargetSB(prevSB);
+
+			taCache.SetTargetSB(stubSB);
+			
+			Assert.That(taCache.targetSB, Is.SameAs(stubSB));
+			}
+		[Test]
+		public void SetTargetSB_FromOtherToSome_CallOtherSBFocus(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable mockSB = MakeSubSB();
+			ISlottable stubSB = MakeSubSB();
+			taCache.SetTargetSB(mockSB);
+
+			taCache.SetTargetSB(stubSB);
+			
+			mockSB.Received().Focus();
+			}
+		[Test]
+		public void SetTargetSB_SomeToNull_CallSBFocus(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable mockSB = MakeSubSB();
+			taCache.SetTargetSB(mockSB);
+
+			taCache.SetTargetSB(null);
+
+			mockSB.Received().Focus();
+			}
+		[Test]
+		public void SetTargetSB_SomeToNull_SetsNull(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable mockSB = MakeSubSB();
+			taCache.SetTargetSB(mockSB);
+
+			taCache.SetTargetSB(null);
+
+			Assert.That(taCache.targetSB, Is.Null);
+			}
+		[Test]
+		public void SetTargetSB_SomeToSame_DoesNotCallSelectTwice(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable mockSB = MakeSubSB();
+			taCache.SetTargetSB(mockSB);
+
+			taCache.SetTargetSB(mockSB);
+
+			mockSB.Received(1).Select();
+			}
+		[Test]
+		public void SetTargetSB_SomeToSame_DoesNotCallFocus(){
+			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			ISlottable mockSB = MakeSubSB();
+			taCache.SetTargetSB(mockSB);
+
+			taCache.SetTargetSB(mockSB);
+
+			mockSB.DidNotReceive().Focus();
+			}
+
+		[Test]
 		public void CreateTransactionResults_WhenCalled_CreateAndStoreSGTAPairInDict(){
 			ITransactionManager tam = Substitute.For<ITransactionManager>();
 			TransactionCache taCache = new TransactionCache(tam);

@@ -368,11 +368,11 @@ namespace SlotSystem{
 			public virtual bool AcceptsFilter(ISlottable pickedSB){
 				if(this.filter is SGNullFilter) return true;
 				else{
-					if(pickedSB.itemInst is BowInstance)
+					if(pickedSB.item is BowInstance)
 						return this.filter is SGBowFilter;
-					else if(pickedSB.itemInst is WearInstance)
+					else if(pickedSB.item is WearInstance)
 						return this.filter is SGWearFilter;
-					else if(pickedSB.itemInst is CarriedGearInstance)
+					else if(pickedSB.item is CarriedGearInstance)
 						return this.filter is SGCGearsFilter;
 					else
 						return this.filter is SGPartsFilter;
@@ -383,7 +383,7 @@ namespace SlotSystem{
 				public override ISlotSystemElement this[int i]{
 					get{return slottables[i];}
 				}
-				public override IEnumerable<ISlotSystemElement> elements{
+				protected override IEnumerable<ISlotSystemElement> elements{
 					get{
 						foreach(ISlottable sb in slottables)
 							yield return (ISlotSystemElement)sb;
@@ -483,7 +483,7 @@ namespace SlotSystem{
 			public virtual ISlottable GetSB(InventoryItemInstance itemInst){
 				foreach(ISlottable sb in this){
 					if(sb != null){
-						if(sb.itemInst == itemInst)
+						if(sb.item == itemInst)
 							return sb;
 					}
 				}
@@ -493,7 +493,7 @@ namespace SlotSystem{
 				bool result = false;
 				foreach(ISlottable sb in this){
 					if(sb != null){
-						if(sb.itemInst == invInst)
+						if(sb.item == invInst)
 							return true;
 					}
 				}
@@ -522,7 +522,7 @@ namespace SlotSystem{
 				int index = -3;
 				foreach(ISlottable sb in this){
 					if(sb != null){
-						if(sb.itemInst == itemInst)
+						if(sb.item == itemInst)
 							index = sb.newSlotID;
 					}
 				}
@@ -630,9 +630,9 @@ namespace SlotSystem{
 
 				if(!isPool){
 					if(added != null)
-						CreateNewSBAndFill(added.itemInst, newSBs);
+						CreateNewSBAndFill(added.item, newSBs);
 					if(removed != null)
-						NullifyIndexOf(removed.itemInst, newSBs);
+						NullifyIndexOf(removed.item, newSBs);
 				}
 				SortContextually(ref newSBs);
 				UpdateSBs(newSBs);
@@ -666,7 +666,7 @@ namespace SlotSystem{
 					ISlottable rem = null;
 					foreach(ISlottable sb in list){
 						if(sb != null){
-							if(sb.itemInst == removedItem)
+							if(sb.item == removedItem)
 								rem = sb;
 						}
 					}
@@ -710,7 +710,7 @@ namespace SlotSystem{
 					if(!isPool){
 						GameObject newSBGO = new GameObject("newSBGO");
 						ISlottable newSB = newSBGO.AddComponent<Slottable>();
-						newSB.SetItem(added.itemInst);
+						newSB.SetItem(added.item);
 						newSB.SetSSM(ssm);
 						newSB.Unequip();
 						newSB.Defocus();
@@ -735,7 +735,7 @@ namespace SlotSystem{
 						List<ISlottable> removed = new List<ISlottable>();
 						foreach(ISlottable sb in target){
 							if(sb != null){
-								if(sb.itemInst == item){
+								if(sb.item == item){
 									int newQuantity;
 									if(added)
 										newQuantity = sb.quantity + item.quantity;
@@ -795,7 +795,7 @@ namespace SlotSystem{
 				foreach(SlottableItem item in items){
 					GameObject newSBGO = new GameObject("newSBGO");
 					ISlottable newSB = newSBGO.AddComponent<Slottable>();
-					newSB.SetItem(item);
+					newSB.SetItem((InventoryItemInstance)item);
 					newSB.SetSSM(ssm);
 					slots[items.IndexOf(item)].sb = newSB;
 				}

@@ -27,7 +27,7 @@ namespace SlotSystem{
 		public void Execute(ISlotGroup sg){
 			foreach(ISlottable sb in sg){
 				if(sb != null){
-					InventoryItemInstance item = sb.itemInst;
+					InventoryItemInstance item = sb.item;
 					if(sb.isToBeRemoved){
 						sg.SyncEquipped(item, false);
 					}else if(sb.isToBeAdded){

@@ -25,14 +25,15 @@ namespace SlotSystem{
 			m_coroutineFake = coroutine;
 		}
 	}
-		public interface ISSEProcess: IEquatable<ISSEProcess>{
-			bool isRunning{get;}
-			System.Func<IEnumeratorFake> coroutineFake{get; set;}
-			ISlotSystemElement sse{get;}
-			void Start();
-			void Stop();
-			void Expire();
-		}
+	public interface ISSEProcess: IEquatable<ISSEProcess>{
+		bool isRunning{get;}
+		System.Func<IEnumeratorFake> coroutineFake{get; set;}
+		ISlotSystemElement sse{get;}
+		void Start();
+		void Stop();
+		void Expire();
+	}
+	/* Engine */
 	public class SSEProcessEngine<T>: ISSEProcessEngine<T> where T: ISSEProcess{
 		public SSEProcessEngine(){}
 		public SSEProcessEngine(T from){
@@ -49,49 +50,85 @@ namespace SlotSystem{
 			}
 		}
 	}
-		public interface ISSEProcessEngine<T> where T: ISSEProcess{
-			T process{get;}
-			void SetAndRunProcess(T process);
+	public interface ISSEProcessEngine<T> where T: ISSEProcess{
+		T process{get;}
+		void SetAndRunProcess(T process);
+	}
+	/* Factory */
+	public class SSECoroutineFactory: ISSECoroutineFactory{
+		public Func<IEnumeratorFake> MakeDeactivateCoroutine(){
+			return DefaultSSEDeactivateCoroutine;
 		}
-		public abstract class SSESelProcess: SSEProcess, ISSESelProcess{}
-		public interface ISSESelProcess: ISSEProcess{}
-			public class SSEDeactivateProcess: SSESelProcess{
-				/* 	Change color, alpha etc from whatever to deactivated value (probably make it disappear)
-					if any indicator for selection is there, fade it out
-				*/
-				public SSEDeactivateProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
+			IEnumeratorFake DefaultSSEDeactivateCoroutine(){
+				return null;
 			}
-			public class SSEFocusProcess: SSESelProcess{
-				/* 	Change color, alpha etc from whatever to focus value
-					if its hidden, make it appear gradually
-					if any indicator for selection is there, fade it out
-				*/
-				public SSEFocusProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
+		public Func<IEnumeratorFake> MakeDefocusCoroutine(){
+			return DefaultSSEDefocusCoroutine;
+		}
+			IEnumeratorFake DefaultSSEDefocusCoroutine(){
+				return null;
 			}
-			public class SSEDefocusProcess: SSESelProcess{
-				/* 	Change color, alpha etc from whatever to defocus value
-					if its hidden, make it appear gradually
-					if any indicator for selection is there, fade it out
-				*/
-				public SSEDefocusProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
+		public Func<IEnumeratorFake> MakeFocusCoroutine(){
+			return DefaultSSEFocusCoroutine;
+		}
+			IEnumeratorFake DefaultSSEFocusCoroutine(){
+				return null;
 			}
-			public class SSESelectProcess: SSESelProcess{
-				/* 	Change color, alpha etc from whatever to select value
-					if its hidden, make it appear gradually
-					if any indicator for selection is not there, fade it in
-				*/
-				public SSESelectProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-					this.sse = sse;
-					this.coroutineFake = coroutineMock;
-				}
+		public Func<IEnumeratorFake> MakeSelectCoroutine(){
+			return DefaultSSESelectCoroutine;
+		}
+			IEnumeratorFake DefaultSSESelectCoroutine(){
+				return null;
 			}
+	}
+	public interface ISSECoroutineFactory{
+		Func<IEnumeratorFake> MakeDeactivateCoroutine();
+		Func<IEnumeratorFake> MakeDefocusCoroutine();
+		Func<IEnumeratorFake> MakeFocusCoroutine();
+		Func<IEnumeratorFake> MakeSelectCoroutine();
+	}
+	/* SelProces */
+	public abstract class SSESelProcess: SSEProcess, ISSESelProcess{
+	}
+	public interface ISSESelProcess: ISSEProcess{
+	}
+	public class SSEDeactivateProcess: SSESelProcess{
+		/* 	Change color, alpha etc from whatever to deactivated value (probably make it disappear)
+			if any indicator for selection is there, fade it out
+		*/
+		public SSEDeactivateProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
+			this.sse = sse;
+			this.coroutineFake = coroutineMock;
+		}
+	}
+	public class SSEFocusProcess: SSESelProcess{
+		/* 	Change color, alpha etc from whatever to focus value
+			if its hidden, make it appear gradually
+			if any indicator for selection is there, fade it out
+		*/
+		public SSEFocusProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
+			this.sse = sse;
+			this.coroutineFake = coroutineMock;
+		}
+	}
+	public class SSEDefocusProcess: SSESelProcess{
+		/* 	Change color, alpha etc from whatever to defocus value
+			if its hidden, make it appear gradually
+			if any indicator for selection is there, fade it out
+		*/
+		public SSEDefocusProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
+			this.sse = sse;
+			this.coroutineFake = coroutineMock;
+		}
+	}
+	public class SSESelectProcess: SSESelProcess{
+		/* 	Change color, alpha etc from whatever to select value
+			if its hidden, make it appear gradually
+			if any indicator for selection is not there, fade it in
+		*/
+		public SSESelectProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
+			this.sse = sse;
+			this.coroutineFake = coroutineMock;
+		}
+	}
 }

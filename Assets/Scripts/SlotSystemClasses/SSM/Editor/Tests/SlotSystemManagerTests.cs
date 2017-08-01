@@ -16,8 +16,7 @@ namespace SlotSystemTests{
 			public void SetCurSSM_WhenCalled_CallsPrevSSMDefocus(){
 				SlotSystemManager ssm = MakeSSM();
 				ISlotSystemManager mockSSM = MakeSubSSM();
-				SlotSystemManager.curSSM = mockSSM;
-
+				SlotSystemManager.CurSSM = mockSSM;
 				ssm.SetCurSSM();
 
 				mockSSM.Received().Defocus();
@@ -26,11 +25,11 @@ namespace SlotSystemTests{
 			public void SetCurSSM_WhenCalled_SetsThisAsCur(){
 				SlotSystemManager ssm = MakeSSM();
 				ISlotSystemManager stubSSM = MakeSubSSM();
-				SlotSystemManager.curSSM = stubSSM;
+				SlotSystemManager.CurSSM = stubSSM;
 
 				ssm.SetCurSSM();
 
-				Assert.That(SlotSystemManager.curSSM, Is.SameAs(ssm));
+				Assert.That(SlotSystemManager.CurSSM, Is.SameAs(ssm));
 				}
 			[Test]
 			public void InspectorSetUp_WhenCalled_SetsBundles(){
@@ -314,124 +313,73 @@ namespace SlotSystemTests{
 						}
 					}
 				[Test]
-				public void FocusedSGGs_Always_CallsAllGenBundlesPIHAddFocusedSGTo(){
+				public void focusedSGGs_Always_ReturnsAllFocusedSGsInOtherBundles(){
 					SlotSystemManager ssm = MakeSSM();
 						ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns;
-							ISlotSystemBundle gBunA = MakeSubBundle();
-							ISlotSystemBundle gBunB = MakeSubBundle();
-							ISlotSystemBundle gBunC = MakeSubBundle();
-							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
+							SlotSystemBundle gBun = MakeSSBundle();//non sub
+								SlotGroup sggA = MakeSG();
+									sggA.transform.SetParent(gBun.transform);
+									sggA.SetElements(new ISlotSystemElement[]{});
+									sggA.Focus();
+								SlotGroup sggB = MakeSG();
+									sggB.SetElements(new ISlotSystemElement[]{});
+									sggB.transform.SetParent(gBun.transform);
+									sggB.Focus();
+								SlotGroup sggC = MakeSG();
+									sggC.SetElements(new ISlotSystemElement[]{});
+									sggC.transform.SetParent(gBun.transform);
+									sggC.Focus();
+								gBun.SetHierarchy();
+								gBun.Focus();
+							gBuns = new ISlotSystemBundle[]{gBun};
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetHierarchy();
-					
-					List<ISlotGroup> list = ssm.focusedSGGs;
-					
-					foreach(var gBun in gBuns)
-						gBun.Received().PerformInHierarchy(ssm.AddFocusedSGTo, Arg.Any<List<ISlotGroup>>());
-					}
-				[TestCaseSource(typeof(FocusedSGsCases))]
-				public void FocusedSGs_Always_ReturnsAllTheFocusedSGsInPBunAndEBunAndCallAllGBunPIHAddFocusedSGTo(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns, List<ISlotGroup> expected){
+					List<ISlotGroup> expected = new List<ISlotGroup>(new ISlotGroup[]{sggA, sggB, sggC});
+
+					List<ISlotGroup> actual = ssm.focusedSGGs;
+
+					Assert.That(actual, Is.EqualTo(expected));
+				}
+				public void focusedSGs_Always_ReturnsSumOfAllFocusedSGs(){
 					SlotSystemManager ssm = MakeSSM();
+						ISlotSystemBundle pBun = MakeSubBundle();
+							ISlotGroup sgp = MakeSubSG();
+							pBun.focusedElement.Returns(sgp);
+						ISlotSystemBundle eBun = MakeSubBundle();
+							IEquipmentSet eSet = MakeSubESet();
+							 	ISlotGroup sgeBow = MakeSubSG();
+								ISlotGroup sgeWear = MakeSubSG();
+								ISlotGroup sgeCGears = MakeSubSG();
+								IEnumerable<ISlotSystemElement> eSetEles = new ISlotSystemElement[]{sgeBow, sgeWear, sgeCGears};
+								eSet.GetEnumerator().Returns(eSetEles.GetEnumerator());
+							eBun.focusedElement.Returns(eSet);
+						IEnumerable<ISlotSystemBundle> gBuns;
+							SlotSystemBundle gBun = MakeSSBundle();//non sub
+								SlotGroup sggA = MakeSG();
+									sggA.transform.SetParent(gBun.transform);
+									sggA.SetElements(new ISlotSystemElement[]{});
+									sggA.Focus();
+								SlotGroup sggB = MakeSG();
+									sggB.SetElements(new ISlotSystemElement[]{});
+									sggB.transform.SetParent(gBun.transform);
+									sggB.Focus();
+								SlotGroup sggC = MakeSG();
+									sggC.SetElements(new ISlotSystemElement[]{});
+									sggC.transform.SetParent(gBun.transform);
+									sggC.Focus();
+								gBun.SetHierarchy();
+								gBun.Focus();
+							gBuns = new ISlotSystemBundle[]{gBun};
 					ssm.InspectorSetUp(pBun, eBun, gBuns);
-					ssm.SetHierarchy();
-					ssm.Focus();
+					List<ISlotGroup> expected = new List<ISlotGroup>(new ISlotGroup[]{
+						sgp, sgeBow, sgeWear, sgeCGears, sggA, sggB, sggC
+					});
 
 					List<ISlotGroup> actual = ssm.focusedSGs;
-
-					Assert.That(actual.MemberEquals(expected), Is.True);
-					foreach(var gBun in gBuns)
-						gBun.Received().PerformInHierarchy(ssm.AddFocusedSGTo, Arg.Any<List<ISlotGroup>>());
-					}
-					class FocusedSGsCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							ISlotSystemBundle pBun = MakeSubBundle();
-								ISlotGroup sgpA = MakeSubSGWithEmptySBs();
-								ISlotGroup sgpB = MakeSubSGWithEmptySBs();
-								ISlotGroup sgpC = MakeSubSGWithEmptySBs();
-								IEnumerable<ISlotSystemElement> pBunEles = new ISlotSystemElement[]{
-									sgpA, sgpB, sgpC
-								};
-								pBun.GetEnumerator().Returns(pBunEles.GetEnumerator());
-								pBun.focusedElement.Returns(sgpA);
-							ISlotSystemBundle eBun = MakeSubBundle();
-								IEnumerable<ISlotSystemElement> eBunEles;
-									IEquipmentSet eSetA = MakeSubEquipmentSetInitWithSGs();
-										IEnumerable<ISlotSystemElement> eSetAEles;
-											ISlotGroup sgBowA = MakeSubSGWithEmptySBs();		
-											ISlotGroup sgWearA = MakeSubSGWithEmptySBs();
-											ISlotGroup sgCGearsA = MakeSubSGWithEmptySBs();
-										eSetAEles = new ISlotSystemElement[]{
-											sgBowA, sgWearA, sgCGearsA
-										};
-										eSetA.GetEnumerator().Returns(eSetAEles.GetEnumerator());
-									IEquipmentSet eSetB = MakeSubEquipmentSetInitWithSGs();
-										IEnumerable<ISlotSystemElement> eSetBEles;
-											ISlotGroup sgBowB = MakeSubSGWithEmptySBs();		
-											ISlotGroup sgWearB = MakeSubSGWithEmptySBs();
-											ISlotGroup sgCGearsB = MakeSubSGWithEmptySBs();
-										eSetBEles = new ISlotSystemElement[]{
-											sgBowB, sgWearB, sgCGearsB
-										};
-										eSetB.GetEnumerator().Returns(eSetBEles.GetEnumerator());
-									IEquipmentSet eSetC = MakeSubEquipmentSetInitWithSGs();
-										IEnumerable<ISlotSystemElement> eSetCEles;
-											ISlotGroup sgBowC = MakeSubSGWithEmptySBs();		
-											ISlotGroup sgWearC = MakeSubSGWithEmptySBs();
-											ISlotGroup sgCGearsC = MakeSubSGWithEmptySBs();
-										eSetCEles = new ISlotSystemElement[]{
-											sgBowC, sgWearC, sgCGearsC
-										};
-										eSetC.GetEnumerator().Returns(eSetCEles.GetEnumerator());
-								eBunEles = new ISlotSystemElement[]{
-									eSetA, eSetB, eSetC
-								};
-								eBun.GetEnumerator().Returns(eBunEles.GetEnumerator());
-								eBun.focusedElement.Returns(eSetC);
-							IEnumerable<ISlotSystemBundle> gBuns;
-								ISlotSystemBundle genBundleA = MakeSubBundle();
-									IEnumerable<ISlotSystemElement> gBunAEles;
-										ISlotGroup sggA_A = MakeSubSGWithEmptySBs();
-										ISlotGroup sggA_B = MakeSubSGWithEmptySBs();
-										ISlotGroup sggA_C = MakeSubSGWithEmptySBs();
-										gBunAEles = new ISlotSystemElement[]{
-											sggA_A, sggA_B, sggA_C
-										};
-									genBundleA.GetEnumerator().Returns(gBunAEles.GetEnumerator());
-								ISlotSystemBundle genBundleB = MakeSubBundle();
-									IEnumerable<ISlotSystemElement> gBunBEles;
-										ISlotGroup sggB_A = MakeSubSGWithEmptySBs();
-										ISlotGroup sggB_B = MakeSubSGWithEmptySBs();
-										ISlotGroup sggB_C = MakeSubSGWithEmptySBs();
-										gBunBEles = new ISlotSystemElement[]{
-											sggB_A, sggB_B, sggB_C
-										};
-									genBundleB.GetEnumerator().Returns(gBunBEles.GetEnumerator());
-								gBuns = new ISlotSystemBundle[]{genBundleA, genBundleB};
-							List<ISlotGroup> case1Exp = new List<ISlotGroup>(new ISlotGroup[]{
-								sgpA, sgBowC, sgWearC, sgCGearsC
-							});
-							yield return new object[]{
-								pBun, eBun, gBuns, case1Exp
-							};
-						}
-					}
-				[Test]
-				public void focusedSGs_Always_ReturnsFactoryProduct(){
-					SlotSystemManager ssm = MakeSSM();
-					IFocusedSGsFactory fac = Substitute.For<IFocusedSGsFactory>();
-					ISlotGroup sgA = MakeSubSG();
-					ISlotGroup sgB = MakeSubSG();
-					ISlotGroup sgC = MakeSubSG();
-					List<ISlotGroup> list = new List<ISlotGroup>(new ISlotGroup[]{sgA, sgB , sgC});
-					fac.focusedSGs.Returns(list);
-					ssm.SetFocusedSGsFactory(fac);
-
-					List<ISlotGroup> actual = ssm.focusedSGs;
-
-					Assert.That(actual.MemberEquals(list), Is.True);
-					}
+					
+					Assert.That(actual, Is.EqualTo(expected));
+				}
 				[Test]
 				public void EquipmentSets_Always_ReturnsEquipBundleElements(){
 					SlotSystemManager ssm = MakeSSM();
@@ -467,9 +415,10 @@ namespace SlotSystemTests{
 									sgpB.GetEnumerator().Returns(sbs.GetEnumerator());
 								ISlotGroup sgpC = MakeSubSG();
 									sgpC.GetEnumerator().Returns(sbs.GetEnumerator());
-							pBun.elements.Returns(new ISlotSystemElement[]{
+							IEnumerable<ISlotSystemElement> pBunEles = new ISlotSystemElement[]{
 								sgpA, sgpB, sgpC
-							});
+							};
+							pBun.GetEnumerator().Returns(pBunEles.GetEnumerator());
 							IPoolInventory pInv = MakeSubPoolInv();
 								sgpA.inventory.Returns(pInv);
 							pBun.focusedElement.Returns(sgpA);
@@ -526,7 +475,7 @@ namespace SlotSystemTests{
 										ISlotGroup sgeBow = MakeSubSG();
 											ISlottable bowSBE = MakeSubSB();
 												BowInstance bowE = MakeBowInstance(0);
-												bowSBE.itemInst.Returns(bowE);
+												bowSBE.item.Returns(bowE);
 												BowInstance expected = bowE;
 											sgeBow[0].Returns(bowSBE);
 											sgeBow.filter.Returns(new SGBowFilter());
@@ -565,7 +514,7 @@ namespace SlotSystemTests{
 										ISlotGroup sgeWear = MakeSubSG();
 											ISlottable wearSBE = MakeSubSB();
 												WearInstance wearE = MakeWearInstance(0);
-												wearSBE.itemInst.Returns(wearE);
+												wearSBE.item.Returns(wearE);
 												WearInstance expected = wearE;
 											sgeWear[0].Returns(wearSBE);
 											sgeWear.filter.Returns(new SGWearFilter());
@@ -605,10 +554,10 @@ namespace SlotSystemTests{
 											IEnumerable<ISlotSystemElement> sgeCGearsEles;
 												ISlottable shieldSBE = MakeSubSB();
 													ShieldInstance shieldE = MakeShieldInstance(0);
-													shieldSBE.itemInst.Returns(shieldE);
+													shieldSBE.item.Returns(shieldE);
 												ISlottable mWeaponSBE = MakeSubSB();
 													MeleeWeaponInstance mWeaponE = MakeMeleeWeaponInstance(0);
-													mWeaponSBE.itemInst.Returns(mWeaponE);
+													mWeaponSBE.item.Returns(mWeaponE);
 												sgeCGearsEles = new ISlotSystemElement[]{shieldSBE, mWeaponSBE};
 												List<CarriedGearInstance> expected = new List<CarriedGearInstance>(new CarriedGearInstance[]{shieldE, mWeaponE});
 											sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());
@@ -645,23 +594,23 @@ namespace SlotSystemTests{
 										ISlotGroup sgeBow = MakeSubSG();
 											ISlottable bowSBE = MakeSubSB();
 												BowInstance bowE = MakeBowInstance(0);
-												bowSBE.itemInst.Returns(bowE);
+												bowSBE.item.Returns(bowE);
 											sgeBow[0].Returns(bowSBE);
 											sgeBow.filter.Returns(new SGBowFilter());
 										ISlotGroup sgeWear = MakeSubSG();
 											ISlottable wearSBE = MakeSubSB();
 												WearInstance wearE = MakeWearInstance(0);
-												wearSBE.itemInst.Returns(wearE);
+												wearSBE.item.Returns(wearE);
 											sgeWear[0].Returns(wearSBE);
 											sgeWear.filter.Returns(new SGWearFilter());
 										ISlotGroup sgeCGears = MakeSubSG();
 											IEnumerable<ISlotSystemElement> sgeCGearsEles;
 												ISlottable shieldSBE = MakeSubSB();
 													ShieldInstance shieldE = MakeShieldInstance(0);
-													shieldSBE.itemInst.Returns(shieldE);
+													shieldSBE.item.Returns(shieldE);
 												ISlottable mWeaponSBE = MakeSubSB();
 													MeleeWeaponInstance mWeaponE = MakeMeleeWeaponInstance(0);
-													mWeaponSBE.itemInst.Returns(mWeaponE);
+													mWeaponSBE.item.Returns(mWeaponE);
 												sgeCGearsEles = new ISlotSystemElement[]{shieldSBE, mWeaponSBE};
 											sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());
 											sgeCGears.filter.Returns(new SGCGearsFilter());
@@ -727,33 +676,6 @@ namespace SlotSystemTests{
 					foreach(var gBun in gBuns)
 						gBun.Received().PerformInHierarchy(ssm.AddSBToRes, Arg.Any<List<ISlottable>>());
 					}
-				[Test]
-				public void FocusedSGsFactory_focusedSGs_Always_ReturnsSumOfCollections(){
-					FocusedSGsFactory fac;
-						ISlotSystemManager stubSSM = MakeSubSSM();
-							ISlotGroup sgp = MakeSubSG();
-							stubSSM.focusedSGP.Returns(sgp);
-							List<ISlotGroup> sges;
-								ISlotGroup sgeA = MakeSubSG();
-								ISlotGroup sgeB = MakeSubSG();
-								ISlotGroup sgeC = MakeSubSG();
-								sges = new List<ISlotGroup>(new ISlotGroup[]{sgeA, sgeB, sgeC});
-							List<ISlotGroup> sggs;
-								ISlotGroup sggA = MakeSubSG();
-								ISlotGroup sggB = MakeSubSG();
-								ISlotGroup sggC = MakeSubSG();
-								sggs = new List<ISlotGroup>(new ISlotGroup[]{sggA, sggB, sggC});
-							stubSSM.focusedSGEs.Returns(sges);
-							stubSSM.focusedSGGs.Returns(sggs);
-					fac = new FocusedSGsFactory(stubSSM);
-					List<ISlotGroup> expected = new List<ISlotGroup>(new ISlotGroup[]{
-						sgp, sgeA, sgeB, sgeC, sggA, sggB, sggC
-					});
-
-					List<ISlotGroup> actual = fac.focusedSGs;
-
-					Assert.That(actual.MemberEquals(expected), Is.True);
-					}
 			/*	methods	*/
 				[Test]
 				public void UpdateEquipStatesOnAll_WhenCalled_CallsEInvRemoveWithItemNotInAllEquippedItems(){
@@ -769,7 +691,7 @@ namespace SlotSystemTests{
 									ISlotGroup sgeBow = MakeSubSG();
 										ISlottable sbeBow = MakeSubSB();
 											BowInstance bowE = MakeBowInstance(0);
-											sbeBow.itemInst.Returns(bowE);
+											sbeBow.item.Returns(bowE);
 										sgeBow[0].Returns(sbeBow);
 										IEquipmentSetInventory eInv = MakeSubEquipInv();
 										sgeBow.inventory.Returns(eInv);
@@ -786,7 +708,7 @@ namespace SlotSystemTests{
 									ISlotGroup sgeWear = MakeSubSG();
 										ISlottable sbeWear = MakeSubSB();
 											WearInstance wearE = MakeWearInstance(0);
-											sbeWear.itemInst.Returns(wearE);
+											sbeWear.item.Returns(wearE);
 										sgeWear[0].Returns(sbeWear);
 										sgeWear.filter.Returns(new SGWearFilter());
 									ISlotGroup sgeCGears = MakeSubSG();
@@ -830,7 +752,7 @@ namespace SlotSystemTests{
 													eInv.GetEnumerator().Returns(eInvEles.GetEnumerator());
 													sgeBow.inventory.Returns(eInv);
 												BowInstance bow = MakeBowInstance(0);
-												sbeBow.itemInst.Returns(bow);
+												sbeBow.item.Returns(bow);
 											sgeBowEles = new ISlotSystemElement[]{sbeBow};
 										// sgeBow.GetEnumerator().Returns(sgeBowEles.GetEnumerator());
 										sgeBow[0].Returns(sbeBow);
@@ -839,7 +761,7 @@ namespace SlotSystemTests{
 										IEnumerable<ISlotSystemElement> sgeWearEles;
 											ISlottable sbeWear = MakeSubSB();
 												WearInstance wear = MakeWearInstance(0);
-												sbeWear.itemInst.Returns(wear);
+												sbeWear.item.Returns(wear);
 											sgeWearEles = new ISlotSystemElement[]{sbeWear};
 										// sgeWear.GetEnumerator().Returns(sgeWearEles.GetEnumerator());
 										sgeWear[0].Returns(sbeWear);
@@ -848,10 +770,10 @@ namespace SlotSystemTests{
 										IEnumerable<ISlotSystemElement> sgeCGearsEles;
 											ISlottable sbeShield = MakeSubSB();
 												ShieldInstance shield = MakeShieldInstance(0);
-												sbeShield.itemInst.Returns(shield);
+												sbeShield.item.Returns(shield);
 											ISlottable sbeMWeapon = MakeSubSB();
 												MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
-												sbeMWeapon.itemInst.Returns(mWeapon);
+												sbeMWeapon.item.Returns(mWeapon);
 											sgeCGearsEles = new ISlotSystemElement[]{sbeShield, sbeMWeapon};
 										sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());
 										sgeCGears.filter.Returns(new SGCGearsFilter());
@@ -887,7 +809,7 @@ namespace SlotSystemTests{
 									ISlotGroup sgeBow = MakeSubSG();
 										ISlottable sbeBow = MakeSubSB();
 											BowInstance bow = MakeBowInstance(0);
-											sbeBow.itemInst.Returns(bow);
+											sbeBow.item.Returns(bow);
 										sgeBow[0].Returns(sbeBow);
 										IEquipmentSetInventory eInv = MakeSubEquipInv();
 										sgeBow.inventory.Returns(eInv);
@@ -895,17 +817,17 @@ namespace SlotSystemTests{
 									ISlotGroup sgeWear = MakeSubSG();
 										ISlottable sbeWear = MakeSubSB();
 											WearInstance wear = MakeWearInstance(0);
-											sbeWear.itemInst.Returns(wear);
+											sbeWear.item.Returns(wear);
 										sgeWear.filter.Returns(new SGWearFilter());
 										sgeWear[0].Returns(sbeWear);
 									ISlotGroup sgeCGears = MakeSubSG();
 										IEnumerable<ISlotSystemElement> sgeCGearsEles;
 											ISlottable sbeShield = MakeSubSB();
 												ShieldInstance shield = MakeShieldInstance(0);
-												sbeShield.itemInst.Returns(shield);
+												sbeShield.item.Returns(shield);
 											ISlottable sbeMWeapon = MakeSubSB();
 												MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
-												sbeMWeapon.itemInst.Returns(mWeapon);
+												sbeMWeapon.item.Returns(mWeapon);
 											sgeCGearsEles = new ISlotSystemElement[]{sbeShield, sbeMWeapon};
 										sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());
 										sgeCGears.filter.Returns(new SGCGearsFilter());
@@ -971,13 +893,13 @@ namespace SlotSystemTests{
 										sgeBow.filter.Returns(new SGBowFilter());
 											ISlottable sbeBow = MakeSubSB();
 												BowInstance bowE = MakeBowInstance(0);
-												sbeBow.itemInst.Returns(bowE);
+												sbeBow.item.Returns(bowE);
 										sgeBow[0].Returns(sbeBow);
 									ISlotGroup sgeWear = MakeSubSG();
 										sgeWear.filter.Returns(new SGWearFilter());
 											ISlottable sbeWear = MakeSubSB();
 												WearInstance wearE = MakeWearInstance(0);
-												sbeWear.itemInst.Returns(wearE);
+												sbeWear.item.Returns(wearE);
 										sgeWear[0].Returns(sbeWear);
 									ISlotGroup sgeCGears = MakeSubSG();
 										IEnumerable<ISlotSystemElement> sgeCGearsEles = new ISlotSystemElement[]{};
@@ -1136,7 +1058,7 @@ namespace SlotSystemTests{
 						stubSG.isFocusedInHierarchy.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
-						mockSB.itemInst.Returns(bow);
+						mockSB.item.Returns(bow);
 						mockSB.newSlotID.Returns(0);
 					
 					ssm.Equip(mockSB, bow);
@@ -1152,7 +1074,7 @@ namespace SlotSystemTests{
 						stubSG.isPool.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
-						mockSB.itemInst.Returns(bow);
+						mockSB.item.Returns(bow);
 					
 					ssm.Equip(mockSB, bow);
 
@@ -1169,7 +1091,7 @@ namespace SlotSystemTests{
 						stubSG.isFocusedInHierarchy.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
-						mockSB.itemInst.Returns(bow);
+						mockSB.item.Returns(bow);
 						mockSB.slotID.Returns(0);
 					
 					ssm.Unequip(mockSB, bow);
@@ -1185,7 +1107,7 @@ namespace SlotSystemTests{
 						stubSG.isPool.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
-						mockSB.itemInst.Returns(bow);
+						mockSB.item.Returns(bow);
 					
 					ssm.Unequip(mockSB, bow);
 

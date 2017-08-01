@@ -50,10 +50,7 @@ public class SlotSystemTest{
 			IEnumerable<ISlotSystemElement> eles = new ISlotSystemElement[]{
 				bowSG, wearSG, cGearsSG
 			};
-			eSet.elements.Returns(eles);
-			eSet.bowSG.Returns(bowSG);
-			eSet.wearSG.Returns(wearSG);
-			eSet.cGearsSG.Returns(cGearsSG);
+			eSet.GetEnumerator().Returns(eles.GetEnumerator());
 			eSet.GetEnumerator().Returns(eles.GetEnumerator());
 			return eSet;
 		}
@@ -72,7 +69,7 @@ public class SlotSystemTest{
 		protected static ISlotGroup MakeSubSGWithEmptySBs(){
 			ISlotGroup sg = MakeSubSG();
 			List<ISlotSystemElement> eles = new List<ISlotSystemElement>();
-			sg.elements.Returns(eles);
+			sg.GetEnumerator().Returns(eles.GetEnumerator());
 			return sg;
 		}
 		protected static SlotGroup MakeSG(){

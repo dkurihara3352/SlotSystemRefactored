@@ -19,8 +19,8 @@ namespace SlotSystemTests{
 				ISlotGroup stubSG_B = MakeSubSG();
 				stubSB_A.sg.Returns(stubSG_A);
 				stubSB_B.sg.Returns(stubSG_B);
-				stubSB_A.itemInst.Returns(stubBowInst_A);
-				stubSB_B.itemInst.Returns(stubBowInst_B);
+				stubSB_A.item.Returns(stubBowInst_A);
+				stubSB_B.item.Returns(stubBowInst_B);
 				stubSG_A.AcceptsFilter(stubSB_B).Returns(true);
 				stubSG_B.AcceptsFilter(stubSB_A).Returns(true);
 				stubSG_A.filter.Returns(new SGBowFilter());
@@ -37,8 +37,8 @@ namespace SlotSystemTests{
 				ISlotGroup stubSG = MakeSubSG();
 				stubSB_A.sg.Returns(stubSG);
 				stubSB_B.sg.Returns(stubSG);
-				stubSB_A.itemInst.Returns(stubBowInst_A);
-				stubSB_B.itemInst.Returns(stubBowInst_B);
+				stubSB_A.item.Returns(stubBowInst_A);
+				stubSB_B.item.Returns(stubBowInst_B);
 				stubSG.AcceptsFilter(stubSB_B).Returns(true);
 				stubSG.AcceptsFilter(stubSB_A).Returns(true);
 				stubSG.filter.Returns(new SGBowFilter());
@@ -56,8 +56,8 @@ namespace SlotSystemTests{
 				ISlotGroup stubSG_B = MakeSubSG();
 				stubSB_A.sg.Returns(stubSG_A);
 				stubSB_B.sg.Returns(stubSG_B);
-				stubSB_A.itemInst.Returns(stubBowInst_A);
-				stubSB_B.itemInst.Returns(stubBowInst_B);
+				stubSB_A.item.Returns(stubBowInst_A);
+				stubSB_B.item.Returns(stubBowInst_B);
 				stubSG_A.AcceptsFilter(stubSB_B).Returns(false);
 				stubSG_B.AcceptsFilter(stubSB_A).Returns(false);
 				stubSG_A.filter.Returns(new SGBowFilter());
@@ -75,8 +75,8 @@ namespace SlotSystemTests{
 				ISlotGroup stubSG_B = MakeSubSG();
 				stubSB_A.sg.Returns(stubSG_A);
 				stubSB_B.sg.Returns(stubSG_B);
-				stubSB_A.itemInst.Returns(stubParts_A);
-				stubSB_B.itemInst.Returns(stubParts_B);
+				stubSB_A.item.Returns(stubParts_A);
+				stubSB_B.item.Returns(stubParts_B);
 				stubSG_A.AcceptsFilter(stubSB_B).Returns(false);
 				stubSG_B.AcceptsFilter(stubSB_A).Returns(false);
 				stubSG_A.filter.Returns(new SGBowFilter());

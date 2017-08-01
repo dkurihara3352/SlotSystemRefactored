@@ -627,12 +627,10 @@ namespace SlotSystemTests{
 					Assert.That(sb.isPickingUp, Is.True);
 					}
 				[Test]
-				public void PickUp_IsNotCurSelStateNullAndValidPrevActState_CallsOnHoverEnterCommandExecute(){
+				public void PickUp_IsNotCurSelStateNullAndValidPrevActState_CallsHoverableOnHoverEnter(){
 					Slottable sb = MakeSB();
-						ISSESelState mockDeactivatedState = Substitute.For<ISSESelState>();
-						ISSESelStateFactory stubStateFactory = Substitute.For<ISSESelStateFactory>();
-						stubStateFactory.MakeDeactivatedState().Returns(mockDeactivatedState);
-						sb.SetSelStateFactory(stubStateFactory);
+						IHoverable mockHoverable = Substitute.For<IHoverable>();
+						sb.SetHoverable(mockHoverable);
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 						sb.SetTAM(stubTAM);
 					sb.WaitForAction();
@@ -641,7 +639,7 @@ namespace SlotSystemTests{
 
 					sb.PickUp();
 
-					mockDeactivatedState.Received().OnHoverEnter(sb, Arg.Any<PointerEventDataFake>());
+					mockHoverable.Received().OnHoverEnter();
 					}
 				[Test]
 				public void PickUp_SSMNotNullAndValidPrevActState_CallsSSMInSequence(){
