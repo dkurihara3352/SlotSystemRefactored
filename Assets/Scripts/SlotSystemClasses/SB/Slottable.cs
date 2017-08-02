@@ -21,7 +21,7 @@ namespace SlotSystem{
 				ISSEStateEngine<ISBActState> actStateEngine{
 					get{
 						if(m_actStateEngine == null)
-							m_actStateEngine = new SSEStateEngine<ISBActState>(this);
+							m_actStateEngine = new SSEStateEngine<ISBActState>();
 						return m_actStateEngine;
 					}
 				}
@@ -41,7 +41,7 @@ namespace SlotSystem{
 					ISBActStateFactory actStateFactory{
 						get{
 							if(m_actStateFactory == null)
-								m_actStateFactory = new SBActStateFactory();
+								m_actStateFactory = new SBActStateFactory(this);
 							return m_actStateFactory;
 						}
 					}
@@ -159,7 +159,7 @@ namespace SlotSystem{
 				ISSEStateEngine<ISBEqpState> eqpStateEngine{
 					get{
 						if(m_eqpStateEngine == null)
-							m_eqpStateEngine = new SSEStateEngine<ISBEqpState>(this);
+							m_eqpStateEngine = new SSEStateEngine<ISBEqpState>();
 						return m_eqpStateEngine;
 					}
 				}
@@ -179,7 +179,7 @@ namespace SlotSystem{
 					ISBEqpStateFactory eqpStateFactory{
 						get{
 							if(m_eqpStateFactory == null)
-								m_eqpStateFactory = new SBEqpStateFactory();
+								m_eqpStateFactory = new SBEqpStateFactory(this);
 							return m_eqpStateFactory;
 						}
 					}
@@ -221,7 +221,7 @@ namespace SlotSystem{
 				ISSEStateEngine<ISBMrkState> mrkStateEngine{
 					get{
 						if(m_markStateEngine == null)
-							m_markStateEngine = new SSEStateEngine<ISBMrkState>(this);
+							m_markStateEngine = new SSEStateEngine<ISBMrkState>();
 						return m_markStateEngine;
 					}
 				}
@@ -241,7 +241,7 @@ namespace SlotSystem{
 					ISBMrkStateFactory mrkStateFactory{
 						get{
 							if(m_mrkStateFactory == null)
-								m_mrkStateFactory = new SBMrkStateFactory();
+								m_mrkStateFactory = new SBMrkStateFactory(this);
 							return m_mrkStateFactory;
 						}
 					}
@@ -402,16 +402,16 @@ namespace SlotSystem{
 			}
 		/*	Event methods	*/
 			public void OnPointerDown(PointerEventDataFake eventDataMock){
-				curActState.OnPointerDown(this, eventDataMock);
+				curActState.OnPointerDown();
 			}
 			public void OnPointerUp(PointerEventDataFake eventDataMock){
-				curActState.OnPointerUp(this, eventDataMock);
+				curActState.OnPointerUp();
 			}
 			public void OnDeselected(PointerEventDataFake eventDataMock){
-				curActState.OnDeselected(this, eventDataMock);
+				curActState.OnDeselected();
 			}
 			public void OnEndDrag(PointerEventDataFake eventDataMock){
-				curActState.OnEndDrag(this, eventDataMock);
+				curActState.OnEndDrag();
 			}
 		/*	public fields	*/
 			/* Item Handling */

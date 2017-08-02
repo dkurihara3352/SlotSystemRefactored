@@ -74,7 +74,7 @@ namespace SlotSystem{
 			public virtual ISSESelStateFactory selStateFactory{
 				get{
 					if(m_selStateFactory == null)
-						m_selStateFactory = new SSESelStateFacotory();
+						m_selStateFactory = new SSESelStateFacotory(this);
 					return m_selStateFactory;
 				}
 			}
@@ -85,7 +85,7 @@ namespace SlotSystem{
 			ISSEStateEngine<ISSESelState> selStateEngine{
 				get{
 					if(m_selStateEngine == null)
-						m_selStateEngine = new SSEStateEngine<ISSESelState>(this);
+						m_selStateEngine = new SSEStateEngine<ISSESelState>();
 					return m_selStateEngine;
 				}
 			}

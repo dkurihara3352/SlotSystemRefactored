@@ -19,7 +19,7 @@ namespace SlotSystem{
 					ISSEStateEngine<ISGActState> actStateEngine{
 						get{
 							if(m_actStateEngine == null)
-								m_actStateEngine = new SSEStateEngine<ISGActState>(this);
+								m_actStateEngine = new SSEStateEngine<ISGActState>();
 							return m_actStateEngine;
 						}
 						}ISSEStateEngine<ISGActState> m_actStateEngine;
@@ -38,86 +38,110 @@ namespace SlotSystem{
 					public bool wasActStateNull{get{return prevActState == null;}}
 					public virtual void ClearCurActState(){SetActState(null);}
 					/* act states */
-						public ISGActState waitForActionState{
+						ISGStatesFactory statesFactory{
 							get{
-								if(m_waitForActionState == null)
-									m_waitForActionState = new SGWaitForActionState();
-								return m_waitForActionState;
+								if(_statesFactory == null)
+									_statesFactory = new SGStatesFactory(this);
+								return _statesFactory;
 							}
-							}private ISGActState m_waitForActionState;
-							public void WaitForAction(){SetActState(waitForActionState);}
-							public virtual bool isWaitingForAction{get{return curActState == waitForActionState;}}
-							public virtual bool wasWaitingForAction{get{return prevActState == waitForActionState;}}
-						public ISGActState revertState{
-							get{
-								if(m_revertState == null)
-									m_revertState = new SGRevertState();
-								return m_revertState;
-							}
-							}private ISGActState m_revertState;
-							public void Revert(){SetActState(revertState);}
-							public virtual bool isReverting{get{return curActState == revertState;}}
-							public virtual bool wasReverting{get{return prevActState == revertState;}}
-						public ISGActState reorderState{
-							get{
-								if(m_reorderState == null)
-									m_reorderState = new SGReorderState();
-								return m_reorderState;
-							}
-							}private ISGActState m_reorderState;
-							public void Reorder(){SetActState(reorderState);}
-							public virtual bool isReordering{get{return curActState == reorderState;}}
-							public virtual bool wasReordering{get{return prevActState == reorderState;}}
-						public ISGActState addState{
-							get{
-								if(m_addState == null)
-									m_addState = new SGAddState();
-								return m_addState;
-							}
-							}private ISGActState m_addState;
-							public void Add(){SetActState(addState);}
-							public virtual bool isAdding{get{return curActState == addState;}}
-							public virtual bool wasAdding{get{return prevActState == addState;}}
-						public ISGActState removeState{
-							get{
-								if(m_removeState == null)
-									m_removeState = new SGRemoveState();
-								return m_removeState;
-							}
-							}private ISGActState m_removeState;
-							public void Remove(){SetActState(removeState);}
-							public virtual bool isRemoving{get{return curActState == removeState;}}
-							public virtual bool wasRemoving{get{return prevActState == removeState;}}
-						public ISGActState swapState{
-							get{
-								if(m_swapState == null)
-									m_swapState = new SGSwapState();
-								return m_swapState;
-							}
-							}private ISGActState m_swapState;
-							public void Swap(){SetActState(swapState);}
-							public virtual bool isSwapping{get{return curActState == swapState;}}
-							public virtual bool wasSwapping{get{return prevActState == swapState;}}
-						public ISGActState fillState{
-							get{
-								if(m_fillState == null)
-									m_fillState = new SGFillState();
-								return m_fillState;
-							}
-							}private ISGActState m_fillState;
-							public void Fill(){SetActState(fillState);}
-							public virtual bool isFilling{get{return curActState == fillState;}}
-							public virtual bool wasFilling{get{return prevActState == fillState;}}
-						public ISGActState sortState{
-						get{
-							if(m_sortState == null)
-								m_sortState = new SGSortState();
-							return m_sortState;
 						}
-						}private ISGActState m_sortState;			
-							public void Sort(){SetActState(sortState);}
-							public virtual bool isSorting{get{return curActState == sortState;}}
-							public virtual bool wasSorting{get{return prevActState == sortState;}}
+							ISGStatesFactory _statesFactory;
+						public void WaitForAction(){
+							SetActState(waitForActionState);
+						}
+							public ISGActState waitForActionState{
+								get{return statesFactory.MakeWaitForActionState();}
+							}
+							public virtual bool isWaitingForAction{
+								get{return curActState == waitForActionState;}
+							}
+							public virtual bool wasWaitingForAction{
+								get{return prevActState == waitForActionState;}
+							}
+						public void Revert(){
+							SetActState(revertState);
+						}
+							public ISGActState revertState{
+								get{return statesFactory.MakeRevertState();}
+							}
+							public virtual bool isReverting{
+								get{return curActState == revertState;}
+							}
+							public virtual bool wasReverting{
+								get{return prevActState == revertState;}
+							}
+						public void Reorder(){
+							SetActState(reorderState);
+						}
+							public ISGActState reorderState{
+								get{return statesFactory.MakeReorderState();}
+							}
+							public virtual bool isReordering{
+								get{return curActState == reorderState;}
+							}
+							public virtual bool wasReordering{
+								get{return prevActState == reorderState;}
+							}
+						public void Add(){
+							SetActState(addState);
+						}
+							public ISGActState addState{
+								get{return statesFactory.MakeAddState();}
+							}
+							public virtual bool isAdding{
+								get{return curActState == addState;}
+							}
+							public virtual bool wasAdding{
+								get{return prevActState == addState;}
+							}
+						public void Remove(){
+							SetActState(removeState);
+						}
+							public ISGActState removeState{
+								get{return statesFactory.MakeRevertState();}
+							}
+							public virtual bool isRemoving{
+								get{return curActState == removeState;}
+							}
+							public virtual bool wasRemoving{
+								get{return prevActState == removeState;}
+							}
+						public void Swap(){
+							SetActState(swapState);
+						}
+							public ISGActState swapState{
+								get{return statesFactory.MakeSwapState();}
+							}
+							public virtual bool isSwapping{
+								get{return curActState == swapState;}
+							}
+							public virtual bool wasSwapping{
+								get{return prevActState == swapState;}
+							}
+						public void Fill(){
+							SetActState(fillState);
+						}
+							public ISGActState fillState{
+								get{return statesFactory.MakeFillState();}
+							}
+							public virtual bool isFilling{
+								get{return curActState == fillState;}
+							}
+							public virtual bool wasFilling{
+								get{return prevActState == fillState;}
+							}
+						public void Sort(){
+							SetActState(sortState);
+						}
+							public ISGActState sortState{
+								get{return statesFactory.MakeSortState();}
+							}
+							public virtual bool isSorting{
+								get{return curActState == sortState;}
+							}
+							public virtual bool wasSorting{
+								get{return prevActState == sortState;}
+							}
 		/*	process	*/
 			/*	Action Process	*/
 				public virtual ISSEProcessEngine<ISGActProcess> actProcEngine{
@@ -482,22 +506,14 @@ namespace SlotSystem{
 			}
 			public virtual ISlottable GetSB(InventoryItemInstance itemInst){
 				foreach(ISlottable sb in this){
-					if(sb != null){
+					if(sb != null)
 						if(sb.item == itemInst)
 							return sb;
-					}
 				}
 				return null;
 			}
-			public virtual bool HasItem(InventoryItemInstance invInst){
-				bool result = false;
-				foreach(ISlottable sb in this){
-					if(sb != null){
-						if(sb.item == invInst)
-							return true;
-					}
-				}
-				return result;
+			public virtual bool HasItem(InventoryItemInstance itemInst){
+				return GetSB(itemInst) != null;
 			}
 			public virtual void UpdateSBs(List<ISlottable> newSBs){
 				SetNewSBs(newSBs);

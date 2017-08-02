@@ -195,7 +195,7 @@ namespace SlotSystem{
 			ISSEStateEngine<ITAMActState> actStateEngine{
 				get{
 					if(m_actStateEngine == null)
-						m_actStateEngine = new SSEStateEngine<ITAMActState>(this);
+						m_actStateEngine = new SSEStateEngine<ITAMActState>();
 					return m_actStateEngine;
 				}
 			}
@@ -214,67 +214,60 @@ namespace SlotSystem{
 				ITAMActState prevActState{
 					get{return actStateEngine.prevState;}
 				}
-			public virtual bool isActStateNull{
-				get{return curActState == null;}
-			}
-			public virtual bool wasActStateNull{
-				get{return prevActState == null;}
-			}
-			public virtual void ClearCurActState(){
-				SetActState(null);
-			}
 			/* states */
+				ITAMStatesFactory statesFactory{
+					get{
+						if(_statesFactory == null)
+							_statesFactory = new TAMStatesFactory(this);
+						return _statesFactory;
+					}
+				}
+					ITAMStatesFactory _statesFactory;
+				public virtual void ClearCurActState(){
+					SetActState(null);
+				}
+					public virtual bool isActStateNull{
+						get{return curActState == null;}
+					}
+					public virtual bool wasActStateNull{
+						get{return prevActState == null;}
+					}
 				public virtual void WaitForAction(){
 					SetActState(waitForActionState);
 				}
-				public ITAMActState waitForActionState{
-					get{
-						if(m_waitForActionState == null)
-							m_waitForActionState = new TAMWaitForActionState();
-						return m_waitForActionState;
+					public ITAMActState waitForActionState{
+						get{return statesFactory.MakeWaitForActionState();}
 					}
-				}
-					ITAMActState m_waitForActionState;
-				public virtual bool isWaitingForAction{
-					get{return curActState == waitForActionState;}
-				}
-				public virtual bool wasWaitingForAction{
-					get{return prevActState == waitForActionState;}
-				}
+					public virtual bool isWaitingForAction{
+						get{return curActState == waitForActionState;}
+					}
+					public virtual bool wasWaitingForAction{
+						get{return prevActState == waitForActionState;}
+					}
 				public virtual void Probe(){
 					SetActState(probingState);
 				}
-				public ITAMActState probingState{
-					get{
-						if(m_probingState == null)
-							m_probingState = new TAMProbingState();
-						return m_probingState;
+					public ITAMActState probingState{
+						get{return statesFactory.MakeProbingState();}
 					}
-				}
-					ITAMActState m_probingState;
-				public virtual bool isProbing{
-					get{return curActState == probingState;}
-				}
-				public virtual bool wasProbing{
-					get{return prevActState == probingState;}
-				}
+					public virtual bool isProbing{
+						get{return curActState == probingState;}
+					}
+					public virtual bool wasProbing{
+						get{return prevActState == probingState;}
+					}
 				public virtual void Transact(){
 					SetActState(transactionState);
 				}
-				public ITAMActState transactionState{
-					get{
-						if(m_transactionState == null)
-							m_transactionState = new TAMTransactionState();
-						return m_transactionState;
+					public ITAMActState transactionState{
+						get{return statesFactory.MakeTransactionState();}
 					}
-				}
-					ITAMActState m_transactionState;
-				public virtual bool isTransacting{
-					get{return curActState == transactionState;}
-				}
-				public virtual bool wasTransacting{
-					get{return prevActState == transactionState;}
-				}
+					public virtual bool isTransacting{
+						get{return curActState == transactionState;}
+					}
+					public virtual bool wasTransacting{
+						get{return prevActState == transactionState;}
+					}
 		/*	process	*/
 			public virtual void SetAndRunActProcess(ITAMActProcess process){
 				actProcEngine.SetAndRunProcess(process);

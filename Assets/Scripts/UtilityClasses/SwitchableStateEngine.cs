@@ -4,8 +4,6 @@ using UnityEngine;
 
 namespace Utility{
 	public abstract class SwitchableStateEngine<T>: ISwitchableStateEngine<T> where T: ISwitchableState{
-		public virtual IStateHandler handler{get{return m_handler;} set{m_handler = value;}}
-			IStateHandler m_handler;
 		virtual public T prevState{
 			get{
 				return m_prevState;
@@ -20,23 +18,22 @@ namespace Utility{
 			if((ISwitchableState)curState != (ISwitchableState)state){
 				m_prevState = curState;
 				if(prevState != null)
-					prevState.ExitState(handler);
+					prevState.ExitState();
 				m_curState = state;
 				if(curState != null){
-					curState.EnterState(handler);
+					curState.EnterState();
 				}
 			}
 		}
 	}
 	public interface ISwitchableStateEngine<T> where T: ISwitchableState{
-		IStateHandler handler{get;set;}
 		T prevState{get;}
 		T curState{get;}
 		void SetState(T state);
 
 	}
 	public interface ISwitchableState{
-		void EnterState(IStateHandler handler);
-		void ExitState(IStateHandler handler);
+		void EnterState();
+		void ExitState();
 	}
 }

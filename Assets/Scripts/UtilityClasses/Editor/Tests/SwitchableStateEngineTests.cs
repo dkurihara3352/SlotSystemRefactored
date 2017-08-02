@@ -19,8 +19,7 @@ namespace UtilityClassTests{
 			bool exitCalled, 
 			bool enterCalled)
 		{
-			IStateHandler handler = Substitute.For<IStateHandler>();
-			TestStateEngine engine = MakeTestStateEngine(null, from, handler);
+			TestStateEngine engine = MakeTestStateEngine(null, from);
 
 			engine.SetState(to);
 
@@ -28,14 +27,14 @@ namespace UtilityClassTests{
 			Assert.That(engine.prevState, Is.SameAs(expPrev));
 			if(from != null)
 				if(exitCalled)
-					from.Received().ExitState(handler);
+					from.Received().ExitState();
 				else
-					from.DidNotReceive().ExitState(handler);
+					from.DidNotReceive().ExitState();
 			if(to != null)
 				if(enterCalled)
-					to.Received().EnterState(handler);
+					to.Received().EnterState();
 				else
-					to.DidNotReceive().EnterState(handler);
+					to.DidNotReceive().EnterState();
 				
 		}
 			class SetState_VariousCases: IEnumerable{
@@ -73,8 +72,8 @@ namespace UtilityClassTests{
 				}
 			}
 		/* Helpers */
-			TestStateEngine MakeTestStateEngine(ISwitchableState prev, ISwitchableState cur, IStateHandler handler){
-				return new TestStateEngine(prev, cur, handler);
+			TestStateEngine MakeTestStateEngine(ISwitchableState prev, ISwitchableState cur){
+				return new TestStateEngine(prev, cur);
 			}
 			class TestStateEngine: SwitchableStateEngine<ISwitchableState>{
 				public void SetTestState(ISwitchableState state){
@@ -82,11 +81,6 @@ namespace UtilityClassTests{
 				}
 				public TestStateEngine(ISwitchableState prev, ISwitchableState cur){
 					m_prevState = prev; m_curState = cur;
-					handler = Substitute.For<IStateHandler>();
-				}
-				public TestStateEngine(ISwitchableState prev, ISwitchableState cur, IStateHandler handler){
-					m_prevState = prev; m_curState = cur;
-					this.handler = handler;
 				}
 			}
 	}
