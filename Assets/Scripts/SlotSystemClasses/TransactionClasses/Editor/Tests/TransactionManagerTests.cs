@@ -41,11 +41,11 @@ namespace SlotSystemTests{
 					public ISlottable targetSB;
 					public ISlotGroup sg1;
 					public ISlotGroup sg2;
-					public ISlotSystemElement hovered;
+					public IHoverable hovered;
 					public DraggedIcon dIcon1;
 					public DraggedIcon dIcon2;
 					public ISlotSystemTransaction transaction;
-					public RefreshTestCase(ISlottable pickedSB, ISlottable targetSB, ISlotGroup sg1, ISlotGroup sg2, ISlotSystemElement hovered, DraggedIcon dIcon1, DraggedIcon dIcon2, ISlotSystemTransaction transaction){
+					public RefreshTestCase(ISlottable pickedSB, ISlottable targetSB, ISlotGroup sg1, ISlotGroup sg2, IHoverable hovered, DraggedIcon dIcon1, DraggedIcon dIcon2, ISlotSystemTransaction transaction){
 						this.pickedSB = pickedSB;
 						this.targetSB = targetSB;
 						this.sg1 = sg1;

@@ -13,18 +13,28 @@ namespace SlotSystem{
 			this.tam = tam;
 		}
 		public virtual void OnHoverEnter(){
-			if(!sse.isDeactivated && !sse.isSelected)
-				SetHovered();
+			if(!sse.isSelStateNull){
+				if(!sse.isDeactivated && !sse.isSelected)
+					SetHovered();
+				else
+					throw new InvalidOperationException("sse needs to be activated and deselected");
+			}else
+				throw new InvalidOperationException("sse sel state not set");
 		}
 		public virtual void OnHoverExit(){
-			if(!sse.isDeactivated)
-				if(isHovered)
-					UnsetHovered();
-				else
-					throw new InvalidOperationException("hoverable is not set hovered");
+			if(!sse.isSelStateNull){
+				if(!sse.isDeactivated){
+					if(isHovered)
+						UnsetHovered();
+					else
+						throw new InvalidOperationException("hoverable is not set hovered");
+				}else
+					throw new InvalidOperationException("sse is deactivated");
+			}else
+				throw new InvalidOperationException("sse' sel state not set");
 		}
 		public virtual bool isHovered{
-			get{return tam.hovered == (ISlotSystemElement)this;}
+			get{return tam.hovered == this;}
 		}
 		public void SetHovered(){
 			tam.SetHovered(this);

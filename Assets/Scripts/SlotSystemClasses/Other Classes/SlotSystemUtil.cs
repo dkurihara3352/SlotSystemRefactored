@@ -203,11 +203,6 @@ namespace SlotSystem{
 				string res = "";
 				string pSB = SlotSystemUtil.SBofSG(tam.pickedSB);
 				string tSB = SlotSystemUtil.SBofSG(tam.targetSB);
-				string hovered = "";
-					if(tam.hovered is ISlottable)
-						hovered = SBofSG((ISlottable)tam.hovered);
-					else if(tam.hovered is ISlotGroup)
-						hovered = tam.hovered.eName;
 				string di1;
 					if(tam.dIcon1 == null)
 						di1 = "null";
@@ -244,7 +239,6 @@ namespace SlotSystem{
 				res = SlotSystemUtil.Bold("SSM:") +
 					" pSB " + pSB +
 					", tSB " + tSB +
-					", hovered " + hovered +
 					", di1 " + di1 +
 					", di2 " + di2 +
 					", sg1 " + sg1 +
@@ -697,7 +691,7 @@ namespace SlotSystem{
 				return res;
 			}
 		/*	Debug	*/
-			public static string TADebug(ISlottable testSB, ISlotSystemElement hovered){
+			public static string TADebug(ISlottable testSB, IHoverable hovered){
 				ITransactionManager tam = TransactionManager.curTAM;
 				ISlotSystemTransaction ta = tam.MakeTransaction(testSB, hovered);
 				string taStr = TransactionName(ta);

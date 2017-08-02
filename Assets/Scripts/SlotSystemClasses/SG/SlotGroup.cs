@@ -6,7 +6,7 @@ namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		/*	states	*/
 			public override void Activate(){
-				if(tam.IsTransactionResultRevertFor(this) == false)
+				if(tam.IsTransactionResultRevertFor(hoverable) == false)
 					Focus();
 				else
 					Defocus();
@@ -770,9 +770,6 @@ namespace SlotSystem{
 				UpdateSBs(thisNewSBs);
 			}
 		/*	Forward	*/
-			public virtual void SetHovered(){
-				tam.SetHovered((ISlotGroup)this);
-			}
 			public virtual ISlottable pickedSB{get{return tam.pickedSB;}}
 			public virtual ISlottable targetSB{get{return tam.targetSB;}}
 			public List<SlottableItem> FilterItem(List<SlottableItem> items){
@@ -823,6 +820,26 @@ namespace SlotSystem{
 				}
 			}ITransactionManager m_tam;
 			public void SetTAM(ITransactionManager tam){m_tam = tam;}
+			public IHoverable hoverable{
+				get{
+					if(m_hoverable == null)
+						m_hoverable = new Hoverable(this, tam);
+					return m_hoverable;
+				}
+			}
+				IHoverable m_hoverable;
+			public void SetHoverable(IHoverable hoverable){
+				m_hoverable = hoverable;
+			}
+			public virtual void SetHovered(){
+				tam.SetHovered(hoverable);
+			}
+			public void OnHoverEnter(){
+				hoverable.OnHoverEnter();
+			}
+			public void OnHoverExit(){
+				hoverable.OnHoverExit();
+			}
 	}
 	public interface ISlotGroup: ISlotSystemElement{
 		/* States and Processes */
@@ -952,7 +969,6 @@ namespace SlotSystem{
 				bool TryChangeStackableQuantity(List<ISlottable> target, InventoryItemInstance addedItem, bool added);
 			void RemoveAndUpdateSBs();
 		/*	Forward	*/
-			void SetHovered();
 			ISlottable pickedSB{get;}
 			ISlottable targetSB{get;}
 			List<SlottableItem> FilterItem(List<SlottableItem> items);
@@ -963,5 +979,10 @@ namespace SlotSystem{
 			void ReportTAComp();
 			ITransactionManager tam{get;}
 			void SetTAM(ITransactionManager tam);
+		/* Hoverable */
+			IHoverable hoverable{get;}
+			void OnHoverEnter();
+			void OnHoverExit();
+			void SetHovered();
 	}
 }

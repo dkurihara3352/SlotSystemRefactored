@@ -196,47 +196,6 @@ namespace SlotSystemTests{
 								yield return null;
 							}
 						}
-			/* Events */
-				[Test]
-				[ExpectedException(typeof(System.InvalidOperationException))]
-				public void OnHoverEnterMock_curSelStateNull_ThrowsException(){
-					TestSlotSystemElement sse = MakeTestSSE();
-
-					sse.OnHoverEnter();
-				}
-				[Test]
-				public void OnHoverEnterMock_curSelStateNotNull_CallsCurSelStateOnHoverEnterMock(){
-					TestSlotSystemElement sse = MakeTestSSE();
-						ISSESelState mockState = Substitute.For<ISSESelState>();
-						ISSESelStateFactory stubFactory = Substitute.For<ISSESelStateFactory>();
-						stubFactory.MakeDeactivatedState().Returns(mockState);
-						sse.SetSelStateFactory(stubFactory);
-					sse.Deactivate();
-
-					sse.OnHoverEnter();
-
-					mockState.Received().OnHoverEnter(sse, Arg.Any<PointerEventDataFake>());
-				}
-				[Test]
-				[ExpectedException(typeof(System.InvalidOperationException))]
-				public void OnHoverExitMock_curSelStateNull_ThrowsException(){
-					TestSlotSystemElement sse = MakeTestSSE();
-
-					sse.OnHoverExit();
-				}
-				[Test]
-				public void OnHoverExitMock_curSelStateNotNull_CallsCurSelStateOnHoverExitMock(){
-					TestSlotSystemElement sse = MakeTestSSE();
-					ISSESelState mockState = Substitute.For<ISSESelState>();
-						ISSESelStateFactory stubFactory = Substitute.For<ISSESelStateFactory>();
-						stubFactory.MakeDeactivatedState().Returns(mockState);
-						sse.SetSelStateFactory(stubFactory);
-					sse.Deactivate();
-
-					sse.OnHoverExit();
-
-					mockState.Received().OnHoverExit(sse, Arg.Any<PointerEventDataFake>());
-				}
 			/*	Fields	*/
 				[TestCase(1)]
 				[TestCase(10)]

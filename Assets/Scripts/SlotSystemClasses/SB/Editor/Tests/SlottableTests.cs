@@ -18,8 +18,10 @@ namespace SlotSystemTests{
 				public void Activate_SSMIsTAResultRevertForFalse_SetIsFocused(){
 					Slottable sb = MakeSB();
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-						stubTAM.IsTransactionResultRevertFor(sb).Returns(false);
+						IHoverable stubHoverable = Substitute.For<IHoverable>();
+						stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(false);
 						sb.SetTAM(stubTAM);
+						sb.SetHoverable(stubHoverable);
 					
 					sb.Activate();
 
@@ -29,8 +31,10 @@ namespace SlotSystemTests{
 				public void Activate_SSMIsTAResultRevertForTrue_SetIsDefocused(){
 					Slottable sb = MakeSB();
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-						stubTAM.IsTransactionResultRevertFor(sb).Returns(true);
+						IHoverable stubHoverable = Substitute.For<IHoverable>();
+						stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(true);
 						sb.SetTAM(stubTAM);
+						sb.SetHoverable(stubHoverable);
 					
 					sb.Activate();
 
@@ -154,14 +158,14 @@ namespace SlotSystemTests{
 					Assert.That(sb.pickedAmount, Is.EqualTo(1));
 					}
 				[TestCaseSource(typeof(IncrementCases))]
-				public void Increment_StackableToMoreThanQuantityAndValidPrevActState_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
+				public void Increment_StackableToMoreThanQuantityAndValidPrevActStateAndIsActivated_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
 					Slottable sb = MakeSB();
 					sb.SetItem(item);
 					ISlotSystemManager ssm = MakeSubSSM();
 					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 					sb.SetSSM(ssm);
 					sb.SetTAM(stubTAM);
-					sb.Deactivate();
+					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 
@@ -187,13 +191,13 @@ namespace SlotSystemTests{
 						}
 					}
 				[TestCaseSource(typeof(IncrementNonStackableCases))]
-				public void Increment_NonStackableAndAfterSSMAndSelStateSetAndFromValidPrevActState_DoesNotIncrement(InventoryItemInstance item){
+				public void Increment_NonStackableAndAfterSSMAndIsActivatedAndFromValidPrevActState_DoesNotIncrement(InventoryItemInstance item){
 					Slottable sb = MakeSB();
 					ISlotSystemManager ssm = MakeSubSSM();
 					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 					sb.SetSSM(ssm);
 					sb.SetTAM(stubTAM);
-					sb.Deactivate();
+					sb.Focus();
 					sb.SetItem(item);
 					sb.WaitForAction();
 					sb.WaitForPickUp();

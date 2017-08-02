@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SlotSystem{
 	public class TransactionFactory: ITransactionFactory{
 
-		public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+		public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered){
 			ISlotGroup origSG = pickedSB.sg;
 			if(hovered != null){
 				if(hovered is ISlotGroup){
@@ -76,6 +76,6 @@ namespace SlotSystem{
 		}
 	}
 	public interface ITransactionFactory{
-		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered);
+		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered);
 	}
 }

@@ -22,18 +22,18 @@ namespace SlotSystem{
 				m_updateFieldsCommand = comm;
 			}		
 		public virtual void CreateTransactionResults(){
-			Dictionary<ISlotSystemElement, ISlotSystemTransaction> result = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
+			Dictionary<IHoverable, ISlotSystemTransaction> result = new Dictionary<IHoverable, ISlotSystemTransaction>();
 			foreach(ISlotGroup sg in tam.focusedSGs){
-				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg);
-				result.Add(sg, ta);
+				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg.hoverable);
+				result.Add(sg.hoverable, ta);
 				if(ta is IRevertTransaction)
 					sg.DefocusSelf();
 				else
 					sg.FocusSelf();
 				foreach(ISlottable sb in sg){
 					if(sb != null){
-						ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb);
-						result.Add(sb, ta2);
+						ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb.hoverable);
+						result.Add(sb.hoverable, ta2);
 						if(ta2 is IRevertTransaction || ta2 is IFillTransaction)
 							sb.Defocus();
 						else
@@ -46,7 +46,7 @@ namespace SlotSystem{
 		public bool IsTransactionGoingToBeRevert(ISlottable sb){
 			bool res = true;
 			foreach(ISlotGroup targetSG in tam.focusedSGs){
-				ISlotSystemTransaction ta = MakeTransaction(sb, targetSG);
+				ISlotSystemTransaction ta = MakeTransaction(sb, targetSG.hoverable);
 				if(ta == null)
 					throw new System.InvalidOperationException("SlotSystemManager.PrePickFilter: given hoveredSSE does not yield any transaction. something's wrong baby");
 				else{
@@ -56,17 +56,17 @@ namespace SlotSystem{
 				}
 				foreach(ISlottable targetSB in targetSG){
 					if(sb != null)
-						if(!(MakeTransaction(sb, targetSB) is IRevertTransaction)){
+						if(!(MakeTransaction(sb, targetSB.hoverable) is IRevertTransaction)){
 							res = false; break;
 						}
 				}
 			}
 			return res;
 		}
-		public bool IsCachedTAResultRevert(ISlotSystemElement sse){
+		public bool IsCachedTAResultRevert(IHoverable hoverable){
 			if(transactionResults != null){
 				ISlotSystemTransaction ta = null;
-				if(transactionResults.TryGetValue(sse, out ta)){
+				if(transactionResults.TryGetValue(hoverable, out ta)){
 					if(ta is IRevertTransaction)
 						return true;
 					else
@@ -77,7 +77,7 @@ namespace SlotSystem{
 			}else
 				throw new System.InvalidOperationException("TransactionResults not set");
 		}		
-		public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, ISlotSystemElement hovered){
+		public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered){
 			return taFactory.MakeTransaction(pickedSB, hovered);
 		}
 		public ITransactionFactory taFactory{
@@ -89,15 +89,15 @@ namespace SlotSystem{
 		}
 			ITransactionFactory m_taFactory;
 			public void SetTAFactory(ITransactionFactory taFac){m_taFactory = taFac;}
-		public Dictionary<ISlotSystemElement, ISlotSystemTransaction> transactionResults{
+		public Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{
 			get{
 					if(m_transactionResults == null)
-						m_transactionResults = new Dictionary<ISlotSystemElement, ISlotSystemTransaction>();
+						m_transactionResults = new Dictionary<IHoverable, ISlotSystemTransaction>();
 					return m_transactionResults;
 			}
 		}
-			Dictionary<ISlotSystemElement, ISlotSystemTransaction> m_transactionResults;
-			public void SetTransactionResults(Dictionary<ISlotSystemElement, ISlotSystemTransaction> results){
+			Dictionary<IHoverable, ISlotSystemTransaction> m_transactionResults;
+			public void SetTransactionResults(Dictionary<IHoverable, ISlotSystemTransaction> results){
 				m_transactionResults = results;
 			}
 		public virtual ISlottable pickedSB{
@@ -124,12 +124,12 @@ namespace SlotSystem{
 						targetSB.Select();
 				}
 			}
-		public ISlotSystemElement hovered{
+		public IHoverable hovered{
 			get{return m_hovered;
 			}
 		}
-			protected ISlotSystemElement m_hovered;
-			public virtual void SetHovered(ISlotSystemElement to){
+			protected IHoverable m_hovered;
+			public virtual void SetHovered(IHoverable to){
 				if(to == null || to != hovered){
 					if(to != null && hovered != null){
 						hovered.OnHoverExit();

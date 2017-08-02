@@ -14,8 +14,10 @@ namespace SlotSystemTests{
 			[Test]
 			public void Activate_SSMIsTAResultRevertFalse_SetsIsFocused(){
 				SlotGroup sg = MakeSG();
+					IHoverable stubHoverable = Substitute.For<IHoverable>();
+					sg.SetHoverable(stubHoverable);
 					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-					stubTAM.IsTransactionResultRevertFor(sg).Returns(false);
+					stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(false);
 					sg.SetTAM(stubTAM);
 				
 				sg.Activate();
@@ -25,8 +27,10 @@ namespace SlotSystemTests{
 			[Test]
 			public void Activate_SSMIsTAResultRevertTrue_SetsIsDefocused(){
 				SlotGroup sg = MakeSG();
+					IHoverable stubHoverable = Substitute.For<IHoverable>();
+					sg.SetHoverable(stubHoverable);
 					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-					stubTAM.IsTransactionResultRevertFor(sg).Returns(true);
+					stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(true);
 					sg.SetTAM(stubTAM);
 				
 				sg.Activate();

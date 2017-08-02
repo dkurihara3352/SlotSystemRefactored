@@ -32,116 +32,6 @@ namespace SlotSystemTests{
 			Assert.That(sb.eqpProcess, Is.Null);
 			Assert.That(sb.mrkProcess, Is.Null);
 		}
-		/* SelStates */
-			[Test]
-			public void InFocused_OnHoverEnter_CallsSSMSetHovered(){
-				Slottable sb = MakeSB();
-					ITransactionManager tam = Substitute.For<ITransactionManager>();
-					sb.SetTAM(tam);
-				sb.Focus();
-
-				sb.OnHoverEnter();
-
-				tam.Received().SetHovered(sb);
-			}
-			[Test]
-			public void InDefocused_OnHoverEnter_CallsSSMSetHovered(){
-				Slottable sb = MakeSB();
-					ITransactionManager tam = Substitute.For<ITransactionManager>();
-					sb.SetTAM(tam);
-				sb.Defocus();
-
-				sb.OnHoverEnter();
-
-				tam.Received().SetHovered(sb);
-			}
-			[Test]
-			public void InFocused_OnHoverExit_IsHovered_CallsSSMSetHoveredNull(){
-				Slottable sb = MakeSB();
-					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-					mockTAM.hovered.Returns(sb);
-					sb.SetTAM(mockTAM);
-				sb.Focus();
-
-				sb.OnHoverExit();
-
-				mockTAM.Received().SetHovered(null);
-			}
-			[Test][ExpectedException(typeof(InvalidOperationException))]
-			public void InFocused_OnHoverExit_IsNotHovered_ThrowsException(){
-				Slottable sb = MakeSB();
-					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-					mockTAM.hovered.Returns((ISlotSystemElement)null);
-					sb.SetTAM(mockTAM);
-				sb.Focus();
-
-				sb.OnHoverExit();
-			}
-			[Test]
-			public void InDefocused_OnHoverExit_IsHovered_CallsSSMSetHoveredNull(){
-				Slottable sb = MakeSB();
-					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-					mockTAM.hovered.Returns(sb);
-					sb.SetTAM(mockTAM);
-				sb.Defocus();
-
-				sb.OnHoverExit();
-
-				mockTAM.Received().SetHovered(null);
-			}
-			[Test][ExpectedException(typeof(InvalidOperationException))]
-			public void InDefocused_OnHoverExit_IsNotHovered_ThrowsException(){
-				Slottable sb = MakeSB();
-					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-					mockTAM.hovered.Returns((ISlotSystemElement)null);
-					sb.SetTAM(mockTAM);
-				sb.Defocus();
-
-				sb.OnHoverExit();
-			}
-			[Test]
-			public void InSelected_OnHoverExit_IsHovered_CallsSSMSetHoveredNull(){
-				Slottable sb = MakeSB();
-					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-					mockTAM.hovered.Returns(sb);
-					sb.SetTAM(mockTAM);
-				sb.Select();
-
-				sb.OnHoverExit();
-
-				mockTAM.Received().SetHovered(null);
-			}
-			[Test][ExpectedException(typeof(InvalidOperationException))]
-			public void InSelected_OnHoverExit_IsNotHovered_ThrowsException(){
-				Slottable sb = MakeSB();
-					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-					mockTAM.hovered.Returns((ISlotSystemElement)null);
-					sb.SetTAM(mockTAM);
-				sb.Select();
-
-				sb.OnHoverExit();
-			}
-			[Test]
-			public void HoverSequence(){
-				TransactionManager tam = MakeTAM();
-				Slottable sb = MakeSB();
-				Slottable otherSB = MakeSB();
-				sb.SetTAM(tam);
-				otherSB.SetTAM(tam);
-				sb.Focus();
-				otherSB.Focus();
-
-				sb.OnHoverEnter();
-					Assert.That(sb.isHovered, Is.True);
-				
-				otherSB.OnHoverEnter();
-					Assert.That(sb.isHovered, Is.False);
-					Assert.That(otherSB.isHovered, Is.True);
-				
-				otherSB.OnHoverExit();
-					Assert.That(otherSB.isHovered, Is.False);
-					Assert.That(tam.hovered, Is.Null);
-			}
 		/* ActStates */
 			/* WaitForActionState */
 				[Test]
@@ -706,7 +596,9 @@ namespace SlotSystemTests{
 				public void InPickingUp_OnPointerUp_IsHoveredAndIsStackable_SetsIsWaitingForNextTouch(){
 					Slottable sb = MakeSB();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
-						tam.hovered.Returns(sb);
+						IHoverable stubHoverable = Substitute.For<IHoverable>();
+						sb.SetHoverable(stubHoverable);
+						stubHoverable.isHovered.Returns(true);
 						PartsInstance parts = MakePartsInstance(0, 2);
 						sb.SetItem(parts);
 						sb.SetTAM(tam);
@@ -722,7 +614,9 @@ namespace SlotSystemTests{
 				public void InPickingUp_OnPointerUp_NotIsHoveredOrNotIsStackable_CallsSSMExecuteTransaction(){
 					Slottable sb = MakeSB();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
-						tam.hovered.Returns(sb);
+						IHoverable stubHoverable = Substitute.For<IHoverable>();
+						sb.SetHoverable(stubHoverable);
+						tam.hovered.Returns(stubHoverable);
 						BowInstance bow = MakeBowInstance(0);
 						sb.SetItem(bow);
 						sb.SetTAM(tam);
@@ -821,11 +715,13 @@ namespace SlotSystemTests{
 						sb.SetTAM(mockTAM);
 						SlottableCommand mockTapComm = Substitute.For<SlottableCommand>();
 						sb.SetTapCommand(mockTapComm);
+						IHoverable stubHoverable = Substitute.For<IHoverable>();
+						sb.SetHoverable(stubHoverable);
 					PointerEventDataFake eventData = new PointerEventDataFake();
 					//focused !(stackable && hovered) WFA_down WFPickUp_exp PickingUp_up execTA
 							sb.Focus();
 							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
-							mockTAM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((IHoverable)null);
 						sb.WaitForAction();
 							Assert.That(sb.isWaitingForAction, Is.True);
 						
@@ -834,7 +730,7 @@ namespace SlotSystemTests{
 						
 						sb.ExpireActProcess();
 							Assert.That(sb.isPickingUp, Is.True);
-							mockTAM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((IHoverable)null);
 						
 						sb.OnPointerUp(eventData);
 							mockTAM.Received(1).ExecuteTransaction();
@@ -842,7 +738,7 @@ namespace SlotSystemTests{
 							sb.Focus();
 							sb.SetItem(parts);
 							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
-							mockTAM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((IHoverable)null);
 						sb.WaitForAction();
 
 						sb.OnPointerDown(eventData);
@@ -850,9 +746,10 @@ namespace SlotSystemTests{
 						
 						sb.ExpireActProcess();
 							Assert.That(sb.isPickingUp, Is.True);
-							mockTAM.hovered.Returns(sb);
+							mockTAM.hovered.Returns(stubHoverable);
 							mockTAM.pickedSB.Returns(sb);
-						
+
+							stubHoverable.isHovered.Returns(true);
 						sb.OnPointerUp(eventData);
 							Assert.That(sb.isWaitingForNextTouch, Is.True);
 						
@@ -862,7 +759,7 @@ namespace SlotSystemTests{
 							sb.Focus();
 							sb.SetItem(parts);
 							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
-							mockTAM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((IHoverable)null);
 						sb.WaitForAction();
 
 						sb.OnPointerDown(eventData);
@@ -872,7 +769,7 @@ namespace SlotSystemTests{
 							Assert.That(sb.isPickingUp, Is.True);
 							Assert.That(sb.pickedAmount, Is.EqualTo(1));
 							mockTAM.pickedSB.Returns(sb);
-							mockTAM.hovered.Returns(sb);
+							mockTAM.hovered.Returns(stubHoverable);
 						
 						sb.OnPointerUp(eventData);
 							Assert.That(sb.isWaitingForNextTouch, Is.True);
@@ -882,7 +779,7 @@ namespace SlotSystemTests{
 					//defocused WFA_down WFPointerUp_up tap
 							sb.Defocus();
 							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
-							mockTAM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((IHoverable)null);
 						sb.WaitForAction();
 							Assert.That(sb.isDefocused, Is.True);
 							Assert.That(sb.isWaitingForAction, Is.True);
@@ -895,7 +792,7 @@ namespace SlotSystemTests{
 					//focused WFA_down WFPickUp_up WFNT_down PickingUp pickedAmount 1
 							sb.Focus();
 							mockTAM.pickedSB.Returns((ISlotSystemElement)null);
-							mockTAM.hovered.Returns((ISlotSystemElement)null);
+							mockTAM.hovered.Returns((IHoverable)null);
 						sb.WaitForAction();
 
 						sb.OnPointerDown(eventData);
