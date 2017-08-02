@@ -1071,10 +1071,10 @@ namespace SlotSystemTests{
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
 						stubSG.isFocusedInHierarchy.Returns(false);
-						stubSG.isPool.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
 						mockSB.item.Returns(bow);
+						mockSB.isPool.Returns(true);
 					
 					ssm.Equip(mockSB, bow);
 
@@ -1104,10 +1104,10 @@ namespace SlotSystemTests{
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
 						stubSG.isFocusedInHierarchy.Returns(false);
-						stubSG.isPool.Returns(true);
 					ISlottable mockSB = MakeSubSB();
 						mockSB.sg.Returns(stubSG);
 						mockSB.item.Returns(bow);
+						mockSB.isPool.Returns(true);
 					
 					ssm.Unequip(mockSB, bow);
 

@@ -358,59 +358,7 @@ namespace SlotSystemTests{
 								};
 								yield return diffSG_sameStackable_F;
 						}
-					}
-				[TestCaseSource(typeof(HaveCommonItemFamilyCases))]
-				public void HaveCommonItemFamily_Various_ReturnsAccordingly(InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
-					Slottable sb = MakeSB();
-					Slottable otherSB = MakeSB();
-					sb.SetItem(iInst);
-					otherSB.SetItem(otherIInst);
-
-					Assert.That(sb.HaveCommonItemFamily(otherSB), Is.EqualTo(expected));
-					}
-					class HaveCommonItemFamilyCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							object[] bow_bow_T;
-								BowInstance bow_1 = MakeBowInstance(0);
-								bow_bow_T = new object[]{bow_1, bow_1, true};
-								yield return bow_bow_T;
-							object[] wear_wear_T;
-								WearInstance wear_2 = MakeWearInstance(0);
-								wear_wear_T = new object[]{wear_2, wear_2, true};
-								yield return wear_wear_T;
-							object[] shield_mWeapon_T;
-								ShieldInstance shield_3 = MakeShieldInstance(0);
-								MeleeWeaponInstance mWeapon_3 = MakeMeleeWeaponInstance(0);
-								shield_mWeapon_T = new object[]{shield_3, mWeapon_3, true};
-								yield return shield_mWeapon_T;
-							object[] parts_parts_T;
-								PartsInstance partsA_4 = MakePartsInstance(0, 1);
-								PartsInstance partsB_4 = MakePartsInstance(1, 3);
-								parts_parts_T = new object[]{partsA_4, partsB_4, true};
-								yield return parts_parts_T;
-							object[] bow_wear_F;
-								BowInstance bow_5 = MakeBowInstance(0);
-								WearInstance wear_5 = MakeWearInstance(0);
-								bow_wear_F = new object[]{bow_5, wear_5, false};
-								yield return bow_wear_F;
-							object[] wear_quiver_F;
-								WearInstance wear_6 = MakeWearInstance(0);
-								QuiverInstance quiver_6 = MakeQuiverInstance(0);
-								wear_quiver_F = new object[]{wear_6, quiver_6, false};
-								yield return wear_quiver_F;
-							object[] shield_parts_F;
-								ShieldInstance shield_7 = MakeShieldInstance(0);
-								PartsInstance parts_7 = MakePartsInstance(0, 1);
-								shield_parts_F = new object[]{shield_7, parts_7, false};
-								yield return shield_parts_F;
-							object[] parts_pack_F;
-								PartsInstance partsA_8 = MakePartsInstance(0, 1);
-								PackInstance pack_8 = MakePackInstance(0);
-								parts_pack_F = new object[]{partsA_8, pack_8, false};
-								yield return parts_pack_F;
-						}
-					}
-			
+					}			
 			/*	helper	*/
 				ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){
 					return Substitute.For<ISSEProcessEngine<ISBEqpProcess>>();

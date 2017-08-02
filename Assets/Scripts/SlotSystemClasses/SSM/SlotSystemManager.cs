@@ -328,9 +328,9 @@ namespace SlotSystem{
 					/*	assume all sbs are properly set in slottables, not in newSBs	*/
 					if(sb.item == item){
 						if(sb.sg.isFocusedInHierarchy){/*	focused sgp or sge	*/
-							if(sb.newSlotID != -1)/*	not being removed	*/
+							if(!sb.isToBeRemoved)/*	not being removed	*/
 								sb.Equip();
-						}else if(sb.sg.isPool){/*	defocused sgp, setting equipped w/o transition	*/
+						}else if(sb.isPool){/*	defocused sgp, setting equipped w/o transition	*/
 							sb.ClearCurEqpState();
 							sb.Equip();
 						}
@@ -344,9 +344,9 @@ namespace SlotSystem{
 					/*	assume all sbs are properly set in slottables, not int newSBs	*/
 					if(sb.item == item){
 						if(sb.sg.isFocusedInHierarchy){
-							if(sb.slotID != -1)/*	not being added	*/
+							if(!sb.isToBeAdded)
 								sb.Unequip();
-						}else if(sb.sg.isPool){/*	defocused sgp	*/
+						}else if(sb.isPool){/*	defocused sgp	*/
 							sb.ClearCurEqpState();
 							sb.Unequip();
 						}

@@ -108,7 +108,7 @@ namespace SlotSystem{
 						}
 					public virtual void PickUp(){
 						SetActState(pickedUpState);
-						m_pickedAmount = 1;
+						pickedAmount = 1;
 					}
 						public ISBActState pickedUpState{
 							get{return actStateFactory.MakePickingUpState();}
@@ -400,205 +400,198 @@ namespace SlotSystem{
 			public void SetTapCommand(SlottableCommand comm){
 				m_tapCommand = comm;
 			}
+		/*	Event methods	*/
+			public void OnPointerDown(PointerEventDataFake eventDataMock){
+				curActState.OnPointerDown(this, eventDataMock);
+			}
+			public void OnPointerUp(PointerEventDataFake eventDataMock){
+				curActState.OnPointerUp(this, eventDataMock);
+			}
+			public void OnDeselected(PointerEventDataFake eventDataMock){
+				curActState.OnDeselected(this, eventDataMock);
+			}
+			public void OnEndDrag(PointerEventDataFake eventDataMock){
+				curActState.OnEndDrag(this, eventDataMock);
+			}
 		/*	public fields	*/
-			public bool isHierarchySetUp{
+			/* Item Handling */
+				IItemHandler itemHandler{
+					get{
+						if(m_itemHandler == null)
+							m_itemHandler = new ItemHandler();
+						return m_itemHandler;
+					}
+				}
+					IItemHandler m_itemHandler;
+				public virtual void Increment(){
+					SetActState(pickedUpState);
+					itemHandler.IncreasePickedAmountWithinQuanity();
+				}
+				public InventoryItemInstance item{
+					get{return itemHandler.item;}
+				}
+				public void SetItem(InventoryItemInstance item){
+					itemHandler.SetItem(item);
+				}
+				public int pickedAmount{
+					get{return itemHandler.pickedAmount;}
+					set{itemHandler.pickedAmount = value;}
+				}
+				public virtual bool isStackable{
+					get{return itemHandler.isStackable;}
+				}
+				public int quantity{
+					get{return itemHandler.quantity;}
+				}
+				public void SetQuantity(int quant){
+					itemHandler.SetQuantity(quant);
+				}
+				public void UpdateEquipState(){
+					if(item.isEquipped) Equip();
+					else Unequip();
+				}
+			/* SG And Slots */
+				public ISlotGroup sg{
+					get{
+						if(parent != null)
+							return parent as ISlotGroup;
+						return null;
+					}
+				}
+				public virtual bool isPool{
+					get{
+						if(sg != null){
+							return sg.isPool;
+						}else
+							throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
+					}
+				}
+				public bool isHierarchySetUp{
+					get{
+						return sg != null;
+					}
+				}
+				public int slotID{
+					get{return m_slotID;}
+				}
+					int m_slotID = -1;
+				public void SetSlotID(int i){
+					m_slotID = i;
+				}
+				public int newSlotID{
+					get{return m_newSlotID;}
+				}
+					int m_newSlotID = -2;
+				public void SetNewSlotID(int id){
+					m_newSlotID = id;
+				}
+				public bool isToBeAdded{
+					get{return slotID == -1;}
+				}
+				public bool isToBeRemoved{
+					get{return newSlotID == -1;}
+				}
+			/* Others */
+				public override void InitializeStates(){
+					Deactivate();
+					WaitForAction();
+					SetEqpState(null);
+					SetMrkState(unmarkedState);
+				}
+				public bool delayed{
+					get{return m_delayed;}
+					set{m_delayed = value;}
+				}
+					bool m_delayed = true;
+				public void Refresh(){
+					WaitForAction();
+					itemHandler.pickedAmount = 0;
+					SetNewSlotID(-2);
+				}
+				public bool ShareSGAndItem(ISlottable other){
+					bool flag = true;
+					flag &= this.sg == other.sg;
+					flag &= this.item == other.item;
+					return flag;
+				}
+				public void Destroy(){
+					GameObject go = gameObject;
+					DestroyImmediate(go);
+				}
+		/*	SlotSystemElement imple and overrides	*/
+			public override ISlotSystemElement this[int i]{
+				get{return null;}
+			}
+			protected override IEnumerable<ISlotSystemElement> elements{
+				get{return null;}
+			}
+			public override string eName{
+				get{return SlotSystemUtil.SBName(this);}
+			}
+			public override ISlotSystemElement parent{
 				get{
-					return sg != null;
+					if(ssm != null)
+						return ssm.FindParent(this);
+					else
+						throw new System.InvalidOperationException("Slottable.parent: ssm is not set");
 				}
 			}
-			public bool delayed{
-				get{return m_delayed;}
-				set{m_delayed = value;}
-			}
-				bool m_delayed = true;
-			public int pickedAmount{
-				get{return m_pickedAmount;}
-				set{m_pickedAmount = value;}
-			}
-				int m_pickedAmount = 0;
-			public InventoryItemInstance item{
-				get{return m_item;}
-			}
-				InventoryItemInstance m_item;
-			public void SetItem(InventoryItemInstance item){
-				m_item = item;
-			}
-			public int slotID{
-				get{return m_slotID;}
-			}
-				int m_slotID = -1;
-			public void SetSlotID(int i){
-				m_slotID = i;
-			}
-			public int newSlotID{
-				get{return m_newSlotID;}
-			}
-				int m_newSlotID = -2;
-			public void SetNewSlotID(int id){
-				m_newSlotID = id;
-			}
-			public bool isToBeAdded{
-				get{return slotID == -1;}
-			}
-			public bool isToBeRemoved{
-				get{return newSlotID == -1;}
-			}
-			public ISlotGroup sg{
+			public override ISlotSystemBundle immediateBundle{
 				get{
-					if(parent != null)
-						return parent as ISlotGroup;
-					return null;
+					if(parent == null)
+						return null;
+					return parent.immediateBundle;
 				}
+			}
+			public override int level{
+				get{return sg.level +1;}
+			}
+			public override void SetHierarchy(){
+			}
+			public override IEnumerator<ISlotSystemElement> GetEnumerator(){
+				yield return null;
+			}
+			public override bool Contains(ISlotSystemElement element){
+				return false;
+			}
+			public override bool ContainsInHierarchy(ISlotSystemElement element){
+				return false;
+			}
+			public override void PerformInHierarchy(System.Action<ISlotSystemElement> act){
+				act(this);
+			}
+			public override void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
+				act(this, obj);
+			}
+			public override void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> obj){
+				act(this, obj);
+			}
+		/*	Transaction	*/
+			public ITransactionManager tam{
+				get{
+					if(m_tam != null)
+						return m_tam;
+					else
+						throw new InvalidOperationException("tam not set");
+				}
+			}ITransactionManager m_tam;
+			public void SetTAM(ITransactionManager tam){m_tam = tam;}
+			public virtual void SetPickedSB(){
+				if(tam != null){
+					tam.SetPickedSB((ISlottable)this);
+				}else
+					throw new System.InvalidOperationException("Slottable.SetPickedSB: ssm not set");
 			}
 			public virtual bool isPickedUp{
 				get{
 					return tam.pickedSB == (ISlottable)this;
 				}
 			}
-			public virtual bool isStackable{
-				get{return item.Item.IsStackable;}
-			}
 			public bool passesPrePickFilter{
 				get{return !tam.IsTransactionGoingToBeRevert(this);}
 			}
-			public int quantity{
-				get{return item.quantity;}
-			}
-			public void SetQuantity(int quant){
-				item.quantity = quant;
-			}
-		/*	SlotSystemElement imple	*/
-			/*	fields	*/
-				public override ISlotSystemElement this[int i]{
-					get{return null;}
-				}
-				protected override IEnumerable<ISlotSystemElement> elements{
-					get{return null;}
-				}
-				public override string eName{
-					get{return SlotSystemUtil.SBName(this);}
-				}
-				public override ISlotSystemElement parent{
-					get{
-						if(ssm != null)
-							return ssm.FindParent(this);
-						else
-							throw new System.InvalidOperationException("Slottable.parent: ssm is not set");
-					}
-				}
-				public override ISlotSystemBundle immediateBundle{
-					get{
-						if(parent == null)
-							return null;
-						return parent.immediateBundle;
-					}
-				}
-				public override int level{
-					get{return sg.level +1;}
-				}
-			/*	methods	*/
-				public override IEnumerator<ISlotSystemElement> GetEnumerator(){
-					yield return null;
-				}
-				public override bool Contains(ISlotSystemElement element){
-					return false;
-				}
-				public override bool ContainsInHierarchy(ISlotSystemElement element){
-					return false;
-				}
-				public override void PerformInHierarchy(System.Action<ISlotSystemElement> act){
-					act(this);
-				}
-				public override void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
-					act(this, obj);
-				}
-				public override void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> obj){
-					act(this, obj);
-				}
-		/*	Event methods	*/
-			/*	Action Event	*/
-				public void OnPointerDown(PointerEventDataFake eventDataMock){
-					curActState.OnPointerDown(this, eventDataMock);
-				}
-				public void OnPointerUp(PointerEventDataFake eventDataMock){
-					curActState.OnPointerUp(this, eventDataMock);
-				}
-				public void OnDeselected(PointerEventDataFake eventDataMock){
-					curActState.OnDeselected(this, eventDataMock);
-				}
-				public void OnEndDrag(PointerEventDataFake eventDataMock){
-					curActState.OnEndDrag(this, eventDataMock);
-				}
-		/*	other Interface implementation	*/
-			int IComparable.CompareTo(object other){
-				if(!(other is ISlottable))
-					throw new InvalidOperationException("CompareTo: no a slottable");
-				return CompareTo((ISlottable)other);
-			}
-			public int CompareTo(ISlottable other){
-				return this.item.CompareTo(other.item);
-			}
-			public static bool operator > (Slottable a, ISlottable b){
-				return a.CompareTo(b) > 0;
-			}
-			public static bool operator < (Slottable a, ISlottable b){
-				return a.CompareTo(b) < 0;
-			}
-		/*	methods	*/
-			public override void InitializeStates(){
-				Deactivate();
-				WaitForAction();
-				SetEqpState(null);
-				SetMrkState(unmarkedState);
-			}
-			public override void SetHierarchy(){
-			}
-			public virtual void Increment(){
-				SetActState(pickedUpState);
-				if(isStackable && quantity > m_pickedAmount){
-					m_pickedAmount ++;
-				}
-			}
 			public virtual void ExecuteTransaction(){
 				tam.ExecuteTransaction();
-			}
-			public void UpdateEquipState(){
-				if(item.isEquipped) Equip();
-				else Unequip();
-			}
-			public void Refresh(){
-				WaitForAction();
-				pickedAmount = 0;
-				SetNewSlotID(-2);
-			}
-			public bool ShareSGAndItem(ISlottable other){
-				bool flag = true;
-				flag &= this.sg == other.sg;
-				flag &= this.item == other.item;
-				return flag;
-			}
-			public bool HaveCommonItemFamily(ISlottable other){
-				if(this.item is BowInstance)
-					return (other.item is BowInstance);
-				else if(this.item is WearInstance)
-					return (other.item is WearInstance);
-				else if(this.item is CarriedGearInstance)
-					return (other.item is CarriedGearInstance);
-				else if(this.item is PartsInstance)
-					return (other.item is PartsInstance);
-				else 
-					return false;
-			}
-			public void Destroy(){
-				GameObject go = gameObject;
-				DestroyImmediate(go);
-			}
-		/*	Forward	*/
-			public virtual void SetPickedSB(){
-				if(tam != null){
-					tam.SetPickedSB((ISlottable)this);
-				}else
-					throw new System.InvalidOperationException("Slottable.SetPickedSB: ssm not set");
 			}
 			public virtual void Probe(){
 				tam.Probe();
@@ -617,24 +610,6 @@ namespace SlotSystem{
 			public virtual void UpdateTA(){
 				tam.UpdateFields();
 			}
-			public virtual bool isPool{
-				get{
-					if(sg != null){
-						return sg.isPool;
-					}else
-						throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
-				}
-			}
-			public ITransactionManager tam{
-				get{
-					if(m_tam != null)
-						return m_tam;
-					else
-						throw new InvalidOperationException("tam not set");
-				}
-			}ITransactionManager m_tam;
-			public void SetTAM(ITransactionManager tam){m_tam = tam;}
-		/* Hoverable */
 			public IHoverable hoverable{
 				get{
 					if(m_hoverable == null)
@@ -655,14 +630,8 @@ namespace SlotSystem{
 			public void OnHoverExit(){
 				hoverable.OnHoverExit();
 			}
-			public void SetHovered(){
-				hoverable.SetHovered();
-			}
-			public void UnsetHovered(){
-				hoverable.UnsetHovered();
-			}
 	}
-	public interface ISlottable: ISlotSystemElement ,IComparable<ISlottable>, IComparable{
+	public interface ISlottable: ISlotSystemElement{
 		/*	States and Processes	*/
 			/* States */
 				/* ActStates */
@@ -745,53 +714,49 @@ namespace SlotSystem{
 					System.Func<IEnumeratorFake> markCoroutine{get;}
 		/*	Commands	*/
 			void Tap();
-		/*	fields	*/
-			bool isHierarchySetUp{get;}
-			bool delayed{get;set;}
-			int pickedAmount{get;set;}
+		/*	Event Methods	*/
+			void OnPointerDown(PointerEventDataFake eventDataMock);
+			void OnPointerUp(PointerEventDataFake eventDataMock);
+			void OnDeselected(PointerEventDataFake eventDataMock);
+			void OnEndDrag(PointerEventDataFake eventDataMock);
+		/* Item Handling */
+			void Increment();
 			void SetItem(InventoryItemInstance item);
 			InventoryItemInstance item{get;}
+			void UpdateEquipState();
+			bool isStackable{get;}
+			int pickedAmount{get;set;}
+			int quantity{get;}
+			void SetQuantity(int quant);
+		/* SG And Slot */
+			ISlotGroup sg{get;}
+			bool isPool{get;}
+			bool isHierarchySetUp{get;}
 			int slotID{get;}
 			void SetSlotID(int i);
 			int newSlotID{get;}
 			void SetNewSlotID(int id);
 			bool isToBeAdded{get;}
 			bool isToBeRemoved{get;}
-			ISlotGroup sg{get;}
-			bool isPickedUp{get;}
-			bool isStackable{get;}
-			bool passesPrePickFilter{get;}
-			int quantity{get;}
-			void SetQuantity(int quant);
-		/*	Event Methods	*/
-			void OnPointerDown(PointerEventDataFake eventDataMock);
-			void OnPointerUp(PointerEventDataFake eventDataMock);
-			void OnDeselected(PointerEventDataFake eventDataMock);
-			void OnEndDrag(PointerEventDataFake eventDataMock);
-		/*	Methods	*/
-			void Increment();
-			void ExecuteTransaction();
-			void UpdateEquipState();
-			void Refresh();
-			bool ShareSGAndItem(ISlottable other);
-			bool HaveCommonItemFamily(ISlottable other);
-			void Destroy();
-		/*	Forward	*/
+		/* Transaction */
+			ITransactionManager tam{get;}
 			void SetPickedSB();
 			void SetDIcon1();
 			void SetDIcon2();
 			void CreateTAResult();
 			void UpdateTA();
-			bool isPool{get;}
 			void Probe();
-			ITransactionManager tam{get;}
-			void SetTAM(ITransactionManager tam);
-		/* Hoverable */
 			IHoverable hoverable{get;}
 			bool isHovered{get;}
+			bool isPickedUp{get;}
+			bool passesPrePickFilter{get;}
+			void ExecuteTransaction();
 			void OnHoverEnter();
 			void OnHoverExit();
-			void SetHovered();
-			void UnsetHovered();
+		/* Other */
+			bool delayed{get;set;}
+			void Refresh();
+			bool ShareSGAndItem(ISlottable other);
+			void Destroy();
 	}
 }
