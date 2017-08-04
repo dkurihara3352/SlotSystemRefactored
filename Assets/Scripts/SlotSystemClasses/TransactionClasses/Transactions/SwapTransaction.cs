@@ -13,12 +13,7 @@ namespace SlotSystem{
 			m_selectedSB = selected;
 			m_origSG = m_pickedSB.sg;
 			m_selectedSG = m_selectedSB.sg;
-		}
-		public SwapTransaction(SwapTransaction orig){
-			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
-			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
-			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
-			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
+			tam = m_pickedSB.tam;
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}
@@ -35,10 +30,10 @@ namespace SlotSystem{
 			sg2.OnActionExecute();
 			base.Execute();
 		}
-		public override void OnComplete(){
+		public override void OnCompleteTransaction(){
 			sg1.OnCompleteSlotMovements();
 			sg2.OnCompleteSlotMovements();
-			base.OnComplete();
+			base.OnCompleteTransaction();
 		}
 	}
 	public interface ISwapTransaction: ISlotSystemTransaction{}

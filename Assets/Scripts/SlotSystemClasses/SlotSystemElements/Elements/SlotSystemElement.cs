@@ -20,10 +20,10 @@ namespace SlotSystem{
 				ISSESelState deactivatedState{
 					get{return selStateFactory.MakeDeactivatedState();}
 				}
-				public virtual bool isDeactivated{
+				public bool isDeactivated{
 					get{return curSelState == deactivatedState;}
 				}
-				public virtual bool wasDeactivated{
+				public bool wasDeactivated{
 					get{return prevSelState == deactivatedState;}
 				}
 			public virtual void Defocus(){
@@ -32,10 +32,10 @@ namespace SlotSystem{
 				ISSESelState defocusedState{
 					get{return selStateFactory.MakeDefocusedState();}
 				}
-				public virtual bool isDefocused{
+				public bool isDefocused{
 					get{return curSelState == defocusedState;}
 				}
-				public virtual bool wasDefocused{
+				public bool wasDefocused{
 					get{return prevSelState == defocusedState;}
 				}
 			public virtual void Focus(){
@@ -44,10 +44,10 @@ namespace SlotSystem{
 				ISSESelState focusedState{
 					get{return selStateFactory.MakeFocusedState();}
 				}
-				public virtual bool isFocused{
+				public bool isFocused{
 					get{return curSelState == focusedState;}
 				}
-				public virtual bool wasFocused{
+				public bool wasFocused{
 					get{return prevSelState == focusedState;}
 				}
 			public virtual void Select(){
@@ -56,10 +56,10 @@ namespace SlotSystem{
 				ISSESelState selectedState{
 					get{return selStateFactory.MakeSelectedState();}
 				}
-				public virtual bool isSelected{
+				public bool isSelected{
 					get{return curSelState == selectedState;}
 				}
-				public virtual bool wasSelected{
+				public bool wasSelected{
 					get{return prevSelState == selectedState;}
 				}
 			public virtual void Activate(){
@@ -71,17 +71,14 @@ namespace SlotSystem{
 			public virtual void InitializeStates(){
 				Deactivate();
 			}
-			public virtual ISSESelStateFactory selStateFactory{
+			ISSESelStateFactory selStateFactory{
 				get{
 					if(m_selStateFactory == null)
 						m_selStateFactory = new SSESelStateFacotory(this);
 					return m_selStateFactory;
 				}
 			}
-				protected ISSESelStateFactory m_selStateFactory;
-			public void SetSelStateFactory(ISSESelStateFactory factory){
-				m_selStateFactory = factory;
-			}
+				ISSESelStateFactory m_selStateFactory;
 			ISSEStateEngine<ISSESelState> selStateEngine{
 				get{
 					if(m_selStateEngine == null)
@@ -90,9 +87,6 @@ namespace SlotSystem{
 				}
 			}
 				ISSEStateEngine<ISSESelState> m_selStateEngine;
-			void SetSelStateEngine(ISSEStateEngine<ISSESelState> engine){
-				m_selStateEngine = engine;
-			}
 			ISSESelState prevSelState{
 				get{return selStateEngine.prevState;}
 			}
@@ -105,13 +99,13 @@ namespace SlotSystem{
 					SetAndRunSelProcess(null);
 			}
 		/*	process	*/
-			public virtual void SetAndRunSelProcess(ISSESelProcess process){
+			public void SetAndRunSelProcess(ISSESelProcess process){
 				selProcEngine.SetAndRunProcess(process);
 			}
-			public virtual ISSESelProcess selProcess{
+			public ISSESelProcess selProcess{
 				get{return selProcEngine.process;}
 			}
-			public virtual ISSEProcessEngine<ISSESelProcess> selProcEngine{
+			ISSEProcessEngine<ISSESelProcess> selProcEngine{
 				get{
 					if(m_selProcEngine == null)
 						m_selProcEngine = new SSEProcessEngine<ISSESelProcess>();
@@ -119,7 +113,7 @@ namespace SlotSystem{
 				}
 			}
 				ISSEProcessEngine<ISSESelProcess> m_selProcEngine;
-			public virtual void SetSelProcEngine(ISSEProcessEngine<ISSESelProcess> engine){
+			public void SetSelProcEngine(ISSEProcessEngine<ISSESelProcess> engine){
 				m_selProcEngine = engine;
 			}
 			/* Coroutines */
@@ -179,7 +173,7 @@ namespace SlotSystem{
 				foreach(var e in this)
 					e.SetParent(this);
 			}
-			public virtual bool isActivatedOnDefault{
+			public bool isActivatedOnDefault{
 				get{
 					ISlotSystemElement inspected = parent;
 					while(true){
@@ -211,7 +205,7 @@ namespace SlotSystem{
 							ele.Defocus();
 					}
 				}
-			public virtual bool isFocusedInHierarchy{
+			public bool isFocusedInHierarchy{
 				get{
 					ISlotSystemElement inspected = this;
 					while(true){
@@ -225,7 +219,7 @@ namespace SlotSystem{
 					return true;
 				}
 			}			
-			public virtual bool isFocusableInHierarchy{
+			public bool isFocusableInHierarchy{
 				get{
 					ISlotSystemElement inspected = this;
 					while(true){
@@ -239,12 +233,12 @@ namespace SlotSystem{
 					return true;
 				}
 			}
-			public virtual bool isBundleElement{
+			public bool isBundleElement{
 				get{
 					return parent is ISlotSystemBundle;
 				}
 			}
-			public virtual ISlotSystemBundle immediateBundle{
+			public ISlotSystemBundle immediateBundle{
 				get{
 					if(parent == null)
 						return null;
@@ -258,14 +252,14 @@ namespace SlotSystem{
 				get{return m_parent;}
 			}
 				ISlotSystemElement m_parent;
-			public virtual void SetParent(ISlotSystemElement par){
+			public void SetParent(ISlotSystemElement par){
 				m_parent = par;
 			}
-			public virtual ISlotSystemManager ssm{
+			public ISlotSystemManager ssm{
 				get{return m_ssm;}
 			}
 				ISlotSystemManager m_ssm;
-			public virtual void SetSSM(ISlotSystemElement ssm){
+			public void SetSSM(ISlotSystemElement ssm){
 				m_ssm = (ISlotSystemManager)ssm;
 			}
 			public virtual bool ContainsInHierarchy(ISlotSystemElement ele){
@@ -281,25 +275,28 @@ namespace SlotSystem{
 				}
 				throw new System.ArgumentNullException();
 			}
-			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement> act){
+			public void PerformInHierarchy(System.Action<ISlotSystemElement> act){
 				act(this);
 				if(elements != null)
 					foreach(ISlotSystemElement ele in this){
-						ele.PerformInHierarchy(act);
+						if(ele != null)
+							ele.PerformInHierarchy(act);
 					}
 			}
-			public virtual void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
+			public void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
 				act(this, obj);
 				if(elements != null)
 					foreach(ISlotSystemElement ele in this){
-						ele.PerformInHierarchy(act, obj);
+						if(ele != null)
+							ele.PerformInHierarchy(act, obj);
 					}
 			}
-			public virtual void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list){
+			public void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list){
 				act(this, list);
 				if(elements != null)
 					foreach(ISlotSystemElement ele in this){
-						ele.PerformInHierarchy<T>(act, list);
+						if(ele != null)
+							ele.PerformInHierarchy<T>(act, list);
 					}
 			}
 			public virtual bool Contains(ISlotSystemElement element){
@@ -310,8 +307,10 @@ namespace SlotSystem{
 					}
 				return false;
 			}
-			public void SetElements(IEnumerable<ISlotSystemElement> elements){m_elements = elements;}
-			public virtual ISlotSystemElement this[int i]{
+			public virtual void SetElements(IEnumerable<ISlotSystemElement> elements){
+				m_elements = elements;
+			}
+			public ISlotSystemElement this[int i]{
 				get{
 					int id = 0;
 					foreach(var ele in elements){
@@ -321,22 +320,22 @@ namespace SlotSystem{
 					throw new System.ArgumentOutOfRangeException("AbsSlotSysElement.indexer: argument out of range");
 				}
 			}
-			public virtual string eName{
-				get{return m_eName;}
-			}
-				protected string m_eName;
 			protected virtual IEnumerable<ISlotSystemElement> elements{
-				get{return m_elements;}
+				get{
+					if(m_elements == null)
+						m_elements = new ISlotSystemElement[]{};
+					return m_elements;
+				}
 			}
-				protected IEnumerable<ISlotSystemElement> m_elements;
-			public virtual int level{
+				IEnumerable<ISlotSystemElement> m_elements;
+			public int level{
 				get{
 					if(parent == null)
 						return 0;
 					return parent.level + 1;
 				}
 			}
-			public virtual IEnumerator<ISlotSystemElement> GetEnumerator(){
+			public IEnumerator<ISlotSystemElement> GetEnumerator(){
 				foreach(ISlotSystemElement ele in elements)
 					yield return ele;
 			}
@@ -344,7 +343,7 @@ namespace SlotSystem{
 					return GetEnumerator();
 				}	
 	}
-	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, IStateHandler{
+	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>{
 		/* Sel states */
 			bool isSelStateNull{get;}
 			bool wasSelStateNull{get;}
@@ -364,7 +363,6 @@ namespace SlotSystem{
 			void Deselect();
 			void InitializeStates();
 			void SetAndRunSelProcess(ISSESelProcess process);
-			ISSESelProcess selProcess{get;}
 			System.Func<IEnumeratorFake> deactivateCoroutine{get;}
 			System.Func<IEnumeratorFake> focusCoroutine{get;}
 			System.Func<IEnumeratorFake> defocusCoroutine{get;}
@@ -372,13 +370,10 @@ namespace SlotSystem{
 		void InstantFocus();
 		void InstantDefocus();
 		void InstantSelect();
-
 		void SetHierarchy();
 		bool isActivatedOnDefault{get;set;}
-		void ActivateRecursively();
 		bool isFocusedInHierarchy{get;}
 		bool isFocusableInHierarchy{get;}
-		bool isBundleElement{get;}
 		ISlotSystemBundle immediateBundle{get;}
 		ISlotSystemElement parent{get;}
 		void SetParent(ISlotSystemElement par);
@@ -390,7 +385,6 @@ namespace SlotSystem{
 		void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list);
 		bool Contains(ISlotSystemElement element);
 		ISlotSystemElement this[int i]{get;}
-		string eName{get;}
 		int level{get;}
 	}
 }

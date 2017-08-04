@@ -197,6 +197,101 @@ namespace SlotSystemTests{
 				Assert.That(tam.sg2, Is.SameAs(stubSG2));
 				Assert.That(tam.transaction, Is.SameAs(stubTA));
 			}
+			[Test]
+			public void SetTAMRecursively_Always_SetsIHoverableTAMThis(){
+				SlotSystemManager ssm = MakeSSM();
+					SlotSystemBundle pBun = MakeSSBundle();
+					pBun.transform.SetParent(ssm.transform);
+						SlotGroup sgpA = MakeSG();
+							sgpA.transform.SetParent(pBun.transform);
+							PoolInventory pInv = new PoolInventory();
+								BowInstance bowA = MakeBowInstance(0);
+								WearInstance wearA = MakeWearInstance(0);
+								ShieldInstance shieldA = MakeShieldInstance(0);
+								MeleeWeaponInstance mWeaponA = MakeMeleeWeaponInstance(0);
+								pInv.Add(bowA);
+								pInv.Add(wearA);
+								pInv.Add(shieldA);
+								pInv.Add(mWeaponA);
+							sgpA.InspectorSetUp(pInv, new SGNullFilter(), new SGItemIDSorter(), 0);
+							sgpA.SetHierarchy();
+							IEnumerable<ISlotSystemElement> xSGPAEles;
+								ISlottable bowSBP = sgpA.GetSB(bowA);
+								ISlottable wearSBP = sgpA.GetSB(wearA);
+								ISlottable shieldSBP = sgpA.GetSB(shieldA);
+								ISlottable mWeaponSBP = sgpA.GetSB(mWeaponA);
+								xSGPAEles = new ISlotSystemElement[]{bowSBP, wearSBP, shieldSBP, mWeaponSBP};
+						SlotGroup sgpB = MakeSG();
+							sgpB.transform.SetParent(pBun.transform);
+						pBun.SetHierarchy();
+					SlotSystemBundle eBun = MakeSSBundle();
+					eBun.transform.SetParent(ssm.transform);
+						EquipmentSet eSetA = MakeEquipmentSet();
+						eSetA.transform.SetParent(eBun.transform);
+							IEquipmentSetInventory eInv = new EquipmentSetInventory(MakeBowInstance(0), MakeWearInstance(0), new List<CarriedGearInstance>(), 1);
+							SlotGroup sgeBow = MakeSG();
+								sgeBow.transform.SetParent(eSetA.transform);
+								sgeBow.InspectorSetUp(eInv, new SGBowFilter(), new SGItemIDSorter(), 1);
+							SlotGroup sgeWear = MakeSG();
+								sgeWear.transform.SetParent(eSetA.transform);
+								sgeWear.InspectorSetUp(eInv, new SGWearFilter(), new SGItemIDSorter(), 1);
+							SlotGroup sgeCGears = MakeSG();
+								sgeCGears.transform.SetParent(eSetA.transform);
+								sgeCGears.InspectorSetUp(eInv, new SGCGearsFilter(), new SGItemIDSorter(), 1);
+							eSetA.SetHierarchy();
+						eBun.SetHierarchy();
+					SlotSystemBundle gBunA = MakeSSBundle();
+					gBunA.transform.SetParent(ssm.transform);
+						TestSlotSystemElement ssegA = MakeTestSSE();
+						ssegA.transform.SetParent(gBunA.transform);
+							SlotGroup sggAA = MakeSG();
+							sggAA.transform.SetParent(ssegA.transform);
+							SlotGroup sggAB = MakeSG();
+							sggAB.transform.SetParent(ssegA.transform);
+						ssegA.SetHierarchy();
+						SlotSystemBundle gBunAA = MakeSSBundle();
+						gBunAA.transform.SetParent(gBunA.transform);
+							SlotGroup sggAAA = MakeSG();
+							sggAAA.transform.SetParent(gBunAA.transform);
+							SlotGroup sggAAB = MakeSG();
+							sggAAB.transform.SetParent(gBunAA.transform);
+						gBunAA.SetHierarchy();
+					gBunA.SetHierarchy();
+				ssm.SetHierarchy();
+					IEnumerable<ISlotSystemElement> xSSMEles = new ISlotSystemElement[]{pBun, eBun, gBunA};
+					Assert.That(ssm.MemberEquals(xSSMEles), Is.True);
+					IEnumerable<ISlotSystemElement> xPBunEles = new ISlotSystemElement[]{sgpA, sgpB};
+					Assert.That(pBun.MemberEquals(xPBunEles), Is.True);
+					Assert.That(sgpA.MemberEquals(xSGPAEles), Is.True);
+					IEnumerable<ISlotSystemElement> xEBunEles = new ISlotSystemElement[]{eSetA};
+					Assert.That(eBun.MemberEquals(xEBunEles), Is.True);
+					IEnumerable<ISlotSystemElement> xESetAEles = new ISlotSystemElement[]{sgeBow, sgeWear, sgeCGears};
+					Assert.That(eSetA.MemberEquals(xESetAEles), Is.True);
+					IEnumerable<ISlotSystemElement> xGBunAEles = new ISlotSystemElement[]{ssegA, gBunAA};
+					Assert.That(gBunA.MemberEquals(xGBunAEles), Is.True);
+					IEnumerable<ISlotSystemElement> xSSEGAEles = new ISlotSystemElement[]{sggAA, sggAB};
+					Assert.That(ssegA.MemberEquals(xSSEGAEles), Is.True);
+					IEnumerable<ISlotSystemElement> xGBunAAEles = new ISlotSystemElement[]{sggAAA, sggAAB};
+					Assert.That(gBunAA.MemberEquals(xGBunAAEles), Is.True);
+				ITransactionManager tam = MakeTAM();
+					tam.SetSSM(ssm);
+				
+				tam.SetTAMRecursively();
+
+				Assert.That(sgpA.tam, Is.SameAs(tam));
+					Assert.That(bowSBP.tam, Is.SameAs(tam));
+					Assert.That(wearSBP.tam, Is.SameAs(tam));
+					Assert.That(shieldSBP.tam, Is.SameAs(tam));
+					Assert.That(mWeaponSBP.tam, Is.SameAs(tam));
+				Assert.That(sgpB.tam, Is.SameAs(tam));
+				Assert.That(sgeBow.tam, Is.SameAs(tam));
+				Assert.That(sgeWear.tam, Is.SameAs(tam));
+				Assert.That(sgeCGears.tam, Is.SameAs(tam));
+				Assert.That(sggAA.tam, Is.SameAs(tam));
+				Assert.That(sggAB.tam, Is.SameAs(tam));
+				Assert.That(sggAAA.tam, Is.SameAs(tam));
+				Assert.That(sggAAB.tam, Is.SameAs(tam));
+			}
 		}
 	}
 }

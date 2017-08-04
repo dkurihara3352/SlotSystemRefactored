@@ -174,15 +174,12 @@ namespace SlotSystem{
             public PickingUpState(ISlottable sb): base(sb){}
             public override void EnterState(){
                 if(sb.wasWaitingForPickUp || sb.wasWaitingForNextTouch){
-                    if(!sb.isSelStateNull)
-                        sb.OnHoverEnter();
-                    if(sb.tam != null){
-                        sb.SetPickedSB();
-                        sb.Probe();
-                        sb.SetDIcon1();
-                        sb.CreateTAResult();
-                        sb.UpdateTA();
-                    }
+                    sb.OnHoverEnter();
+                    sb.SetPickedSB();
+                    sb.Probe();
+                    sb.SetDIcon1();
+                    sb.CreateTAResult();
+                    sb.UpdateTA();
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than WaitForPickUpState or WaitForNextTouchState");
                 ISBActProcess pickedUpProcess = new PickUpProcess(sb, sb.pickUpCoroutine);

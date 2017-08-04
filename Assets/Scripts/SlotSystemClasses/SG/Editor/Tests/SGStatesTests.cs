@@ -84,7 +84,7 @@ namespace SlotSystemTests{
 
 					revState.EnterState();
 
-					mockSG.Received().UpdateToRevert();
+					mockSG.Received().RevertAndUpdateSBs();
 
 					}
 				[Test]

@@ -26,7 +26,7 @@ namespace SlotSystem{
 			}
 			public override void Expire(){
 				base.Expire();
-				tam.OnComplete();
+				tam.OnCompleteTransaction();
 			}
 		}
 }

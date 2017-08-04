@@ -11,11 +11,7 @@ namespace SlotSystem{
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
 			m_origSG = m_pickedSB.sg;
-		}
-		public ReorderTransaction(ReorderTransaction orig){
-			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
-			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
-			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
+			tam = pickedSB.tam;
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}
@@ -26,9 +22,9 @@ namespace SlotSystem{
 			sg1.OnActionExecute();
 			base.Execute();
 		}
-		public override void OnComplete(){
+		public override void OnCompleteTransaction(){
 			sg1.OnCompleteSlotMovements();
-			base.OnComplete();
+			base.OnCompleteTransaction();
 		}
 	}
 	public interface IReorderTransaction: ISlotSystemTransaction{}

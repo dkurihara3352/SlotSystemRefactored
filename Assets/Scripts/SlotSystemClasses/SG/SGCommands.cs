@@ -3,16 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public interface SlotGroupCommand{
-		void Execute(ISlotGroup Sg);
+	public abstract class SGCommand: ISGCommand{
+		protected ISlotGroup sg;
+		public SGCommand(ISlotGroup sg){
+			this.sg = sg;
+		}
+		public abstract void Execute();
+
 	}
-	public class SGEmptyCommand: ISGEmptyCommand{
-		public void Execute(ISlotGroup sg){
+	public interface ISGCommand{
+		void Execute();
+	}
+	public class SGCommandsFactory: ISGCommandsFactory{
+		ISlotGroup sg;
+		public SGCommandsFactory(ISlotGroup sg){
+			this.sg = sg;
+		}
+		public ISGCommand MakeInitializeItemsCommand(){
+			if(_InitializeItemsCommand == null)
+				_InitializeItemsCommand = new SGInitItemsCommand(sg);
+			return _InitializeItemsCommand;
+		}
+			ISGCommand _InitializeItemsCommand;
+		public ISGCommand MakeOnActionCompleteCommand(){
+			if(_OnActionCompleteCommand == null)
+				_OnActionCompleteCommand = new SGEmptyCommand(sg);
+			return _OnActionCompleteCommand;
+		}
+			ISGCommand _OnActionCompleteCommand;
+		public ISGCommand MakeOnActionExecuteCommand(){
+			if(_OnActionExecuteCommand == null)
+				_OnActionExecuteCommand = new SGUpdateEquipAtExecutionCommand(sg);
+			return _OnActionExecuteCommand;
+		}
+			ISGCommand _OnActionExecuteCommand;
+	}
+	public interface ISGCommandsFactory{
+		ISGCommand MakeInitializeItemsCommand();
+		ISGCommand MakeOnActionCompleteCommand();
+		ISGCommand MakeOnActionExecuteCommand();
+	}
+	public class SGEmptyCommand: SGCommand, ISGEmptyCommand{
+		public SGEmptyCommand(ISlotGroup sg): base(sg){}
+		public override void Execute(){
 		}
 	}
-	public interface ISGEmptyCommand: SlotGroupCommand{}
-	public class SGInitItemsCommand: ISGInitItemsCommand{
-		public void Execute(ISlotGroup sg){
+	public interface ISGEmptyCommand: ISGCommand{}
+	public class SGInitItemsCommand: SGCommand,ISGInitItemsCommand{
+		public SGInitItemsCommand(ISlotGroup sg): base(sg){}
+		public override void Execute(){
 			List<SlottableItem> items = new List<SlottableItem>(sg.inventory);
 			items = sg.FilterItem(items);
 			sg.InitSlots(items);
@@ -22,9 +61,10 @@ namespace SlotSystem{
 				sg.InstantSort();
 		}
 	}
-		public interface ISGInitItemsCommand: SlotGroupCommand{}
-	public class SGUpdateEquipAtExecutionCommand: ISGUpdateEquipAtExeecutionCommand{
-		public void Execute(ISlotGroup sg){
+		public interface ISGInitItemsCommand: ISGCommand{}
+	public class SGUpdateEquipAtExecutionCommand: SGCommand, ISGUpdateEquipAtExeecutionCommand{
+		public SGUpdateEquipAtExecutionCommand(ISlotGroup sg): base(sg){}
+		public override void Execute(){
 			foreach(ISlottable sb in sg){
 				if(sb != null){
 					InventoryItemInstance item = sb.item;
@@ -37,11 +77,12 @@ namespace SlotSystem{
 			}
 		}
 	}
-		public interface ISGUpdateEquipAtExeecutionCommand: SlotGroupCommand{}
-	public class SGUpdateEquipStatusCommand: ISGUpdateEquipStatusCommand{
-		public void Execute(ISlotGroup sg){
+		public interface ISGUpdateEquipAtExeecutionCommand: ISGCommand{}
+	public class SGUpdateEquipStatusCommand: SGCommand, ISGUpdateEquipStatusCommand{
+		public SGUpdateEquipStatusCommand(ISlotGroup sg): base(sg){}
+		public override void Execute(){
 			sg.UpdateEquipStatesOnAll();
 		}
 	}
-		public interface ISGUpdateEquipStatusCommand: SlotGroupCommand{}
+		public interface ISGUpdateEquipStatusCommand: ISGCommand{}
 }

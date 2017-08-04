@@ -18,7 +18,7 @@ namespace SlotSystem{
 		ISortTransactionFactory sortFA{
 			get{
 				if(m_sortFA == null)
-					m_sortFA = new SortTransactionFactory();
+					m_sortFA = new SortTransactionFactory(tam);
 				return m_sortFA;
 			}
 		}
@@ -31,6 +31,10 @@ namespace SlotSystem{
 		void SortSG(ISlotGroup sg, SGSorter sorter);
 	}
 	public class SortTransactionFactory: ISortTransactionFactory{
+		ITransactionManager tam;
+		public SortTransactionFactory(ITransactionManager tam){
+			this.tam = tam;
+		}
 		public ISortTransaction MakeSortTA(ISlotGroup sg, SGSorter sorter){
 			return new SortTransaction(sg, sorter);
 		}

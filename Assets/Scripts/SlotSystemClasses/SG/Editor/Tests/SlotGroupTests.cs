@@ -718,73 +718,8 @@ namespace SlotSystemTests{
 					sbB.Received().Defocus();
 					sbC.Received().Defocus();
 					}
-				
-				
 				[Test]
-				public void PerformInHierarchyV1_WhenCalled_ActsOnSelfAndAllSBs(){
-					SlotGroup sg = MakeSG();
-						List<ISlottable> sbs;
-							ISlottable sbA = MakeSubSB();
-							ISlottable sbB = MakeSubSB();
-							ISlottable sbC = MakeSubSB();
-						sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
-						sg.SetSBs(sbs);
-					
-					sg.PerformInHierarchy(TestMethodV1);
-
-					Assert.That(sg.isFocused, Is.True);
-					sbA.Received().Focus();
-					sbB.Received().Focus();
-					sbC.Received().Focus();
-					}
-					void TestMethodV1(ISlotSystemElement ele){
-						ele.Focus();
-					}
-				[Test]
-				public void PerformInHierarchyV2_WhenCalled_ActsOnSelfAndAllSBs(){
-					SlotGroup sg = MakeSG();
-						List<ISlottable> sbs;
-							ISlottable sbA = MakeSubSB();
-							ISlottable sbB = MakeSubSB();
-							ISlottable sbC = MakeSubSB();
-						sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
-						sg.SetSBs(sbs);
-					ISlotSystemElement stubEle = MakeSubSSE();
-					sg.PerformInHierarchy(TestMethodV2, stubEle);
-
-					Assert.That(sg.parent, Is.SameAs(stubEle));
-					sbA.Received().SetParent(stubEle);
-					sbB.Received().SetParent(stubEle);
-					sbC.Received().SetParent(stubEle);
-					}
-					void TestMethodV2(ISlotSystemElement ele, object o){
-						ISlotSystemElement e = (ISlotSystemElement)o;
-						ele.SetParent(e);
-					}
-				[Test]
-				public void PerformInHierarchyV3_WhenCalled_ActsOnSelfAndAllSBs(){
-					SlotGroup sg = MakeSG();
-						List<ISlottable> sbs;
-							ISlottable sbA = MakeSubSB();
-							ISlottable sbB = MakeSubSB();
-							ISlottable sbC = MakeSubSB();
-						sbs = new List<ISlottable>(new ISlottable[]{sbA, null, null, sbB, sbC});
-						sg.SetSBs(sbs);
-					List<ISlotSystemElement> list = new List<ISlotSystemElement>();
-					List<ISlotSystemElement> expected = new List<ISlotSystemElement>(new ISlotSystemElement[]{
-						sg, sbA, sbB, sbC
-					});
-					
-					sg.PerformInHierarchy(TestMethodV3, list);
-
-					bool equality = list.MemberEquals(expected);
-					Assert.That(equality, Is.True);
-					}
-					void TestMethodV3(ISlotSystemElement ele, IList<ISlotSystemElement> list){
-						list.Add(ele);
-					}
-				[Test]
-				public void SetElements_WhenCalled_SetsElements(){
+				public void SetHierarchy_WhenCalled_SetsElements(){
 					SlotGroup sg = MakeSG();
 						GenericInventory inventory = new GenericInventory();
 							BowInstance bow = MakeBowInstance(0);
@@ -805,7 +740,7 @@ namespace SlotSystemTests{
 					Assert.That(actualEles.Count, Is.EqualTo(4));
 					}
 				[Test]
-				public void SetElements_WhenCalled_SetsSBsAndSlots(){
+				public void SetHierarchy_WhenCalled_SetsSBsAndSlots(){
 					SlotGroup sg = MakeSG();
 						GenericInventory inventory = new GenericInventory();
 							BowInstance bow = MakeBowInstance(0);
@@ -864,14 +799,14 @@ namespace SlotSystemTests{
 					public string name;
 					public SGFilter filter;
 					public Inventory inventory;
-					public SlotGroupCommand OnACompComm;
-					public SlotGroupCommand oAExecComm;
+					public ISGCommand OnACompComm;
+					public ISGCommand oAExecComm;
 					public bool isShrinkable;
 					public int initSlotsCount;
 					public bool isExpandable;
 					public SSEState sgSelState;
 					public SSEState sgActState;
-					public SGSetUpFieldsData(string name, SGFilter filter, Inventory inventory, SlotGroupCommand OnACompComm, SlotGroupCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
+					public SGSetUpFieldsData(string name, SGFilter filter, Inventory inventory, ISGCommand OnACompComm, ISGCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
 						this.name = name;
 						this.filter = filter;
 						this.inventory = inventory;
@@ -1798,7 +1733,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
 					
-					sg.UpdateToRevert();
+					sg.RevertAndUpdateSBs();
 					
 					bool equality = sg.newSBs.MemberEquals(sbs);
 					Assert.That(equality, Is.True);
@@ -1811,7 +1746,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
 					
-					sg.UpdateToRevert();
+					sg.RevertAndUpdateSBs();
 
 					Assert.That(sg.newSlots.Count, Is.EqualTo(count));
 					foreach(var slot in sg.newSlots)
@@ -1823,7 +1758,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
 					
-					sg.UpdateToRevert();
+					sg.RevertAndUpdateSBs();
 					
 					bool equality = sg.toList.MemberEquals(sbs);
 					Assert.That(equality, Is.True);
@@ -1834,7 +1769,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						sg.SetSBs(sbs);
 					
-					sg.UpdateToRevert();
+					sg.RevertAndUpdateSBs();
 
 					foreach(ISlottable sb in sg)
 						sb.Received().MoveWithin();

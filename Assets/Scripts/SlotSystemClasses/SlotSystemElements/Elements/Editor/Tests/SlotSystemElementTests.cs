@@ -435,7 +435,7 @@ namespace SlotSystemTests{
 					}
 			/*	Methods	*/
 				[Test]
-				public void SetElements_WhenCalled_SetsElements(){
+				public void SetHierarchy_HasTransformChildrenWithSSE_SetsThemElements(){
 					TestSlotSystemElement sse = MakeTestSSE();
 						TestSlotSystemElement childA = MakeTestSSE();
 							childA.transform.SetParent(sse.transform);
@@ -450,6 +450,38 @@ namespace SlotSystemTests{
 					bool equality = sse.MemberEquals(expectedEles);
 					Assert.That(equality, Is.True);
 					}
+				[Test]
+				public void SetHierarchy_HasTransformChildrenWithSSE_SetsTheirParentThis(){
+					TestSlotSystemElement sse = MakeTestSSE();
+						TestSlotSystemElement childA = MakeTestSSE();
+							childA.transform.SetParent(sse.transform);
+						TestSlotSystemElement childB = MakeTestSSE();
+							childB.transform.SetParent(sse.transform);
+						TestSlotSystemElement childC = MakeTestSSE();
+							childC.transform.SetParent(sse.transform);
+					
+					sse.SetHierarchy();
+
+					Assert.That(childA.parent, Is.SameAs(sse));
+					Assert.That(childB.parent, Is.SameAs(sse));
+					Assert.That(childC.parent, Is.SameAs(sse));
+				}
+				[Test]
+				public void SetHierarchy_HasTransformChildrenWithoutSSE_SetsElementsEmpty(){
+					TestSlotSystemElement sse = MakeTestSSE();
+						GameObject childA = MakeGO();
+						GameObject childB = MakeGO();
+						GameObject childC = MakeGO();
+					
+					sse.SetHierarchy();
+
+					Assert.That(sse, Is.Empty);
+				}
+				public GameObject MakeGO(){
+					GameObject go = new GameObject("go");
+					go.tag = "TestGO";
+					return go;
+				}
 				[Test]
 				public void ContainsInHierarchy_Various_ReturnsAccordingly(){
 					TestSlotSystemElement sse_0 = MakeTestSSE();
@@ -1028,7 +1060,8 @@ namespace SlotSystemTests{
 					
 					Assert.That(testSSE.Contains(stubMember), Is.True);
 					}
-			//
+
+			/* Other */
 				[TestCaseSource(typeof(isFocusableInHierarchyCases))]
 				public void isFocusableInHierarchy_AllAncestorsContainedInBundleFocusedElement_ReturnsTrue(TestSlotSystemElement top, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
 					foreach(var e in xOn)
@@ -1412,6 +1445,12 @@ namespace SlotSystemTests{
 								yield return case1;
 						}
 					}
+				[Test]
+				public void isActivatedOnDefault_ParentIsNull_ReturnsTrue(){
+					TestSlotSystemElement sse = MakeTestSSE();
+
+					Assert.That(sse.isActivatedOnDefault, Is.True);
+				}
 				[TestCaseSource(typeof(isActivatedOnDefaultCases))]
 				public void isActivatedOnDefault_Always_ReturnsAccordingly(TestSlotSystemElement sse, IEnumerable<ISlotSystemElement> xOn, IEnumerable<ISlotSystemElement> xOff){
 					sse.SetHierarchyRecursively();

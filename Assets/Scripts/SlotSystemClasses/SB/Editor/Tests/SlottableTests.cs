@@ -137,7 +137,8 @@ namespace SlotSystemTests{
 				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
 					Slottable sb = MakeSB();
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-						sb.SetTAM(stubTAM);					
+						sb.SetTAM(stubTAM);
+						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
@@ -149,7 +150,8 @@ namespace SlotSystemTests{
 				public void Pickup_FromValidPrevActState_SetsPickedAmountOne(){
 					Slottable sb = MakeSB();
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-						sb.SetTAM(stubTAM);					
+						sb.SetTAM(stubTAM);
+						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					

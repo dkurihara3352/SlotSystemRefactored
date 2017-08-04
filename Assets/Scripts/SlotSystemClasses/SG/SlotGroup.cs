@@ -22,197 +22,207 @@ namespace SlotSystem{
 								m_actStateEngine = new SSEStateEngine<ISGActState>();
 							return m_actStateEngine;
 						}
-						}ISSEStateEngine<ISGActState> m_actStateEngine;
-					void SetActStateEngine(ISSEStateEngine<ISGActState> engine){m_actStateEngine = engine;}
-					ISGActState curActState{
-						get{return actStateEngine.curState;}
 					}
-					ISGActState prevActState{
-						get{return actStateEngine.prevState;}
+						ISSEStateEngine<ISGActState> m_actStateEngine;
+					void SetActStateEngine(ISSEStateEngine<ISGActState> engine){
+						m_actStateEngine = engine;
 					}
 					void SetActState(ISGActState state){
 						actStateEngine.SetState(state);
 						if(state ==null && actProcess != null)
 							SetAndRunActProcess(null);
 					}
-					public bool wasActStateNull{get{return prevActState == null;}}
-					public virtual void ClearCurActState(){SetActState(null);}
-					/* act states */
-						ISGStatesFactory statesFactory{
-							get{
-								if(_statesFactory == null)
-									_statesFactory = new SGStatesFactory(this);
-								return _statesFactory;
-							}
+					ISGActState curActState{
+						get{return actStateEngine.curState;}
+					}
+					ISGActState prevActState{
+						get{return actStateEngine.prevState;}
+					}
+					ISGStatesFactory statesFactory{
+						get{
+							if(_statesFactory == null)
+								_statesFactory = new SGStatesFactory(this);
+							return _statesFactory;
 						}
-							ISGStatesFactory _statesFactory;
-						public void WaitForAction(){
-							SetActState(waitForActionState);
+					}
+						ISGStatesFactory _statesFactory;
+					public void ClearCurActState(){
+						SetActState(null);
+					}
+						public bool isActStateNull{
+							get{return curActState == null;}
 						}
-							public ISGActState waitForActionState{
-								get{return statesFactory.MakeWaitForActionState();}
-							}
-							public virtual bool isWaitingForAction{
-								get{return curActState == waitForActionState;}
-							}
-							public virtual bool wasWaitingForAction{
-								get{return prevActState == waitForActionState;}
-							}
-						public void Revert(){
-							SetActState(revertState);
+						public bool wasActStateNull{
+							get{return prevActState == null;}
 						}
-							public ISGActState revertState{
-								get{return statesFactory.MakeRevertState();}
-							}
-							public virtual bool isReverting{
-								get{return curActState == revertState;}
-							}
-							public virtual bool wasReverting{
-								get{return prevActState == revertState;}
-							}
-						public void Reorder(){
-							SetActState(reorderState);
+					public void WaitForAction(){
+						SetActState(waitForActionState);
+					}
+						public ISGActState waitForActionState{
+							get{return statesFactory.MakeWaitForActionState();}
 						}
-							public ISGActState reorderState{
-								get{return statesFactory.MakeReorderState();}
-							}
-							public virtual bool isReordering{
-								get{return curActState == reorderState;}
-							}
-							public virtual bool wasReordering{
-								get{return prevActState == reorderState;}
-							}
-						public void Add(){
-							SetActState(addState);
+						public bool isWaitingForAction{
+							get{return curActState == waitForActionState;}
 						}
-							public ISGActState addState{
-								get{return statesFactory.MakeAddState();}
-							}
-							public virtual bool isAdding{
-								get{return curActState == addState;}
-							}
-							public virtual bool wasAdding{
-								get{return prevActState == addState;}
-							}
-						public void Remove(){
-							SetActState(removeState);
+						public bool wasWaitingForAction{
+							get{return prevActState == waitForActionState;}
 						}
-							public ISGActState removeState{
-								get{return statesFactory.MakeRevertState();}
-							}
-							public virtual bool isRemoving{
-								get{return curActState == removeState;}
-							}
-							public virtual bool wasRemoving{
-								get{return prevActState == removeState;}
-							}
-						public void Swap(){
-							SetActState(swapState);
+					public void Revert(){
+						SetActState(revertState);
+					}
+						public ISGActState revertState{
+							get{return statesFactory.MakeRevertState();}
 						}
-							public ISGActState swapState{
-								get{return statesFactory.MakeSwapState();}
-							}
-							public virtual bool isSwapping{
-								get{return curActState == swapState;}
-							}
-							public virtual bool wasSwapping{
-								get{return prevActState == swapState;}
-							}
-						public void Fill(){
-							SetActState(fillState);
+						public bool isReverting{
+							get{return curActState == revertState;}
 						}
-							public ISGActState fillState{
-								get{return statesFactory.MakeFillState();}
-							}
-							public virtual bool isFilling{
-								get{return curActState == fillState;}
-							}
-							public virtual bool wasFilling{
-								get{return prevActState == fillState;}
-							}
-						public void Sort(){
-							SetActState(sortState);
+						public bool wasReverting{
+							get{return prevActState == revertState;}
 						}
-							public ISGActState sortState{
-								get{return statesFactory.MakeSortState();}
-							}
-							public virtual bool isSorting{
-								get{return curActState == sortState;}
-							}
-							public virtual bool wasSorting{
-								get{return prevActState == sortState;}
-							}
+					public void Reorder(){
+						SetActState(reorderState);
+					}
+						public ISGActState reorderState{
+							get{return statesFactory.MakeReorderState();}
+						}
+						public bool isReordering{
+							get{return curActState == reorderState;}
+						}
+						public bool wasReordering{
+							get{return prevActState == reorderState;}
+						}
+					public void Add(){
+						SetActState(addState);
+					}
+						public ISGActState addState{
+							get{return statesFactory.MakeAddState();}
+						}
+						public bool isAdding{
+							get{return curActState == addState;}
+						}
+						public bool wasAdding{
+							get{return prevActState == addState;}
+						}
+					public void Remove(){
+						SetActState(removeState);
+					}
+						public ISGActState removeState{
+							get{return statesFactory.MakeRevertState();}
+						}
+						public bool isRemoving{
+							get{return curActState == removeState;}
+						}
+						public bool wasRemoving{
+							get{return prevActState == removeState;}
+						}
+					public void Swap(){
+						SetActState(swapState);
+					}
+						public ISGActState swapState{
+							get{return statesFactory.MakeSwapState();}
+						}
+						public bool isSwapping{
+							get{return curActState == swapState;}
+						}
+						public bool wasSwapping{
+							get{return prevActState == swapState;}
+						}
+					public void Fill(){
+						SetActState(fillState);
+					}
+						public ISGActState fillState{
+							get{return statesFactory.MakeFillState();}
+						}
+						public bool isFilling{
+							get{return curActState == fillState;}
+						}
+						public bool wasFilling{
+							get{return prevActState == fillState;}
+						}
+					public void Sort(){
+						SetActState(sortState);
+					}
+						public ISGActState sortState{
+							get{return statesFactory.MakeSortState();}
+						}
+						public bool isSorting{
+							get{return curActState == sortState;}
+						}
+						public bool wasSorting{
+							get{return prevActState == sortState;}
+						}
 		/*	process	*/
 			/*	Action Process	*/
-				public virtual ISSEProcessEngine<ISGActProcess> actProcEngine{
+				ISSEProcessEngine<ISGActProcess> actProcEngine{
 					get{
 						if(m_actProcEngine == null)
 							m_actProcEngine = new SSEProcessEngine<ISGActProcess>();
 						return m_actProcEngine;
 					}
 					}ISSEProcessEngine<ISGActProcess> m_actProcEngine;
-				public virtual void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine){m_actProcEngine = engine;}
-				public virtual ISGActProcess actProcess{
-					get{return actProcEngine.process;}
-				}
-				public virtual void SetAndRunActProcess(ISGActProcess process){
+				public void SetAndRunActProcess(ISGActProcess process){
 					actProcEngine.SetAndRunProcess(process);
 				}
-				public void ExpireActProcess(){if(actProcess != null) actProcess.Expire();}
-				/* Coroutine */
-					public IEnumeratorFake TransactionCoroutine(){
-						bool flag = true;
-						foreach(ISlottable sb in this){
-							if(sb != null)
-							flag &= !sb.actProcess.isRunning;
-						}
-						if(flag){
-							actProcess.Expire();
-						}
-						return null;
-					}
-		/*	public fields	*/
-			public virtual AxisScrollerMock scroller{
-				get{return m_scroller;}
-				set{m_scroller = value;}
-				}AxisScrollerMock m_scroller;
-			public virtual Inventory inventory{
-				get{return m_inventory;}
+				public void ExpireActProcess(){
+					if(actProcess != null) 
+						actProcess.Expire();
 				}
+				public ISGActProcess actProcess{
+					get{return actProcEngine.process;}
+				}
+				public IEnumeratorFake TransactionCoroutine(){
+					bool flag = true;
+					foreach(ISlottable sb in this){
+						if(sb != null)
+						flag &= !sb.actProcess.isRunning;
+					}
+					if(flag){
+						actProcess.Expire();
+					}
+					return null;
+				}
+				public void ReportTAComp(){
+					tam.AcceptSGTAComp(this);
+				}
+		/*  Commands	*/
+			ISGCommandsFactory commandsFactory{
+				get{
+					if(_commandsFactory == null)
+						_commandsFactory = new SGCommandsFactory(this);
+					return _commandsFactory;
+				}
+			}
+				ISGCommandsFactory _commandsFactory;
+
+		/*	public fields	*/
+			public Inventory inventory{
+				get{return m_inventory;}
+			}
 				Inventory m_inventory;
-				public virtual void SetInventory(Inventory inv){
+				void SetInventory(Inventory inv){
 					m_inventory = inv;
 					inv.SetSG(this);
 				}
-			public virtual bool isShrinkable{get{return m_isShrinkable;}} bool m_isShrinkable;
-			public virtual bool isExpandable{get{return m_isExpandable;} }bool m_isExpandable;
-			public virtual List<Slot> slots{
-				get{
-					if(m_slots == null)
-						m_slots = new List<Slot>();
-					return m_slots;}
-				}List<Slot> m_slots;
-				public virtual void SetSlots(List<Slot> slots){
-					m_slots = slots;
-				}
-			public virtual List<Slot> newSlots{
-				get{return m_newSlots;}
-				}List<Slot> m_newSlots;
-				public virtual void SetNewSlots(List<Slot> newSlots){
-					m_newSlots = newSlots;
-				}
-			
-			public virtual bool isPool{
+			public bool isShrinkable{
+				get{return m_isShrinkable;}
+			}
+				bool m_isShrinkable;
+			public bool isExpandable{
+				get{return m_isExpandable;}
+			}
+				bool m_isExpandable;
+		/* Hierarchy */
+			public bool isPool{
 				get{
 					return ssm.poolBundle.ContainsInHierarchy(this);
 				}
 			}
-			public virtual bool isSGE{
+			public bool isSGE{
 				get{
 					return ssm.equipBundle.ContainsInHierarchy(this);
 				}
 			}
-			public virtual bool isSGG{
+			public bool isSGG{
 				get{
 					foreach(ISlotSystemBundle gBundle in ssm.otherBundles){
 						if(gBundle.ContainsInHierarchy(this))
@@ -221,30 +231,38 @@ namespace SlotSystem{
 					return false;
 				}
 			}
-			public virtual bool isAutoSort{
-				get{return m_isAutoSort;}
-				}protected bool m_isAutoSort = true;
-				public void ToggleAutoSort(bool on){
-					m_isAutoSort = on;
-					ssm.Focus();
+		/* Slots */
+			public Slot GetNewSlot(InventoryItemInstance itemInst){
+				int index = -3;
+				foreach(ISlottable sb in this){
+					if(sb != null){
+						if(sb.item == itemInst)
+							index = sb.newSlotID;
+					}
 				}
-			List<ISlottable> slottables{
+				if(index != -3)
+					return newSlots[index];
+				else 
+					return null;
+			}
+			public List<Slot> newSlots{
+				get{return m_newSlots;}
+			}
+				List<Slot> m_newSlots;
+				public void SetNewSlots(List<Slot> newSlots){
+					m_newSlots = newSlots;
+				}
+			public List<Slot> slots{
 				get{
-					if(m_slottables == null)
-						m_slottables = new List<ISlottable>();
-					return m_slottables;
+					if(m_slots == null)
+						m_slots = new List<Slot>();
+					return m_slots;}
+			}
+				List<Slot> m_slots;
+				public void SetSlots(List<Slot> slots){
+					m_slots = slots;
 				}
-				}protected List<ISlottable> m_slottables;
-				public virtual void SetSBs(List<ISlottable> sbs){
-					m_slottables = sbs;
-				}
-			public virtual List<ISlottable> newSBs{
-				get{return m_newSBs;}
-				}List<ISlottable> m_newSBs;
-				public virtual void SetNewSBs(List<ISlottable> sbs){
-					m_newSBs = sbs;
-				}
-			public virtual bool hasEmptySlot{
+			public bool hasEmptySlot{
 				get{
 					bool emptyFound = false;
 					foreach(Slot slot in slots){
@@ -254,7 +272,44 @@ namespace SlotSystem{
 					return emptyFound;
 				}
 			}
-			public virtual List<ISlottable> equippedSBs{
+			public void SetInitSlotsCount(int i){
+				m_initSlotsCount = i;
+			}
+				public int initSlotsCount{
+					get{return m_initSlotsCount;}
+				}
+				int m_initSlotsCount;
+		/* SB */
+			public ISlottable GetSB(InventoryItemInstance itemInst){
+				foreach(ISlottable sb in this){
+					if(sb != null)
+						if(sb.item == itemInst)
+							return sb;
+				}
+				return null;
+			}
+			public bool HasItem(InventoryItemInstance itemInst){
+				return GetSB(itemInst) != null;
+			}
+			List<ISlottable> slottables{
+				get{
+					if(m_slottables == null)
+						m_slottables = new List<ISlottable>();
+					return m_slottables;
+				}
+			}
+				List<ISlottable> m_slottables;
+				public void SetSBs(List<ISlottable> sbs){
+					m_slottables = sbs;
+				}
+			public List<ISlottable> newSBs{
+				get{return m_newSBs;}
+			}
+				List<ISlottable> m_newSBs;
+				public void SetNewSBs(List<ISlottable> sbs){
+					m_newSBs = sbs;
+				}
+			public List<ISlottable> equippedSBs{
 				get{
 					List<ISlottable> result = new List<ISlottable>();
 					foreach(ISlottable sb in this){
@@ -264,7 +319,7 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public virtual bool isAllSBActProcDone{
+			public bool isAllSBActProcDone{
 				get{
 					foreach(ISlottable sb in this){
 						if(sb != null){
@@ -276,120 +331,42 @@ namespace SlotSystem{
 					return true;
 				}
 			}
-			public virtual int initSlotsCount{
-				get{return m_initSlotsCount;}
-				}int m_initSlotsCount;
-				public virtual void SetInitSlotsCount(int i){
-					m_initSlotsCount = i;
-				}
-
-			
-		/*	commands methods	*/
-			public virtual void InitializeItems(){
-				initItemsCommand.Execute(this);
-				}
-				public SlotGroupCommand initItemsCommand{get{return m_initItemsCommand;}} SlotGroupCommand m_initItemsCommand = new SGInitItemsCommand();
-				public void SetInitItemsCommand(ISGInitItemsCommand comm){
-					m_initItemsCommand = comm;
-				}
-			public virtual void OnActionComplete(){
-				onActionCompleteCommand.Execute(this);
-				}
-				public SlotGroupCommand onActionCompleteCommand{get{return m_onActionCompleteCommand;}} SlotGroupCommand m_onActionCompleteCommand;
-			public virtual void OnActionExecute(){
-				onActionExecuteCommand.Execute(this);
-				}
-				public SlotGroupCommand onActionExecuteCommand{get{return m_onActionExecuteCommand;}} SlotGroupCommand m_onActionExecuteCommand;
-
-			/*	commands	*/
-				public SlotGroupCommand updateEquippedStatusCommand{
-					get{
-						return m_updateEquippedStatusCommand;
-					}
-					}SlotGroupCommand m_updateEquippedStatusCommand = new SGUpdateEquipStatusCommand();
-				public SlotGroupCommand emptyCommand{
-					get{
-						return m_emptyCommand;
-					}
-					}SlotGroupCommand m_emptyCommand = new SGEmptyCommand();
-				public SlotGroupCommand updateEquipAtExecutionCommand{
-					get{
-						return m_updateEquipAtExecutionCommand;
-					}
-					}SlotGroupCommand m_updateEquipAtExecutionCommand = new SGUpdateEquipAtExecutionCommand();
 		/*	sorter	*/
-			public SGSorter itemIDSorter{
-				get{
-					return m_itemIDSorter;
-				}
-				}SGSorter m_itemIDSorter = new SGItemIDSorter();
-			public SGSorter inverseIDSorter{
-				get{
-					return m_inverseItemIDSorter;
-				}
-				}SGSorter m_inverseItemIDSorter = new SGInverseItemIDSorter();
-			public SGSorter acquisitionOrderSorter{
-				get{
-					return m_acquisitionOrderSorter;
-				}
-				}SGSorter m_acquisitionOrderSorter = new SGAcquisitionOrderSorter();
-			
-			public virtual SGSorter sorter{
-				get{return m_sorter;}
-				}SGSorter m_sorter;
-				public virtual void SetSorter(SGSorter sorter){
-					m_sorter = sorter;
-				}
-			public virtual void InstantSort(){
+			public void InstantSort(){
 				List<ISlottable> orderedSbs = slottables;
 				sorter.OrderSBsWithRetainedSize(ref orderedSbs);
 				foreach(Slot slot in slots){
 					slot.sb = orderedSbs[slots.IndexOf(slot)];
 				}
 			}
+			public void SetSorter(SGSorter sorter){
+				m_sorter = sorter;
+			}
+				public SGSorter sorter{
+					get{return m_sorter;}
+				}
+				SGSorter m_sorter;
+			public void ToggleAutoSort(bool on){
+				m_isAutoSort = on;
+				ssm.Focus();
+			}
+			public bool isAutoSort{
+				get{return m_isAutoSort;}
+			}
+				protected bool m_isAutoSort = true;
 		/*	filter	*/
-			public SGFilter nullFilter{
-				get{
-					if(m_nullFilter == null)
-						m_nullFilter = new SGNullFilter();
-					return m_nullFilter;
-				}
-				}SGFilter m_nullFilter;
-			public SGFilter bowFilter{
-				get{
-					if(m_bowFilter == null)
-						m_bowFilter = new SGBowFilter();
-					return m_bowFilter;
-				}
-				}SGFilter m_bowFilter;
-			public SGFilter wearFilter{
-				get{
-					if(m_wearFilter == null)
-						m_wearFilter = new SGWearFilter();
-					return m_wearFilter;
-				}
-				}SGFilter m_wearFilter;
-			public SGFilter cGearsFilter{
-				get{
-					if(m_cGearsFilter == null)
-						m_cGearsFilter = new SGCGearsFilter();
-					return m_cGearsFilter;
-				}
-				}SGFilter m_cGearsFilter;
-			public SGFilter partsFilter{
-				get{
-					if(m_partsFilter == null)
-						m_partsFilter = new SGPartsFilter();
-					return m_partsFilter;
-				}
-				}SGFilter m_partsFilter;
-			public virtual SGFilter filter{
+			public List<SlottableItem> FilterItem(List<SlottableItem> items){
+				filter.Filter(ref items);
+				return items;
+			}
+			public SGFilter filter{
 				get{return m_filter;}
-				}SGFilter m_filter;
-				public virtual void SetFilter(SGFilter filter){
+			}
+				SGFilter m_filter;
+				public void SetFilter(SGFilter filter){
 					m_filter = filter;
 				}
-			public virtual bool AcceptsFilter(ISlottable pickedSB){
+			public bool AcceptsFilter(ISlottable pickedSB){
 				if(this.filter is SGNullFilter) return true;
 				else{
 					if(pickedSB.item is BowInstance)
@@ -404,30 +381,30 @@ namespace SlotSystem{
 			}
 		/*	SlotSystemElement implementation	*/
 			/* fields	*/
-				public override ISlotSystemElement this[int i]{
-					get{return slottables[i];}
-				}
 				protected override IEnumerable<ISlotSystemElement> elements{
 					get{
 						foreach(ISlottable sb in slottables)
 							yield return (ISlotSystemElement)sb;
 					}
 				}
-				public override string eName{
-					get{
-						string res = m_eName;
-						if(ssm != null){
-							if(isPool) res = SlotSystemUtil.Red(res);
-							if(isSGE) res = SlotSystemUtil.Blue(res);
-							if(isSGG) res = SlotSystemUtil.Green(res);
-						}
-						return res;
+				public override void SetElements(IEnumerable<ISlotSystemElement> elements){
+					List<ISlottable> sbs = new List<ISlottable>();
+					foreach(var e in elements){
+						if(e == null || e is ISlottable){
+							sbs.Add(e as ISlottable);
+						}else
+							throw new System.ArgumentException("parameter needs to be a collection of only ISlottable or null");
 					}
+					SetSBs(sbs);
 				}
-				public virtual List<ISlottable> toList{get{return slottables;}}
-
+				public List<ISlottable> toList{
+					get{return slottables;}
+				}
 			/*	methods	*/
-
+				public override void InitializeStates(){
+					Deactivate();
+					WaitForAction();
+				}
 				public override bool Contains(ISlotSystemElement element){
 					if(element is ISlottable)
 						return slottables.Contains((ISlottable)element);
@@ -438,10 +415,10 @@ namespace SlotSystem{
 					FocusSBs();
 					Refresh();
 				}
-				public virtual void FocusSelf(){
+				public void FocusSelf(){
 					base.Focus();
 				}
-				public virtual void FocusSBs(){
+				public void FocusSBs(){
 					foreach(ISlottable sb in this){
 						if(sb != null){
 							sb.Refresh();
@@ -457,10 +434,10 @@ namespace SlotSystem{
 					DefocusSBs();
 					Refresh();
 				}
-				public virtual void DefocusSelf(){
+				public void DefocusSelf(){
 					base.Defocus();
 				}
-				public virtual void DefocusSBs(){
+				public void DefocusSBs(){
 					foreach(ISlottable sb in this){
 						if(sb != null){
 							sb.Refresh();
@@ -468,54 +445,150 @@ namespace SlotSystem{
 						}
 					}
 				}
-				public override void Deactivate(){
-					base.Deactivate();
+		/* Transaction */
+			public void ReorderAndUpdateSBs(){
+				ISlottable sb1 = pickedSB;
+				ISlottable sb2 = targetSB;
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
+				newSBs.Reorder(sb1, sb2);
+				UpdateSBs(newSBs);
+			}
+			public void RevertAndUpdateSBs(){
+				SetNewSBs(toList);
+				CreateNewSlots();
+				SetSBsActStates();
+			}
+			public void SortAndUpdateSBs(){
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
+				if(isExpandable)
+					sorter.TrimAndOrderSBs(ref newSBs);
+				else
+					sorter.OrderSBsWithRetainedSize(ref newSBs);
+				
+				UpdateSBs(newSBs);
+			}
+			public void FillAndUpdateSBs(){
+				ISlottable added = GetAddedForFill();
+				ISlottable removed = GetRemovedForFill();
+
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
+
+				if(!isPool){
+					if(added != null)
+						CreateNewSBAndFill(added.item, newSBs);
+					if(removed != null)
+						NullifyIndexOf(removed.item, newSBs);
 				}
-				public override void PerformInHierarchy(System.Action<ISlotSystemElement> act){
-					act(this);
-					foreach(ISlottable sb in this){
-						if(sb != null) act(sb);
+				SortContextually(ref newSBs);
+				UpdateSBs(newSBs);
+			}
+			public ISlottable GetAddedForFill(){
+				ISlottable added;
+				if(tam.sg1 == (ISlotGroup)this)
+					added = null;
+				else
+					added = tam.pickedSB;
+				return added;
+			}
+			public ISlottable GetRemovedForFill(){
+				ISlottable removed;
+				if(tam.sg1 == (ISlotGroup)this)
+					removed = tam.pickedSB;
+				else
+					removed = null;
+				return removed;
+			}
+			public void SwapAndUpdateSBs(){
+				ISlottable added = GetAddedForSwap();
+				ISlottable removed = GetRemovedForSwap();
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
+				
+				CreateNewSBAndSwapInList(added, removed, newSBs);
+
+				SortContextually(ref newSBs);
+				UpdateSBs(newSBs);
+			}
+			public ISlottable GetAddedForSwap(){
+				ISlottable added = null;
+				if(tam.sg1 == (ISlotGroup)this)
+					added = tam.targetSB;
+				else
+					added = tam.pickedSB;
+				return added;
+			}
+			public ISlottable GetRemovedForSwap(){
+				ISlottable removed;
+				if(tam.sg1 == (ISlotGroup)this)
+					removed = tam.pickedSB;
+				else
+					removed = tam.targetSB;
+				return removed;
+			}
+			void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list){
+				if(!isPool){
+					GameObject newSBGO = new GameObject("newSBGO");
+					ISlottable newSB = newSBGO.AddComponent<Slottable>();
+					newSB.SetItem(added.item);
+					newSB.SetSSM(ssm);
+					newSB.Unequip();
+					newSB.Defocus();
+					list[list.IndexOf(removed)] = newSB;
+				}
+			}
+			public void AddAndUpdateSBs(){
+				List<InventoryItemInstance> added = tam.moved;
+				List<ISlottable> newSBs = new List<ISlottable>(toList);
+
+				foreach(InventoryItemInstance itemInst in added){
+					if(!TryChangeStackableQuantity(newSBs, itemInst, true)){
+						CreateNewSBAndFill(itemInst, newSBs);
 					}
 				}
-				public override void PerformInHierarchy(System.Action<ISlotSystemElement, object> act, object obj){
-					act(this, obj);
-					foreach(ISlottable sb in this){
-						if(sb != null) act(sb, obj);
+				SortContextually(ref newSBs);
+				UpdateSBs(newSBs);
+			}
+			public bool TryChangeStackableQuantity(List<ISlottable> target, InventoryItemInstance item, bool added){
+				bool changed = false;
+				if(item.IsStackable){
+					List<ISlottable> removed = new List<ISlottable>();
+					foreach(ISlottable sb in target){
+						if(sb != null){
+							if(sb.item == item){
+								int newQuantity;
+								if(added)
+									newQuantity = sb.quantity + item.quantity;
+								else
+									newQuantity = sb.quantity - item.quantity;
+								if(newQuantity <= 0)
+									removed.Add(sb);
+								else
+									sb.SetQuantity(newQuantity);
+								changed = true;
+							}
+						}
+					}
+					foreach(ISlottable sb in removed){
+						target[target.IndexOf(sb)] = null;
+						sb.Destroy();
 					}
 				}
-				public override void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list){
-					act(this, list);
-					foreach(ISlottable sb in this){
-						if(sb != null) act(sb, list);
+				return changed;
+			}
+			public void RemoveAndUpdateSBs(){
+				List<InventoryItemInstance> removed = tam.moved;
+				List<ISlottable> thisNewSBs = toList;
+				
+				foreach(InventoryItemInstance item in removed){
+					if(!TryChangeStackableQuantity(thisNewSBs, item, false)){
+						NullifyIndexOf(item, thisNewSBs);
 					}
 				}
-		/*	methods	*/
-			public override void InitializeStates(){
-				Deactivate();
-				WaitForAction();
+				SortContextually(ref thisNewSBs);
+				
+				UpdateSBs(thisNewSBs);
 			}
-			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
-				SetInventory(inv);
-				SetFilter(filter);
-				SetSorter(sorter);
-				SetInitSlotsCount(initSlotsCount);
-				m_isExpandable = initSlotsCount == 0;
-			}
-			public override void SetHierarchy(){
-				InitializeItems();
-			}
-			public virtual ISlottable GetSB(InventoryItemInstance itemInst){
-				foreach(ISlottable sb in this){
-					if(sb != null)
-						if(sb.item == itemInst)
-							return sb;
-				}
-				return null;
-			}
-			public virtual bool HasItem(InventoryItemInstance itemInst){
-				return GetSB(itemInst) != null;
-			}
-			public virtual void UpdateSBs(List<ISlottable> newSBs){
+		//Transaction Utility
+			public void UpdateSBs(List<ISlottable> newSBs){
 				SetNewSBs(newSBs);
 				CreateNewSlots();
 				SetSBsActStates();
@@ -526,7 +599,7 @@ namespace SlotSystem{
 					allSBs.AddRange(added);
 				SetSBs(allSBs);
 			}
-			public virtual void CreateNewSlots(){
+			public void CreateNewSlots(){
 				List<Slot> newSlots = new List<Slot>();
 				for(int i = 0; i < newSBs.Count; i++){
 					Slot newSlot = new Slot();
@@ -534,20 +607,7 @@ namespace SlotSystem{
 				}
 				SetNewSlots(newSlots);
 			}
-			public virtual Slot GetNewSlot(InventoryItemInstance itemInst){
-				int index = -3;
-				foreach(ISlottable sb in this){
-					if(sb != null){
-						if(sb.item == itemInst)
-							index = sb.newSlotID;
-					}
-				}
-				if(index != -3)
-					return newSlots[index];
-				else 
-					return null;
-			}
-			public virtual void SetSBsActStates(){
+			public void SetSBsActStates(){
 				List<ISlottable> moveWithins = new List<ISlottable>();
 				List<ISlottable> removed = new List<ISlottable>();
 				List<ISlottable> added = new List<ISlottable>();
@@ -578,7 +638,7 @@ namespace SlotSystem{
 					sb.Add();
 				}
 			}
-			public virtual void OnCompleteSlotMovements(){
+			public void OnCompleteSlotMovements(){
 				foreach(ISlottable sb in this){
 					if(sb != null){
 						if(sb.isToBeRemoved){
@@ -591,7 +651,7 @@ namespace SlotSystem{
 				SetSlots(newSlots);
 				SyncSBsToSlots();
 			}
-			public virtual void SyncSBsToSlots(){
+			public void SyncSBsToSlots(){
 				List<ISlottable> newSBs = new List<ISlottable>();
 				foreach(Slot slot in slots){
 					newSBs.Add(slot.sb);
@@ -602,7 +662,58 @@ namespace SlotSystem{
 					sb.SetSlotID(newSBs.IndexOf(sb));
 				}
 			}
-			public virtual List<ISlottable> SwappableSBs(ISlottable pickedSB){
+			public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
+				GameObject newSBGO = new GameObject("newSBGO");
+				ISlottable newSB = newSBGO.AddComponent<Slottable>();
+				newSB.SetItem(addedItem);
+				newSB.SetSSM(ssm);
+				newSB.Defocus();
+				newSB.Unequip();
+				list.Fill(newSB);
+			}
+			public void NullifyIndexOf(InventoryItemInstance removedItem, List<ISlottable> list){
+				ISlottable rem = null;
+				foreach(ISlottable sb in list){
+					if(sb != null){
+						if(sb.item == removedItem)
+							rem = sb;
+					}
+				}
+				list[list.IndexOf(rem)] = null;
+			}
+			void SortContextually(ref List<ISlottable> list){
+				if(isAutoSort){
+					if(isExpandable)
+						sorter.TrimAndOrderSBs(ref list);
+					else
+						sorter.OrderSBsWithRetainedSize(ref list);
+				}
+			}
+			public void OnActionComplete(){
+				onActionCompleteCommand.Execute();
+			}
+				public ISGCommand onActionCompleteCommand{
+					get{return commandsFactory.MakeOnActionCompleteCommand();}
+				}
+			public void UpdateEquipStatesOnAll(){
+				ssm.UpdateEquipStatesOnAll();
+			}
+			public void OnActionExecute(){
+				onActionExecuteCommand.Execute();
+			}
+				public ISGCommand onActionExecuteCommand{
+					get{return commandsFactory.MakeOnActionExecuteCommand();}
+				}
+			public void SyncEquipped(InventoryItemInstance item, bool equipped){
+				if(equipped)
+					inventory.Add(item);
+				else
+					inventory.Remove(item);
+				ssm.MarkEquippedInPool(item, equipped);
+				ssm.SetEquippedOnAllSBs(item, equipped);
+			}
+		/* Other */
+			public List<ISlottable> SwappableSBs(ISlottable pickedSB){
 				List<ISlottable> result = new List<ISlottable>();
 				foreach(ISlottable sb in this){
 					if(sb != null){
@@ -612,186 +723,27 @@ namespace SlotSystem{
 				}
 				return result;
 			}
-			public virtual void Refresh(){
+			public void Refresh(){
 				WaitForAction();
 				SetNewSBs(null);
 				SetNewSlots(null);
 			}
-			public virtual void ReorderAndUpdateSBs(){
-				ISlottable sb1 = pickedSB;
-				ISlottable sb2 = targetSB;
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-				newSBs.Reorder(sb1, sb2);
-				UpdateSBs(newSBs);
+			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
+				SetInventory(inv);
+				SetFilter(filter);
+				SetSorter(sorter);
+				SetInitSlotsCount(initSlotsCount);
+				m_isExpandable = initSlotsCount == 0;
 			}
-			public virtual void UpdateToRevert(){
-				SetNewSBs(toList);
-				CreateNewSlots();
-				SetSBsActStates();
+			public override void SetHierarchy(){
+				InitializeItems();
 			}
-			public virtual void SortAndUpdateSBs(){
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-				if(isExpandable)
-					sorter.TrimAndOrderSBs(ref newSBs);
-				else
-					sorter.OrderSBsWithRetainedSize(ref newSBs);
-				
-				UpdateSBs(newSBs);
+			public void InitializeItems(){
+				initItemsCommand.Execute();
 			}
-			public virtual void FillAndUpdateSBs(){
-				ISlottable added = GetAddedForFill();
-				ISlottable removed = GetRemovedForFill();
-
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-
-				if(!isPool){
-					if(added != null)
-						CreateNewSBAndFill(added.item, newSBs);
-					if(removed != null)
-						NullifyIndexOf(removed.item, newSBs);
+				public ISGCommand initItemsCommand{
+					get{return commandsFactory.MakeInitializeItemsCommand();}
 				}
-				SortContextually(ref newSBs);
-				UpdateSBs(newSBs);
-			}
-				public ISlottable GetAddedForFill(){
-					ISlottable added;
-					if(tam.sg1 == (ISlotGroup)this)
-						added = null;
-					else
-						added = tam.pickedSB;
-					return added;
-				}
-				public ISlottable GetRemovedForFill(){
-					ISlottable removed;
-					if(tam.sg1 == (ISlotGroup)this)
-						removed = tam.pickedSB;
-					else
-						removed = null;
-					return removed;
-				}
-				public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
-					GameObject newSBGO = new GameObject("newSBGO");
-					ISlottable newSB = newSBGO.AddComponent<Slottable>();
-					newSB.SetItem(addedItem);
-					newSB.SetSSM(ssm);
-					newSB.Defocus();
-					newSB.Unequip();
-					list.Fill(newSB);
-				}
-				public void NullifyIndexOf(InventoryItemInstance removedItem, List<ISlottable> list){
-					ISlottable rem = null;
-					foreach(ISlottable sb in list){
-						if(sb != null){
-							if(sb.item == removedItem)
-								rem = sb;
-						}
-					}
-					list[list.IndexOf(rem)] = null;
-				}
-				public void SortContextually(ref List<ISlottable> list){
-					if(isAutoSort){
-						if(isExpandable)
-							sorter.TrimAndOrderSBs(ref list);
-						else
-							sorter.OrderSBsWithRetainedSize(ref list);
-					}
-				}
-			public virtual void SwapAndUpdateSBs(){
-				ISlottable added = GetAddedForSwap();
-				ISlottable removed = GetRemovedForSwap();
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-				
-				CreateNewSBAndSwapInList(added, removed, newSBs);
-
-				SortContextually(ref newSBs);
-				UpdateSBs(newSBs);
-			}
-				public ISlottable GetAddedForSwap(){
-					ISlottable added = null;
-					if(tam.sg1 == (ISlotGroup)this)
-						added = tam.targetSB;
-					else
-						added = tam.pickedSB;
-					return added;
-				}
-				public ISlottable GetRemovedForSwap(){
-					ISlottable removed;
-					if(tam.sg1 == (ISlotGroup)this)
-						removed = tam.pickedSB;
-					else
-						removed = tam.targetSB;
-					return removed;
-				}
-				public void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list){
-					if(!isPool){
-						GameObject newSBGO = new GameObject("newSBGO");
-						ISlottable newSB = newSBGO.AddComponent<Slottable>();
-						newSB.SetItem(added.item);
-						newSB.SetSSM(ssm);
-						newSB.Unequip();
-						newSB.Defocus();
-						list[list.IndexOf(removed)] = newSB;
-					}
-				}
-			public virtual void AddAndUpdateSBs(){
-				List<InventoryItemInstance> added = tam.moved;
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-
-				foreach(InventoryItemInstance itemInst in added){
-					if(!TryChangeStackableQuantity(newSBs, itemInst, true)){
-						CreateNewSBAndFill(itemInst, newSBs);
-					}
-				}
-				SortContextually(ref newSBs);
-				UpdateSBs(newSBs);
-			}
-				public bool TryChangeStackableQuantity(List<ISlottable> target, InventoryItemInstance item, bool added){
-					bool changed = false;
-					if(item.IsStackable){
-						List<ISlottable> removed = new List<ISlottable>();
-						foreach(ISlottable sb in target){
-							if(sb != null){
-								if(sb.item == item){
-									int newQuantity;
-									if(added)
-										newQuantity = sb.quantity + item.quantity;
-									else
-										newQuantity = sb.quantity - item.quantity;
-									if(newQuantity <= 0)
-										removed.Add(sb);
-									else
-										sb.SetQuantity(newQuantity);
-									changed = true;
-								}
-							}
-						}
-						foreach(ISlottable sb in removed){
-							target[target.IndexOf(sb)] = null;
-							sb.Destroy();
-						}
-					}
-					return changed;
-				}
-			public virtual void RemoveAndUpdateSBs(){
-				List<InventoryItemInstance> removed = tam.moved;
-				List<ISlottable> thisNewSBs = toList;
-				
-				foreach(InventoryItemInstance item in removed){
-					if(!TryChangeStackableQuantity(thisNewSBs, item, false)){
-						NullifyIndexOf(item, thisNewSBs);
-					}
-				}
-				SortContextually(ref thisNewSBs);
-				
-				UpdateSBs(thisNewSBs);
-			}
-		/*	Forward	*/
-			public virtual ISlottable pickedSB{get{return tam.pickedSB;}}
-			public virtual ISlottable targetSB{get{return tam.targetSB;}}
-			public List<SlottableItem> FilterItem(List<SlottableItem> items){
-				filter.Filter(ref items);
-				return items;
-			}
 			public void InitSlots(List<SlottableItem> items){
 				List<Slot> newSlots = new List<Slot>();
 				int slotCountToCreate = initSlotsCount == 0? items.Count: initSlotsCount;
@@ -813,20 +765,7 @@ namespace SlotSystem{
 					slots[items.IndexOf(item)].sb = newSB;
 				}
 			}
-			public void SyncEquipped(InventoryItemInstance item, bool equipped){
-				if(equipped)
-					inventory.Add(item);
-				else
-					inventory.Remove(item);
-				ssm.MarkEquippedInPool(item, equipped);
-				ssm.SetEquippedOnAllSBs(item, equipped);
-			}
-			public void UpdateEquipStatesOnAll(){
-				ssm.UpdateEquipStatesOnAll();
-			}
-			public void ReportTAComp(){
-				tam.AcceptSGTAComp(this);
-			}
+		/* TAM */
 			public ITransactionManager tam{
 				get{
 					if(m_tam != null)
@@ -836,6 +775,12 @@ namespace SlotSystem{
 				}
 			}ITransactionManager m_tam;
 			public void SetTAM(ITransactionManager tam){m_tam = tam;}
+			public ISlottable pickedSB{
+				get{return tam.pickedSB;}
+			}
+			public ISlottable targetSB{
+				get{return tam.targetSB;}
+			}
 			public IHoverable hoverable{
 				get{
 					if(m_hoverable == null)
@@ -847,7 +792,7 @@ namespace SlotSystem{
 			public void SetHoverable(IHoverable hoverable){
 				m_hoverable = hoverable;
 			}
-			public virtual void SetHovered(){
+			public void SetHovered(){
 				tam.SetHovered(hoverable);
 			}
 			public void OnHoverEnter(){
@@ -856,12 +801,16 @@ namespace SlotSystem{
 			public void OnHoverExit(){
 				hoverable.OnHoverExit();
 			}
+			public bool isHovered{
+				get{return hoverable.isHovered;}
+			}
 	}
-	public interface ISlotGroup: ISlotSystemElement{
+	public interface ISlotGroup: ISlotSystemElement, IHoverable{
 		/* States and Processes */
 			/* ActStates */
-				bool wasActStateNull{get;}
 				void ClearCurActState();
+					bool wasActStateNull{get;}
+					bool isActStateNull{get;}
 				ISGActState waitForActionState{get;}
 					void WaitForAction();
 					bool isWaitingForAction{get;}
@@ -895,110 +844,56 @@ namespace SlotSystem{
 					bool isSorting{get;}
 					bool wasSorting{get;}
 			/* Proc */
-			ISSEProcessEngine<ISGActProcess> actProcEngine{get;}
-				void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine);
-				ISGActProcess actProcess{get;}
 				void SetAndRunActProcess(ISGActProcess process);
 				void ExpireActProcess();
+				ISGActProcess actProcess{get;}
 				IEnumeratorFake TransactionCoroutine();
+				void ReportTAComp();
 		/*	fields	*/
-			AxisScrollerMock scroller{get;}
 			Inventory inventory{get;}
-				void SetInventory(Inventory inv);
 			bool isShrinkable{get;}
 			bool isExpandable{get;}
-			List<Slot> slots{get;}
-				void SetSlots(List<Slot> slots);
-			List<Slot> newSlots{get;}
-				void SetNewSlots(List<Slot> newSlots);
 			bool isPool{get;}
-			bool isSGE{get;}
-			bool isSGG{get;}
-			bool isAutoSort{get;}
-				void ToggleAutoSort(bool on);
-			void SetSBs(List<ISlottable> sbs);
-			List<ISlottable> newSBs{get;}
-				void SetNewSBs(List<ISlottable> sbs);
-			bool hasEmptySlot{get;}
-			List<ISlottable> equippedSBs{get;}
-			bool isAllSBActProcDone{get;}
-			int initSlotsCount{get;}
-				void SetInitSlotsCount(int i);
-
-		/*	commands 	*/
-			void InitializeItems();
-				SlotGroupCommand initItemsCommand{get;}
-			void OnActionComplete();
-				SlotGroupCommand onActionCompleteCommand{get;}
-			void OnActionExecute();
-				SlotGroupCommand onActionExecuteCommand{get;}
-			SlotGroupCommand updateEquippedStatusCommand{get;}
-			SlotGroupCommand emptyCommand{get;}
-			SlotGroupCommand updateEquipAtExecutionCommand{get;}
-		/*	Sorter	*/
-			SGSorter sorter{get;}
-				void SetSorter(SGSorter sorter);
-			void InstantSort();
-				SGSorter itemIDSorter{get;}
-				SGSorter inverseIDSorter{get;}
-				SGSorter acquisitionOrderSorter{get;}
-		/*	Filter	*/
-			SGFilter filter{get;}
-				void SetFilter(SGFilter filter);
-			bool AcceptsFilter(ISlottable pickedSB);
-				SGFilter nullFilter{get;}
-				SGFilter bowFilter{get;}
-				SGFilter wearFilter{get;}
-				SGFilter cGearsFilter{get;}
-				SGFilter partsFilter{get;}
-		/*	SSE */
-			List<ISlottable> toList{get;}
-			void FocusSelf();
-			void FocusSBs();
-			void DefocusSelf();
-			void DefocusSBs();
-		/*	Methods	*/
 			ISlottable GetSB(InventoryItemInstance itemInst);
 			bool HasItem(InventoryItemInstance invInst);
-			void UpdateSBs(List<ISlottable> newSBs);
-			void CreateNewSlots();
+			void SetSBs(List<ISlottable> sbs);
 			Slot GetNewSlot(InventoryItemInstance itemInst);
-			void SetSBsActStates();
-			void OnCompleteSlotMovements();
-			void SyncSBsToSlots();
-			List<ISlottable> SwappableSBs(ISlottable pickedSB);
-			void Refresh();
+			bool hasEmptySlot{get;}
+			void SetInitSlotsCount(int i);
+		/*	Sorter	*/
+			void SetSorter(SGSorter sorter);
+			void InstantSort();
+			bool isAutoSort{get;}
+		/*	Filter	*/
+			List<SlottableItem> FilterItem(List<SlottableItem> items);
+			SGFilter filter{get;}
+			bool AcceptsFilter(ISlottable pickedSB);
+		/*	SSE */
+			void FocusSelf();
+			void DefocusSelf();
+		/*	Transaction	*/
 			void ReorderAndUpdateSBs();
-			void UpdateToRevert();
+			void RevertAndUpdateSBs();
 			void SortAndUpdateSBs();
 			void FillAndUpdateSBs();
-				ISlottable GetAddedForFill();
-				ISlottable GetRemovedForFill();
-				void CreateNewSBAndFill(InventoryItemInstance added, List<ISlottable> list);
-				void NullifyIndexOf(InventoryItemInstance removed, List<ISlottable> list);
-				void SortContextually(ref List<ISlottable> list);
 			void SwapAndUpdateSBs();
-				ISlottable GetAddedForSwap();
-				ISlottable GetRemovedForSwap();
-				void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list);
 			void AddAndUpdateSBs();
-				bool TryChangeStackableQuantity(List<ISlottable> target, InventoryItemInstance addedItem, bool added);
 			void RemoveAndUpdateSBs();
-		/*	Forward	*/
-			ISlottable pickedSB{get;}
-			ISlottable targetSB{get;}
-			List<SlottableItem> FilterItem(List<SlottableItem> items);
+			void OnCompleteSlotMovements();
+			void SyncSBsToSlots();
+			void OnActionComplete();
+			void UpdateEquipStatesOnAll();
+			void OnActionExecute();
+			void SyncEquipped(InventoryItemInstance item, bool equipped);
+		/* Other */
+			List<ISlottable> SwappableSBs(ISlottable pickedSB);
+			void InitializeItems();
 			void InitSlots(List<SlottableItem> items);
 			void InitSBs(List<SlottableItem> items);
-			void SyncEquipped(InventoryItemInstance item, bool equipped);
-			void UpdateEquipStatesOnAll();
-			void ReportTAComp();
-			ITransactionManager tam{get;}
-			void SetTAM(ITransactionManager tam);
 		/* Hoverable */
+			ISlottable pickedSB{get;}
+			ISlottable targetSB{get;}
 			IHoverable hoverable{get;}
-			void OnHoverEnter();
-			void OnHoverExit();
 			void SetHovered();
 	}
 }

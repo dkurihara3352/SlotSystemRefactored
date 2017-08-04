@@ -188,7 +188,7 @@ namespace SlotSystemTests{
 				prevProc = selProc;
 		}
 		/* Helpers */
-			public void AssertSSESelProcIsSetAndIsRunning(ISlotSystemElement sse, Type procType, Func<IEnumeratorFake> mockCoroutine){
+			public void AssertSSESelProcIsSetAndIsRunning(SlotSystemElement sse, Type procType, Func<IEnumeratorFake> mockCoroutine){
 				ISSESelProcess actual = sse.selProcess;
 				Assert.That(actual, Is.TypeOf(procType));
 				Assert.That(actual.sse, Is.SameAs(sse));

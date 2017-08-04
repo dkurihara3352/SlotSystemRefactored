@@ -9,10 +9,7 @@ namespace SlotSystem{
 		public SortTransaction(ISlotGroup sg, SGSorter sorter){
 			m_selectedSG = sg;
 			m_sorter = sorter;
-		}
-		public SortTransaction(SortTransaction orig){
-			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
-			this.m_sorter = orig.m_sorter;
+			tam = m_selectedSG.tam;
 		}
 		public override ISlotGroup sg1{get{return m_selectedSG;}}
 		public override void Indicate(){}
@@ -22,9 +19,9 @@ namespace SlotSystem{
 			sg1.OnActionExecute();
 			base.Execute();
 		}
-		public override void OnComplete(){
+		public override void OnCompleteTransaction(){
 			sg1.OnCompleteSlotMovements();
-			base.OnComplete();
+			base.OnCompleteTransaction();
 		}
 	}
 	public interface ISortTransaction: ISlotSystemTransaction{}

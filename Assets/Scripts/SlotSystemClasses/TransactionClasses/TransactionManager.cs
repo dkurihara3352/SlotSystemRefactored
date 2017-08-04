@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class TransactionManager : SlotSystemRootElement, ITransactionManager{
+	public class TransactionManager : SlotSystemElement, ITransactionManager{
 		public List<ISlotGroup> focusedSGs{
 			get{
 				return ssm.focusedSGs;
@@ -14,21 +14,21 @@ namespace SlotSystem{
 			Transact();
 			transaction.Execute();
 		}
-		public void OnComplete(){
-			transaction.OnComplete();
+		public void OnCompleteTransaction(){
+			transaction.OnCompleteTransaction();
 		}
-		public ISlotSystemTransaction transaction{
-			get{return m_transaction;}
-		}
-			ISlotSystemTransaction m_transaction;
-			public void SetTransaction(ISlotSystemTransaction transaction){
-				if(m_transaction != transaction){
-					m_transaction = transaction;
-					if(m_transaction != null){
-						m_transaction.Indicate();
-					}
+		public void SetTransaction(ISlotSystemTransaction transaction){
+			if(m_transaction != transaction){
+				m_transaction = transaction;
+				if(m_transaction != null){
+					m_transaction.Indicate();
 				}
 			}
+		}
+			public ISlotSystemTransaction transaction{
+				get{return m_transaction;}
+			}
+			ISlotSystemTransaction m_transaction;
 		/* Transaction Cache */
 			public void UpdateFields(){
 				transactionCache.UpdateFields();
@@ -46,16 +46,13 @@ namespace SlotSystem{
 				}
 			}
 				ITransactionCache m_transactionCache;
-				public void SetTransactionCache(ITransactionCache taCache){
-					m_transactionCache = taCache;
-				}
 			public bool IsTransactionGoingToBeRevert(ISlottable sb){
 				return transactionCache.IsTransactionGoingToBeRevert(sb);
 			}
 			public bool IsTransactionResultRevertFor(IHoverable hoverable){
 				return transactionCache.IsCachedTAResultRevert(hoverable);
 			}
-			public virtual void CreateTransactionResults(){
+			public void CreateTransactionResults(){
 				transactionCache.CreateTransactionResults();
 			}
 			public Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{
@@ -64,10 +61,10 @@ namespace SlotSystem{
 			public ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered){
 				return transactionCache.MakeTransaction(pickedSB, hovered);
 			}
-			public virtual ISlottable pickedSB{
+			public ISlottable pickedSB{
 				get{return transactionCache.pickedSB;}
 			}
-				public virtual void SetPickedSB(ISlottable sb){
+				public void SetPickedSB(ISlottable sb){
 					transactionCache.SetPickedSB(sb);
 				}
 			public ISlottable targetSB{
@@ -79,13 +76,13 @@ namespace SlotSystem{
 			public IHoverable hovered{
 				get{return transactionCache.hovered;}
 			}
-				public virtual void SetHovered(IHoverable to){
+				public void SetHovered(IHoverable to){
 					transactionCache.SetHovered(to);
 				}
-			public virtual List<InventoryItemInstance> moved{
+			public List<InventoryItemInstance> moved{
 				get{return transactionCache.moved;}
 			}
-				public virtual void SetMoved(List<InventoryItemInstance> moved){
+				public void SetMoved(List<InventoryItemInstance> moved){
 					transactionCache.SetMoved(moved);
 				}
 		/* Sort Engine */
@@ -123,18 +120,17 @@ namespace SlotSystem{
 				public void SetSG2(ISlotGroup sg){
 					sgHandler.SetSG2(sg);
 				}
-			public ITransactionSGHandler sgHandler{
-				get{
-					if(m_sgHandler == null)
-						m_sgHandler = new TransactionSGHandler(this);
-					return m_sgHandler;
-				}
+			public void SetSGHandler(ITransactionSGHandler sgHandler){
+				m_sgHandler = sgHandler;
 			}
-				ITransactionSGHandler m_sgHandler;
-				public void SetSGHandler(ITransactionSGHandler sgHandler){
-					m_sgHandler = sgHandler;
+				ITransactionSGHandler sgHandler{
+					get{
+						if(m_sgHandler == null)
+							m_sgHandler = new TransactionSGHandler(this);
+						return m_sgHandler;
+					}
 				}
-			//
+				ITransactionSGHandler m_sgHandler;
 		/* IconHandling */
 			public void AcceptDITAComp(DraggedIcon di){
 				iconHandler.AcceptDITAComp(di);
@@ -151,32 +147,25 @@ namespace SlotSystem{
 				public virtual void SetDIcon2(DraggedIcon di){
 					iconHandler.SetDIcon2(di);
 				}
-			public ITransactionIconHandler iconHandler{
-				get{
-					if(m_iconHandler == null)
-						m_iconHandler = new TransactionIconHandler(this);
-					return m_iconHandler;
-				}
+			public void SetIconHandler(ITransactionIconHandler iconHandler){
+				m_iconHandler = iconHandler;
 			}
-				ITransactionIconHandler m_iconHandler;
-				public void SetIconHandler(ITransactionIconHandler iconHandler){
-					m_iconHandler = iconHandler;
-				}
-			//
-		/* Framework */
-			public void SetCurTAM(){
-				if(curTAM != null){
-					if(curTAM != (ISlotSystemManager)this){
-						curTAM.Defocus();
-						curTAM = this;
-					}else{
-						// no change
+				ITransactionIconHandler iconHandler{
+					get{
+						if(m_iconHandler == null)
+							m_iconHandler = new TransactionIconHandler(this);
+						return m_iconHandler;
 					}
-				}else{
-					curTAM = this;
 				}
+				ITransactionIconHandler m_iconHandler;
+		/* Other */
+			public void SetTAMRecursively(){
+				ssm.PerformInHierarchy(SetTAMInHi);
 			}
-				public static ITransactionManager curTAM;
+				void SetTAMInHi(ISlotSystemElement ele){
+					if(ele is IHoverable)
+						((IHoverable)ele).SetTAM(this);
+				}
 			public override void InitializeStates(){
 				WaitForAction();
 			}
@@ -307,10 +296,9 @@ namespace SlotSystem{
 	}
 	public interface ITransactionManager: ISlotSystemElement{
 		List<ISlotGroup> focusedSGs{get;}
-		ISlotSystemTransaction transaction{get;}
-		void SetTransaction(ISlotSystemTransaction transaction);
 		void ExecuteTransaction();
-		void OnComplete();
+		void OnCompleteTransaction();
+		void SetTransaction(ISlotSystemTransaction transaction);
 		/* TransactionCache */
 			void UpdateFields();
 			void InnerUpdateFields(ISlotSystemTransaction ta);
@@ -335,16 +323,14 @@ namespace SlotSystem{
 			void SetSG1(ISlotGroup sg);
 			ISlotGroup sg2{get;}
 			void SetSG2(ISlotGroup sg);
-			ITransactionSGHandler sgHandler{get;}
 		/* TAIconHandler */
 			void AcceptDITAComp(DraggedIcon di);
 			DraggedIcon dIcon1{get;}
 			void SetDIcon1(DraggedIcon di);
 			DraggedIcon dIcon2{get;}
 			void SetDIcon2(DraggedIcon di);
-			ITransactionIconHandler iconHandler{get;}
-		/* Framework */
-			void SetCurTAM();
+		/* Other */
+			void SetTAMRecursively();
 			void Refresh();
 			void ClearFields();
 		/* ActState */

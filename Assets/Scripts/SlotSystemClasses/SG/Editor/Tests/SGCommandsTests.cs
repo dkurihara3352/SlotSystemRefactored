@@ -14,8 +14,8 @@ namespace SlotSystemTests{
 
 			[Test]
 			public void SGInitItemsCommand_Execute_IsNotAutoSort_CallsSGVariousButInstantSort(){
-				SGInitItemsCommand comm = new SGInitItemsCommand();
 					ISlotGroup mockSG = MakeSubSG();
+				SGInitItemsCommand comm = new SGInitItemsCommand(mockSG);
 						Inventory stubInv = Substitute.For<Inventory>();
 						mockSG.isAutoSort.Returns(false);
 						mockSG.inventory.Returns(stubInv);
@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 						List<SlottableItem> list = new List<SlottableItem>(new SlottableItem[]{ bow, wear});
 						mockSG.FilterItem(Arg.Is<List<SlottableItem>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
 				
-				comm.Execute(mockSG);
+				comm.Execute();
 
 				Received.InOrder(() => {
 					mockSG.FilterItem(Arg.Is<List<SlottableItem>>(x => x.Contains(bow) && x.Contains(wear)));
@@ -43,17 +43,17 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void SGInitItemsCommand_Execute_SGIsAutoSort_CallsSGInstantSort(){
-				SGInitItemsCommand comm = new SGInitItemsCommand();
 				ISlotGroup mockSG = MakeSubSG();
+				SGInitItemsCommand comm = new SGInitItemsCommand(mockSG);
 				mockSG.isAutoSort.Returns(true);
-				comm.Execute(mockSG);
+				comm.Execute();
 
 				mockSG.Received().InstantSort();
 				}
 			[Test]
 			public void SGUpdateEquipAtExecutionCommand_Execute_VariousSBIDs_CallsSGAccordingly(){
-				SGUpdateEquipAtExecutionCommand comm = new SGUpdateEquipAtExecutionCommand();
 				ISlotGroup mockSG = MakeSubSG();
+				SGUpdateEquipAtExecutionCommand comm = new SGUpdateEquipAtExecutionCommand(mockSG);
 					IEnumerable<ISlotSystemElement> sbs;
 						ISlottable stubSB_A = MakeSubSB();
 							BowInstance bow = MakeBowInstance(0);
@@ -72,7 +72,7 @@ namespace SlotSystemTests{
 						sbs = new ISlotSystemElement[]{stubSB_A, stubSB_B, stubSB_C};
 				mockSG.GetEnumerator().Returns(sbs.GetEnumerator());
 
-				comm.Execute(mockSG);
+				comm.Execute();
 
 				mockSG.Received().SyncEquipped(Arg.Is<InventoryItemInstance>(bow), false);
 				mockSG.Received().SyncEquipped(Arg.Is<InventoryItemInstance>(wear), true);

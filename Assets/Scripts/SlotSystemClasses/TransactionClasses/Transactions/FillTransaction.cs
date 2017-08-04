@@ -11,11 +11,7 @@ namespace SlotSystem{
 			m_pickedSB = pickedSB;
 			m_selectedSG = selected;
 			m_origSG = m_pickedSB.sg;
-		}
-		public FillTransaction(FillTransaction orig){
-			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
-			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
-			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
+			tam = pickedSB.tam;
 		}
 		public override ISlotGroup sg1{get{return m_origSG;}}
 		public override ISlotGroup sg2{get{return m_selectedSG;}}
@@ -28,10 +24,10 @@ namespace SlotSystem{
 			sg2.OnActionExecute();
 			base.Execute();
 		}
-		public override void OnComplete(){
+		public override void OnCompleteTransaction(){
 			sg1.OnCompleteSlotMovements();
 			sg2.OnCompleteSlotMovements();
-			base.OnComplete();
+			base.OnCompleteTransaction();
 		}
 	}
 	public interface IFillTransaction: ISlotSystemTransaction{}

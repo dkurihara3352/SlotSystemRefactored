@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 namespace SlotSystem{
 	public class EquipmentSet : SlotSystemElement, IEquipmentSet{
 		public ISlotGroup bowSG{
@@ -31,6 +32,29 @@ namespace SlotSystem{
 		}
 			ISlotGroup m_cGearsSG;
 		public override void SetHierarchy(){
+			if(transform.childCount == 3){
+				for(int i = 0; i< transform.childCount; i++){
+					ISlotGroup sg = transform.GetChild(i).GetComponent<ISlotGroup>();
+					if(sg != null){
+						if(sg.filter is SGBowFilter){
+							m_bowSG = sg;
+							bowSG.SetParent(this);
+						}
+						else if(sg.filter is SGWearFilter){
+							m_wearSG = sg;
+							wearSG.SetParent(this);
+						}
+						else if(sg.filter is SGCGearsFilter){
+							m_cGearsSG = sg;
+							cGearsSG.SetParent(this);
+						}
+					}else 
+						throw new InvalidOperationException("some childrent does not have SG");
+				}
+				if(bowSG != null && wearSG != null && cGearsSG != null)
+					return;
+			}else
+				throw new InvalidOperationException("transform children' count is not exactly 3");
 		}
 		public void InspectorSetUp(ISlotGroup bowSG, ISlotGroup wearSG, ISlotGroup cGearsSG){
 			m_bowSG = bowSG; m_wearSG = wearSG; m_cGearsSG = cGearsSG;

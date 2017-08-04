@@ -11,21 +11,13 @@ namespace SlotSystem{
 		public List<InventoryItemInstance> itemCache = new List<InventoryItemInstance>();
 		public StackTransaction(ISlottable pickedSB ,ISlottable selected){
 			m_pickedSB = pickedSB;
+			tam = m_pickedSB.tam;
 			m_origSG = pickedSB.sg;
 			m_selectedSB = selected;
 			m_selectedSG = m_selectedSB.sg;
 			InventoryItemInstance cache = pickedSB.item;
 			cache.quantity = pickedSB.pickedAmount;
 			itemCache.Add(cache);
-		}
-		public StackTransaction(StackTransaction orig){
-			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
-			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
-			this.m_selectedSB = SlotSystemUtil.CloneSB(orig.m_selectedSB);
-			this.m_selectedSG = SlotSystemUtil.CloneSG(orig.m_selectedSG);
-			InventoryItemInstance item = this.m_pickedSB.item;
-			m_pickedSB.SetQuantity(orig.m_pickedSB.pickedAmount);
-			itemCache.Add(item);
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}
@@ -38,10 +30,10 @@ namespace SlotSystem{
 			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.item));
 			base.Execute();
 		}
-		public override void OnComplete(){
+		public override void OnCompleteTransaction(){
 			sg1.OnCompleteSlotMovements();
 			sg2.OnCompleteSlotMovements();
-			base.OnComplete();
+			base.OnCompleteTransaction();
 		}
 	}
 	public interface IStackTransaction:ISlotSystemTransaction{}

@@ -1,22 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class SlotSystemManager : SlotSystemRootElement, ISlotSystemManager{
-		public static ISlotSystemManager CurSSM;
-		public void SetCurSSM(){
-			if(CurSSM != null){
-				if(CurSSM != (ISlotSystemManager)this){
-					CurSSM.Defocus();
-					CurSSM = this;
-				}else{
-					// no change
-				}
-			}else{
-				CurSSM = this;
-			}
-		}
+	public class SlotSystemManager : SlotSystemElement, ISlotSystemManager{
 		public List<ISlotGroup> focusedSGs{
 			get{
 				List<ISlotGroup> result = new List<ISlotGroup>();
@@ -36,7 +24,7 @@ namespace SlotSystem{
 				throw new System.InvalidOperationException("SlotSystemManager.poolInv: focusedSGP is not set");
 			}
 		}
-			public virtual List<ISlotGroup> allSGs{
+			public List<ISlotGroup> allSGs{
 				get{
 					List<ISlotGroup> result = new List<ISlotGroup>();
 					result.AddRange(allSGPs);
@@ -45,7 +33,7 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public virtual List<ISlotGroup> allSGPs
+			public List<ISlotGroup> allSGPs
 			{
 				get{
 					List<ISlotGroup> result = new List<ISlotGroup>();
@@ -53,14 +41,14 @@ namespace SlotSystem{
 					return result;
 				}
 			}
-			public virtual List<ISlotGroup> allSGEs{
+			public List<ISlotGroup> allSGEs{
 				get{
 					List<ISlotGroup> result = new List<ISlotGroup>();
 					equipBundle.PerformInHierarchy(AddInSGList, result);
 					return result;
 				}
 			}
-			public virtual List<ISlotGroup> allSGGs{
+			public List<ISlotGroup> allSGGs{
 				get{
 					List<ISlotGroup> result = new List<ISlotGroup>();
 					foreach(ISlotSystemBundle gBun in otherBundles){
@@ -354,15 +342,15 @@ namespace SlotSystem{
 				}
 			}
 		/*	SlotSystemElement	*/
-			public virtual ISlotSystemBundle poolBundle{
+			public ISlotSystemBundle poolBundle{
 				get{return m_poolBundle;}
 			}
 				ISlotSystemBundle m_poolBundle;
-			public virtual ISlotSystemBundle equipBundle{
+			public ISlotSystemBundle equipBundle{
 				get{return m_equipBundle;}
 			}
 				ISlotSystemBundle m_equipBundle;
-			public virtual IEnumerable<ISlotSystemBundle> otherBundles{
+			public IEnumerable<ISlotSystemBundle> otherBundles{
 				get{
 					if(m_otherBundles == null)
 						m_otherBundles = new ISlotSystemBundle[]{};
@@ -377,19 +365,57 @@ namespace SlotSystem{
 						yield return ele;
 				}
 			}
-			public override ISlotSystemManager ssm{
-				get{return this;}
+			public override void SetElements(IEnumerable<ISlotSystemElement> elements){
+				throw new InvalidOperationException("not valid for this object. Use InspectorSetUp instead.");
 			}
 			public void InspectorSetUp(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns){
 				m_poolBundle = pBun;
 				m_equipBundle = eBun;
 				m_otherBundles = gBuns;
 			}
+			bool isElementsSetUp{
+				get{
+					return poolBundle != null && equipBundle != null;
+				}
+			}
 			public override void SetHierarchy(){
+				if(!isElementsSetUp){
+					List<ISlotSystemBundle> genericBundles = new List<ISlotSystemBundle>();
+					if(transform.childCount >= 2){
+						for(int i = 0; i < transform.childCount; i ++){
+							ISlotSystemBundle bun = transform.GetChild(i).GetComponent<ISlotSystemBundle>();
+							if(bun != null){
+								if(bun[0] is IEquipmentSet){
+									m_equipBundle = bun;
+									equipBundle.SetParent(this);
+								}
+								else if(bun[0] is ISlotGroup){
+									ISlotGroup sg = (ISlotGroup)bun[0];
+									if(sg.inventory is PoolInventory){
+										m_poolBundle = bun;
+										poolBundle.SetParent(this);
+									}
+									else
+										genericBundles.Add(bun);
+								}
+								else
+									genericBundles.Add(bun);
+							}else
+								throw new InvalidOperationException("some child does not have ISlotSystemBundle component");
+						}
+						m_otherBundles = genericBundles;
+						foreach(var bun in otherBundles)
+							bun.SetParent(this);
+						if(poolBundle == null)
+							throw new InvalidOperationException("poolBundle is not set");
+						if(equipBundle == null)
+							throw new InvalidOperationException("equipBundle is not set");
+					}else
+						throw new InvalidOperationException("there has to be at least two transform children");
+				}
 			}
 			public void Initialize(){
 				PerformInHierarchy(SetSSMInH);
-				PerformInHierarchy(SetParent);
 				PerformInHierarchy(InitStatesInHi);
 			}
 			public void SetSSMInH(ISlotSystemElement ele){
@@ -401,7 +427,7 @@ namespace SlotSystem{
 			public override void InitializeStates(){
 				base.Deactivate();
 			}
-			public virtual ISlotSystemElement FindParent(ISlotSystemElement ele){
+			public ISlotSystemElement FindParent(ISlotSystemElement ele){
 				foundParent = null;
 				PerformInHierarchy(CheckAndReportParent, ele);
 				return foundParent;
@@ -417,48 +443,37 @@ namespace SlotSystem{
 					}
 				}
 
-			public override void SetSSM(ISlotSystemElement ssm){
-			}
-			public override void SetParent(ISlotSystemElement ele){
-				if(!((ele is ISlottable) || (ele is ISlotGroup)))
-				foreach(ISlotSystemElement e in ele){
-					if(e != null)
-					e.SetParent(ele);
-				}
-			}
 			public override void Activate(){
-				SetCurSSM();
 				UpdateEquipStatesOnAll();
 				Focus();
 			}
 			public void FindAndFocusInBundle(ISlotSystemElement ele){
-					PerformInHierarchy(FocusInBundle, ele);
-					}
-					public void FocusInBundle(ISlotSystemElement inspected, object target){
-						ISlotSystemElement targetEle = (ISlotSystemElement)target;
-						if(inspected == targetEle){
-							ISlotSystemElement tested = inspected;
-							while(true){
-								ISlotSystemBundle immBundle = tested.immediateBundle;
-								if(immBundle == null)
-									break;
-								ISlotSystemElement containingEle = null;
-								foreach(ISlotSystemElement e in immBundle){
-									if(e.ContainsInHierarchy(tested) || e == tested)
-										containingEle = e;
-								}
-								immBundle.SetFocusedBundleElement(containingEle);
-								tested = tested.immediateBundle;
+				PerformInHierarchy(FocusInBundle, ele);
+			}
+				void FocusInBundle(ISlotSystemElement inspected, object target){
+					ISlotSystemElement targetEle = (ISlotSystemElement)target;
+					if(inspected == targetEle){
+						ISlotSystemElement tested = inspected;
+						while(true){
+							ISlotSystemBundle immBundle = tested.immediateBundle;
+							if(immBundle == null)
+								break;
+							ISlotSystemElement containingEle = null;
+							foreach(ISlotSystemElement e in immBundle){
+								if(e.ContainsInHierarchy(tested) || e == tested)
+									containingEle = e;
 							}
-							this.Focus();
+							immBundle.SetFocusedBundleElement(containingEle);
+							tested = tested.immediateBundle;
 						}
+						this.Focus();
 					}
+				}
 		
 	}
 	public interface ISlotSystemManager: ISlotSystemElement{
 		void Initialize();
 		List<ISlotGroup> focusedSGs{get;}
-		IPoolInventory poolInv{get;}
 		void UpdateEquipStatesOnAll();
 		void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG);
 		void MarkEquippedInPool(InventoryItemInstance item, bool equipped);
@@ -469,6 +484,5 @@ namespace SlotSystem{
 		IEnumerable<ISlotSystemBundle> otherBundles{get;}
 		ISlotSystemElement FindParent(ISlotSystemElement ele);
 		void FindAndFocusInBundle(ISlotSystemElement ele);
-		void FocusInBundle(ISlotSystemElement inspected, object target);
 	}
 }

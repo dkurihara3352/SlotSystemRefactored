@@ -21,7 +21,7 @@ namespace SlotSystem{
 		public DraggedIcon(ISlottable sb){
 			m_sb = sb;
 			m_item = this.sb.item;
-			tam = TransactionManager.curTAM;
+			tam = sb.tam;
 		}
 		public void CompleteMovement(){
 			tam.AcceptDITAComp(this);

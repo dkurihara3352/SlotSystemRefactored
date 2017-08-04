@@ -7,7 +7,7 @@ namespace SlotSystem{
 		public TransactionCache(ITransactionManager tam){
 			this.tam = tam;
 		}
-		public virtual void UpdateFields(){
+		public void UpdateFields(){
 			updateFieldsCommand.Execute();
 		}
 		public TransactionCacheCommand updateFieldsCommand{
@@ -21,7 +21,7 @@ namespace SlotSystem{
 			public void SetUpdateFieldsCommand(TransactionCacheCommand comm){
 				m_updateFieldsCommand = comm;
 			}		
-		public virtual void CreateTransactionResults(){
+		public void CreateTransactionResults(){
 			Dictionary<IHoverable, ISlotSystemTransaction> result = new Dictionary<IHoverable, ISlotSystemTransaction>();
 			foreach(ISlotGroup sg in tam.focusedSGs){
 				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg.hoverable);
@@ -100,13 +100,13 @@ namespace SlotSystem{
 			public void SetTransactionResults(Dictionary<IHoverable, ISlotSystemTransaction> results){
 				m_transactionResults = results;
 			}
-		public virtual ISlottable pickedSB{
+		public ISlottable pickedSB{
 			get{
 				return m_pickedSB;
 			}
 		}
 				ISlottable m_pickedSB;
-				public virtual void SetPickedSB(ISlottable sb){
+				public void SetPickedSB(ISlottable sb){
 					this.m_pickedSB = sb;
 				}
 
@@ -129,7 +129,7 @@ namespace SlotSystem{
 			}
 		}
 			protected IHoverable m_hovered;
-			public virtual void SetHovered(IHoverable to){
+			public void SetHovered(IHoverable to){
 				if(to == null || to != hovered){
 					if(to != null && hovered != null){
 						hovered.OnHoverExit();
@@ -139,13 +139,13 @@ namespace SlotSystem{
 						UpdateFields();
 				}
 			}
-		public virtual List<InventoryItemInstance> moved{
+		public List<InventoryItemInstance> moved{
 			get{
 				return m_moved;
 			}
 		}
 			List<InventoryItemInstance> m_moved;
-			public virtual void SetMoved(List<InventoryItemInstance> moved){
+			public void SetMoved(List<InventoryItemInstance> moved){
 				this.m_moved = moved;
 			}
 		public void ClearFields(){
@@ -164,7 +164,6 @@ namespace SlotSystem{
 		bool IsCachedTAResultRevert(IHoverable hoverable);
 		void CreateTransactionResults();
 		Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{get;}
-		ITransactionFactory taFactory{get;}
 		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered);
 		ISlottable pickedSB{get;}
 		void SetPickedSB(ISlottable sb);

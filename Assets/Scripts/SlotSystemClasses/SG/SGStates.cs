@@ -91,7 +91,7 @@ namespace SlotSystem{
     public class SGRevertState: SGActState{
         public SGRevertState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.UpdateToRevert();
+            sg.RevertAndUpdateSBs();
             if(sg.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, sg.TransactionCoroutine);
                 sg.SetAndRunActProcess(process);

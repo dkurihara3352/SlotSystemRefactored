@@ -9,10 +9,7 @@ namespace SlotSystem{
 		public RevertTransaction(ISlottable pickedSB){
 			m_pickedSB = pickedSB;
 			m_origSG = m_pickedSB.sg;
-		}
-		public RevertTransaction(RevertTransaction orig){
-			this.m_pickedSB = SlotSystemUtil.CloneSB(orig.m_pickedSB);
-			this.m_origSG = SlotSystemUtil.CloneSG(orig.m_origSG);
+			tam = pickedSB.tam;
 		}
 		public override void Indicate(){}
 		public override void Execute(){
@@ -21,9 +18,9 @@ namespace SlotSystem{
 			m_origSG.OnActionExecute();
 			base.Execute();
 		}
-		public override void OnComplete(){
+		public override void OnCompleteTransaction(){
 			m_origSG.OnCompleteSlotMovements();
-			base.OnComplete();
+			base.OnCompleteTransaction();
 		}
 	}
 	public interface IRevertTransaction: ISlotSystemTransaction{}

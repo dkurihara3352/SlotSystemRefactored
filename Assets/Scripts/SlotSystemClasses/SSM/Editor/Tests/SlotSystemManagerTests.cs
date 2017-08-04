@@ -13,25 +13,6 @@ namespace SlotSystemTests{
 		[Category("SSM")]
 		public class SlotSystemManagerTests: SlotSystemTest{
 			[Test]
-			public void SetCurSSM_WhenCalled_CallsPrevSSMDefocus(){
-				SlotSystemManager ssm = MakeSSM();
-				ISlotSystemManager mockSSM = MakeSubSSM();
-				SlotSystemManager.CurSSM = mockSSM;
-				ssm.SetCurSSM();
-
-				mockSSM.Received().Defocus();
-				}
-			[Test]
-			public void SetCurSSM_WhenCalled_SetsThisAsCur(){
-				SlotSystemManager ssm = MakeSSM();
-				ISlotSystemManager stubSSM = MakeSubSSM();
-				SlotSystemManager.CurSSM = stubSSM;
-
-				ssm.SetCurSSM();
-
-				Assert.That(SlotSystemManager.CurSSM, Is.SameAs(ssm));
-				}
-			[Test]
 			public void InspectorSetUp_WhenCalled_SetsBundles(){
 				SlotSystemManager ssm = MakeSSM();
 					ISlotSystemBundle pBun = MakeSubBundle();
@@ -47,21 +28,6 @@ namespace SlotSystemTests{
 				Assert.That(ssm.poolBundle, Is.SameAs(pBun));
 				Assert.That(ssm.equipBundle, Is.SameAs(eBun));
 				bool equality = ssm.otherBundles.MemberEquals(gBuns);
-				Assert.That(equality, Is.True);
-				}
-			[Test]
-			public void SetElements_Always_DoNothing(){
-				SlotSystemManager ssm = MakeSSM();
-					TestSlotSystemElement sseA = MakeTestSSE();
-						sseA.transform.SetParent(ssm.transform);
-					TestSlotSystemElement sseB = MakeTestSSE();
-						sseB.transform.SetParent(ssm.transform);
-					TestSlotSystemElement sseC = MakeTestSSE();
-						sseC.transform.SetParent(ssm.transform);
-				IEnumerable<ISlotSystemElement> expected = new ISlotSystemElement[]{null, null};
-				ssm.SetHierarchy();
-				
-				bool equality = ssm.MemberEquals(expected);
 				Assert.That(equality, Is.True);
 				}
 			[Test]
@@ -84,27 +50,6 @@ namespace SlotSystemTests{
 				eBun.Received().PerformInHierarchy(ssm.SetSSMInH);
 				foreach(var gBun in gBuns)
 					gBun.Received().PerformInHierarchy(ssm.SetSSMInH);
-				}
-			[Test]
-			public void Initialize_WhenCalled_CallsSetParentInHierarchy(){
-				SlotSystemManager ssm = MakeSSM();
-					ISlotSystemBundle pBun = MakeSubBundle();
-						ISlotSystemBundle eBun = MakeSubBundle();
-						IEnumerable<ISlotSystemBundle> gBuns;
-							ISlotSystemBundle gBunA = MakeSubBundle();
-							ISlotSystemBundle gBunB = MakeSubBundle();
-							ISlotSystemBundle gBunC = MakeSubBundle();
-							gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};	
-				ssm.InspectorSetUp(pBun, eBun, gBuns);
-				ssm.SetHierarchy();
-
-				ssm.Initialize();
-				
-				Assert.That(ssm.parent, Is.Null);
-				pBun.Received().PerformInHierarchy(ssm.SetParent);
-				eBun.Received().PerformInHierarchy(ssm.SetParent);
-				foreach(var gBun in gBuns)
-					gBun.Received().PerformInHierarchy(ssm.SetParent);
 				}
 			[Test]
 			public void Initialize_WhenCalled_CallsPIHInitializeState(){
@@ -1196,55 +1141,6 @@ namespace SlotSystemTests{
 								yield return directChildSB_T;
 						}
 					}
-				[TestCaseSource(typeof(SetParentCases))]
-				public void SetParent_ParentNotSBNorSG_SetsAllElementsParAsSelf(ISlotSystemElement parent, IEnumerable<ISlotSystemElement> elements, bool valid){
-					SlotSystemManager ssm = MakeSSM();
-					
-					ssm.SetParent(parent);
-
-					foreach(var ele in elements)
-						if(valid)
-							ele.Received().SetParent(parent);
-						else
-							ele.DidNotReceive().SetParent(parent);
-					}
-					class SetParentCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							object[] bundle_T;
-								ISlotSystemBundle bundle_0 = MakeSubBundle();
-									IEnumerable<ISlotSystemElement> eles_0;
-										ISlotSystemElement sse0_0 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse1_0 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse2_0 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse3_0 = Substitute.For<ISlotSystemElement>();
-										eles_0 = new ISlotSystemElement[]{sse0_0, sse1_0, sse2_0, sse3_0};
-									bundle_0.GetEnumerator().Returns(eles_0.GetEnumerator());
-								bundle_T = new object[]{bundle_0, eles_0, true};
-								yield return bundle_T;
-							object[] sg_F;
-								ISlotGroup sg_2 = Substitute.For<ISlotGroup>();
-									IEnumerable<ISlotSystemElement> eles_2;
-										ISlotSystemElement sse0_2 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse1_2 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse2_2 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse3_2 = Substitute.For<ISlotSystemElement>();
-										eles_2 = new ISlotSystemElement[]{sse0_2, sse1_2, sse2_2, sse3_2};
-									sg_2.GetEnumerator().Returns(eles_2.GetEnumerator());
-								sg_F = new object[]{sg_2, eles_2, false};
-								yield return sg_F;
-							object[] sb_F;
-								ISlottable sb_3 = Substitute.For<ISlottable>();
-									IEnumerable<ISlotSystemElement> eles_3;
-										ISlotSystemElement sse0_3 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse1_3 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse2_3 = Substitute.For<ISlotSystemElement>();
-										ISlotSystemElement sse3_3 = Substitute.For<ISlotSystemElement>();
-										eles_3 = new ISlotSystemElement[]{sse0_3, sse1_3, sse2_3, sse3_3};
-									sb_3.GetEnumerator().Returns(eles_3.GetEnumerator());
-								sb_F = new object[]{sb_3, eles_3, false};
-								yield return sb_F;
-						}
-					}
 				[Test]
 				public void Focus_WhenCalled_SetsSelStateFocusedState(){
 					SlotSystemManager ssm = MakeSSM();
@@ -1279,7 +1175,74 @@ namespace SlotSystemTests{
 					// 				BowInstance bow = MakeBowInstance(0);
 
 					}
-			/*	Transaction */
+			/*	SSE imple */
+				[Test]
+				public void SetHierarchy_isElementsSetUp_DoesNotThrowException(){
+					SlotSystemManager ssm = MakeSSM();
+						ISlotSystemBundle pBun = MakeSubBundle();
+						ISlotSystemBundle eBun = MakeSubBundle();
+						IEnumerable<ISlotSystemBundle> gBuns = new ISlotSystemBundle[]{};
+					ssm.InspectorSetUp(pBun, eBun, gBuns);
+
+					ssm.SetHierarchy();
+				}
+				[Test]
+				public void SetHiearchy_TransformChildCountLessThan2_ThrowsException(){
+					SlotSystemManager ssm = MakeSSM();
+					TestSlotSystemElement stubSSE = MakeTestSSE();
+						stubSSE.transform.SetParent(ssm.transform);
+					
+					Exception ex = Assert.Catch<InvalidOperationException>(() => ssm.SetHierarchy());
+
+					Assert.That(ex.Message, Is.StringContaining("there has to be at least two transform children"));
+				}
+				[Test]
+				public void SetHiearchy_ChildWithoutBundle_ThrowsException(){
+					SlotSystemManager ssm = MakeSSM();
+					TestSlotSystemElement stubSSEA = MakeTestSSE();
+						stubSSEA.transform.SetParent(ssm.transform);
+					TestSlotSystemElement stubSSEB = MakeTestSSE();
+						stubSSEB.transform.SetParent(ssm.transform);
+					
+					Exception ex = Assert.Catch(() => ssm.SetHierarchy());
+					
+					Assert.That(ex.Message, Is.StringContaining(("some child does not have ISlotSystemBundle component")));
+				}
+				[Test]
+				public void SetHierarchy_HasValidTransformChildren_SetsThemBundlesAndSetsTheirParentThis(){
+					SlotSystemManager ssm = MakeSSM();
+						SlotSystemBundle pBun = MakeSSBundle();
+							ISlotGroup stubSGP = MakeSubSG();
+								PoolInventory stubPInv = new PoolInventory();
+								stubSGP.inventory.Returns(stubPInv);
+							IEnumerable<ISlotSystemElement> pBunEles = new ISlotSystemElement[]{stubSGP};
+							pBun.SetElements(pBunEles);
+							pBun.transform.SetParent(ssm.transform);
+						SlotSystemBundle eBun = MakeSSBundle();
+							IEnumerable<ISlotSystemElement> eBunEles;
+								IEquipmentSet stubESet = Substitute.For<IEquipmentSet>();
+								eBunEles = new ISlotSystemElement[]{stubESet};
+							eBun.SetElements(eBunEles);
+							eBun.transform.SetParent(ssm.transform);
+						SlotSystemBundle gBunA = MakeSSBundle();
+							gBunA.transform.SetParent(ssm.transform);
+							gBunA.SetElements(new ISlotSystemElement[]{MakeSubSG()});
+						SlotSystemBundle gBunB = MakeSSBundle();
+							gBunB.transform.SetParent(ssm.transform);
+							gBunB.SetElements(new ISlotSystemElement[]{MakeSubBundle()});
+						IEnumerable<ISlotSystemBundle> xGBuns = new ISlotSystemBundle[]{gBunA, gBunB};
+
+					ssm.SetHierarchy();
+
+					Assert.That(ssm.poolBundle, Is.SameAs(pBun));
+					Assert.That(ssm.equipBundle, Is.SameAs(eBun));
+					Assert.That(ssm.otherBundles, Is.EqualTo(xGBuns));
+
+					Assert.That(pBun.parent, Is.SameAs(ssm));
+					Assert.That(eBun.parent, Is.SameAs(ssm));
+					Assert.That(gBunA.parent, Is.SameAs(ssm));
+					Assert.That(gBunB.parent, Is.SameAs(ssm));
+				}
 			/*	helper	*/
 				public IEnumerable<ISlotSystemElement> ConvertToSSEs<T>(IEnumerable<T> sgs) where T: ISlotSystemElement{
 					foreach(var sg in sgs)

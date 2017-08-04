@@ -7,10 +7,16 @@ using Utility;
 namespace SlotSystem{
 	public class Hoverable : IHoverable{
 		ISlotSystemElement sse;
-		ITransactionManager tam;
+		public ITransactionManager tam{
+			get{return _tam;}
+		}
+			ITransactionManager _tam;
+		public void SetTAM(ITransactionManager tam){
+			_tam = tam;
+		}
 		public Hoverable(ISlotSystemElement sse, ITransactionManager tam){
 			this.sse = sse;
-			this.tam = tam;
+			_tam = tam;
 		}
 		public virtual void OnHoverEnter(){
 			if(!sse.isSelStateNull){
@@ -36,18 +42,18 @@ namespace SlotSystem{
 		public virtual bool isHovered{
 			get{return tam.hovered == this;}
 		}
-		public void SetHovered(){
+		void SetHovered(){
 			tam.SetHovered(this);
 		}
-		public void UnsetHovered(){
+		void UnsetHovered(){
 			tam.SetHovered(null);
 		}
 	}
 	public interface IHoverable{
+		ITransactionManager tam{get;}
+		void SetTAM(ITransactionManager tam);
 		bool isHovered{get;}
 		void OnHoverEnter();
 		void OnHoverExit();
-		void SetHovered();
-		void UnsetHovered();
 	}
 }
