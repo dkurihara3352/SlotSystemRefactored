@@ -104,6 +104,12 @@ public class SlotSystemTest{
 		protected static ITransactionManager MakeSubTAM(){
 			return Substitute.For<ITransactionManager>();
 		}
+		protected static ITransactionCache MakeSubTAC(){
+			return Substitute.For<ITransactionCache>();
+		}
+		protected static IFocusedSGProvider MakeSubFocSGPrv(){
+			return Substitute.For<IFocusedSGProvider>();
+		}
 		protected static List<Slot> CreateSlots(int count){
 			List<Slot> slots = new List<Slot>();
 			for(int i = 0; i< count; i++)

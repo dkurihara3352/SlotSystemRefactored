@@ -6,10 +6,9 @@ namespace SlotSystem{
 	public class SortTransaction: AbsSlotSystemTransaction, ISortTransaction{
 		public ISlotGroup m_selectedSG;
 		public SGSorter m_sorter;
-		public SortTransaction(ISlotGroup sg, SGSorter sorter){
+		public SortTransaction(ISlotGroup sg, SGSorter sorter, ITransactionManager tam): base(tam){
 			m_selectedSG = sg;
 			m_sorter = sorter;
-			tam = m_selectedSG.tam;
 		}
 		public override ISlotGroup sg1{get{return m_selectedSG;}}
 		public override void Indicate(){}

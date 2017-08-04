@@ -18,10 +18,10 @@ namespace SlotSystem{
 		public ISlottable sb{
 			get{return m_sb;}
 			}ISlottable m_sb;
-		public DraggedIcon(ISlottable sb){
+		public DraggedIcon(ISlottable sb, ITransactionManager tam){
 			m_sb = sb;
 			m_item = this.sb.item;
-			tam = sb.tam;
+			this.tam = tam;
 		}
 		public void CompleteMovement(){
 			tam.AcceptDITAComp(this);

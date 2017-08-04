@@ -7,11 +7,11 @@ namespace SlotSystem{
 		public ISlottable m_pickedSB;
 		public ISlottable m_selectedSB;
 		public ISlotGroup m_origSG;
-		public ReorderTransaction(ISlottable pickedSB, ISlottable selected){
+		public ReorderTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
 			m_origSG = m_pickedSB.sg;
-			tam = pickedSB.tam;
+			this.tam = tam;
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}

@@ -6,7 +6,7 @@ namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		/*	states	*/
 			public override void Activate(){
-				if(tam.IsTransactionResultRevertFor(hoverable) == false)
+				if(taCache.IsCachedTAResultRevert(hoverable) == false)
 					Focus();
 				else
 					Defocus();
@@ -410,14 +410,6 @@ namespace SlotSystem{
 						return slottables.Contains((ISlottable)element);
 					return false;
 				}
-				public override void Focus(){
-					FocusSelf();
-					FocusSBs();
-					Refresh();
-				}
-				public void FocusSelf(){
-					base.Focus();
-				}
 				public void FocusSBs(){
 					foreach(ISlottable sb in this){
 						if(sb != null){
@@ -428,14 +420,6 @@ namespace SlotSystem{
 								sb.Defocus();
 						}
 					}
-				}
-				public override void Defocus(){
-					DefocusSelf();
-					DefocusSBs();
-					Refresh();
-				}
-				public void DefocusSelf(){
-					base.Defocus();
 				}
 				public void DefocusSBs(){
 					foreach(ISlottable sb in this){
@@ -487,13 +471,13 @@ namespace SlotSystem{
 				if(tam.sg1 == (ISlotGroup)this)
 					added = null;
 				else
-					added = tam.pickedSB;
+					added = taCache.pickedSB;
 				return added;
 			}
 			public ISlottable GetRemovedForFill(){
 				ISlottable removed;
 				if(tam.sg1 == (ISlotGroup)this)
-					removed = tam.pickedSB;
+					removed = taCache.pickedSB;
 				else
 					removed = null;
 				return removed;
@@ -511,17 +495,17 @@ namespace SlotSystem{
 			public ISlottable GetAddedForSwap(){
 				ISlottable added = null;
 				if(tam.sg1 == (ISlotGroup)this)
-					added = tam.targetSB;
+					added = taCache.targetSB;
 				else
-					added = tam.pickedSB;
+					added = taCache.pickedSB;
 				return added;
 			}
 			public ISlottable GetRemovedForSwap(){
 				ISlottable removed;
 				if(tam.sg1 == (ISlotGroup)this)
-					removed = tam.pickedSB;
+					removed = taCache.pickedSB;
 				else
-					removed = tam.targetSB;
+					removed = taCache.targetSB;
 				return removed;
 			}
 			void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list){
@@ -536,7 +520,7 @@ namespace SlotSystem{
 				}
 			}
 			public void AddAndUpdateSBs(){
-				List<InventoryItemInstance> added = tam.moved;
+				List<InventoryItemInstance> added = taCache.moved;
 				List<ISlottable> newSBs = new List<ISlottable>(toList);
 
 				foreach(InventoryItemInstance itemInst in added){
@@ -575,7 +559,7 @@ namespace SlotSystem{
 				return changed;
 			}
 			public void RemoveAndUpdateSBs(){
-				List<InventoryItemInstance> removed = tam.moved;
+				List<InventoryItemInstance> removed = taCache.moved;
 				List<ISlottable> thisNewSBs = toList;
 				
 				foreach(InventoryItemInstance item in removed){
@@ -765,7 +749,7 @@ namespace SlotSystem{
 					slots[items.IndexOf(item)].sb = newSB;
 				}
 			}
-		/* TAM */
+		/* Hoverable */
 			public ITransactionManager tam{
 				get{
 					if(m_tam != null)
@@ -773,18 +757,31 @@ namespace SlotSystem{
 					else
 						throw new System.InvalidOperationException("tam not set");
 				}
-			}ITransactionManager m_tam;
+			}
+				ITransactionManager m_tam;
 			public void SetTAM(ITransactionManager tam){m_tam = tam;}
+			public ITransactionCache taCache{
+				get{
+					if(_taCache != null)
+						return _taCache;
+					else
+						throw new System.InvalidOperationException("taCache is not set");
+				}
+			}
+				ITransactionCache _taCache;
+			public void SetTACache(ITransactionCache taCache){
+				_taCache = taCache;
+			}
 			public ISlottable pickedSB{
-				get{return tam.pickedSB;}
+				get{return taCache.pickedSB;}
 			}
 			public ISlottable targetSB{
-				get{return tam.targetSB;}
+				get{return taCache.targetSB;}
 			}
 			public IHoverable hoverable{
 				get{
 					if(m_hoverable == null)
-						m_hoverable = new Hoverable(this, tam);
+						m_hoverable = new Hoverable(this, taCache);
 					return m_hoverable;
 				}
 			}
@@ -793,7 +790,7 @@ namespace SlotSystem{
 				m_hoverable = hoverable;
 			}
 			public void SetHovered(){
-				tam.SetHovered(hoverable);
+				taCache.SetHovered(hoverable);
 			}
 			public void OnHoverEnter(){
 				hoverable.OnHoverEnter();
@@ -868,9 +865,6 @@ namespace SlotSystem{
 			List<SlottableItem> FilterItem(List<SlottableItem> items);
 			SGFilter filter{get;}
 			bool AcceptsFilter(ISlottable pickedSB);
-		/*	SSE */
-			void FocusSelf();
-			void DefocusSelf();
 		/*	Transaction	*/
 			void ReorderAndUpdateSBs();
 			void RevertAndUpdateSBs();

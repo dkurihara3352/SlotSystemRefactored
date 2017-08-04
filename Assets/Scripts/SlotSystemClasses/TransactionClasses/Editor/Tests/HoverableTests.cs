@@ -17,7 +17,7 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement sse = MakeSubSSE();
 					sse.isSelStateNull.Returns(true);
-				hoverable = new Hoverable(sse, MakeSubTAM());
+				hoverable = new Hoverable(sse, MakeSubTAC());
 
 			hoverable.OnHoverEnter();
 		}
@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement sse = MakeSubSSE();
 					sse.isDeactivated.Returns(true);
-				hoverable = new Hoverable(sse, MakeSubTAM());
+				hoverable = new Hoverable(sse, MakeSubTAC());
 
 			hoverable.OnHoverEnter();
 		}
@@ -37,7 +37,7 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement sse = MakeSubSSE();
 					sse.isSelected.Returns(true);
-				hoverable = new Hoverable(sse, MakeSubTAM());
+				hoverable = new Hoverable(sse, MakeSubTAC());
 
 			hoverable.OnHoverEnter();
 		}
@@ -46,24 +46,24 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isFocused.Returns(true);
-				ITransactionManager mockTAM = MakeSubTAM();
-				hoverable = new Hoverable(stubSSE, mockTAM);
+				ITransactionCache mockTAC = MakeSubTAC();
+				hoverable = new Hoverable(stubSSE, mockTAC);
 			
 			hoverable.OnHoverEnter();
 
-			mockTAM.Received().SetHovered(hoverable);
+			mockTAC.Received().SetHovered(hoverable);
 		}
 		[Test]
 		public void OnHoverEnter_SSEIsDefocused_CallsTAMSetHoveredThis(){
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isDefocused.Returns(true);
-				ITransactionManager mockTAM = MakeSubTAM();
-				hoverable = new Hoverable(stubSSE, mockTAM);
+				ITransactionCache mockTAC = MakeSubTAC();
+				hoverable = new Hoverable(stubSSE, mockTAC);
 			
 			hoverable.OnHoverEnter();
 
-			mockTAM.Received().SetHovered(hoverable);
+			mockTAC.Received().SetHovered(hoverable);
 		}
 		
 		[Test][ExpectedException(typeof(System.InvalidOperationException))]
@@ -71,7 +71,7 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isSelStateNull.Returns(true);
-			hoverable = new Hoverable(stubSSE, MakeSubTAM());
+			hoverable = new Hoverable(stubSSE, MakeSubTAC());
 
 			hoverable.OnHoverExit();
 		}
@@ -80,7 +80,7 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isDeactivated.Returns(true);
-			hoverable = new Hoverable(stubSSE, MakeSubTAM());
+			hoverable = new Hoverable(stubSSE, MakeSubTAC());
 
 			hoverable.OnHoverExit();
 		}
@@ -89,9 +89,9 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isDeactivated.Returns(false);
-				ITransactionManager stubTAM = MakeSubTAM();
-					stubTAM.hovered.Returns((IHoverable)null);
-			hoverable = new Hoverable(stubSSE, stubTAM);
+				ITransactionCache stubTAC = MakeSubTAC();
+					stubTAC.hovered.Returns((IHoverable)null);
+			hoverable = new Hoverable(stubSSE, stubTAC);
 
 			hoverable.OnHoverExit();
 		}
@@ -101,13 +101,13 @@ namespace SlotSystemTests{
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isFocused.Returns(true);
 					stubSSE.isDeactivated.Returns(false);
-				ITransactionManager mockTAM = MakeSubTAM();
-			hoverable = new Hoverable(stubSSE, mockTAM);
-				mockTAM.hovered.Returns(hoverable);
+				ITransactionCache mockTAC = MakeSubTAC();
+			hoverable = new Hoverable(stubSSE, mockTAC);
+				mockTAC.hovered.Returns(hoverable);
 			
 			hoverable.OnHoverExit();
 			
-			mockTAM.Received().SetHovered((IHoverable)null);
+			mockTAC.Received().SetHovered((IHoverable)null);
 		}
 	}
 }

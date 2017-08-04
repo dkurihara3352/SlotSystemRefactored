@@ -28,8 +28,10 @@ namespace SlotSystemTests{
 			[Test]
 			public void SortSG_WhenCalled_CallsTAMMethods(){
 				ITransactionManager mockTAM = MakeSubTAM();
+				ITransactionCache mockTAC = MakeSubTAC();
 				SortEngine sortEngine = new SortEngine(mockTAM);
 					ISlotGroup stubSG = MakeSubSG();
+						stubSG.taCache.Returns(mockTAC);
 					SGSorter stubSorter = Substitute.For<SGSorter>();
 					ISortTransactionFactory stubSortTAFactory = Substitute.For<ISortTransactionFactory>();
 						ISortTransaction stubTA = Substitute.For<ISortTransaction>();
@@ -43,7 +45,7 @@ namespace SlotSystemTests{
 				sortEngine.SortSG(stubSG, stubSorter);
 
 				Received.InOrder(()=>{
-					mockTAM.SetTargetSB(stubTargetSB);
+					mockTAC.SetTargetSB(stubTargetSB);
 					mockTAM.SetSG1(stubSG1);
 					mockTAM.SetTransaction(stubTA);
 					mockTAM.ExecuteTransaction();

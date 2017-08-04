@@ -17,10 +17,10 @@ namespace SlotSystemTests{
 				[Test]
 				public void Activate_SSMIsTAResultRevertForFalse_SetIsFocused(){
 					Slottable sb = MakeSB();
-						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						ITransactionCache stubTAC = MakeSubTAC();
 						IHoverable stubHoverable = Substitute.For<IHoverable>();
-						stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(false);
-						sb.SetTAM(stubTAM);
+						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(false);
+						sb.SetTACache(stubTAC);
 						sb.SetHoverable(stubHoverable);
 					
 					sb.Activate();
@@ -30,10 +30,10 @@ namespace SlotSystemTests{
 				[Test]
 				public void Activate_SSMIsTAResultRevertForTrue_SetIsDefocused(){
 					Slottable sb = MakeSB();
-						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+						ITransactionCache stubTAC = MakeSubTAC();
 						IHoverable stubHoverable = Substitute.For<IHoverable>();
-						stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(true);
-						sb.SetTAM(stubTAM);
+						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(true);
+						sb.SetTACache(stubTAC);
 						sb.SetHoverable(stubHoverable);
 					
 					sb.Activate();
@@ -138,6 +138,8 @@ namespace SlotSystemTests{
 					Slottable sb = MakeSB();
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 						sb.SetTAM(stubTAM);
+						ITransactionCache stubTAC = MakeSubTAC();
+						sb.SetTACache(stubTAC);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -151,6 +153,8 @@ namespace SlotSystemTests{
 					Slottable sb = MakeSB();
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 						sb.SetTAM(stubTAM);
+						ITransactionCache stubTAC = MakeSubTAC();
+						sb.SetTACache(stubTAC);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -165,8 +169,10 @@ namespace SlotSystemTests{
 					sb.SetItem(item);
 					ISlotSystemManager ssm = MakeSubSSM();
 					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+					ITransactionCache stubTAC = MakeSubTAC();
 					sb.SetSSM(ssm);
 					sb.SetTAM(stubTAM);
+					sb.SetTACache(stubTAC);
 					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -196,9 +202,11 @@ namespace SlotSystemTests{
 				public void Increment_NonStackableAndAfterSSMAndIsActivatedAndFromValidPrevActState_DoesNotIncrement(InventoryItemInstance item){
 					Slottable sb = MakeSB();
 					ISlotSystemManager ssm = MakeSubSSM();
-					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
+					ITransactionManager stubTAM = MakeSubTAM();
+					ITransactionCache stubTAC = MakeSubTAC();
 					sb.SetSSM(ssm);
 					sb.SetTAM(stubTAM);
+					sb.SetTACache(stubTAC);
 					sb.Focus();
 					sb.SetItem(item);
 					sb.WaitForAction();

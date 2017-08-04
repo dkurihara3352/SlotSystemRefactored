@@ -7,11 +7,11 @@ namespace SlotSystem{
 		public ISlottable m_pickedSB;
 		public ISlotGroup m_selectedSG;
 		public ISlotGroup m_origSG;
-		public FillTransaction(ISlottable pickedSB, ISlotGroup selected){
+		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam):base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSG = selected;
 			m_origSG = m_pickedSB.sg;
-			tam = pickedSB.tam;
+			this.tam = tam;
 		}
 		public override ISlotGroup sg1{get{return m_origSG;}}
 		public override ISlotGroup sg2{get{return m_selectedSG;}}

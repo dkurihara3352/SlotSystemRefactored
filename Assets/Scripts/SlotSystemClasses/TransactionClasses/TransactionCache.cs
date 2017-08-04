@@ -3,9 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace SlotSystem{
 	public class TransactionCache : ITransactionCache {
-		ITransactionManager tam;
-		public TransactionCache(ITransactionManager tam){
-			this.tam = tam;
+		IFocusedSGProvider focusedSGProvider{
+			get{
+				if(_focusedSGProvider != null)
+					return _focusedSGProvider;
+				else
+					throw new System.InvalidOperationException("focusedSGProvider not set");
+			}
+		}
+			IFocusedSGProvider _focusedSGProvider;
+		ITransactionManager tam{
+			get{
+				if(_tam != null)
+					return _tam;
+				else
+					throw new System.InvalidOperationException("tam not set");
+			}
+		}
+			ITransactionManager _tam;
+		public TransactionCache(ITransactionManager tam, IFocusedSGProvider focusedSGProvider){
+			_tam = tam;
+			_focusedSGProvider = focusedSGProvider;
 		}
 		public void UpdateFields(){
 			updateFieldsCommand.Execute();
@@ -23,13 +41,13 @@ namespace SlotSystem{
 			}		
 		public void CreateTransactionResults(){
 			Dictionary<IHoverable, ISlotSystemTransaction> result = new Dictionary<IHoverable, ISlotSystemTransaction>();
-			foreach(ISlotGroup sg in tam.focusedSGs){
+			foreach(ISlotGroup sg in focusedSGProvider.focusedSGs){
 				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg.hoverable);
 				result.Add(sg.hoverable, ta);
 				if(ta is IRevertTransaction)
-					sg.DefocusSelf();
+					sg.Defocus();
 				else
-					sg.FocusSelf();
+					sg.Focus();
 				foreach(ISlottable sb in sg){
 					if(sb != null){
 						ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb.hoverable);
@@ -45,7 +63,7 @@ namespace SlotSystem{
 		}
 		public bool IsTransactionGoingToBeRevert(ISlottable sb){
 			bool res = true;
-			foreach(ISlotGroup targetSG in tam.focusedSGs){
+			foreach(ISlotGroup targetSG in focusedSGProvider.focusedSGs){
 				ISlotSystemTransaction ta = MakeTransaction(sb, targetSG.hoverable);
 				if(ta == null)
 					throw new System.InvalidOperationException("SlotSystemManager.PrePickFilter: given hoveredSSE does not yield any transaction. something's wrong baby");
@@ -83,7 +101,7 @@ namespace SlotSystem{
 		public ITransactionFactory taFactory{
 			get{
 				if(m_taFactory == null)
-					m_taFactory = new TransactionFactory();
+					m_taFactory = new TransactionFactory(tam);
 				return m_taFactory;
 			}
 		}
@@ -154,7 +172,7 @@ namespace SlotSystem{
 			SetHovered(null);
 		}
 		public void InnerUpdateFieldsOfTAM(ISlotSystemTransaction ta){
-			tam.InnerUpdateFields(ta);
+			tam.UpdateFields(ta);
 		}
 	}
 	public interface ITransactionCache{

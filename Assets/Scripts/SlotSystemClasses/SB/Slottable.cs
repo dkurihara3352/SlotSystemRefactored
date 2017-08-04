@@ -9,7 +9,7 @@ namespace SlotSystem{
 		/*	States	*/
 			/* Selection */
 				public override void Activate(){
-					if(tam.IsTransactionResultRevertFor(hoverable) == false)
+					if(taCache.IsCachedTAResultRevert(hoverable) == false)
 						Focus();
 					else
 						Defocus();
@@ -542,19 +542,31 @@ namespace SlotSystem{
 			public void SetTAM(ITransactionManager tam){
 				m_tam = tam;
 			}
+			public ITransactionCache taCache{
+				get{
+					if(_taCache != null)
+						return _taCache;
+					else
+						throw new InvalidOperationException("taCache not set");
+				}
+			}
+				ITransactionCache _taCache;
+			public void SetTACache(ITransactionCache taCache){
+				_taCache = taCache;
+			}
 			public void SetPickedSB(){
-				if(tam != null){
-					tam.SetPickedSB((ISlottable)this);
+				if(taCache != null){
+					taCache.SetPickedSB((ISlottable)this);
 				}else
 					throw new System.InvalidOperationException("Slottable.SetPickedSB: ssm not set");
 			}
 			public bool isPickedUp{
 				get{
-					return tam.pickedSB == (ISlottable)this;
+					return taCache.pickedSB == (ISlottable)this;
 				}
 			}
 			public bool passesPrePickFilter{
-				get{return !tam.IsTransactionGoingToBeRevert(this);}
+				get{return !taCache.IsTransactionGoingToBeRevert(this);}
 			}
 			public void ExecuteTransaction(){
 				tam.ExecuteTransaction();
@@ -563,23 +575,23 @@ namespace SlotSystem{
 				tam.Probe();
 			}
 			public void SetDIcon1(){
-				DraggedIcon dIcon = new DraggedIcon(this);
+				DraggedIcon dIcon = new DraggedIcon(this, tam);
 				tam.SetDIcon1(dIcon);
 			}
 			public void SetDIcon2(){
-				DraggedIcon dIcon = new DraggedIcon(this);
+				DraggedIcon dIcon = new DraggedIcon(this, tam);
 				tam.SetDIcon2(dIcon);
 			}
 			public void CreateTAResult(){
-				tam.CreateTransactionResults();
+				taCache.CreateTransactionResults();
 			}
 			public void UpdateTA(){
-				tam.UpdateFields();
+				taCache.UpdateFields();
 			}
 			public IHoverable hoverable{
 				get{
 					if(m_hoverable == null)
-						m_hoverable = new Hoverable(this, tam);
+						m_hoverable = new Hoverable(this, taCache);
 					return m_hoverable;
 				}
 			}

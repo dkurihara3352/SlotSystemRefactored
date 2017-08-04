@@ -9,9 +9,8 @@ namespace SlotSystem{
 		public ISlottable m_selectedSB;
 		public ISlotGroup m_selectedSG;
 		public List<InventoryItemInstance> itemCache = new List<InventoryItemInstance>();
-		public StackTransaction(ISlottable pickedSB ,ISlottable selected){
+		public StackTransaction(ISlottable pickedSB ,ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
-			tam = m_pickedSB.tam;
 			m_origSG = pickedSB.sg;
 			m_selectedSB = selected;
 			m_selectedSG = m_selectedSB.sg;

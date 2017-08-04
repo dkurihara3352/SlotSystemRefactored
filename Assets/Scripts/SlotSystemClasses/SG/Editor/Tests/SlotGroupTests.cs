@@ -16,9 +16,9 @@ namespace SlotSystemTests{
 				SlotGroup sg = MakeSG();
 					IHoverable stubHoverable = Substitute.For<IHoverable>();
 					sg.SetHoverable(stubHoverable);
-					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-					stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(false);
-					sg.SetTAM(stubTAM);
+						ITransactionCache stubTAC = MakeSubTAC();
+					stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(false);
+					sg.SetTACache(stubTAC);
 				
 				sg.Activate();
 
@@ -29,9 +29,9 @@ namespace SlotSystemTests{
 				SlotGroup sg = MakeSG();
 					IHoverable stubHoverable = Substitute.For<IHoverable>();
 					sg.SetHoverable(stubHoverable);
-					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-					stubTAM.IsTransactionResultRevertFor(stubHoverable).Returns(true);
-					sg.SetTAM(stubTAM);
+					ITransactionCache stubTAC = MakeSubTAC();
+					stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(true);
+					sg.SetTACache(stubTAC);
 				
 				sg.Activate();
 
@@ -614,14 +614,6 @@ namespace SlotSystemTests{
 						}
 					}
 				[Test]
-				public void FocusSelf_WhenCalled_SetsSelStateFocused(){
-					SlotGroup sg = MakeSG();
-
-					sg.FocusSelf();
-
-					Assert.That(sg.isFocused, Is.True);
-					}
-				[Test]
 				public void FocusSBs_WhenCalled_CallsSBRefresh(){
 					SlotGroup sg = MakeSG();
 						List<ISlottable> sbs;
@@ -693,14 +685,6 @@ namespace SlotSystemTests{
 					sbA.Received().Refresh();
 					sbB.Received().Refresh();
 					sbC.Received().Refresh();
-					}
-				[Test]
-				public void DefocusSelf_WhenCalled_SetsSelStateDefocused(){
-					SlotGroup sg = MakeSG();
-
-					sg.DefocusSelf();
-
-					Assert.That(sg.isDefocused, Is.True);
 					}
 				[Test]
 				public void DefocusSBs_WhenCalled_CallsSBDefocus(){
@@ -1675,11 +1659,11 @@ namespace SlotSystemTests{
 					}
 				[TestCaseSource(typeof(ReorderAndUpdateSBsCases))]
 				public void ReorderAndUpdateSBs_WhenCalled_CallsSBsSetNewSlotIDAndMoveWithin(ISlottable picked, ISlottable target, List<ISlottable> sbs, Dictionary<ISlottable, int> newSlotIDs){
-					ITransactionManager tam = Substitute.For<ITransactionManager>();
-						tam.pickedSB.Returns(picked);
-						tam.targetSB.Returns(target);
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
+						tac.pickedSB.Returns(picked);
+						tac.targetSB.Returns(target);
 					SlotGroup sg = MakeSG();
-						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 						sg.SetSBs(sbs);
 					
 					sg.ReorderAndUpdateSBs();
@@ -1966,10 +1950,12 @@ namespace SlotSystemTests{
 				public void GetAddedForFill_SSMSG1NotThis_ReturnsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable pickedSB = MakeSubSB();
-							tam.pickedSB.Returns(pickedSB);
+							tac.pickedSB.Returns(pickedSB);
 							ISlotGroup otherSG = MakeSubSG();
 							tam.sg1.Returns(otherSG);
+						sg.SetTACache(tac);
 						sg.SetTAM(tam);
 					
 					ISlottable actual = sg.GetAddedForFill();
@@ -1980,10 +1966,12 @@ namespace SlotSystemTests{
 				public void GetAddedForFill_SSMSG1IsThis_ReturnsNull(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable pickedSB = MakeSubSB();
-							tam.pickedSB.Returns(pickedSB);
+							tac.pickedSB.Returns(pickedSB);
 							tam.sg1.Returns(sg);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 					
 					ISlottable actual = sg.GetAddedForFill();
 
@@ -1993,11 +1981,13 @@ namespace SlotSystemTests{
 				public void GetRemovedForFill_SSMSG1NotThis_ReturnsNull(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable pickedSB = MakeSubSB();
-							tam.pickedSB.Returns(pickedSB);
+							tac.pickedSB.Returns(pickedSB);
 							ISlotGroup otherSG = MakeSubSG();
 							tam.sg1.Returns(otherSG);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 					
 					ISlottable actual = sg.GetRemovedForFill();
 
@@ -2007,10 +1997,12 @@ namespace SlotSystemTests{
 				public void GetRemovedForFill_SSMSG1IsThis_RetunsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable pickedSB = MakeSubSB();
-							tam.pickedSB.Returns(pickedSB);
+							tac.pickedSB.Returns(pickedSB);
 							tam.sg1.Returns(sg);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 					
 					ISlottable actual = sg.GetRemovedForFill();
 
@@ -2182,17 +2174,19 @@ namespace SlotSystemTests{
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), Substitute.For<SGSorter>(), isExpandable?0: 10);
 						ISlotGroup otherSG = MakeSubSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 						ISlotSystemManager ssm = MakeSubSSM();
 							tam.sg1.Returns(otherSG);
 							ISlottable pickedSB = MakeSubSB();
 								BowInstance bow = MakeBowInstance(0);
 								pickedSB.item.Returns(bow);
-								tam.pickedSB.Returns(pickedSB);
+								tac.pickedSB.Returns(pickedSB);
 								ISlotSystemBundle poolBundle = MakeSubBundle();
 									poolBundle.ContainsInHierarchy(sg).Returns(false);
 								ssm.poolBundle.Returns(poolBundle);
 							ssm.FindParent(Arg.Any<ISlottable>()).Returns(sg);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(isAutoSort);
@@ -2348,12 +2342,13 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						ISlotGroup otherSG = MakeSubSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 						ISlotSystemManager ssm = MakeSubSSM();
 							if(added)
 								tam.sg1.Returns(otherSG);
 							else
 								tam.sg1.Returns(sg);
-							tam.pickedSB.Returns(pickedSB);
+							tac.pickedSB.Returns(pickedSB);
 								ISlotSystemBundle poolBundle = MakeSubBundle();
 									if(isPool)
 										poolBundle.ContainsInHierarchy(sg).Returns(true);
@@ -2363,6 +2358,7 @@ namespace SlotSystemTests{
 							ssm.FindParent(Arg.Any<ISlottable>()).Returns(sg);
 					sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 10);
 					sg.SetTAM(tam);
+					sg.SetTACache(tac);
 					sg.SetSSM(ssm);
 					sg.SetSBs(sbs);
 					sg.ToggleAutoSort(isAutoSort);
@@ -2864,10 +2860,12 @@ namespace SlotSystemTests{
 				public void GetAddedForSwap_SSMSG1This_ReturnsSSMTargetSB(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable targetSB = MakeSubSB();
-							tam.targetSB.Returns(targetSB);
+							tac.targetSB.Returns(targetSB);
 							tam.sg1.Returns(sg);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 
 					ISlottable actual = sg.GetAddedForSwap();
 
@@ -2877,11 +2875,13 @@ namespace SlotSystemTests{
 				public void GetAddedForSwap_SSMSG1NotThis_ReturnsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable pickedSB = MakeSubSB();
-							tam.pickedSB.Returns(pickedSB);
+							tac.pickedSB.Returns(pickedSB);
 							ISlotGroup otherSG = MakeSubSG();
 							tam.sg1.Returns(otherSG);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 
 					ISlottable actual = sg.GetAddedForSwap();
 
@@ -2891,10 +2891,12 @@ namespace SlotSystemTests{
 				public void GetRemovedForSwap_SSMSG1This_ReturnsSSMPickedSB(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable pickedSB = MakeSubSB();
-							tam.pickedSB.Returns(pickedSB);
+							tac.pickedSB.Returns(pickedSB);
 							tam.sg1.Returns(sg);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 
 					ISlottable actual = sg.GetRemovedForSwap();
 
@@ -2904,11 +2906,13 @@ namespace SlotSystemTests{
 				public void GetRemovedForSwap_SSMSG1NotThis_ReturnsSSMTargetSB(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlottable targetSB = MakeSubSB();
-							tam.targetSB.Returns(targetSB);
+							tac.targetSB.Returns(targetSB);
 							ISlotGroup otherSG = MakeSubSG();
 							tam.sg1.Returns(otherSG);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 
 					ISlottable actual = sg.GetRemovedForSwap();
 
@@ -2918,6 +2922,7 @@ namespace SlotSystemTests{
 				public void SwapAndUpdateSBs_SSMSG1This_CreateAndAddNewSBFromSSMTargetSBToTheEndOfSBs(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 						ISlotSystemManager ssm = MakeSubSSM();
 							ISlottable targetSB = MakeSubSB();
 								BowInstance bow = MakeBowInstance(0);
@@ -2925,10 +2930,11 @@ namespace SlotSystemTests{
 							ISlottable pickedSB = MakeSubSB();
 							List<ISlottable> sbs = CreateSBs(3);
 								sbs.Add(pickedSB);
-							tam.targetSB.Returns(targetSB);
-							tam.pickedSB.Returns(pickedSB);
+							tac.targetSB.Returns(targetSB);
+							tac.pickedSB.Returns(pickedSB);
 							tam.sg1.Returns(sg);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(false);
@@ -2945,6 +2951,7 @@ namespace SlotSystemTests{
 				public void SwapAndUpdateSBs_SSMSG1NotThis_CreateAndAddNewSBFromSSMPickedSBToTheEndOfSBs(){
 					SlotGroup sg = MakeSG();
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 						ISlotSystemManager ssm = MakeSubSSM();
 							ISlottable targetSB = MakeSubSB();
 							List<ISlottable> sbs = CreateSBs(3);
@@ -2952,11 +2959,12 @@ namespace SlotSystemTests{
 							ISlottable pickedSB = MakeSubSB();
 								BowInstance bow = MakeBowInstance(0);
 								pickedSB.item.Returns(bow);
-							tam.targetSB.Returns(targetSB);
-							tam.pickedSB.Returns(pickedSB);
+							tac.targetSB.Returns(targetSB);
+							tac.pickedSB.Returns(pickedSB);
 							ISlotGroup otherSG = MakeSubSG();
 							tam.sg1.Returns(otherSG);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(false);
@@ -2984,24 +2992,26 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 10);
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 						ISlotSystemManager ssm = MakeSubSSM();
 							ISlottable targetSB = MakeSubSB();
-							tam.targetSB.Returns(targetSB);
+							tac.targetSB.Returns(targetSB);
 							ISlotGroup otherSG = MakeSubSG();
 							if(sg1This){
 								tam.sg1.Returns(sg);
-								tam.targetSB.Returns(added);
-								tam.pickedSB.Returns(removed);
+								tac.targetSB.Returns(added);
+								tac.pickedSB.Returns(removed);
 							}
 							else{
 								tam.sg1.Returns(otherSG);
-								tam.targetSB.Returns(removed);
-								tam.pickedSB.Returns(added);
+								tac.targetSB.Returns(removed);
+								tac.pickedSB.Returns(added);
 							}
 							ISlotSystemBundle pBun = MakeSubBundle();
 								pBun.ContainsInHierarchy(sg).Returns(isPool);
 							ssm.poolBundle.Returns(pBun);
 						sg.SetTAM(tam);
+						sg.SetTACache(tac);
 						sg.SetSSM(ssm);
 						sg.SetSBs(sbs);
 						sg.ToggleAutoSort(isAutoSort);
@@ -3740,11 +3750,11 @@ namespace SlotSystemTests{
 						List<ISlottable> expectedNewSBs = new List<ISlottable>(expNewSBs);
 						SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
-							ITransactionManager tam = Substitute.For<ITransactionManager>();
+						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlotSystemManager ssm = MakeSubSSM();
-								tam.moved.Returns(added);
+								tac.moved.Returns(added);
 								ssm.FindParent(Arg.Any<ISlottable>()).Returns(sg);
-							sg.SetTAM(tam);
+							sg.SetTACache(tac);
 							sg.SetSSM(ssm);
 							sg.SetSBs(sbs);
 							sg.ToggleAutoSort(isAutoSort);
@@ -4053,10 +4063,10 @@ namespace SlotSystemTests{
 					{
 						SlotGroup sg = MakeSG();
 							sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
-								ITransactionManager tam = Substitute.For<ITransactionManager>();
+							ITransactionCache tac = Substitute.For<ITransactionCache>();
 								ISlotSystemManager ssm = MakeSubSSM();
-									tam.moved.Returns(removed);
-								sg.SetTAM(tam);
+									tac.moved.Returns(removed);
+								sg.SetTACache(tac);
 								sg.SetSSM(ssm);
 								sg.SetSBs(sbs);
 								sg.ToggleAutoSort(isAutoSort);

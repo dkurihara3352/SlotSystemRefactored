@@ -368,10 +368,35 @@ namespace SlotSystem{
 			public override void SetElements(IEnumerable<ISlotSystemElement> elements){
 				throw new InvalidOperationException("not valid for this object. Use InspectorSetUp instead.");
 			}
-			public void InspectorSetUp(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns){
+			public ITransactionManager tam{
+				get{
+					if(_tam != null)
+						return _tam;
+					else
+						throw new InvalidOperationException("tam no set");
+				}
+			}
+				ITransactionManager _tam;
+			public void SetTAM(ITransactionManager tam){
+				_tam = tam;
+			}
+			public ITransactionCache taCache{
+				get{
+					if(_taCache != null)
+						return _taCache;
+					else
+						throw new InvalidOperationException("tac not set");
+				}
+			}
+				ITransactionCache _taCache;
+			public void SetTACache(ITransactionCache taCache){
+				_taCache = taCache;
+			}
+			public void InspectorSetUp(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns, ITransactionManager tam){
 				m_poolBundle = pBun;
 				m_equipBundle = eBun;
 				m_otherBundles = gBuns;
+				_tam = tam;
 			}
 			bool isElementsSetUp{
 				get{
@@ -415,15 +440,38 @@ namespace SlotSystem{
 				}
 			}
 			public void Initialize(){
+				_taCache = new TransactionCache(tam, this);
+				SetSSMRecursively();
+				SetTAMRecursively();
+				SetTACacheRecursively();
+				InitializeStatesRecursively();
+			}
+			public void SetSSMRecursively(){
 				PerformInHierarchy(SetSSMInH);
+			}
+				public void SetSSMInH(ISlotSystemElement ele){
+					ele.SetSSM(this);
+				}
+			public void SetTACacheRecursively(){
+				PerformInHierarchy(SetTACacheInHi);
+			}
+				void SetTACacheInHi(ISlotSystemElement ele){
+					if(ele is IHoverable)
+						((IHoverable)ele).SetTACache(taCache);
+				}
+			public void SetTAMRecursively(){
+				PerformInHierarchy(SetTAMInHi);
+			}
+				void SetTAMInHi(ISlotSystemElement ele){
+					if(ele is IHoverable)
+						((IHoverable)ele).SetTAM(tam);
+				}
+			public void InitializeStatesRecursively(){
 				PerformInHierarchy(InitStatesInHi);
 			}
-			public void SetSSMInH(ISlotSystemElement ele){
-				ele.SetSSM(this);
-			}
-			public void InitStatesInHi(ISlotSystemElement element){
-				element.InitializeStates();
-			}
+				public void InitStatesInHi(ISlotSystemElement element){
+					element.InitializeStates();
+				}
 			public override void InitializeStates(){
 				base.Deactivate();
 			}
@@ -471,9 +519,8 @@ namespace SlotSystem{
 				}
 		
 	}
-	public interface ISlotSystemManager: ISlotSystemElement{
+	public interface ISlotSystemManager: ISlotSystemElement, IFocusedSGProvider{
 		void Initialize();
-		List<ISlotGroup> focusedSGs{get;}
 		void UpdateEquipStatesOnAll();
 		void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG);
 		void MarkEquippedInPool(InventoryItemInstance item, bool equipped);

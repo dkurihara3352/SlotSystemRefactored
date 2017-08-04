@@ -5,12 +5,13 @@ using UnityEngine;
 namespace SlotSystem{
 	public class SortEngine : ISortEngine{
 		ITransactionManager tam;
+		ITransactionCache taCache;
 		public SortEngine(ITransactionManager tam){
 			this.tam = tam;
 		}
 		public void SortSG(ISlotGroup sg, SGSorter sorter){
 			ISlotSystemTransaction sortTransaction = sortFA.MakeSortTA(sg, sorter);
-			tam.SetTargetSB(sortTransaction.targetSB);
+			sg.taCache.SetTargetSB(sortTransaction.targetSB);
 			tam.SetSG1(sortTransaction.sg1);
 			tam.SetTransaction(sortTransaction);
 			tam.ExecuteTransaction();
@@ -36,7 +37,7 @@ namespace SlotSystem{
 			this.tam = tam;
 		}
 		public ISortTransaction MakeSortTA(ISlotGroup sg, SGSorter sorter){
-			return new SortTransaction(sg, sorter);
+			return new SortTransaction(sg, sorter, tam);
 		}
 	}
 	public interface ISortTransactionFactory{

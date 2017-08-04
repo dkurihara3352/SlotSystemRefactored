@@ -6,10 +6,9 @@ namespace SlotSystem{
 	public class RevertTransaction: AbsSlotSystemTransaction, IRevertTransaction{
 		public ISlottable m_pickedSB;
 		public ISlotGroup m_origSG;
-		public RevertTransaction(ISlottable pickedSB){
+		public RevertTransaction(ISlottable pickedSB, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_origSG = m_pickedSB.sg;
-			tam = pickedSB.tam;
 		}
 		public override void Indicate(){}
 		public override void Execute(){

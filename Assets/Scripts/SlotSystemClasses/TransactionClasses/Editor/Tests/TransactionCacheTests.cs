@@ -18,9 +18,9 @@ namespace SlotSystem{
 			ITransactionFactory taFac,
 			bool expected)
 		{
-			ITransactionManager tam = MakeSubTAM();
-			TransactionCache taCache = new TransactionCache(tam);
-				tam.focusedSGs.Returns(focusedSGs);
+			IFocusedSGProvider focSGPrv = Substitute.For<IFocusedSGProvider>();
+				focSGPrv.focusedSGs.Returns(focusedSGs);
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), focSGPrv);
 				taCache.SetPickedSB(pickedSB);
 				taCache.SetTAFactory(taFac);
 
@@ -119,13 +119,13 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void hovered_ByDefault_IsNull(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 
 			Assert.That(taCache.hovered, Is.Null);
 		}
 		[Test]
 		public void SetHovered_hoveredNullToSome_SetsItHovered(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable stubHoverable = Substitute.For<IHoverable>();
 
 			taCache.SetHovered(stubHoverable);
@@ -134,7 +134,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetHovered_hoveredNullToSome_CallsUpdateFieldsCommandExecute(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 				TransactionCacheCommand mockUpdateFieldsCommand = Substitute.For<TransactionCacheCommand>();
 				taCache.SetUpdateFieldsCommand(mockUpdateFieldsCommand);
 			IHoverable stubHoverable = Substitute.For<IHoverable>();
@@ -145,7 +145,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetHovered_SomeToNull_SetsHoveredNull(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable stubHoverable = Substitute.For<IHoverable>();
 			taCache.SetHovered(stubHoverable);
 
@@ -155,7 +155,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetHovered_SomeToNull_DoesNotCallsPrevOnHoverExit(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable mockHoverable = Substitute.For<IHoverable>();
 			taCache.SetHovered(mockHoverable);
 
@@ -165,7 +165,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetHovered_SomeToOther_CallsPrevOnHoverExit(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable mockHoverable = Substitute.For<IHoverable>();
 			IHoverable newHoverable = Substitute.For<IHoverable>();
 			taCache.SetHovered(mockHoverable);
@@ -176,7 +176,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetHovered_SomeToOther_SetsTheOtherHovered(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable stubHoverable = Substitute.For<IHoverable>();
 			IHoverable newHoverable = Substitute.For<IHoverable>();
 			taCache.SetHovered(stubHoverable);
@@ -187,7 +187,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetHovered_SomeToOther_CallsUpdateFieldsCommandExecute(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 				TransactionCacheCommand mockUpdateFieldsCommand = Substitute.For<TransactionCacheCommand>();
 				taCache.SetUpdateFieldsCommand(mockUpdateFieldsCommand);
 			IHoverable stubHoverable = Substitute.For<IHoverable>();
@@ -200,7 +200,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetHovered_SomeToSame_DoesNotCallFormerOnHoverExit(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable mockHoverable = Substitute.For<IHoverable>();
 			taCache.SetHovered(mockHoverable);
 			
@@ -210,7 +210,7 @@ namespace SlotSystem{
 		}
 		[Test]
 		public void SetTargetSB_FromNullToSome_CallsSBSelect(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable mockSB = MakeSubSB();
 
 			taCache.SetTargetSB(mockSB);
@@ -220,7 +220,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_FromNullToSome_SetsItTargetSB(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable stubSB = MakeSubSB();
 
 			taCache.SetTargetSB(stubSB);
@@ -229,7 +229,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_FromOtherToSome_CallsSBSelect(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable stubSB = MakeSubSB();
 			ISlottable mockSB = MakeSubSB();
 			taCache.SetTargetSB(stubSB);
@@ -240,7 +240,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_FromOtherToSome_SetsItTargetSB(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable prevSB = MakeSubSB();
 			ISlottable stubSB = MakeSubSB();
 			taCache.SetTargetSB(prevSB);
@@ -251,7 +251,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_FromOtherToSome_CallOtherSBFocus(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable mockSB = MakeSubSB();
 			ISlottable stubSB = MakeSubSB();
 			taCache.SetTargetSB(mockSB);
@@ -262,7 +262,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_SomeToNull_CallSBFocus(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable mockSB = MakeSubSB();
 			taCache.SetTargetSB(mockSB);
 
@@ -272,7 +272,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_SomeToNull_SetsNull(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable mockSB = MakeSubSB();
 			taCache.SetTargetSB(mockSB);
 
@@ -282,7 +282,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_SomeToSame_DoesNotCallSelectTwice(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable mockSB = MakeSubSB();
 			taCache.SetTargetSB(mockSB);
 
@@ -292,7 +292,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void SetTargetSB_SomeToSame_DoesNotCallFocus(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			ISlottable mockSB = MakeSubSB();
 			taCache.SetTargetSB(mockSB);
 
@@ -304,7 +304,8 @@ namespace SlotSystem{
 		[Test]
 		public void CreateTransactionResults_WhenCalled_CreateAndStoreSGTAPairInDict(){
 			ITransactionManager tam = Substitute.For<ITransactionManager>();
-			TransactionCache taCache = new TransactionCache(tam);
+			IFocusedSGProvider focSGPrv = Substitute.For<IFocusedSGProvider>();
+			TransactionCache taCache = new TransactionCache(tam, focSGPrv);
 				ISlottable pickedSB = MakeSubSB();
 				taCache.SetPickedSB(pickedSB);
 				ITransactionFactory stubMakeTAFactory = MakeSubTAFactory();
@@ -330,7 +331,7 @@ namespace SlotSystem{
 					stubMakeTAFactory.MakeTransaction(pickedSB, hoverableB).Returns(fillTA);
 					stubMakeTAFactory.MakeTransaction(pickedSB, hoverableC).Returns(reoTA);
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA, sgB, sgC});
-					tam.focusedSGs.Returns(sgsList);
+					focSGPrv.focusedSGs.Returns(sgsList);
 			taCache.SetTAFactory(stubMakeTAFactory);
 
 			taCache.CreateTransactionResults();
@@ -353,7 +354,8 @@ namespace SlotSystem{
 		[Test]
 		public void CreateTransactionResults_WhenCalled_CreateAndStoreSBTAPairInDict(){
 			ITransactionManager tam = Substitute.For<ITransactionManager>();
-			TransactionCache taCache = new TransactionCache(tam);
+			IFocusedSGProvider focSGPrv = Substitute.For<IFocusedSGProvider>();
+			TransactionCache taCache = new TransactionCache(tam, focSGPrv);
 				ISlottable pickedSB = MakeSubSB();
 				taCache.SetPickedSB(pickedSB);
 					ISlotGroup sg = MakeSubSG();
@@ -380,7 +382,7 @@ namespace SlotSystem{
 						stubMakeTAFactory.MakeTransaction(pickedSB, hoverableSBB).Returns(fillTA);
 						stubMakeTAFactory.MakeTransaction(pickedSB, hoverableSBC).Returns(stackTA);
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sg});
-					tam.focusedSGs.Returns(sgsList);
+					focSGPrv.focusedSGs.Returns(sgsList);
 			taCache.SetTAFactory(stubMakeTAFactory);
 			Dictionary<IHoverable, ISlotSystemTransaction> expected = new Dictionary<IHoverable, ISlotSystemTransaction>();
 			expected.Add(hoverableSG, revTA);
@@ -403,7 +405,8 @@ namespace SlotSystem{
 		[TestCaseSource(typeof(CreateTransactionResultsVariousTACases))]
 		public void CreateTransactionResults_VariousTA_CallsSGDefocusSelfOrFocusSelfAccordingly(ISlotSystemTransaction ta){
 			ITransactionManager tam = Substitute.For<ITransactionManager>();
-			TransactionCache taCache = new TransactionCache(tam);
+			IFocusedSGProvider focSGPrv = Substitute.For<IFocusedSGProvider>();
+			TransactionCache taCache = new TransactionCache(tam, focSGPrv);
 				ISlottable pickedSB = MakeSubSB();
 				taCache.SetPickedSB(pickedSB);
 				ITransactionFactory stubFac = MakeSubTAFactory();
@@ -414,15 +417,15 @@ namespace SlotSystem{
 						sgA.hoverable.Returns(hoverable);
 					stubFac.MakeTransaction(pickedSB, hoverable).Returns(ta);
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA});
-					tam.focusedSGs.Returns(sgsList);
+					focSGPrv.focusedSGs.Returns(sgsList);
 			taCache.SetTAFactory(stubFac);
 
 			taCache.CreateTransactionResults();
 
 			if(ta is IRevertTransaction)
-				sgA.Received().DefocusSelf();
+				sgA.Received().Defocus();
 			else
-				sgA.Received().FocusSelf();
+				sgA.Received().Focus();
 			}
 			class CreateTransactionResultsVariousTACases: IEnumerable{
 				public IEnumerator GetEnumerator(){
@@ -437,7 +440,8 @@ namespace SlotSystem{
 		[TestCaseSource(typeof(CreateTransactionResultsVariousTACases))]
 		public void CreateTransactionResults_VariousTA_CallsSBFocusOrDefocusAccordingly(ISlotSystemTransaction ta){
 			ITransactionManager tam = Substitute.For<ITransactionManager>();
-			TransactionCache taCache = new TransactionCache(tam);
+			IFocusedSGProvider focSGPrv = Substitute.For<IFocusedSGProvider>();
+			TransactionCache taCache = new TransactionCache(tam, focSGPrv);
 				ISlottable pickedSB = MakeSubSB();
 				taCache.SetPickedSB(pickedSB);
 				ITransactionFactory stubFac = MakeSubTAFactory();
@@ -453,7 +457,7 @@ namespace SlotSystem{
 					stubFac.MakeTransaction(pickedSB, hoverableSB).Returns(ta);
 					stubFac.MakeTransaction(pickedSB, hoverableSG).Returns(Substitute.For<IRevertTransaction>());
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sg});
-					tam.focusedSGs.Returns(sgsList);
+					focSGPrv.focusedSGs.Returns(sgsList);
 			taCache.SetTAFactory(stubFac);
 
 			taCache.CreateTransactionResults();
@@ -467,7 +471,7 @@ namespace SlotSystem{
 			}
 		[Test]
 		public void UpdateField_MatchFoundInTAResultsForHovered_SetsFields(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 				Dictionary<IHoverable, ISlotSystemTransaction> taResults = new Dictionary<IHoverable, ISlotSystemTransaction>();
 					IHoverable stubHovered = Substitute.For<IHoverable>();
 					ISlotSystemTransaction stubTA = Substitute.For<ISlotSystemTransaction>();
@@ -487,7 +491,7 @@ namespace SlotSystem{
 		[Test]
 		public void UpdateField_MatchFoundInTAResultsForHovered_CallsTAMInnerUpdateFields(){
 			ITransactionManager mockTAM = MakeSubTAM();
-			TransactionCache taCache = new TransactionCache(mockTAM);
+			TransactionCache taCache = new TransactionCache(mockTAM, MakeSubFocSGPrv());
 				Dictionary<IHoverable, ISlotSystemTransaction> taResults = new Dictionary<IHoverable, ISlotSystemTransaction>();
 					IHoverable stubHovered = Substitute.For<IHoverable>();
 					ISlotSystemTransaction stubTA = Substitute.For<ISlotSystemTransaction>();
@@ -501,18 +505,18 @@ namespace SlotSystem{
 
 			taCache.UpdateFields();
 
-			mockTAM.Received().InnerUpdateFields(stubTA);
+			mockTAM.Received().UpdateFields(stubTA);
 		}
 		[Test][ExpectedException(typeof(System.InvalidOperationException))]
 		public void IsTransactionResultRevertFor_TAResultsNoMatch_ThrowsException(){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable mockHoverable = Substitute.For<IHoverable>();
 
 			taCache.IsCachedTAResultRevert(mockHoverable);
 		}
 		[TestCaseSource(typeof(IsTransactionResultRevertFor_VariousTAsCases))]
 		public void IsTransactionResultRevertFor_VariousTAs_ReturnsAccordingly(ISlotSystemTransaction ta, bool expected){
-			TransactionCache taCache = new TransactionCache(MakeSubTAM());
+			TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 			IHoverable mockHoverable = Substitute.For<IHoverable>();
 			Dictionary<IHoverable, ISlotSystemTransaction> dict = new Dictionary<IHoverable, ISlotSystemTransaction>();
 				dict.Add(mockHoverable, ta);

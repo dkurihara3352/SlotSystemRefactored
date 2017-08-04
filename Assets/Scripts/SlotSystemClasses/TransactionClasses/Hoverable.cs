@@ -14,9 +14,16 @@ namespace SlotSystem{
 		public void SetTAM(ITransactionManager tam){
 			_tam = tam;
 		}
-		public Hoverable(ISlotSystemElement sse, ITransactionManager tam){
+		public ITransactionCache taCache{
+			get{return _taCache;}
+		}
+			ITransactionCache _taCache;
+		public void SetTACache(ITransactionCache taCache){
+			_taCache = taCache;
+		}
+		public Hoverable(ISlotSystemElement sse, ITransactionCache taCache){
 			this.sse = sse;
-			_tam = tam;
+			_taCache = taCache;
 		}
 		public virtual void OnHoverEnter(){
 			if(!sse.isSelStateNull){
@@ -40,18 +47,20 @@ namespace SlotSystem{
 				throw new InvalidOperationException("sse' sel state not set");
 		}
 		public virtual bool isHovered{
-			get{return tam.hovered == this;}
+			get{return taCache.hovered == this;}
 		}
 		void SetHovered(){
-			tam.SetHovered(this);
+			taCache.SetHovered(this);
 		}
 		void UnsetHovered(){
-			tam.SetHovered(null);
+			taCache.SetHovered(null);
 		}
 	}
 	public interface IHoverable{
 		ITransactionManager tam{get;}
 		void SetTAM(ITransactionManager tam);
+		ITransactionCache taCache{get;}
+		void SetTACache(ITransactionCache taCache);
 		bool isHovered{get;}
 		void OnHoverEnter();
 		void OnHoverExit();
