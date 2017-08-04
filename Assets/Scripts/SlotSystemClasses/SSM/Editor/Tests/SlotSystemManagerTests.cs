@@ -41,7 +41,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Initialize_WhenCalled_CallsSetSSMInHierarchy(){
-				SlotSystemManager ssm = MakeSSM();
+				SlotSystemManager ssm = MakeSSMWithSelStateHandler();
 					ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns;
@@ -62,7 +62,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Initialize_WhenCalled_CallsPIHInitializeState(){
-				SlotSystemManager ssm = MakeSSM();
+				SlotSystemManager ssm = MakeSSMWithSelStateHandler();
 					ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns;
@@ -266,22 +266,34 @@ namespace SlotSystemTests{
 								
 						}
 					}
+				SlotSystemBundle MakeSSBundleWithSelStateHandler(){
+					SlotSystemBundle bundle = MakeSSBundle();
+					SSEStateHandler handler = new SSEStateHandler();
+					bundle.SetSelStateHandler(handler);
+					return bundle;
+				}
+				SlotGroup MakeSGWithSelStateHandler(){
+					SlotGroup sg = MakeSG();
+					SSEStateHandler handler = new SSEStateHandler();
+					sg.SetSelStateHandler(handler);
+					return sg;
+				}
 				[Test]
 				public void focusedSGGs_Always_ReturnsAllFocusedSGsInOtherBundles(){
-					SlotSystemManager ssm = MakeSSM();
+					SlotSystemManager ssm = MakeSSMWithSelStateHandler();
 						ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns;
-							SlotSystemBundle gBun = MakeSSBundle();//non sub
-								SlotGroup sggA = MakeSG();
+							SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
+								SlotGroup sggA = MakeSGWithSelStateHandler();
 									sggA.transform.SetParent(gBun.transform);
 									sggA.SetElements(new ISlotSystemElement[]{});
 									sggA.Focus();
-								SlotGroup sggB = MakeSG();
+								SlotGroup sggB = MakeSGWithSelStateHandler();
 									sggB.SetElements(new ISlotSystemElement[]{});
 									sggB.transform.SetParent(gBun.transform);
 									sggB.Focus();
-								SlotGroup sggC = MakeSG();
+								SlotGroup sggC = MakeSGWithSelStateHandler();
 									sggC.SetElements(new ISlotSystemElement[]{});
 									sggC.transform.SetParent(gBun.transform);
 									sggC.Focus();
@@ -1152,7 +1164,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Focus_WhenCalled_SetsSelStateFocusedState(){
-					SlotSystemManager ssm = MakeSSM();
+					SlotSystemManager ssm = MakeSSMWithSelStateHandler();
 
 					ssm.Focus();
 
@@ -1160,15 +1172,21 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Defocus_WhenCalled_SetsSelStateDefocused(){
-					SlotSystemManager ssm = MakeSSM();
+					SlotSystemManager ssm = MakeSSMWithSelStateHandler();
 
 					ssm.Defocus();
 
 					Assert.That(ssm.isDefocused, Is.True);
 					}
+				SlotSystemManager MakeSSMWithSelStateHandler(){
+					SlotSystemManager ssm = MakeSSM();
+					SSEStateHandler handler = new SSEStateHandler();
+					ssm.SetSelStateHandler(handler);
+					return ssm;
+				}
 				[Test]
 				public void Deactivate_WhenCalled_SetsSelStateDeactivateed(){
-					SlotSystemManager ssm = MakeSSM();
+					SlotSystemManager ssm = MakeSSMWithSelStateHandler();
 
 					ssm.Deactivate();
 

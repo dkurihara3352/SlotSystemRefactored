@@ -1,28 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace SlotSystem{
 	public abstract class TransactionMNGProcess: SSEProcess, ITAMProcess {
+		public TransactionMNGProcess(ISSEStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
+		}
 		public ITransactionManager tam{
-			get{return (ITransactionManager)sse;}
-			set{}
+			get{return (ITransactionManager)handler;}
 		}
 	}
 	public interface ITAMProcess: ISSEProcess{
-		ITransactionManager tam{get; set;}
+		ITransactionManager tam{get;}
 	}
 	public interface ITAMActProcess: ITAMProcess{}
 		public class TAMProbeProcess: TransactionMNGProcess, ITAMActProcess{
-			public TAMProbeProcess(ITransactionManager tam, System.Func<IEnumeratorFake> coroutineMock){
-				this.sse = tam;
-				this.coroutineFake = coroutineMock;
+			public TAMProbeProcess(ITransactionManager tam, Func<IEnumeratorFake> coroutine): base(tam, coroutine){
 			}
 		}
 		public class TAMTransactionProcess: TransactionMNGProcess, ITAMActProcess{
-			public TAMTransactionProcess(ITransactionManager tam){
-				this.sse = tam;
-				this.coroutineFake = tam.transactionCoroutine;
+			public TAMTransactionProcess(ITransactionManager tam, Func<IEnumeratorFake> coroutine):base(tam, coroutine){
 			}
 			public override void Expire(){
 				base.Expire();

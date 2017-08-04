@@ -511,7 +511,9 @@ namespace SlotSystem{
 			void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list){
 				if(!isPool){
 					GameObject newSBGO = new GameObject("newSBGO");
-					ISlottable newSB = newSBGO.AddComponent<Slottable>();
+					Slottable newSB = newSBGO.AddComponent<Slottable>();
+					SSEStateHandler stateHandler = new SSEStateHandler();
+					newSB.SetSelStateHandler(stateHandler);
 					newSB.SetItem(added.item);
 					newSB.SetSSM(ssm);
 					newSB.Unequip();
@@ -648,7 +650,9 @@ namespace SlotSystem{
 			}
 			public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
 				GameObject newSBGO = new GameObject("newSBGO");
-				ISlottable newSB = newSBGO.AddComponent<Slottable>();
+				Slottable newSB = newSBGO.AddComponent<Slottable>();
+				SSEStateHandler stateHandler = new SSEStateHandler();
+				newSB.SetSelStateHandler(stateHandler);
 				newSB.SetItem(addedItem);
 				newSB.SetSSM(ssm);
 				newSB.Defocus();

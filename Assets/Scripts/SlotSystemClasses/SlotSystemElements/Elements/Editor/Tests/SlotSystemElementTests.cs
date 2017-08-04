@@ -11,191 +11,6 @@ namespace SlotSystemTests{
 		[TestFixture]
 		[Category("OtherElements")]
 		public class SlotSystemElementTests: SlotSystemTest{
-			/*	State and process */
-				/* States */
-					[Test]
-					public void SelStateFields_ByDefault_AreSetDefault(){
-						TestSlotSystemElement sse = MakeTestSSE();
-
-						Assert.That(sse.isDeactivated, Is.False);
-						Assert.That(sse.isFocused, Is.False);
-						Assert.That(sse.isDefocused, Is.False);
-						Assert.That(sse.isSelected, Is.False);
-					}
-					[Test]
-					public void Deactivate_WhenCalled_SetsCurSelStateDeactivated(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						
-						testSSE.Deactivate();
-
-						Assert.That(testSSE.isDeactivated, Is.True);
-						Assert.That(testSSE.isDefocused, Is.False);
-						Assert.That(testSSE.isFocused, Is.False);
-						Assert.That(testSSE.isSelected, Is.False);
-						}
-					[Test]
-					public void Deactivate_IsSelStateInit_DoesNotSetSelProc(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-
-						testSSE.Deactivate();
-
-						Assert.That(testSSE.selProcess, Is.Null);
-						}
-					[Test]
-					public void Deactivate_IsNotSelStateInit_SetsSelProcDeactivateProc(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						testSSE.Defocus();
-
-						testSSE.Deactivate();
-
-						Assert.That(testSSE.selProcess, Is.TypeOf(typeof(SSEDeactivateProcess)));
-						}
-					[Test]
-					public void Deactivate_FromNullToDeaToDea_DoesNotSetSelProc(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						testSSE.Deactivate();
-
-						testSSE.Deactivate();
-
-						Assert.That(testSSE.selProcess, Is.Null);
-					}
-					[Test]
-					public void Focus_WhenCalled_SetsCurSelStateFocused(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						
-						testSSE.Focus();
-
-						Assert.That(testSSE.isDeactivated, Is.False);
-						Assert.That(testSSE.isDefocused, Is.False);
-						Assert.That(testSSE.isFocused, Is.True);
-						Assert.That(testSSE.isSelected, Is.False);
-						}
-					[Test]
-					public void Focus_IsSelStateInit_DoesNotSetSelProc(){
-						TestSlotSystemElement sse = MakeTestSSE();
-
-						sse.Focus();
-
-						Assert.That(sse.selProcess, Is.Null);
-						}
-					[Test]
-					public void Focus_IsSelStateInit_CallsInstantFocus(){
-						TestSlotSystemElement sse = MakeTestSSE();
-							ISSECommand mockComm = Substitute.For<ISSECommand>();
-							IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
-							stubInstantCommands.When(x => x.ExecuteInstantFocus()).Do(x => mockComm.Execute());
-							sse.SetInstantCommands(stubInstantCommands);
-
-						sse.Focus();
-
-						mockComm.Received().Execute();
-						}
-					[Test]
-					public void Focus_IsNotSelStateInit_SetsSelProcFocus(){
-						TestSlotSystemElement sse = MakeTestSSE();
-						sse.Deactivate();
-
-						sse.Focus();
-
-						Assert.That(sse.selProcess, Is.TypeOf(typeof(SSEFocusProcess)));
-						}
-					[Test]
-					public void Defocus_WhenCalled_SetCurStateToDefocusd(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						
-						testSSE.Defocus();
-
-						Assert.That(testSSE.isDeactivated, Is.False);
-						Assert.That(testSSE.isDefocused, Is.True);
-						Assert.That(testSSE.isFocused, Is.False);
-						Assert.That(testSSE.isSelected, Is.False);
-						}
-					[Test]
-					public void Defocus_IsSelStateInit_DoesNotSetSelProc(){
-						TestSlotSystemElement sse = MakeTestSSE();
-
-						sse.Defocus();
-
-						Assert.That(sse.selProcess, Is.Null);
-						}
-					[Test]
-					public void Defocus_IsSelStateInit_CallsInstantDefocus(){
-						TestSlotSystemElement sse = MakeTestSSE();
-							ISSECommand mockComm = Substitute.For<ISSECommand>();
-							IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
-							stubInstantCommands.When(x => x.ExecuteInstantDefocus()).Do(x => mockComm.Execute());
-							sse.SetInstantCommands(stubInstantCommands);
-
-						sse.Defocus();
-
-						mockComm.Received().Execute();
-						}
-					[Test]
-					public void Defocus_IsNotSelStateInit_SetsSelProcDefocus(){
-						TestSlotSystemElement sse = MakeTestSSE();
-						sse.Deactivate();
-
-						sse.Defocus();
-
-						Assert.That(sse.selProcess, Is.TypeOf(typeof(SSEDefocusProcess)));
-						}
-					[Test]
-					public void Select_WhenCalled_SetCurStateToSelected(){
-						TestSlotSystemElement testSSE = MakeTestSSE();
-						
-						testSSE.Select();
-
-						Assert.That(testSSE.isDeactivated, Is.False);
-						Assert.That(testSSE.isDefocused, Is.False);
-						Assert.That(testSSE.isFocused, Is.False);
-						Assert.That(testSSE.isSelected, Is.True);
-						}
-					[Test]
-					public void Select_IsSelStateInit_DoesNotSetSelProc(){
-						TestSlotSystemElement sse = MakeTestSSE();
-
-						sse.Select();
-
-						Assert.That(sse.selProcess, Is.Null);
-						}
-					[Test]
-					public void Select_IsSelStateInit_CallsInstantSelect(){
-						TestSlotSystemElement sse = MakeTestSSE();
-							ISSECommand mockComm = Substitute.For<ISSECommand>();
-							IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
-							stubInstantCommands.When(x => x.ExecuteInstantSelect()).Do(x => mockComm.Execute());
-							sse.SetInstantCommands(stubInstantCommands);
-
-						sse.Select();
-
-						mockComm.Received().Execute();
-						}
-					[Test]
-					public void Select_IsNotSelStateInit_SetsSelProcSelect(){
-						TestSlotSystemElement sse = MakeTestSSE();
-						sse.Deactivate();
-
-						sse.Select();
-
-						Assert.That(sse.selProcess, Is.TypeOf(typeof(SSESelectProcess)));
-						}
-				/* Process */
-					[TestCaseSource(typeof(SetAndRunSelProcess_ISSESelProcessOrNullCases))]
-					public void SetAndRunSelProcess_ISSESelProcessOrNull_CallsSelProcEngineSAR(ISSESelProcess process){
-						TestSlotSystemElement sse = MakeTestSSE();
-							ISSEProcessEngine<ISSESelProcess> engine = Substitute.For<ISSEProcessEngine<ISSESelProcess>>();
-							sse.SetSelProcEngine(engine);
-						
-						sse.SetAndRunSelProcess(process);
-
-						engine.Received().SetAndRunProcess(process);
-						}
-						class SetAndRunSelProcess_ISSESelProcessOrNullCases: IEnumerable{
-							public IEnumerator GetEnumerator(){
-								yield return Substitute.For<ISSESelProcess>();
-								yield return null;
-							}
-						}
 			/*	Fields	*/
 				[TestCase(1)]
 				[TestCase(10)]
@@ -324,16 +139,16 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void isFocusedInHierarchy_Various_ReturnsAccordingly(){
-					TestSlotSystemElement sseF_0 = MakeTestSSE();
-						TestSlotSystemElement sseF_0_0 = MakeTestSSE();
-							TestSlotSystemElement sseF_0_0_0 = MakeTestSSE();
-								TestSlotSystemElement sseD_0_0_0_0 = MakeTestSSE();
-									TestSlotSystemElement sseF_0_0_0_0_0 = MakeTestSSE();
-								TestSlotSystemElement sseF_0_0_0_1 = MakeTestSSE();
-						TestSlotSystemElement sseD_0_1 = MakeTestSSE();
-							TestSlotSystemElement sseF_0_1_0 = MakeTestSSE();
-								TestSlotSystemElement sseF_0_1_0_0 = MakeTestSSE();
-									TestSlotSystemElement sseF_0_1_0_0_0 = MakeTestSSE();
+					TestSlotSystemElement sseF_0 = MakeTestSSEWithStateHandler();
+						TestSlotSystemElement sseF_0_0 = MakeTestSSEWithStateHandler();
+							TestSlotSystemElement sseF_0_0_0 = MakeTestSSEWithStateHandler();
+								TestSlotSystemElement sseD_0_0_0_0 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sseF_0_0_0_0_0 = MakeTestSSEWithStateHandler();
+								TestSlotSystemElement sseF_0_0_0_1 = MakeTestSSEWithStateHandler();
+						TestSlotSystemElement sseD_0_1 = MakeTestSSEWithStateHandler();
+							TestSlotSystemElement sseF_0_1_0 = MakeTestSSEWithStateHandler();
+								TestSlotSystemElement sseF_0_1_0_0 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sseF_0_1_0_0_0 = MakeTestSSEWithStateHandler();
 					sseF_0.SetParent(null);
 						sseF_0_0.SetParent(sseF_0);
 							sseF_0_0_0.SetParent(sseF_0_0);
@@ -380,21 +195,21 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void isFocusedInHierarchy_SelfFocusedAndNoParent_ReturnsTrue(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
+					TestSlotSystemElement testSSE = MakeTestSSEWithStateHandler();
 					testSSE.Focus();
 
 					Assert.That(testSSE.isFocusedInHierarchy, Is.True);
 					}
 				[Test]
 				public void isFocusedInHierarchy_SelfNotFocused_ReturnsFalse(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
+					TestSlotSystemElement testSSE = MakeTestSSEWithStateHandler();
 
 					Assert.That(testSSE.isFocusedInHierarchy, Is.False);
 					}
 				[Test]
 				public void isFocusedInHierarchy_SelfFocusedParentNotFocused_ReturnsFalse(){
-					TestSlotSystemElement testSSE = MakeTestSSE();
-					TestSlotSystemElement stubPar = MakeTestSSE();
+					TestSlotSystemElement testSSE = MakeTestSSEWithStateHandler();
+					TestSlotSystemElement stubPar = MakeTestSSEWithStateHandler();
 					testSSE.SetParent(stubPar);
 					stubPar.Defocus();
 					testSSE.Focus();
@@ -403,10 +218,10 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void isFocusedInHierarchy_SelfAndAllParentsFocused_ReturnsTrue(){
-					TestSlotSystemElement stubPar1 = MakeTestSSE();
-					TestSlotSystemElement stubPar2 = MakeTestSSE();
-					TestSlotSystemElement stubPar3 = MakeTestSSE();
-					TestSlotSystemElement testSSE = MakeTestSSE();
+					TestSlotSystemElement stubPar1 = MakeTestSSEWithStateHandler();
+					TestSlotSystemElement stubPar2 = MakeTestSSEWithStateHandler();
+					TestSlotSystemElement stubPar3 = MakeTestSSEWithStateHandler();
+					TestSlotSystemElement testSSE = MakeTestSSEWithStateHandler();
 					testSSE.SetParent(stubPar3);
 					stubPar3.SetElements(new ISlotSystemElement[]{testSSE});
 					stubPar3.SetParent(stubPar2);
@@ -419,10 +234,10 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void isFocusedInHierarchy_SomeNonfocusedAncester_ReturnsFalse(){
-					TestSlotSystemElement stubPar1 = MakeTestSSE();
-					TestSlotSystemElement stubPar2 = MakeTestSSE();
-					TestSlotSystemElement stubPar3 = MakeTestSSE();
-					TestSlotSystemElement testSSE = MakeTestSSE();
+					TestSlotSystemElement stubPar1 = MakeTestSSEWithStateHandler();
+					TestSlotSystemElement stubPar2 = MakeTestSSEWithStateHandler();
+					TestSlotSystemElement stubPar3 = MakeTestSSEWithStateHandler();
+					TestSlotSystemElement testSSE = MakeTestSSEWithStateHandler();
 					testSSE.SetParent(stubPar3);
 					stubPar3.SetElements(new ISlotSystemElement[]{testSSE});
 					stubPar3.SetParent(stubPar2);
@@ -1068,162 +883,162 @@ namespace SlotSystemTests{
 						Assert.That(e.isFocusableInHierarchy, Is.True);
 					foreach(var e in xOff)
 						Assert.That(e.isFocusableInHierarchy, Is.False);
+				}
+				class isFocusableInHierarchyCases: IEnumerable{
+					public IEnumerator GetEnumerator(){
+						object[] case0;
+							TestSlotSystemElement top_0 = MakeTestSSE();
+								SlotSystemBundle bun0_0 = MakeSSBundle();
+									TestSlotSystemElement sse00_0 = MakeTestSSE();
+									TestSlotSystemElement sse01_0 = MakeTestSSE();//foc
+									TestSlotSystemElement sse02_0 = MakeTestSSE();
+									SlotSystemBundle bun03_0 = MakeSSBundle();
+										TestSlotSystemElement sse030_0 = MakeTestSSE();//foc
+										TestSlotSystemElement sse031_0 = MakeTestSSE();
+								SlotSystemBundle bun1_0 = MakeSSBundle();
+									SlotSystemBundle bun10_0 = MakeSSBundle();
+										TestSlotSystemElement sse100_0 = MakeTestSSE();//foc
+										TestSlotSystemElement sse101_0 = MakeTestSSE();
+									SlotSystemBundle bun11_0 = MakeSSBundle();//foc
+										SlotSystemBundle bun110_0 = MakeSSBundle();//foc
+											TestSlotSystemElement sse1100_0 = MakeTestSSE();//foc
+											TestSlotSystemElement sse1101_0 = MakeTestSSE();
+										SlotSystemBundle bun111_0 = MakeSSBundle();
+										SlotSystemBundle bun112_0 = MakeSSBundle();
+							bun0_0.transform.SetParent(top_0.transform);
+								sse00_0.transform.SetParent(bun0_0.transform);
+								sse01_0.transform.SetParent(bun0_0.transform);
+								sse02_0.transform.SetParent(bun0_0.transform);
+								bun03_0.transform.SetParent(bun0_0.transform);
+									sse030_0.transform.SetParent(bun03_0.transform);
+									sse031_0.transform.SetParent(bun03_0.transform);
+							bun1_0.transform.SetParent(top_0.transform);
+								bun10_0.transform.SetParent(bun1_0.transform);
+									sse100_0.transform.SetParent(bun10_0.transform);
+									sse101_0.transform.SetParent(bun10_0.transform);
+								bun11_0.transform.SetParent(bun1_0.transform);
+									bun110_0.transform.SetParent(bun11_0.transform);
+										sse1100_0.transform.SetParent(bun110_0.transform);
+										sse1101_0.transform.SetParent(bun110_0.transform);
+									bun111_0.transform.SetParent(bun11_0.transform);
+									bun112_0.transform.SetParent(bun11_0.transform);
+
+							top_0.SetHierarchyRecursively();
+
+							bun0_0.InspectorSetUp(sse01_0);
+							bun03_0.InspectorSetUp(sse030_0);
+							bun1_0.InspectorSetUp(bun11_0);
+							bun10_0.InspectorSetUp(sse100_0);
+							bun11_0.InspectorSetUp(bun110_0);
+							bun110_0.InspectorSetUp(sse1100_0);
+
+							IEnumerable<ISlotSystemElement> xOn_0 = new ISlotSystemElement[]{
+								top_0,
+								bun0_0,
+								sse01_0,
+								bun1_0,
+								bun11_0,
+								bun110_0,
+								sse1100_0
+							};
+							IEnumerable<ISlotSystemElement> xOff_0 = new ISlotSystemElement[]{
+								sse00_0,
+								sse02_0,
+								bun03_0,
+								sse030_0,
+								sse031_0,
+								bun10_0,
+								sse100_0,
+								sse101_0,
+								sse1101_0,
+								bun111_0,
+								bun112_0
+							};
+							case0 = new object[]{top_0, xOn_0, xOff_0};
+							yield return case0;
+						object[] case1;
+							TestSlotSystemElement top_1 = MakeTestSSE();
+								SlotSystemBundle bun0_1 = MakeSSBundle();
+									TestSlotSystemElement sse00_1 = MakeTestSSE();
+									TestSlotSystemElement sse01_1 = MakeTestSSE();
+									TestSlotSystemElement sse02_1 = MakeTestSSE();
+									SlotSystemBundle bun03_1 = MakeSSBundle();//foc
+										TestSlotSystemElement sse030_1 = MakeTestSSE();//foc
+										TestSlotSystemElement sse031_1 = MakeTestSSE();
+								SlotSystemBundle bun1_1 = MakeSSBundle();
+									SlotSystemBundle bun10_1 = MakeSSBundle();//foc
+										TestSlotSystemElement sse100_1 = MakeTestSSE();//foc
+										TestSlotSystemElement sse101_1 = MakeTestSSE();
+									SlotSystemBundle bun11_1 = MakeSSBundle();
+										SlotSystemBundle bun110_1 = MakeSSBundle();//foc
+											TestSlotSystemElement sse1100_1 = MakeTestSSE();//foc
+											TestSlotSystemElement sse1101_1 = MakeTestSSE();
+										SlotSystemBundle bun111_1 = MakeSSBundle();
+										SlotSystemBundle bun112_1 = MakeSSBundle();
+							bun0_1.transform.SetParent(top_1.transform);
+								sse00_1.transform.SetParent(bun0_1.transform);
+								sse01_1.transform.SetParent(bun0_1.transform);
+								sse02_1.transform.SetParent(bun0_1.transform);
+								bun03_1.transform.SetParent(bun0_1.transform);
+									sse030_1.transform.SetParent(bun03_1.transform);
+									sse031_1.transform.SetParent(bun03_1.transform);
+							bun1_1.transform.SetParent(top_1.transform);
+								bun10_1.transform.SetParent(bun1_1.transform);
+									sse100_1.transform.SetParent(bun10_1.transform);
+									sse101_1.transform.SetParent(bun10_1.transform);
+								bun11_1.transform.SetParent(bun1_1.transform);
+									bun110_1.transform.SetParent(bun11_1.transform);
+										sse1100_1.transform.SetParent(bun110_1.transform);
+										sse1101_1.transform.SetParent(bun110_1.transform);
+									bun111_1.transform.SetParent(bun11_1.transform);
+									bun112_1.transform.SetParent(bun11_1.transform);
+
+							top_1.SetHierarchyRecursively();
+
+							bun0_1.InspectorSetUp(bun03_1);
+							bun03_1.InspectorSetUp(sse030_1);
+							bun1_1.InspectorSetUp(bun10_1);
+							bun10_1.InspectorSetUp(sse100_1);
+							bun11_1.InspectorSetUp(bun110_1);
+							bun110_1.InspectorSetUp(sse1100_1);
+
+							IEnumerable<ISlotSystemElement> xOn_1 = new ISlotSystemElement[]{
+								top_1,
+								bun0_1,
+								bun03_1,
+								sse030_1,
+								bun1_1,
+								bun10_1,
+								sse100_1
+							};
+							IEnumerable<ISlotSystemElement> xOff_1 = new ISlotSystemElement[]{
+								sse00_1,
+								sse01_1,
+								sse02_1,
+								sse031_1,
+								sse101_1,
+								bun11_1,
+								bun110_1,
+								sse1100_1,
+								sse1101_1,
+								bun111_1,
+								bun112_1
+							};
+							case1 = new object[]{top_1, xOn_1, xOff_1};
+							yield return case1;
 					}
-					class isFocusableInHierarchyCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							object[] case0;
-								TestSlotSystemElement top_0 = MakeTestSSE();
-									SlotSystemBundle bun0_0 = MakeSSBundle();
-										TestSlotSystemElement sse00_0 = MakeTestSSE();
-										TestSlotSystemElement sse01_0 = MakeTestSSE();//foc
-										TestSlotSystemElement sse02_0 = MakeTestSSE();
-										SlotSystemBundle bun03_0 = MakeSSBundle();
-											TestSlotSystemElement sse030_0 = MakeTestSSE();//foc
-											TestSlotSystemElement sse031_0 = MakeTestSSE();
-									SlotSystemBundle bun1_0 = MakeSSBundle();
-										SlotSystemBundle bun10_0 = MakeSSBundle();
-											TestSlotSystemElement sse100_0 = MakeTestSSE();//foc
-											TestSlotSystemElement sse101_0 = MakeTestSSE();
-										SlotSystemBundle bun11_0 = MakeSSBundle();//foc
-											SlotSystemBundle bun110_0 = MakeSSBundle();//foc
-												TestSlotSystemElement sse1100_0 = MakeTestSSE();//foc
-												TestSlotSystemElement sse1101_0 = MakeTestSSE();
-											SlotSystemBundle bun111_0 = MakeSSBundle();
-											SlotSystemBundle bun112_0 = MakeSSBundle();
-								bun0_0.transform.SetParent(top_0.transform);
-									sse00_0.transform.SetParent(bun0_0.transform);
-									sse01_0.transform.SetParent(bun0_0.transform);
-									sse02_0.transform.SetParent(bun0_0.transform);
-									bun03_0.transform.SetParent(bun0_0.transform);
-										sse030_0.transform.SetParent(bun03_0.transform);
-										sse031_0.transform.SetParent(bun03_0.transform);
-								bun1_0.transform.SetParent(top_0.transform);
-									bun10_0.transform.SetParent(bun1_0.transform);
-										sse100_0.transform.SetParent(bun10_0.transform);
-										sse101_0.transform.SetParent(bun10_0.transform);
-									bun11_0.transform.SetParent(bun1_0.transform);
-										bun110_0.transform.SetParent(bun11_0.transform);
-											sse1100_0.transform.SetParent(bun110_0.transform);
-											sse1101_0.transform.SetParent(bun110_0.transform);
-										bun111_0.transform.SetParent(bun11_0.transform);
-										bun112_0.transform.SetParent(bun11_0.transform);
-
-								top_0.SetHierarchyRecursively();
-
-								bun0_0.InspectorSetUp(sse01_0);
-								bun03_0.InspectorSetUp(sse030_0);
-								bun1_0.InspectorSetUp(bun11_0);
-								bun10_0.InspectorSetUp(sse100_0);
-								bun11_0.InspectorSetUp(bun110_0);
-								bun110_0.InspectorSetUp(sse1100_0);
-
-								IEnumerable<ISlotSystemElement> xOn_0 = new ISlotSystemElement[]{
-									top_0,
-									bun0_0,
-									sse01_0,
-									bun1_0,
-									bun11_0,
-									bun110_0,
-									sse1100_0
-								};
-								IEnumerable<ISlotSystemElement> xOff_0 = new ISlotSystemElement[]{
-									sse00_0,
-									sse02_0,
-									bun03_0,
-									sse030_0,
-									sse031_0,
-									bun10_0,
-									sse100_0,
-									sse101_0,
-									sse1101_0,
-									bun111_0,
-									bun112_0
-								};
-								case0 = new object[]{top_0, xOn_0, xOff_0};
-								yield return case0;
-							object[] case1;
-								TestSlotSystemElement top_1 = MakeTestSSE();
-									SlotSystemBundle bun0_1 = MakeSSBundle();
-										TestSlotSystemElement sse00_1 = MakeTestSSE();
-										TestSlotSystemElement sse01_1 = MakeTestSSE();
-										TestSlotSystemElement sse02_1 = MakeTestSSE();
-										SlotSystemBundle bun03_1 = MakeSSBundle();//foc
-											TestSlotSystemElement sse030_1 = MakeTestSSE();//foc
-											TestSlotSystemElement sse031_1 = MakeTestSSE();
-									SlotSystemBundle bun1_1 = MakeSSBundle();
-										SlotSystemBundle bun10_1 = MakeSSBundle();//foc
-											TestSlotSystemElement sse100_1 = MakeTestSSE();//foc
-											TestSlotSystemElement sse101_1 = MakeTestSSE();
-										SlotSystemBundle bun11_1 = MakeSSBundle();
-											SlotSystemBundle bun110_1 = MakeSSBundle();//foc
-												TestSlotSystemElement sse1100_1 = MakeTestSSE();//foc
-												TestSlotSystemElement sse1101_1 = MakeTestSSE();
-											SlotSystemBundle bun111_1 = MakeSSBundle();
-											SlotSystemBundle bun112_1 = MakeSSBundle();
-								bun0_1.transform.SetParent(top_1.transform);
-									sse00_1.transform.SetParent(bun0_1.transform);
-									sse01_1.transform.SetParent(bun0_1.transform);
-									sse02_1.transform.SetParent(bun0_1.transform);
-									bun03_1.transform.SetParent(bun0_1.transform);
-										sse030_1.transform.SetParent(bun03_1.transform);
-										sse031_1.transform.SetParent(bun03_1.transform);
-								bun1_1.transform.SetParent(top_1.transform);
-									bun10_1.transform.SetParent(bun1_1.transform);
-										sse100_1.transform.SetParent(bun10_1.transform);
-										sse101_1.transform.SetParent(bun10_1.transform);
-									bun11_1.transform.SetParent(bun1_1.transform);
-										bun110_1.transform.SetParent(bun11_1.transform);
-											sse1100_1.transform.SetParent(bun110_1.transform);
-											sse1101_1.transform.SetParent(bun110_1.transform);
-										bun111_1.transform.SetParent(bun11_1.transform);
-										bun112_1.transform.SetParent(bun11_1.transform);
-
-								top_1.SetHierarchyRecursively();
-
-								bun0_1.InspectorSetUp(bun03_1);
-								bun03_1.InspectorSetUp(sse030_1);
-								bun1_1.InspectorSetUp(bun10_1);
-								bun10_1.InspectorSetUp(sse100_1);
-								bun11_1.InspectorSetUp(bun110_1);
-								bun110_1.InspectorSetUp(sse1100_1);
-
-								IEnumerable<ISlotSystemElement> xOn_1 = new ISlotSystemElement[]{
-									top_1,
-									bun0_1,
-									bun03_1,
-									sse030_1,
-									bun1_1,
-									bun10_1,
-									sse100_1
-								};
-								IEnumerable<ISlotSystemElement> xOff_1 = new ISlotSystemElement[]{
-									sse00_1,
-									sse01_1,
-									sse02_1,
-									sse031_1,
-									sse101_1,
-									bun11_1,
-									bun110_1,
-									sse1100_1,
-									sse1101_1,
-									bun111_1,
-									bun112_1
-								};
-								case1 = new object[]{top_1, xOn_1, xOff_1};
-								yield return case1;
-						}
-					}
-				[Test]
-				public void Activate_WhenCalled_ActivateAccordingly(){
-					/* 	"Spot" activation: sets focused or defocused according to rule
-							generic sse -> focus
-							sg or sb -> referToTA
-					*/
-					TestSlotSystemElement sse = MakeTestSSE();
-
-					sse.Activate();
-
-					Assert.That(sse.isFocused, Is.True);
+				}
+				static TestSlotSystemElement MakeTestSSEWithStateHandler(){
+					TestSlotSystemElement testSSE = MakeTestSSE();
+					SSEStateHandler handler = new SSEStateHandler();
+					testSSE.SetSelStateHandler(handler);
+					return testSSE;
+				}
+				static SlotSystemBundle MakeSSBundleWithStateHandler(){
+					SlotSystemBundle bundle = MakeSSBundle();
+					SSEStateHandler handler = new SSEStateHandler();
+					bundle.SetSelStateHandler(handler);
+					return bundle;
 				}
 				[TestCaseSource(typeof(ActivateRecursivelyCases))]
 				public void ActivateRecursively_WhenCalled_FocusIfIsAOFAndFocusable_DefocusIfIsAODAndNotFocusable(TestSlotSystemElement top, IEnumerable<ISlotSystemElement> xFocused, IEnumerable<ISlotSystemElement> xDefocused, IEnumerable<ISlotSystemElement> xDeactivated){
@@ -1240,30 +1055,30 @@ namespace SlotSystemTests{
 					class ActivateRecursivelyCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] case0;
-								TestSlotSystemElement top_0 = MakeTestSSE();
-									SlotSystemBundle bun0_0 = MakeSSBundle();
-										TestSlotSystemElement sse00_0 = MakeTestSSE();
-											SlotSystemBundle bun000_0 = MakeSSBundle();
-												TestSlotSystemElement sse0000_0 = MakeTestSSE();
-												TestSlotSystemElement sse0001_0 = MakeTestSSE();
-											TestSlotSystemElement sse001_0 = MakeTestSSE();
-												TestSlotSystemElement sse0010_0 = MakeTestSSE();
-												TestSlotSystemElement sse0011_0 = MakeTestSSE();
-										TestSlotSystemElement sse01_0 = MakeTestSSE();
-										TestSlotSystemElement sse02_0 = MakeTestSSE();
-									SlotSystemBundle bun1_0 = MakeSSBundle();
-										SlotSystemBundle bun10_0 = MakeSSBundle();
-											TestSlotSystemElement sse100_0 = MakeTestSSE();
-											TestSlotSystemElement sse101_0 = MakeTestSSE();
-												SlotSystemBundle bun1010_0 = MakeSSBundle();
-													TestSlotSystemElement sse10100_0 = MakeTestSSE();
-													TestSlotSystemElement sse10101_0 = MakeTestSSE();
-										SlotSystemBundle bun11_0 = MakeSSBundle();
-											TestSlotSystemElement sse110_0 = MakeTestSSE();
-											TestSlotSystemElement sse111_0 = MakeTestSSE();
-									SlotSystemBundle bun2_0 = MakeSSBundle();
-										SlotSystemBundle bun20_0 = MakeSSBundle();
-										SlotSystemBundle bun21_0 = MakeSSBundle();
+								TestSlotSystemElement top_0 = MakeTestSSEWithStateHandler();
+									SlotSystemBundle bun0_0 = MakeSSBundleWithStateHandler();
+										TestSlotSystemElement sse00_0 = MakeTestSSEWithStateHandler();
+											SlotSystemBundle bun000_0 = MakeSSBundleWithStateHandler();
+												TestSlotSystemElement sse0000_0 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse0001_0 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse001_0 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse0010_0 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse0011_0 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse01_0 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse02_0 = MakeTestSSEWithStateHandler();
+									SlotSystemBundle bun1_0 = MakeSSBundleWithStateHandler();
+										SlotSystemBundle bun10_0 = MakeSSBundleWithStateHandler();
+											TestSlotSystemElement sse100_0 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse101_0 = MakeTestSSEWithStateHandler();
+												SlotSystemBundle bun1010_0 = MakeSSBundleWithStateHandler();
+													TestSlotSystemElement sse10100_0 = MakeTestSSEWithStateHandler();
+													TestSlotSystemElement sse10101_0 = MakeTestSSEWithStateHandler();
+										SlotSystemBundle bun11_0 = MakeSSBundleWithStateHandler();
+											TestSlotSystemElement sse110_0 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse111_0 = MakeTestSSEWithStateHandler();
+									SlotSystemBundle bun2_0 = MakeSSBundleWithStateHandler();
+										SlotSystemBundle bun20_0 = MakeSSBundleWithStateHandler();
+										SlotSystemBundle bun21_0 = MakeSSBundleWithStateHandler();
 									bun0_0.transform.SetParent(top_0.transform);
 										sse00_0.transform.SetParent(bun0_0.transform);/* foc */
 											bun000_0.transform.SetParent(sse00_0.transform);
@@ -1342,30 +1157,30 @@ namespace SlotSystemTests{
 								case0 = new object[]{top_0, xFocused_0, xDefocused_0, xDeactivated_0};
 								yield return case0;
 							object[] case1;
-								TestSlotSystemElement top_1 = MakeTestSSE();
-									SlotSystemBundle bun0_1 = MakeSSBundle();
-										TestSlotSystemElement sse00_1 = MakeTestSSE();
-											SlotSystemBundle bun000_1 = MakeSSBundle();
-												TestSlotSystemElement sse0000_1 = MakeTestSSE();
-												TestSlotSystemElement sse0001_1 = MakeTestSSE();
-											TestSlotSystemElement sse001_1 = MakeTestSSE();
-												TestSlotSystemElement sse0010_1 = MakeTestSSE();
-												TestSlotSystemElement sse0011_1 = MakeTestSSE();
-										TestSlotSystemElement sse01_1 = MakeTestSSE();
-										TestSlotSystemElement sse02_1 = MakeTestSSE();
-									SlotSystemBundle bun1_1 = MakeSSBundle();
-										SlotSystemBundle bun10_1 = MakeSSBundle();
-											TestSlotSystemElement sse100_1 = MakeTestSSE();
-											TestSlotSystemElement sse101_1 = MakeTestSSE();
-												SlotSystemBundle bun1010_1 = MakeSSBundle();
-													TestSlotSystemElement sse10100_1 = MakeTestSSE();
-													TestSlotSystemElement sse10101_1 = MakeTestSSE();
-										SlotSystemBundle bun11_1 = MakeSSBundle();
-											TestSlotSystemElement sse110_1 = MakeTestSSE();
-											TestSlotSystemElement sse111_1 = MakeTestSSE();
-									SlotSystemBundle bun2_1 = MakeSSBundle();
-										SlotSystemBundle bun20_1 = MakeSSBundle();
-										SlotSystemBundle bun21_1 = MakeSSBundle();
+								TestSlotSystemElement top_1 = MakeTestSSEWithStateHandler();
+									SlotSystemBundle bun0_1 = MakeSSBundleWithStateHandler();
+										TestSlotSystemElement sse00_1 = MakeTestSSEWithStateHandler();
+											SlotSystemBundle bun000_1 = MakeSSBundleWithStateHandler();
+												TestSlotSystemElement sse0000_1 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse0001_1 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse001_1 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse0010_1 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse0011_1 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse01_1 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse02_1 = MakeTestSSEWithStateHandler();
+									SlotSystemBundle bun1_1 = MakeSSBundleWithStateHandler();
+										SlotSystemBundle bun10_1 = MakeSSBundleWithStateHandler();
+											TestSlotSystemElement sse100_1 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse101_1 = MakeTestSSEWithStateHandler();
+												SlotSystemBundle bun1010_1 = MakeSSBundleWithStateHandler();
+													TestSlotSystemElement sse10100_1 = MakeTestSSEWithStateHandler();
+													TestSlotSystemElement sse10101_1 = MakeTestSSEWithStateHandler();
+										SlotSystemBundle bun11_1 = MakeSSBundleWithStateHandler();
+											TestSlotSystemElement sse110_1 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse111_1 = MakeTestSSEWithStateHandler();
+									SlotSystemBundle bun2_1 = MakeSSBundleWithStateHandler();
+										SlotSystemBundle bun20_1 = MakeSSBundleWithStateHandler();
+										SlotSystemBundle bun21_1 = MakeSSBundleWithStateHandler();
 									/* !isAOD */
 									bun0_1.transform.SetParent(top_1.transform);
 										sse00_1.transform.SetParent(bun0_1.transform);/* foc */
@@ -1465,16 +1280,16 @@ namespace SlotSystemTests{
 					class isActivatedOnDefaultCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] case0;
-								TestSlotSystemElement sse_0 = MakeTestSSE();
-									TestSlotSystemElement sse0_0 = MakeTestSSE();//off
-										TestSlotSystemElement sse00_0 = MakeTestSSE();
-										TestSlotSystemElement sse01_0 = MakeTestSSE();
-									TestSlotSystemElement sse1_0 = MakeTestSSE();
-										TestSlotSystemElement sse10_0 = MakeTestSSE();
-											TestSlotSystemElement sse100_0 = MakeTestSSE();//off
-												TestSlotSystemElement sse1000_0 = MakeTestSSE();
-											TestSlotSystemElement sse101_0 = MakeTestSSE();
-										TestSlotSystemElement sse11_0 = MakeTestSSE();
+								TestSlotSystemElement sse_0 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sse0_0 = MakeTestSSEWithStateHandler();//off
+										TestSlotSystemElement sse00_0 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse01_0 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sse1_0 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse10_0 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse100_0 = MakeTestSSEWithStateHandler();//off
+												TestSlotSystemElement sse1000_0 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse101_0 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse11_0 = MakeTestSSEWithStateHandler();
 										sse0_0.transform.SetParent(sse_0.transform);
 											sse0_0.isActivatedOnDefault = false;
 										sse00_0.transform.SetParent(sse0_0.transform);
@@ -1503,16 +1318,16 @@ namespace SlotSystemTests{
 								case0 = new object[]{sse_0, xOn_0, xOff_0};
 								yield return case0;
 							object[] case1;
-								TestSlotSystemElement sse_1 = MakeTestSSE();//off
-									TestSlotSystemElement sse0_1 = MakeTestSSE();
-										TestSlotSystemElement sse00_1 = MakeTestSSE();
-										TestSlotSystemElement sse01_1 = MakeTestSSE();
-									TestSlotSystemElement sse1_1 = MakeTestSSE();
-										TestSlotSystemElement sse10_1 = MakeTestSSE();
-											TestSlotSystemElement sse100_1 = MakeTestSSE();
-												TestSlotSystemElement sse1000_1 = MakeTestSSE();
-											TestSlotSystemElement sse101_1 = MakeTestSSE();
-										TestSlotSystemElement sse11_1 = MakeTestSSE();
+								TestSlotSystemElement sse_1 = MakeTestSSEWithStateHandler();//off
+									TestSlotSystemElement sse0_1 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse00_1 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse01_1 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sse1_1 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse10_1 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse100_1 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse1000_1 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse101_1 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse11_1 = MakeTestSSEWithStateHandler();
 										sse_1.isActivatedOnDefault = false;
 										sse0_1.transform.SetParent(sse_1.transform);
 										sse00_1.transform.SetParent(sse0_1.transform);
@@ -1540,16 +1355,16 @@ namespace SlotSystemTests{
 								case1 = new object[]{sse_1, xOn_1, xOff_1};
 								yield return case1;
 							object[] case2;
-								TestSlotSystemElement sse_2 = MakeTestSSE();
-									TestSlotSystemElement sse0_2 = MakeTestSSE();
-										TestSlotSystemElement sse00_2 = MakeTestSSE();
-										TestSlotSystemElement sse01_2 = MakeTestSSE();
-									TestSlotSystemElement sse1_2 = MakeTestSSE();
-										TestSlotSystemElement sse10_2 = MakeTestSSE();
-											TestSlotSystemElement sse100_2 = MakeTestSSE();
-												TestSlotSystemElement sse1000_2 = MakeTestSSE();
-											TestSlotSystemElement sse101_2 = MakeTestSSE();
-										TestSlotSystemElement sse11_2 = MakeTestSSE();
+								TestSlotSystemElement sse_2 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sse0_2 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse00_2 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse01_2 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sse1_2 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse10_2 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse100_2 = MakeTestSSEWithStateHandler();
+												TestSlotSystemElement sse1000_2 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse101_2 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse11_2 = MakeTestSSEWithStateHandler();
 										sse0_2.transform.SetParent(sse_2.transform);
 										sse00_2.transform.SetParent(sse0_2.transform);
 										sse01_2.transform.SetParent(sse0_2.transform);
@@ -1576,16 +1391,16 @@ namespace SlotSystemTests{
 								case2 = new object[]{sse_2, xOn_2, xOff_2};
 								yield return case2;
 							object[] case3;
-								TestSlotSystemElement sse_3 = MakeTestSSE();
-									TestSlotSystemElement sse0_3 = MakeTestSSE();
-										TestSlotSystemElement sse00_3 = MakeTestSSE();
-										TestSlotSystemElement sse01_3 = MakeTestSSE();
-									TestSlotSystemElement sse1_3 = MakeTestSSE();//off
-										TestSlotSystemElement sse10_3 = MakeTestSSE();//on
-											TestSlotSystemElement sse100_3 = MakeTestSSE();//off
-												TestSlotSystemElement sse1000_3 = MakeTestSSE();
-											TestSlotSystemElement sse101_3 = MakeTestSSE();
-										TestSlotSystemElement sse11_3 = MakeTestSSE();
+								TestSlotSystemElement sse_3 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sse0_3 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse00_3 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse01_3 = MakeTestSSEWithStateHandler();
+									TestSlotSystemElement sse1_3 = MakeTestSSEWithStateHandler();//off
+										TestSlotSystemElement sse10_3 = MakeTestSSEWithStateHandler();//on
+											TestSlotSystemElement sse100_3 = MakeTestSSEWithStateHandler();//off
+												TestSlotSystemElement sse1000_3 = MakeTestSSEWithStateHandler();
+											TestSlotSystemElement sse101_3 = MakeTestSSEWithStateHandler();
+										TestSlotSystemElement sse11_3 = MakeTestSSEWithStateHandler();
 										sse0_3.transform.SetParent(sse_3.transform);
 										sse00_3.transform.SetParent(sse0_3.transform);
 										sse01_3.transform.SetParent(sse0_3.transform);

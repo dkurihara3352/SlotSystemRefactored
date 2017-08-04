@@ -203,19 +203,19 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void SSEProcess_Fields_ByDefault_AreSetWithDefault(){
-				ISlotSystemElement sse = MakeSubSSE();
+				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(sse, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 
 				Assert.That(proc.isRunning, Is.False);
-				Assert.That(proc.sse, Is.SameAs(sse));
+				Assert.That(proc.handler, Is.SameAs(handler));
 				Assert.That(proc.coroutineFake, Is.SameAs(fakeCoroutine));
 			}
 			[Test]
 			public void SSEProcess_Start_WhenCalled_SetsIsRunningTrueAndCallsCoroutine(){
-				ISlotSystemElement sse = MakeSubSSE();
+				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(sse, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 
 				proc.Start();
 
@@ -224,9 +224,9 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SSEProcess_Stop_IsRunning_SetsIsRunningFalse(){
-				ISlotSystemElement sse = MakeSubSSE();
+				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(sse, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 				proc.Start();
 
 				proc.Stop();
@@ -235,9 +235,9 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SSEProcess_Expire_IsRunning_SetsIsRunningFalse(){
-				ISlotSystemElement sse = MakeSubSSE();
+				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(sse, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 				proc.Start();
 
 				proc.Expire();

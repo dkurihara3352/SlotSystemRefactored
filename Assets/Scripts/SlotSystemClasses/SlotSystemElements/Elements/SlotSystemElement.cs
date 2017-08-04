@@ -4,161 +4,84 @@ using UnityEngine;
 using Utility;
 namespace SlotSystem{
 	public abstract class SlotSystemElement :MonoBehaviour, ISlotSystemElement{
-		/*	state	*/
-			public void ClearCurSelState(){
-				SetSelState(null);
+		/* State Handling */
+			ISSEStateHandler stateHandler;
+			public void SetSelStateHandler(ISSEStateHandler handler){
+				stateHandler = handler;
 			}
-				public bool isSelStateNull{
-					get{return curSelState == null;}
-				}
-				public bool wasSelStateNull{
-					get{return prevSelState == null;}
-				}
-			public virtual void Deactivate(){
-				SetSelState(deactivatedState);
+			public bool isSelStateNull{
+				get{return stateHandler.isSelStateNull;}
 			}
-				ISSESelState deactivatedState{
-					get{return selStateFactory.MakeDeactivatedState();}
-				}
+			public bool wasSelStateNull{
+				get{return stateHandler.wasSelStateNull;}
+			}
+			public void Deactivate(){
+				stateHandler.Deactivate();
+			}
 				public bool isDeactivated{
-					get{return curSelState == deactivatedState;}
+					get{return stateHandler.isDeactivated;}
 				}
 				public bool wasDeactivated{
-					get{return prevSelState == deactivatedState;}
+					get{return stateHandler.wasDeactivated;}
 				}
-			public virtual void Defocus(){
-				SetSelState(defocusedState);
+			public void Focus(){
+				stateHandler.Focus();
 			}
-				ISSESelState defocusedState{
-					get{return selStateFactory.MakeDefocusedState();}
-				}
-				public bool isDefocused{
-					get{return curSelState == defocusedState;}
-				}
-				public bool wasDefocused{
-					get{return prevSelState == defocusedState;}
-				}
-			public virtual void Focus(){
-				SetSelState(focusedState);
-			}
-				ISSESelState focusedState{
-					get{return selStateFactory.MakeFocusedState();}
-				}
 				public bool isFocused{
-					get{return curSelState == focusedState;}
+					get{return stateHandler.isFocused;}
 				}
 				public bool wasFocused{
-					get{return prevSelState == focusedState;}
+					get{return stateHandler.wasFocused;}
 				}
-			public virtual void Select(){
-				SetSelState(selectedState);
+			public void Defocus(){
+				stateHandler.Defocus();
 			}
-				ISSESelState selectedState{
-					get{return selStateFactory.MakeSelectedState();}
+				public bool isDefocused{
+					get{return stateHandler.isDefocused;}
 				}
+				public bool wasDefocused{
+					get{return stateHandler.wasDefocused;}
+				}
+			public void Select(){
+				stateHandler.Select();
+			}
 				public bool isSelected{
-					get{return curSelState == selectedState;}
+					get{return stateHandler.isSelected;}
 				}
 				public bool wasSelected{
-					get{return prevSelState == selectedState;}
+					get{return stateHandler.wasSelected;}
 				}
 			public virtual void Activate(){
-				Focus();
+				stateHandler.Activate();
 			}
 			public virtual void Deselect(){
-				Focus();
+				stateHandler.Deselect();
 			}
 			public virtual void InitializeStates(){
-				Deactivate();
+				stateHandler.InitializeStates();
 			}
-			ISSESelStateFactory selStateFactory{
-				get{
-					if(m_selStateFactory == null)
-						m_selStateFactory = new SSESelStateFacotory(this);
-					return m_selStateFactory;
-				}
-			}
-				ISSESelStateFactory m_selStateFactory;
-			ISSEStateEngine<ISSESelState> selStateEngine{
-				get{
-					if(m_selStateEngine == null)
-						m_selStateEngine = new SSEStateEngine<ISSESelState>();
-					return m_selStateEngine;
-				}
-			}
-				ISSEStateEngine<ISSESelState> m_selStateEngine;
-			ISSESelState prevSelState{
-				get{return selStateEngine.prevState;}
-			}
-			ISSESelState curSelState{
-				get{return selStateEngine.curState;}
-			}
-			void SetSelState(ISSESelState state){
-				selStateEngine.SetState(state);
-				if(state == null && selProcess != null)
-					SetAndRunSelProcess(null);
-			}
-		/*	process	*/
 			public void SetAndRunSelProcess(ISSESelProcess process){
-				selProcEngine.SetAndRunProcess(process);
 			}
-			public ISSESelProcess selProcess{
-				get{return selProcEngine.process;}
+			public System.Func<IEnumeratorFake> deactivateCoroutine{
+				get{return stateHandler.deactivateCoroutine;}
 			}
-			ISSEProcessEngine<ISSESelProcess> selProcEngine{
-				get{
-					if(m_selProcEngine == null)
-						m_selProcEngine = new SSEProcessEngine<ISSESelProcess>();
-					return m_selProcEngine;
-				}
+			public System.Func<IEnumeratorFake> focusCoroutine{
+				get{return stateHandler.focusCoroutine;}
 			}
-				ISSEProcessEngine<ISSESelProcess> m_selProcEngine;
-			public void SetSelProcEngine(ISSEProcessEngine<ISSESelProcess> engine){
-				m_selProcEngine = engine;
+			public System.Func<IEnumeratorFake> defocusCoroutine{
+				get{return stateHandler.defocusCoroutine;}
 			}
-			/* Coroutines */
-				public System.Func<IEnumeratorFake> deactivateCoroutine{
-					get{return coroutineFactory.MakeDeactivateCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> focusCoroutine{
-					get{return coroutineFactory.MakeFocusCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> defocusCoroutine{
-					get{return coroutineFactory.MakeDefocusCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> selectCoroutine{
-					get{return coroutineFactory.MakeSelectCoroutine();}
-				}
-				ISSECoroutineFactory coroutineFactory{
-					get{
-						if(m_coroutineFactory == null)
-							m_coroutineFactory = new SSECoroutineFactory();
-						return m_coroutineFactory;
-					}
-				}
-					ISSECoroutineFactory m_coroutineFactory;
-					public void SetCoroutineFactory(ISSECoroutineFactory factory){m_coroutineFactory = factory;}
-
-		/* Instant Methods */
-			IInstantCommands instantCommands{
-				get{
-					if(m_instantCommands == null)
-						m_instantCommands = new InstantCommands();
-					return m_instantCommands;
-				}
+			public System.Func<IEnumeratorFake> selectCoroutine{
+				get{return stateHandler.selectCoroutine;}
 			}
-				IInstantCommands m_instantCommands;
-				public void SetInstantCommands(IInstantCommands comms){
-					m_instantCommands = comms;
-				}
-			public virtual void InstantDefocus(){
-				instantCommands.ExecuteInstantDefocus();
+			public void InstantFocus(){
+				stateHandler.InstantFocus();
 			}
-			public virtual void InstantFocus(){
-				instantCommands.ExecuteInstantFocus();
+			public void InstantDefocus(){
+				stateHandler.InstantDefocus();
 			}
-			public virtual void InstantSelect(){
-				instantCommands.ExecuteInstantSelect();
+			public void InstantSelect(){
+				stateHandler.InstantSelect();
 			}
 		/*	public fields	*/
 			public virtual void SetHierarchy(){
@@ -343,33 +266,7 @@ namespace SlotSystem{
 					return GetEnumerator();
 				}	
 	}
-	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>{
-		/* Sel states */
-			bool isSelStateNull{get;}
-			bool wasSelStateNull{get;}
-			void Deactivate();
-				bool isDeactivated{get;}
-				bool wasDeactivated{get;}
-			void Focus();
-				bool isFocused{get;}
-				bool wasFocused{get;}
-			void Defocus();
-				bool isDefocused{get;}
-				bool wasDefocused{get;}
-			void Select();
-				bool isSelected{get;}
-				bool wasSelected{get;}
-			void Activate();
-			void Deselect();
-			void InitializeStates();
-			void SetAndRunSelProcess(ISSESelProcess process);
-			System.Func<IEnumeratorFake> deactivateCoroutine{get;}
-			System.Func<IEnumeratorFake> focusCoroutine{get;}
-			System.Func<IEnumeratorFake> defocusCoroutine{get;}
-			System.Func<IEnumeratorFake> selectCoroutine{get;}
-		void InstantFocus();
-		void InstantDefocus();
-		void InstantSelect();
+	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, ISSEStateHandler{
 		void SetHierarchy();
 		bool isActivatedOnDefault{get;set;}
 		bool isFocusedInHierarchy{get;}

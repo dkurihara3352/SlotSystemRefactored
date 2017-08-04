@@ -5,30 +5,46 @@ using System;
 
 namespace SlotSystem{
 	public class SSEProcess: ISSEProcess{
-		public virtual bool isRunning{ get{return m_isRunning;} }bool m_isRunning;
-		public System.Func<IEnumeratorFake> coroutineFake{get{return m_coroutineFake;} set{m_coroutineFake = value;}} System.Func<IEnumeratorFake> m_coroutineFake;
-		public ISlotSystemElement sse{ get{return m_sse;} set{m_sse = value;}} ISlotSystemElement m_sse;
+		public virtual bool isRunning{
+			get{return m_isRunning;}
+		}
+			bool m_isRunning;
+		public System.Func<IEnumeratorFake> coroutineFake{
+			get{return m_coroutineFake;} 
+			set{m_coroutineFake = value;}
+		}
+			System.Func<IEnumeratorFake> m_coroutineFake;
+		public ISSEStateHandler handler{
+			get{return m_handler;}
+			set{m_handler = value;}
+		}
+			ISSEStateHandler m_handler;
 		public virtual void Start(){
 			m_isRunning = true;
 			m_coroutineFake();
 		}
-		public virtual void Stop(){ if(isRunning) m_isRunning = false; }
-		public virtual void Expire(){if(isRunning) m_isRunning = false; }
+		public virtual void Stop(){ 
+			if(isRunning)
+				m_isRunning = false; 
+		}
+		public virtual void Expire(){
+			if(isRunning)
+				m_isRunning = false; 
+		}
 		public bool Equals(ISSEProcess other){
 			if(other != null)
 				return this.GetType().Equals(other.GetType());
 			else return false;
 		}
-		public SSEProcess(){}
-		public SSEProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutine){
-			m_sse = sse;
+		public SSEProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutine){
+			m_handler = handler;
 			m_coroutineFake = coroutine;
 		}
 	}
 	public interface ISSEProcess: IEquatable<ISSEProcess>{
 		bool isRunning{get;}
 		System.Func<IEnumeratorFake> coroutineFake{get; set;}
-		ISlotSystemElement sse{get;}
+		ISSEStateHandler handler{get;}
 		void Start();
 		void Stop();
 		void Expire();
@@ -89,6 +105,8 @@ namespace SlotSystem{
 	}
 	/* SelProces */
 	public abstract class SSESelProcess: SSEProcess, ISSESelProcess{
+		public SSESelProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutine): base(handler, coroutine){
+		}
 	}
 	public interface ISSESelProcess: ISSEProcess{
 	}
@@ -96,9 +114,7 @@ namespace SlotSystem{
 		/* 	Change color, alpha etc from whatever to deactivated value (probably make it disappear)
 			if any indicator for selection is there, fade it out
 		*/
-		public SSEDeactivateProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-			this.sse = sse;
-			this.coroutineFake = coroutineMock;
+		public SSEDeactivateProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 	public class SSEFocusProcess: SSESelProcess{
@@ -106,9 +122,7 @@ namespace SlotSystem{
 			if its hidden, make it appear gradually
 			if any indicator for selection is there, fade it out
 		*/
-		public SSEFocusProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-			this.sse = sse;
-			this.coroutineFake = coroutineMock;
+		public SSEFocusProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 	public class SSEDefocusProcess: SSESelProcess{
@@ -116,9 +130,7 @@ namespace SlotSystem{
 			if its hidden, make it appear gradually
 			if any indicator for selection is there, fade it out
 		*/
-		public SSEDefocusProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-			this.sse = sse;
-			this.coroutineFake = coroutineMock;
+		public SSEDefocusProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 	public class SSESelectProcess: SSESelProcess{
@@ -126,9 +138,7 @@ namespace SlotSystem{
 			if its hidden, make it appear gradually
 			if any indicator for selection is not there, fade it in
 		*/
-		public SSESelectProcess(ISlotSystemElement sse, System.Func<IEnumeratorFake> coroutineMock){
-			this.sse = sse;
-			this.coroutineFake = coroutineMock;
+		public SSESelectProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 }

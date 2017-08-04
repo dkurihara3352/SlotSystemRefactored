@@ -68,7 +68,7 @@ namespace SlotSystem{
 		public TAMTransactionState(ITransactionManager tam): base(tam){
 		}
 		public override void EnterState(){
-			tam.SetAndRunActProcess(new TAMTransactionProcess(tam));
+			tam.SetAndRunActProcess(new TAMTransactionProcess(tam, tam.transactionCoroutine));
 		}
 	}
 }

@@ -14,6 +14,8 @@ namespace SlotSystemTests{
 		[Test]
 		public void SBStates_ByDefault_AreNull(){
 			Slottable sb = MakeSB();
+				SSEStateHandler handler = new SSEStateHandler();
+				sb.SetSelStateHandler(handler);
 			Assert.That(sb.isActStateNull, Is.True);
 			Assert.That(sb.wasActStateNull, Is.True);
 			Assert.That(sb.isSelStateNull, Is.True);
@@ -27,7 +29,7 @@ namespace SlotSystemTests{
 		public void processes_ByDefault_AreNull(){
 			Slottable sb = MakeSB();
 
-			Assert.That(sb.selProcess, Is.Null);
+			// Assert.That(sb.selProcess, Is.Null);
 			Assert.That(sb.actProcess, Is.Null);
 			Assert.That(sb.eqpProcess, Is.Null);
 			Assert.That(sb.mrkProcess, Is.Null);
@@ -78,6 +80,8 @@ namespace SlotSystemTests{
 				public void InWaitForAction_OnPointerDown_IsFocused_SetsIsSelected(){
 					Slottable sb = MakeSB();
 					sb.WaitForAction();
+					SSEStateHandler handler = new SSEStateHandler();
+					sb.SetSelStateHandler(handler);
 					sb.Focus();
 
 					sb.OnPointerDown(new PointerEventDataFake());
@@ -88,6 +92,8 @@ namespace SlotSystemTests{
 				public void InWaitForAction_OnPointerDown_IsFocused_SetsIsWFPickUp(){
 					Slottable sb = MakeSB();
 					sb.WaitForAction();
+					SSEStateHandler handler = new SSEStateHandler();
+					sb.SetSelStateHandler(handler);
 					sb.Focus();
 
 					sb.OnPointerDown(new PointerEventDataFake());
@@ -98,6 +104,8 @@ namespace SlotSystemTests{
 				public void InWaitForAction_OnPointerDown_IsNotFocused_SetsIsWFPointerUp(){
 					Slottable sb = MakeSB();
 					sb.WaitForAction();
+					SSEStateHandler handler = new SSEStateHandler();
+					sb.SetSelStateHandler(handler);
 
 					sb.OnPointerDown(new PointerEventDataFake());
 
@@ -139,6 +147,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -154,6 +164,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -176,6 +188,8 @@ namespace SlotSystemTests{
 				public void InWaitForPickUp_OnEndDrag_Always_CallsRefresh(){
 					Slottable sb = MakeSB();
 						SetUpForRefreshCall(sb);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 
@@ -186,6 +200,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void InWaitForPickUp_OnEndDrag_Always_SetsIsFocused(){
 					Slottable sb = MakeSB();
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 
@@ -225,6 +241,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void ExpireActPorcess_WaitForPointerUpProcess_SetIsDefocused(){
 					Slottable sb = MakeSB();
+					SSEStateHandler handler = new SSEStateHandler();
+					sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPointerUp();
 
@@ -237,6 +255,8 @@ namespace SlotSystemTests{
 					Slottable sb = MakeSB();
 						SlottableCommand mockTapComm = Substitute.For<SlottableCommand>();
 						sb.SetTapCommand(mockTapComm);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPointerUp();
 
@@ -248,6 +268,8 @@ namespace SlotSystemTests{
 				public void InWaitForPointerUp_OnPointerUp_Always_CallsRefresh(){
 					Slottable sb = MakeSB();
 						SetUpForRefreshCall(sb);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPointerUp();
 
@@ -258,6 +280,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void InWaitForPointerUp_OnPointerUp_Always_SetsIsDefocused(){
 					Slottable sb = MakeSB();
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPointerUp();
 
@@ -269,6 +293,8 @@ namespace SlotSystemTests{
 				public void InWaitForPointerUp_OnEndDrag_Always_CallsRefresh(){
 					Slottable sb = MakeSB();
 						SetUpForRefreshCall(sb);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPointerUp();
 
@@ -279,6 +305,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void InWaitForPointerUp_OnEndDrag_Always_SetsIsDefocused(){
 					Slottable sb = MakeSB();
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPointerUp();
 
@@ -300,6 +328,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -330,6 +360,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);	
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -361,6 +393,8 @@ namespace SlotSystemTests{
 						ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
 						mockTAC.pickedSB.Returns((ISlottable)null);
 						sb.SetTACache(mockTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -376,6 +410,8 @@ namespace SlotSystemTests{
 						ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
 						mockTAC.pickedSB.Returns((ISlottable)null);
 						sb.SetTACache(mockTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -390,6 +426,8 @@ namespace SlotSystemTests{
 						ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
 						mockTAC.pickedSB.Returns((ISlottable)null);
 						sb.SetTACache(mockTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -422,6 +460,8 @@ namespace SlotSystemTests{
 						ITransactionCache tac = Substitute.For<ITransactionCache>();
 						tac.pickedSB.Returns((ISlottable)null);
 						sb.SetTACache(tac);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -439,6 +479,8 @@ namespace SlotSystemTests{
 						ITransactionCache tac = Substitute.For<ITransactionCache>();
 						tac.pickedSB.Returns((ISlottable)null);
 						sb.SetTACache(tac);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -458,6 +500,8 @@ namespace SlotSystemTests{
 						sb.SetTACache(tac);
 						BowInstance bow = MakeBowInstance(0);
 						sb.SetItem(bow);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -478,6 +522,8 @@ namespace SlotSystemTests{
 						PartsInstance parts = MakePartsInstance(0, 10);
 						sb.SetItem(parts);
 						sb.pickedAmount = 8;
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -491,6 +537,8 @@ namespace SlotSystemTests{
 				public void InWaitForNextTouch_OnDeselect_Always_CallsRefresh(){
 					Slottable sb = MakeSB();
 						SetUpForRefreshCall(sb);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -502,6 +550,8 @@ namespace SlotSystemTests{
 				[Test]
 				public void InWaitForNextTouch_OnDeselect_Always_SetsIsFocused(){
 					Slottable sb = MakeSB();
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.WaitForNextTouch();
@@ -514,6 +564,8 @@ namespace SlotSystemTests{
 				[Test][ExpectedException(typeof(InvalidOperationException))]
 				public void PickUp_WasNotWaitingForPickUpNorWaitingForNextTouch_ThrowsException(){
 					Slottable sb = MakeSB();
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 
 					sb.PickUp();
 				}
@@ -524,6 +576,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -539,6 +593,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -557,6 +613,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					sb.Deactivate();
@@ -572,6 +630,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(mockTAM);
 						ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
 						sb.SetTACache(mockTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -597,6 +657,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -613,6 +675,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -629,6 +693,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -650,6 +716,8 @@ namespace SlotSystemTests{
 						stubHoverable.isHovered.Returns(true);
 						PartsInstance parts = MakePartsInstance(0, 2);
 						sb.SetItem(parts);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -688,6 +756,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(tam);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -776,6 +846,8 @@ namespace SlotSystemTests{
 						IHoverable stubHoverable = Substitute.For<IHoverable>();
 						sb.SetHoverable(stubHoverable);
 					PointerEventDataFake eventData = new PointerEventDataFake();
+					SSEStateHandler selStateHandler = new SSEStateHandler();
+					sb.SetSelStateHandler(selStateHandler);
 					//focused !(stackable && hovered) WFA_down WFPickUp_exp PickingUp_up execTA
 							sb.Focus();
 							mockTAC.pickedSB.Returns((ISlotSystemElement)null);
@@ -880,7 +952,7 @@ namespace SlotSystemTests{
 		public void AssertSBActProcessIsSetAndRunning(ISlottable sb, Type procType, System.Func<IEnumeratorFake> coroutine){
 			ISBActProcess actualProc = sb.actProcess;
 			Assert.That(actualProc, Is.TypeOf(procType));
-			Assert.That(actualProc.sse, Is.SameAs(sb));
+			Assert.That(actualProc.handler, Is.SameAs(sb));
 			Assert.That(actualProc.isRunning, Is.True);
 			coroutine.Received().Invoke();
 		}

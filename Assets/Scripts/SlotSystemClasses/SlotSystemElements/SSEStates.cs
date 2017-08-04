@@ -12,16 +12,16 @@ namespace SlotSystem{
 		public interface ISSEStateEngine<T>: ISwitchableStateEngine<T> where T: ISSEState{}
 	/* StateFacotory */
 		public class SSESelStateFacotory: ISSESelStateFactory{
-			protected ISlotSystemElement sse;
-			public SSESelStateFacotory(ISlotSystemElement sse){
-				this.sse = sse;
+			protected ISSEStateHandler handler;
+			public SSESelStateFacotory(ISSEStateHandler handler){
+				this.handler = handler;
 			}
 			public ISSESelState MakeDeactivatedState(){
 				return deactivatedState;}
 			ISSESelState deactivatedState{
 				get{
 					if(m_deactivatedState ==null)
-						m_deactivatedState = new SSEDeactivatedState(sse);
+						m_deactivatedState = new SSEDeactivatedState(handler);
 					return m_deactivatedState;}}
 			ISSESelState m_deactivatedState;
 
@@ -30,7 +30,7 @@ namespace SlotSystem{
 			ISSESelState defocusedState{
 				get{
 					if(m_defocusedState ==null)
-						m_defocusedState = new SSEDefocusedState(sse);
+						m_defocusedState = new SSEDefocusedState(handler);
 					return m_defocusedState;}}
 			ISSESelState m_defocusedState;
 			
@@ -39,7 +39,7 @@ namespace SlotSystem{
 			ISSESelState focusedState{
 				get{
 					if(m_focusedState ==null)
-						m_focusedState = new SSEFocusedState(sse);
+						m_focusedState = new SSEFocusedState(handler);
 					return m_focusedState;}}
 			ISSESelState m_focusedState;
 			
@@ -48,7 +48,7 @@ namespace SlotSystem{
 			ISSESelState selectedState{
 				get{
 					if(m_selectedState ==null)
-						m_selectedState = new SSESelectedState(sse);
+						m_selectedState = new SSESelectedState(handler);
 					return m_selectedState;}}
 			ISSESelState m_selectedState;
 		}
@@ -60,9 +60,9 @@ namespace SlotSystem{
 		}
 	/* State */
 		public abstract class SSEState: ISSEState{
-			protected ISlotSystemElement sse;
-			public SSEState(ISlotSystemElement sse){
-				this.sse = sse;
+			protected ISSEStateHandler handler;
+			public SSEState(ISSEStateHandler handler){
+				this.handler = handler;
 			}
 			public virtual void EnterState(){
 			}
@@ -71,43 +71,43 @@ namespace SlotSystem{
 		}
 		public interface ISSEState: ISwitchableState{}
 		public abstract class SSESelState: SSEState, ISSESelState{
-			public SSESelState(ISlotSystemElement sse): base(sse){}
+			public SSESelState(ISSEStateHandler handler): base(handler){}
 		}
 		public interface ISSESelState: ISSEState{
 		}
 			public class SSEDeactivatedState: SSESelState{
-				public SSEDeactivatedState(ISlotSystemElement sse): base(sse){}
+				public SSEDeactivatedState(ISSEStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!sse.wasSelStateNull)
-						sse.SetAndRunSelProcess(new SSEDeactivateProcess(sse, sse.deactivateCoroutine));
+					if(!handler.wasSelStateNull)
+						handler.SetAndRunSelProcess(new SSEDeactivateProcess(handler, handler.deactivateCoroutine));
 				}
 			}
 			public class SSEFocusedState: SSESelState{
-				public SSEFocusedState(ISlotSystemElement sse): base(sse){}
+				public SSEFocusedState(ISSEStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!sse.wasSelStateNull){
-						sse.SetAndRunSelProcess(new SSEFocusProcess(sse, sse.focusCoroutine));
+					if(!handler.wasSelStateNull){
+						handler.SetAndRunSelProcess(new SSEFocusProcess(handler, handler.focusCoroutine));
 					}
 					else
-						sse.InstantFocus();
+						handler.InstantFocus();
 				}
 			}
 			public class SSEDefocusedState: SSESelState{
-				public SSEDefocusedState(ISlotSystemElement sse): base(sse){}
+				public SSEDefocusedState(ISSEStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!sse.wasSelStateNull)
-						sse.SetAndRunSelProcess(new SSEDefocusProcess(sse, sse.defocusCoroutine));
+					if(!handler.wasSelStateNull)
+						handler.SetAndRunSelProcess(new SSEDefocusProcess(handler, handler.defocusCoroutine));
 					else
-						sse.InstantDefocus();
+						handler.InstantDefocus();
 				}
 			}
 			public class SSESelectedState : SSESelState{
-				public SSESelectedState(ISlotSystemElement sse): base(sse){}
+				public SSESelectedState(ISSEStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!sse.wasSelStateNull)
-						sse.SetAndRunSelProcess(new SSESelectProcess(sse, sse.selectCoroutine));
+					if(!handler.wasSelStateNull)
+						handler.SetAndRunSelProcess(new SSESelectProcess(handler, handler.selectCoroutine));
 					else
-						sse.InstantSelect();
+						handler.InstantSelect();
 				}
 			
 			}

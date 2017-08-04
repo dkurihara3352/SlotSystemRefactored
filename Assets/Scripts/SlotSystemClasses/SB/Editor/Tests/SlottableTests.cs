@@ -22,6 +22,8 @@ namespace SlotSystemTests{
 						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(false);
 						sb.SetTACache(stubTAC);
 						sb.SetHoverable(stubHoverable);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					
 					sb.Activate();
 
@@ -35,6 +37,8 @@ namespace SlotSystemTests{
 						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(true);
 						sb.SetTACache(stubTAC);
 						sb.SetHoverable(stubHoverable);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 					
 					sb.Activate();
 
@@ -115,12 +119,14 @@ namespace SlotSystemTests{
 				}
 			/*	Methods	*/
 				[Test]
-				public void InitializeStates_AfterSGIsSet_InitializesStates(){
+				public void InitializeStates_Always_InitializesStates(){
 					Slottable sb = MakeSB();
 					ISlotSystemManager ssm = MakeSubSSM();
 						ISlotGroup sg = MakeSubSG();
 						ssm.FindParent(sb).Returns(sg);
 					sb.SetSSM(ssm);
+					SSEStateHandler handler = new SSEStateHandler();
+					sb.SetSelStateHandler(handler);
 
 					sb.InitializeStates();
 
@@ -140,6 +146,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -155,6 +163,8 @@ namespace SlotSystemTests{
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
+						SSEStateHandler handler = new SSEStateHandler();
+						sb.SetSelStateHandler(handler);
 						sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -173,6 +183,8 @@ namespace SlotSystemTests{
 					sb.SetSSM(ssm);
 					sb.SetTAM(stubTAM);
 					sb.SetTACache(stubTAC);
+					SSEStateHandler handler = new SSEStateHandler();
+					sb.SetSelStateHandler(handler);
 					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -207,6 +219,8 @@ namespace SlotSystemTests{
 					sb.SetSSM(ssm);
 					sb.SetTAM(stubTAM);
 					sb.SetTACache(stubTAC);
+					SSEStateHandler handler = new SSEStateHandler();
+					sb.SetSelStateHandler(handler);
 					sb.Focus();
 					sb.SetItem(item);
 					sb.WaitForAction();

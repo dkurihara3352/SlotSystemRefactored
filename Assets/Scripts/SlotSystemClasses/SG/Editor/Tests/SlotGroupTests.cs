@@ -11,9 +11,15 @@ namespace SlotSystemTests{
 	namespace ElementsTests{
 		[TestFixture][Category("SG")]
 		public class SlotGroupTests: SlotSystemTest{
+			SlotGroup MakeSGWithSelStateHandler(){
+				SlotGroup sg = MakeSG();
+				SSEStateHandler handler = new SSEStateHandler();
+				sg.SetSelStateHandler(handler);
+				return sg;
+			}
 			[Test]
 			public void Activate_SSMIsTAResultRevertFalse_SetsIsFocused(){
-				SlotGroup sg = MakeSG();
+				SlotGroup sg = MakeSGWithSelStateHandler();
 					IHoverable stubHoverable = Substitute.For<IHoverable>();
 					sg.SetHoverable(stubHoverable);
 						ITransactionCache stubTAC = MakeSubTAC();
@@ -26,7 +32,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Activate_SSMIsTAResultRevertTrue_SetsIsDefocused(){
-				SlotGroup sg = MakeSG();
+				SlotGroup sg = MakeSGWithSelStateHandler();
 					IHoverable stubHoverable = Substitute.For<IHoverable>();
 					sg.SetHoverable(stubHoverable);
 					ITransactionCache stubTAC = MakeSubTAC();
@@ -754,7 +760,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InitializeState_WhenCalled_InitializesStates(){
-					SlotGroup sg = MakeSG();
+					SlotGroup sg = MakeSGWithSelStateHandler();
 
 					sg.InitializeStates();
 
@@ -2989,7 +2995,7 @@ namespace SlotSystemTests{
 					List<ISlottable> expected, 
 					int indexAtAdded)
 					{
-					SlotGroup sg = MakeSG();
+					SlotGroup sg = MakeSGWithSelStateHandler();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 10);
 						ITransactionManager tam = Substitute.For<ITransactionManager>();
 						ITransactionCache tac = Substitute.For<ITransactionCache>();
@@ -3748,7 +3754,7 @@ namespace SlotSystemTests{
 					{
 						List<ISlottable> expectedSBs = new List<ISlottable>(expSBs);
 						List<ISlottable> expectedNewSBs = new List<ISlottable>(expNewSBs);
-						SlotGroup sg = MakeSG();
+						SlotGroup sg = MakeSGWithSelStateHandler();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), sorter, isExpandable?0: 20);
 						ITransactionCache tac = Substitute.For<ITransactionCache>();
 							ISlotSystemManager ssm = MakeSubSSM();
@@ -4336,7 +4342,7 @@ namespace SlotSystemTests{
 					}
 				[TestCaseSource(typeof(InitSBs_WhenCalledCases))]
 				public void InitSBs_WhenCalled_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<SlottableItem> items){
-					SlotGroup sg = MakeSG();
+					SlotGroup sg = MakeSGWithSelStateHandler();
 						sg.SetSSM(ssm);
 						sg.SetSlots(slots);
 					
