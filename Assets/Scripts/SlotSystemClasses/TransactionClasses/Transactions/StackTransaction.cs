@@ -10,7 +10,7 @@ namespace SlotSystem{
 		ISlotGroup m_selectedSG;
 		List<InventoryItemInstance> itemCache = new List<InventoryItemInstance>();
 		ITransactionIconHandler iconHandler;
-		public StackTransaction(ISlottable pickedSB ,ISlottable selected, ITransactionManager tam, ITransactionIconHandler iconHandler, ITAMActStateHandler tamStateHandler): base(tam, tamStateHandler){
+		public StackTransaction(ISlottable pickedSB ,ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_origSG = pickedSB.sg;
 			m_selectedSB = selected;
@@ -18,7 +18,7 @@ namespace SlotSystem{
 			InventoryItemInstance cache = pickedSB.item;
 			cache.quantity = pickedSB.pickedAmount;
 			itemCache.Add(cache);
-			this.iconHandler = iconHandler;
+			this.iconHandler = tam.iconHandler;
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}

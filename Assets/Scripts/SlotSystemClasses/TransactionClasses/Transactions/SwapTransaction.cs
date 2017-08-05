@@ -9,12 +9,12 @@ namespace SlotSystem{
 		ISlottable m_selectedSB;
 		ISlotGroup m_selectedSG;
 		ITransactionIconHandler iconHandler;
-		public SwapTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam, ITransactionIconHandler iconHandler, ITAMActStateHandler tamStateHandler): base(tam, tamStateHandler){
+		public SwapTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
 			m_origSG = m_pickedSB.sg;
 			m_selectedSG = m_selectedSB.sg;
-			this.iconHandler = iconHandler;
+			this.iconHandler = tam.iconHandler;
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}

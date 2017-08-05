@@ -165,7 +165,7 @@ namespace SlotSystem{
 			SetTargetSB(null);
 			SetHovered(null);
 		}
-		public void InnerUpdateFieldsOfTAM(ISlotSystemTransaction ta){
+		public void UpdateFieldsOfTAM(ISlotSystemTransaction ta){
 			tam.UpdateFields(ta);
 		}
 	}
@@ -185,7 +185,7 @@ namespace SlotSystem{
 		void SetHovered(IHoverable to);
 		List<InventoryItemInstance> moved{get;}
 		void SetMoved(List<InventoryItemInstance> moved);
-		void InnerUpdateFieldsOfTAM(ISlotSystemTransaction ta);
+		void UpdateFieldsOfTAM(ISlotSystemTransaction ta);
 	}
 	public interface TransactionCacheCommand{
 		void Execute();
@@ -201,7 +201,7 @@ namespace SlotSystem{
 				if(taCache.transactionResults.TryGetValue(taCache.hovered, out ta)){
 					taCache.SetTargetSB(ta.targetSB);
 					taCache.SetMoved(ta.moved);
-					taCache.InnerUpdateFieldsOfTAM(ta);
+					taCache.UpdateFieldsOfTAM(ta);
 				}
 			}
 		}

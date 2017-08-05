@@ -791,7 +791,7 @@ namespace SlotSystem{
 			}
 	}
 	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler{
-		/*	fields	*/
+		/*	instrinsic	*/
 			Inventory inventory{get;}
 			bool isShrinkable{get;}
 			bool isExpandable{get;}
@@ -802,6 +802,10 @@ namespace SlotSystem{
 			Slot GetNewSlot(InventoryItemInstance itemInst);
 			bool hasEmptySlot{get;}
 			void SetInitSlotsCount(int i);
+			List<ISlottable> SwappableSBs(ISlottable pickedSB);
+			void InitializeItems();
+			void InitSlots(List<SlottableItem> items);
+			void InitSBs(List<SlottableItem> items);
 		/*	Sorter	*/
 			void SetSorter(SGSorter sorter);
 			void InstantSort();
@@ -825,11 +829,6 @@ namespace SlotSystem{
 			void OnActionExecute();
 			void SyncEquipped(InventoryItemInstance item, bool equipped);
 			void ReportTAComp();
-		/* Other */
-			List<ISlottable> SwappableSBs(ISlottable pickedSB);
-			void InitializeItems();
-			void InitSlots(List<SlottableItem> items);
-			void InitSBs(List<SlottableItem> items);
 		/* Hoverable */
 			ISlottable pickedSB{get;}
 			ISlottable targetSB{get;}

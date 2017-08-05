@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SlotSystem{
 	public class TransactionManager : SlotSystemElement, ITransactionManager{
 		public void ExecuteTransaction(){
-			stateHandler.Transact();
+			actStateHandler.Transact();
 			transaction.Execute();
 		}
 		public void OnCompleteTransaction(){
@@ -27,7 +27,7 @@ namespace SlotSystem{
 		public ITransactionFactory taFactory{
 			get{
 				if(_taFactory == null)
-					_taFactory = new TransactionFactory(this, iconHandler, stateHandler);
+					_taFactory = new TransactionFactory(this);
 				return _taFactory;
 			}
 		}
@@ -52,7 +52,7 @@ namespace SlotSystem{
 			ISortEngine sortEngine{
 				get{
 					if(m_sortEngine == null)
-						m_sortEngine = new SortEngine(this, sgHandler, stateHandler);
+						m_sortEngine = new SortEngine(this, sgHandler, actStateHandler);
 					return m_sortEngine;
 				}
 			}
@@ -64,7 +64,7 @@ namespace SlotSystem{
 			ITransactionSGHandler sgHandler{
 				get{
 					if(m_sgHandler == null)
-						m_sgHandler = new TransactionSGHandler(stateHandler);
+						m_sgHandler = new TransactionSGHandler(actStateHandler);
 					return m_sgHandler;
 				}
 			}
@@ -73,10 +73,10 @@ namespace SlotSystem{
 				m_sgHandler = sgHandler;
 			}
 		/* IconHandling */
-			ITransactionIconHandler iconHandler{
+			public ITransactionIconHandler iconHandler{
 				get{
 					if(m_iconHandler == null)
-						m_iconHandler = new TransactionIconHandler(stateHandler);
+						m_iconHandler = new TransactionIconHandler(actStateHandler);
 					return m_iconHandler;
 				}
 			}
@@ -86,13 +86,13 @@ namespace SlotSystem{
 			}
 		/* Other */
 			public override void InitializeStates(){
-				stateHandler.WaitForAction();
+				actStateHandler.WaitForAction();
 			}
 			public void Refresh(){
-				stateHandler.WaitForAction();
+				actStateHandler.WaitForAction();
 			}
 		/* state handler */
-			ITAMActStateHandler stateHandler{
+			public ITAMActStateHandler actStateHandler{
 				get{
 					if(_stateHandler != null)
 						return _stateHandler;
@@ -111,7 +111,7 @@ namespace SlotSystem{
 				flag &= iconHandler.dIcon1Done;
 				flag &= iconHandler.dIcon2Done;
 				if(flag)
-					stateHandler.ExpireActProcess();
+					actStateHandler.ExpireActProcess();
 				return null;
 			}
 	}
@@ -124,5 +124,7 @@ namespace SlotSystem{
 		void Refresh();
 		IEnumeratorFake transactionCoroutine();
 		ITransactionFactory taFactory{get;}
+		ITAMActStateHandler actStateHandler{get;}
+		ITransactionIconHandler iconHandler{get;}
 	}
 }

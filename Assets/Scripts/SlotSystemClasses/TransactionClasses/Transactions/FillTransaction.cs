@@ -8,14 +8,18 @@ namespace SlotSystem{
 		ISlotGroup m_selectedSG;
 		ISlotGroup m_origSG;
 		ITransactionIconHandler iconHandler;
-		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam, ITransactionIconHandler iconHandler, ITAMActStateHandler tamStateHandler):base(tam, tamStateHandler){
+		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam):base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSG = selected;
 			m_origSG = m_pickedSB.sg;
-			this.iconHandler = iconHandler;
+			this.iconHandler = tam.iconHandler;
 		}
-		public override ISlotGroup sg1{get{return m_origSG;}}
-		public override ISlotGroup sg2{get{return m_selectedSG;}}
+		public override ISlotGroup sg1{
+			get{return m_origSG;}
+		}
+		public override ISlotGroup sg2{
+			get{return m_selectedSG;}
+		}
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1.Fill();

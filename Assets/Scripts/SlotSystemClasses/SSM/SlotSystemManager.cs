@@ -519,7 +519,7 @@ namespace SlotSystem{
 				}
 		
 	}
-	public interface ISlotSystemManager: ISlotSystemElement, IFocusedSGProvider{
+	public interface ISlotSystemManager: ISlotSystemElement, IFocusedSGProvider {
 		void Initialize();
 		void UpdateEquipStatesOnAll();
 		void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG);

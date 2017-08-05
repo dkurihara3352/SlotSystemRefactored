@@ -23,7 +23,7 @@ namespace SlotSystem{
 		ISortTransactionFactory sortFA{
 			get{
 				if(m_sortFA == null)
-					m_sortFA = new SortTransactionFactory(tam, tamStateHandler);
+					m_sortFA = new SortTransactionFactory(tam);
 				return m_sortFA;
 			}
 		}
@@ -37,13 +37,11 @@ namespace SlotSystem{
 	}
 	public class SortTransactionFactory: ISortTransactionFactory{
 		ITransactionManager tam;
-		ITAMActStateHandler tamStateHandler;
-		public SortTransactionFactory(ITransactionManager tam, ITAMActStateHandler tamStateHandler){
+		public SortTransactionFactory(ITransactionManager tam){
 			this.tam = tam;
-			this.tamStateHandler = tamStateHandler;
 		}
 		public ISortTransaction MakeSortTA(ISlotGroup sg, SGSorter sorter){
-			return new SortTransaction(sg, sorter, tam, tamStateHandler);
+			return new SortTransaction(sg, sorter, tam);
 		}
 	}
 	public interface ISortTransactionFactory{

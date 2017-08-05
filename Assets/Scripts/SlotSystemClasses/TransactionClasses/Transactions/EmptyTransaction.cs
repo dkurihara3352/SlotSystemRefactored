@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class EmptyTransaction: AbsSlotSystemTransaction{
-		public EmptyTransaction(ITransactionManager tam, ITAMActStateHandler handler): base(tam, handler){
+		public EmptyTransaction(ITransactionManager tam): base(tam){
 		}
 	}
 }

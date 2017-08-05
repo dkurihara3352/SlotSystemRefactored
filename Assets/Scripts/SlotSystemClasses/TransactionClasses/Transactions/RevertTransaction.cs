@@ -7,10 +7,10 @@ namespace SlotSystem{
 		ISlottable m_pickedSB;
 		ISlotGroup m_origSG;
 		ITransactionIconHandler iconHandler;
-		public RevertTransaction(ISlottable pickedSB, ITransactionManager tam, ITransactionIconHandler iconHandler, ITAMActStateHandler tamStateHandler): base(tam, tamStateHandler){
+		public RevertTransaction(ISlottable pickedSB, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_origSG = m_pickedSB.sg;
-			this.iconHandler = iconHandler;
+			this.iconHandler = tam.iconHandler;
 		}
 		public override void Indicate(){}
 		public override void Execute(){

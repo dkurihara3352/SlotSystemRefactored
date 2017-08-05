@@ -8,11 +8,11 @@ namespace SlotSystem{
 		ISlottable m_selectedSB;
 		ISlotGroup m_origSG;
 		ITransactionIconHandler iconHandler;
-		public ReorderTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam, ITransactionIconHandler iconHandler, ITAMActStateHandler tamStateHandler): base(tam, tamStateHandler){
+		public ReorderTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
 			m_origSG = m_pickedSB.sg;
-			this.iconHandler = iconHandler;
+			this.iconHandler = tam.iconHandler;
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}

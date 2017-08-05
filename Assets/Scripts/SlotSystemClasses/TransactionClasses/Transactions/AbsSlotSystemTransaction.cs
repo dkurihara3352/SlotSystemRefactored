@@ -6,9 +6,9 @@ namespace SlotSystem{
 	public abstract class AbsSlotSystemTransaction: ISlotSystemTransaction{
 		protected ITransactionManager tam;
 		protected ITAMActStateHandler tamStateHandler;
-		public AbsSlotSystemTransaction(ITransactionManager tam, ITAMActStateHandler tamStateHandler){
+		public AbsSlotSystemTransaction(ITransactionManager tam){
 			this.tam = tam;
-			this.tamStateHandler = tamStateHandler;
+			this.tamStateHandler = tam.actStateHandler;
 		}
 		protected List<InventoryItemInstance> removed = new List<InventoryItemInstance>();
 		protected List<InventoryItemInstance> added = new List<InventoryItemInstance>();
