@@ -107,6 +107,15 @@ public class SlotSystemTest{
 		protected static ITransactionCache MakeSubTAC(){
 			return Substitute.For<ITransactionCache>();
 		}
+		protected static ITransactionIconHandler MakeSubIconHandler(){
+			return Substitute.For<ITransactionIconHandler>();
+		}
+		protected static ITransactionSGHandler MakeSubSGHandler(){
+			return Substitute.For<ITransactionSGHandler>();
+		}
+		protected static ITAMActStateHandler MakeSubTAMStateHandler(){
+			return Substitute.For<ITAMActStateHandler>();
+		}
 		protected static IFocusedSGProvider MakeSubFocSGPrv(){
 			return Substitute.For<IFocusedSGProvider>();
 		}

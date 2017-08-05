@@ -7,7 +7,7 @@ using System;
 namespace SlotSystem{
 	public abstract class SBState: SSEState{
         protected ISlottable sb;
-        public SBState(ISlottable sb): base(sb){
+        public SBState(ISlottable sb){
             this.sb = sb;
         }
 	}

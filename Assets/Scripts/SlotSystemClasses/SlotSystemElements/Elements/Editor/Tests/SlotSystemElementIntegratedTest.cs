@@ -18,7 +18,7 @@ namespace SlotSystemTests{
 				System.Func<IEnumeratorFake> mockDeaCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
 					stubCorFactory.MakeDeactivateCoroutine().Returns(mockDeaCoroutine);
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					handler.SetCoroutineFactory(stubCorFactory);
 				sse.SetSelStateHandler(handler);
 			sse.Defocus();
@@ -33,7 +33,7 @@ namespace SlotSystemTests{
 				System.Func<IEnumeratorFake> mockDefCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
 					stubCorFactory.MakeDefocusCoroutine().Returns(mockDefCoroutine);
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					handler.SetCoroutineFactory(stubCorFactory);
 				sse.SetSelStateHandler(handler);
 			sse.Deactivate();
@@ -48,7 +48,7 @@ namespace SlotSystemTests{
 				System.Func<IEnumeratorFake> mockFocCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
 					stubCorFactory.MakeFocusCoroutine().Returns(mockFocCoroutine);
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					handler.SetCoroutineFactory(stubCorFactory);
 				sse.SetSelStateHandler(handler);
 			sse.Deactivate();
@@ -63,7 +63,7 @@ namespace SlotSystemTests{
 				System.Func<IEnumeratorFake> mockSelCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				ISSECoroutineFactory stubCorFactory = Substitute.For<ISSECoroutineFactory>();
 					stubCorFactory.MakeSelectCoroutine().Returns(mockSelCoroutine);
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					handler.SetCoroutineFactory(stubCorFactory);
 				sse.SetSelStateHandler(handler);
 			sse.Deactivate();
@@ -84,7 +84,7 @@ namespace SlotSystemTests{
 					stubCorFactory.MakeDefocusCoroutine().Returns(mockDefCor);
 					stubCorFactory.MakeFocusCoroutine().Returns(mockFocCor);
 					stubCorFactory.MakeSelectCoroutine().Returns(mockSelCor);
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					handler.SetCoroutineFactory(stubCorFactory);
 				sse.SetSelStateHandler(handler);
 			ISSESelProcess selProc = handler.selProcess;
@@ -198,7 +198,7 @@ namespace SlotSystemTests{
 				prevProc = selProc;
 		}
 		/* Helpers */
-			public void AssertSSESelProcIsSetAndIsRunning(SSEStateHandler handler, Type procType, Func<IEnumeratorFake> mockCoroutine){
+			public void AssertSSESelProcIsSetAndIsRunning(SSESelStateHandler handler, Type procType, Func<IEnumeratorFake> mockCoroutine){
 				ISSESelProcess actual = handler.selProcess;
 				Assert.That(actual, Is.TypeOf(procType));
 				Assert.That(actual.handler, Is.SameAs(handler));

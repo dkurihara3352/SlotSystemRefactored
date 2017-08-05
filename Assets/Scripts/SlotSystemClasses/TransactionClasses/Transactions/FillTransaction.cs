@@ -4,14 +4,15 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class FillTransaction: AbsSlotSystemTransaction, IFillTransaction{
-		public ISlottable m_pickedSB;
-		public ISlotGroup m_selectedSG;
-		public ISlotGroup m_origSG;
-		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam):base(tam){
+		ISlottable m_pickedSB;
+		ISlotGroup m_selectedSG;
+		ISlotGroup m_origSG;
+		ITransactionIconHandler iconHandler;
+		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam, ITransactionIconHandler iconHandler, ITAMActStateHandler tamStateHandler):base(tam, tamStateHandler){
 			m_pickedSB = pickedSB;
 			m_selectedSG = selected;
 			m_origSG = m_pickedSB.sg;
-			this.tam = tam;
+			this.iconHandler = iconHandler;
 		}
 		public override ISlotGroup sg1{get{return m_origSG;}}
 		public override ISlotGroup sg2{get{return m_selectedSG;}}
@@ -19,7 +20,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1.Fill();
 			sg2.Fill();
-			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.item));
+			iconHandler.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.item));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();
 			base.Execute();

@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class TransactionIconHandler: ITransactionIconHandler{
-		ITransactionManager tam;
-		public TransactionIconHandler(ITransactionManager tam){
-			this.tam = tam;
+		ITAMActStateHandler tamStateHandler;
+		public TransactionIconHandler(ITAMActStateHandler tamStateHandler){
+			this.tamStateHandler = tamStateHandler;
 		}
 		public void AcceptDITAComp(DraggedIcon di){
 			if(dIcon2 != null && di == dIcon2) m_dIcon2Done = true;
 			else if(dIcon1 != null && di == dIcon1) m_dIcon1Done = true;
-			if(tam.isTransacting){
-				tam.transactionCoroutine();
+			if(tamStateHandler.isTransacting){
+				tamStateHandler.transactionCoroutine();
 			}
 		}
 		public virtual DraggedIcon dIcon1{

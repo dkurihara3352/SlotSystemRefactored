@@ -13,7 +13,7 @@ namespace SlotSystemTests{
 	public class TransactionSGHandlerTests: SlotSystemTest {
 		[Test]
 		public void AcceptsSGTAComp_ValidSG_SetsDone(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 			sgHandler.SetSG1(stubSG);
 
@@ -23,7 +23,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG1_NullToSome_SetsSG1(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 
 			sgHandler.SetSG1(stubSG);
@@ -32,7 +32,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG1_NullToSome_SetsSG1DoneFalse(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 
 			sgHandler.SetSG1(stubSG);
@@ -41,7 +41,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG1_OtherToSome_SetsSG1(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup prevSG = MakeSubSG();
 			ISlotGroup stubSG = MakeSubSG();
 
@@ -52,7 +52,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG1_OtherToSome_SetsSG1DoneFalse(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup prevSG = MakeSubSG();
 			ISlotGroup stubSG = MakeSubSG();
 
@@ -63,7 +63,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG1_SomeToNull_SetsSG1Null(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 			sgHandler.SetSG1(stubSG);
 
@@ -73,7 +73,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG1_SomeToNull_SetsSG1DoneTrue(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 			sgHandler.SetSG1(stubSG);
 
@@ -83,7 +83,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_NullToSome_SetsSG2(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 
 			sgHandler.SetSG2(stubSG);
@@ -92,7 +92,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_NullToSome_SetsSG2DoneFalse(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 
 			sgHandler.SetSG2(stubSG);
@@ -101,7 +101,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_NullToSome_CallSG2Select(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup mockSG = MakeSubSG();
 
 			sgHandler.SetSG2(mockSG);
@@ -110,7 +110,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_OtherToSome_SetsSG2(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup prevSG = MakeSubSG();
 			ISlotGroup stubSG = MakeSubSG();
 
@@ -121,7 +121,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_OtherToSome_SetsSG2DoneFalse(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup prevSG = MakeSubSG();
 			ISlotGroup stubSG = MakeSubSG();
 
@@ -132,7 +132,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_OtherToSome_CallsSG2Select(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup prevSG = MakeSubSG();
 			ISlotGroup mockSG = MakeSubSG();
 
@@ -143,7 +143,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_SomeToNull_SetsSG2Null(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 			sgHandler.SetSG2(stubSG);
 
@@ -153,7 +153,7 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetSG2_SomeToNull_SetsSG2DoneTrue(){
-			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAM());
+			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup stubSG = MakeSubSG();
 			sgHandler.SetSG2(stubSG);
 

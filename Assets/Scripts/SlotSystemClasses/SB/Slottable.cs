@@ -551,9 +551,6 @@ namespace SlotSystem{
 				}
 			}
 				ITransactionCache _taCache;
-			public void SetTACache(ITransactionCache taCache){
-				_taCache = taCache;
-			}
 			public void SetPickedSB(){
 				if(taCache != null){
 					taCache.SetPickedSB((ISlottable)this);
@@ -571,16 +568,43 @@ namespace SlotSystem{
 			public void ExecuteTransaction(){
 				tam.ExecuteTransaction();
 			}
+			public ITAMActStateHandler tamStateHandler{
+				get{
+					if(_tamStateHandler != null)
+						return _tamStateHandler;
+					else
+						throw new InvalidOperationException("tamStateHandler not set");
+				}
+			}
+				ITAMActStateHandler _tamStateHandler;
+			public void SetTAMStateHandler(ITAMActStateHandler handler){
+				_tamStateHandler = handler;
+			}
 			public void Probe(){
-				tam.Probe();
+				tamStateHandler.Probe();
+			}
+			public ITransactionIconHandler iconHandler{
+				get{
+					if(_iconHandler != null)
+						return _iconHandler;
+					else	
+						throw new InvalidOperationException("iconHandler not set");
+				}
+			}
+				ITransactionIconHandler _iconHandler;
+			public void SetIconHandler(ITransactionIconHandler iconHandler){
+				_iconHandler = iconHandler;
+			}
+			public void SetTACache(ITransactionCache taCache){
+				_taCache = taCache;
 			}
 			public void SetDIcon1(){
-				DraggedIcon dIcon = new DraggedIcon(this, tam);
-				tam.SetDIcon1(dIcon);
+				DraggedIcon dIcon = new DraggedIcon(this, iconHandler);
+				iconHandler.SetDIcon1(dIcon);
 			}
 			public void SetDIcon2(){
-				DraggedIcon dIcon = new DraggedIcon(this, tam);
-				tam.SetDIcon2(dIcon);
+				DraggedIcon dIcon = new DraggedIcon(this, iconHandler);
+				iconHandler.SetDIcon2(dIcon);
 			}
 			public void CreateTAResult(){
 				taCache.CreateTransactionResults();

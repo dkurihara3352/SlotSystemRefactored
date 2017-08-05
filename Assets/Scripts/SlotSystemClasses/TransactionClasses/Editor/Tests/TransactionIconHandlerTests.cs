@@ -13,8 +13,8 @@ namespace SlotSystemTests{
 	public class TransactionIconHandlerTests: SlotSystemTest{
 		[Test]
 		public void AcceptsDITAComp_ValidDI_SetsDone(){
-			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAM());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubTAM());
+			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
+			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
 			iconHandler.SetDIcon1(stubDI);
 
 			iconHandler.AcceptDITAComp(stubDI);
@@ -23,8 +23,8 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetDIcon1_ToNonNull_SetsDIcon1DoneFalse(){
-			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAM());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubTAM());
+			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
+			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
 
 			iconHandler.SetDIcon1(stubDI);
 
@@ -32,8 +32,8 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetDIcon1_ToNull_SetsDIcon1DoneTrue(){
-			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAM());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubTAM());
+			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
+			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
 
 			iconHandler.SetDIcon1(stubDI);
 			iconHandler.SetDIcon1(null);
@@ -42,8 +42,8 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetDIcon2_ToNonNull_SetsDIcon2DoneFalse(){
-			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAM());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubTAM());
+			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
+			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
 
 			iconHandler.SetDIcon2(stubDI);
 
@@ -51,8 +51,8 @@ namespace SlotSystemTests{
 			}
 		[Test]
 		public void SetDIcon2_ToNull_SetsDIcon2DoneTrue(){
-			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAM());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubTAM());
+			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
+			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
 
 			iconHandler.SetDIcon2(stubDI);
 			iconHandler.SetDIcon2(null);

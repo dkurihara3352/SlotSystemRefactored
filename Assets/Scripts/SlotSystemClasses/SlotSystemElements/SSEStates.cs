@@ -12,8 +12,8 @@ namespace SlotSystem{
 		public interface ISSEStateEngine<T>: ISwitchableStateEngine<T> where T: ISSEState{}
 	/* StateFacotory */
 		public class SSESelStateFacotory: ISSESelStateFactory{
-			protected ISSEStateHandler handler;
-			public SSESelStateFacotory(ISSEStateHandler handler){
+			protected ISSESelStateHandler handler;
+			public SSESelStateFacotory(ISSESelStateHandler handler){
 				this.handler = handler;
 			}
 			public ISSESelState MakeDeactivatedState(){
@@ -60,10 +60,6 @@ namespace SlotSystem{
 		}
 	/* State */
 		public abstract class SSEState: ISSEState{
-			protected ISSEStateHandler handler;
-			public SSEState(ISSEStateHandler handler){
-				this.handler = handler;
-			}
 			public virtual void EnterState(){
 			}
 			public virtual void ExitState(){
@@ -71,19 +67,22 @@ namespace SlotSystem{
 		}
 		public interface ISSEState: ISwitchableState{}
 		public abstract class SSESelState: SSEState, ISSESelState{
-			public SSESelState(ISSEStateHandler handler): base(handler){}
+			protected ISSESelStateHandler handler;
+			public SSESelState(ISSESelStateHandler handler){
+				this.handler = handler;
+			}
 		}
 		public interface ISSESelState: ISSEState{
 		}
 			public class SSEDeactivatedState: SSESelState{
-				public SSEDeactivatedState(ISSEStateHandler handler): base(handler){}
+				public SSEDeactivatedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.wasSelStateNull)
 						handler.SetAndRunSelProcess(new SSEDeactivateProcess(handler, handler.deactivateCoroutine));
 				}
 			}
 			public class SSEFocusedState: SSESelState{
-				public SSEFocusedState(ISSEStateHandler handler): base(handler){}
+				public SSEFocusedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.wasSelStateNull){
 						handler.SetAndRunSelProcess(new SSEFocusProcess(handler, handler.focusCoroutine));
@@ -93,7 +92,7 @@ namespace SlotSystem{
 				}
 			}
 			public class SSEDefocusedState: SSESelState{
-				public SSEDefocusedState(ISSEStateHandler handler): base(handler){}
+				public SSEDefocusedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.wasSelStateNull)
 						handler.SetAndRunSelProcess(new SSEDefocusProcess(handler, handler.defocusCoroutine));
@@ -102,7 +101,7 @@ namespace SlotSystem{
 				}
 			}
 			public class SSESelectedState : SSESelState{
-				public SSESelectedState(ISSEStateHandler handler): base(handler){}
+				public SSESelectedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.wasSelStateNull)
 						handler.SetAndRunSelProcess(new SSESelectProcess(handler, handler.selectCoroutine));

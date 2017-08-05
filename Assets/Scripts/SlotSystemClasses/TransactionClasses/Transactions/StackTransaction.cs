@@ -4,12 +4,13 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class StackTransaction: AbsSlotSystemTransaction, IStackTransaction{
-		public ISlottable m_pickedSB;
-		public ISlotGroup m_origSG;
-		public ISlottable m_selectedSB;
-		public ISlotGroup m_selectedSG;
-		public List<InventoryItemInstance> itemCache = new List<InventoryItemInstance>();
-		public StackTransaction(ISlottable pickedSB ,ISlottable selected, ITransactionManager tam): base(tam){
+		ISlottable m_pickedSB;
+		ISlotGroup m_origSG;
+		ISlottable m_selectedSB;
+		ISlotGroup m_selectedSG;
+		List<InventoryItemInstance> itemCache = new List<InventoryItemInstance>();
+		ITransactionIconHandler iconHandler;
+		public StackTransaction(ISlottable pickedSB ,ISlottable selected, ITransactionManager tam, ITransactionIconHandler iconHandler, ITAMActStateHandler tamStateHandler): base(tam, tamStateHandler){
 			m_pickedSB = pickedSB;
 			m_origSG = pickedSB.sg;
 			m_selectedSB = selected;
@@ -17,6 +18,7 @@ namespace SlotSystem{
 			InventoryItemInstance cache = pickedSB.item;
 			cache.quantity = pickedSB.pickedAmount;
 			itemCache.Add(cache);
+			this.iconHandler = iconHandler;
 		}
 		public override ISlottable targetSB{get{return m_selectedSB;}}
 		public override ISlotGroup sg1{get{return m_origSG;}}
@@ -26,7 +28,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1.Remove();
 			sg2.Add();
-			tam.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.item));
+			iconHandler.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.item));
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){

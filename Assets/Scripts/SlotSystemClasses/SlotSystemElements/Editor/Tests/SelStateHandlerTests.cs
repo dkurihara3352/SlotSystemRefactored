@@ -13,7 +13,7 @@ namespace SlotSystemTests{
 		public class SelStateHandlerTests {
 			[Test]
 			public void SelStateFields_ByDefault_AreSetDefault(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 
 				Assert.That(handler.isDeactivated, Is.False);
 				Assert.That(handler.isFocused, Is.False);
@@ -22,7 +22,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Activate_Always_SetsFocused(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 
 				handler.Activate();
 
@@ -30,7 +30,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Deactivate_WhenCalled_SetsCurSelStateDeactivated(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				
 				handler.Deactivate();
 
@@ -41,7 +41,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Deactivate_WasSelStateNull_DoesNotSetSelProc(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 
 				handler.Deactivate();
 
@@ -49,7 +49,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Deactivate_IsNotSelStateInit_SetsSelProcDeactivateProc(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				handler.Defocus();
 
 				handler.Deactivate();
@@ -58,7 +58,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Deactivate_FromNullToDeaToDea_DoesNotSetSelProc(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				handler.Deactivate();
 
 				handler.Deactivate();
@@ -67,7 +67,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Focus_WhenCalled_SetsCurSelStateFocused(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				
 				handler.Focus();
 
@@ -79,7 +79,7 @@ namespace SlotSystemTests{
 
 			[Test]
 			public void Focus_IsSelStateInit_DoesNotSetSelProc(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 
 				handler.Focus();
 
@@ -87,7 +87,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Focus_IsSelStateInit_CallsInstantFocus(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					ISSECommand mockComm = Substitute.For<ISSECommand>();
 					IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
 					stubInstantCommands.When(x => x.ExecuteInstantFocus()).Do(x => mockComm.Execute());
@@ -99,7 +99,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Focus_IsNotSelStateInit_SetsSelProcFocus(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				handler.Deactivate();
 
 				handler.Focus();
@@ -108,7 +108,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Defocus_WhenCalled_SetCurStateToDefocusd(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				
 				handler.Defocus();
 
@@ -119,7 +119,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Defocus_IsSelStateInit_DoesNotSetSelProc(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 
 				handler.Defocus();
 
@@ -127,7 +127,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Defocus_IsSelStateInit_CallsInstantDefocus(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					ISSECommand mockComm = Substitute.For<ISSECommand>();
 					IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
 					stubInstantCommands.When(x => x.ExecuteInstantDefocus()).Do(x => mockComm.Execute());
@@ -139,7 +139,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Defocus_IsNotSelStateInit_SetsSelProcDefocus(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				handler.Deactivate();
 
 				handler.Defocus();
@@ -148,7 +148,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Select_WhenCalled_SetCurStateToSelected(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				
 				handler.Select();
 
@@ -159,7 +159,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Select_IsSelStateInit_DoesNotSetSelProc(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 
 				handler.Select();
 
@@ -167,7 +167,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Select_IsSelStateInit_CallsInstantSelect(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					ISSECommand mockComm = Substitute.For<ISSECommand>();
 					IInstantCommands stubInstantCommands = Substitute.For<IInstantCommands>();
 					stubInstantCommands.When(x => x.ExecuteInstantSelect()).Do(x => mockComm.Execute());
@@ -179,7 +179,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Select_IsNotSelStateInit_SetsSelProcSelect(){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 				handler.Deactivate();
 
 				handler.Select();
@@ -188,7 +188,7 @@ namespace SlotSystemTests{
 				}
 			[TestCaseSource(typeof(SetAndRunSelProcess_ISSESelProcessOrNullCases))]
 			public void SetAndRunSelProcess_ISSESelProcessOrNull_CallsSelProcEngineSAR(ISSESelProcess process){
-				SSEStateHandler handler = new SSEStateHandler();
+				SSESelStateHandler handler = new SSESelStateHandler();
 					ISSEProcessEngine<ISSESelProcess> engine = Substitute.For<ISSEProcessEngine<ISSESelProcess>>();
 					handler.SetSelProcEngine(engine);
 				

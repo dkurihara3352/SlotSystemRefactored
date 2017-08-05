@@ -20,9 +20,10 @@ namespace SlotSystem{
 		{
 			IFocusedSGProvider focSGPrv = Substitute.For<IFocusedSGProvider>();
 				focSGPrv.focusedSGs.Returns(focusedSGs);
-			TransactionCache taCache = new TransactionCache(MakeSubTAM(), focSGPrv);
+			ITransactionManager stubTAM = MakeSubTAM();
+			TransactionCache taCache = new TransactionCache(stubTAM, focSGPrv);
 				taCache.SetPickedSB(pickedSB);
-				taCache.SetTAFactory(taFac);
+				stubTAM.taFactory.Returns(taFac);
 
 			bool result = taCache.IsTransactionGoingToBeRevert(pickedSB);
 
@@ -332,7 +333,7 @@ namespace SlotSystem{
 					stubMakeTAFactory.MakeTransaction(pickedSB, hoverableC).Returns(reoTA);
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA, sgB, sgC});
 					focSGPrv.focusedSGs.Returns(sgsList);
-			taCache.SetTAFactory(stubMakeTAFactory);
+			tam.taFactory.Returns(stubMakeTAFactory);
 
 			taCache.CreateTransactionResults();
 
@@ -383,7 +384,7 @@ namespace SlotSystem{
 						stubMakeTAFactory.MakeTransaction(pickedSB, hoverableSBC).Returns(stackTA);
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sg});
 					focSGPrv.focusedSGs.Returns(sgsList);
-			taCache.SetTAFactory(stubMakeTAFactory);
+			tam.taFactory.Returns(stubMakeTAFactory);
 			Dictionary<IHoverable, ISlotSystemTransaction> expected = new Dictionary<IHoverable, ISlotSystemTransaction>();
 			expected.Add(hoverableSG, revTA);
 			expected.Add(hoverableSBA, revTA);
@@ -418,7 +419,7 @@ namespace SlotSystem{
 					stubFac.MakeTransaction(pickedSB, hoverable).Returns(ta);
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA});
 					focSGPrv.focusedSGs.Returns(sgsList);
-			taCache.SetTAFactory(stubFac);
+			tam.taFactory.Returns(stubFac);
 
 			taCache.CreateTransactionResults();
 
@@ -458,7 +459,7 @@ namespace SlotSystem{
 					stubFac.MakeTransaction(pickedSB, hoverableSG).Returns(Substitute.For<IRevertTransaction>());
 					List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sg});
 					focSGPrv.focusedSGs.Returns(sgsList);
-			taCache.SetTAFactory(stubFac);
+			tam.taFactory.Returns(stubFac);
 
 			taCache.CreateTransactionResults();
 

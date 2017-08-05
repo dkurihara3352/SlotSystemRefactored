@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 namespace SlotSystem{
 	public abstract class SBProcess: SSEProcess, ISBProcess{
-		public SBProcess(ISSEStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
+		public SBProcess(ISSESelStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
 		}
 		public ISlottable sb{
 			get{return (ISlottable)handler;}

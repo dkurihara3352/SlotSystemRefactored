@@ -5,8 +5,10 @@ using UnityEngine;
 namespace SlotSystem{
 	public abstract class AbsSlotSystemTransaction: ISlotSystemTransaction{
 		protected ITransactionManager tam;
-		public AbsSlotSystemTransaction(ITransactionManager tam){
+		protected ITAMActStateHandler tamStateHandler;
+		public AbsSlotSystemTransaction(ITransactionManager tam, ITAMActStateHandler tamStateHandler){
 			this.tam = tam;
+			this.tamStateHandler = tamStateHandler;
 		}
 		protected List<InventoryItemInstance> removed = new List<InventoryItemInstance>();
 		protected List<InventoryItemInstance> added = new List<InventoryItemInstance>();
@@ -16,7 +18,7 @@ namespace SlotSystem{
 		public virtual List<InventoryItemInstance> moved{get{return null;}}
 		public virtual void Indicate(){}
 		public virtual void Execute(){
-			tam.Transact();
+			tamStateHandler.Transact();
 		}
 		public virtual void OnCompleteTransaction(){
 			tam.Refresh();

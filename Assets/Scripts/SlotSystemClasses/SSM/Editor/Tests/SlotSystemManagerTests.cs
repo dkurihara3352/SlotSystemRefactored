@@ -268,13 +268,13 @@ namespace SlotSystemTests{
 					}
 				SlotSystemBundle MakeSSBundleWithSelStateHandler(){
 					SlotSystemBundle bundle = MakeSSBundle();
-					SSEStateHandler handler = new SSEStateHandler();
+					SSESelStateHandler handler = new SSESelStateHandler();
 					bundle.SetSelStateHandler(handler);
 					return bundle;
 				}
 				SlotGroup MakeSGWithSelStateHandler(){
 					SlotGroup sg = MakeSG();
-					SSEStateHandler handler = new SSEStateHandler();
+					SSESelStateHandler handler = new SSESelStateHandler();
 					sg.SetSelStateHandler(handler);
 					return sg;
 				}
@@ -1180,7 +1180,7 @@ namespace SlotSystemTests{
 					}
 				SlotSystemManager MakeSSMWithSelStateHandler(){
 					SlotSystemManager ssm = MakeSSM();
-					SSEStateHandler handler = new SSEStateHandler();
+					SSESelStateHandler handler = new SSESelStateHandler();
 					ssm.SetSelStateHandler(handler);
 					return ssm;
 				}

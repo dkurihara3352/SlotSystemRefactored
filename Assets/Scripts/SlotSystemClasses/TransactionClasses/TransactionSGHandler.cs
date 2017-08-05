@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class TransactionSGHandler: ITransactionSGHandler{
-		ITransactionManager tam;
-		public TransactionSGHandler(ITransactionManager tam){
-			this.tam = tam;
+		ITAMActStateHandler tamStateHandler;
+		public TransactionSGHandler(ITAMActStateHandler tamStateHandler){
+			this.tamStateHandler = tamStateHandler;
 		}
 		public void AcceptSGTAComp(ISlotGroup sg){
 			if(sg2 != null && sg == sg2) m_sg2Done = true;
 			else if(sg1 != null && sg == sg1) m_sg1Done = true;
-			if(tam.isTransacting){
-				tam.transactionCoroutine();
+			if(tamStateHandler.isTransacting){
+				tamStateHandler.transactionCoroutine();
 			}
 		}
 		public ISlotGroup sg1{

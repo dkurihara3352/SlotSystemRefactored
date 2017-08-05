@@ -5,8 +5,8 @@ using Utility;
 namespace SlotSystem{
 	public abstract class SlotSystemElement :MonoBehaviour, ISlotSystemElement{
 		/* State Handling */
-			ISSEStateHandler stateHandler;
-			public void SetSelStateHandler(ISSEStateHandler handler){
+			ISSESelStateHandler stateHandler;
+			public void SetSelStateHandler(ISSESelStateHandler handler){
 				stateHandler = handler;
 			}
 			public bool isSelStateNull{
@@ -266,7 +266,7 @@ namespace SlotSystem{
 					return GetEnumerator();
 				}	
 	}
-	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, ISSEStateHandler{
+	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, ISSESelStateHandler{
 		void SetHierarchy();
 		bool isActivatedOnDefault{get;set;}
 		bool isFocusedInHierarchy{get;}

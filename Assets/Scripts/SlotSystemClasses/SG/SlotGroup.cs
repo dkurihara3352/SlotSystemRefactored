@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Utility;
+using System;
 namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		/*	states	*/
@@ -14,176 +15,144 @@ namespace SlotSystem{
 			public override void Deselect(){
 				Activate();
 			}
-			/*	Engines	*/
-				/*	Action State	*/
-					ISSEStateEngine<ISGActState> actStateEngine{
-						get{
-							if(m_actStateEngine == null)
-								m_actStateEngine = new SSEStateEngine<ISGActState>();
-							return m_actStateEngine;
-						}
-					}
-						ISSEStateEngine<ISGActState> m_actStateEngine;
-					void SetActStateEngine(ISSEStateEngine<ISGActState> engine){
-						m_actStateEngine = engine;
-					}
-					void SetActState(ISGActState state){
-						actStateEngine.SetState(state);
-						if(state ==null && actProcess != null)
-							SetAndRunActProcess(null);
-					}
-					ISGActState curActState{
-						get{return actStateEngine.curState;}
-					}
-					ISGActState prevActState{
-						get{return actStateEngine.prevState;}
-					}
-					ISGStatesFactory statesFactory{
-						get{
-							if(_statesFactory == null)
-								_statesFactory = new SGStatesFactory(this);
-							return _statesFactory;
-						}
-					}
-						ISGStatesFactory _statesFactory;
-					public void ClearCurActState(){
-						SetActState(null);
-					}
-						public bool isActStateNull{
-							get{return curActState == null;}
-						}
-						public bool wasActStateNull{
-							get{return prevActState == null;}
-						}
-					public void WaitForAction(){
-						SetActState(waitForActionState);
-					}
-						public ISGActState waitForActionState{
-							get{return statesFactory.MakeWaitForActionState();}
-						}
-						public bool isWaitingForAction{
-							get{return curActState == waitForActionState;}
-						}
-						public bool wasWaitingForAction{
-							get{return prevActState == waitForActionState;}
-						}
-					public void Revert(){
-						SetActState(revertState);
-					}
-						public ISGActState revertState{
-							get{return statesFactory.MakeRevertState();}
-						}
-						public bool isReverting{
-							get{return curActState == revertState;}
-						}
-						public bool wasReverting{
-							get{return prevActState == revertState;}
-						}
-					public void Reorder(){
-						SetActState(reorderState);
-					}
-						public ISGActState reorderState{
-							get{return statesFactory.MakeReorderState();}
-						}
-						public bool isReordering{
-							get{return curActState == reorderState;}
-						}
-						public bool wasReordering{
-							get{return prevActState == reorderState;}
-						}
-					public void Add(){
-						SetActState(addState);
-					}
-						public ISGActState addState{
-							get{return statesFactory.MakeAddState();}
-						}
-						public bool isAdding{
-							get{return curActState == addState;}
-						}
-						public bool wasAdding{
-							get{return prevActState == addState;}
-						}
-					public void Remove(){
-						SetActState(removeState);
-					}
-						public ISGActState removeState{
-							get{return statesFactory.MakeRevertState();}
-						}
-						public bool isRemoving{
-							get{return curActState == removeState;}
-						}
-						public bool wasRemoving{
-							get{return prevActState == removeState;}
-						}
-					public void Swap(){
-						SetActState(swapState);
-					}
-						public ISGActState swapState{
-							get{return statesFactory.MakeSwapState();}
-						}
-						public bool isSwapping{
-							get{return curActState == swapState;}
-						}
-						public bool wasSwapping{
-							get{return prevActState == swapState;}
-						}
-					public void Fill(){
-						SetActState(fillState);
-					}
-						public ISGActState fillState{
-							get{return statesFactory.MakeFillState();}
-						}
-						public bool isFilling{
-							get{return curActState == fillState;}
-						}
-						public bool wasFilling{
-							get{return prevActState == fillState;}
-						}
-					public void Sort(){
-						SetActState(sortState);
-					}
-						public ISGActState sortState{
-							get{return statesFactory.MakeSortState();}
-						}
-						public bool isSorting{
-							get{return curActState == sortState;}
-						}
-						public bool wasSorting{
-							get{return prevActState == sortState;}
-						}
-		/*	process	*/
-			/*	Action Process	*/
-				ISSEProcessEngine<ISGActProcess> actProcEngine{
-					get{
-						if(m_actProcEngine == null)
-							m_actProcEngine = new SSEProcessEngine<ISGActProcess>();
-						return m_actProcEngine;
-					}
-					}ISSEProcessEngine<ISGActProcess> m_actProcEngine;
-				public void SetAndRunActProcess(ISGActProcess process){
-					actProcEngine.SetAndRunProcess(process);
+			ISGActStateHandler sgStateHandler{
+				get{
+					if(_sgStateHandler != null)
+						return _sgStateHandler;
+					else
+						throw new System.InvalidOperationException("sgStateHandler not set");
 				}
-				public void ExpireActProcess(){
-					if(actProcess != null) 
-						actProcess.Expire();
-				}
-				public ISGActProcess actProcess{
-					get{return actProcEngine.process;}
-				}
-				public IEnumeratorFake TransactionCoroutine(){
-					bool flag = true;
-					foreach(ISlottable sb in this){
-						if(sb != null)
-						flag &= !sb.actProcess.isRunning;
-					}
-					if(flag){
-						actProcess.Expire();
-					}
-					return null;
-				}
-				public void ReportTAComp(){
-					tam.AcceptSGTAComp(this);
-				}
+			}
+				ISGActStateHandler _sgStateHandler;
+			public void SetSGActStateHandler(ISGActStateHandler handler){
+				_sgStateHandler = handler;
+			}
+		public void ClearCurActState(){
+			sgStateHandler.ClearCurActState();
+		}
+			public bool wasActStateNull{
+				get{return sgStateHandler.wasActStateNull;}
+			}
+			public bool isActStateNull{
+				get{return sgStateHandler.isActStateNull;}
+			}
+		public ISGActState waitForActionState{
+			get{return sgStateHandler.waitForActionState;}
+		}
+			public void WaitForAction(){
+				sgStateHandler.WaitForAction();
+			}
+			public bool isWaitingForAction{
+				get{return sgStateHandler.isWaitingForAction;}
+			}
+			public bool wasWaitingForAction{
+				get{return sgStateHandler.wasWaitingForAction;}
+			}
+		public ISGActState revertState{
+			get{return sgStateHandler.revertState;}
+		}
+			public void Revert(){
+				sgStateHandler.Revert();
+			}
+			public bool isReverting{
+				get{return sgStateHandler.isReverting;}
+			}
+			public bool wasReverting{
+				get{return sgStateHandler.wasReverting;}
+			}
+		public ISGActState reorderState{
+			get{return sgStateHandler.reorderState;}
+		}
+			public void Reorder(){
+				sgStateHandler.Reorder();
+			}
+			public bool isReordering{
+				get{return sgStateHandler.isReordering;}
+			}
+			public bool wasReordering{
+				get{return sgStateHandler.wasReordering;}
+			}
+		public ISGActState addState{
+			get{return sgStateHandler.addState;}
+		}
+			public void Add(){
+				sgStateHandler.Add();
+			}
+			public bool isAdding{
+				get{return sgStateHandler.isAdding;}
+			}
+			public bool wasAdding{
+				get{return sgStateHandler.wasAdding;}
+			}
+		public ISGActState removeState{
+			get{return sgStateHandler.removeState;}
+		}
+			public void Remove(){
+				sgStateHandler.Remove();
+			}
+			public bool isRemoving{
+				get{return sgStateHandler.isRemoving;}
+			}
+			public bool wasRemoving{
+				get{return sgStateHandler.wasRemoving;}
+			}
+		public ISGActState swapState{
+			get{return sgStateHandler.swapState;}
+		}
+			public void Swap(){
+				sgStateHandler.Swap();
+			}
+			public bool isSwapping{
+				get{return sgStateHandler.isSwapping;}
+			}
+			public bool wasSwapping{
+				get{return sgStateHandler.wasSwapping;}
+			}
+		public ISGActState fillState{
+			get{return sgStateHandler.fillState;}
+		}
+			public void Fill(){
+				sgStateHandler.Fill();
+			}
+			public bool isFilling{
+				get{return sgStateHandler.isFilling;}
+			}
+			public bool wasFilling{
+				get{return sgStateHandler.wasFilling;}
+			}
+		public ISGActState sortState{
+			get{return sgStateHandler.sortState;}
+		}
+			public void Sort(){
+				sgStateHandler.Sort();
+			}
+			public bool isSorting{
+				get{return sgStateHandler.isSorting;}
+			}
+			public bool wasSorting{
+				get{return sgStateHandler.wasSorting;}
+			}
+	/* Proc */
+		public void SetAndRunActProcess(ISGActProcess process){
+			sgStateHandler.SetAndRunActProcess(process);
+		}
+		public void ExpireActProcess(){
+			sgStateHandler.ExpireActProcess();
+		}
+		public ISGActProcess actProcess{
+			get{return sgStateHandler.actProcess;}
+		}
+		public IEnumeratorFake TransactionCoroutine(){
+			bool flag = true;
+			foreach(ISlottable sb in this){
+				if(sb != null)
+				flag &= !sb.actProcess.isRunning;
+			}
+			if(flag){
+				actProcess.Expire();
+			}
+			return null;
+		}
 		/*  Commands	*/
 			ISGCommandsFactory commandsFactory{
 				get{
@@ -430,6 +399,18 @@ namespace SlotSystem{
 					}
 				}
 		/* Transaction */
+			ITransactionSGHandler sgHandler{
+				get{
+					if(_sgHandler != null)
+						return _sgHandler;
+					else
+						throw new InvalidOperationException("sgHandler not set");
+				}
+			}
+				ITransactionSGHandler _sgHandler;
+			public void SetSGHandler(ITransactionSGHandler sgHandler){
+				_sgHandler = sgHandler;
+			}
 			public void ReorderAndUpdateSBs(){
 				ISlottable sb1 = pickedSB;
 				ISlottable sb2 = targetSB;
@@ -468,7 +449,7 @@ namespace SlotSystem{
 			}
 			public ISlottable GetAddedForFill(){
 				ISlottable added;
-				if(tam.sg1 == (ISlotGroup)this)
+				if(sgHandler.sg1 == (ISlotGroup)this)
 					added = null;
 				else
 					added = taCache.pickedSB;
@@ -476,7 +457,7 @@ namespace SlotSystem{
 			}
 			public ISlottable GetRemovedForFill(){
 				ISlottable removed;
-				if(tam.sg1 == (ISlotGroup)this)
+				if(sgHandler.sg1 == (ISlotGroup)this)
 					removed = taCache.pickedSB;
 				else
 					removed = null;
@@ -494,7 +475,7 @@ namespace SlotSystem{
 			}
 			public ISlottable GetAddedForSwap(){
 				ISlottable added = null;
-				if(tam.sg1 == (ISlotGroup)this)
+				if(sgHandler.sg1 == (ISlotGroup)this)
 					added = taCache.targetSB;
 				else
 					added = taCache.pickedSB;
@@ -502,7 +483,7 @@ namespace SlotSystem{
 			}
 			public ISlottable GetRemovedForSwap(){
 				ISlottable removed;
-				if(tam.sg1 == (ISlotGroup)this)
+				if(sgHandler.sg1 == (ISlotGroup)this)
 					removed = taCache.pickedSB;
 				else
 					removed = taCache.targetSB;
@@ -512,7 +493,7 @@ namespace SlotSystem{
 				if(!isPool){
 					GameObject newSBGO = new GameObject("newSBGO");
 					Slottable newSB = newSBGO.AddComponent<Slottable>();
-					SSEStateHandler stateHandler = new SSEStateHandler();
+					SSESelStateHandler stateHandler = new SSESelStateHandler();
 					newSB.SetSelStateHandler(stateHandler);
 					newSB.SetItem(added.item);
 					newSB.SetSSM(ssm);
@@ -651,7 +632,7 @@ namespace SlotSystem{
 			public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
 				GameObject newSBGO = new GameObject("newSBGO");
 				Slottable newSB = newSBGO.AddComponent<Slottable>();
-				SSEStateHandler stateHandler = new SSEStateHandler();
+				SSESelStateHandler stateHandler = new SSESelStateHandler();
 				newSB.SetSelStateHandler(stateHandler);
 				newSB.SetItem(addedItem);
 				newSB.SetSSM(ssm);
@@ -699,6 +680,9 @@ namespace SlotSystem{
 					inventory.Remove(item);
 				ssm.MarkEquippedInPool(item, equipped);
 				ssm.SetEquippedOnAllSBs(item, equipped);
+			}
+			public void ReportTAComp(){
+				sgHandler.AcceptSGTAComp(this);
 			}
 		/* Other */
 			public List<ISlottable> SwappableSBs(ISlottable pickedSB){
@@ -806,50 +790,7 @@ namespace SlotSystem{
 				get{return hoverable.isHovered;}
 			}
 	}
-	public interface ISlotGroup: ISlotSystemElement, IHoverable{
-		/* States and Processes */
-			/* ActStates */
-				void ClearCurActState();
-					bool wasActStateNull{get;}
-					bool isActStateNull{get;}
-				ISGActState waitForActionState{get;}
-					void WaitForAction();
-					bool isWaitingForAction{get;}
-					bool wasWaitingForAction{get;}
-				ISGActState revertState{get;}
-					void Revert();
-					bool isReverting{get;}
-					bool wasReverting{get;}
-				ISGActState reorderState{get;}
-					void Reorder();
-					bool isReordering{get;}
-					bool wasReordering{get;}
-				ISGActState addState{get;}
-					void Add();
-					bool isAdding{get;}
-					bool wasAdding{get;}
-				ISGActState removeState{get;}
-					void Remove();
-					bool isRemoving{get;}
-					bool wasRemoving{get;}
-				ISGActState swapState{get;}
-					void Swap();
-					bool isSwapping{get;}
-					bool wasSwapping{get;}
-				ISGActState fillState{get;}
-					void Fill();
-					bool isFilling{get;}
-					bool wasFilling{get;}
-				ISGActState sortState{get;}
-					void Sort();
-					bool isSorting{get;}
-					bool wasSorting{get;}
-			/* Proc */
-				void SetAndRunActProcess(ISGActProcess process);
-				void ExpireActProcess();
-				ISGActProcess actProcess{get;}
-				IEnumeratorFake TransactionCoroutine();
-				void ReportTAComp();
+	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler{
 		/*	fields	*/
 			Inventory inventory{get;}
 			bool isShrinkable{get;}
@@ -883,6 +824,7 @@ namespace SlotSystem{
 			void UpdateEquipStatesOnAll();
 			void OnActionExecute();
 			void SyncEquipped(InventoryItemInstance item, bool equipped);
+			void ReportTAComp();
 		/* Other */
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();

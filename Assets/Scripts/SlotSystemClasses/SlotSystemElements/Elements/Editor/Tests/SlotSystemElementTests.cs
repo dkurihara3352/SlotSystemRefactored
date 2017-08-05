@@ -1030,13 +1030,13 @@ namespace SlotSystemTests{
 				}
 				static TestSlotSystemElement MakeTestSSEWithStateHandler(){
 					TestSlotSystemElement testSSE = MakeTestSSE();
-					SSEStateHandler handler = new SSEStateHandler();
+					SSESelStateHandler handler = new SSESelStateHandler();
 					testSSE.SetSelStateHandler(handler);
 					return testSSE;
 				}
 				static SlotSystemBundle MakeSSBundleWithStateHandler(){
 					SlotSystemBundle bundle = MakeSSBundle();
-					SSEStateHandler handler = new SSEStateHandler();
+					SSESelStateHandler handler = new SSESelStateHandler();
 					bundle.SetSelStateHandler(handler);
 					return bundle;
 				}

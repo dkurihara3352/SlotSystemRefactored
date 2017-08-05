@@ -13,28 +13,33 @@ namespace SlotSystemTests{
 		[Category("TAM")]
 		public class TransactionManagerTests: SlotSystemTest {
 			[Test]
-			public void Refresh_WhenCalled_SetsActStateWFA(){
+			public void Refresh_Always_SetsActStateWFA(){
 				TransactionManager tam = MakeTAM();
+					TAMActStateHandler stateHandler = new TAMActStateHandler(tam);
+					tam.SetActStateHandler(stateHandler);
 
 				tam.Refresh();
 
-				Assert.That(tam.isWaitingForAction, Is.True);
+				Assert.That(stateHandler.isWaitingForAction, Is.True);
 				}
 
 			[TestCaseSource(typeof(transactionCoroutineCases))]
 			public void transactionCoroutine_WhenAllDone_CallsActProcExpire(DraggedIcon di1, DraggedIcon di2, ISlotGroup sg1, ISlotGroup sg2, bool called){
 				TransactionManager tam = MakeTAM();
-				tam.SetDIcon1(di1);
-				tam.SetDIcon2(di2);
+					TAMActStateHandler tamStateHandler = new TAMActStateHandler(tam);
+					tam.SetActStateHandler(tamStateHandler);
 				ITransactionSGHandler stubSGHandler = Substitute.For<ITransactionSGHandler>();
 					stubSGHandler.sg1Done.Returns(sg1 == null);
 					stubSGHandler.sg2Done.Returns(sg2 == null);
-					
 				tam.SetSGHandler(stubSGHandler);
+				ITransactionIconHandler stubIconHandler = Substitute.For<ITransactionIconHandler>();
+					stubIconHandler.dIcon1Done.Returns(di1 == null);
+					stubIconHandler.dIcon2Done.Returns(di2 == null);
+				tam.SetIconHandler(stubIconHandler);
 				ITAMActProcess mockProc = Substitute.For<ITAMActProcess>();
-				tam.SetAndRunActProcess(mockProc);
+				tamStateHandler.SetAndRunActProcess(mockProc);
 
-				tam.transactionCoroutine();
+				tamStateHandler.transactionCoroutine();
 
 				if(called)
 					mockProc.Received().Expire();
@@ -48,12 +53,12 @@ namespace SlotSystemTests{
 							yield return allDone_T;
 						object[] di1NotDone_F;
 							ISlottable stubSB_1 = MakeSubSB();
-							DraggedIcon di1 = new DraggedIcon(stubSB_1, MakeSubTAM());
+							DraggedIcon di1 = new DraggedIcon(stubSB_1, MakeSubIconHandler());
 							di1NotDone_F = new object[]{di1, null, null, null, false};
 							yield return di1NotDone_F;
 						object[] di2NotDone_F;
 							ISlottable stubSB_2 = MakeSubSB();
-							DraggedIcon di2 = new DraggedIcon(stubSB_2, MakeSubTAM());
+							DraggedIcon di2 = new DraggedIcon(stubSB_2, MakeSubIconHandler());
 							di2NotDone_F = new object[]{null, di2, null, null, false};
 							yield return di2NotDone_F;
 						object[] sg1NotDone_F;
@@ -126,28 +131,34 @@ namespace SlotSystemTests{
 				Assert.That(tam.transaction, Is.Null);
 				}
 			[Test]
-			public void ExecuteTransaction_WhenCalled_SetsActStatTransaction(){
+			public void ExecuteTransaction_Always_SetsActStatTransaction(){
 				TransactionManager tam = MakeTAM();
 				ISlotSystemTransaction stubTA = MakeSubTA();
 				tam.SetTransaction(stubTA);
+				TAMActStateHandler tamStateHandler = new TAMActStateHandler(tam);
+				tam.SetActStateHandler(tamStateHandler);
 				
 				tam.ExecuteTransaction();
 
-				Assert.That(tam.isTransacting, Is.True);
+				Assert.That(tamStateHandler.isTransacting, Is.True);
 				}
 			[Test]
 			public void InnerUpdateFields_Always_SetsFields(){
 				TransactionManager tam = MakeTAM();
+					TAMActStateHandler tamStateHandler = new TAMActStateHandler(tam);
+					tam.SetActStateHandler(tamStateHandler);
 				ISlotSystemTransaction stubTA = Substitute.For<ISlotSystemTransaction>();
 					ISlotGroup stubSG1 = MakeSubSG();
 					ISlotGroup stubSG2 = MakeSubSG();
 					stubTA.sg1.Returns(stubSG1);
 					stubTA.sg2.Returns(stubSG2);
+				TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
+				tam.SetSGHandler(sgHandler);
 				
 				tam.UpdateFields(stubTA);
 
-				Assert.That(tam.sg1, Is.SameAs(stubSG1));
-				Assert.That(tam.sg2, Is.SameAs(stubSG2));
+				Assert.That(sgHandler.sg1, Is.SameAs(stubSG1));
+				Assert.That(sgHandler.sg2, Is.SameAs(stubSG2));
 				Assert.That(tam.transaction, Is.SameAs(stubTA));
 			}
 		}

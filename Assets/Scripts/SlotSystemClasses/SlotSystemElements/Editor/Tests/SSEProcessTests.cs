@@ -203,7 +203,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void SSEProcess_Fields_ByDefault_AreSetWithDefault(){
-				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
+				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 
@@ -213,7 +213,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SSEProcess_Start_WhenCalled_SetsIsRunningTrueAndCallsCoroutine(){
-				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
+				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 
@@ -224,7 +224,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SSEProcess_Stop_IsRunning_SetsIsRunningFalse(){
-				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
+				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 				proc.Start();
@@ -235,7 +235,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SSEProcess_Expire_IsRunning_SetsIsRunningFalse(){
-				ISSEStateHandler handler = Substitute.For<ISSEStateHandler>();
+				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
 				proc.Start();

@@ -5,7 +5,7 @@ using System;
 
 namespace SlotSystem{
 	public abstract class TransactionMNGProcess: SSEProcess, ITAMProcess {
-		public TransactionMNGProcess(ISSEStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
+		public TransactionMNGProcess(ISSESelStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
 		}
 		public ITransactionManager tam{
 			get{return (ITransactionManager)handler;}

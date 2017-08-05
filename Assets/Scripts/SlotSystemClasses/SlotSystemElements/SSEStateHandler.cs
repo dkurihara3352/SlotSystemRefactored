@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class SSEStateHandler : ISSEStateHandler {
+	public class SSESelStateHandler : ISSESelStateHandler {
 		/*	state	*/
 			public void ClearCurSelState(){
 				SetSelState(null);
@@ -161,7 +161,7 @@ namespace SlotSystem{
 				instantCommands.ExecuteInstantSelect();
 			}
 	}
-	public interface ISSEStateHandler{
+	public interface ISSESelStateHandler{
 		bool isSelStateNull{get;}
 		bool wasSelStateNull{get;}
 		void Deactivate();

@@ -99,14 +99,8 @@ namespace SlotSystem{
 			return taFactory.MakeTransaction(pickedSB, hovered);
 		}
 		public ITransactionFactory taFactory{
-			get{
-				if(m_taFactory == null)
-					m_taFactory = new TransactionFactory(tam);
-				return m_taFactory;
-			}
+			get{return tam.taFactory;}
 		}
-			ITransactionFactory m_taFactory;
-			public void SetTAFactory(ITransactionFactory taFac){m_taFactory = taFac;}
 		public Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{
 			get{
 					if(m_transactionResults == null)

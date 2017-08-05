@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 namespace SlotSystem{
 	public abstract class SGProcess: SSEProcess, ISGProcess{
-		public SGProcess(ISSEStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
+		public SGProcess(ISSESelStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
 		}
 		public ISlotGroup sg{
 			get{return (ISlotGroup)handler;}

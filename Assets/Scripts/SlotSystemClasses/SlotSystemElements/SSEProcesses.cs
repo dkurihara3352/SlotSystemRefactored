@@ -14,11 +14,11 @@ namespace SlotSystem{
 			set{m_coroutineFake = value;}
 		}
 			System.Func<IEnumeratorFake> m_coroutineFake;
-		public ISSEStateHandler handler{
+		public ISSESelStateHandler handler{
 			get{return m_handler;}
 			set{m_handler = value;}
 		}
-			ISSEStateHandler m_handler;
+			ISSESelStateHandler m_handler;
 		public virtual void Start(){
 			m_isRunning = true;
 			m_coroutineFake();
@@ -36,7 +36,7 @@ namespace SlotSystem{
 				return this.GetType().Equals(other.GetType());
 			else return false;
 		}
-		public SSEProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutine){
+		public SSEProcess(ISSESelStateHandler handler, System.Func<IEnumeratorFake> coroutine){
 			m_handler = handler;
 			m_coroutineFake = coroutine;
 		}
@@ -44,7 +44,7 @@ namespace SlotSystem{
 	public interface ISSEProcess: IEquatable<ISSEProcess>{
 		bool isRunning{get;}
 		System.Func<IEnumeratorFake> coroutineFake{get; set;}
-		ISSEStateHandler handler{get;}
+		ISSESelStateHandler handler{get;}
 		void Start();
 		void Stop();
 		void Expire();
@@ -105,7 +105,7 @@ namespace SlotSystem{
 	}
 	/* SelProces */
 	public abstract class SSESelProcess: SSEProcess, ISSESelProcess{
-		public SSESelProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutine): base(handler, coroutine){
+		public SSESelProcess(ISSESelStateHandler handler, System.Func<IEnumeratorFake> coroutine): base(handler, coroutine){
 		}
 	}
 	public interface ISSESelProcess: ISSEProcess{
@@ -114,7 +114,7 @@ namespace SlotSystem{
 		/* 	Change color, alpha etc from whatever to deactivated value (probably make it disappear)
 			if any indicator for selection is there, fade it out
 		*/
-		public SSEDeactivateProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
+		public SSEDeactivateProcess(ISSESelStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 	public class SSEFocusProcess: SSESelProcess{
@@ -122,7 +122,7 @@ namespace SlotSystem{
 			if its hidden, make it appear gradually
 			if any indicator for selection is there, fade it out
 		*/
-		public SSEFocusProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
+		public SSEFocusProcess(ISSESelStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 	public class SSEDefocusProcess: SSESelProcess{
@@ -130,7 +130,7 @@ namespace SlotSystem{
 			if its hidden, make it appear gradually
 			if any indicator for selection is there, fade it out
 		*/
-		public SSEDefocusProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
+		public SSEDefocusProcess(ISSESelStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 	public class SSESelectProcess: SSESelProcess{
@@ -138,7 +138,7 @@ namespace SlotSystem{
 			if its hidden, make it appear gradually
 			if any indicator for selection is not there, fade it in
 		*/
-		public SSESelectProcess(ISSEStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
+		public SSESelectProcess(ISSESelStateHandler handler, System.Func<IEnumeratorFake> coroutineMock): base(handler, coroutineMock){
 		}
 	}
 }

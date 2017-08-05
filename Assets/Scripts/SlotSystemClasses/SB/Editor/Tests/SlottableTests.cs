@@ -22,7 +22,7 @@ namespace SlotSystemTests{
 						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(false);
 						sb.SetTACache(stubTAC);
 						sb.SetHoverable(stubHoverable);
-						SSEStateHandler handler = new SSEStateHandler();
+						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
 					
 					sb.Activate();
@@ -37,7 +37,7 @@ namespace SlotSystemTests{
 						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(true);
 						sb.SetTACache(stubTAC);
 						sb.SetHoverable(stubHoverable);
-						SSEStateHandler handler = new SSEStateHandler();
+						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
 					
 					sb.Activate();
@@ -125,7 +125,7 @@ namespace SlotSystemTests{
 						ISlotGroup sg = MakeSubSG();
 						ssm.FindParent(sb).Returns(sg);
 					sb.SetSSM(ssm);
-					SSEStateHandler handler = new SSEStateHandler();
+					SSESelStateHandler handler = new SSESelStateHandler();
 					sb.SetSelStateHandler(handler);
 
 					sb.InitializeStates();
@@ -139,16 +139,24 @@ namespace SlotSystemTests{
 					Assert.That(sb.isUnmarked, Is.True);
 					Assert.That(sb.wasMrkStateNull, Is.True);
 					}
-				[Test]
-				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
+				Slottable MakeSBForPickUp(){
 					Slottable sb = MakeSB();
 						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
 						sb.SetTAM(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetTACache(stubTAC);
-						SSEStateHandler handler = new SSEStateHandler();
-						sb.SetSelStateHandler(handler);
-						sb.Focus();
+						SSESelStateHandler selStateHd = new SSESelStateHandler();
+						sb.SetSelStateHandler(selStateHd);
+						ITransactionIconHandler iconHd = MakeSubIconHandler();
+						sb.SetIconHandler(iconHd);
+						ITAMActStateHandler tamStateHandler = MakeSubTAMStateHandler();
+						sb.SetTAMStateHandler(tamStateHandler);
+					return sb;
+				}
+				[Test]
+				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
+					Slottable sb = MakeSBForPickUp();
+					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
@@ -158,33 +166,35 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedAmountOne(){
-					Slottable sb = MakeSB();
-						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-						sb.SetTAM(stubTAM);
-						ITransactionCache stubTAC = MakeSubTAC();
-						sb.SetTACache(stubTAC);
-						SSEStateHandler handler = new SSEStateHandler();
-						sb.SetSelStateHandler(handler);
-						sb.Focus();
+					Slottable sb = MakeSBForPickUp();
+					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
 					sb.PickUp();
 
 					Assert.That(sb.pickedAmount, Is.EqualTo(1));
-					}
+				}
+				Slottable MakeSBforIncrement(InventoryItemInstance item){
+					Slottable sb = MakeSB();
+						ISlotSystemManager ssm = MakeSubSSM();
+						ITransactionManager stubTAM = MakeSubTAM();
+						ITransactionCache stubTAC = MakeSubTAC();
+						sb.SetSSM(ssm);
+						sb.SetTAM(stubTAM);
+						sb.SetTACache(stubTAC);
+						SSESelStateHandler selStateHandler = new SSESelStateHandler();
+						sb.SetSelStateHandler(selStateHandler);
+						ITransactionIconHandler subIconHd = MakeSubIconHandler();
+						sb.SetIconHandler(subIconHd);
+						ITAMActStateHandler tamStateHandler = MakeSubTAMStateHandler();
+						sb.SetTAMStateHandler(tamStateHandler);
+						sb.SetItem(item);
+					return sb;
+				}
 				[TestCaseSource(typeof(IncrementCases))]
 				public void Increment_StackableToMoreThanQuantityAndValidPrevActStateAndIsActivated_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
-					Slottable sb = MakeSB();
-					sb.SetItem(item);
-					ISlotSystemManager ssm = MakeSubSSM();
-					ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-					ITransactionCache stubTAC = MakeSubTAC();
-					sb.SetSSM(ssm);
-					sb.SetTAM(stubTAM);
-					sb.SetTACache(stubTAC);
-					SSEStateHandler handler = new SSEStateHandler();
-					sb.SetSelStateHandler(handler);
+					Slottable sb = MakeSBforIncrement(item);
 					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -212,17 +222,8 @@ namespace SlotSystemTests{
 					}
 				[TestCaseSource(typeof(IncrementNonStackableCases))]
 				public void Increment_NonStackableAndAfterSSMAndIsActivatedAndFromValidPrevActState_DoesNotIncrement(InventoryItemInstance item){
-					Slottable sb = MakeSB();
-					ISlotSystemManager ssm = MakeSubSSM();
-					ITransactionManager stubTAM = MakeSubTAM();
-					ITransactionCache stubTAC = MakeSubTAC();
-					sb.SetSSM(ssm);
-					sb.SetTAM(stubTAM);
-					sb.SetTACache(stubTAC);
-					SSEStateHandler handler = new SSEStateHandler();
-					sb.SetSelStateHandler(handler);
+					Slottable sb = MakeSBforIncrement(item);
 					sb.Focus();
-					sb.SetItem(item);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 

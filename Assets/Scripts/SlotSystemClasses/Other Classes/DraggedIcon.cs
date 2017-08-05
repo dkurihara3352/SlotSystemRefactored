@@ -14,17 +14,17 @@ namespace SlotSystem{
 				IconDestination newDest = new IconDestination(sg, slot);
 				m_dest = newDest;
 			}
-		ITransactionManager tam;
+		ITransactionIconHandler iconHandler;
 		public ISlottable sb{
 			get{return m_sb;}
 			}ISlottable m_sb;
-		public DraggedIcon(ISlottable sb, ITransactionManager tam){
+		public DraggedIcon(ISlottable sb, ITransactionIconHandler iconHandler){
 			m_sb = sb;
 			m_item = this.sb.item;
-			this.tam = tam;
+			this.iconHandler = iconHandler;
 		}
 		public void CompleteMovement(){
-			tam.AcceptDITAComp(this);
+			iconHandler.AcceptDITAComp(this);
 		}
 	}
 }
