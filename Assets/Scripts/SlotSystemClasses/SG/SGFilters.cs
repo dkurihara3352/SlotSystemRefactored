@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public interface SGFilter{
-		void Filter(ref List<SlottableItem> items);
+		void Filter(ref List<InventoryItemInstance> items);
 	}
 		public class SGNullFilter: SGFilter{
-			public void Filter(ref List<SlottableItem> items){}
+			public void Filter(ref List<InventoryItemInstance> items){}
 		}
 		public class SGBowFilter: SGFilter{
-			public void Filter(ref List<SlottableItem> items){
-				List<SlottableItem> res = new List<SlottableItem>();
-				foreach(SlottableItem item in items){
+			public void Filter(ref List<InventoryItemInstance> items){
+				List<InventoryItemInstance> res = new List<InventoryItemInstance>();
+				foreach(InventoryItemInstance item in items){
 					if(item is BowInstance)
 						res.Add(item);
 				}
@@ -20,9 +20,9 @@ namespace SlotSystem{
 			}
 		}
 		public class SGWearFilter: SGFilter{
-			public void Filter(ref List<SlottableItem> items){
-				List<SlottableItem> res = new List<SlottableItem>();
-				foreach(SlottableItem item in items){
+			public void Filter(ref List<InventoryItemInstance> items){
+				List<InventoryItemInstance> res = new List<InventoryItemInstance>();
+				foreach(InventoryItemInstance item in items){
 					if(item is WearInstance)
 						res.Add(item);
 				}
@@ -30,9 +30,9 @@ namespace SlotSystem{
 			}
 		}
 		public class SGCGearsFilter: SGFilter{
-			public void Filter(ref List<SlottableItem> items){
-				List<SlottableItem> res = new List<SlottableItem>();
-				foreach(SlottableItem item in items){
+			public void Filter(ref List<InventoryItemInstance> items){
+				List<InventoryItemInstance> res = new List<InventoryItemInstance>();
+				foreach(InventoryItemInstance item in items){
 					if(item is CarriedGearInstance)
 						res.Add(item);
 				}
@@ -40,9 +40,9 @@ namespace SlotSystem{
 			}
 		}
 		public class SGPartsFilter: SGFilter{
-			public void Filter(ref List<SlottableItem> items){
-				List<SlottableItem> res = new List<SlottableItem>();
-				foreach(SlottableItem item in items){
+			public void Filter(ref List<InventoryItemInstance> items){
+				List<InventoryItemInstance> res = new List<InventoryItemInstance>();
+				foreach(InventoryItemInstance item in items){
 					if(item is PartsInstance)
 						res.Add(item);
 				}

@@ -4325,7 +4325,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), new SGItemIDSorter() , initSlotsCount);
 					
-					sg.InitSlots(new List<SlottableItem>());
+					sg.InitSlots(new List<InventoryItemInstance>());
 
 					int actual = sg.slots.Count;
 
@@ -4339,7 +4339,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						sg.InspectorSetUp(new GenericInventory(), new SGNullFilter(), new SGItemIDSorter() , 0);
 					
-					sg.InitSlots(new List<SlottableItem>(new SlottableItem[itemsCount]));
+					sg.InitSlots(new List<InventoryItemInstance>(new InventoryItemInstance[itemsCount]));
 
 					int actual = sg.slots.Count;
 
@@ -4348,7 +4348,7 @@ namespace SlotSystemTests{
 						Assert.That(slot.sb, Is.Null);
 					}
 				[TestCaseSource(typeof(InitSBs_SlotsNotEnoughCases))]
-				public void InitSBs_SlotsNotEnough_RemoveNonFittableItems(List<Slot> slots, List<SlottableItem> items, List<SlottableItem> expected){
+				public void InitSBs_SlotsNotEnough_RemoveNonFittableItems(List<Slot> slots, List<InventoryItemInstance> items, List<InventoryItemInstance> expected){
 					SlotGroup sg = MakeSG();
 						sg.SetSlots(slots);
 					
@@ -4360,21 +4360,21 @@ namespace SlotSystemTests{
 					class InitSBs_SlotsNotEnoughCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							List<Slot> slots = CreateSlots(4);
-							List<SlottableItem> items;
+							List<InventoryItemInstance> items;
 								BowInstance bowA = MakeBowInstance(0);
 								BowInstance bowA_1 = MakeBowInstance(0);
 								BowInstance bowA_2 = MakeBowInstance(0);
 								WearInstance wear = MakeWearInstance(0);
 								ShieldInstance shield = MakeShieldInstance(0);
 								MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
-								items = new List<SlottableItem>(new SlottableItem[]{bowA, bowA_1, bowA_2, wear, shield, mWeapon});
-							List<SlottableItem> expected = new List<SlottableItem>(new SlottableItem[]{bowA, bowA_1, bowA_2, wear});
+								items = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowA_1, bowA_2, wear, shield, mWeapon});
+							List<InventoryItemInstance> expected = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowA_1, bowA_2, wear});
 							yield return new object[]{slots, items, expected};
 
 						}
 					}
 				[TestCaseSource(typeof(InitSBs_AlwaysCases))]
-				public void InitSBs_Always_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<SlottableItem> items){
+				public void InitSBs_Always_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<InventoryItemInstance> items){
 					SlotGroup sg = MakeSGWithSelStateHandler();
 						sg.SetSSM(ssm);
 						sg.SetSlots(slots);
@@ -4394,12 +4394,12 @@ namespace SlotSystemTests{
 						public IEnumerator GetEnumerator(){
 							ISlotSystemManager ssm = MakeSubSSM();
 							List<Slot> slots = CreateSlots(4);
-							List<SlottableItem> items;
+							List<InventoryItemInstance> items;
 								BowInstance bowA = MakeBowInstance(0);
 								BowInstance bowB = MakeBowInstance(1);
 								BowInstance bowC = MakeBowInstance(2);
 								BowInstance bowD = MakeBowInstance(3);
-								items = new List<SlottableItem>(new SlottableItem[]{bowA, bowB, bowC, bowD});
+								items = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowB, bowC, bowD});
 							yield return new object[]{
 								ssm, slots, items
 							};

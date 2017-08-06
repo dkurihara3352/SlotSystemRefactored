@@ -52,7 +52,7 @@ namespace SlotSystem{
 	public class SGInitItemsCommand: SGCommand,ISGInitItemsCommand{
 		public SGInitItemsCommand(ISlotGroup sg): base(sg){}
 		public override void Execute(){
-			List<SlottableItem> items = new List<SlottableItem>(sg.inventory);
+			List<InventoryItemInstance> items = new List<InventoryItemInstance>(sg.inventory);
 			items = sg.FilterItem(items);
 			sg.InitSlots(items);
 			sg.InitSBs(items);

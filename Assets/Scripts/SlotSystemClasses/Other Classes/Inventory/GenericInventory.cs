@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class GenericInventory: Inventory{
-		public IEnumerator<SlottableItem> GetEnumerator(){
-			foreach(SlottableItem item in items){
+		public IEnumerator<InventoryItemInstance> GetEnumerator(){
+			foreach(InventoryItemInstance item in items){
 				yield return item;
 			}
 			}IEnumerator IEnumerable.GetEnumerator(){
@@ -15,17 +15,17 @@ namespace SlotSystem{
 		public int count{
 			get{return items.Count;}
 		}
-		public bool Contains(SlottableItem item){
+		public bool Contains(InventoryItemInstance item){
 			return items.Contains(item);
 		}
-		public SlottableItem this[int i]{
+		public InventoryItemInstance this[int i]{
 			get{return items[i];}
 		}
-		List<SlottableItem> items = new List<SlottableItem>();
-		public void Add(SlottableItem item){
+		List<InventoryItemInstance> items = new List<InventoryItemInstance>();
+		public void Add(InventoryItemInstance item){
 			items.Add(item);
 		}
-		public void Remove(SlottableItem item){
+		public void Remove(InventoryItemInstance item){
 			items.Remove(item);
 		}
 		public ISlotGroup sg{

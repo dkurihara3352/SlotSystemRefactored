@@ -4,31 +4,31 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class PoolInventory: IPoolInventory{
-		public IEnumerator<SlottableItem> GetEnumerator(){
-			foreach(SlottableItem item in m_items){
+		public IEnumerator<InventoryItemInstance> GetEnumerator(){
+			foreach(InventoryItemInstance item in m_items){
 				yield return item;
 			}
 			}IEnumerator IEnumerable.GetEnumerator(){
 				return GetEnumerator();
 			}
-		public bool Contains(SlottableItem item){
+		public bool Contains(InventoryItemInstance item){
 			return m_items.Contains(item);
 		}
 		public int count{
 			get{return m_items.Count;}
 		}
-		public SlottableItem this[int i]{
+		public InventoryItemInstance this[int i]{
 			get{return m_items[i];}
 		}
-		List<SlottableItem> m_items = new List<SlottableItem>();
+		List<InventoryItemInstance> m_items = new List<InventoryItemInstance>();
 		public ISlotGroup sg{get{return m_sg;}}
 			ISlotGroup m_sg;
 			public void SetSG(ISlotGroup sg){
 				m_sg = sg;
 			}
-		public void Add(SlottableItem item){
+		public void Add(InventoryItemInstance item){
 			if(item != null){
-				foreach(SlottableItem it in m_items){
+				foreach(InventoryItemInstance it in m_items){
 					InventoryItemInstance invInst = (InventoryItemInstance)it;
 					InventoryItemInstance addedInst = (InventoryItemInstance)item;
 					if(object.ReferenceEquals(invInst, addedInst))
@@ -43,10 +43,10 @@ namespace SlotSystem{
 			}else
 			throw new System.ArgumentNullException();
 		}
-		public void Remove(SlottableItem item){
+		public void Remove(InventoryItemInstance item){
 			if(item != null){
-				SlottableItem itemToRemove = null;
-				foreach(SlottableItem it in m_items){
+				InventoryItemInstance itemToRemove = null;
+				foreach(InventoryItemInstance it in m_items){
 					InventoryItemInstance checkedInst = (InventoryItemInstance)it;
 					InventoryItemInstance removedInst = (InventoryItemInstance)item;
 					if(checkedInst == removedInst){

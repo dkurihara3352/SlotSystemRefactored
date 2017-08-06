@@ -5,8 +5,8 @@ using System;
 
 namespace SlotSystem{
 	public class EquipmentSetInventory: IEquipmentSetInventory{
-		public IEnumerator<SlottableItem> GetEnumerator(){
-			foreach(SlottableItem item in m_items){
+		public IEnumerator<InventoryItemInstance> GetEnumerator(){
+			foreach(InventoryItemInstance item in m_items){
 				yield return item;
 			}
 			}IEnumerator IEnumerable.GetEnumerator(){
@@ -18,8 +18,8 @@ namespace SlotSystem{
 			m_equippedCGears = initCGears;
 			SetEquippableCGearsCount(initCGCount);
 		}
-		public bool Contains(SlottableItem item){
-			foreach(SlottableItem it in this){
+		public bool Contains(InventoryItemInstance item){
+			foreach(InventoryItemInstance it in this){
 				if(it == item)
 					return true;
 			}
@@ -28,7 +28,7 @@ namespace SlotSystem{
 		public int count{
 			get{return m_items.Count;}
 		}
-		public SlottableItem this[int i]{
+		public InventoryItemInstance this[int i]{
 			get{return m_items[i];}
 		}
 		public ISlotGroup sg{get{return m_sg;}}
@@ -48,22 +48,22 @@ namespace SlotSystem{
 			sg.SetInitSlotsCount(num);
 		}
 		
-		protected List<SlottableItem> m_items{
+		protected List<InventoryItemInstance> m_items{
 			get{
-				List<SlottableItem> result = new List<SlottableItem>();
+				List<InventoryItemInstance> result = new List<InventoryItemInstance>();
 				if(m_equippedBow != null)
 					result.Add(m_equippedBow);
 				if(m_equippedWear != null)
 					result.Add(m_equippedWear);
 				if(m_equippedCGears.Count != 0){
 					foreach(CarriedGearInstance inst in m_equippedCGears){
-						result.Add((SlottableItem)inst);
+						result.Add((InventoryItemInstance)inst);
 					}
 				}
 				return result;
 			}
 		}
-		public void Add(SlottableItem item){
+		public void Add(InventoryItemInstance item){
 			if(item != null){
 				if(item is BowInstance){
 					BowInstance bowInst = (BowInstance)item;
@@ -82,7 +82,7 @@ namespace SlotSystem{
 			}else
 				throw new ArgumentNullException();
 		}
-		public void Remove(SlottableItem removedItem){
+		public void Remove(InventoryItemInstance removedItem){
 			if(removedItem != null){
 				if(removedItem is BowInstance){
 					if((BowInstance)removedItem == m_equippedBow)

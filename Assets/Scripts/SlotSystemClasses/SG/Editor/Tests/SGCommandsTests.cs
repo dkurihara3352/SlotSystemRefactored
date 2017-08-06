@@ -23,24 +23,21 @@ namespace SlotSystemTests{
 							BowInstance bow = MakeBowInstance(0);
 							WearInstance wear = MakeWearInstance(0);
 							items = new InventoryItemInstance[]{bow, wear};
-							stubInv.GetEnumerator().Returns(SlottableItemRator(items));
-						List<SlottableItem> list = new List<SlottableItem>(new SlottableItem[]{ bow, wear});
-						mockSG.FilterItem(Arg.Is<List<SlottableItem>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
+							stubInv.GetEnumerator().Returns(items.GetEnumerator());
+						List<InventoryItemInstance> list = new List<InventoryItemInstance>(new InventoryItemInstance[]{ bow, wear});
+						mockSG.FilterItem(Arg.Is<List<InventoryItemInstance>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
 				
 				comm.Execute();
 
 				Received.InOrder(() => {
-					mockSG.FilterItem(Arg.Is<List<SlottableItem>>(x => x.Contains(bow) && x.Contains(wear)));
-					mockSG.InitSlots(Arg.Is<List<SlottableItem>>(x => x.Contains(bow) && x.Contains(wear)));
-					mockSG.InitSBs(Arg.Is<List<SlottableItem>>(x => x.Contains(bow) && x.Contains(wear)));
+					mockSG.FilterItem(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
+					mockSG.InitSlots(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
+					mockSG.InitSBs(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
 					mockSG.SyncSBsToSlots();
 				});
 				mockSG.DidNotReceive().InstantSort();
 				}
-				IEnumerator<SlottableItem> SlottableItemRator(IEnumerable<InventoryItemInstance> items){
-					foreach(var item in items)
-						yield return (SlottableItem)item;
-				}
+
 			[Test]
 			public void SGInitItemsCommand_Execute_SGIsAutoSort_CallsSGInstantSort(){
 				ISlotGroup mockSG = MakeSubSG();

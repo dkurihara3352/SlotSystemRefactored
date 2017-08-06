@@ -15,9 +15,9 @@ namespace SlotSystemTests{
 		public class SGFilterTests: SlotSystemTest {
 
 			[TestCaseSource(typeof(SGFilterCases))]
-			public void SGFilter_Filter_WhenCalled_SetsItemsAccordingly(SGFilter targFilter, List<SlottableItem> targList, IEnumerable<SlottableItem> expected){
+			public void SGFilter_Filter_WhenCalled_SetsItemsAccordingly(SGFilter targFilter, List<InventoryItemInstance> targList, IEnumerable<InventoryItemInstance> expected){
 				SGFilter filter = targFilter;
-                List<SlottableItem> list = targList;
+                List<InventoryItemInstance> list = targList;
 
 				filter.Filter(ref list);
 
@@ -48,7 +48,7 @@ namespace SlotSystemTests{
 							PartsInstance partsA0_1 = MakePartsInstance(0, 1);
 							PartsInstance partsA1_1 = MakePartsInstance(0, 1);
 							PartsInstance partsA2_1 = MakePartsInstance(0, 1);
-							List<SlottableItem> list_1 = new List<SlottableItem>(new SlottableItem[]{
+							List<InventoryItemInstance> list_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
 								bowA0_1, bowA1_1, bowA2_1,
 								wearA0_1, wearA1_1, wearA2_1,
 								shieldA0_1, shieldA1_1, shieldA2_1,
@@ -57,7 +57,7 @@ namespace SlotSystemTests{
 								packA0_1, packA1_1, packA2_1,
 								partsA0_1, partsA1_1, partsA2_1
 							});
-							IEnumerable<SlottableItem> expected_1 = new SlottableItem[]{
+							IEnumerable<InventoryItemInstance> expected_1 = new InventoryItemInstance[]{
 								bowA0_1, bowA1_1, bowA2_1
 							};
 							bowFilter = new object[]{new SGBowFilter(), list_1, expected_1};
@@ -84,7 +84,7 @@ namespace SlotSystemTests{
 							PartsInstance partsA0_2 = MakePartsInstance(0, 1);
 							PartsInstance partsA1_2 = MakePartsInstance(0, 1);
 							PartsInstance partsA2_2 = MakePartsInstance(0, 1);
-							List<SlottableItem> list_2 = new List<SlottableItem>(new SlottableItem[]{
+							List<InventoryItemInstance> list_2 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
 								bowA0_2, bowA1_2, bowA2_2,
 								wearA0_2, wearA1_2, wearA2_2,
 								shieldA0_2, shieldA1_2, shieldA2_2,
@@ -93,7 +93,7 @@ namespace SlotSystemTests{
 								packA0_2, packA1_2, packA2_2,
 								partsA0_2, partsA1_2, partsA2_2
 							});
-							IEnumerable<SlottableItem> expected_2 = new SlottableItem[]{
+							IEnumerable<InventoryItemInstance> expected_2 = new InventoryItemInstance[]{
 								wearA0_2, wearA1_2, wearA2_2
 							};
 							wearFilter = new object[]{new SGWearFilter(), list_2, expected_2};
@@ -120,7 +120,7 @@ namespace SlotSystemTests{
 							PartsInstance partsA0_3 = MakePartsInstance(0, 1);
 							PartsInstance partsA1_3 = MakePartsInstance(0, 1);
 							PartsInstance partsA2_3 = MakePartsInstance(0, 1);
-							List<SlottableItem> list_3 = new List<SlottableItem>(new SlottableItem[]{
+							List<InventoryItemInstance> list_3 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
 								bowA0_3, bowA1_3, bowA2_3,
 								wearA0_3, wearA1_3, wearA2_3,
 								shieldA0_3, shieldA1_3, shieldA2_3,
@@ -129,7 +129,7 @@ namespace SlotSystemTests{
 								packA0_3, packA1_3, packA2_3,
 								partsA0_3, partsA1_3, partsA2_3
 							});
-							IEnumerable<SlottableItem> expected_3 = new SlottableItem[]{
+							IEnumerable<InventoryItemInstance> expected_3 = new InventoryItemInstance[]{
 								shieldA0_3, shieldA1_3, shieldA2_3,
 								mWeaponA0_3, mWeaponA1_3, mWeaponA2_3,
 								quiverA0_3, quiverA1_3, quiverA2_3,
@@ -159,7 +159,7 @@ namespace SlotSystemTests{
 							PartsInstance partsA0_4 = MakePartsInstance(0, 1);
 							PartsInstance partsA1_4 = MakePartsInstance(0, 1);
 							PartsInstance partsA2_4 = MakePartsInstance(0, 1);
-							List<SlottableItem> list_4 = new List<SlottableItem>(new SlottableItem[]{
+							List<InventoryItemInstance> list_4 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
 								bowA0_4, bowA1_4, bowA2_4,
 								wearA0_4, wearA1_4, wearA2_4,
 								shieldA0_4, shieldA1_4, shieldA2_4,
@@ -168,7 +168,7 @@ namespace SlotSystemTests{
 								packA0_4, packA1_4, packA2_4,
 								partsA0_4, partsA1_4, partsA2_4
 							});
-							IEnumerable<SlottableItem> expected_4 = new SlottableItem[]{
+							IEnumerable<InventoryItemInstance> expected_4 = new InventoryItemInstance[]{
 								partsA0_4, partsA1_4, partsA2_4
 							};
 							partsFilter = new object[]{new SGPartsFilter(), list_4, expected_4};

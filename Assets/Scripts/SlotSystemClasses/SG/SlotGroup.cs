@@ -324,7 +324,7 @@ namespace SlotSystem{
 			}
 				protected bool m_isAutoSort = true;
 		/*	filter	*/
-			public List<SlottableItem> FilterItem(List<SlottableItem> items){
+			public List<InventoryItemInstance> FilterItem(List<InventoryItemInstance> items){
 				filter.Filter(ref items);
 				return items;
 			}
@@ -665,7 +665,7 @@ namespace SlotSystem{
 					get{return commandsFactory.MakeOnActionCompleteCommand();}
 				}
 			public void UpdateEquipStatesOnAll(){
-				ssm.UpdateEquipStatesOnAll();
+				ssm.UpdateEquipInvAndAllSBsEquipState();
 			}
 			public void OnActionExecute(){
 				onActionExecuteCommand.Execute();
@@ -716,7 +716,7 @@ namespace SlotSystem{
 				public ISGCommand initItemsCommand{
 					get{return commandsFactory.MakeInitializeItemsCommand();}
 				}
-			public void InitSlots(List<SlottableItem> items){
+			public void InitSlots(List<InventoryItemInstance> items){
 				List<Slot> newSlots = new List<Slot>();
 				int slotCountToCreate = initSlotsCount == 0? items.Count: initSlotsCount;
 				for(int i = 0; i <slotCountToCreate; i++){
@@ -725,11 +725,11 @@ namespace SlotSystem{
 				}
 				SetSlots(newSlots);
 			}
-			public void InitSBs(List<SlottableItem> items){
+			public void InitSBs(List<InventoryItemInstance> items){
 				while(slots.Count < items.Count){
 					items.RemoveAt(slots.Count);
 				}
-				foreach(SlottableItem item in items){
+				foreach(InventoryItemInstance item in items){
 					GameObject newSBGO = new GameObject("newSBGO");
 					ISlottable newSB = newSBGO.AddComponent<Slottable>();
 					newSB.SetItem((InventoryItemInstance)item);
@@ -804,14 +804,14 @@ namespace SlotSystem{
 			void SetInitSlotsCount(int i);
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();
-			void InitSlots(List<SlottableItem> items);
-			void InitSBs(List<SlottableItem> items);
+			void InitSlots(List<InventoryItemInstance> items);
+			void InitSBs(List<InventoryItemInstance> items);
 		/*	Sorter	*/
 			void SetSorter(SGSorter sorter);
 			void InstantSort();
 			bool isAutoSort{get;}
 		/*	Filter	*/
-			List<SlottableItem> FilterItem(List<SlottableItem> items);
+			List<InventoryItemInstance> FilterItem(List<InventoryItemInstance> items);
 			SGFilter filter{get;}
 			bool AcceptsFilter(ISlottable pickedSB);
 		/*	Transaction	*/
