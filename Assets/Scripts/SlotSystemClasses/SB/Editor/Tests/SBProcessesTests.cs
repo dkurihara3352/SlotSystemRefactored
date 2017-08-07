@@ -7,9 +7,8 @@ using System.Collections.Generic;
 using NSubstitute;
 
 namespace SlotSystemTests{
-	namespace SBTests{
+	namespace SlottableTests{
 		[TestFixture]
-		[Category("SB")]
 		public class SBProcessesTests: SlotSystemTest{
 			[Test]
 			public void WaitForPickUpProcess_Expire_WhenCalled_CallsSBPickUp(){

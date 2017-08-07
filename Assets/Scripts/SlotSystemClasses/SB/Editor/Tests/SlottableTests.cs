@@ -1,49 +1,17 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using NUnit.Framework;
-using SlotSystem;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System;
-using Utility;
+using NUnit.Framework;
 using NSubstitute;
+using SlotSystem;
+using Utility;
 
 namespace SlotSystemTests{
-	namespace ElementsTests{
+	namespace SlottableTests{
 		[TestFixture]
-		[Category("SB")]
 		public class SlottableTests: SlotSystemTest {
-			/* States */
-				[Test]
-				public void Activate_SSMIsTAResultRevertForFalse_SetIsFocused(){
-					Slottable sb = MakeSB();
-						ITransactionCache stubTAC = MakeSubTAC();
-						IHoverable stubHoverable = Substitute.For<IHoverable>();
-						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(false);
-						sb.SetTACache(stubTAC);
-						sb.SetHoverable(stubHoverable);
-						SSESelStateHandler handler = new SSESelStateHandler();
-						sb.SetSelStateHandler(handler);
-					
-					sb.Activate();
-
-					Assert.That(sb.isFocused, Is.True);
-				}
-				[Test]
-				public void Activate_SSMIsTAResultRevertForTrue_SetIsDefocused(){
-					Slottable sb = MakeSB();
-						ITransactionCache stubTAC = MakeSubTAC();
-						IHoverable stubHoverable = Substitute.For<IHoverable>();
-						stubTAC.IsCachedTAResultRevert(stubHoverable).Returns(true);
-						sb.SetTACache(stubTAC);
-						sb.SetHoverable(stubHoverable);
-						SSESelStateHandler handler = new SSESelStateHandler();
-						sb.SetSelStateHandler(handler);
-					
-					sb.Activate();
-
-					Assert.That(sb.isDefocused, Is.True);
-				}
 			/*	Process	*/
 				/*	ActProc	*/
 					[Test]
@@ -125,8 +93,8 @@ namespace SlotSystemTests{
 						ISlotGroup sg = MakeSubSG();
 						ssm.FindParent(sb).Returns(sg);
 					sb.SetSSM(ssm);
-					SSESelStateHandler handler = new SSESelStateHandler();
-					sb.SetSelStateHandler(handler);
+					SBSelStateHandler selStateHandler = new SBSelStateHandler(sb);
+					sb.SetSelStateHandler(selStateHandler);
 
 					sb.InitializeStates();
 
@@ -139,20 +107,6 @@ namespace SlotSystemTests{
 					Assert.That(sb.isUnmarked, Is.True);
 					Assert.That(sb.wasMrkStateNull, Is.True);
 					}
-				Slottable MakeSBForPickUp(){
-					Slottable sb = MakeSB();
-						ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-						sb.SetTAM(stubTAM);
-						ITransactionCache stubTAC = MakeSubTAC();
-						sb.SetTACache(stubTAC);
-						SSESelStateHandler selStateHd = new SSESelStateHandler();
-						sb.SetSelStateHandler(selStateHd);
-						ITransactionIconHandler iconHd = MakeSubIconHandler();
-						sb.SetIconHandler(iconHd);
-						ITAMActStateHandler tamStateHandler = MakeSubTAMStateHandler();
-						sb.SetTAMStateHandler(tamStateHandler);
-					return sb;
-				}
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
 					Slottable sb = MakeSBForPickUp();
@@ -183,7 +137,7 @@ namespace SlotSystemTests{
 						sb.SetSSM(ssm);
 						sb.SetTAM(stubTAM);
 						sb.SetTACache(stubTAC);
-						SSESelStateHandler selStateHandler = new SSESelStateHandler();
+						SBSelStateHandler selStateHandler = new SBSelStateHandler(sb);
 						sb.SetSelStateHandler(selStateHandler);
 						ITransactionIconHandler subIconHd = MakeSubIconHandler();
 						sb.SetIconHandler(subIconHd);
@@ -192,56 +146,17 @@ namespace SlotSystemTests{
 						sb.SetItem(item);
 					return sb;
 				}
-				[TestCaseSource(typeof(IncrementCases))]
-				public void Increment_StackableToMoreThanQuantityAndValidPrevActStateAndIsActivated_IncrementsPickedAmountUpToQuanityNoMoreThanQuantity(InventoryItemInstance item, int expected){
-					Slottable sb = MakeSBforIncrement(item);
+				[Test]
+				public void Increment_Always_SetsIsPickingUp(){
+					Slottable sb = MakeSBForPickUp();
 					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 
-					for(int i =0; i< expected *2; i++){
-						sb.Increment();
-					}
+					sb.Increment();
 
-					Assert.That(sb.pickedAmount, Is.EqualTo(expected));
-					}
-					class IncrementCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							object[] case1 = new object[]{
-								MakePartsInstance(0, 2),
-								2
-							};
-							yield return case1;
-
-							object[] case2 = new object[]{
-								MakePartsInstance(0, 10),
-								10
-							};
-							yield return case2;
-						}
-					}
-				[TestCaseSource(typeof(IncrementNonStackableCases))]
-				public void Increment_NonStackableAndAfterSSMAndIsActivatedAndFromValidPrevActState_DoesNotIncrement(InventoryItemInstance item){
-					Slottable sb = MakeSBforIncrement(item);
-					sb.Focus();
-					sb.WaitForAction();
-					sb.WaitForPickUp();
-
-					for(int i = 0; i < 10; i++)
-						sb.Increment();
-
-					Assert.That(sb.pickedAmount, Is.EqualTo(0));
-					}
-					class IncrementNonStackableCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							yield return MakeBowInstance(0);
-							yield return MakeWearInstance(0);
-							yield return MakeShieldInstance(0);
-							yield return MakeMeleeWeaponInstance(0);
-							yield return MakeQuiverInstance(0);
-							yield return MakePackInstance(0);
-						}
-					}
+					Assert.That(sb.isPickingUp, Is.True);
+				}
 				[Test]
 				public void ExecuteTransaction_WhenCalled_CallsSSMExecuteTransaction(){
 					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
@@ -265,10 +180,10 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void UpdateEquipState_ItemInstIsEquipped_SetsSBEquipped(){
-					Slottable testSB = MakeSB();
+					Slottable testSB = MakeSB_ItemHandler();
 					BowInstance stubBow = MakeBowInstance(0);
-					stubBow.isEquipped = true;
-					testSB.SetItem(stubBow);
+						stubBow.isEquipped = true;
+						testSB.itemHandler.item.Returns(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
 					ISlotSystemManager stubSSM = MakeSubSSM();
 					stubSSM.FindParent(testSB).Returns(stubSG);
@@ -280,10 +195,10 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void UpdateEquipState_ItemInstIsNotEquipped_SetsSBUnequipped(){
-					Slottable testSB = MakeSB();
+					Slottable testSB = MakeSB_ItemHandler();
 					BowInstance stubBow = MakeBowInstance(0);
-					stubBow.isEquipped = false;
-					testSB.SetItem(stubBow);
+						stubBow.isEquipped = false;
+						testSB.itemHandler.item.Returns(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
 					ISlotSystemManager stubSSM = MakeSubSSM();
 					stubSSM.FindParent(testSB).Returns(stubSG);
@@ -295,7 +210,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsActStateWFAState(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_ItemHandler();
 					
 					((ISlottable)sb).Refresh();
 
@@ -303,7 +218,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsPickedAmountZero(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_ItemHandler();
 					sb.pickedAmount = 10;
 					((ISlottable)sb).Refresh();
 
@@ -311,7 +226,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsNewSlotIDMinus2(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_ItemHandler();
 					sb.SetNewSlotID(3);
 					((ISlottable)sb).Refresh();
 
@@ -319,15 +234,15 @@ namespace SlotSystemTests{
 					}
 				[TestCaseSource(typeof(ShareSGAndItemCases))]
 				public void ShareSGAndItem_VariousCombo_ReturnsAccordingly(ISlotGroup sg, ISlotGroup otherSG, InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
-					Slottable sb = MakeSB();
-					Slottable otherSB = MakeSB();
+					Slottable sb = MakeSB_ItemHandler();
+					Slottable otherSB = MakeSB_ItemHandler();
 					ISlotSystemManager stubSSM = MakeSubSSM();
 					sb.SetSSM(stubSSM);
 					otherSB.SetSSM(stubSSM);
 					stubSSM.FindParent(sb).Returns(sg);
 					stubSSM.FindParent(otherSB).Returns(otherSG);
-					sb.SetItem(iInst);
-					otherSB.SetItem(otherIInst);
+					sb.itemHandler.item.Returns(iInst);
+					otherSB.itemHandler.item.Returns(otherIInst);
 
 					Assert.That(sb.ShareSGAndItem(otherSB), Is.EqualTo(expected));
 					}
@@ -387,8 +302,26 @@ namespace SlotSystemTests{
 			/*	helper	*/
 				Slottable MakeSB_TACache(){
 					Slottable sb = MakeSB();
-					ITransactionCache taCache = Substitute.For<ITransactionCache>();
-					sb.SetTACache(taCache);
+						ITransactionCache taCache = Substitute.For<ITransactionCache>();
+						sb.SetTACache(taCache);
+					return sb;
+				}
+				Slottable MakeSB_ItemHandler(){
+					Slottable sb = MakeSB();
+						IItemHandler itemHandler = Substitute.For<IItemHandler>();
+						sb.SetItemHandler(itemHandler);
+					return sb;
+				}
+				Slottable MakeSBForPickUp(){
+					Slottable sb = MakeSB();
+						IItemHandler itemHandler = Substitute.For<IItemHandler>();
+						sb.SetItemHandler(itemHandler);
+						ITransactionCache taCache = Substitute.For<ITransactionCache>();
+						sb.SetTACache(taCache);
+						ITAMActStateHandler tamStateHandler = Substitute.For<ITAMActStateHandler>();
+						sb.SetTAMStateHandler(tamStateHandler);
+						ITransactionIconHandler iconHandler = Substitute.For<ITransactionIconHandler>();
+						sb.SetIconHandler(iconHandler);
 					return sb;
 				}
 				ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){

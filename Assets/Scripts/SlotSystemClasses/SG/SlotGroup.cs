@@ -16,15 +16,15 @@ namespace SlotSystem{
 				ISSESelStateHandler _selStateHandler;
 			ISGActStateHandler actStateHandler{
 				get{
-					if(_sgStateHandler != null)
-						return _sgStateHandler;
+					if(_actStateHandler != null)
+						return _actStateHandler;
 					else
 						throw new System.InvalidOperationException("sgStateHandler not set");
 				}
 			}
-				ISGActStateHandler _sgStateHandler;
+				ISGActStateHandler _actStateHandler;
 			public void SetSGActStateHandler(ISGActStateHandler handler){
-				_sgStateHandler = handler;
+				_actStateHandler = handler;
 			}
 			public void ClearCurActState(){
 				actStateHandler.ClearCurActState();
@@ -550,7 +550,9 @@ namespace SlotSystem{
 				newSB.SetTACache(taCache);
 				SBSelStateHandler stateHandler = new SBSelStateHandler(newSB);
 				newSB.SetSelStateHandler(stateHandler);
-				newSB.SetItem(item);
+				ItemHandler itemHandler = new ItemHandler();
+					itemHandler.SetItem(item);
+				newSB.SetItemHandler(itemHandler);
 				newSB.SetSSM(ssm);
 				newSB.Defocus();
 				return newSB;

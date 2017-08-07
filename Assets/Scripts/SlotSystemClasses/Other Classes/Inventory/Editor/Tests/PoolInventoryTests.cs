@@ -26,7 +26,7 @@ namespace SlotSystemTests{
 							InventoryItemInstance itemInst = (InventoryItemInstance)item;
 							Assert.That(itemInst.quantity, Is.EqualTo(1));
 						}
-						}
+					}
 						class AddNonStackableCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
 								object[] addNonStackables;
@@ -42,7 +42,6 @@ namespace SlotSystemTests{
 									yield return addNonStackables;
 							}
 						}
-					
 					[TestCaseSource(typeof(AddSameStackableCases))]
 					public void Add_SameStackableDiffInsts_IncreasesQuantity(IEnumerable<InventoryItemInstance> addedItems, List<InventoryItemInstance> expected){
 						PoolInventory poolInv = MakePoolInventory();

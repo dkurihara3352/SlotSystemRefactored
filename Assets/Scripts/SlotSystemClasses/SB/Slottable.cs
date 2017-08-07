@@ -7,15 +7,21 @@ using Utility;
 namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
 		/*	States	*/
+			public override void InitializeStates(){
+				selStateHandler.InitializeStates();
+				WaitForAction();
+				ClearCurEqpState();
+				Unmark();
+			}
 			/* Selection */
-				public override ISSESelStateHandler selStateHandler{
-					get{
-						if(_selStateHandler == null)
-							_selStateHandler = new SBSelStateHandler(this);
-						return _selStateHandler;
-					}
+			public override ISSESelStateHandler selStateHandler{
+				get{
+					if(_selStateHandler == null)
+						_selStateHandler = new SBSelStateHandler(this);
+					return _selStateHandler;
 				}
-					ISSESelStateHandler _selStateHandler;
+			}
+				ISSESelStateHandler _selStateHandler;
 			/*	Action State	*/
 				ISSEStateEngine<ISBActState> actStateEngine{
 					get{
@@ -405,17 +411,20 @@ namespace SlotSystem{
 			}
 		/*	public fields	*/
 			/* Item Handling */
-				IItemHandler itemHandler{
+				public IItemHandler itemHandler{
 					get{
-						if(m_itemHandler == null)
-							m_itemHandler = new ItemHandler();
-						return m_itemHandler;
+						if(_itemHandler != null)
+							return _itemHandler;
+						else throw new InvalidOperationException("itemHandler not set");
 					}
 				}
-					IItemHandler m_itemHandler;
+					IItemHandler _itemHandler;
+				public void SetItemHandler(IItemHandler itemHandler){
+					_itemHandler = itemHandler;
+				}
 				public void Increment(){
 					SetActState(pickedUpState);
-					itemHandler.IncreasePickedAmountWithinQuanity();
+					itemHandler.Increment();
 				}
 				public InventoryItemInstance item{
 					get{return itemHandler.item;}
@@ -626,7 +635,7 @@ namespace SlotSystem{
 				hoverable.OnHoverExit();
 			}
 	}
-	public interface ISlottable: ISlotSystemElement, IHoverable{
+	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler{
 		/*	States and Processes	*/
 			/* States */
 				/* ActStates */
@@ -715,14 +724,7 @@ namespace SlotSystem{
 			void OnDeselected(PointerEventDataFake eventDataMock);
 			void OnEndDrag(PointerEventDataFake eventDataMock);
 		/* Item Handling */
-			void Increment();
-			void SetItem(InventoryItemInstance item);
-			InventoryItemInstance item{get;}
 			void UpdateEquipState();
-			bool isStackable{get;}
-			int pickedAmount{get;set;}
-			int quantity{get;}
-			void SetQuantity(int quant);
 		/* SG And Slot */
 			ISlotGroup sg{get;}
 			bool isPool{get;}

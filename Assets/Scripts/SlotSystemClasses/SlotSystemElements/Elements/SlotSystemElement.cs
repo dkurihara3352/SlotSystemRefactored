@@ -65,7 +65,7 @@ namespace SlotSystem{
 			public void Deselect(){
 				selStateHandler.Deselect();
 			}
-			public void InitializeStates(){
+			public virtual void InitializeStates(){
 				selStateHandler.InitializeStates();
 			}
 			public void SetAndRunSelProcess(ISSESelProcess process){

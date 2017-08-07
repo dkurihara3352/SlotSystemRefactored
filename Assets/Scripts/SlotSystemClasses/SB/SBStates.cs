@@ -11,7 +11,6 @@ namespace SlotSystem{
             this.sb = sb;
         }
 	}
-    /* SelState */
     /* ActState */
         public abstract class SBActState: SBState, ISBActState{
             public SBActState(ISlottable sb) : base(sb){}

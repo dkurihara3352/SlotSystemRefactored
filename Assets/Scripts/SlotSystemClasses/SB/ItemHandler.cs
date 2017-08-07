@@ -1,19 +1,23 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
 	public class ItemHandler : IItemHandler {
-		public ItemHandler(){
-		}
 		public InventoryItemInstance item{
-			get{return m_item;}
+			get{
+				if(_item != null)
+					return _item;
+				else
+					throw new InvalidOperationException("item not set");
+			}
 		}
-			InventoryItemInstance m_item;
+			InventoryItemInstance _item;
 		public void SetItem(InventoryItemInstance item){
-			m_item = item;
+			_item = item;
 		}
-		public void IncreasePickedAmountWithinQuanity(){
+		public void Increment(){
 			if(isStackable && quantity > m_pickedAmount){
 				m_pickedAmount ++;
 			}
@@ -34,7 +38,7 @@ namespace SlotSystem{
 		}
 	}
 	public interface IItemHandler{
-		void IncreasePickedAmountWithinQuanity();
+		void Increment();
 		InventoryItemInstance item{get;}
 		void SetItem(InventoryItemInstance item);
 		int pickedAmount{get;set;}
