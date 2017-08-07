@@ -291,6 +291,10 @@ namespace SlotSystemTests{
 					sse.SetHierarchy();
 
 					Assert.That(sse, Is.Empty);
+
+					GameObject.DestroyImmediate(childA);
+					GameObject.DestroyImmediate(childB);
+					GameObject.DestroyImmediate(childC);
 				}
 				public GameObject MakeGO(){
 					GameObject go = new GameObject("go");

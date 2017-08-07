@@ -137,6 +137,14 @@ namespace SlotSystem{
 				}
 			}
 		/*	SlotSystemElement	*/
+			public override ISSESelStateHandler selStateHandler{
+				get{
+					if(_selStateHandler == null)
+						_selStateHandler = new SSMSelStateHandler(this);
+					return _selStateHandler;
+				}
+			}
+				ISSESelStateHandler _selStateHandler;
 			public ISlotSystemBundle poolBundle{
 				get{return m_poolBundle;}
 			}
@@ -276,9 +284,6 @@ namespace SlotSystem{
 				public void InitStatesInHi(ISlotSystemElement element){
 					element.InitializeStates();
 				}
-			public override void InitializeStates(){
-				base.Deactivate();
-			}
 			public ISlotSystemElement FindParent(ISlotSystemElement ele){
 				foundParent = null;
 				PerformInHierarchy(CheckAndReportParent, ele);
@@ -295,10 +300,6 @@ namespace SlotSystem{
 					}
 				}
 
-			public override void Activate(){
-				UpdateEquipInvAndAllSBsEquipState();
-				Focus();
-			}
 			public void FindAndFocusInBundle(ISlotSystemElement ele){
 				PerformInHierarchy(FocusInBundle, ele);
 			}
@@ -336,5 +337,7 @@ namespace SlotSystem{
 		IEquippedProvider equippedProvider{get;}
 		IFocusedSGProvider focusedSGProvider{get;}
 		IAllElementsProvider allElementsProvider{get;}
+		ITransactionManager tam{get;}
+		ITransactionCache taCache{get;}
 	}
 }

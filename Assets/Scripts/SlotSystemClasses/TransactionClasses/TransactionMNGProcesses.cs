@@ -5,14 +5,20 @@ using System;
 
 namespace SlotSystem{
 	public abstract class TransactionMNGProcess: SSEProcess, ITAMProcess {
-		public TransactionMNGProcess(ISSESelStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
+		protected ITransactionManager tam{
+			get{
+				if(_tam != null)
+					return _tam;
+				else
+					throw new InvalidOperationException("tam not set");
+			}
 		}
-		public ITransactionManager tam{
-			get{return (ITransactionManager)handler;}
+			ITransactionManager _tam;
+		public TransactionMNGProcess(ITransactionManager tam, Func<IEnumeratorFake> coroutine): base(coroutine){
+			_tam = tam;
 		}
 	}
 	public interface ITAMProcess: ISSEProcess{
-		ITransactionManager tam{get;}
 	}
 	public interface ITAMActProcess: ITAMProcess{}
 		public class TAMProbeProcess: TransactionMNGProcess, ITAMActProcess{

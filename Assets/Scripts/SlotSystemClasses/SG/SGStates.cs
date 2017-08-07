@@ -24,6 +24,7 @@ namespace SlotSystem{
         ISlotGroup sg;
         public SGStatesFactory(ISGActStateHandler handler, ISlotGroup sg){
             this.handler = handler;
+            this.sg = sg;
         }
         public ISGActState MakeWaitForActionState(){
             if(_WaitForActionState == null)

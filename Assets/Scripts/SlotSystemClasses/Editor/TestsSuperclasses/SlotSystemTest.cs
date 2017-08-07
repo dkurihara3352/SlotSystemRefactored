@@ -20,9 +20,7 @@ public class SlotSystemTest{
 	}
 	/*	Elements	*/
 		protected static TransactionManager MakeTAM(){
-			GameObject go = new GameObject("tamGo");
-			go.tag = "TestGO";
-			return go.AddComponent<TransactionManager>();
+			return new TransactionManager();
 		}
 		protected static SlotSystemManager MakeSSM(){
 			GameObject go = new GameObject("go");
@@ -101,6 +99,9 @@ public class SlotSystemTest{
 			return Substitute.For<ISlotSystemElement>();
 		}
 	/*	Non elements	*/
+		protected static ISSESelStateHandler MakeSubSelStateHandler(){
+			return Substitute.For<ISSESelStateHandler>();
+		}
 		protected static ITransactionManager MakeSubTAM(){
 			return Substitute.For<ITransactionManager>();
 		}
@@ -148,9 +149,6 @@ public class SlotSystemTest{
 				return Substitute.For<TAMActState>();
 			}
 		/* Process */
-			protected static ISBSelProcess MakeSubSBSelProc(){
-				return Substitute.For<ISBSelProcess>();
-			}
 			protected static ISBActProcess MakeSubSBActProc(){
 				return Substitute.For<ISBActProcess>();
 			}
@@ -159,9 +157,6 @@ public class SlotSystemTest{
 			}
 			protected static ISBMrkProcess MakeSubSBMrkProc(){
 				return Substitute.For<ISBMrkProcess>();
-			}
-			protected static ISGSelProcess MakeSubSGSelProc(){
-				return Substitute.For<ISGSelProcess>();
 			}
 			protected static ISGActProcess MakeSubSGActProc(){
 				return Substitute.For<ISGActProcess>();

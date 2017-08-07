@@ -4,32 +4,13 @@ using UnityEngine;
 using System;
 namespace SlotSystem{
 	public abstract class SBProcess: SSEProcess, ISBProcess{
-		public SBProcess(ISSESelStateHandler handler, Func<IEnumeratorFake> coroutine): base(handler, coroutine){
-		}
-		public ISlottable sb{
-			get{return (ISlottable)handler;}
+		protected ISlottable sb;
+		public SBProcess(ISlottable sb, Func<IEnumeratorFake> coroutine): base(coroutine){
+			this.sb = sb;
 		}
 	}
 	public interface ISBProcess: ISSEProcess{
-		ISlottable sb{get;}
 	}
-		public interface ISBSelProcess: ISSEProcess{}
-			public class SBGreyinProcess: SBProcess, ISBSelProcess{
-				public SBGreyinProcess(ISlottable sb, Func<IEnumeratorFake> coroutine): base(sb, coroutine){
-				}
-			}
-			public class SBGreyoutProcess: SBProcess, ISBSelProcess{
-				public SBGreyoutProcess(ISlottable sb, Func<IEnumeratorFake> coroutine): base(sb, coroutine){
-				}
-			}
-			public class SBHighlightProcess: SBProcess, ISBSelProcess{
-				public SBHighlightProcess(ISlottable sb, Func<IEnumeratorFake> coroutine): base(sb, coroutine){
-				}
-			}
-			public class SBDehighlightProcess: SBProcess, ISBSelProcess{
-				public SBDehighlightProcess(ISlottable sb, Func<IEnumeratorFake> coroutine): base(sb, coroutine){
-				}
-			}
 		public interface ISBActProcess: ISBProcess{}
 			public class WaitForPickUpProcess: SBProcess, ISBActProcess{
 				public WaitForPickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
@@ -96,8 +77,6 @@ namespace SlotSystem{
 				}
 			}
 	public class SBCoroutineFactory: ISBCoroutineFactory{
-		ISlottable sb;
-		public SBCoroutineFactory(ISlottable sb){this.sb = sb;}
 
 		public System.Func<IEnumeratorFake> MakeWaitForPointerUpCoroutine(){
 			return DefaultWaitForPointerUpCoroutine;

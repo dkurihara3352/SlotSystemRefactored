@@ -1,87 +1,96 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace SlotSystem{
 	public abstract class SlotSystemElement :MonoBehaviour, ISlotSystemElement{
 		/* State Handling */
-			ISSESelStateHandler stateHandler;
+			public virtual ISSESelStateHandler selStateHandler{
+				get{
+					if(_selStateHandler == null)
+						_selStateHandler = new SSESelStateHandler();
+					return _selStateHandler;
+				}
+			}
+				ISSESelStateHandler _selStateHandler;
 			public void SetSelStateHandler(ISSESelStateHandler handler){
-				stateHandler = handler;
+				_selStateHandler = handler;
 			}
 			public bool isSelStateNull{
-				get{return stateHandler.isSelStateNull;}
+				get{return selStateHandler.isSelStateNull;}
 			}
 			public bool wasSelStateNull{
-				get{return stateHandler.wasSelStateNull;}
+				get{return selStateHandler.wasSelStateNull;}
 			}
 			public void Deactivate(){
-				stateHandler.Deactivate();
+				selStateHandler.Deactivate();
 			}
 				public bool isDeactivated{
-					get{return stateHandler.isDeactivated;}
+					get{return selStateHandler.isDeactivated;}
 				}
 				public bool wasDeactivated{
-					get{return stateHandler.wasDeactivated;}
+					get{return selStateHandler.wasDeactivated;}
 				}
 			public void Focus(){
-				stateHandler.Focus();
+				selStateHandler.Focus();
 			}
 				public bool isFocused{
-					get{return stateHandler.isFocused;}
+					get{return selStateHandler.isFocused;}
 				}
 				public bool wasFocused{
-					get{return stateHandler.wasFocused;}
+					get{return selStateHandler.wasFocused;}
 				}
 			public void Defocus(){
-				stateHandler.Defocus();
+				selStateHandler.Defocus();
 			}
 				public bool isDefocused{
-					get{return stateHandler.isDefocused;}
+					get{return selStateHandler.isDefocused;}
 				}
 				public bool wasDefocused{
-					get{return stateHandler.wasDefocused;}
+					get{return selStateHandler.wasDefocused;}
 				}
 			public void Select(){
-				stateHandler.Select();
+				selStateHandler.Select();
 			}
 				public bool isSelected{
-					get{return stateHandler.isSelected;}
+					get{return selStateHandler.isSelected;}
 				}
 				public bool wasSelected{
-					get{return stateHandler.wasSelected;}
+					get{return selStateHandler.wasSelected;}
 				}
-			public virtual void Activate(){
-				stateHandler.Activate();
+			public void Activate(){
+				selStateHandler.Activate();
 			}
-			public virtual void Deselect(){
-				stateHandler.Deselect();
+			public void Deselect(){
+				selStateHandler.Deselect();
 			}
-			public virtual void InitializeStates(){
-				stateHandler.InitializeStates();
+			public void InitializeStates(){
+				selStateHandler.InitializeStates();
 			}
 			public void SetAndRunSelProcess(ISSESelProcess process){
+				selStateHandler.SetAndRunSelProcess(process);
 			}
 			public System.Func<IEnumeratorFake> deactivateCoroutine{
-				get{return stateHandler.deactivateCoroutine;}
+				get{return selStateHandler.deactivateCoroutine;}
 			}
 			public System.Func<IEnumeratorFake> focusCoroutine{
-				get{return stateHandler.focusCoroutine;}
+				get{return selStateHandler.focusCoroutine;}
 			}
 			public System.Func<IEnumeratorFake> defocusCoroutine{
-				get{return stateHandler.defocusCoroutine;}
+				get{return selStateHandler.defocusCoroutine;}
 			}
 			public System.Func<IEnumeratorFake> selectCoroutine{
-				get{return stateHandler.selectCoroutine;}
+				get{return selStateHandler.selectCoroutine;}
 			}
 			public void InstantFocus(){
-				stateHandler.InstantFocus();
+				selStateHandler.InstantFocus();
 			}
 			public void InstantDefocus(){
-				stateHandler.InstantDefocus();
+				selStateHandler.InstantDefocus();
 			}
 			public void InstantSelect(){
-				stateHandler.InstantSelect();
+				selStateHandler.InstantSelect();
 			}
 		/*	public fields	*/
 			public virtual void SetHierarchy(){
@@ -179,7 +188,12 @@ namespace SlotSystem{
 				m_parent = par;
 			}
 			public ISlotSystemManager ssm{
-				get{return m_ssm;}
+				get{
+					if(m_ssm != null)
+						return m_ssm;
+					else
+						throw new InvalidOperationException("ssm not set");
+				}
 			}
 				ISlotSystemManager m_ssm;
 			public void SetSSM(ISlotSystemElement ssm){
@@ -283,5 +297,6 @@ namespace SlotSystem{
 		bool Contains(ISlotSystemElement element);
 		ISlotSystemElement this[int i]{get;}
 		int level{get;}
+		ISSESelStateHandler selStateHandler{get;}
 	}
 }

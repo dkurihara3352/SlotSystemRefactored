@@ -86,116 +86,116 @@ namespace SlotSystemTests{
 					public IEnumerator GetEnumerator(){
 						object[] dea_dea_T;
 							dea_dea_T = new object[]{
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
 								true
 							};
 							yield return dea_dea_T;
 						object[] dea_def_F;
 							dea_def_F = new object[]{
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
 								false
 							};
 							yield return dea_def_F;
 						object[] dea_foc_F;
 							dea_foc_F = new object[]{
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
 								false
 							};
 							yield return dea_foc_F;
 						object[] dea_sel_F;
 							dea_sel_F = new object[]{
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
 								false
 							};
 							yield return dea_sel_F;
 
 						object[] foc_dea_F;
 							foc_dea_F = new object[]{
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
 								false
 							};
 							yield return foc_dea_F;
 						object[] foc_def_F;
 							foc_def_F = new object[]{
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
 								false
 							};
 							yield return foc_def_F;
 						object[] foc_foc_T;
 							foc_foc_T = new object[]{
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
 								true
 							};
 							yield return foc_foc_T;
 						object[] foc_sel_F;
 							foc_sel_F = new object[]{
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
 								false
 							};
 							yield return foc_sel_F;
 
 						object[] def_dea_F;
 							def_dea_F = new object[]{
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
 								false
 							};
 							yield return def_dea_F;
 						object[] def_def_T;
 							def_def_T = new object[]{
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
 								true
 							};
 							yield return def_def_T;
 						object[] def_foc_F;
 							def_foc_F = new object[]{
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
 								false
 							};
 							yield return def_foc_F;
 						object[] def_sel_F;
 							def_sel_F = new object[]{
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
 								false
 							};
 							yield return def_sel_F;
 						
 						object[] sel_dea_F;
 							sel_dea_F = new object[]{
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
+								new SSEDeactivateProcess(FakeCoroutine), 
 								false
 							};
 							yield return sel_dea_F;
 						object[] sel_def_F;
 							sel_def_F = new object[]{
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
+								new SSEDefocusProcess(FakeCoroutine), 
 								false
 							};
 							yield return sel_def_F;
 						object[] sel_foc_F;
 							sel_foc_F = new object[]{
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSEFocusProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
+								new SSEFocusProcess(FakeCoroutine), 
 								false
 							};
 							yield return sel_foc_F;
 						object[] sel_sel_T;
 							sel_sel_T = new object[]{
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
-								new SSESelectProcess(MakeSubSSE(), FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
+								new SSESelectProcess(FakeCoroutine), 
 								true
 							};
 							yield return sel_sel_T;
@@ -203,19 +203,16 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void SSEProcess_Fields_ByDefault_AreSetWithDefault(){
-				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(fakeCoroutine);
 
 				Assert.That(proc.isRunning, Is.False);
-				Assert.That(proc.handler, Is.SameAs(handler));
 				Assert.That(proc.coroutineFake, Is.SameAs(fakeCoroutine));
 			}
 			[Test]
 			public void SSEProcess_Start_WhenCalled_SetsIsRunningTrueAndCallsCoroutine(){
-				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(fakeCoroutine);
 
 				proc.Start();
 
@@ -224,9 +221,8 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SSEProcess_Stop_IsRunning_SetsIsRunningFalse(){
-				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(fakeCoroutine);
 				proc.Start();
 
 				proc.Stop();
@@ -235,9 +231,8 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void SSEProcess_Expire_IsRunning_SetsIsRunningFalse(){
-				ISSESelStateHandler handler = Substitute.For<ISSESelStateHandler>();
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-				SSEProcess proc = new SSEProcess(handler, fakeCoroutine);
+				SSEProcess proc = new SSEProcess(fakeCoroutine);
 				proc.Start();
 
 				proc.Expire();

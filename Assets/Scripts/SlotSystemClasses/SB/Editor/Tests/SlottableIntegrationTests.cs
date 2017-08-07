@@ -13,7 +13,7 @@ namespace SlotSystemTests{
 	public class SlottableIntegrationTests : SlotSystemTest{
 		[Test]
 		public void SBStates_ByDefault_AreNull(){
-			Slottable sb = MakeSB();
+			Slottable sb = MakeSB_TACache();
 				SSESelStateHandler handler = new SSESelStateHandler();
 				sb.SetSelStateHandler(handler);
 			Assert.That(sb.isActStateNull, Is.True);
@@ -78,7 +78,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForAction_OnPointerDown_IsFocused_SetsIsSelected(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 					sb.WaitForAction();
 					SSESelStateHandler handler = new SSESelStateHandler();
 					sb.SetSelStateHandler(handler);
@@ -90,7 +90,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForAction_OnPointerDown_IsFocused_SetsIsWFPickUp(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 					sb.WaitForAction();
 					SSESelStateHandler handler = new SSESelStateHandler();
 					sb.SetSelStateHandler(handler);
@@ -102,7 +102,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForAction_OnPointerDown_IsNotFocused_SetsIsWFPointerUp(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 					sb.WaitForAction();
 					SSESelStateHandler handler = new SSESelStateHandler();
 					sb.SetSelStateHandler(handler);
@@ -174,7 +174,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForPickUp_OnEndDrag_Always_CallsRefresh(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SetUpForRefreshCall(sb);
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
@@ -187,7 +187,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForPickUp_OnEndDrag_Always_SetsIsFocused(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
@@ -228,7 +228,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void ExpireActPorcess_WaitForPointerUpProcess_SetIsDefocused(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 					SSESelStateHandler handler = new SSESelStateHandler();
 					sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
@@ -240,7 +240,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForPointerUp_OnPointerUp_Always_CallsTapCommandExecute(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SlottableCommand mockTapComm = Substitute.For<SlottableCommand>();
 						sb.SetTapCommand(mockTapComm);
 						SSESelStateHandler handler = new SSESelStateHandler();
@@ -254,7 +254,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForPointerUp_OnPointerUp_Always_CallsRefresh(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SetUpForRefreshCall(sb);
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
@@ -267,7 +267,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForPointerUp_OnPointerUp_Always_SetsIsDefocused(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
@@ -279,7 +279,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForPointerUp_OnEndDrag_Always_CallsRefresh(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SetUpForRefreshCall(sb);
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
@@ -292,7 +292,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForPointerUp_OnEndDrag_Always_SetsIsDefocused(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
@@ -501,7 +501,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForNextTouch_OnDeselect_Always_CallsRefresh(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SetUpForRefreshCall(sb);
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
@@ -515,7 +515,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void InWaitForNextTouch_OnDeselect_Always_SetsIsFocused(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
 					sb.WaitForAction();
@@ -886,6 +886,12 @@ namespace SlotSystemTests{
 			/* EquippedState */
 				
 	/* helpers */
+		Slottable MakeSB_TACache(){
+			Slottable sb = MakeSB();
+			ITransactionCache tac = Substitute.For<ITransactionCache>();
+			sb.SetTACache(tac);
+			return sb;
+		}
 		PointerEventDataFake eventData{get{return new PointerEventDataFake();}}
 		void AssertRefreshCalled(ISlottable sb){
 			Assert.That(sb.isWaitingForAction, Is.True);
@@ -899,7 +905,6 @@ namespace SlotSystemTests{
 		public void AssertSBActProcessIsSetAndRunning(ISlottable sb, Type procType, System.Func<IEnumeratorFake> coroutine){
 			ISBActProcess actualProc = sb.actProcess;
 			Assert.That(actualProc, Is.TypeOf(procType));
-			Assert.That(actualProc.handler, Is.SameAs(sb));
 			Assert.That(actualProc.isRunning, Is.True);
 			coroutine.Received().Invoke();
 		}

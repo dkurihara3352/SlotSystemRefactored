@@ -8,15 +8,14 @@ namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
 		/*	States	*/
 			/* Selection */
-				public override void Activate(){
-					if(taCache.IsCachedTAResultRevert(hoverable) == false)
-						Focus();
-					else
-						Defocus();
+				public override ISSESelStateHandler selStateHandler{
+					get{
+						if(_selStateHandler == null)
+							_selStateHandler = new SBSelStateHandler(this);
+						return _selStateHandler;
+					}
 				}
-				public override void Deselect(){
-					Activate();
-				}
+					ISSESelStateHandler _selStateHandler;
 			/*	Action State	*/
 				ISSEStateEngine<ISBActState> actStateEngine{
 					get{
@@ -277,7 +276,7 @@ namespace SlotSystem{
 			ISBCoroutineFactory coroutineFactory{
 				get{
 					if(m_coroutineFactory == null)
-						m_coroutineFactory = new SBCoroutineFactory(this);
+						m_coroutineFactory = new SBCoroutineFactory();
 					return m_coroutineFactory;
 				}
 			}
@@ -483,12 +482,6 @@ namespace SlotSystem{
 					get{return newSlotID == -1;}
 				}
 			/* Others */
-				public override void InitializeStates(){
-					Deactivate();
-					WaitForAction();
-					SetEqpState(null);
-					SetMrkState(unmarkedState);
-				}
 				public bool delayed{
 					get{return m_delayed;}
 					set{m_delayed = value;}

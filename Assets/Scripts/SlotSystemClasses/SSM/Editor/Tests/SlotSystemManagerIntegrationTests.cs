@@ -16,7 +16,7 @@ namespace SlotSystemTests{
 				SlotSystemManager ssm = MakeSSM();
 					SlotSystemBundle pBun = MakeSSBundle();
 					pBun.transform.SetParent(ssm.transform);
-						SlotGroup sgpA = MakeSG();
+						SlotGroup sgpA = MakeSG_SSM_TAM();
 							sgpA.transform.SetParent(pBun.transform);
 							PoolInventory pInv = new PoolInventory();
 								BowInstance bowA = MakeBowInstance(0);
@@ -111,7 +111,7 @@ namespace SlotSystemTests{
 				SlotSystemManager ssm = MakeSSM();
 					SlotSystemBundle pBun = MakeSSBundle();
 					pBun.transform.SetParent(ssm.transform);
-						SlotGroup sgpA = MakeSG();
+						SlotGroup sgpA = MakeSG_SSM_TAM();
 							sgpA.transform.SetParent(pBun.transform);
 							PoolInventory pInv = new PoolInventory();
 								BowInstance bowA = MakeBowInstance(0);
@@ -125,10 +125,10 @@ namespace SlotSystemTests{
 							sgpA.InspectorSetUp(pInv, new SGNullFilter(), new SGItemIDSorter(), 0);
 							sgpA.SetHierarchy();
 							IEnumerable<ISlotSystemElement> xSGPAEles;
-								ISlottable bowSBP = sgpA.GetSB(bowA);
-								ISlottable wearSBP = sgpA.GetSB(wearA);
-								ISlottable shieldSBP = sgpA.GetSB(shieldA);
-								ISlottable mWeaponSBP = sgpA.GetSB(mWeaponA);
+								Slottable bowSBP = (Slottable)sgpA.GetSB(bowA);
+								Slottable wearSBP = (Slottable)sgpA.GetSB(wearA);
+								Slottable shieldSBP = (Slottable)sgpA.GetSB(shieldA);
+								Slottable mWeaponSBP = (Slottable)sgpA.GetSB(mWeaponA);
 								xSGPAEles = new ISlotSystemElement[]{bowSBP, wearSBP, shieldSBP, mWeaponSBP};
 						SlotGroup sgpB = MakeSG();
 							sgpB.transform.SetParent(pBun.transform);
@@ -183,7 +183,6 @@ namespace SlotSystemTests{
 					IEnumerable<ISlotSystemElement> xGBunAAEles = new ISlotSystemElement[]{sggAAA, sggAAB};
 					Assert.That(gBunAA.MemberEquals(xGBunAAEles), Is.True);
 				TransactionManager tam = MakeTAM();
-					tam.SetSSM(ssm);
 				ssm.SetTAM(tam);
 				
 				ssm.SetTAMRecursively();
@@ -201,6 +200,15 @@ namespace SlotSystemTests{
 				Assert.That(sggAB.tam, Is.SameAs(tam));
 				Assert.That(sggAAA.tam, Is.SameAs(tam));
 				Assert.That(sggAAB.tam, Is.SameAs(tam));
+			}
+		/* helper */
+			SlotGroup MakeSG_SSM_TAM(){
+				SlotGroup sg = MakeSG();
+				ISlotSystemManager ssm = Substitute.For<ISlotSystemManager>();
+				sg.SetSSM(ssm);
+				ITransactionManager tam = Substitute.For<ITransactionManager>();
+				sg.SetTAM(tam);
+				return sg;
 			}
 	}
 }

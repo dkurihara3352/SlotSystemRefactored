@@ -112,7 +112,6 @@ namespace SlotSystemTests{
 
 				selProc = handler.selProcess;
 				Assert.That(selProc, Is.TypeOf(typeof(SSEDefocusProcess)));
-				Assert.That(selProc.handler, Is.SameAs(handler));
 				Assert.That(selProc.isRunning, Is.True);
 				mockDefCor.Received(1).Invoke();
 				Assert.That(sse.isDefocused, Is.True);
@@ -123,13 +122,11 @@ namespace SlotSystemTests{
 
 				selProc = handler.selProcess;
 				Assert.That(selProc, Is.TypeOf(typeof(SSEDefocusProcess)));
-				Assert.That(selProc.handler, Is.SameAs(handler));
 				Assert.That(selProc.isRunning, Is.True);
 				mockDefCor.Received(1).Invoke();
 				Assert.That(sse.isDefocused, Is.True);
 				Assert.That(sse.wasDeactivated, Is.True);
 				Assert.That(prevProc, Is.TypeOf(typeof(SSEDefocusProcess)));
-				Assert.That(prevProc.handler, Is.SameAs(handler));
 				Assert.That(prevProc.isRunning, Is.True);
 				prevProc = selProc;
 			
@@ -137,13 +134,11 @@ namespace SlotSystemTests{
 
 				selProc = handler.selProcess;
 				Assert.That(selProc, Is.TypeOf(typeof(SSEFocusProcess)));
-				Assert.That(selProc.handler, Is.SameAs(handler));
 				Assert.That(selProc.isRunning, Is.True);
 				mockFocCor.Received(1).Invoke();
 				Assert.That(sse.isFocused, Is.True);
 				Assert.That(sse.wasDefocused, Is.True);
 				Assert.That(prevProc, Is.TypeOf(typeof(SSEDefocusProcess)));
-				Assert.That(prevProc.handler, Is.SameAs(handler));
 				Assert.That(prevProc.isRunning, Is.False);
 				prevProc = selProc;
 
@@ -151,13 +146,11 @@ namespace SlotSystemTests{
 
 				selProc = handler.selProcess;
 				Assert.That(selProc, Is.TypeOf(typeof(SSEDefocusProcess)));
-				Assert.That(selProc.handler, Is.SameAs(handler));
 				Assert.That(selProc.isRunning, Is.True);
 				mockDefCor.Received(2).Invoke();
 				Assert.That(sse.isDefocused, Is.True);
 				Assert.That(sse.wasFocused, Is.True);
 				Assert.That(prevProc, Is.TypeOf(typeof(SSEFocusProcess)));
-				Assert.That(prevProc.handler, Is.SameAs(handler));
 				Assert.That(prevProc.isRunning, Is.False);
 				prevProc = selProc;
 			
@@ -165,13 +158,11 @@ namespace SlotSystemTests{
 				
 				selProc = handler.selProcess;
 				Assert.That(selProc, Is.TypeOf(typeof(SSEDeactivateProcess)));
-				Assert.That(selProc.handler, Is.SameAs(handler));
 				Assert.That(selProc.isRunning, Is.True);
 				mockDeaCor.Received(1).Invoke();
 				Assert.That(sse.isDeactivated, Is.True);
 				Assert.That(sse.wasDefocused, Is.True);
 				Assert.That(prevProc, Is.TypeOf(typeof(SSEDefocusProcess)));
-				Assert.That(prevProc.handler, Is.SameAs(handler));
 				Assert.That(prevProc.isRunning, Is.False);
 				prevProc = selProc;
 			
@@ -183,7 +174,6 @@ namespace SlotSystemTests{
 				Assert.That(sse.isSelStateNull, Is.True);
 				Assert.That(sse.wasDeactivated, Is.True);
 				Assert.That(prevProc, Is.TypeOf(typeof(SSEDeactivateProcess)));
-				Assert.That(prevProc.handler, Is.SameAs(handler));
 				Assert.That(prevProc.isRunning, Is.False);
 				prevProc = selProc;
 			
@@ -201,7 +191,6 @@ namespace SlotSystemTests{
 			public void AssertSSESelProcIsSetAndIsRunning(SSESelStateHandler handler, Type procType, Func<IEnumeratorFake> mockCoroutine){
 				ISSESelProcess actual = handler.selProcess;
 				Assert.That(actual, Is.TypeOf(procType));
-				Assert.That(actual.handler, Is.SameAs(handler));
 				mockCoroutine.Received().Invoke();
 				Assert.That(actual.isRunning, Is.True);
 			}

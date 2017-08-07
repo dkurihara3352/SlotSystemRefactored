@@ -93,15 +93,15 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					IEnumerable<ISlotSystemBundle> gBuns;
 						SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
-							SlotGroup sggA = MakeSGWithSelStateHandler();
+							SlotGroup sggA = MakeSGWithSGSelStateHandlerAndTACache();
 								sggA.transform.SetParent(gBun.transform);
 								sggA.SetElements(new ISlotSystemElement[]{});
 								sggA.Focus();
-							SlotGroup sggB = MakeSGWithSelStateHandler();
+							SlotGroup sggB = MakeSGWithSGSelStateHandlerAndTACache();
 								sggB.SetElements(new ISlotSystemElement[]{});
 								sggB.transform.SetParent(gBun.transform);
 								sggB.Focus();
-							SlotGroup sggC = MakeSGWithSelStateHandler();
+							SlotGroup sggC = MakeSGWithSGSelStateHandlerAndTACache();
 								sggC.SetElements(new ISlotSystemElement[]{});
 								sggC.transform.SetParent(gBun.transform);
 								sggC.Focus();
@@ -134,15 +134,15 @@ namespace SlotSystemTests{
 						eBun.focusedElement.Returns(eSet);
 					IEnumerable<ISlotSystemBundle> gBuns;
 						SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
-							SlotGroup sggA = MakeSGWithSelStateHandler();
+							SlotGroup sggA = MakeSGWithSGSelStateHandlerAndTACache();
 								sggA.transform.SetParent(gBun.transform);
 								sggA.SetElements(new ISlotSystemElement[]{});
 								sggA.Focus();
-							SlotGroup sggB = MakeSGWithSelStateHandler();
+							SlotGroup sggB = MakeSGWithSGSelStateHandlerAndTACache();
 								sggB.SetElements(new ISlotSystemElement[]{});
 								sggB.transform.SetParent(gBun.transform);
 								sggB.Focus();
-							SlotGroup sggC = MakeSGWithSelStateHandler();
+							SlotGroup sggC = MakeSGWithSGSelStateHandlerAndTACache();
 								sggC.SetElements(new ISlotSystemElement[]{});
 								sggC.transform.SetParent(gBun.transform);
 								sggC.Focus();
@@ -262,6 +262,14 @@ namespace SlotSystemTests{
 				SlotGroup sg = MakeSG();
 				SSESelStateHandler handler = new SSESelStateHandler();
 				sg.SetSelStateHandler(handler);
+				return sg;
+			}
+			SlotGroup MakeSGWithSGSelStateHandlerAndTACache(){
+				SlotGroup sg = MakeSG();
+				ITransactionCache taCache = Substitute.For<ITransactionCache>();
+				sg.SetTACache(taCache);
+				SGSelStateHandler sgSelStateHandler = new SGSelStateHandler(sg);
+				sg.SetSelStateHandler(sgSelStateHandler);
 				return sg;
 			}
 			public IEnumerable<ISlotSystemElement> ConvertToSSEs<T>(IEnumerable<T> sgs) where T: ISlotSystemElement{

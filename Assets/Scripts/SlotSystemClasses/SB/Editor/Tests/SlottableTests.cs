@@ -120,7 +120,7 @@ namespace SlotSystemTests{
 			/*	Methods	*/
 				[Test]
 				public void InitializeStates_Always_InitializesStates(){
-					Slottable sb = MakeSB();
+					Slottable sb = MakeSB_TACache();
 					ISlotSystemManager ssm = MakeSubSSM();
 						ISlotGroup sg = MakeSubSG();
 						ssm.FindParent(sb).Returns(sg);
@@ -385,6 +385,12 @@ namespace SlotSystemTests{
 						}
 					}			
 			/*	helper	*/
+				Slottable MakeSB_TACache(){
+					Slottable sb = MakeSB();
+					ITransactionCache taCache = Substitute.For<ITransactionCache>();
+					sb.SetTACache(taCache);
+					return sb;
+				}
 				ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){
 					return Substitute.For<ISSEProcessEngine<ISBEqpProcess>>();
 				}

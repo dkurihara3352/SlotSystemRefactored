@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public class TransactionManager : SlotSystemElement, ITransactionManager{
+	public class TransactionManager : ITransactionManager{
 		public void ExecuteTransaction(){
 			actStateHandler.Transact();
 			transaction.Execute();
@@ -52,7 +52,7 @@ namespace SlotSystem{
 			ISortEngine sortEngine{
 				get{
 					if(m_sortEngine == null)
-						m_sortEngine = new SortEngine(this, sgHandler, actStateHandler);
+						m_sortEngine = new SortEngine(this, sgHandler);
 					return m_sortEngine;
 				}
 			}
@@ -85,9 +85,6 @@ namespace SlotSystem{
 				m_iconHandler = iconHandler;
 			}
 		/* Other */
-			public override void InitializeStates(){
-				actStateHandler.WaitForAction();
-			}
 			public void Refresh(){
 				actStateHandler.WaitForAction();
 			}
@@ -114,8 +111,11 @@ namespace SlotSystem{
 					actStateHandler.ExpireActProcess();
 				return null;
 			}
+			public void WaitForAction(){
+				actStateHandler.WaitForAction();
+			}
 	}
-	public interface ITransactionManager: ISlotSystemElement{
+	public interface ITransactionManager{
 		void ExecuteTransaction();
 		void OnCompleteTransaction();
 		void SetTransaction(ISlotSystemTransaction transaction);
@@ -126,5 +126,6 @@ namespace SlotSystem{
 		ITransactionFactory taFactory{get;}
 		ITAMActStateHandler actStateHandler{get;}
 		ITransactionIconHandler iconHandler{get;}
+		void WaitForAction();
 	}
 }

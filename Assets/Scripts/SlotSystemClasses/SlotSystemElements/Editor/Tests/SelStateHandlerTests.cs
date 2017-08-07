@@ -19,6 +19,8 @@ namespace SlotSystemTests{
 				Assert.That(handler.isFocused, Is.False);
 				Assert.That(handler.isDefocused, Is.False);
 				Assert.That(handler.isSelected, Is.False);
+				Assert.That(handler.isSelStateNull, Is.True);
+				Assert.That(handler.wasSelStateNull, Is.True);
 			}
 			[Test]
 			public void Activate_Always_SetsFocused(){

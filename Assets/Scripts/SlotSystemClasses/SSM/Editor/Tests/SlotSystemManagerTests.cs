@@ -41,7 +41,7 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void Initialize_WhenCalled_CallsSetSSMInHierarchy(){
-				SlotSystemManager ssm = MakeSSMWithSelStateHandler();
+				SlotSystemManager ssm = MakeSSM_selStateHandler();
 					ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns;
@@ -64,7 +64,7 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Initialize_WhenCalled_CallsPIHInitializeState(){
-				SlotSystemManager ssm = MakeSSMWithSelStateHandler();
+				SlotSystemManager ssm = MakeSSM_selStateHandler();
 					ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns;
@@ -667,7 +667,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Focus_WhenCalled_SetsSelStateFocusedState(){
-					SlotSystemManager ssm = MakeSSMWithSelStateHandler();
+					SlotSystemManager ssm = MakeSSM_TAM_selStateHandler();
 
 					ssm.Focus();
 
@@ -675,21 +675,15 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Defocus_WhenCalled_SetsSelStateDefocused(){
-					SlotSystemManager ssm = MakeSSMWithSelStateHandler();
+					SlotSystemManager ssm = MakeSSM_TAM_selStateHandler();
 
 					ssm.Defocus();
 
 					Assert.That(ssm.isDefocused, Is.True);
 					}
-				SlotSystemManager MakeSSMWithSelStateHandler(){
-					SlotSystemManager ssm = MakeSSM();
-					SSESelStateHandler handler = new SSESelStateHandler();
-					ssm.SetSelStateHandler(handler);
-					return ssm;
-				}
 				[Test]
 				public void Deactivate_WhenCalled_SetsSelStateDeactivateed(){
-					SlotSystemManager ssm = MakeSSMWithSelStateHandler();
+					SlotSystemManager ssm = MakeSSM_TAM_selStateHandler();
 
 					ssm.Deactivate();
 
@@ -777,6 +771,20 @@ namespace SlotSystemTests{
 				public IEnumerable<ISlotSystemElement> ConvertToSSEs<T>(IEnumerable<T> sgs) where T: ISlotSystemElement{
 					foreach(var sg in sgs)
 						yield return (ISlotSystemElement)sg;
+				}
+				SlotSystemManager MakeSSM_selStateHandler(){
+					SlotSystemManager ssm = MakeSSM();
+					SSESelStateHandler selStateHandler = new SSESelStateHandler();
+					ssm.SetSelStateHandler(selStateHandler);
+					return ssm;
+				}
+				SlotSystemManager MakeSSM_TAM_selStateHandler(){
+					SlotSystemManager ssm = MakeSSM();
+					ITransactionManager tam = Substitute.For<ITransactionManager>();
+					ssm.SetTAM(tam);
+					SSESelStateHandler selStateHandler = new SSESelStateHandler();
+					ssm.SetSelStateHandler(selStateHandler);
+					return ssm;
 				}
 		}
 	}

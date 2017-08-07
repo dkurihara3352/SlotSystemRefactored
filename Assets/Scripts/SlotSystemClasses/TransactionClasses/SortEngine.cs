@@ -7,11 +7,9 @@ namespace SlotSystem{
 		ITransactionManager tam;
 		ITransactionCache taCache;
 		ITransactionSGHandler sgHandler;
-		ITAMActStateHandler tamStateHandler;
-		public SortEngine(ITransactionManager tam, ITransactionSGHandler sgHandler, ITAMActStateHandler tamStateHandler){
+		public SortEngine(ITransactionManager tam, ITransactionSGHandler sgHandler){
 			this.tam = tam;
 			this.sgHandler = sgHandler;
-			this.tamStateHandler = tamStateHandler;
 		}
 		public void SortSG(ISlotGroup sg, SGSorter sorter){
 			ISlotSystemTransaction sortTransaction = sortFA.MakeSortTA(sg, sorter);

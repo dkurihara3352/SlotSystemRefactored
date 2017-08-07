@@ -13,7 +13,7 @@ namespace SlotSystemTests{
 	public class SortEngineTests : SlotSystemTest{
 			[Test]
 			public void SortSG_WhenCalled_CallsSortFAMakeSortTA(){
-				SortEngine sortEngine = new SortEngine(MakeSubTAM(), MakeSubSGHandler(), MakeSubTAMStateHandler());
+				SortEngine sortEngine = new SortEngine(MakeSubTAM(), MakeSubSGHandler());
 				ISortTransactionFactory sortFA = Substitute.For<ISortTransactionFactory>();
 					ISortTransaction stubSortTA = Substitute.For<ISortTransaction>();
 					sortFA.MakeSortTA(Arg.Any<ISlotGroup>(), Arg.Any<SGSorter>()).Returns(stubSortTA);
@@ -30,7 +30,7 @@ namespace SlotSystemTests{
 				ITransactionManager mockTAM = MakeSubTAM();
 				ITransactionCache mockTAC = MakeSubTAC();
 				ITransactionSGHandler mockSGHd = MakeSubSGHandler();
-				SortEngine sortEngine = new SortEngine(mockTAM, mockSGHd, MakeSubTAMStateHandler());
+				SortEngine sortEngine = new SortEngine(mockTAM, mockSGHd);
 					ISlotGroup stubSG = MakeSubSG();
 						stubSG.taCache.Returns(mockTAC);
 					SGSorter stubSorter = Substitute.For<SGSorter>();

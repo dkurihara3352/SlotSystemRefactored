@@ -46,7 +46,7 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isFocused.Returns(true);
-				ITransactionCache mockTAC = MakeSubTAC();
+					ITransactionCache mockTAC = MakeSubTAC();
 				hoverable = new Hoverable(stubSSE, mockTAC);
 			
 			hoverable.OnHoverEnter();
@@ -58,7 +58,7 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isDefocused.Returns(true);
-				ITransactionCache mockTAC = MakeSubTAC();
+					ITransactionCache mockTAC = MakeSubTAC();
 				hoverable = new Hoverable(stubSSE, mockTAC);
 			
 			hoverable.OnHoverEnter();
@@ -89,9 +89,9 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isDeactivated.Returns(false);
-				ITransactionCache stubTAC = MakeSubTAC();
+					ITransactionCache stubTAC = MakeSubTAC();
+				hoverable = new Hoverable(stubSSE, stubTAC);
 					stubTAC.hovered.Returns((IHoverable)null);
-			hoverable = new Hoverable(stubSSE, stubTAC);
 
 			hoverable.OnHoverExit();
 		}
@@ -101,9 +101,9 @@ namespace SlotSystemTests{
 				ISlotSystemElement stubSSE = MakeSubSSE();
 					stubSSE.isFocused.Returns(true);
 					stubSSE.isDeactivated.Returns(false);
-				ITransactionCache mockTAC = MakeSubTAC();
-			hoverable = new Hoverable(stubSSE, mockTAC);
-				mockTAC.hovered.Returns(hoverable);
+					ITransactionCache mockTAC = MakeSubTAC();
+				hoverable = new Hoverable(stubSSE, mockTAC);
+					mockTAC.hovered.Returns(hoverable);
 			
 			hoverable.OnHoverExit();
 			

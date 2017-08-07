@@ -54,10 +54,10 @@ namespace SlotSystemTests{
 				mockSSE.Received().SetAndRunSelProcess(Arg.Any<T>());
 			}
 				class Various_EnterState_FromVariousNonNullCases: IEnumerable{
-					SSEDeactivateProcess deaProc = new SSEDeactivateProcess(MakeSubSSE(), FakeCoroutine);
-					SSEFocusProcess focProc = new SSEFocusProcess(MakeSubSSE(), FakeCoroutine);
-					SSEDefocusProcess defoProc = new SSEDefocusProcess(MakeSubSSE(), FakeCoroutine);
-					SSESelectProcess selectProc = new SSESelectProcess(MakeSubSSE(), FakeCoroutine);
+					SSEDeactivateProcess deaProc = new SSEDeactivateProcess(FakeCoroutine);
+					SSEFocusProcess focProc = new SSEFocusProcess(FakeCoroutine);
+					SSEDefocusProcess defoProc = new SSEDefocusProcess(FakeCoroutine);
+					SSESelectProcess selectProc = new SSESelectProcess(FakeCoroutine);
 					public IEnumerator GetEnumerator(){
 							object[] dea_dea_dea;
 									ISlotSystemElement mockSSE = MakeSubSSE();
