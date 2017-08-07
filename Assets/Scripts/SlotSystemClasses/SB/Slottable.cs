@@ -14,148 +14,182 @@ namespace SlotSystem{
 				Unmark();
 			}
 			/* Selection */
-			public override ISSESelStateHandler selStateHandler{
-				get{
-					if(_selStateHandler == null)
-						_selStateHandler = new SBSelStateHandler(this);
-					return _selStateHandler;
+				public override ISSESelStateHandler selStateHandler{
+					get{
+						if(_selStateHandler == null)
+							_selStateHandler = new SBSelStateHandler(this);
+						return _selStateHandler;
+					}
 				}
-			}
-				ISSESelStateHandler _selStateHandler;
+					ISSESelStateHandler _selStateHandler;
 			/*	Action State	*/
-				ISSEStateEngine<ISBActState> actStateEngine{
+				public ISBActStateHandler actStateHandler{
 					get{
-						if(m_actStateEngine == null)
-							m_actStateEngine = new SSEStateEngine<ISBActState>();
-						return m_actStateEngine;
+						if(_actStateHandler == null)
+							_actStateHandler = new SBActStateHandler(this);
+						return _actStateHandler;
 					}
 				}
-					ISSEStateEngine<ISBActState> m_actStateEngine;
-				void SetActState(ISBActState state){
-					actStateEngine.SetState(state);
-					if(state == null && actProcess != null)
-						SetAndRunActProcess(null);
+					ISBActStateHandler _actStateHandler;
+				public void SetActSTateHandler(ISBActStateHandler actStateHandler){
+					_actStateHandler = actStateHandler;
 				}
-				ISBActState curActState{
-					get{return actStateEngine.curState;}
-				}
-				ISBActState prevActState{
-					get{return actStateEngine.prevState;}
-				}
-				ISBActStateFactory actStateFactory{
-					get{
-						if(m_actStateFactory == null)
-							m_actStateFactory = new SBActStateFactory(this);
-						return m_actStateFactory;
-					}
-				}
-					ISBActStateFactory m_actStateFactory;
 				public void ClearCurActState(){
-					SetActState(null);
+					actStateHandler.ClearCurActState();
 				}
 					public bool wasActStateNull{
-						get{return prevActState == null;}
+						get{return actStateHandler.wasActStateNull;}
 					}
 					public bool isActStateNull{
-						get{return curActState == null;}
+						get{return actStateHandler.isActStateNull;}
 					}
-				public virtual void WaitForAction(){
-					SetActState(waitForActionState);
+				public void WaitForAction(){
+					actStateHandler.WaitForAction();
 				}
 					public ISBActState waitForActionState{
-						get{return actStateFactory.MakeWaitForActionState();}
+						get{return actStateHandler.waitForActionState;}
 					}
-					public virtual bool isWaitingForAction{
-						get{return curActState == waitForActionState;}
+					public bool isWaitingForAction{
+						get{return actStateHandler.isWaitingForAction;}
 					}
-					public virtual bool wasWaitingForAction{
-						get{return prevActState == waitForActionState;}
+					public bool wasWaitingForAction{
+						get{return actStateHandler.wasWaitingForAction;}
 					}
-				public virtual void WaitForPointerUp(){
-					SetActState(waitForPointerUpState);
+				public void WaitForPointerUp(){
+					actStateHandler.WaitForPointerUp();
 				}
 					public ISBActState waitForPointerUpState{
-						get{return actStateFactory.MakeWaitForPointerUpState();}
+						get{return actStateHandler.waitForPointerUpState;}
 					}
-					public virtual bool isWaitingForPointerUp{
-						get{return curActState == waitForPointerUpState;}
+					public bool isWaitingForPointerUp{
+						get{return actStateHandler.isWaitingForPointerUp;}
 					}
-					public virtual bool wasWaitingForPointerUp{
-						get{return prevActState == waitForPointerUpState;}
+					public bool wasWaitingForPointerUp{
+						get{return actStateHandler.wasWaitingForPointerUp;}
 					}
-				public virtual void WaitForPickUp(){
-					SetActState(waitForPickUpState);
+				public void WaitForPickUp(){
+					actStateHandler.WaitForPickUp();
 				}
 					public ISBActState waitForPickUpState{
-						get{return actStateFactory.MakeWaitForPickUpState();}
+						get{return actStateHandler.waitForPickUpState;}
 					}
-					public virtual bool isWaitingForPickUp{
-						get{return curActState == waitForPickUpState;}
+					public bool isWaitingForPickUp{
+						get{return actStateHandler.isWaitingForPickUp;}
 					}
-					public virtual bool wasWaitingForPickUp{
-						get{return prevActState == waitForPickUpState;}
+					public bool wasWaitingForPickUp{
+						get{return actStateHandler.wasWaitingForPickUp;}
 					}
-				public virtual void WaitForNextTouch(){
-					SetActState(waitForNextTouchState);
+				public void WaitForNextTouch(){
+					actStateHandler.WaitForNextTouch();
 				}
 					public ISBActState waitForNextTouchState{
-						get{return actStateFactory.MakeWaitForNextTouchState();}
+						get{return actStateHandler.waitForNextTouchState;}
 					}
-					public virtual bool isWaitingForNextTouch{
-						get{return curActState == waitForNextTouchState;}
+					public bool isWaitingForNextTouch{
+						get{return actStateHandler.isWaitingForNextTouch;}
 					}
-					public virtual bool wasWaitingForNextTouch{
-						get{return prevActState == waitForNextTouchState;}
+					public bool wasWaitingForNextTouch{
+						get{return actStateHandler.wasWaitingForNextTouch;}
 					}
-				public virtual void PickUp(){
-					SetActState(pickedUpState);
-					pickedAmount = 1;
+				public void PickUp(){
+					actStateHandler.PickUp();
+				}
+				public void SetPickedUpState(){
+					actStateHandler.SetPickedUpState();
 				}
 					public ISBActState pickedUpState{
-						get{return actStateFactory.MakePickingUpState();}
+						get{return actStateHandler.pickedUpState;}
 					}
-					public virtual bool isPickingUp{
-						get{return curActState == pickedUpState;}
+					public bool isPickingUp{
+						get{return actStateHandler.isPickingUp;}
 					}
-					public virtual bool wasPickingUp{
-						get{return prevActState == pickedUpState;}
+					public bool wasPickingUp{
+						get{return actStateHandler.wasPickingUp;}
 					}
-				public virtual void Remove(){
-					SetActState(removedState);
+				public void Remove(){
+					actStateHandler.Remove();
 				}
 					public ISBActState removedState{
-						get{return actStateFactory.MakeRemovedState();}
+						get{return actStateHandler.removedState;}
 					}
-					public virtual bool isRemoving{
-						get{return curActState == removedState;}
+					public bool isRemoving{
+						get{return actStateHandler.isRemoving;}
 					}
-					public virtual bool wasRemoving{
-						get{return prevActState == removedState;}
+					public bool wasRemoving{
+						get{return actStateHandler.wasRemoving;}
 					}
-				public virtual void Add(){
-					SetActState(addedState);
+				public void Add(){
+					actStateHandler.Add();
 				}
 					public ISBActState addedState{
-						get{return actStateFactory.MakeAddedState();}
+						get{return actStateHandler.addedState;}
 					}
-					public virtual bool isAdding{
-						get{return curActState == addedState;}
+					public bool isAdding{
+						get{return actStateHandler.isAdding;}
 					}
-					public virtual bool wasAdding{
-						get{return prevActState == addedState;}
+					public bool wasAdding{
+						get{return actStateHandler.wasAdding;}
 					}
-				public virtual void MoveWithin(){
-					SetActState(moveWithinState);
+				public void MoveWithin(){
+					actStateHandler.MoveWithin();
 				}
 					public ISBActState moveWithinState{
-						get{return actStateFactory.MakeMoveWithinState();}
+						get{return actStateHandler.moveWithinState;}
 					}
-					public virtual bool isMovingWithin{
-						get{return curActState == moveWithinState;}
+					public bool isMovingWithin{
+						get{return actStateHandler.isMovingWithin;}
 					}
-					public virtual bool wasMovingWithin{
-						get{return prevActState == moveWithinState;}
+					public bool wasMovingWithin{
+						get{return actStateHandler.wasMovingWithin;}
 					}
+				public ISBActProcess actProcess{
+					get{return actStateHandler.actProcess;}
+				}
+				public void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine){
+					((SBActStateHandler)actStateHandler).SetActProcessEngine(engine);
+				}
+				public void SetAndRunActProcess(ISBActProcess process){
+					actStateHandler.SetAndRunActProcess(process);
+				}
+				public void ExpireActProcess(){
+					actStateHandler.ExpireActProcess();
+				}
+				public void SetActCoroutineRepo(ISBActCoroutineRepo repo){
+					((SBActStateHandler)actStateHandler).SetCoroutineRepo(repo);
+				}
+				public System.Func<IEnumeratorFake> waitForPointerUpCoroutine{
+					get{return actStateHandler.waitForPointerUpCoroutine;}
+				}
+				public System.Func<IEnumeratorFake> waitForPickUpCoroutine{
+					get{return actStateHandler.waitForPickUpCoroutine;}
+				}
+				public System.Func<IEnumeratorFake> pickUpCoroutine{
+					get{return actStateHandler.pickUpCoroutine;}
+				}
+				public System.Func<IEnumeratorFake> waitForNextTouchCoroutine{
+					get{return actStateHandler.waitForNextTouchCoroutine;}
+				}
+				public System.Func<IEnumeratorFake> removeCoroutine{
+					get{return actStateHandler.removeCoroutine;}
+				}
+				public System.Func<IEnumeratorFake> addCoroutine{
+					get{return actStateHandler.addCoroutine;}
+				}
+				public System.Func<IEnumeratorFake> moveWithinCoroutine{
+					get{return actStateHandler.moveWithinCoroutine;}
+				}
+				public void OnPointerDown(PointerEventDataFake eventDataMock){
+					actStateHandler.OnPointerDown(eventDataMock);
+				}
+				public void OnPointerUp(PointerEventDataFake eventDataMock){
+					actStateHandler.OnPointerUp(eventDataMock);
+				}
+				public void OnDeselected(PointerEventDataFake eventDataMock){
+					actStateHandler.OnDeselected(eventDataMock);
+				}
+				public void OnEndDrag(PointerEventDataFake eventDataMock){
+					actStateHandler.OnEndDrag(eventDataMock);
+				}
 			/*	Equip State	*/
 				ISSEStateEngine<ISBEqpState> eqpStateEngine{
 					get{
@@ -176,14 +210,14 @@ namespace SlotSystem{
 				ISBEqpState prevEqpState{
 					get{return eqpStateEngine.prevState;}
 				}
-				ISBEqpStateFactory eqpStateFactory{
+				ISBEqpStateRepo eqpStateRepo{
 					get{
-						if(m_eqpStateFactory == null)
-							m_eqpStateFactory = new SBEqpStateFactory(this);
-						return m_eqpStateFactory;
+						if(m_eqpStateRepo == null)
+							m_eqpStateRepo = new SBEqpStateRepo(this);
+						return m_eqpStateRepo;
 					}
 				}
-					ISBEqpStateFactory m_eqpStateFactory;
+					ISBEqpStateRepo m_eqpStateRepo;
 				public virtual void ClearCurEqpState(){
 					SetEqpState(null);
 				}
@@ -197,7 +231,7 @@ namespace SlotSystem{
 					SetEqpState(equippedState);
 				}
 					public ISBEqpState equippedState{
-						get{return eqpStateFactory.MakeEquippedState();}
+						get{return eqpStateRepo.equippedState;}
 					}
 					public virtual bool isEquipped{
 						get{ return curEqpState == equippedState;}
@@ -209,7 +243,7 @@ namespace SlotSystem{
 					SetEqpState(unequippedState);
 				}
 					public ISBEqpState unequippedState{
-						get{return eqpStateFactory.MakeUnequippedState();}
+						get{return eqpStateRepo.unequippedState;}
 					}
 					public virtual bool isUnequipped{
 						get{ return curEqpState == unequippedState;}
@@ -237,14 +271,14 @@ namespace SlotSystem{
 				ISBMrkState prevMrkState{
 					get{return mrkStateEngine.prevState;}
 				}
-				ISBMrkStateFactory mrkStateFactory{
+				ISBMrkStateRepo mrkStateRepo{
 					get{
-						if(m_mrkStateFactory == null)
-							m_mrkStateFactory = new SBMrkStateFactory(this);
-						return m_mrkStateFactory;
+						if(m_mrkStateRepo == null)
+							m_mrkStateRepo = new SBMrkStateRepo(this);
+						return m_mrkStateRepo;
 					}
 				}
-					ISBMrkStateFactory m_mrkStateFactory;
+					ISBMrkStateRepo m_mrkStateRepo;
 				public virtual void ClearCurMrkState(){
 					SetMrkState(null);
 				}
@@ -258,7 +292,7 @@ namespace SlotSystem{
 					SetMrkState(markedState);
 				}
 					public ISBMrkState markedState{
-						get{return mrkStateFactory.MakeMarkedState();}
+						get{return mrkStateRepo.markedState;}
 					}
 					public virtual bool isMarked{
 						get{return curMrkState == markedState;}
@@ -270,7 +304,7 @@ namespace SlotSystem{
 					SetMrkState(unmarkedState);
 				}
 					public ISBMrkState unmarkedState{
-						get{return mrkStateFactory.MakeUnmarkedState();}
+						get{return mrkStateRepo.unmarkedState;}
 					}
 					public virtual bool isUnmarked{
 						get{return curMrkState == unmarkedState;}
@@ -279,60 +313,7 @@ namespace SlotSystem{
 						get{return prevMrkState == markedState;}
 					}
 		/*	processes	*/
-			ISBCoroutineFactory coroutineFactory{
-				get{
-					if(m_coroutineFactory == null)
-						m_coroutineFactory = new SBCoroutineFactory();
-					return m_coroutineFactory;
-				}
-			}
-				ISBCoroutineFactory m_coroutineFactory;
-			public void SetCoroutineFactory(ISBCoroutineFactory factory){
-				m_coroutineFactory = factory;
-			}
 			/*	Action Process	*/
-				public ISBActProcess actProcess{
-					get{return actProcEngine.process;}
-				}
-				public void SetAndRunActProcess(ISBActProcess process){
-					actProcEngine.SetAndRunProcess(process);
-				}
-				ISSEProcessEngine<ISBActProcess> actProcEngine{
-					get{
-						if(m_actProcEngine == null)
-							m_actProcEngine = new SSEProcessEngine<ISBActProcess>();
-						return m_actProcEngine;
-					}
-				}
-					ISSEProcessEngine<ISBActProcess> m_actProcEngine;
-				public void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine){
-					m_actProcEngine = engine;
-				}
-				public void ExpireActProcess(){
-					if(actProcess != null)
-						actProcess.Expire();
-				}
-				public System.Func<IEnumeratorFake> waitForPointerUpCoroutine{
-					get{return coroutineFactory.MakeWaitForPointerUpCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> waitForPickUpCoroutine{
-					get{return coroutineFactory.MakeWaitForPickUpCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> pickUpCoroutine{
-					get{return coroutineFactory.MakePickUpCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> waitForNextTouchCoroutine{
-					get{return coroutineFactory.MakeWaitForNextTouchCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> removeCoroutine{
-					get{return coroutineFactory.MakeRemoveCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> addCoroutine{
-					get{return coroutineFactory.MakeAddCoroutine();}
-				}
-				public System.Func<IEnumeratorFake> moveWithinCoroutine{
-					get{return coroutineFactory.MakeMoveWithinCoroutine();}
-				}
 			/*	Equip Process	*/
 				public ISBEqpProcess eqpProcess{
 					get{return eqpProcEngine.process;}
@@ -351,11 +332,22 @@ namespace SlotSystem{
 				public void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine){
 					m_eqpProcEngine = engine;
 				}
+				ISBEqpCoroutineRepo eqpCoroutineRepo{
+					get{
+						if(_eqpCoroutineRepo == null)
+							_eqpCoroutineRepo = new SBEqpCoroutineRepo();
+						return _eqpCoroutineRepo;
+					}
+				}
+					ISBEqpCoroutineRepo _eqpCoroutineRepo;
+				public void SetEqpCoroutineRepo(ISBEqpCoroutineRepo repo){
+					_eqpCoroutineRepo = repo;
+				}
 				public System.Func<IEnumeratorFake> equipCoroutine{
-					get{return coroutineFactory.MakeEquipCoroutine();}
+					get{return eqpCoroutineRepo.equipCoroutine;}
 				}
 				public System.Func<IEnumeratorFake> unequipCoroutine{
-					get{return coroutineFactory.MakeUnequipCoroutine();}
+					get{return eqpCoroutineRepo.unequipCoroutine;}
 				}
 			/*	Mark Process	*/
 				public ISBMrkProcess mrkProcess{
@@ -375,11 +367,22 @@ namespace SlotSystem{
 				public void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine){
 					m_mrkProcEngine = engine;
 				}
+				ISBMrkCoroutineRepo mrkCoroutineRepo{
+					get{
+						if(_mrkCoroutineRepo == null)
+							_mrkCoroutineRepo = new SBMrkCoroutineRepo();
+						return _mrkCoroutineRepo;
+					}
+				}
+					ISBMrkCoroutineRepo _mrkCoroutineRepo;
+				public void SetMrkCoroutineRepo(ISBMrkCoroutineRepo repo){
+					_mrkCoroutineRepo = repo;
+				}
 				public System.Func<IEnumeratorFake> markCoroutine{
-					get{return coroutineFactory.MakeMarkCoroutine();}
+					get{return mrkCoroutineRepo.markCoroutine;}
 				}
 				public System.Func<IEnumeratorFake> unmarkCoroutine{
-					get{return coroutineFactory.MakeUnmarkCoroutine();}
+					get{return mrkCoroutineRepo.unmarkCoroutine;}
 				}
 		/*	commands	*/
 			public void Tap(){
@@ -396,20 +399,16 @@ namespace SlotSystem{
 			public void SetTapCommand(SlottableCommand comm){
 				m_tapCommand = comm;
 			}
-		/*	Event methods	*/
-			public void OnPointerDown(PointerEventDataFake eventDataMock){
-				curActState.OnPointerDown();
-			}
-			public void OnPointerUp(PointerEventDataFake eventDataMock){
-				curActState.OnPointerUp();
-			}
-			public void OnDeselected(PointerEventDataFake eventDataMock){
-				curActState.OnDeselected();
-			}
-			public void OnEndDrag(PointerEventDataFake eventDataMock){
-				curActState.OnEndDrag();
-			}
 		/*	public fields	*/
+			public void Increment(){
+				SetPickedUpState();
+				IncreasePickedAmountUpToQuantity();
+			}
+			public void IncreasePickedAmountUpToQuantity(){
+				if(isStackable && quantity > pickedAmount){
+					pickedAmount ++;
+				}
+			}
 			/* Item Handling */
 				public IItemHandler itemHandler{
 					get{
@@ -421,10 +420,6 @@ namespace SlotSystem{
 					IItemHandler _itemHandler;
 				public void SetItemHandler(IItemHandler itemHandler){
 					_itemHandler = itemHandler;
-				}
-				public void Increment(){
-					SetActState(pickedUpState);
-					itemHandler.Increment();
 				}
 				public InventoryItemInstance item{
 					get{return itemHandler.item;}
@@ -635,45 +630,9 @@ namespace SlotSystem{
 				hoverable.OnHoverExit();
 			}
 	}
-	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler{
+	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler, ISBActStateHandler{
 		/*	States and Processes	*/
 			/* States */
-				/* ActStates */
-					void ClearCurActState();
-						bool wasActStateNull{get;}
-						bool isActStateNull{get;}
-					void WaitForAction();
-						ISBActState waitForActionState{get;}
-						bool isWaitingForAction{get;}
-						bool wasWaitingForAction{get;}
-					void WaitForPointerUp();
-						ISBActState waitForPointerUpState{get;}
-						bool isWaitingForPointerUp{get;}
-						bool wasWaitingForPointerUp{get;}
-					void WaitForPickUp();
-						ISBActState waitForPickUpState{get;}
-						bool isWaitingForPickUp{get;}
-						bool wasWaitingForPickUp{get;}
-					void WaitForNextTouch();
-						ISBActState waitForNextTouchState{get;}
-						bool isWaitingForNextTouch{get;}
-						bool wasWaitingForNextTouch{get;}
-					void PickUp();
-						ISBActState pickedUpState{get;}
-						bool isPickingUp{get;}
-						bool wasPickingUp{get;}
-					void Remove();
-						ISBActState removedState{get;}
-						bool isRemoving{get;}
-						bool wasRemoving{get;}
-					void Add();
-						ISBActState addedState{get;}
-						bool isAdding{get;}
-						bool wasAdding{get;}
-					void MoveWithin();
-						ISBActState moveWithinState{get;}
-						bool isMovingWithin{get;}
-						bool wasMovingWithin{get;}
 				/* Eqp States */
 					void ClearCurEqpState();
 						bool isEqpStateNull{get;}
@@ -699,15 +658,6 @@ namespace SlotSystem{
 						bool isUnmarked{get;}
 						bool wasUnmarked{get;}
 			/* Process */
-				ISBActProcess actProcess{get;}
-				void SetAndRunActProcess(ISBActProcess process);
-					System.Func<IEnumeratorFake> waitForPointerUpCoroutine{get;}
-					System.Func<IEnumeratorFake> waitForPickUpCoroutine{get;}
-					System.Func<IEnumeratorFake> pickUpCoroutine{get;}
-					System.Func<IEnumeratorFake> waitForNextTouchCoroutine{get;}
-					System.Func<IEnumeratorFake> removeCoroutine{get;}
-					System.Func<IEnumeratorFake> addCoroutine{get;}
-					System.Func<IEnumeratorFake> moveWithinCoroutine{get;}
 				ISBEqpProcess eqpProcess{get;}
 				void SetAndRunEqpProcess(ISBEqpProcess process);
 					System.Func<IEnumeratorFake> unequipCoroutine{get;}
@@ -718,11 +668,6 @@ namespace SlotSystem{
 					System.Func<IEnumeratorFake> markCoroutine{get;}
 		/*	Commands	*/
 			void Tap();
-		/*	Event Methods	*/
-			void OnPointerDown(PointerEventDataFake eventDataMock);
-			void OnPointerUp(PointerEventDataFake eventDataMock);
-			void OnDeselected(PointerEventDataFake eventDataMock);
-			void OnEndDrag(PointerEventDataFake eventDataMock);
 		/* Item Handling */
 			void UpdateEquipState();
 		/* SG And Slot */
@@ -747,6 +692,7 @@ namespace SlotSystem{
 			bool passesPrePickFilter{get;}
 			void ExecuteTransaction();
 		/* Other */
+			void Increment();
 			bool delayed{get;set;}
 			void Refresh();
 			bool ShareSGAndItem(ISlottable other);

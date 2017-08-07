@@ -132,9 +132,9 @@ namespace SlotSystemTests{
 					public void WaitForPickUp_WasWaitingForAction_SetsAndRunsWFPickUpProc(){
 						Slottable sb = MakeSB();
 							System.Func<IEnumeratorFake> mockWFPickUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory mockCorFac = Substitute.For<ISBCoroutineFactory>();
-							mockCorFac.MakeWaitForPickUpCoroutine().Returns(mockWFPickUpCoroutine);
-							sb.SetCoroutineFactory(mockCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.waitForPickUpCoroutine.Returns(mockWFPickUpCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 						sb.WaitForAction();
 
 						sb.WaitForPickUp();
@@ -218,9 +218,9 @@ namespace SlotSystemTests{
 					public void WaitForPointerUp_WasWaitingForAction_SetsAndRunsWaitForPointerUpProcess(){
 						Slottable sb = MakeSB();
 							System.Func<IEnumeratorFake> mockWFPointerUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory mockCorFac = Substitute.For<ISBCoroutineFactory>();
-							mockCorFac.MakeWaitForPointerUpCoroutine().Returns(mockWFPointerUpCoroutine);
-							sb.SetCoroutineFactory(mockCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.waitForPointerUpCoroutine.Returns(mockWFPointerUpCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 						sb.WaitForAction();
 						
 						sb.WaitForPointerUp();
@@ -336,9 +336,9 @@ namespace SlotSystemTests{
 					public void WaitForNextTouch_WasPickingUp_SetsAndRunsWaitForNextTouchProcess(){
 						Slottable sb = MakeSBForPickUp();
 							System.Func<IEnumeratorFake> mockWFNTCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-							stubCorFac.MakeWaitForNextTouchCoroutine().Returns(mockWFNTCoroutine);
-							sb.SetCoroutineFactory(stubCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.waitForNextTouchCoroutine.Returns(mockWFNTCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -352,9 +352,9 @@ namespace SlotSystemTests{
 					public void WaitForNextTouch_WasWaitingForPickUp_SetsAndRunsWaitForNextTouchProcess(){
 						Slottable sb = MakeSB();
 							System.Func<IEnumeratorFake> mockWFNTCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-							stubCorFac.MakeWaitForNextTouchCoroutine().Returns(mockWFNTCoroutine);
-							sb.SetCoroutineFactory(stubCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.waitForNextTouchCoroutine.Returns(mockWFNTCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						
@@ -605,9 +605,9 @@ namespace SlotSystemTests{
 					public void PickUp_WasWaitingForPickUpOrWaitingForNextTouch_SetsAndRunsPickUpProcess(){
 						Slottable sb = MakeSBForPickUp();
 							System.Func<IEnumeratorFake> mockPickUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-							stubCorFac.MakePickUpCoroutine().Returns(mockPickUpCoroutine);
-							sb.SetCoroutineFactory(stubCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.pickUpCoroutine.Returns(mockPickUpCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -698,9 +698,9 @@ namespace SlotSystemTests{
 					public void MoveWithin_Always_SetsAndRunsMoveWithinProcess(){
 						Slottable sb = MakeSB();
 							System.Func<IEnumeratorFake> mockMoveWithinCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-							stubCorFac.MakeMoveWithinCoroutine().Returns(mockMoveWithinCoroutine);
-							sb.SetCoroutineFactory(stubCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.moveWithinCoroutine.Returns(mockMoveWithinCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 
 						sb.MoveWithin();
 
@@ -719,9 +719,9 @@ namespace SlotSystemTests{
 					public void Add_Always_SetsAndRunsAddProcess(){
 						Slottable sb = MakeSB();
 							System.Func<IEnumeratorFake> mockAddCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-							stubCorFac.MakeAddCoroutine().Returns(mockAddCoroutine);
-							sb.SetCoroutineFactory(stubCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.addCoroutine.Returns(mockAddCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 
 						sb.Add();
 
@@ -740,9 +740,9 @@ namespace SlotSystemTests{
 					public void Remove_Always_SetsAndRunsRemovProcess(){
 						Slottable sb = MakeSB();
 							System.Func<IEnumeratorFake> mockRemoveCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
-							ISBCoroutineFactory stubCorFac = Substitute.For<ISBCoroutineFactory>();
-							stubCorFac.MakeRemoveCoroutine().Returns(mockRemoveCoroutine);
-							sb.SetCoroutineFactory(stubCorFac);
+							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
+							mockCorRepo.removeCoroutine.Returns(mockRemoveCoroutine);
+							sb.SetActCoroutineRepo(mockCorRepo);
 
 						sb.Remove();
 

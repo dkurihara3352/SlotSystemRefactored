@@ -17,11 +17,6 @@ namespace SlotSystem{
 		public void SetItem(InventoryItemInstance item){
 			_item = item;
 		}
-		public void Increment(){
-			if(isStackable && quantity > m_pickedAmount){
-				m_pickedAmount ++;
-			}
-		}
 		public int pickedAmount{
 			get{return m_pickedAmount;}
 			set{m_pickedAmount = value;}
@@ -38,7 +33,6 @@ namespace SlotSystem{
 		}
 	}
 	public interface IItemHandler{
-		void Increment();
 		InventoryItemInstance item{get;}
 		void SetItem(InventoryItemInstance item);
 		int pickedAmount{get;set;}

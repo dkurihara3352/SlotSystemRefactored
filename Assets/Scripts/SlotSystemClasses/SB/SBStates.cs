@@ -13,7 +13,7 @@ namespace SlotSystem{
 	}
     /* ActState */
         public abstract class SBActState: SBState, ISBActState{
-            public SBActState(ISlottable sb) : base(sb){}
+            public SBActState(ISBActStateHandler actStateHandler) : base((ISlottable)actStateHandler){}
             public virtual void OnPointerDown(){}
             public virtual void OnPointerUp(){}
             public virtual void OnDeselected(){}
@@ -25,80 +25,95 @@ namespace SlotSystem{
             void OnDeselected();
             void OnEndDrag();
         }
-        public abstract class SBStateFactory{
-            protected ISlottable sb;
-            protected IItemHandler itemHandler;
-            public SBStateFactory(ISlottable sb){
-                this.sb = sb;
+        public abstract class SBStateRepo{
+            protected ISBActStateHandler actStateHandler;
+            public SBStateRepo(ISBActStateHandler actStateHandler){
+                this.actStateHandler = actStateHandler;
             }
         }
-        public class SBActStateFactory: SBStateFactory, ISBActStateFactory{
-            public SBActStateFactory(ISlottable sb): base(sb){
+        public class SBActStateRepo: SBStateRepo, ISBActStateRepo{
+            public SBActStateRepo(ISBActStateHandler actStateHandler): base(actStateHandler){
             }
-            public ISBActState MakeWaitForActionState(){
-                if(waitForActionState == null)
-                    waitForActionState = new WaitForActionState(sb);
-                return waitForActionState;
+            public ISBActState waitForActionState{
+                get{
+                    if(_waitForActionState == null)
+                        _waitForActionState = new WaitForActionState(actStateHandler);
+                    return _waitForActionState;
+                }
             }
-                ISBActState waitForActionState;
-            public ISBActState MakeWaitForPickUpState(){
-                if(waitForPickUpState == null)
-                    waitForPickUpState = new WaitForPickUpState(sb);
-                return waitForPickUpState;
+                ISBActState _waitForActionState;
+            public ISBActState waitForPickUpState{
+                get{
+                    if(_waitForPickUpState == null)
+                        _waitForPickUpState = new WaitForPickUpState(actStateHandler);
+                    return _waitForPickUpState;
+                }
             }
-                ISBActState waitForPickUpState;
-            public ISBActState MakeWaitForPointerUpState(){
-                if(waitForPointerUpState == null)
-                    waitForPointerUpState = new WaitForPointerUpState(sb);
-                return waitForPointerUpState;
+                ISBActState _waitForPickUpState;
+            public ISBActState waitForPointerUpState{
+                get{
+                    if(_waitForPointerUpState == null)
+                        _waitForPointerUpState = new WaitForPointerUpState(actStateHandler);
+                    return _waitForPointerUpState;
+                }
             }
-                ISBActState waitForPointerUpState;
-            public ISBActState MakeWaitForNextTouchState(){
-                if(waitForNextTouchState == null)
-                    waitForNextTouchState = new WaitForNextTouchState(sb);
-                return waitForNextTouchState;
+                ISBActState _waitForPointerUpState;
+            public ISBActState waitForNextTouchState{
+                get{
+                    if(_waitForNextTouchState == null)
+                        _waitForNextTouchState = new WaitForNextTouchState(actStateHandler);
+                    return _waitForNextTouchState;
+                }
             }
-                ISBActState waitForNextTouchState;
-            public ISBActState MakePickingUpState(){
-                if(pickingUpState == null)
-                    pickingUpState = new PickingUpState(sb);
-                return pickingUpState;
+                ISBActState _waitForNextTouchState;
+            public ISBActState pickingUpState{
+                get{
+                    if(_pickingUpState == null)
+                        _pickingUpState = new PickingUpState(actStateHandler);
+                    return _pickingUpState;
+                }
             }
-                ISBActState pickingUpState;
-            public ISBActState MakeAddedState(){
-                if(addedState == null)
-                    addedState = new SBAddedState(sb);
-                return addedState;
+                ISBActState _pickingUpState;
+            public ISBActState addedState{
+                get{
+                    if(_addedState == null)
+                        _addedState = new SBAddedState(actStateHandler);
+                    return _addedState;
+                }
             }
-                ISBActState addedState;
-            public ISBActState MakeRemovedState(){
-                if(removedState == null)
-                    removedState = new SBRemovedState(sb);
-                return removedState;
+                ISBActState _addedState;
+            public ISBActState removedState{
+                get{
+                    if(_removedState == null)
+                        _removedState = new SBRemovedState(actStateHandler);
+                    return _removedState;
+                }
             }
-                ISBActState removedState;
-            public ISBActState MakeMoveWithinState(){
-                if(moveWithinState == null)
-                    moveWithinState = new MoveWithinState(sb);
-                return moveWithinState;
+                ISBActState _removedState;
+            public ISBActState moveWithinState{
+                get{
+                    if(_moveWithinState == null)
+                        _moveWithinState = new MoveWithinState(actStateHandler);
+                    return _moveWithinState;
+                }
             }
-                ISBActState moveWithinState;
+                ISBActState _moveWithinState;
 
             
         }
-        public interface ISBActStateFactory{
-            ISBActState MakeWaitForActionState();
-            ISBActState MakeWaitForPickUpState();
-            ISBActState MakeWaitForPointerUpState();
-            ISBActState MakeWaitForNextTouchState();
-            ISBActState MakePickingUpState();
-            ISBActState MakeAddedState();
-            ISBActState MakeRemovedState();
-            ISBActState MakeMoveWithinState();
+        public interface ISBActStateRepo{
+            ISBActState waitForActionState{get;}
+            ISBActState waitForPickUpState{get;}
+            ISBActState waitForPointerUpState{get;}
+            ISBActState waitForNextTouchState{get;}
+            ISBActState pickingUpState{get;}
+            ISBActState addedState{get;}
+            ISBActState removedState{get;}
+            ISBActState moveWithinState{get;}
 
         }
         public class WaitForActionState: SBActState{//up state
-            public WaitForActionState(ISlottable sb): base(sb){}
+            public WaitForActionState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 if(!sb.wasActStateNull)
                     sb.SetAndRunActProcess(null);
@@ -113,7 +128,7 @@ namespace SlotSystem{
             }
         }
         public class WaitForPickUpState: SBActState{//down state
-            public WaitForPickUpState(ISlottable sb): base(sb){}
+            public WaitForPickUpState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 if(sb.wasWaitingForAction){
                     ISBActProcess wfpuProcess = new WaitForPickUpProcess(sb, sb.waitForPickUpCoroutine);
@@ -130,7 +145,7 @@ namespace SlotSystem{
             }
         }
         public class WaitForPointerUpState: SBActState{//down state
-            public WaitForPointerUpState(ISlottable sb): base(sb){}
+            public WaitForPointerUpState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 if(sb.wasWaitingForAction){
                     ISBActProcess wfPtuProcess = new WaitForPointerUpProcess(sb, sb.waitForPointerUpCoroutine);
@@ -149,7 +164,7 @@ namespace SlotSystem{
                 }
         }
         public class WaitForNextTouchState: SBActState{//up state
-            public WaitForNextTouchState(ISlottable sb): base(sb){}
+            public WaitForNextTouchState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 if(sb.wasPickingUp || sb.wasWaitingForPickUp){
                     ISBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.waitForNextTouchCoroutine);
@@ -170,7 +185,7 @@ namespace SlotSystem{
             }
         }
         public class PickingUpState: SBActState{//down state
-            public PickingUpState(ISlottable sb): base(sb){}
+            public PickingUpState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 if(sb.wasWaitingForPickUp || sb.wasWaitingForNextTouch){
                     sb.OnHoverEnter();
@@ -199,21 +214,21 @@ namespace SlotSystem{
             }
         }
         public class SBAddedState: SBActState{
-            public SBAddedState(ISlottable sb): base(sb){}
+            public SBAddedState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 SBAddProcess process = new SBAddProcess(sb, sb.addCoroutine);
                 sb.SetAndRunActProcess(process);
             }
         }
         public class SBRemovedState: SBActState{
-            public SBRemovedState(ISlottable sb): base(sb){}
+            public SBRemovedState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 SBRemoveProcess process = new SBRemoveProcess(sb, sb.removeCoroutine);
                 sb.SetAndRunActProcess(process);
             }
         }
         public class MoveWithinState: SBActState{
-            public MoveWithinState(ISlottable sb): base(sb){}
+            public MoveWithinState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
                 SBMoveWithinProcess process = new SBMoveWithinProcess(sb, sb.moveWithinCoroutine);
                 sb.SetAndRunActProcess(process);
@@ -221,28 +236,35 @@ namespace SlotSystem{
         }
     /* EqpState */
         public abstract class SBEqpState: SBState, ISBEqpState{
-            public SBEqpState(ISlottable sb): base(sb){}
+            public SBEqpState(ISlottable sb): base(sb){
+            }
         }
         public interface ISBEqpState: ISSEState{}
-        public class SBEqpStateFactory: SBStateFactory, ISBEqpStateFactory{
-            public SBEqpStateFactory(ISlottable sb): base(sb){
+        public class SBEqpStateRepo: SBStateRepo, ISBEqpStateRepo{
+            ISlottable sb;
+            public SBEqpStateRepo(ISlottable sb): base(sb){
+                this.sb = sb;
             }
-            public ISBEqpState MakeEquippedState(){
-                if(equippedState == null)
-                    equippedState = new SBEquippedState(sb);
-                return equippedState;
+            public ISBEqpState equippedState{
+                get{
+                    if(_equippedState == null)
+                        _equippedState = new SBEquippedState(sb);
+                    return _equippedState;
+                }
             }
-                ISBEqpState equippedState;
-            public ISBEqpState MakeUnequippedState(){
-                if(unequippedState == null)
-                    unequippedState = new SBUnequippedState(sb);
-                return unequippedState;
+                ISBEqpState _equippedState;
+            public ISBEqpState unequippedState{
+                get{
+                    if(_unequippedState == null)
+                        _unequippedState = new SBUnequippedState(sb);
+                    return _unequippedState;
+                }
             }
-                ISBEqpState unequippedState;
+                ISBEqpState _unequippedState;
         }
-        public interface ISBEqpStateFactory{
-            ISBEqpState MakeEquippedState();
-            ISBEqpState MakeUnequippedState();
+        public interface ISBEqpStateRepo{
+            ISBEqpState equippedState{get;}
+            ISBEqpState unequippedState{get;}
         }
         public class SBEquippedState: SBEqpState{
             public SBEquippedState(ISlottable sb): base(sb){}
@@ -276,25 +298,31 @@ namespace SlotSystem{
         }
         public interface ISBMrkState: ISSEState{
         }
-        public class SBMrkStateFactory: SBStateFactory, ISBMrkStateFactory{
-            public SBMrkStateFactory(ISlottable sb): base(sb){
+        public class SBMrkStateRepo: SBStateRepo, ISBMrkStateRepo{
+            ISlottable sb;
+            public SBMrkStateRepo(ISlottable sb): base(sb){
+                this.sb = sb;
             }
-            public ISBMrkState MakeMarkedState(){
-                if(markedState == null)
-                    markedState = new SBMarkedState(sb);
-                return markedState;
+            public ISBMrkState markedState{
+                get{
+                    if(_markedState == null)
+                        _markedState = new SBMarkedState(sb);
+                    return _markedState;
+                }
             }
-                ISBMrkState markedState;
-            public ISBMrkState MakeUnmarkedState(){
-                if(unmarkedState == null)
-                    unmarkedState = new SBUnmarkedState(sb);
-                return unmarkedState;
+                ISBMrkState _markedState;
+            public ISBMrkState unmarkedState{
+                get{
+                    if(_unmarkedState == null)
+                        _unmarkedState = new SBUnmarkedState(sb);
+                    return _unmarkedState;
+                }
             }
-                ISBMrkState unmarkedState;
+                ISBMrkState _unmarkedState;
         }
-        public interface ISBMrkStateFactory{
-            ISBMrkState MakeMarkedState();
-            ISBMrkState MakeUnmarkedState();
+        public interface ISBMrkStateRepo{
+            ISBMrkState markedState{get;}
+            ISBMrkState unmarkedState{get;}
         }
         public class SBMarkedState: SBMrkState{
             public SBMarkedState(ISlottable sb): base(sb){}

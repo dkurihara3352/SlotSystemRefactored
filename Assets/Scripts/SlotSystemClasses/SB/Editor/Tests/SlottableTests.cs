@@ -87,6 +87,40 @@ namespace SlotSystemTests{
 				}
 			/*	Methods	*/
 				[Test]
+				public void IncreasePickedAmountUpToQuantity_isStackable_IncreasePickedAmountUpToQuantity(){
+					Slottable sb = MakeSB();
+						ItemHandler itemHandler = new ItemHandler();
+						sb.SetItemHandler(itemHandler);
+							PartsInstance parts = MakePartsInstance(0, 2);
+							sb.SetItem(parts);
+					
+					sb.IncreasePickedAmountUpToQuantity();
+						Assert.That(sb.pickedAmount, Is.EqualTo(1));
+					
+					sb.IncreasePickedAmountUpToQuantity();
+						Assert.That(sb.pickedAmount, Is.EqualTo(2));
+					
+					sb.IncreasePickedAmountUpToQuantity();
+						Assert.That(sb.pickedAmount, Is.EqualTo(2));
+				}
+				[Test]
+				public void IncreasePickedAmountUpToQuantity_isNotStackable_DoesNotIncrease(){
+					Slottable sb = MakeSB();
+						ItemHandler itemHandler = new ItemHandler();
+						sb.SetItemHandler(itemHandler);
+						BowInstance bow = MakeBowInstance(0);
+						sb.SetItem(bow);
+					
+					sb.IncreasePickedAmountUpToQuantity();
+						Assert.That(sb.pickedAmount, Is.EqualTo(0));
+					
+					sb.IncreasePickedAmountUpToQuantity();
+						Assert.That(sb.pickedAmount, Is.EqualTo(0));
+					
+					sb.IncreasePickedAmountUpToQuantity();
+						Assert.That(sb.pickedAmount, Is.EqualTo(0));
+				}
+				[Test]
 				public void InitializeStates_Always_InitializesStates(){
 					Slottable sb = MakeSB_TACache();
 					ISlotSystemManager ssm = MakeSubSSM();
