@@ -13,7 +13,7 @@ namespace SlotSystem{
 				ClearCurEqpState();
 				Unmark();
 			}
-			/* Selection */
+			/*	Selection state */
 				public override ISSESelStateHandler selStateHandler{
 					get{
 						if(_selStateHandler == null)
@@ -191,198 +191,121 @@ namespace SlotSystem{
 					actStateHandler.OnEndDrag(eventDataMock);
 				}
 			/*	Equip State	*/
-				ISSEStateEngine<ISBEqpState> eqpStateEngine{
+				ISBEqpStateHandler eqpStateHandler{
 					get{
-						if(m_eqpStateEngine == null)
-							m_eqpStateEngine = new SSEStateEngine<ISBEqpState>();
-						return m_eqpStateEngine;
+						if(_eqpStateHandler == null)
+							_eqpStateHandler = new SBEqpStateHandler(this);
+						return _eqpStateHandler;
 					}
 				}
-					ISSEStateEngine<ISBEqpState> m_eqpStateEngine;
-				void SetEqpState(ISBEqpState state){
-					eqpStateEngine.SetState(state);
-					if(state == null && eqpProcess != null)
-						SetAndRunEqpProcess(null);
+					ISBEqpStateHandler _eqpStateHandler;
+				public void ClearCurEqpState(){
+					eqpStateHandler.ClearCurEqpState();
 				}
-				ISBEqpState curEqpState{
-					get{return eqpStateEngine.curState;}
+				public bool isEqpStateNull{
+					get{return eqpStateHandler.isEqpStateNull;}
 				}
-				ISBEqpState prevEqpState{
-					get{return eqpStateEngine.prevState;}
+				public bool wasEqpStateNull{
+					get{return eqpStateHandler.wasEqpStateNull;}
 				}
-				ISBEqpStateRepo eqpStateRepo{
-					get{
-						if(m_eqpStateRepo == null)
-							m_eqpStateRepo = new SBEqpStateRepo(this);
-						return m_eqpStateRepo;
-					}
+				public void Equip(){
+					eqpStateHandler.Equip();
 				}
-					ISBEqpStateRepo m_eqpStateRepo;
-				public virtual void ClearCurEqpState(){
-					SetEqpState(null);
+				public ISBEqpState equippedState{
+					get{return eqpStateHandler.equippedState;}
 				}
-					public virtual bool isEqpStateNull{
-						get{return curEqpState == null;}
-					}
-					public virtual bool wasEqpStateNull{
-						get{return prevEqpState == null;}
-					}				
-				public virtual void Equip(){
-					SetEqpState(equippedState);
+				public bool isEquipped{
+					get{return eqpStateHandler.isEquipped;}
 				}
-					public ISBEqpState equippedState{
-						get{return eqpStateRepo.equippedState;}
-					}
-					public virtual bool isEquipped{
-						get{ return curEqpState == equippedState;}
-					}
-					public virtual bool wasEquipped{
-						get{return prevEqpState == equippedState;}
-					}
-				public virtual void Unequip(){
-					SetEqpState(unequippedState);
+				public bool wasEquipped{
+					get{return eqpStateHandler.wasEquipped;}
 				}
-					public ISBEqpState unequippedState{
-						get{return eqpStateRepo.unequippedState;}
-					}
-					public virtual bool isUnequipped{
-						get{ return curEqpState == unequippedState;}
-					}
-					public virtual bool wasUnequipped{
-						get{ return prevEqpState == unequippedState;}
-					}
-			/*	Mark state	*/
-				ISSEStateEngine<ISBMrkState> mrkStateEngine{
-					get{
-						if(m_markStateEngine == null)
-							m_markStateEngine = new SSEStateEngine<ISBMrkState>();
-						return m_markStateEngine;
-					}
+				public void Unequip(){
+					eqpStateHandler.Unequip();
 				}
-					ISSEStateEngine<ISBMrkState> m_markStateEngine;
-				void SetMrkState(ISBMrkState state){
-					mrkStateEngine.SetState(state);
-					if(state == null && mrkProcess != null)
-						SetAndRunMrkProcess(null);
+				public ISBEqpState unequippedState{
+					get{return eqpStateHandler.unequippedState;}
 				}
-				ISBMrkState curMrkState{
-					get{return mrkStateEngine.curState;}
+				public bool isUnequipped{
+					get{return eqpStateHandler.isUnequipped;}
 				}
-				ISBMrkState prevMrkState{
-					get{return mrkStateEngine.prevState;}
+				public bool wasUnequipped{
+					get{return eqpStateHandler.wasUnequipped;}
 				}
-				ISBMrkStateRepo mrkStateRepo{
-					get{
-						if(m_mrkStateRepo == null)
-							m_mrkStateRepo = new SBMrkStateRepo(this);
-						return m_mrkStateRepo;
-					}
-				}
-					ISBMrkStateRepo m_mrkStateRepo;
-				public virtual void ClearCurMrkState(){
-					SetMrkState(null);
-				}
-					public virtual bool isMrkStateNull{
-						get{return curMrkState == null;}
-					}
-					public virtual bool wasMrkStateNull{
-						get{return prevMrkState == null;}
-					}
-				public virtual void Mark(){
-					SetMrkState(markedState);
-				}
-					public ISBMrkState markedState{
-						get{return mrkStateRepo.markedState;}
-					}
-					public virtual bool isMarked{
-						get{return curMrkState == markedState;}
-					}
-					public virtual bool wasMarked{
-						get{return prevMrkState == markedState;}
-					}
-				public virtual void Unmark(){
-					SetMrkState(unmarkedState);
-				}
-					public ISBMrkState unmarkedState{
-						get{return mrkStateRepo.unmarkedState;}
-					}
-					public virtual bool isUnmarked{
-						get{return curMrkState == unmarkedState;}
-					}
-					public virtual bool wasUnmarked{
-						get{return prevMrkState == markedState;}
-					}
-		/*	processes	*/
-			/*	Action Process	*/
-			/*	Equip Process	*/
 				public ISBEqpProcess eqpProcess{
-					get{return eqpProcEngine.process;}
+					get{return eqpStateHandler.eqpProcess;}
+				}
+				public void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine){
+					((SBEqpStateHandler)eqpStateHandler).SetEqpProcessEngine(engine);
 				}
 				public void SetAndRunEqpProcess(ISBEqpProcess process){
-					eqpProcEngine.SetAndRunProcess(process);
-				}
-				ISSEProcessEngine<ISBEqpProcess> eqpProcEngine{
-					get{
-						if(m_eqpProcEngine == null)
-							m_eqpProcEngine = new SSEProcessEngine<ISBEqpProcess>();
-						return m_eqpProcEngine;
-					}
-				}
-					ISSEProcessEngine<ISBEqpProcess> m_eqpProcEngine;
-				public void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine){
-					m_eqpProcEngine = engine;
-				}
-				ISBEqpCoroutineRepo eqpCoroutineRepo{
-					get{
-						if(_eqpCoroutineRepo == null)
-							_eqpCoroutineRepo = new SBEqpCoroutineRepo();
-						return _eqpCoroutineRepo;
-					}
-				}
-					ISBEqpCoroutineRepo _eqpCoroutineRepo;
-				public void SetEqpCoroutineRepo(ISBEqpCoroutineRepo repo){
-					_eqpCoroutineRepo = repo;
-				}
-				public System.Func<IEnumeratorFake> equipCoroutine{
-					get{return eqpCoroutineRepo.equipCoroutine;}
+					eqpStateHandler.SetAndRunEqpProcess(process);
 				}
 				public System.Func<IEnumeratorFake> unequipCoroutine{
-					get{return eqpCoroutineRepo.unequipCoroutine;}
+					get{return eqpStateHandler.unequipCoroutine;}
 				}
-			/*	Mark Process	*/
+				public System.Func<IEnumeratorFake> equipCoroutine{
+					get{return eqpStateHandler.equipCoroutine;}
+				}
+			/*	Mark state	*/
+				ISBMrkStateHandler mrkStateHandler{
+					get{
+						if(_mrkStateHandler == null)
+							_mrkStateHandler = new SBMrkStateHandler(this);
+						return _mrkStateHandler;
+					}
+				}
+					ISBMrkStateHandler _mrkStateHandler;
+				public void SetMrkStateHandler(ISBMrkStateHandler mrkStateHandler){
+					_mrkStateHandler = mrkStateHandler;
+				}
+				public void ClearCurMrkState(){
+					mrkStateHandler.ClearCurMrkState();
+				}
+				public bool isMrkStateNull{
+					get{return mrkStateHandler.isMrkStateNull;}
+				}
+				public bool wasMrkStateNull{
+					get{return mrkStateHandler.wasMrkStateNull;}
+				}
+				public void Mark(){
+					mrkStateHandler.Mark();
+				}
+				public ISBMrkState	markedState{
+					get{return mrkStateHandler.markedState;}
+				}
+				public bool isMarked{
+					get{return mrkStateHandler.isMarked;}
+				}
+				public bool wasMarked{
+					get{return mrkStateHandler.wasMarked;}
+				}
+				public void Unmark(){
+					mrkStateHandler.Unmark();
+				}
+				public ISBMrkState unmarkedState{
+					get{return mrkStateHandler.unmarkedState;}
+				}
+				public bool isUnmarked{
+					get{return mrkStateHandler.isUnmarked;}
+				}
+				public bool wasUnmarked{
+					get{return mrkStateHandler.wasUnmarked;}
+				}
 				public ISBMrkProcess mrkProcess{
-					get{return mrkProcEngine.process;}
+					get{return mrkStateHandler.mrkProcess;}
+				}
+				public void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine){
+					((SBMrkStateHandler)mrkStateHandler).SetMrkProcessEngine(engine);
 				}
 				public void SetAndRunMrkProcess(ISBMrkProcess process){
-					mrkProcEngine.SetAndRunProcess(process);
-				}
-				ISSEProcessEngine<ISBMrkProcess> mrkProcEngine{
-					get{
-						if(m_mrkProcEngine == null)
-							m_mrkProcEngine = new SSEProcessEngine<ISBMrkProcess>();
-						return m_mrkProcEngine;
-					}
-				}
-					ISSEProcessEngine<ISBMrkProcess> m_mrkProcEngine;
-				public void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine){
-					m_mrkProcEngine = engine;
-				}
-				ISBMrkCoroutineRepo mrkCoroutineRepo{
-					get{
-						if(_mrkCoroutineRepo == null)
-							_mrkCoroutineRepo = new SBMrkCoroutineRepo();
-						return _mrkCoroutineRepo;
-					}
-				}
-					ISBMrkCoroutineRepo _mrkCoroutineRepo;
-				public void SetMrkCoroutineRepo(ISBMrkCoroutineRepo repo){
-					_mrkCoroutineRepo = repo;
-				}
-				public System.Func<IEnumeratorFake> markCoroutine{
-					get{return mrkCoroutineRepo.markCoroutine;}
+					mrkStateHandler.SetAndRunMrkProcess(process);
 				}
 				public System.Func<IEnumeratorFake> unmarkCoroutine{
-					get{return mrkCoroutineRepo.unmarkCoroutine;}
+					get{return mrkStateHandler.unmarkCoroutine;}
+				}
+				public System.Func<IEnumeratorFake> markCoroutine{
+					get{return mrkStateHandler.markCoroutine;}
 				}
 		/*	commands	*/
 			public void Tap(){
@@ -539,6 +462,9 @@ namespace SlotSystem{
 			public void SetTAM(ITransactionManager tam){
 				m_tam = tam;
 			}
+			public void ExecuteTransaction(){
+				tam.ExecuteTransaction();
+			}
 			public ITransactionCache taCache{
 				get{
 					if(_taCache != null)
@@ -548,6 +474,9 @@ namespace SlotSystem{
 				}
 			}
 				ITransactionCache _taCache;
+			public void SetTACache(ITransactionCache taCache){
+				_taCache = taCache;
+			}
 			public void SetPickedSB(){
 				if(taCache != null){
 					taCache.SetPickedSB((ISlottable)this);
@@ -562,8 +491,11 @@ namespace SlotSystem{
 			public bool passesPrePickFilter{
 				get{return !taCache.IsTransactionGoingToBeRevert(this);}
 			}
-			public void ExecuteTransaction(){
-				tam.ExecuteTransaction();
+			public void CreateTAResult(){
+				taCache.CreateTransactionResults();
+			}
+			public void UpdateTA(){
+				taCache.UpdateFields();
 			}
 			public ITAMActStateHandler tamStateHandler{
 				get{
@@ -592,9 +524,6 @@ namespace SlotSystem{
 			public void SetIconHandler(ITransactionIconHandler iconHandler){
 				_iconHandler = iconHandler;
 			}
-			public void SetTACache(ITransactionCache taCache){
-				_taCache = taCache;
-			}
 			public void SetDIcon1(){
 				DraggedIcon dIcon = new DraggedIcon(this, iconHandler);
 				iconHandler.SetDIcon1(dIcon);
@@ -602,12 +531,6 @@ namespace SlotSystem{
 			public void SetDIcon2(){
 				DraggedIcon dIcon = new DraggedIcon(this, iconHandler);
 				iconHandler.SetDIcon2(dIcon);
-			}
-			public void CreateTAResult(){
-				taCache.CreateTransactionResults();
-			}
-			public void UpdateTA(){
-				taCache.UpdateFields();
 			}
 			public IHoverable hoverable{
 				get{
@@ -630,42 +553,9 @@ namespace SlotSystem{
 				hoverable.OnHoverExit();
 			}
 	}
-	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler, ISBActStateHandler{
+	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler, ISBActStateHandler, ISBEqpStateHandler, ISBMrkStateHandler{
 		/*	States and Processes	*/
 			/* States */
-				/* Eqp States */
-					void ClearCurEqpState();
-						bool isEqpStateNull{get;}
-						bool wasEqpStateNull{get;}
-					void Equip();
-						ISBEqpState equippedState{get;}
-						bool isEquipped{get;}
-						bool wasEquipped{get;}
-					void Unequip();
-						ISBEqpState unequippedState{get;}
-						bool isUnequipped{get;}
-						bool wasUnequipped{get;}
-				/* Mrk States */
-					void ClearCurMrkState();
-						bool isMrkStateNull{get;}
-						bool wasMrkStateNull{get;}
-					void Mark();
-						ISBMrkState	markedState{get;}
-						bool isMarked{get;}
-						bool wasMarked{get;}
-					void Unmark();
-						ISBMrkState unmarkedState{get;}
-						bool isUnmarked{get;}
-						bool wasUnmarked{get;}
-			/* Process */
-				ISBEqpProcess eqpProcess{get;}
-				void SetAndRunEqpProcess(ISBEqpProcess process);
-					System.Func<IEnumeratorFake> unequipCoroutine{get;}
-					System.Func<IEnumeratorFake> equipCoroutine{get;}
-				ISBMrkProcess mrkProcess{get;}
-				void SetAndRunMrkProcess(ISBMrkProcess process);
-					System.Func<IEnumeratorFake> unmarkCoroutine{get;}
-					System.Func<IEnumeratorFake> markCoroutine{get;}
 		/*	Commands	*/
 			void Tap();
 		/* Item Handling */
