@@ -8,9 +8,9 @@ namespace SlotSystem{
 		public TransactionIconHandler(ITAMActStateHandler tamStateHandler){
 			this.tamStateHandler = tamStateHandler;
 		}
-		public void AcceptDITAComp(DraggedIcon di){
-			if(dIcon2 != null && di == dIcon2) m_dIcon2Done = true;
-			else if(dIcon1 != null && di == dIcon1) m_dIcon1Done = true;
+		public void AcceptDITAComp(ISlottable sb){
+			if(dIcon2 != null && sb == dIcon2.sb) m_dIcon2Done = true;
+			else if(dIcon1 != null && sb == dIcon1.sb) m_dIcon1Done = true;
 			if(tamStateHandler.isTransacting){
 				tamStateHandler.transactionCoroutine();
 			}
@@ -19,8 +19,12 @@ namespace SlotSystem{
 			get{return m_dIcon1;}
 		}
 			DraggedIcon m_dIcon1;
-		public virtual void SetDIcon1(DraggedIcon di){
-			m_dIcon1 = di;
+		public virtual void SetDIcon1(ISlottable sb){
+			if(sb != null){
+				DraggedIcon di = new DraggedIcon(sb, this);
+				m_dIcon1 = di;
+			}else
+				m_dIcon1 = null;
 			if(m_dIcon1 == null)
 				m_dIcon1Done = true;
 			else
@@ -35,8 +39,12 @@ namespace SlotSystem{
 			get{return m_dIcon2;}
 		}
 			DraggedIcon m_dIcon2;
-		public virtual void SetDIcon2(DraggedIcon di){
-			m_dIcon2 = di;
+		public virtual void SetDIcon2(ISlottable sb){
+			if(sb != null){
+				DraggedIcon di = new DraggedIcon(sb, this);
+				m_dIcon2 = di;
+			}else
+				m_dIcon2 = null;
 			if(m_dIcon2 == null)
 				m_dIcon2Done = true;
 			else
@@ -48,12 +56,12 @@ namespace SlotSystem{
 			bool m_dIcon2Done = true;
 	}
 	public interface ITransactionIconHandler{
-		void AcceptDITAComp(DraggedIcon di);
+		void AcceptDITAComp(ISlottable sb);
 		DraggedIcon dIcon1{get;}
-		void SetDIcon1(DraggedIcon di);
+		void SetDIcon1(ISlottable sb);
 		bool dIcon1Done{get;}
 		DraggedIcon dIcon2{get;}
-		void SetDIcon2(DraggedIcon di);
+		void SetDIcon2(ISlottable sb);
 		bool dIcon2Done{get;}
 	}
 }

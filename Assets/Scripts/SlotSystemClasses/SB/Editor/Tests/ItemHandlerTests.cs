@@ -13,9 +13,9 @@ namespace SlotSystemTests{
 		public class ItemHandlerTests: SlotSystemTest {
 			[Test]
 			public void Fields_ByDefault_AreSetToDefault(){
-				ItemHandler itemHandler = new ItemHandler();
+				ItemHandler itemHandler;
 					BowInstance bow = MakeBowInstance(0);
-					itemHandler.SetItem(bow);
+					itemHandler = new ItemHandler(bow);
 
 				Assert.That(itemHandler.item, Is.SameAs(bow));
 				Assert.That(itemHandler.pickedAmount, Is.EqualTo(0));

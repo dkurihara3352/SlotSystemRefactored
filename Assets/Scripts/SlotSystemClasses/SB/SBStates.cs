@@ -26,13 +26,15 @@ namespace SlotSystem{
             void OnEndDrag();
         }
         public abstract class SBStateRepo{
-            protected ISBActStateHandler actStateHandler;
-            public SBStateRepo(ISBActStateHandler actStateHandler){
-                this.actStateHandler = actStateHandler;
-            }
         }
         public class SBActStateRepo: SBStateRepo, ISBActStateRepo{
-            public SBActStateRepo(ISBActStateHandler actStateHandler): base(actStateHandler){
+            ITransactionManager tam;
+            ITransactionCache taCache;
+            ISBActStateHandler actStateHandler;
+            public SBActStateRepo(ISBActStateHandler actStateHandler, ITransactionManager tam, ITransactionCache taCache){
+                this.tam = tam;
+                this.taCache = taCache;
+                this.actStateHandler = actStateHandler;
             }
             public ISBActState waitForActionState{
                 get{
@@ -61,7 +63,7 @@ namespace SlotSystem{
             public ISBActState waitForNextTouchState{
                 get{
                     if(_waitForNextTouchState == null)
-                        _waitForNextTouchState = new WaitForNextTouchState(actStateHandler);
+                        _waitForNextTouchState = new WaitForNextTouchState(actStateHandler, tam);
                     return _waitForNextTouchState;
                 }
             }
@@ -69,7 +71,7 @@ namespace SlotSystem{
             public ISBActState pickingUpState{
                 get{
                     if(_pickingUpState == null)
-                        _pickingUpState = new PickingUpState(actStateHandler);
+                        _pickingUpState = new PickingUpState(actStateHandler, tam, taCache);
                     return _pickingUpState;
                 }
             }
@@ -164,10 +166,13 @@ namespace SlotSystem{
                 }
         }
         public class WaitForNextTouchState: SBActState{//up state
-            public WaitForNextTouchState(ISBActStateHandler actStateHandler): base(actStateHandler){}
+            ITransactionManager tam;
+            public WaitForNextTouchState(ISBActStateHandler actStateHandler, ITransactionManager tam): base(actStateHandler){
+                this.tam = tam;
+            }
             public override void EnterState(){
                 if(sb.wasPickingUp || sb.wasWaitingForPickUp){
-                    ISBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.waitForNextTouchCoroutine);
+                    ISBActProcess wfntProcess = new WaitForNextTouchProcess(sb, sb.waitForNextTouchCoroutine, tam);
                     sb.SetAndRunActProcess(wfntProcess);
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than PickingUpState or WaitForPickUpState");
@@ -185,15 +190,32 @@ namespace SlotSystem{
             }
         }
         public class PickingUpState: SBActState{//down state
-            public PickingUpState(ISBActStateHandler actStateHandler): base(actStateHandler){}
+            ITransactionManager tam;
+            ITransactionIconHandler iconHandler;
+            ITransactionCache taCache{
+                get{
+                    if(_taCache != null)
+                        return _taCache;
+                    else
+                        throw new InvalidOperationException("taCache not set");
+                }
+            }
+                ITransactionCache _taCache;
+            ITAMActStateHandler tamStateHandler;
+            public PickingUpState(ISBActStateHandler actStateHandler, ITransactionManager tam, ITransactionCache taCache): base(actStateHandler){
+                this.tam = tam;
+                this.iconHandler = tam.iconHandler;
+                _taCache = taCache;
+                this.tamStateHandler = tam.actStateHandler;
+            }
             public override void EnterState(){
                 if(sb.wasWaitingForPickUp || sb.wasWaitingForNextTouch){
                     sb.OnHoverEnter();
-                    sb.SetPickedSB();
-                    sb.Probe();
-                    sb.SetDIcon1();
-                    sb.CreateTAResult();
-                    sb.UpdateTA();
+                    taCache.SetPickedSB(sb);
+                    iconHandler.SetDIcon1(sb);
+                    tamStateHandler.Probe();
+                    taCache.CreateTransactionResults();
+                    taCache.UpdateFields();
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than WaitForPickUpState or WaitForNextTouchState");
                 ISBActProcess pickedUpProcess = new PickUpProcess(sb, sb.pickUpCoroutine);
@@ -207,10 +229,10 @@ namespace SlotSystem{
                 if(sb.isHovered && sb.isStackable)
                     sb.WaitForNextTouch();
                 else
-                    sb.ExecuteTransaction();
+                    tam.ExecuteTransaction();
             }
             public override void OnEndDrag(){
-                sb.ExecuteTransaction();
+                tam.ExecuteTransaction();
             }
         }
         public class SBAddedState: SBActState{
@@ -236,14 +258,18 @@ namespace SlotSystem{
         }
     /* EqpState */
         public abstract class SBEqpState: SBState, ISBEqpState{
+            protected ISBEqpStateHandler eqpStateHandler;
             public SBEqpState(ISlottable sb): base(sb){
+                this.eqpStateHandler = sb;
             }
         }
         public interface ISBEqpState: ISSEState{}
         public class SBEqpStateRepo: SBStateRepo, ISBEqpStateRepo{
             ISlottable sb;
-            public SBEqpStateRepo(ISlottable sb): base(sb){
+            protected ISBEqpStateHandler eqpStateHandler;
+            public SBEqpStateRepo(ISlottable sb){
                 this.sb = sb;
+                this.eqpStateHandler = sb;
             }
             public ISBEqpState equippedState{
                 get{
@@ -272,9 +298,9 @@ namespace SlotSystem{
                 if(!sb.isHierarchySetUp)
                     return;
                 if(sb.isPool){
-                    if(sb.isUnequipped){
-                        ISBEqpProcess process = new SBEquipProcess(sb, sb.equipCoroutine);
-                        sb.SetAndRunEqpProcess(process);
+                    if(eqpStateHandler.isUnequipped){
+                        ISBEqpProcess process = new SBEquipProcess(sb, eqpStateHandler.equipCoroutine);
+                        eqpStateHandler.SetAndRunEqpProcess(process);
                     }
                 }
             }
@@ -285,22 +311,25 @@ namespace SlotSystem{
                 if(!sb.isHierarchySetUp) 
                     return;
                 if(sb.isPool){
-                    if(sb.isEquipped){
-                        ISBEqpProcess process = new SBUnequipProcess(sb, sb.unequipCoroutine);
-                        sb.SetAndRunEqpProcess(process);
+                    if(eqpStateHandler.isEquipped){
+                        ISBEqpProcess process = new SBUnequipProcess(sb, eqpStateHandler.unequipCoroutine);
+                        eqpStateHandler.SetAndRunEqpProcess(process);
                     }
                 }
             }
         }
     /* MrkState */
         public abstract class SBMrkState: SBState, ISBMrkState{
-            public SBMrkState(ISlottable sb): base(sb){}
+            protected ISBMrkStateHandler mrkStateHandler;
+            public SBMrkState(ISlottable sb): base(sb){
+                mrkStateHandler = sb;
+            }
         }
         public interface ISBMrkState: ISSEState{
         }
         public class SBMrkStateRepo: SBStateRepo, ISBMrkStateRepo{
             ISlottable sb;
-            public SBMrkStateRepo(ISlottable sb): base(sb){
+            public SBMrkStateRepo(ISlottable sb){
                 this.sb = sb;
             }
             public ISBMrkState markedState{
@@ -330,9 +359,9 @@ namespace SlotSystem{
                 if(!sb.isHierarchySetUp)
                     return;
                 if(sb.isPool){
-                    if(sb.isUnmarked){
-                        ISBMrkProcess process = new SBMarkProcess(sb, sb.markCoroutine);
-                        sb.SetAndRunMrkProcess(process);
+                    if(mrkStateHandler.isUnmarked){
+                        ISBMrkProcess process = new SBMarkProcess(sb, mrkStateHandler.markCoroutine);
+                        mrkStateHandler.SetAndRunMrkProcess(process);
                     }
                 }
             }
@@ -343,9 +372,9 @@ namespace SlotSystem{
                 if(!sb.isHierarchySetUp)
                     return;
                 if(sb.isPool){
-                    if(sb.isMarked){
-                        ISBMrkProcess process = new SBUnmarkProcess(sb, sb.unmarkCoroutine);
-                        sb.SetAndRunMrkProcess(process);
+                    if(mrkStateHandler.isMarked){
+                        ISBMrkProcess process = new SBUnmarkProcess(sb, mrkStateHandler.unmarkCoroutine);
+                        mrkStateHandler.SetAndRunMrkProcess(process);
                     }
                 }
             }

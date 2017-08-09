@@ -31,10 +31,10 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetHierarchy_SomeChildWithoutSG_ThrowsException(){
 				EquipmentSet eSet = MakeEquipmentSet();
-					SlotGroup sgA = MakeSG();
+					SlotGroup sgA = MakeSGInitWithSubs();
 						sgA.SetElements(new ISlotSystemElement[]{});
 						sgA.transform.SetParent(eSet.transform);
-					SlotGroup sgB = MakeSG();
+					SlotGroup sgB = MakeSGInitWithSubs();
 						sgB.SetElements(new ISlotSystemElement[]{});
 						sgB.transform.SetParent(eSet.transform);
 					TestSlotSystemElement childSSEC = MakeTestSSE();

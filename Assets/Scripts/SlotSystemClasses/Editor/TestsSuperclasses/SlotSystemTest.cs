@@ -19,6 +19,68 @@ public class SlotSystemTest{
 			return object.ReferenceEquals(a, b);
 	}
 	/*	Elements	*/
+		protected static Slottable MakeSBInitWithSubs(){
+			Slottable sb = MakeSB();
+				sb.SetSSM(MakeSubSSM());
+					sb.ssm.tam.Returns(MakeSubTAM());
+					sb.ssm.tam.iconHandler.Returns(Substitute.For<ITransactionIconHandler>());
+				sb.SetTACache(MakeSubTAC());
+				sb.SetTapCommand(Substitute.For<ISBCommand>());
+				sb.SetItemHandler(Substitute.For<IItemHandler>());
+				sb.SetHoverable(Substitute.For<IHoverable>());
+				sb.SetSlotHandler(Substitute.For<ISlotHandler>());
+				sb.SetSelStateHandler(Substitute.For<ISSESelStateHandler>());
+				sb.SetActStateHandler(Substitute.For<ISBActStateHandler>());
+				sb.SetEqpStateHandler(Substitute.For<ISBEqpStateHandler>());
+				sb.SetMrkStateHandler(Substitute.For<ISBMrkStateHandler>());
+			return sb;
+		}
+		protected static Slottable MakeSBWithRealStateHandlers(){
+			Slottable sb = MakeSBInitWithSubs();
+				SBSelStateHandler selStateHandler = new SBSelStateHandler(sb);
+				sb.SetSelStateHandler(selStateHandler);
+				SBActStateHandler actStateHandler = new SBActStateHandler(sb, sb.ssm.tam);
+				sb.SetActStateHandler(actStateHandler);
+				SBEqpStateHandler eqpStateHandler = new SBEqpStateHandler(sb);
+				sb.SetEqpStateHandler(eqpStateHandler);
+				SBMrkStateHandler mrkStateHandler = new SBMrkStateHandler(sb);
+				sb.SetMrkStateHandler(mrkStateHandler);
+			return sb;
+		}
+		protected static SlotGroup MakeSGInitWithSubs(){
+			SlotGroup sg = MakeSG();
+				List<ISlottable> sbs = new List<ISlottable>();
+				sg.SetSBs(sbs);
+				sg.SetSSM(MakeSubSSM());
+					sg.ssm.tam.Returns(MakeSubTAM());
+					sg.ssm.tam.sgHandler.Returns(Substitute.For<ITransactionSGHandler>());
+				sg.SetTACache(MakeSubTAC());
+				sg.SetTAM(sg.ssm.tam);
+				sg.InspectorSetUp(Substitute.For<Inventory>(), Substitute.For<SGFilter>(), Substitute.For<SGSorter>(), 0);
+				sg.SetCommandsRepo(Substitute.For<ISGCommandsRepo>());
+				sg.SetNewSlots(new List<Slot>());
+				sg.SetNewSBs(new List<ISlottable>());
+				sg.SetHoverable(Substitute.For<IHoverable>());
+				sg.SetSGHandler(sg.ssm.tam.sgHandler);
+				sg.SetSelStateHandler(Substitute.For<ISSESelStateHandler>());
+				sg.SetSGActStateHandler(Substitute.For<ISGActStateHandler>());
+			return sg;
+		}
+		protected static SlotGroup MakeSGWithRealStateHandlers(){
+			SlotGroup sg = MakeSGInitWithSubs();
+			sg.InitializeStateHandlers();
+			return sg;
+		}
+		protected static SlotGroup MakeSGInitWithSubsAndRealCommands(){
+			SlotGroup sg = MakeSGInitWithSubs();
+			sg.SetCommandsRepo(new SGCommandsRepo(sg));
+			return sg;
+		}
+		protected static SlotGroup MakeSGWithRealStateHandlersAndRealCommands(){
+			SlotGroup sg = MakeSGWithRealStateHandlers();
+			sg.SetCommandsRepo(new SGCommandsRepo(sg));
+			return sg;
+		}
 		protected static TransactionManager MakeTAM(){
 			return new TransactionManager();
 		}

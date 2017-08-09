@@ -42,16 +42,16 @@ namespace SlotSystem{
 		public void CreateTransactionResults(){
 			Dictionary<IHoverable, ISlotSystemTransaction> result = new Dictionary<IHoverable, ISlotSystemTransaction>();
 			foreach(ISlotGroup sg in focusedSGProvider.focusedSGs){
-				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg.hoverable);
-				result.Add(sg.hoverable, ta);
+				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg);
+				result.Add(sg, ta);
 				if(ta is IRevertTransaction)
 					sg.Defocus();
 				else
 					sg.Focus();
 				foreach(ISlottable sb in sg){
 					if(sb != null){
-						ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb.hoverable);
-						result.Add(sb.hoverable, ta2);
+						ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb);
+						result.Add(sb, ta2);
 						if(ta2 is IRevertTransaction || ta2 is IFillTransaction)
 							sb.Defocus();
 						else
@@ -64,7 +64,7 @@ namespace SlotSystem{
 		public bool IsTransactionGoingToBeRevert(ISlottable sb){
 			bool res = true;
 			foreach(ISlotGroup targetSG in focusedSGProvider.focusedSGs){
-				ISlotSystemTransaction ta = MakeTransaction(sb, targetSG.hoverable);
+				ISlotSystemTransaction ta = MakeTransaction(sb, targetSG);
 				if(ta == null)
 					throw new System.InvalidOperationException("SlotSystemManager.PrePickFilter: given hoveredSSE does not yield any transaction. something's wrong baby");
 				else{
@@ -74,7 +74,7 @@ namespace SlotSystem{
 				}
 				foreach(ISlottable targetSB in targetSG){
 					if(sb != null)
-						if(!(MakeTransaction(sb, targetSB.hoverable) is IRevertTransaction)){
+						if(!(MakeTransaction(sb, targetSB) is IRevertTransaction)){
 							res = false; break;
 						}
 				}

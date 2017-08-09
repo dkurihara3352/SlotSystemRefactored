@@ -61,7 +61,7 @@ namespace SlotSystem{
 					m_sortEngine = sortEngine;
 				}
 		/* SGHandling */
-			ITransactionSGHandler sgHandler{
+			public ITransactionSGHandler sgHandler{
 				get{
 					if(m_sgHandler == null)
 						m_sgHandler = new TransactionSGHandler(actStateHandler);
@@ -126,6 +126,7 @@ namespace SlotSystem{
 		ITransactionFactory taFactory{get;}
 		ITAMActStateHandler actStateHandler{get;}
 		ITransactionIconHandler iconHandler{get;}
+		ITransactionSGHandler sgHandler{get;}
 		void WaitForAction();
 	}
 }

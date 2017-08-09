@@ -14,28 +14,28 @@ namespace SlotSystemTests{
 		[Test]
 		public void AcceptsDITAComp_ValidDI_SetsDone(){
 			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
-			iconHandler.SetDIcon1(stubDI);
+			ISlottable stubSB = MakeSubSB();
+			iconHandler.SetDIcon1(stubSB);
 
-			iconHandler.AcceptDITAComp(stubDI);
+			iconHandler.AcceptDITAComp(stubSB);
 
 			Assert.That(iconHandler.dIcon1Done, Is.True);
 			}
 		[Test]
 		public void SetDIcon1_ToNonNull_SetsDIcon1DoneFalse(){
 			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
+			ISlottable stubSB = MakeSubSB();
 
-			iconHandler.SetDIcon1(stubDI);
+			iconHandler.SetDIcon1(stubSB);
 
 			Assert.That(iconHandler.dIcon1Done, Is.False);
 			}
 		[Test]
 		public void SetDIcon1_ToNull_SetsDIcon1DoneTrue(){
 			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
+			ISlottable stubSB = MakeSubSB();
 
-			iconHandler.SetDIcon1(stubDI);
+			iconHandler.SetDIcon1(stubSB);
 			iconHandler.SetDIcon1(null);
 
 			Assert.That(iconHandler.dIcon1Done, Is.True);
@@ -43,18 +43,18 @@ namespace SlotSystemTests{
 		[Test]
 		public void SetDIcon2_ToNonNull_SetsDIcon2DoneFalse(){
 			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
+			ISlottable stubSB = MakeSubSB();
 
-			iconHandler.SetDIcon2(stubDI);
+			iconHandler.SetDIcon2(stubSB);
 
 			Assert.That(iconHandler.dIcon2Done, Is.False);
 			}
 		[Test]
 		public void SetDIcon2_ToNull_SetsDIcon2DoneTrue(){
 			TransactionIconHandler iconHandler = new TransactionIconHandler(MakeSubTAMStateHandler());
-			DraggedIcon stubDI = new DraggedIcon(MakeSubSB(), MakeSubIconHandler());
+			ISlottable stubSB = MakeSubSB();
 
-			iconHandler.SetDIcon2(stubDI);
+			iconHandler.SetDIcon2(stubSB);
 			iconHandler.SetDIcon2(null);
 
 			Assert.That(iconHandler.dIcon2Done, Is.True);

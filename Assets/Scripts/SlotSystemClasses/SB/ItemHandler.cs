@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class ItemHandler : IItemHandler {
+		public ItemHandler(InventoryItemInstance item){
+			_item = item;
+		}
 		public InventoryItemInstance item{
 			get{
 				if(_item != null)

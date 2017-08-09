@@ -25,7 +25,7 @@ namespace SlotSystem{
 				}
 			}
 				ISSEStateEngine<ISBEqpState> m_eqpStateEngine;
-			void SetEqpState(ISBEqpState state){
+			public void SetEqpState(ISBEqpState state){
 				eqpStateEngine.SetState(state);
 				if(state == null && eqpProcess != null)
 					SetAndRunEqpProcess(null);

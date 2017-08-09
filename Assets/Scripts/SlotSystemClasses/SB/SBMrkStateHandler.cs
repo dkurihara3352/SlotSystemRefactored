@@ -16,7 +16,7 @@ namespace SlotSystem{
 				}
 			}
 				ISSEStateEngine<ISBMrkState> m_markStateEngine;
-			void SetMrkState(ISBMrkState state){
+			public void SetMrkState(ISBMrkState state){
 				mrkStateEngine.SetState(state);
 				if(state == null && mrkProcess != null)
 					SetAndRunMrkProcess(null);

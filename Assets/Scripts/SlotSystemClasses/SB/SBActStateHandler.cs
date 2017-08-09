@@ -12,8 +12,18 @@ namespace SlotSystem{
 			}
 		}
 			ISlottable _sb;
-		public SBActStateHandler(ISlottable sb){
+		ITransactionManager tam{
+			get{
+				if(_tam != null)
+					return _tam;
+				else
+					throw new System.InvalidOperationException("tam not set");
+			}
+		}
+			ITransactionManager _tam;
+		public SBActStateHandler(ISlottable sb, ITransactionManager tam){
 			_sb = sb;
+			_tam = tam;
 		}
 		ISSEStateEngine<ISBActState> actStateEngine{
 			get{
@@ -23,7 +33,7 @@ namespace SlotSystem{
 			}
 		}
 			ISSEStateEngine<ISBActState> m_actStateEngine;
-		void SetActState(ISBActState state){
+		public void SetActState(ISBActState state){
 			actStateEngine.SetState(state);
 			if(state == null && actProcess != null)
 				SetAndRunActProcess(null);
@@ -37,7 +47,7 @@ namespace SlotSystem{
 		ISBActStateRepo actStateRepo{
 			get{
 				if(m_actStateRepo == null)
-					m_actStateRepo = new SBActStateRepo(sb);
+					m_actStateRepo = new SBActStateRepo(sb, tam, sb.taCache);
 				return m_actStateRepo;
 			}
 		}

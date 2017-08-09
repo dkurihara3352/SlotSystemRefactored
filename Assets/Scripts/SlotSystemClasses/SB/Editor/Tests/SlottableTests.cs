@@ -11,67 +11,7 @@ using Utility;
 namespace SlotSystemTests{
 	namespace SlottableTests{
 		[TestFixture]
-		public class SlottableTests: SlotSystemTest {
-			/*	Process	*/
-				/*	ActProc	*/
-					[Test]
-					public void SetAndRunActState_Null_SetsActProcNull(){
-						Slottable sb = MakeSB();
-						
-						sb.SetAndRunActProcess(null);
-
-						Assert.That(sb.actProcess, Is.Null);
-						}
-					[Test]
-					public void SetAndRunActProcess_ISBActProcess_SetsActProc(){
-						Slottable sb = MakeSB();
-						
-						ISBActProcess stubProc = MakeSubSBActProc();
-						sb.SetAndRunActProcess(stubProc);
-
-						Assert.That(sb.actProcess, Is.SameAs(stubProc));
-						}
-				/*	EqpProc	*/
-					[Test]
-					public void SetAndRunEqpState_Null_CallsEngineWithNull(){
-						Slottable sb = MakeSB();
-						ISSEProcessEngine<ISBEqpProcess> mockEngine = MakeSubSBEqpProcessEngine();
-						sb.SetEqpProcessEngine(mockEngine);
-						sb.SetAndRunEqpProcess(null);
-
-						mockEngine.Received().SetAndRunProcess(null);
-						}
-					[Test]
-					public void SetAndRunEqpProcess_ISBEqpProcess_CallsEqpProcEngineWithTheProc(){
-						Slottable sb = MakeSB();
-						ISSEProcessEngine<ISBEqpProcess> mockEngine = MakeSubSBEqpProcessEngine();
-						sb.SetEqpProcessEngine(mockEngine);
-						ISBEqpProcess stubProc = MakeSubSBEqpProc();
-						sb.SetAndRunEqpProcess(stubProc);
-
-						mockEngine.Received().SetAndRunProcess(stubProc);
-						}
-				/*	MrkProc	*/
-					[Test]
-					public void SetAndRunMrkState_Null_CallsEngineWithNull(){
-						Slottable sb = MakeSB();
-						ISSEProcessEngine<ISBMrkProcess> mockEngine = MakeSubSBMrkProcessEngine();
-						sb.SetMrkProcessEngine(mockEngine);
-						sb.SetAndRunMrkProcess(null);
-
-						mockEngine.Received().SetAndRunProcess(null);
-						}
-					[Test]
-					public void SetAndRunMrkProcess_ISBMrkProcess_CallsMrkProcEngineWithTheProc(){
-						Slottable sb = MakeSB();
-						ISSEProcessEngine<ISBMrkProcess> mockEngine = MakeSubSBMrkProcessEngine();
-						sb.SetMrkProcessEngine(mockEngine);
-						ISBMrkProcess stubProc = MakeSubSBMrkProc();
-						sb.SetAndRunMrkProcess(stubProc);
-
-						mockEngine.Received().SetAndRunProcess(stubProc);
-						}
-			
+		public class SlottableTests: SlotSystemTest {			
 			/*	Fields	*/
 				[Test]
 				public void isHierarchySetUp_SGIsSet_ReturnsTrue(){
@@ -89,10 +29,10 @@ namespace SlotSystemTests{
 				[Test]
 				public void IncreasePickedAmountUpToQuantity_isStackable_IncreasePickedAmountUpToQuantity(){
 					Slottable sb = MakeSB();
-						ItemHandler itemHandler = new ItemHandler();
-						sb.SetItemHandler(itemHandler);
+						ItemHandler itemHandler;
 							PartsInstance parts = MakePartsInstance(0, 2);
-							sb.SetItem(parts);
+							itemHandler = new ItemHandler(parts);
+						sb.SetItemHandler(itemHandler);
 					
 					sb.IncreasePickedAmountUpToQuantity();
 						Assert.That(sb.pickedAmount, Is.EqualTo(1));
@@ -106,10 +46,10 @@ namespace SlotSystemTests{
 				[Test]
 				public void IncreasePickedAmountUpToQuantity_isNotStackable_DoesNotIncrease(){
 					Slottable sb = MakeSB();
-						ItemHandler itemHandler = new ItemHandler();
+						ItemHandler itemHandler;
+							BowInstance bow = MakeBowInstance(0);
+							itemHandler = new ItemHandler(bow);
 						sb.SetItemHandler(itemHandler);
-						BowInstance bow = MakeBowInstance(0);
-						sb.SetItem(bow);
 					
 					sb.IncreasePickedAmountUpToQuantity();
 						Assert.That(sb.pickedAmount, Is.EqualTo(0));
@@ -122,13 +62,7 @@ namespace SlotSystemTests{
 				}
 				[Test]
 				public void InitializeStates_Always_InitializesStates(){
-					Slottable sb = MakeSB_TACache();
-					ISlotSystemManager ssm = MakeSubSSM();
-						ISlotGroup sg = MakeSubSG();
-						ssm.FindParent(sb).Returns(sg);
-					sb.SetSSM(ssm);
-					SBSelStateHandler selStateHandler = new SBSelStateHandler(sb);
-					sb.SetSelStateHandler(selStateHandler);
+					Slottable sb = MakeSBWithRealStateHandlers();
 
 					sb.InitializeStates();
 
@@ -143,7 +77,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
-					Slottable sb = MakeSBForPickUp();
+					Slottable sb = MakeSBWithRealStateHandlers();
 					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -154,7 +88,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedAmountOne(){
-					Slottable sb = MakeSBForPickUp();
+					Slottable sb = MakeSBWithRealStateHandlers();
 					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -167,22 +101,22 @@ namespace SlotSystemTests{
 					Slottable sb = MakeSB();
 						ISlotSystemManager ssm = MakeSubSSM();
 						ITransactionManager stubTAM = MakeSubTAM();
+							ITransactionIconHandler subIconHd = MakeSubIconHandler();
+							stubTAM.iconHandler.Returns(subIconHd);
+							ssm.tam.Returns(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetSSM(ssm);
-						sb.SetTAM(stubTAM);
 						sb.SetTACache(stubTAC);
 						SBSelStateHandler selStateHandler = new SBSelStateHandler(sb);
 						sb.SetSelStateHandler(selStateHandler);
-						ITransactionIconHandler subIconHd = MakeSubIconHandler();
-						sb.SetIconHandler(subIconHd);
 						ITAMActStateHandler tamStateHandler = MakeSubTAMStateHandler();
-						sb.SetTAMStateHandler(tamStateHandler);
+							stubTAM.actStateHandler.Returns(tamStateHandler);
 						sb.SetItem(item);
 					return sb;
 				}
 				[Test]
 				public void Increment_Always_SetsIsPickingUp(){
-					Slottable sb = MakeSBForPickUp();
+					Slottable sb = MakeSBWithRealStateHandlers();
 					sb.Focus();
 					sb.WaitForAction();
 					sb.WaitForPickUp();
@@ -192,29 +126,8 @@ namespace SlotSystemTests{
 					Assert.That(sb.isPickingUp, Is.True);
 				}
 				[Test]
-				public void ExecuteTransaction_WhenCalled_CallsSSMExecuteTransaction(){
-					ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-					Slottable stubSB = MakeSB();
-					stubSB.SetTAM(mockTAM);
-
-					stubSB.ExecuteTransaction();
-
-					mockTAM.Received().ExecuteTransaction();
-					}
-				[Test]
-				public void ExpireActionProcess_actProcIsRunning_CallsActProcExpire(){
-					ISBActProcess mockProc = Substitute.For<ISBActProcess>();
-					mockProc.isRunning.Returns(true);
-					Slottable stubSB = MakeSB();
-					stubSB.SetAndRunActProcess(mockProc);
-
-					stubSB.ExpireActProcess();
-
-					mockProc.Received().Expire();
-					}
-				[Test]
 				public void UpdateEquipState_ItemInstIsEquipped_SetsSBEquipped(){
-					Slottable testSB = MakeSB_ItemHandler();
+					Slottable testSB = MakeSBWithRealStateHandlers();
 					BowInstance stubBow = MakeBowInstance(0);
 						stubBow.isEquipped = true;
 						testSB.itemHandler.item.Returns(stubBow);
@@ -229,7 +142,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void UpdateEquipState_ItemInstIsNotEquipped_SetsSBUnequipped(){
-					Slottable testSB = MakeSB_ItemHandler();
+					Slottable testSB = MakeSBWithRealStateHandlers();
 					BowInstance stubBow = MakeBowInstance(0);
 						stubBow.isEquipped = false;
 						testSB.itemHandler.item.Returns(stubBow);
@@ -244,7 +157,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsActStateWFAState(){
-					Slottable sb = MakeSB_ItemHandler();
+					Slottable sb = MakeSBWithRealStateHandlers();
 					
 					((ISlottable)sb).Refresh();
 
@@ -252,7 +165,7 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsPickedAmountZero(){
-					Slottable sb = MakeSB_ItemHandler();
+					Slottable sb = MakeSBWithRealStateHandlers();
 					sb.pickedAmount = 10;
 					((ISlottable)sb).Refresh();
 
@@ -260,7 +173,8 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsNewSlotIDMinus2(){
-					Slottable sb = MakeSB_ItemHandler();
+					Slottable sb = MakeSBWithRealStateHandlers();
+						sb.SetSlotHandler(new SlotHandler());
 					sb.SetNewSlotID(3);
 					((ISlottable)sb).Refresh();
 
@@ -268,8 +182,8 @@ namespace SlotSystemTests{
 					}
 				[TestCaseSource(typeof(ShareSGAndItemCases))]
 				public void ShareSGAndItem_VariousCombo_ReturnsAccordingly(ISlotGroup sg, ISlotGroup otherSG, InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
-					Slottable sb = MakeSB_ItemHandler();
-					Slottable otherSB = MakeSB_ItemHandler();
+					Slottable sb = MakeSBWithRealStateHandlers();
+					Slottable otherSB = MakeSBWithRealStateHandlers();
 					ISlotSystemManager stubSSM = MakeSubSSM();
 					sb.SetSSM(stubSSM);
 					otherSB.SetSSM(stubSSM);
@@ -334,30 +248,6 @@ namespace SlotSystemTests{
 						}
 					}			
 			/*	helper	*/
-				Slottable MakeSB_TACache(){
-					Slottable sb = MakeSB();
-						ITransactionCache taCache = Substitute.For<ITransactionCache>();
-						sb.SetTACache(taCache);
-					return sb;
-				}
-				Slottable MakeSB_ItemHandler(){
-					Slottable sb = MakeSB();
-						IItemHandler itemHandler = Substitute.For<IItemHandler>();
-						sb.SetItemHandler(itemHandler);
-					return sb;
-				}
-				Slottable MakeSBForPickUp(){
-					Slottable sb = MakeSB();
-						IItemHandler itemHandler = Substitute.For<IItemHandler>();
-						sb.SetItemHandler(itemHandler);
-						ITransactionCache taCache = Substitute.For<ITransactionCache>();
-						sb.SetTACache(taCache);
-						ITAMActStateHandler tamStateHandler = Substitute.For<ITAMActStateHandler>();
-						sb.SetTAMStateHandler(tamStateHandler);
-						ITransactionIconHandler iconHandler = Substitute.For<ITransactionIconHandler>();
-						sb.SetIconHandler(iconHandler);
-					return sb;
-				}
 				ISSEProcessEngine<ISBEqpProcess> MakeSubSBEqpProcessEngine(){
 					return Substitute.For<ISSEProcessEngine<ISBEqpProcess>>();
 				}

@@ -14,34 +14,40 @@ namespace SlotSystem{
 	public interface ISGCommand{
 		void Execute();
 	}
-	public class SGCommandsFactory: ISGCommandsFactory{
+	public class SGCommandsRepo: ISGCommandsRepo{
 		ISlotGroup sg;
-		public SGCommandsFactory(ISlotGroup sg){
+		public SGCommandsRepo(ISlotGroup sg){
 			this.sg = sg;
 		}
-		public ISGCommand MakeInitializeItemsCommand(){
-			if(_InitializeItemsCommand == null)
-				_InitializeItemsCommand = new SGInitItemsCommand(sg);
-			return _InitializeItemsCommand;
+		public ISGCommand initializeItemsCommand{
+			get{				
+				if(_initializeItemsCommand == null)
+					_initializeItemsCommand = new SGInitItemsCommand(sg);
+				return _initializeItemsCommand;
+			}
 		}
-			ISGCommand _InitializeItemsCommand;
-		public ISGCommand MakeOnActionCompleteCommand(){
-			if(_OnActionCompleteCommand == null)
-				_OnActionCompleteCommand = new SGEmptyCommand(sg);
-			return _OnActionCompleteCommand;
+			ISGCommand _initializeItemsCommand;
+		public ISGCommand onActionCompleteCommand{
+			get{
+				if(_onActionCompleteCommand == null)
+					_onActionCompleteCommand = new SGEmptyCommand(sg);
+				return _onActionCompleteCommand;
+			}
 		}
-			ISGCommand _OnActionCompleteCommand;
-		public ISGCommand MakeOnActionExecuteCommand(){
-			if(_OnActionExecuteCommand == null)
-				_OnActionExecuteCommand = new SGUpdateEquipAtExecutionCommand(sg);
-			return _OnActionExecuteCommand;
+			ISGCommand _onActionCompleteCommand;
+		public ISGCommand onActionExecuteCommand{
+			get{
+				if(_onActionExecuteCommand == null)
+					_onActionExecuteCommand = new SGUpdateEquipAtExecutionCommand(sg);
+				return _onActionExecuteCommand;
+			}
 		}
-			ISGCommand _OnActionExecuteCommand;
+			ISGCommand _onActionExecuteCommand;
 	}
-	public interface ISGCommandsFactory{
-		ISGCommand MakeInitializeItemsCommand();
-		ISGCommand MakeOnActionCompleteCommand();
-		ISGCommand MakeOnActionExecuteCommand();
+	public interface ISGCommandsRepo{
+		ISGCommand initializeItemsCommand{get;}
+		ISGCommand onActionCompleteCommand{get;}
+		ISGCommand onActionExecuteCommand{get;}
 	}
 	public class SGEmptyCommand: SGCommand, ISGEmptyCommand{
 		public SGEmptyCommand(ISlotGroup sg): base(sg){}

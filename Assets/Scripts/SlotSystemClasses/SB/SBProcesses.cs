@@ -19,7 +19,7 @@ namespace SlotSystem{
 					base.Expire();
 					sb.PickUp();
 				}
-				}
+			}
 			public class WaitForPointerUpProcess: SBProcess, ISBActProcess{
 				public WaitForPointerUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
 				}
@@ -27,9 +27,11 @@ namespace SlotSystem{
 					base.Expire();
 					sb.Defocus();
 				}
-				}
+			}
 			public class WaitForNextTouchProcess: SBProcess, ISBActProcess{
-				public WaitForNextTouchProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				ITransactionManager tam;
+				public WaitForNextTouchProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine, ITransactionManager tam): base(sb, coroutine){
+					this.tam = tam;
 				}
 				public override void Expire(){
 					base.Expire();
@@ -38,7 +40,7 @@ namespace SlotSystem{
 						sb.Refresh();
 						sb.Focus();
 					}else{
-						sb.ExecuteTransaction();
+						tam.ExecuteTransaction();
 					}
 				}
 			}

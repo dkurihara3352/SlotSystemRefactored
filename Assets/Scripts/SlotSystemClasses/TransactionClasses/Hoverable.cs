@@ -7,13 +7,6 @@ using Utility;
 namespace SlotSystem{
 	public class Hoverable : IHoverable{
 		ISlotSystemElement sse;
-		public ITransactionManager tam{
-			get{return _tam;}
-		}
-			ITransactionManager _tam;
-		public void SetTAM(ITransactionManager tam){
-			_tam = tam;
-		}
 		public ITransactionCache taCache{
 			get{return _taCache;}
 		}
@@ -57,8 +50,6 @@ namespace SlotSystem{
 		}
 	}
 	public interface IHoverable{
-		ITransactionManager tam{get;}
-		void SetTAM(ITransactionManager tam);
 		ITransactionCache taCache{get;}
 		void SetTACache(ITransactionCache taCache);
 		bool isHovered{get;}

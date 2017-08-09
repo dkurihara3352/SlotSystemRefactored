@@ -14,7 +14,7 @@ namespace SlotSystem{
 				}
 			}
 				ISSESelStateHandler _selStateHandler;
-			public void SetSelStateHandler(ISSESelStateHandler handler){
+			public virtual void SetSelStateHandler(ISSESelStateHandler handler){
 				_selStateHandler = handler;
 			}
 			public bool isSelStateNull{

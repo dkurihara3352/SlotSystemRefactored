@@ -24,7 +24,7 @@ namespace SlotSystem{
 			this.iconHandler = iconHandler;
 		}
 		public void CompleteMovement(){
-			iconHandler.AcceptDITAComp(this);
+			iconHandler.AcceptDITAComp(sb);
 		}
 	}
 }

@@ -8,7 +8,7 @@ namespace SlotSystem{
 		IHoverable hoverable;
 		public  SBSelStateHandler(ISlottable sb){
 			this.taCache = sb.taCache;
-			this.hoverable = sb.hoverable;
+			this.hoverable = sb;
 		}
 		public override void Activate(){
 			if(taCache.IsCachedTAResultRevert(hoverable) == false)

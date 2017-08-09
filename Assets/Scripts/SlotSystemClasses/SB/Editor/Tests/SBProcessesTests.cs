@@ -30,18 +30,20 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void WaitForNextTouchProcess_Expire_SBIsPickedUp_CallsSBExecuteTransaction(){
-				ISlottable mockSB = MakeSubSB();
-				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(mockSB, FakeCoroutine);
-				mockSB.isPickedUp.Returns(true);
+				ISlottable stubSB = MakeSubSB();
+				ITransactionManager mockTAM = MakeSubTAM();
+				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(stubSB, FakeCoroutine, mockTAM);
+				stubSB.isPickedUp.Returns(true);
 
 				wfntProc.Expire();
 
-				mockSB.Received().ExecuteTransaction();
-				}
+				mockTAM.Received().ExecuteTransaction();
+			}
 			[Test]
 			public void WaitForNextTouchProcess_Expire_SBIsNOTPickedUp_CallsSBVarious(){
 				ISlottable mockSB = MakeSubSB();
-				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(mockSB, FakeCoroutine);
+				ITransactionManager stubTAM = MakeSubTAM();
+				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(mockSB, FakeCoroutine, stubTAM);
 				mockSB.isPickedUp.Returns(false);
 
 				wfntProc.Expire();
@@ -49,7 +51,7 @@ namespace SlotSystemTests{
 				mockSB.Received().Tap();
 				mockSB.Received().Refresh();
 				mockSB.Received().Focus();
-				}
+			}
 			/*	helper	*/
 		}
 	}

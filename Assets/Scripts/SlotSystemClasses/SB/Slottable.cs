@@ -13,25 +13,44 @@ namespace SlotSystem{
 				ClearCurEqpState();
 				Unmark();
 			}
+			public void InitializeSB(InventoryItemInstance item){
+				SetTACache(ssm.taCache);
+				SetTapCommand(new SBTapCommand());
+				SetItemHandler(new ItemHandler(item));
+				SetHoverable(new Hoverable(this, taCache));
+				SetSlotHandler(new SlotHandler());
+				InitializeStateHandlers();
+			}
+			public void InitializeStateHandlers(){
+				_selStateHandler = new SBSelStateHandler(this);
+				_actStateHandler = new SBActStateHandler(this, ssm.tam);
+				_eqpStateHandler = new SBEqpStateHandler(this);
+				_mrkStateHandler = new SBMrkStateHandler(this);
+			}
 			/*	Selection state */
 				public override ISSESelStateHandler selStateHandler{
 					get{
-						if(_selStateHandler == null)
-							_selStateHandler = new SBSelStateHandler(this);
-						return _selStateHandler;
+						if(_selStateHandler != null)
+							return _selStateHandler;
+						else
+							throw new InvalidOperationException("selStateHandler not set");
 					}
 				}
 					ISSESelStateHandler _selStateHandler;
-			/*	Action State	*/
+				public override void SetSelStateHandler(ISSESelStateHandler handler){
+					_selStateHandler = handler;
+				}
+			/*	Action State */
 				public ISBActStateHandler actStateHandler{
 					get{
-						if(_actStateHandler == null)
-							_actStateHandler = new SBActStateHandler(this);
-						return _actStateHandler;
+						if(_actStateHandler != null)
+							return _actStateHandler;
+						else
+							throw new InvalidOperationException("actStateHandler not set");
 					}
 				}
 					ISBActStateHandler _actStateHandler;
-				public void SetActSTateHandler(ISBActStateHandler actStateHandler){
+				public void SetActStateHandler(ISBActStateHandler actStateHandler){
 					_actStateHandler = actStateHandler;
 				}
 				public void ClearCurActState(){
@@ -193,12 +212,16 @@ namespace SlotSystem{
 			/*	Equip State	*/
 				ISBEqpStateHandler eqpStateHandler{
 					get{
-						if(_eqpStateHandler == null)
-							_eqpStateHandler = new SBEqpStateHandler(this);
-						return _eqpStateHandler;
+						if(_eqpStateHandler != null)
+							return _eqpStateHandler;
+						else
+							throw new InvalidOperationException("eqpStateHandler not set");
 					}
 				}
 					ISBEqpStateHandler _eqpStateHandler;
+				public void SetEqpStateHandler(ISBEqpStateHandler handler){
+					_eqpStateHandler = handler;
+				}
 				public void ClearCurEqpState(){
 					eqpStateHandler.ClearCurEqpState();
 				}
@@ -250,9 +273,10 @@ namespace SlotSystem{
 			/*	Mark state	*/
 				ISBMrkStateHandler mrkStateHandler{
 					get{
-						if(_mrkStateHandler == null)
-							_mrkStateHandler = new SBMrkStateHandler(this);
-						return _mrkStateHandler;
+						if(_mrkStateHandler != null)
+							return _mrkStateHandler;
+						else
+							throw new InvalidOperationException("mrkStateHandler not set");
 					}
 				}
 					ISBMrkStateHandler _mrkStateHandler;
@@ -311,16 +335,17 @@ namespace SlotSystem{
 			public void Tap(){
 				tapCommand.Execute(this);
 			}
-			SlottableCommand tapCommand{
+			public ISBCommand tapCommand{
 				get{
-					if(m_tapCommand == null)
-						m_tapCommand = new SBTapCommand();
-					return m_tapCommand;
+					if(_tapCommand != null)
+						return _tapCommand;
+					else
+						throw new InvalidOperationException("tapCommand not set");
 				}
 			}
-				SlottableCommand m_tapCommand = new SBTapCommand();
-			public void SetTapCommand(SlottableCommand comm){
-				m_tapCommand = comm;
+				ISBCommand _tapCommand;
+			public void SetTapCommand(ISBCommand comm){
+				_tapCommand = comm;
 			}
 		/*	public fields	*/
 			public void Increment(){
@@ -332,103 +357,114 @@ namespace SlotSystem{
 					pickedAmount ++;
 				}
 			}
-			/* Item Handling */
-				public IItemHandler itemHandler{
-					get{
-						if(_itemHandler != null)
-							return _itemHandler;
-						else throw new InvalidOperationException("itemHandler not set");
-					}
+		/* Item Handling */
+			public IItemHandler itemHandler{
+				get{
+					if(_itemHandler != null)
+						return _itemHandler;
+					else throw new InvalidOperationException("itemHandler not set");
 				}
-					IItemHandler _itemHandler;
-				public void SetItemHandler(IItemHandler itemHandler){
-					_itemHandler = itemHandler;
+			}
+				IItemHandler _itemHandler;
+			public void SetItemHandler(IItemHandler itemHandler){
+				_itemHandler = itemHandler;
+			}
+			public InventoryItemInstance item{
+				get{return itemHandler.item;}
+			}
+			public void SetItem(InventoryItemInstance item){
+				itemHandler.SetItem(item);
+			}
+			public int pickedAmount{
+				get{return itemHandler.pickedAmount;}
+				set{itemHandler.pickedAmount = value;}
+			}
+			public bool isStackable{
+				get{return itemHandler.isStackable;}
+			}
+			public int quantity{
+				get{return itemHandler.quantity;}
+			}
+			public void SetQuantity(int quant){
+				itemHandler.SetQuantity(quant);
+			}
+			public void UpdateEquipState(){
+				if(item.isEquipped) Equip();
+				else Unequip();
+			}
+		/* SG And Slots */
+			public ISlotGroup sg{
+				get{
+					if(parent != null)
+						return parent as ISlotGroup;
+					return null;
 				}
-				public InventoryItemInstance item{
-					get{return itemHandler.item;}
+			}
+			public virtual bool isPool{
+				get{
+					if(sg != null){
+						return sg.isPool;
+					}else
+						throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
 				}
-				public void SetItem(InventoryItemInstance item){
-					itemHandler.SetItem(item);
+			}
+			public bool isHierarchySetUp{
+				get{
+					return sg != null;
 				}
-				public int pickedAmount{
-					get{return itemHandler.pickedAmount;}
-					set{itemHandler.pickedAmount = value;}
+			}
+		/* slotHandling */
+			public ISlotHandler slotHandler{
+				get{
+					if(_slotHandler != null)
+						return _slotHandler;
+					else
+						throw new InvalidOperationException("slotHandler not set");
 				}
-				public bool isStackable{
-					get{return itemHandler.isStackable;}
-				}
-				public int quantity{
-					get{return itemHandler.quantity;}
-				}
-				public void SetQuantity(int quant){
-					itemHandler.SetQuantity(quant);
-				}
-				public void UpdateEquipState(){
-					if(item.isEquipped) Equip();
-					else Unequip();
-				}
-			/* SG And Slots */
-				public ISlotGroup sg{
-					get{
-						if(parent != null)
-							return parent as ISlotGroup;
-						return null;
-					}
-				}
-				public virtual bool isPool{
-					get{
-						if(sg != null){
-							return sg.isPool;
-						}else
-							throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
-					}
-				}
-				public bool isHierarchySetUp{
-					get{
-						return sg != null;
-					}
-				}
-				public int slotID{
-					get{return m_slotID;}
-				}
-					int m_slotID = -1;
-				public void SetSlotID(int i){
-					m_slotID = i;
-				}
-				public int newSlotID{
-					get{return m_newSlotID;}
-				}
-					int m_newSlotID = -2;
-				public void SetNewSlotID(int id){
-					m_newSlotID = id;
-				}
-				public bool isToBeAdded{
-					get{return slotID == -1;}
-				}
-				public bool isToBeRemoved{
-					get{return newSlotID == -1;}
-				}
-			/* Others */
-				public bool delayed{
-					get{return m_delayed;}
-					set{m_delayed = value;}
-				}
-					bool m_delayed = true;
-				public void Refresh(){
-					WaitForAction();
-					itemHandler.pickedAmount = 0;
-					SetNewSlotID(-2);
-				}
-				public bool ShareSGAndItem(ISlottable other){
-					bool flag = true;
-					flag &= this.sg == other.sg;
-					flag &= this.item == other.item;
-					return flag;
-				}
-				public void Destroy(){
-					GameObject go = gameObject;
-					DestroyImmediate(go);
-				}
+			}
+				ISlotHandler _slotHandler;
+			public void SetSlotHandler(ISlotHandler slotHandler){
+				_slotHandler = slotHandler;
+			}
+			public int slotID{
+				get{return slotHandler.slotID;}
+			}
+			public void SetSlotID(int i){
+				slotHandler.SetSlotID(i);
+			}
+			public int newSlotID{
+				get{return slotHandler.newSlotID;}
+			}
+			public void SetNewSlotID(int id){
+				slotHandler.SetNewSlotID(id);
+			}
+			public bool isToBeAdded{
+				get{return slotHandler.isToBeAdded;}
+			}
+			public bool isToBeRemoved{
+				get{return slotHandler.isToBeRemoved;}
+			}
+		/* Others */
+			public bool delayed{
+				get{return m_delayed;}
+				set{m_delayed = value;}
+			}
+				bool m_delayed = true;
+			public void Refresh(){
+				WaitForAction();
+				itemHandler.pickedAmount = 0;
+				slotHandler.SetNewSlotID(-2);
+			}
+			public bool ShareSGAndItem(ISlottable other){
+				bool flag = true;
+				flag &= this.sg == other.sg;
+				flag &= this.item == other.item;
+				return flag;
+			}
+			public void Destroy(){
+				GameObject go = gameObject;
+				DestroyImmediate(go);
+			}
 		/*	SlotSystemElement imple and overrides	*/
 			protected override IEnumerable<ISlotSystemElement> elements{
 				get{return new ISlotSystemElement[]{};}
@@ -450,21 +486,6 @@ namespace SlotSystem{
 				return false;
 			}
 		/*	Transaction	*/
-			public ITransactionManager tam{
-				get{
-					if(m_tam != null)
-						return m_tam;
-					else
-						throw new InvalidOperationException("tam not set");
-				}
-			}
-				ITransactionManager m_tam;
-			public void SetTAM(ITransactionManager tam){
-				m_tam = tam;
-			}
-			public void ExecuteTransaction(){
-				tam.ExecuteTransaction();
-			}
 			public ITransactionCache taCache{
 				get{
 					if(_taCache != null)
@@ -477,12 +498,6 @@ namespace SlotSystem{
 			public void SetTACache(ITransactionCache taCache){
 				_taCache = taCache;
 			}
-			public void SetPickedSB(){
-				if(taCache != null){
-					taCache.SetPickedSB((ISlottable)this);
-				}else
-					throw new System.InvalidOperationException("Slottable.SetPickedSB: ssm not set");
-			}
 			public bool isPickedUp{
 				get{
 					return taCache.pickedSB == (ISlottable)this;
@@ -491,52 +506,13 @@ namespace SlotSystem{
 			public bool passesPrePickFilter{
 				get{return !taCache.IsTransactionGoingToBeRevert(this);}
 			}
-			public void CreateTAResult(){
-				taCache.CreateTransactionResults();
-			}
-			public void UpdateTA(){
-				taCache.UpdateFields();
-			}
-			public ITAMActStateHandler tamStateHandler{
-				get{
-					if(_tamStateHandler != null)
-						return _tamStateHandler;
-					else
-						throw new InvalidOperationException("tamStateHandler not set");
-				}
-			}
-				ITAMActStateHandler _tamStateHandler;
-			public void SetTAMStateHandler(ITAMActStateHandler handler){
-				_tamStateHandler = handler;
-			}
-			public void Probe(){
-				tamStateHandler.Probe();
-			}
-			public ITransactionIconHandler iconHandler{
-				get{
-					if(_iconHandler != null)
-						return _iconHandler;
-					else	
-						throw new InvalidOperationException("iconHandler not set");
-				}
-			}
-				ITransactionIconHandler _iconHandler;
-			public void SetIconHandler(ITransactionIconHandler iconHandler){
-				_iconHandler = iconHandler;
-			}
-			public void SetDIcon1(){
-				DraggedIcon dIcon = new DraggedIcon(this, iconHandler);
-				iconHandler.SetDIcon1(dIcon);
-			}
-			public void SetDIcon2(){
-				DraggedIcon dIcon = new DraggedIcon(this, iconHandler);
-				iconHandler.SetDIcon2(dIcon);
-			}
+		/* hoverable */
 			public IHoverable hoverable{
 				get{
-					if(m_hoverable == null)
-						m_hoverable = new Hoverable(this, taCache);
-					return m_hoverable;
+					if(m_hoverable != null)
+						return m_hoverable;
+					else
+						throw new InvalidOperationException("hoverable not set");
 				}
 			}
 				IHoverable m_hoverable;
@@ -553,9 +529,7 @@ namespace SlotSystem{
 				hoverable.OnHoverExit();
 			}
 	}
-	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler, ISBActStateHandler, ISBEqpStateHandler, ISBMrkStateHandler{
-		/*	States and Processes	*/
-			/* States */
+	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler, ISBActStateHandler, ISBEqpStateHandler, ISBMrkStateHandler, ISlotHandler{
 		/*	Commands	*/
 			void Tap();
 		/* Item Handling */
@@ -564,23 +538,9 @@ namespace SlotSystem{
 			ISlotGroup sg{get;}
 			bool isPool{get;}
 			bool isHierarchySetUp{get;}
-			int slotID{get;}
-			void SetSlotID(int i);
-			int newSlotID{get;}
-			void SetNewSlotID(int id);
-			bool isToBeAdded{get;}
-			bool isToBeRemoved{get;}
 		/* Transaction */
-			void SetPickedSB();
-			void SetDIcon1();
-			void SetDIcon2();
-			void CreateTAResult();
-			void UpdateTA();
-			void Probe();
-			IHoverable hoverable{get;}
 			bool isPickedUp{get;}
 			bool passesPrePickFilter{get;}
-			void ExecuteTransaction();
 		/* Other */
 			void Increment();
 			bool delayed{get;set;}

@@ -254,7 +254,6 @@ namespace SlotSystem{
 			public void Initialize(){
 				_taCache = new TransactionCache(tam, focusedSGProvider);
 				SetSSMRecursively();
-				SetTAMRecursively();
 				SetTACacheRecursively();
 				InitializeStatesRecursively();
 			}
@@ -271,13 +270,7 @@ namespace SlotSystem{
 					if(ele is IHoverable)
 						((IHoverable)ele).SetTACache(taCache);
 				}
-			public void SetTAMRecursively(){
-				PerformInHierarchy(SetTAMInHi);
-			}
-				void SetTAMInHi(ISlotSystemElement ele){
-					if(ele is IHoverable)
-						((IHoverable)ele).SetTAM(tam);
-				}
+
 			public void InitializeStatesRecursively(){
 				PerformInHierarchy(InitStatesInHi);
 			}

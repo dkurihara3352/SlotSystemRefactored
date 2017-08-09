@@ -5,21 +5,40 @@ using Utility;
 using System;
 namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
+		public void InitializeStateHandlers(){
+			SetSelStateHandler(new SGSelStateHandler(this));
+			SetSGActStateHandler(new SGActStateHandler(this));
+		}
+		public void InitializeSG(){
+			SetCommandsRepo(new SGCommandsRepo(this));
+			SetNewSlots(new List<Slot>());
+			SetSlots(new List<Slot>());
+			SetNewSBs(new List<ISlottable>());
+			SetTAM(ssm.tam);
+			SetTACache(ssm.taCache);
+			SetHoverable(new Hoverable(this, taCache));
+			SetSGHandler(ssm.tam.sgHandler);
+			InitializeStateHandlers();
+		}
 		/*	states	*/
 			public override ISSESelStateHandler selStateHandler{
 				get{
-					if(_selStateHandler == null)
-						_selStateHandler = new SGSelStateHandler(this);
-					return _selStateHandler;
+					if(_selStateHandler != null)
+						return _selStateHandler;
+					else
+						throw new InvalidOperationException("selStateHandler not set");
 				}
 			}
 				ISSESelStateHandler _selStateHandler;
+			public override void SetSelStateHandler(ISSESelStateHandler handler){
+				_selStateHandler = handler;
+			}
 			ISGActStateHandler actStateHandler{
 				get{
 					if(_actStateHandler != null)
 						return _actStateHandler;
 					else
-						throw new System.InvalidOperationException("sgStateHandler not set");
+						throw new System.InvalidOperationException("actStateHandler not set");
 				}
 			}
 				ISGActStateHandler _actStateHandler;
@@ -152,22 +171,31 @@ namespace SlotSystem{
 				return null;
 			}
 		/*  Commands	*/
-			ISGCommandsFactory commandsFactory{
+			ISGCommandsRepo commandsRepo{
 				get{
-					if(_commandsFactory == null)
-						_commandsFactory = new SGCommandsFactory(this);
-					return _commandsFactory;
+					if(_commandsRepo != null)
+						return _commandsRepo;
+					else 
+						throw new InvalidOperationException("commandsRepo not set");
 				}
 			}
-				ISGCommandsFactory _commandsFactory;
+				ISGCommandsRepo _commandsRepo;
+			public void SetCommandsRepo(ISGCommandsRepo repo){
+				_commandsRepo = repo;
+			}
 
 		/*	public fields	*/
 			public Inventory inventory{
-				get{return m_inventory;}
+				get{
+					if(_inventory != null)
+						return _inventory;
+					else
+						throw new InvalidOperationException("inventory not set");
+				}
 			}
-				Inventory m_inventory;
+				Inventory _inventory;
 				void SetInventory(Inventory inv){
-					m_inventory = inv;
+					_inventory = inv;
 					inv.SetSG(this);
 				}
 			public bool isShrinkable{
@@ -213,17 +241,23 @@ namespace SlotSystem{
 					return null;
 			}
 			public List<Slot> newSlots{
-				get{return m_newSlots;}
+				get{
+					if(_newSlots != null)
+						return _newSlots;
+					else
+						throw new InvalidOperationException("newSlots not set");
+				}
 			}
-				List<Slot> m_newSlots;
+				List<Slot> _newSlots;
 				public void SetNewSlots(List<Slot> newSlots){
-					m_newSlots = newSlots;
+					_newSlots = newSlots;
 				}
 			public List<Slot> slots{
 				get{
-					if(m_slots == null)
-						m_slots = new List<Slot>();
-					return m_slots;}
+					if(m_slots != null)
+						return m_slots;
+					else throw new InvalidOperationException("slots not set");
+				}
 			}
 				List<Slot> m_slots;
 				public void SetSlots(List<Slot> slots){
@@ -240,12 +274,17 @@ namespace SlotSystem{
 				}
 			}
 			public void SetInitSlotsCount(int i){
-				m_initSlotsCount = i;
+				_initSlotsCount = i;
 			}
 				public int initSlotsCount{
-					get{return m_initSlotsCount;}
+					get{
+						if(_initSlotsCount != -1)
+							return _initSlotsCount;
+						else
+							throw new InvalidOperationException("initSlotsCount not set");
+					}
 				}
-				int m_initSlotsCount;
+				int _initSlotsCount = -1;
 		/* SB */
 			public ISlottable GetSB(InventoryItemInstance itemInst){
 				foreach(ISlottable sb in this){
@@ -260,21 +299,27 @@ namespace SlotSystem{
 			}
 			List<ISlottable> slottables{
 				get{
-					if(m_slottables == null)
-						m_slottables = new List<ISlottable>();
-					return m_slottables;
+					if(_slottables != null)
+						return _slottables;
+					else
+						throw new InvalidOperationException("sbs not set");
 				}
 			}
-				List<ISlottable> m_slottables;
+				List<ISlottable> _slottables;
 				public void SetSBs(List<ISlottable> sbs){
-					m_slottables = sbs;
+					_slottables = sbs;
 				}
 			public List<ISlottable> newSBs{
-				get{return m_newSBs;}
+				get{
+					if(_newSBs != null)
+						return _newSBs;
+					else
+						throw new InvalidOperationException("newSBs not Set");
+				}
 			}
-				List<ISlottable> m_newSBs;
+				List<ISlottable> _newSBs;
 				public void SetNewSBs(List<ISlottable> sbs){
-					m_newSBs = sbs;
+					_newSBs = sbs;
 				}
 			public List<ISlottable> equippedSBs{
 				get{
@@ -307,12 +352,17 @@ namespace SlotSystem{
 				}
 			}
 			public void SetSorter(SGSorter sorter){
-				m_sorter = sorter;
+				_sorter = sorter;
 			}
 				public SGSorter sorter{
-					get{return m_sorter;}
+					get{
+						if(_sorter != null)
+							return _sorter;
+						else
+							throw new InvalidOperationException("sorter not set");
+					}
 				}
-				SGSorter m_sorter;
+				SGSorter _sorter;
 			public void ToggleAutoSort(bool on){
 				m_isAutoSort = on;
 				selStateHandler.Focus();
@@ -327,11 +377,16 @@ namespace SlotSystem{
 				return items;
 			}
 			public SGFilter filter{
-				get{return m_filter;}
+				get{
+					if(_filter != null)
+						return _filter;
+					else
+						throw new InvalidOperationException("filter not set");
+				}
 			}
-				SGFilter m_filter;
+				SGFilter _filter;
 				public void SetFilter(SGFilter filter){
-					m_filter = filter;
+					_filter = filter;
 				}
 			public bool AcceptsFilter(ISlottable pickedSB){
 				if(this.filter is SGNullFilter) return true;
@@ -347,53 +402,51 @@ namespace SlotSystem{
 				}
 			}
 		/*	SlotSystemElement implementation	*/
-			/* fields	*/
-				protected override IEnumerable<ISlotSystemElement> elements{
-					get{
-						foreach(ISlottable sb in slottables)
-							yield return (ISlotSystemElement)sb;
-					}
+			protected override IEnumerable<ISlotSystemElement> elements{
+				get{
+					foreach(ISlottable sb in slottables)
+						yield return (ISlotSystemElement)sb;
 				}
-				public override void SetElements(IEnumerable<ISlotSystemElement> elements){
-					List<ISlottable> sbs = new List<ISlottable>();
-					foreach(var e in elements){
-						if(e == null || e is ISlottable){
-							sbs.Add(e as ISlottable);
-						}else
-							throw new System.ArgumentException("parameter needs to be a collection of only ISlottable or null");
-					}
-					SetSBs(sbs);
+			}
+			public override void SetElements(IEnumerable<ISlotSystemElement> elements){
+				List<ISlottable> sbs = new List<ISlottable>();
+				foreach(var e in elements){
+					if(e == null || e is ISlottable){
+						sbs.Add(e as ISlottable);
+					}else
+						throw new System.ArgumentException("parameter needs to be a collection of only ISlottable or null");
 				}
-				public List<ISlottable> toList{
-					get{return slottables;}
-				}
-			/*	methods	*/
-				public override bool Contains(ISlotSystemElement element){
-					if(element is ISlottable)
-						return slottables.Contains((ISlottable)element);
-					return false;
-				}
-				public void FocusSBs(){
-					foreach(ISlottable sb in this){
-						if(sb != null){
-							sb.Refresh();
-							if(sb.passesPrePickFilter)
-								sb.Focus();
-							else
-								sb.Defocus();
-						}
-					}
-				}
-				public void DefocusSBs(){
-					foreach(ISlottable sb in this){
-						if(sb != null){
-							sb.Refresh();
+				SetSBs(sbs);
+			}
+			public List<ISlottable> toList{
+				get{return slottables;}
+			}
+			public override bool Contains(ISlotSystemElement element){
+				if(element is ISlottable)
+					return slottables.Contains((ISlottable)element);
+				return false;
+			}
+			public void FocusSBs(){
+				foreach(ISlottable sb in this){
+					if(sb != null){
+						sb.Refresh();
+						if(sb.passesPrePickFilter)
+							sb.Focus();
+						else
 							sb.Defocus();
-						}
 					}
 				}
+			}
+			public void DefocusSBs(){
+				foreach(ISlottable sb in this){
+					if(sb != null){
+						sb.Refresh();
+						sb.Defocus();
+					}
+				}
+			}
 		/* Transaction */
-			ITransactionSGHandler sgHandler{
+			public ITransactionSGHandler sgHandler{
 				get{
 					if(_sgHandler != null)
 						return _sgHandler;
@@ -542,18 +595,12 @@ namespace SlotSystem{
 				
 				UpdateSBs(thisNewSBs);
 			}
-		//Transaction Utility
+			//Transaction Utility
 			public Slottable CreateSB(InventoryItemInstance item){
 				GameObject newSBGO = new GameObject("newSBGO");
 				Slottable newSB = newSBGO.AddComponent<Slottable>();
-				TransactionCache taCache = new TransactionCache(tam, ssm.focusedSGProvider);
-				newSB.SetTACache(taCache);
-				SBSelStateHandler stateHandler = new SBSelStateHandler(newSB);
-				newSB.SetSelStateHandler(stateHandler);
-				ItemHandler itemHandler = new ItemHandler();
-					itemHandler.SetItem(item);
-				newSB.SetItemHandler(itemHandler);
 				newSB.SetSSM(ssm);
+				newSB.InitializeSB(item);
 				newSB.Defocus();
 				return newSB;
 			}
@@ -658,7 +705,7 @@ namespace SlotSystem{
 				onActionCompleteCommand.Execute();
 			}
 				public ISGCommand onActionCompleteCommand{
-					get{return commandsFactory.MakeOnActionCompleteCommand();}
+					get{return commandsRepo.onActionCompleteCommand;}
 				}
 			public void UpdateEquipStatesOnAll(){
 				ssm.UpdateEquipInvAndAllSBsEquipState();
@@ -667,7 +714,7 @@ namespace SlotSystem{
 				onActionExecuteCommand.Execute();
 			}
 				public ISGCommand onActionExecuteCommand{
-					get{return commandsFactory.MakeOnActionExecuteCommand();}
+					get{return commandsRepo.onActionExecuteCommand;}
 				}
 			public void SyncEquipped(InventoryItemInstance item, bool equipped){
 				if(equipped)
@@ -693,8 +740,8 @@ namespace SlotSystem{
 			}
 			public void Refresh(){
 				WaitForAction();
-				SetNewSBs(null);
-				SetNewSlots(null);
+				SetNewSBs(new List<ISlottable>());
+				SetNewSlots(new List<Slot>());
 			}
 			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
 				SetInventory(inv);
@@ -710,7 +757,7 @@ namespace SlotSystem{
 				initItemsCommand.Execute();
 			}
 				public ISGCommand initItemsCommand{
-					get{return commandsFactory.MakeInitializeItemsCommand();}
+					get{return commandsRepo.initializeItemsCommand;}
 				}
 			public void InitSlots(List<InventoryItemInstance> items){
 				List<Slot> newSlots = new List<Slot>();
@@ -761,14 +808,15 @@ namespace SlotSystem{
 			}
 			public IHoverable hoverable{
 				get{
-					if(m_hoverable == null)
-						m_hoverable = new Hoverable(this, taCache);
-					return m_hoverable;
+					if(_hoverable != null)
+						return _hoverable;
+					else
+						throw new InvalidOperationException("hoverable not set");
 				}
 			}
-				IHoverable m_hoverable;
+				IHoverable _hoverable;
 			public void SetHoverable(IHoverable hoverable){
-				m_hoverable = hoverable;
+				_hoverable = hoverable;
 			}
 			public void SetHovered(){
 				taCache.SetHovered(hoverable);
@@ -808,6 +856,7 @@ namespace SlotSystem{
 			SGFilter filter{get;}
 			bool AcceptsFilter(ISlottable pickedSB);
 		/*	Transaction	*/
+			ITransactionSGHandler sgHandler{get;}
 			void ReorderAndUpdateSBs();
 			void RevertAndUpdateSBs();
 			void SortAndUpdateSBs();

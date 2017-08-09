@@ -24,8 +24,7 @@ namespace SlotSystem{
 			sg1.Swap();
 			sg2.Swap();
 			iconHandler.dIcon1.SetDestination(sg2, sg2.GetNewSlot(m_pickedSB.item));
-			DraggedIcon di2 = new DraggedIcon(targetSB, iconHandler);
-			iconHandler.SetDIcon2(di2);
+			iconHandler.SetDIcon2(targetSB);
 			iconHandler.dIcon2.SetDestination(sg1, sg1.GetNewSlot(targetSB.item));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();

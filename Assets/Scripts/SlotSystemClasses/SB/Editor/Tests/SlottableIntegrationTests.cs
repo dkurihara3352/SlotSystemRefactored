@@ -14,9 +14,7 @@ namespace SlotSystemTests{
 		public class SlottableIntegrationTests : SlotSystemTest{
 			[Test]
 			public void SBStates_ByDefault_AreNull(){
-				Slottable sb = MakeSB_TACache();
-					SSESelStateHandler handler = new SSESelStateHandler();
-					sb.SetSelStateHandler(handler);
+				Slottable sb = MakeSBWithRealStateHandlers();
 				Assert.That(sb.isActStateNull, Is.True);
 				Assert.That(sb.wasActStateNull, Is.True);
 				Assert.That(sb.isSelStateNull, Is.True);
@@ -28,9 +26,8 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void processes_ByDefault_AreNull(){
-				Slottable sb = MakeSB();
+				Slottable sb = MakeSBWithRealStateHandlers();
 
-				// Assert.That(sb.selProcess, Is.Null);
 				Assert.That(sb.actProcess, Is.Null);
 				Assert.That(sb.eqpProcess, Is.Null);
 				Assert.That(sb.mrkProcess, Is.Null);
@@ -39,7 +36,7 @@ namespace SlotSystemTests{
 				/* WaitForActionState */
 					[Test]
 					public void WaitForAction_Always_SetsIsWaitingForAction(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						
 						sb.WaitForAction();
 
@@ -47,7 +44,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForAction_wasActStateNull_DoesNotCallActEngineSetProcNull(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							ISSEProcessEngine<ISBActProcess> mockProcEngine = Substitute.For<ISSEProcessEngine<ISBActProcess>>();
 							sb.SetActProcessEngine(mockProcEngine);
 						sb.WaitForAction();
@@ -57,7 +54,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForAction_WasWaitingForAction_DoesNotCallActEngineSetProcNull(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							ISSEProcessEngine<ISBActProcess> mockProcEngine = Substitute.For<ISSEProcessEngine<ISBActProcess>>();
 							sb.SetActProcessEngine(mockProcEngine);
 						sb.WaitForAction();
@@ -68,7 +65,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForAction_IsNotActStateInitAndWasNotWFAction_CallsActEngineSetProcNull(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							ISSEProcessEngine<ISBActProcess> mockEngine = Substitute.For<ISSEProcessEngine<ISBActProcess>>();
 							sb.SetActProcessEngine(mockEngine);
 						sb.Add();
@@ -79,7 +76,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForAction_OnPointerDown_IsFocused_SetsIsSelected(){
-						Slottable sb = MakeSB_TACache();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
@@ -91,7 +88,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForAction_OnPointerDown_IsFocused_SetsIsWFPickUp(){
-						Slottable sb = MakeSB_TACache();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
@@ -103,7 +100,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForAction_OnPointerDown_IsNotFocused_SetsIsWFPointerUp(){
-						Slottable sb = MakeSB_TACache();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
@@ -115,13 +112,13 @@ namespace SlotSystemTests{
 				/* WaitForPickUp */
 					[Test][ExpectedException(typeof(InvalidOperationException))]
 					public void WaitForPickUp_WasNotWaitForAction_ThrowsException(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 
 						sb.WaitForPickUp();
 					}
 					[Test]
 					public void WaitForPickUp_WasWaitingForAction_SetsIsWaitingForPickUp(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 
 						sb.WaitForPickUp();
@@ -130,7 +127,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForPickUp_WasWaitingForAction_SetsAndRunsWFPickUpProc(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockWFPickUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.waitForPickUpCoroutine.Returns(mockWFPickUpCoroutine);
@@ -143,7 +140,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void ExpireProcess_WaitingForPickUpProcess_SetsIsPickingUp(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -154,7 +151,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void ExpireProcess_WaitingForPickUpProcess_SetsPickedAmount1(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -165,7 +162,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPickUp_OnPointerUp_Always_SetsIsWaitingForNextTouch(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 
@@ -175,10 +172,9 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPickUp_OnEndDrag_Always_CallsRefresh(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SetUpForRefreshCall(sb);
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+							sb.SetSlotHandler(new SlotHandler());
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 
@@ -188,7 +184,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPickUp_OnEndDrag_Always_SetsIsFocused(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SSESelStateHandler handler = new SSESelStateHandler();
 							sb.SetSelStateHandler(handler);
 						sb.WaitForAction();
@@ -201,13 +197,13 @@ namespace SlotSystemTests{
 				/* WaitForPointerUpState */
 					[Test][ExpectedException(typeof(InvalidOperationException))]
 					public void WaitForPointerUp_WasNotWaitingForAction_ThrowsException(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 
 						sb.WaitForPointerUp();
 					}
 					[Test]
 					public void WaitForPointerUp_WasWaitingForAction_SetsIsWaitingForPointerUp(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 
 						sb.WaitForPointerUp();
@@ -216,7 +212,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForPointerUp_WasWaitingForAction_SetsAndRunsWaitForPointerUpProcess(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockWFPointerUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.waitForPointerUpCoroutine.Returns(mockWFPointerUpCoroutine);
@@ -229,7 +225,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void ExpireActPorcess_WaitForPointerUpProcess_SetIsDefocused(){
-						Slottable sb = MakeSB_TACache();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						SSESelStateHandler handler = new SSESelStateHandler();
 						sb.SetSelStateHandler(handler);
 						sb.WaitForAction();
@@ -241,8 +237,8 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPointerUp_OnPointerUp_Always_CallsTapCommandExecute(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
-							SlottableCommand mockTapComm = Substitute.For<SlottableCommand>();
+						Slottable sb = MakeSBWithRealStateHandlers();
+							ISBCommand mockTapComm = Substitute.For<ISBCommand>();
 							sb.SetTapCommand(mockTapComm);
 							SSESelStateHandler handler = new SSESelStateHandler();
 							sb.SetSelStateHandler(handler);
@@ -255,10 +251,9 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPointerUp_OnPointerUp_Always_CallsRefresh(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SetUpForRefreshCall(sb);
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+							sb.SetSlotHandler(new SlotHandler());
 						sb.WaitForAction();
 						sb.WaitForPointerUp();
 
@@ -268,9 +263,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPointerUp_OnPointerUp_Always_SetsIsDefocused(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 						sb.WaitForPointerUp();
 
@@ -280,10 +273,9 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPointerUp_OnEndDrag_Always_CallsRefresh(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SetUpForRefreshCall(sb);
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+							sb.SetSlotHandler(new SlotHandler());
 						sb.WaitForAction();
 						sb.WaitForPointerUp();
 
@@ -293,7 +285,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForPointerUp_OnEndDrag_Always_SetsIsDefocused(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SSESelStateHandler handler = new SSESelStateHandler();
 							sb.SetSelStateHandler(handler);
 						sb.WaitForAction();
@@ -312,7 +304,7 @@ namespace SlotSystemTests{
 					}
 					[Test]
 					public void WaitForNextTouch_WasPickingUp_SetsIsWaitingForNextTouch(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -324,7 +316,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForNextTouch_WasWaitingForPickUp_SetsIsWaitingForNextTouch(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 
@@ -334,7 +326,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForNextTouch_WasPickingUp_SetsAndRunsWaitForNextTouchProcess(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockWFNTCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.waitForNextTouchCoroutine.Returns(mockWFNTCoroutine);
@@ -350,7 +342,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void WaitForNextTouch_WasWaitingForPickUp_SetsAndRunsWaitForNextTouchProcess(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockWFNTCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.waitForNextTouchCoroutine.Returns(mockWFNTCoroutine);
@@ -364,14 +356,8 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void ExpireActProcess_WaitForNextTouchProcess_IsNotPickedUp_CallsTapCommandExecute(){
-						Slottable sb = MakeSB_ItemHandler();
-							SlottableCommand mockComm = Substitute.For<SlottableCommand>();
-							sb.SetTapCommand(mockComm);
-							ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
-							mockTAC.pickedSB.Returns((ISlottable)null);
-							sb.SetTACache(mockTAC);
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+						Slottable sb = MakeSBWithRealStateHandlers();
+						ISBCommand mockComm = sb.tapCommand;
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						sb.WaitForNextTouch();
@@ -382,13 +368,10 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void ExpireActProcess_WaitForNextTouchProcess_IsNotPickedUp_CallsRefresh(){
-						Slottable sb = MakeSB_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SetUpForRefreshCall(sb);
-							ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
-							mockTAC.pickedSB.Returns((ISlottable)null);
-							sb.SetTACache(mockTAC);
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+							sb.taCache.pickedSB.Returns((ISlottable)null);
+							sb.SetSlotHandler(new SlotHandler());
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						sb.WaitForNextTouch();
@@ -396,15 +379,11 @@ namespace SlotSystemTests{
 						sb.ExpireActProcess();
 
 						AssertRefreshCalled(sb);
-						}
+					}
 					[Test]
 					public void ExpireActProcess_WaitForNextTouchProcess_IsNotPickedUp_SetsIsFocused(){
-						Slottable sb = MakeSB_ItemHandler();
-							ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
-							mockTAC.pickedSB.Returns((ISlottable)null);
-							sb.SetTACache(mockTAC);
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+						Slottable sb = MakeSBWithRealStateHandlers();
+							sb.taCache.pickedSB.Returns((ISlottable)null);
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						sb.WaitForNextTouch();
@@ -415,12 +394,9 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void ExpireActProcess_WaitForNextTouchProcess_IsPickedUp_CallsSSMExecuteTransaction(){
-						Slottable sb = MakeSB();
-							ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-							sb.SetTAM(mockTAM);
-							ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
-							mockTAC.pickedSB.Returns(sb);
-							sb.SetTACache(mockTAC);
+						Slottable sb = MakeSBWithRealStateHandlers();
+							sb.taCache.pickedSB.Returns(sb);
+						ITransactionManager mockTAM = sb.ssm.tam;
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						sb.WaitForNextTouch();
@@ -428,9 +404,9 @@ namespace SlotSystemTests{
 						sb.ExpireActProcess();
 
 						mockTAM.Received().ExecuteTransaction();
-						}
+					}
 					Slottable MakeSBForInWFNT(bool isPickedUp){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							if(!isPickedUp)
 								sb.taCache.pickedSB.Returns((ISlottable)null);
 							else
@@ -478,9 +454,9 @@ namespace SlotSystemTests{
 					[Test]
 					public void InWaitForNextTouch_OnPointerDown_IsPickedUpIsStackableQuantityGrearterThanPickedAmount_IncrementsPickedAmount(){
 						Slottable sb = MakeSBForInWFNT(true);
-							ItemHandler itemHandler = new ItemHandler();
+							ItemHandler itemHandler;
 								PartsInstance parts = MakePartsInstance(0, 10);
-								itemHandler.SetItem(parts);
+								itemHandler = new ItemHandler(parts);
 								itemHandler.pickedAmount = 8;
 							sb.SetItemHandler(itemHandler);
 							sb.taCache.pickedSB.Returns(sb);
@@ -495,10 +471,9 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForNextTouch_OnDeselect_Always_CallsRefresh(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SetUpForRefreshCall(sb);
-							SSESelStateHandler handler = new SSESelStateHandler();
-							sb.SetSelStateHandler(handler);
+							sb.SetSlotHandler(new SlotHandler());
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						sb.WaitForNextTouch();
@@ -509,7 +484,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InWaitForNextTouch_OnDeselect_Always_SetsIsFocused(){
-						Slottable sb = MakeSB_TACache_ItemHandler();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							SSESelStateHandler handler = new SSESelStateHandler();
 							sb.SetSelStateHandler(handler);
 						sb.WaitForAction();
@@ -531,23 +506,25 @@ namespace SlotSystemTests{
 					}
 					Slottable MakeSBForPickUp(){
 						Slottable sb = MakeSB();
-							ITransactionManager stubTAM = Substitute.For<ITransactionManager>();
-							sb.SetTAM(stubTAM);
+							ISlotSystemManager ssm = Substitute.For<ISlotSystemManager>();
+								ITransactionManager tam = Substitute.For<ITransactionManager>();
+									ITransactionIconHandler iconHd = MakeSubIconHandler();
+									tam.iconHandler.Returns(iconHd);
+								ssm.tam.Returns(tam);
+							sb.SetSSM(ssm);
 							ITransactionCache stubTAC = MakeSubTAC();
 							sb.SetTACache(stubTAC);
 							SSESelStateHandler selStateHandler = new SSESelStateHandler();
 							sb.SetSelStateHandler(selStateHandler);
-							ITransactionIconHandler iconHd = MakeSubIconHandler();
-							sb.SetIconHandler(iconHd);
 							ITAMActStateHandler tamStateHandler = MakeSubTAMStateHandler();
-							sb.SetTAMStateHandler(tamStateHandler);
+								tam.actStateHandler.Returns(tamStateHandler);
 							IItemHandler itemHandler = Substitute.For<IItemHandler>();
 							sb.SetItemHandler(itemHandler);
 						return sb;
 					}
 					[Test]
 					public void PickUp_WasWaitingForPickUp_SetsIsPickingUp(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -558,7 +535,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void PickUp_WasWaitingForNextTouch_SetsIsPickingUp(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -570,9 +547,8 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void PickUp_IsNotCurSelStateNullAndValidPrevActState_CallsHoverableOnHoverEnter(){
-						Slottable sb = MakeSBForPickUp();
-							IHoverable mockHoverable = Substitute.For<IHoverable>();
-							sb.SetHoverable(mockHoverable);
+						Slottable sb = MakeSBWithRealStateHandlers();
+						IHoverable mockHoverable = sb.hoverable;
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						sb.Deactivate();
@@ -583,10 +559,10 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void PickUp_SSMNotNullAndValidPrevActState_CallsSSMInSequence(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							ITransactionCache mockTAC = sb.taCache;
-							ITAMActStateHandler tamStateHandler = sb.tamStateHandler;
-							ITransactionIconHandler mockIconHandler = sb.iconHandler;
+							ITAMActStateHandler tamStateHandler = sb.ssm.tam.actStateHandler;
+							ITransactionIconHandler mockIconHandler = sb.ssm.tam.iconHandler;
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -595,15 +571,15 @@ namespace SlotSystemTests{
 
 						Received.InOrder(()=> {
 							mockTAC.SetPickedSB(sb);
+							mockIconHandler.SetDIcon1(sb);
 							tamStateHandler.Probe();
-							mockIconHandler.SetDIcon1(Arg.Any<DraggedIcon>());
 							mockTAC.CreateTransactionResults();
 							mockTAC.UpdateFields();
 						});
 						}
 					[Test]
 					public void PickUp_WasWaitingForPickUpOrWaitingForNextTouch_SetsAndRunsPickUpProcess(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockPickUpCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.pickUpCoroutine.Returns(mockPickUpCoroutine);
@@ -618,8 +594,9 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InPickingUp_OnDeselected_Always_CallsRefresh(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						SetUpForRefreshCall(sb);
+						sb.SetSlotHandler(new SlotHandler());
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -631,7 +608,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InPickingUp_OnDeselected_Always_SetsIsFocused(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
 						SetUpForRefreshCall(sb);
 						sb.Focus();
 						sb.WaitForAction();
@@ -644,12 +621,10 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InPickingUp_OnPointerUp_IsHoveredAndIsStackable_SetsIsWaitingForNextTouch(){
-						Slottable sb = MakeSBForPickUp();
-						SetUpForRefreshCall(sb);
+						Slottable sb = MakeSBWithRealStateHandlers();
 							sb.itemHandler.isStackable.Returns(true);
-							IHoverable stubHoverable = Substitute.For<IHoverable>();
-							sb.SetHoverable(stubHoverable);
-							stubHoverable.isHovered.Returns(true);
+							sb.hoverable.isHovered.Returns(true);
+						SetUpForRefreshCall(sb);
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -661,21 +636,21 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void InPickingUp_OnPointerUp_NotIsHoveredOrNotIsStackable_CallsSSMExecuteTransaction(){
-						Slottable sb = MakeSBForPickUp();
-							IHoverable stubHoverable = Substitute.For<IHoverable>();
-							sb.SetHoverable(stubHoverable);
-							sb.taCache.hovered.Returns(stubHoverable);
+						Slottable sb = MakeSBWithRealStateHandlers();
+							sb.hoverable.isHovered.Returns(false);
+						ITransactionManager mockTAM = sb.ssm.tam;
 						sb.WaitForAction();
 						sb.WaitForPickUp();
 						sb.PickUp();
 
 						sb.OnPointerUp(new PointerEventDataFake());
 
-						sb.tam.Received().ExecuteTransaction();
+						mockTAM.Received().ExecuteTransaction();
 						}
 					[Test]
 					public void InPickingUp_OnEndDrag_Always_CallsSSMExecuteTransaction(){
-						Slottable sb = MakeSBForPickUp();
+						Slottable sb = MakeSBWithRealStateHandlers();
+						ITransactionManager mockTAM = sb.ssm.tam;
 						sb.Focus();
 						sb.WaitForAction();
 						sb.WaitForPickUp();
@@ -683,12 +658,12 @@ namespace SlotSystemTests{
 
 						sb.OnEndDrag(new PointerEventDataFake());
 
-						sb.tam.Received().ExecuteTransaction();
+						mockTAM.Received().ExecuteTransaction();
 						}
 				/*  MoveWithinState	*/
 					[Test]
 					public void MoveWithin_Always_SetsIsMovingWithin(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 
 						sb.MoveWithin();
 
@@ -696,7 +671,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void MoveWithin_Always_SetsAndRunsMoveWithinProcess(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockMoveWithinCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.moveWithinCoroutine.Returns(mockMoveWithinCoroutine);
@@ -709,7 +684,7 @@ namespace SlotSystemTests{
 				/*  AddedState	*/
 					[Test]
 					public void Add_Always_SetsIsAdding(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 
 						sb.Add();
 
@@ -717,7 +692,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void Add_Always_SetsAndRunsAddProcess(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockAddCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.addCoroutine.Returns(mockAddCoroutine);
@@ -730,7 +705,7 @@ namespace SlotSystemTests{
 				/*  RemovedState	*/
 					[Test]
 					public void Remove_Always_SetsIsRemoving(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 
 						sb.Remove();
 
@@ -738,7 +713,7 @@ namespace SlotSystemTests{
 						}
 					[Test]
 					public void Remove_Always_SetsAndRunsRemovProcess(){
-						Slottable sb = MakeSB();
+						Slottable sb = MakeSBWithRealStateHandlers();
 							System.Func<IEnumeratorFake> mockRemoveCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 							ISBActCoroutineRepo mockCorRepo = Substitute.For<ISBActCoroutineRepo>();
 							mockCorRepo.removeCoroutine.Returns(mockRemoveCoroutine);
@@ -751,27 +726,14 @@ namespace SlotSystemTests{
 				/* Sequence */
 					[Test]
 					public void ActStates_EventSequence(){
-						Slottable sb = MakeSB();
-							ItemHandler itemHandler = new ItemHandler();
-							sb.SetItemHandler(itemHandler);
-							PartsInstance parts = MakePartsInstance(0, 20);
-							BowInstance bow = MakeBowInstance(0);
-							itemHandler.SetItem(bow);
-							sb.SetItem(parts);
-							ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-							sb.SetTAM(mockTAM);
-							ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
-							sb.SetTACache(mockTAC);
-							SlottableCommand mockTapComm = Substitute.For<SlottableCommand>();
-							sb.SetTapCommand(mockTapComm);
-							IHoverable stubHoverable = Substitute.For<IHoverable>();
-							sb.SetHoverable(stubHoverable);
-							SSESelStateHandler selStateHandler = new SSESelStateHandler();
-							sb.SetSelStateHandler(selStateHandler);
-							ITransactionIconHandler iconHd = MakeSubIconHandler();
-							sb.SetIconHandler(iconHd);
-							ITAMActStateHandler tamStateHandler = MakeSubTAMStateHandler();
-							sb.SetTAMStateHandler(tamStateHandler);
+						Slottable sb = MakeSBWithRealStateHandlers();
+								BowInstance bow = MakeBowInstance(0);
+								PartsInstance parts = MakePartsInstance(0, 20);
+							sb.itemHandler.item.Returns(parts);
+							ITransactionCache mockTAC = sb.taCache;
+							ITransactionManager mockTAM = sb.ssm.tam;
+							ISBCommand mockTapComm = sb.tapCommand;
+							
 						PointerEventDataFake eventData = new PointerEventDataFake();
 						//focused !(stackable && hovered) WFA_down WFPickUp_exp PickingUp_up execTA
 								sb.Focus();
@@ -791,7 +753,8 @@ namespace SlotSystemTests{
 								mockTAM.Received(1).ExecuteTransaction();
 						//focused stackable && hovered WFA_down WFPickUp_exp PickingUp_up WFNT_exp execTA
 								sb.Focus();
-								itemHandler.SetItem(parts);
+								// sb.itemHandler.item.Returns(parts);
+								sb.itemHandler.isStackable.Returns(true);
 								mockTAC.pickedSB.Returns((ISlotSystemElement)null);
 								mockTAC.hovered.Returns((IHoverable)null);
 							sb.WaitForAction();
@@ -801,10 +764,10 @@ namespace SlotSystemTests{
 							
 							sb.ExpireActProcess();
 								Assert.That(sb.isPickingUp, Is.True);
-								mockTAC.hovered.Returns(stubHoverable);
+								mockTAC.hovered.Returns(sb.hoverable);
 								mockTAC.pickedSB.Returns(sb);
 
-								stubHoverable.isHovered.Returns(true);
+								sb.hoverable.isHovered.Returns(true);
 							sb.OnPointerUp(eventData);
 								Assert.That(sb.isWaitingForNextTouch, Is.True);
 							
@@ -812,7 +775,7 @@ namespace SlotSystemTests{
 								mockTAM.Received(2).ExecuteTransaction();
 						//focused stackable && hovered WFA_down WFPickUp_exp PickingUp_up WFNT_down increment
 								sb.Focus();
-								itemHandler.SetItem(parts);
+								sb.itemHandler.item.Returns(parts);
 								mockTAC.pickedSB.Returns((ISlotSystemElement)null);
 								mockTAC.hovered.Returns((IHoverable)null);
 							sb.WaitForAction();
@@ -824,13 +787,13 @@ namespace SlotSystemTests{
 								Assert.That(sb.isPickingUp, Is.True);
 								Assert.That(sb.pickedAmount, Is.EqualTo(1));
 								mockTAC.pickedSB.Returns(sb);
-								mockTAC.hovered.Returns(stubHoverable);
+								mockTAC.hovered.Returns(sb.hoverable);
 							
 							sb.OnPointerUp(eventData);
 								Assert.That(sb.isWaitingForNextTouch, Is.True);
 							
 							sb.OnPointerDown(eventData);
-								Assert.That(sb.pickedAmount, Is.EqualTo(2));
+								sb.itemHandler.Received().pickedAmount++;
 						//defocused WFA_down WFPointerUp_up tap
 								sb.Defocus();
 								mockTAC.pickedSB.Returns((ISlotSystemElement)null);
@@ -864,26 +827,6 @@ namespace SlotSystemTests{
 				/* EquippedState */
 					
 		/* helpers */
-			Slottable MakeSB_ItemHandler(){
-				Slottable sb = MakeSB();
-				IItemHandler itemHandler = Substitute.For<IItemHandler>();
-				sb.SetItemHandler(itemHandler);
-				return sb;
-			}
-			Slottable MakeSB_TACache(){
-				Slottable sb = MakeSB();
-				ITransactionCache tac = Substitute.For<ITransactionCache>();
-				sb.SetTACache(tac);
-				return sb;
-			}
-			Slottable MakeSB_TACache_ItemHandler(){
-				Slottable sb = MakeSB();
-				ITransactionCache tac = Substitute.For<ITransactionCache>();
-				sb.SetTACache(tac);
-				IItemHandler itemHandler = Substitute.For<IItemHandler>();
-				sb.SetItemHandler(itemHandler);
-				return sb;
-			}
 
 			PointerEventDataFake eventData{get{return new PointerEventDataFake();}}
 			void AssertRefreshCalled(ISlottable sb){
