@@ -31,11 +31,23 @@ namespace SlotSystem{
 		public InventoryItemInstance this[int i]{
 			get{return m_items[i];}
 		}
-		public ISlotGroup sg{get{return m_sg;}}
+		public ISlotGroup sg{
+			get{return m_sg;}
+		}
 			ISlotGroup m_sg;
 			public void SetSG(ISlotGroup sg){
 				m_sg = sg;
+				_slotsHolder = sg;
 			}
+		public ISlotsHolder slotsHolder{
+			get{
+				if(_slotsHolder != null)
+					return _slotsHolder;
+				else
+					throw new InvalidOperationException("slotsHolder not set");
+			}
+		}
+			ISlotsHolder _slotsHolder;
 		protected BowInstance m_equippedBow;
 		protected WearInstance m_equippedWear;
 		protected List<CarriedGearInstance> m_equippedCGears = new List<CarriedGearInstance>();
@@ -45,7 +57,7 @@ namespace SlotSystem{
 		public void SetEquippableCGearsCount(int num){
 			m_equippableCGearsCount = num;
 			if(sg != null && sg.filter is SGCGearsFilter && !sg.isExpandable)
-			sg.SetInitSlotsCount(num);
+			slotsHolder.SetInitSlotsCount(num);
 		}
 		
 		protected List<InventoryItemInstance> m_items{

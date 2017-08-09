@@ -16,7 +16,7 @@ namespace SlotSystemTests{
 				SlotSystemManager ssm = MakeSSM();
 					SlotSystemBundle pBun = MakeSSBundle();
 					pBun.transform.SetParent(ssm.transform);
-						SlotGroup sgpA = MakeSGInitWithSubsAndRealCommands();
+						SlotGroup sgpA = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 							sgpA.transform.SetParent(pBun.transform);
 							PoolInventory pInv = new PoolInventory();
 								BowInstance bowA = MakeBowInstance(0);
@@ -35,7 +35,7 @@ namespace SlotSystemTests{
 								ISlottable shieldSBP = sgpA.GetSB(shieldA);
 								ISlottable mWeaponSBP = sgpA.GetSB(mWeaponA);
 								xSGPAEles = new ISlotSystemElement[]{bowSBP, wearSBP, shieldSBP, mWeaponSBP};
-						SlotGroup sgpB = MakeSGInitWithSubsAndRealCommands();
+						SlotGroup sgpB = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 							sgpB.transform.SetParent(pBun.transform);
 						pBun.SetHierarchy();
 					SlotSystemBundle eBun = MakeSSBundle();
@@ -43,13 +43,13 @@ namespace SlotSystemTests{
 						EquipmentSet eSetA = MakeEquipmentSet();
 						eSetA.transform.SetParent(eBun.transform);
 							IEquipmentSetInventory eInv = new EquipmentSetInventory(MakeBowInstance(0), MakeWearInstance(0), new List<CarriedGearInstance>(), 1);
-							SlotGroup sgeBow = MakeSGInitWithSubsAndRealCommands();
+							SlotGroup sgeBow = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 								sgeBow.transform.SetParent(eSetA.transform);
 								sgeBow.InspectorSetUp(eInv, new SGBowFilter(), new SGItemIDSorter(), 1);
-							SlotGroup sgeWear = MakeSGInitWithSubsAndRealCommands();
+							SlotGroup sgeWear = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 								sgeWear.transform.SetParent(eSetA.transform);
 								sgeWear.InspectorSetUp(eInv, new SGWearFilter(), new SGItemIDSorter(), 1);
-							SlotGroup sgeCGears = MakeSGInitWithSubsAndRealCommands();
+							SlotGroup sgeCGears = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 								sgeCGears.transform.SetParent(eSetA.transform);
 								sgeCGears.InspectorSetUp(eInv, new SGCGearsFilter(), new SGItemIDSorter(), 1);
 							eSetA.SetHierarchy();
@@ -58,16 +58,16 @@ namespace SlotSystemTests{
 					gBunA.transform.SetParent(ssm.transform);
 						TestSlotSystemElement ssegA = MakeTestSSE();
 						ssegA.transform.SetParent(gBunA.transform);
-							SlotGroup sggAA = MakeSGInitWithSubsAndRealCommands();
+							SlotGroup sggAA = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 							sggAA.transform.SetParent(ssegA.transform);
-							SlotGroup sggAB = MakeSGInitWithSubsAndRealCommands();
+							SlotGroup sggAB = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 							sggAB.transform.SetParent(ssegA.transform);
 						ssegA.SetHierarchy();
 						SlotSystemBundle gBunAA = MakeSSBundle();
 						gBunAA.transform.SetParent(gBunA.transform);
-							SlotGroup sggAAA = MakeSGInitWithSubsAndRealCommands();
+							SlotGroup sggAAA = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 							sggAAA.transform.SetParent(gBunAA.transform);
-							SlotGroup sggAAB = MakeSGInitWithSubsAndRealCommands();
+							SlotGroup sggAAB = MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder();
 							sggAAB.transform.SetParent(gBunAA.transform);
 						gBunAA.SetHierarchy();
 					gBunA.SetHierarchy();
@@ -107,14 +107,6 @@ namespace SlotSystemTests{
 				Assert.That(sggAAB.taCache, Is.SameAs(stubTAC));
 			}
 		/* helper */
-			SlotGroup MakeSG_SSM_TAM(){
-				SlotGroup sg = MakeSG();
-				ISlotSystemManager ssm = Substitute.For<ISlotSystemManager>();
-				sg.SetSSM(ssm);
-				ITransactionManager tam = Substitute.For<ITransactionManager>();
-				sg.SetTAM(tam);
-				return sg;
-			}
 	}
 }
 

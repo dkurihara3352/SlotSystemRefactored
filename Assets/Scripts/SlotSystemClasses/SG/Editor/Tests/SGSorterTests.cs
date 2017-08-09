@@ -15,13 +15,12 @@ namespace SlotSystemTests{
 		public class SGSorterTests: SlotSystemTest {
 
 			[TestCaseSource(typeof(VariousSGSorterOSBWRSCases))]
-			public void VariousSGSorter_OrderSBsWithRetainedSize_WhenCalled_SetsSBsAccordingly(SGSorter targetSorter,List<ISlottable> original, List<ISlottable> expected){
+			public void VariousSGSorter_OrderSBsWithRetainedSize_WhenCalled_SetsSBsAccordingly(SGSorter targetSorter,List<ISlottable> source, List<ISlottable> expected){
 				SGSorter sorter = targetSorter;
-				List<ISlottable> list = new List<ISlottable>(original);
 
-				sorter.OrderSBsWithRetainedSize(ref list);
+				List<ISlottable> actual = sorter.OrderedSBsWithoutResize(source);
 
-				bool equality = list.MemberEquals(expected);
+				bool equality = actual.MemberEquals(expected);
 				Assert.That(equality, Is.True);
 				}
 				class VariousSGSorterOSBWRSCases: IEnumerable{
@@ -224,13 +223,12 @@ namespace SlotSystemTests{
 					}
 				}
 			[TestCaseSource(typeof(VariousSGSorterTrimCases))]
-			public void VariousSGSorter_TrimAndOrderSBs_WhenCalled_SetsSBsAccordingly(SGSorter targetSorter,List<ISlottable> original, List<ISlottable> expected){
+			public void VariousSGSorter_TrimAndOrderSBs_WhenCalled_SetsSBsAccordingly(SGSorter targetSorter,List<ISlottable> source, List<ISlottable> expected){
 				SGSorter sorter = targetSorter;
-				List<ISlottable> list = new List<ISlottable>(original);
 
-				sorter.TrimAndOrderSBs(ref list);
+				List<ISlottable> actual = sorter.OrderedAndTrimmedSBs(source);
 
-				bool equality = list.MemberEquals(expected);
+				bool equality = actual.MemberEquals(expected);
 				Assert.That(equality, Is.True);
 				}
 				class VariousSGSorterTrimCases: IEnumerable{

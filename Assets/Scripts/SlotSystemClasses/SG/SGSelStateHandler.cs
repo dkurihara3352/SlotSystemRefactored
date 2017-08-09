@@ -8,7 +8,7 @@ namespace SlotSystem{
 		ISlotGroup sg;
 		public SGSelStateHandler(ISlotGroup sg){
 			this.taCache = sg.taCache;
-			this.hoverable = sg.hoverable;
+			this.hoverable = sg;
 			this.sg = sg;
 		}
 		public override void Activate(){

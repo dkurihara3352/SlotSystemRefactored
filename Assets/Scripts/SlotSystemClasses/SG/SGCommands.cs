@@ -56,11 +56,14 @@ namespace SlotSystem{
 	}
 	public interface ISGEmptyCommand: ISGCommand{}
 	public class SGInitItemsCommand: SGCommand,ISGInitItemsCommand{
-		public SGInitItemsCommand(ISlotGroup sg): base(sg){}
+		ISlotsHolder slotsHolder;
+		public SGInitItemsCommand(ISlotGroup sg): base(sg){
+			slotsHolder = sg;
+		}
 		public override void Execute(){
 			List<InventoryItemInstance> items = new List<InventoryItemInstance>(sg.inventory);
 			items = sg.FilterItem(items);
-			sg.InitSlots(items);
+			slotsHolder.InitSlots(items);
 			sg.InitSBs(items);
 			sg.SyncSBsToSlots();
 			if(sg.isAutoSort)

@@ -11,13 +11,12 @@ namespace SlotSystem{
 		}
 		public void InitializeSG(){
 			SetCommandsRepo(new SGCommandsRepo(this));
-			SetNewSlots(new List<Slot>());
-			SetSlots(new List<Slot>());
+			SetSlotsHolder(new SlotsHolder(this));
 			SetNewSBs(new List<ISlottable>());
-			SetTAM(ssm.tam);
 			SetTACache(ssm.taCache);
 			SetHoverable(new Hoverable(this, taCache));
 			SetSGHandler(ssm.tam.sgHandler);
+			SetSorterHandler(new SorterHandler());
 			InitializeStateHandlers();
 		}
 		/*	states	*/
@@ -183,7 +182,6 @@ namespace SlotSystem{
 			public void SetCommandsRepo(ISGCommandsRepo repo){
 				_commandsRepo = repo;
 			}
-
 		/*	public fields	*/
 			public Inventory inventory{
 				get{
@@ -227,64 +225,48 @@ namespace SlotSystem{
 				}
 			}
 		/* Slots */
-			public Slot GetNewSlot(InventoryItemInstance itemInst){
-				int index = -3;
-				foreach(ISlottable sb in this){
-					if(sb != null){
-						if(sb.item == itemInst)
-							index = sb.newSlotID;
-					}
+			public ISlotsHolder slotsHolder{
+				get{
+					if(_slotsHolder != null)
+						return _slotsHolder;
+					else
+						throw new InvalidOperationException("slotsHolder not set");
 				}
-				if(index != -3)
-					return newSlots[index];
-				else 
-					return null;
+			}
+				ISlotsHolder _slotsHolder;
+			public void SetSlotsHolder(ISlotsHolder slotsHolder){
+				_slotsHolder = slotsHolder;
+			}
+			public List<Slot> slots{
+				get{return slotsHolder.slots;}
+			}
+			public void SetSlots(List<Slot> slots){
+				slotsHolder.SetSlots(slots);
+			}
+			public bool hasEmptySlot{
+				get{return slotsHolder.hasEmptySlot;}
 			}
 			public List<Slot> newSlots{
-				get{
-					if(_newSlots != null)
-						return _newSlots;
-					else
-						throw new InvalidOperationException("newSlots not set");
-				}
+				get{return slotsHolder.newSlots;}
 			}
-				List<Slot> _newSlots;
-				public void SetNewSlots(List<Slot> newSlots){
-					_newSlots = newSlots;
-				}
-			public List<Slot> slots{
-				get{
-					if(m_slots != null)
-						return m_slots;
-					else throw new InvalidOperationException("slots not set");
-				}
+			public void SetNewSlots(List<Slot> newSlots){
+				slotsHolder.SetNewSlots(newSlots);
 			}
-				List<Slot> m_slots;
-				public void SetSlots(List<Slot> slots){
-					m_slots = slots;
-				}
-			public bool hasEmptySlot{
-				get{
-					bool emptyFound = false;
-					foreach(Slot slot in slots){
-						if(slot.sb == null)
-							emptyFound = true;
-					}
-					return emptyFound;
-				}
+			public Slot GetNewSlot(InventoryItemInstance item){
+				return slotsHolder.GetNewSlot(item);
 			}
-			public void SetInitSlotsCount(int i){
-				_initSlotsCount = i;
+			public void SetInitSlotsCount(int count){
+				slotsHolder.SetInitSlotsCount(count);
 			}
-				public int initSlotsCount{
-					get{
-						if(_initSlotsCount != -1)
-							return _initSlotsCount;
-						else
-							throw new InvalidOperationException("initSlotsCount not set");
-					}
-				}
-				int _initSlotsCount = -1;
+			public int initSlotsCount{
+				get{return slotsHolder.initSlotsCount;}
+			}
+			public void InitSlots(List<InventoryItemInstance> items){
+				slotsHolder.InitSlots(items);
+			}
+			public void PutSBsInSlots(List<ISlottable> sbs){
+				slotsHolder.PutSBsInSlots(sbs);
+			}
 		/* SB */
 			public ISlottable GetSB(InventoryItemInstance itemInst){
 				foreach(ISlottable sb in this){
@@ -344,33 +326,41 @@ namespace SlotSystem{
 				}
 			}
 		/*	sorter	*/
-			public void InstantSort(){
-				List<ISlottable> orderedSbs = slottables;
-				sorter.OrderSBsWithRetainedSize(ref orderedSbs);
-				foreach(Slot slot in slots){
-					slot.sb = orderedSbs[slots.IndexOf(slot)];
+			public ISorterHandler sorterHandler{
+				get{
+					if(_sorterHandler != null)
+						return _sorterHandler;
+					else
+						throw new InvalidOperationException("sorterHandler not set");
 				}
+			}
+				ISorterHandler _sorterHandler;
+			public void SetSorterHandler(ISorterHandler sorterHandler){
+				_sorterHandler = sorterHandler;
+			}
+			public void InstantSort(){
+				List<ISlottable> sortedSBs = GetSortedSBsWithoutResize(slottables);
+				PutSBsInSlots(sortedSBs);
+			}
+			public void ToggleAutoSort(bool on){
+				SetIsAutoSort(on);
+				Focus();
+			}
+			public List<ISlottable> GetSortedSBsWithoutResize(List<ISlottable> source){
+				return sorterHandler.GetSortedSBsWithoutResize(source);
+			}
+			public List<ISlottable> GetSortedSBsWithResize(List<ISlottable> source){
+				return sorterHandler.GetSortedSBsWithResize(source);
 			}
 			public void SetSorter(SGSorter sorter){
-				_sorter = sorter;
+				sorterHandler.SetSorter(sorter);
 			}
-				public SGSorter sorter{
-					get{
-						if(_sorter != null)
-							return _sorter;
-						else
-							throw new InvalidOperationException("sorter not set");
-					}
-				}
-				SGSorter _sorter;
-			public void ToggleAutoSort(bool on){
-				m_isAutoSort = on;
-				selStateHandler.Focus();
+			public void SetIsAutoSort(bool on){
+				sorterHandler.SetIsAutoSort(on);
 			}
 			public bool isAutoSort{
-				get{return m_isAutoSort;}
+				get{return sorterHandler.isAutoSort;}
 			}
-				protected bool m_isAutoSort = true;
 		/*	filter	*/
 			public List<InventoryItemInstance> FilterItem(List<InventoryItemInstance> items){
 				filter.Filter(ref items);
@@ -459,8 +449,8 @@ namespace SlotSystem{
 				_sgHandler = sgHandler;
 			}
 			public void ReorderAndUpdateSBs(){
-				ISlottable sb1 = pickedSB;
-				ISlottable sb2 = targetSB;
+				ISlottable sb1 = taCache.pickedSB;
+				ISlottable sb2 = taCache.targetSB;
 				List<ISlottable> newSBs = new List<ISlottable>(toList);
 				newSBs.Reorder(sb1, sb2);
 				UpdateSBs(newSBs);
@@ -471,11 +461,11 @@ namespace SlotSystem{
 				SetSBsActStates();
 			}
 			public void SortAndUpdateSBs(){
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
+				List<ISlottable> newSBs;
 				if(isExpandable)
-					sorter.TrimAndOrderSBs(ref newSBs);
+					newSBs = GetSortedSBsWithResize(toList);
 				else
-					sorter.OrderSBsWithRetainedSize(ref newSBs);
+					newSBs = GetSortedSBsWithoutResize(toList);
 				
 				UpdateSBs(newSBs);
 			}
@@ -491,7 +481,7 @@ namespace SlotSystem{
 					if(removed != null)
 						NullifyIndexOf(removed.item, newSBs);
 				}
-				SortContextually(ref newSBs);
+				newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
 				UpdateSBs(newSBs);
 			}
 			public ISlottable GetAddedForFill(){
@@ -517,7 +507,7 @@ namespace SlotSystem{
 				
 				CreateNewSBAndSwapInList(added, removed, newSBs);
 
-				SortContextually(ref newSBs);
+				newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
 				UpdateSBs(newSBs);
 			}
 			public ISlottable GetAddedForSwap(){
@@ -552,7 +542,7 @@ namespace SlotSystem{
 						CreateNewSBAndFill(itemInst, newSBs);
 					}
 				}
-				SortContextually(ref newSBs);
+				newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
 				UpdateSBs(newSBs);
 			}
 			public bool TryChangeStackableQuantity(List<ISlottable> target, InventoryItemInstance item, bool added){
@@ -591,7 +581,7 @@ namespace SlotSystem{
 						NullifyIndexOf(item, thisNewSBs);
 					}
 				}
-				SortContextually(ref thisNewSBs);
+				thisNewSBs = SortedSBsIfAutoSortAccordingToExpandability(thisNewSBs);
 				
 				UpdateSBs(thisNewSBs);
 			}
@@ -693,13 +683,17 @@ namespace SlotSystem{
 				}
 				list[list.IndexOf(rem)] = null;
 			}
-			void SortContextually(ref List<ISlottable> list){
+			List<ISlottable> SortedSBsIfAutoSortAccordingToExpandability(List<ISlottable> source){
+				List<ISlottable> result = source;
 				if(isAutoSort){
 					if(isExpandable)
-						sorter.TrimAndOrderSBs(ref list);
+						result = GetSortedSBsWithResize(result);
 					else
-						sorter.OrderSBsWithRetainedSize(ref list);
+						result = GetSortedSBsWithoutResize(result);
 				}
+				if(result == null)
+					return source;
+				return result;
 			}
 			public void OnActionComplete(){
 				onActionCompleteCommand.Execute();
@@ -759,15 +753,6 @@ namespace SlotSystem{
 				public ISGCommand initItemsCommand{
 					get{return commandsRepo.initializeItemsCommand;}
 				}
-			public void InitSlots(List<InventoryItemInstance> items){
-				List<Slot> newSlots = new List<Slot>();
-				int slotCountToCreate = initSlotsCount == 0? items.Count: initSlotsCount;
-				for(int i = 0; i <slotCountToCreate; i++){
-					Slot newSlot = new Slot();
-					newSlots.Add(newSlot);
-				}
-				SetSlots(newSlots);
-			}
 			public void InitSBs(List<InventoryItemInstance> items){
 				while(slots.Count < items.Count){
 					items.RemoveAt(slots.Count);
@@ -778,16 +763,6 @@ namespace SlotSystem{
 				}
 			}
 		/* Hoverable */
-			public ITransactionManager tam{
-				get{
-					if(m_tam != null)
-						return m_tam;
-					else
-						throw new System.InvalidOperationException("tam not set");
-				}
-			}
-				ITransactionManager m_tam;
-			public void SetTAM(ITransactionManager tam){m_tam = tam;}
 			public ITransactionCache taCache{
 				get{
 					if(_taCache != null)
@@ -799,12 +774,6 @@ namespace SlotSystem{
 				ITransactionCache _taCache;
 			public void SetTACache(ITransactionCache taCache){
 				_taCache = taCache;
-			}
-			public ISlottable pickedSB{
-				get{return taCache.pickedSB;}
-			}
-			public ISlottable targetSB{
-				get{return taCache.targetSB;}
 			}
 			public IHoverable hoverable{
 				get{
@@ -818,9 +787,6 @@ namespace SlotSystem{
 			public void SetHoverable(IHoverable hoverable){
 				_hoverable = hoverable;
 			}
-			public void SetHovered(){
-				taCache.SetHovered(hoverable);
-			}
 			public void OnHoverEnter(){
 				hoverable.OnHoverEnter();
 			}
@@ -831,7 +797,7 @@ namespace SlotSystem{
 				get{return hoverable.isHovered;}
 			}
 	}
-	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler{
+	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler{
 		/*	instrinsic	*/
 			Inventory inventory{get;}
 			bool isShrinkable{get;}
@@ -840,17 +806,11 @@ namespace SlotSystem{
 			ISlottable GetSB(InventoryItemInstance itemInst);
 			bool HasItem(InventoryItemInstance invInst);
 			void SetSBs(List<ISlottable> sbs);
-			Slot GetNewSlot(InventoryItemInstance itemInst);
-			bool hasEmptySlot{get;}
-			void SetInitSlotsCount(int i);
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();
-			void InitSlots(List<InventoryItemInstance> items);
 			void InitSBs(List<InventoryItemInstance> items);
 		/*	Sorter	*/
-			void SetSorter(SGSorter sorter);
 			void InstantSort();
-			bool isAutoSort{get;}
 		/*	Filter	*/
 			List<InventoryItemInstance> FilterItem(List<InventoryItemInstance> items);
 			SGFilter filter{get;}
@@ -871,10 +831,5 @@ namespace SlotSystem{
 			void OnActionExecute();
 			void SyncEquipped(InventoryItemInstance item, bool equipped);
 			void ReportTAComp();
-		/* Hoverable */
-			ISlottable pickedSB{get;}
-			ISlottable targetSB{get;}
-			IHoverable hoverable{get;}
-			void SetHovered();
 	}
 }

@@ -55,15 +55,20 @@ public class SlotSystemTest{
 					sg.ssm.tam.Returns(MakeSubTAM());
 					sg.ssm.tam.sgHandler.Returns(Substitute.For<ITransactionSGHandler>());
 				sg.SetTACache(MakeSubTAC());
-				sg.SetTAM(sg.ssm.tam);
+				sg.SetSlotsHolder(Substitute.For<ISlotsHolder>());
+				sg.SetSorterHandler(Substitute.For<ISorterHandler>());
 				sg.InspectorSetUp(Substitute.For<Inventory>(), Substitute.For<SGFilter>(), Substitute.For<SGSorter>(), 0);
 				sg.SetCommandsRepo(Substitute.For<ISGCommandsRepo>());
-				sg.SetNewSlots(new List<Slot>());
-				sg.SetNewSBs(new List<ISlottable>());
 				sg.SetHoverable(Substitute.For<IHoverable>());
 				sg.SetSGHandler(sg.ssm.tam.sgHandler);
 				sg.SetSelStateHandler(Substitute.For<ISSESelStateHandler>());
 				sg.SetSGActStateHandler(Substitute.For<ISGActStateHandler>());
+			return sg;
+		}
+		protected static SlotGroup MakeSGInitWithSubsAndRealSlotsHolder(){
+			SlotGroup sg = MakeSGInitWithSubs();
+			SlotsHolder slotsHolder = new SlotsHolder(sg);
+			sg.SetSlotsHolder(slotsHolder);
 			return sg;
 		}
 		protected static SlotGroup MakeSGWithRealStateHandlers(){
@@ -71,9 +76,21 @@ public class SlotSystemTest{
 			sg.InitializeStateHandlers();
 			return sg;
 		}
+		protected static SlotGroup MakeSGWithRealStateHandlersAndRealSlotsHolder(){
+			SlotGroup sg = MakeSGWithRealStateHandlers();
+			SlotsHolder slotsHolder = new SlotsHolder(sg);
+			sg.SetSlotsHolder(slotsHolder);
+			return sg;
+		}
 		protected static SlotGroup MakeSGInitWithSubsAndRealCommands(){
 			SlotGroup sg = MakeSGInitWithSubs();
 			sg.SetCommandsRepo(new SGCommandsRepo(sg));
+			return sg;
+		}
+		protected static SlotGroup MakeSGInitWithSubsAndRealCommandsAndRealSlotsHolder(){
+			SlotGroup sg = MakeSGInitWithSubsAndRealCommands();
+			SlotsHolder slotsHolder = new SlotsHolder(sg);
+			sg.SetSlotsHolder(slotsHolder);
 			return sg;
 		}
 		protected static SlotGroup MakeSGWithRealStateHandlersAndRealCommands(){

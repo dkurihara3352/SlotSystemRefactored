@@ -3,69 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SlotSystem{
-	public interface SGSorter{
-		void OrderSBsWithRetainedSize(ref List<ISlottable> sbs);
-		void TrimAndOrderSBs(ref List<ISlottable> sbs);
+	public interface ISGSorter{
+		List<ISlottable> OrderedSBsWithoutResize(List<ISlottable> source);
+		List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> soruce);
+	}
+	public abstract class SGSorter: ISGSorter{
+		public virtual List<ISlottable> OrderedSBsWithoutResize(List<ISlottable> source){
+			List<ISlottable> result = source;
+			int origCount = source.Count;
+			result = OrderedAndTrimmedSBs(result);
+			while(result.Count < origCount){
+				result.Add(null);
+			}
+			return result;
+		}
+		public abstract List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source);
+		public List<ISlottable> TrimmedSBsOrderedByCompairer(List<ISlottable> source, Comparer<ISlottable> compairer){
+			List<ISlottable> result = new List<ISlottable>();
+			foreach(ISlottable sb in source){
+				if(sb != null)
+					result.Add(sb);
+			}
+			result.Sort(compairer);
+			return result;
+		}
 	}
 		public class　SGItemIDSorter: SGSorter{
-			public void OrderSBsWithRetainedSize(ref List<ISlottable> sbs){
-				int origCount = sbs.Count;
-				List<ISlottable> trimmed = sbs;
-				this.TrimAndOrderSBs(ref trimmed);
-				while(trimmed.Count < origCount){
-					trimmed.Add(null);
-				}
-				sbs = trimmed;
-			}
-			public void TrimAndOrderSBs(ref List<ISlottable> sbs){
-				List<ISlottable> trimmed = new List<ISlottable>();
-				foreach(ISlottable sb in sbs){
-					if(sb != null)
-						trimmed.Add(sb);
-				}
-				trimmed.Sort(new ItemIDOrderComparer());
-				sbs = trimmed;
+			public override List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source){
+				return TrimmedSBsOrderedByCompairer(source, new ItemIDOrderComparer());
 			}
 		}
 		public class SGInverseItemIDSorter: SGSorter{
-			public void OrderSBsWithRetainedSize(ref List<ISlottable> sbs){
-				int origCount = sbs.Count;
-				List<ISlottable> trimmed = sbs;
-				this.TrimAndOrderSBs(ref trimmed);
-				while(trimmed.Count < origCount){
-					trimmed.Add(null);
-				}
-				sbs = trimmed;
-			}
-			public void TrimAndOrderSBs(ref List<ISlottable> sbs){
-				List<ISlottable> trimmed = new List<ISlottable>();
-				foreach(ISlottable sb in sbs){
-					if(sb != null)
-						trimmed.Add(sb);
-				}
-				trimmed.Sort(new ItemIDOrderComparer());
-				trimmed.Reverse();
-				sbs = trimmed;
+			public override List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source){
+				List<ISlottable> result = new SGItemIDSorter().OrderedAndTrimmedSBs(source);
+				result.Reverse();
+				return result;
 			}
 		}
 		public class SGAcquisitionOrderSorter: SGSorter{
-			public void OrderSBsWithRetainedSize(ref List<ISlottable> sbs){
-				int origCount = sbs.Count;
-				List<ISlottable> trimmed = sbs;
-				this.TrimAndOrderSBs(ref trimmed);
-				while(trimmed.Count < origCount){
-					trimmed.Add(null);
-				}
-				sbs = trimmed;
-			}
-			public void TrimAndOrderSBs(ref List<ISlottable> sbs){
-				List<ISlottable> trimmed = new List<ISlottable>();
-				foreach(ISlottable sb in sbs){
-					if(sb != null)
-						trimmed.Add(sb);
-				}
-				trimmed.Sort(new AcquisitionOrderComparer());
-				sbs = trimmed;
+			public override List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source){
+				return TrimmedSBsOrderedByCompairer(source, new AcquisitionOrderComparer());
 			}
 		}
 		public class AcquisitionOrderComparer: Comparer<ISlottable>{
