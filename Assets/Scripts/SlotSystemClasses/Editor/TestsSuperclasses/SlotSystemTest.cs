@@ -116,6 +116,14 @@ public class SlotSystemTest{
 			sg.SetFilterHandler(new FilterHandler());
 			return sg;
 		}
+		protected static SlotGroup MakeSG_ISBHandler(List<ISlottable> sbs){
+			SlotGroup sg = MakeSG();
+				ISBHandler sbHandler = Substitute.For<ISBHandler>();
+				sbHandler.slottables.Returns(sbs);
+			sg.SetSBHandler(sbHandler);
+
+			return sg;
+		}
 		protected static TransactionManager MakeTAM(){
 			return new TransactionManager();
 		}

@@ -14,23 +14,25 @@ namespace SlotSystemTests{
 			[Test]
 			public void TransactionCoroutine_AllSBsNotRunning_CallsActProcessExpire(){
 				SlotGroup sg = MakeSG();
-				sg.SetSBHandler(new SBHandler());
-				List<ISlottable> sbs;
-					ISlottable sbA = MakeSBWithActProc(false);
-					ISlottable sbB = MakeSBWithActProc(false);
-					ISlottable sbC = MakeSBWithActProc(false);
-					sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
-				sg.SetSBs(sbs);
-				ISGActProcess sgActProc = MakeSubSGActProc();
-					SGActStateHandler handler = new SGActStateHandler(sg);
-					sg.SetSGActStateHandler(handler);	
-				sg.SetAndRunActProcess(sgActProc);
+					ISBHandler sbHandler = Substitute.For<ISBHandler>();
+						List<ISlottable> sbs;
+							ISlottable sbA = MakeSBWithActProc(false);
+							ISlottable sbB = MakeSBWithActProc(false);
+							ISlottable sbC = MakeSBWithActProc(false);
+							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
+						sbHandler.slottables.Returns(sbs);
+					sg.SetSBHandler(sbHandler);
+					ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
+							ISGActProcess mockActProc = MakeSubSGActProc();
+						actStateHandler.actProcess.Returns(mockActProc);
+					sg.SetSGActStateHandler(actStateHandler);
+				sg.SetAndRunActProcess(mockActProc);
 
 				sg.TransactionCoroutine();
 				
-				sgActProc.Received().Expire();
+				mockActProc.Received().Expire();
 			}
-			/*	Fields	*/
+			/*	intrinsic	*/
 				[Test]
 				public void isPool_SSMPBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
@@ -40,7 +42,7 @@ namespace SlotSystemTests{
 					bool actual = sg.isPool;
 
 					Assert.That(actual, Is.True);
-					}
+				}
 				[Test]
 				public void isSGE_SSMEBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
@@ -50,7 +52,7 @@ namespace SlotSystemTests{
 					bool actual = sg.isSGE;
 
 					Assert.That(actual, Is.True);
-					}
+				}
 				[Test]
 				public void isSGG_SSMGBunContainsInHierarchyThis_ReturnsTrue(){
 					SlotGroup sg = MakeSG();
@@ -61,245 +63,174 @@ namespace SlotSystemTests{
 
 					Assert.That(actual, Is.True);
 				}
-			/*	Methods	*/
-				[TestCaseSource(typeof(InstantSortCases))]
-				public void InstantSort_Always_ReorderSlotSBs(List<ISlottable> sbs, SGSorter sorter, List<ISlottable> expected){
-					List<ISlottable> orig = new List<ISlottable>(sbs);
-					SlotGroup sg = MakeSG();
-						sg.SetSorterHandler(new SorterHandler());
-						sg.SetSBHandler(new SBHandler());
-						sg.SetSlotsHolder(new SlotsHolder(sg));
-					sg.SetSorter(sorter);
-					sg.SetSBs(orig);
-					List<Slot> slots = new List<Slot>();
-						for(int i = 0; i< sbs.Count; i++)
-							slots.Add(new Slot());
-					sg.SetSlots(slots);
+				[TestCaseSource(typeof(SwappableSBsCases))]
+				public void SwappableSBs_SBAreSwappable_ReturnsList(SlotGroup sg, ISlottable sb, List<ISlottable> expected){
+					List<ISlottable> actual = sg.SwappableSBs(sb);
 
-					sg.InstantSort();
-
-					List<ISlottable> actual = new List<ISlottable>();
-					foreach(var slot in sg.slots)
-						actual.Add(slot.sb);
 					bool equality = actual.MemberEquals(expected);
 					Assert.That(equality, Is.True);
-					}
-					class InstantSortCases: IEnumerable{
+				}
+					class SwappableSBsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
-							object[] itemIDSorter;
-								PartsInstance partsB_0 = MakePartsInstance(1, 1);
-								BowInstance bowA_0 = MakeBowInstance(0);
-								ShieldInstance shieldA_0 = MakeShieldInstance(0);
-								PartsInstance partsA_0 = MakePartsInstance(0, 2);
-								BowInstance bowB_0 = MakeBowInstance(1);
-								WearInstance wearA_0 = MakeWearInstance(0);
-								QuiverInstance quiverA_0 = MakeQuiverInstance(0);
-								MeleeWeaponInstance mWeaponA_0 = MakeMeleeWeaponInstance(0);
-								PackInstance packA_0 = MakePackInstance(0);
-								WearInstance wearB_0 = MakeWearInstance(1);
-								partsB_0.SetAcquisitionOrder(0);
-								bowA_0.SetAcquisitionOrder(1);
-								shieldA_0.SetAcquisitionOrder(2);
-								partsA_0.SetAcquisitionOrder(3);
-								bowB_0.SetAcquisitionOrder(4);
-								wearA_0.SetAcquisitionOrder(5);
-								quiverA_0.SetAcquisitionOrder(6);
-								mWeaponA_0.SetAcquisitionOrder(7);
-								packA_0.SetAcquisitionOrder(8);
-								wearB_0.SetAcquisitionOrder(9);
-								ISlottable partsBSB_0 = MakeSubSB();
-									partsBSB_0.item.Returns(partsB_0);
-								ISlottable bowASB_0 = MakeSubSB();
-									bowASB_0.item.Returns(bowA_0);
-								ISlottable shieldASB_0 = MakeSubSB();
-									shieldASB_0.item.Returns(shieldA_0);
-								ISlottable partsASB_0 = MakeSubSB();
-									partsASB_0.item.Returns(partsA_0);
-								ISlottable bowBSB_0 = MakeSubSB();
-									bowBSB_0.item.Returns(bowB_0);
-								ISlottable wearASB_0 = MakeSubSB();
-									wearASB_0.item.Returns(wearA_0);
-								ISlottable quiverASB_0 = MakeSubSB();
-									quiverASB_0.item.Returns(quiverA_0);
-								ISlottable mWeaponASB_0 = MakeSubSB();
-									mWeaponASB_0.item.Returns(mWeaponA_0);
-								ISlottable packASB_0 = MakeSubSB();
-									packASB_0.item.Returns(packA_0);
-								ISlottable wearBSB_0 = MakeSubSB();
-									wearBSB_0.item.Returns(wearA_0);
-								List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{
-									partsBSB_0, 
-									bowASB_0, 
-									shieldASB_0, 
-									partsASB_0, 
-									bowBSB_0, 
-									wearASB_0, 
-									quiverASB_0, 
-									mWeaponASB_0, 
-									packASB_0, 
-									wearBSB_0
-								});
-								List<ISlottable> expected_0 = new List<ISlottable>(new ISlottable[]{
-									bowASB_0,
-									bowBSB_0,
-									wearASB_0,
-									wearBSB_0,
-									shieldASB_0,
-									mWeaponASB_0,
-									quiverASB_0,
-									packASB_0,
-									partsASB_0,
-									partsBSB_0
-								});
-								itemIDSorter = new object[]{sbs_0, new SGItemIDSorter(), expected_0};
-								yield return itemIDSorter;
-							object[] inverseIDSorter;
-								PartsInstance partsB_1 = MakePartsInstance(1, 1);
-								BowInstance bowA_1 = MakeBowInstance(0);
-								ShieldInstance shieldA_1 = MakeShieldInstance(0);
-								PartsInstance partsA_1 = MakePartsInstance(0, 2);
-								BowInstance bowB_1 = MakeBowInstance(1);
-								WearInstance wearA_1 = MakeWearInstance(0);
-								QuiverInstance quiverA_1 = MakeQuiverInstance(0);
-								MeleeWeaponInstance mWeaponA_1 = MakeMeleeWeaponInstance(0);
-								PackInstance packA_1 = MakePackInstance(0);
-								WearInstance wearB_1 = MakeWearInstance(1);
-								partsB_1.SetAcquisitionOrder(0);
-								bowA_1.SetAcquisitionOrder(1);
-								shieldA_1.SetAcquisitionOrder(2);
-								partsA_1.SetAcquisitionOrder(3);
-								bowB_1.SetAcquisitionOrder(4);
-								wearA_1.SetAcquisitionOrder(5);
-								quiverA_1.SetAcquisitionOrder(6);
-								mWeaponA_1.SetAcquisitionOrder(7);
-								packA_1.SetAcquisitionOrder(8);
-								wearB_1.SetAcquisitionOrder(9);
-								ISlottable partsBSB_1 = MakeSubSB();
-									partsBSB_1.item.Returns(partsB_1);
-								ISlottable bowASB_1 = MakeSubSB();
-									bowASB_1.item.Returns(bowA_1);
-								ISlottable shieldASB_1 = MakeSubSB();
-									shieldASB_1.item.Returns(shieldA_1);
-								ISlottable partsASB_1 = MakeSubSB();
-									partsASB_1.item.Returns(partsA_1);
-								ISlottable bowBSB_1 = MakeSubSB();
-									bowBSB_1.item.Returns(bowB_1);
-								ISlottable wearASB_1 = MakeSubSB();
-									wearASB_1.item.Returns(wearA_1);
-								ISlottable quiverASB_1 = MakeSubSB();
-									quiverASB_1.item.Returns(quiverA_1);
-								ISlottable mWeaponASB_1 = MakeSubSB();
-									mWeaponASB_1.item.Returns(mWeaponA_1);
-								ISlottable packASB_1 = MakeSubSB();
-									packASB_1.item.Returns(packA_1);
-								ISlottable wearBSB_1 = MakeSubSB();
-									wearBSB_1.item.Returns(wearA_1);
-								List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{
-									partsBSB_1, 
-									bowASB_1, 
-									shieldASB_1, 
-									partsASB_1, 
-									bowBSB_1, 
-									wearASB_1, 
-									quiverASB_1, 
-									mWeaponASB_1, 
-									packASB_1, 
-									wearBSB_1
-								});
-								List<ISlottable> expected_1 = new List<ISlottable>(new ISlottable[]{
-									partsBSB_1,
-									partsASB_1,
-									packASB_1,
-									quiverASB_1,
-									mWeaponASB_1,
-									shieldASB_1,
-									wearBSB_1,
-									wearASB_1,
-									bowBSB_1,
-									bowASB_1
-								});
-								inverseIDSorter = new object[]{sbs_1, new SGInverseItemIDSorter(), expected_1};
-								yield return inverseIDSorter;
-							object[] acqOrderSorter;
-								PartsInstance partsB_2 = MakePartsInstance(1, 1);
-								BowInstance bowA_2 = MakeBowInstance(0);
-								ShieldInstance shieldA_2 = MakeShieldInstance(0);
-								PartsInstance partsA_2 = MakePartsInstance(0, 2);
-								BowInstance bowB_2 = MakeBowInstance(1);
-								WearInstance wearA_2 = MakeWearInstance(0);
-								QuiverInstance quiverA_2 = MakeQuiverInstance(0);
-								MeleeWeaponInstance mWeaponA_2 = MakeMeleeWeaponInstance(0);
-								PackInstance packA_2 = MakePackInstance(0);
-								WearInstance wearB_2 = MakeWearInstance(1);
-								partsB_2.SetAcquisitionOrder(0);
-								bowA_2.SetAcquisitionOrder(1);
-								shieldA_2.SetAcquisitionOrder(2);
-								partsA_2.SetAcquisitionOrder(3);
-								bowB_2.SetAcquisitionOrder(4);
-								wearA_2.SetAcquisitionOrder(5);
-								quiverA_2.SetAcquisitionOrder(6);
-								mWeaponA_2.SetAcquisitionOrder(7);
-								packA_2.SetAcquisitionOrder(8);
-								wearB_2.SetAcquisitionOrder(9);
-								ISlottable partsBSB_2 = MakeSubSB();
-									partsBSB_2.item.Returns(partsB_2);
-								ISlottable bowASB_2 = MakeSubSB();
-									bowASB_2.item.Returns(bowA_2);
-								ISlottable shieldASB_2 = MakeSubSB();
-									shieldASB_2.item.Returns(shieldA_2);
-								ISlottable partsASB_2 = MakeSubSB();
-									partsASB_2.item.Returns(partsA_2);
-								ISlottable bowBSB_2 = MakeSubSB();
-									bowBSB_2.item.Returns(bowB_2);
-								ISlottable wearASB_2 = MakeSubSB();
-									wearASB_2.item.Returns(wearA_2);
-								ISlottable quiverASB_2 = MakeSubSB();
-									quiverASB_2.item.Returns(quiverA_2);
-								ISlottable mWeaponASB_2 = MakeSubSB();
-									mWeaponASB_2.item.Returns(mWeaponA_2);
-								ISlottable packASB_2 = MakeSubSB();
-									packASB_2.item.Returns(packA_2);
-								ISlottable wearBSB_2 = MakeSubSB();
-									wearBSB_2.item.Returns(wearB_2);
-								List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{
-									partsBSB_2, 
-									bowASB_2, 
-									shieldASB_2, 
-									partsASB_2, 
-									bowBSB_2, 
-									wearASB_2, 
-									quiverASB_2, 
-									mWeaponASB_2, 
-									packASB_2, 
-									wearBSB_2
-								});
-								List<ISlottable> expected_2 = new List<ISlottable>(new ISlottable[]{
-									partsBSB_2,
-									bowASB_2,
-									shieldASB_2,
-									partsASB_2,
-									bowBSB_2,
-									wearASB_2,
-									quiverASB_2,
-									mWeaponASB_2,
-									packASB_2,
-									wearBSB_2
-								});
-								acqOrderSorter = new object[]{sbs_2, new SGAcquisitionOrderSorter(), expected_2};
-								yield return acqOrderSorter;
+							object[] sameSG_empty;
+								SlotGroup sg_0 = MakeSG();
+									sg_0.SetFilterHandler(new FilterHandler());
+									sg_0.SetFilter(new SGNullFilter());
+									ISlottable bow0SB_0 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_0);
+									ISlottable bow1SB_0 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_0);
+									ISlottable wearSB_0 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_0);
+									ISlottable shieldSB_0 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_0);
+									ISlottable mWeaponSB_0 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_0);
+									ISlottable quiverSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
+									ISlottable packSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
+									ISlottable partsSB_0 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_0);
+									sg_0.SetSBHandler(new SBHandler());
+									sg_0.SetSBs(new List<ISlottable>(new ISlottable[]{
+										bow0SB_0, bow1SB_0, wearSB_0, shieldSB_0, mWeaponSB_0, quiverSB_0, packSB_0, partsSB_0
+									}));
+								sameSG_empty = new object[]{sg_0, shieldSB_0, new List<ISlottable>()};
+								yield return sameSG_empty;
+							object[] withBows;
+								SlotGroup sg_1 = MakeSG();
+									sg_1.SetFilterHandler(new FilterHandler());
+									sg_1.SetFilter(new SGNullFilter());
+									ISlottable bow0SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_1);
+									ISlottable bow1SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_1);
+									ISlottable wearSB_1 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_1);
+									ISlottable shieldSB_1 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_1);
+									ISlottable mWeaponSB_1 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_1);
+									ISlottable quiverSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
+									ISlottable packSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
+									ISlottable partsSB_1 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_1);
+									sg_1.SetSBHandler(new SBHandler());
+									sg_1.SetSBs(new List<ISlottable>(new ISlottable[]{
+										bow0SB_1, bow1SB_1, wearSB_1, shieldSB_1, mWeaponSB_1, quiverSB_1, packSB_1, partsSB_1
+									}));
+								SlotGroup bowSG_1 = MakeSG();
+									bowSG_1.SetFilterHandler(new FilterHandler());
+									bowSG_1.SetFilter(new SGBowFilter());
+									ISlottable oBow0SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), bowSG_1);
+								withBows = new object[]{sg_1, oBow0SB_1, new List<ISlottable>(new ISlottable[]{bow0SB_1, bow1SB_1})};
+								yield return withBows;
+							object[] withWears;
+								SlotGroup sg_2 = MakeSG();
+									sg_2.SetFilterHandler(new FilterHandler());
+									sg_2.SetFilter(new SGNullFilter());
+									ISlottable bow0SB_2 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_2);
+									ISlottable bow1SB_2 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_2);
+									ISlottable wearSB_2 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_2);
+									ISlottable shieldSB_2 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_2);
+									ISlottable mWeaponSB_2 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_2);
+									ISlottable quiverSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
+									ISlottable packSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
+									ISlottable partsSB_2 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_2);
+									sg_2.SetSBHandler(new SBHandler());
+									sg_2.SetSBs(new List<ISlottable>(new ISlottable[]{
+										bow0SB_2, bow1SB_2, wearSB_2, shieldSB_2, mWeaponSB_2, quiverSB_2, packSB_2, partsSB_2
+									}));
+								SlotGroup wearSG_2 = MakeSG();
+									wearSG_2.SetFilterHandler(new FilterHandler());
+									wearSG_2.SetFilter(new SGWearFilter());
+									ISlottable oWear0SB_2 = MakeSubSBWithItemAndSG(MakeWearInstance(0), wearSG_2);
+								withWears = new object[]{sg_2, oWear0SB_2, new List<ISlottable>(new ISlottable[]{wearSB_2})};
+								yield return withWears;
+							object[] withCGears;
+								SlotGroup sg_3 = MakeSG();
+									sg_3.SetFilterHandler(new FilterHandler());
+									sg_3.SetFilter(new SGNullFilter());
+									ISlottable bow0SB_3 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_3);
+									ISlottable bow1SB_3 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_3);
+									ISlottable wearSB_3 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_3);
+									ISlottable shieldSB_3 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_3);
+									ISlottable mWeaponSB_3 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_3);
+									ISlottable quiverSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
+									ISlottable packSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
+									ISlottable partsSB_3 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_3);
+									sg_3.SetSBHandler(new SBHandler());
+									sg_3.SetSBs(new List<ISlottable>(new ISlottable[]{
+										bow0SB_3, bow1SB_3, wearSB_3, shieldSB_3, mWeaponSB_3, quiverSB_3, packSB_3, partsSB_3
+									}));
+								SlotGroup cGearsSG_3 = MakeSG();
+									cGearsSG_3.SetFilterHandler(new FilterHandler());
+									cGearsSG_3.SetFilter(new SGCGearsFilter());
+									ISlottable oShieldSB_3 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), cGearsSG_3);
+								withCGears = new object[]{sg_3, oShieldSB_3, new List<ISlottable>(new ISlottable[]{shieldSB_3, mWeaponSB_3, quiverSB_3, packSB_3})};
+								yield return withCGears;
+							object[] sameParts_empty;
+								SlotGroup sg_4 = MakeSG();
+									sg_4.SetFilterHandler(new FilterHandler());
+									sg_4.SetFilter(new SGNullFilter());
+									ISlottable bow0SB_4 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_4);
+									ISlottable bow1SB_4 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_4);
+									ISlottable wearSB_4 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_4);
+									ISlottable shieldSB_4 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_4);
+									ISlottable mWeaponSB_4 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_4);
+									ISlottable quiverSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
+									ISlottable packSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
+									ISlottable partsSB_4 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_4);
+									sg_4.SetSBHandler(new SBHandler());
+									sg_4.SetSBs(new List<ISlottable>(new ISlottable[]{
+										bow0SB_4, bow1SB_4, wearSB_4, shieldSB_4, mWeaponSB_4, quiverSB_4, packSB_4, partsSB_4
+									}));
+								SlotGroup partsSG_4 = MakeSG();
+									partsSG_4.SetFilterHandler(new FilterHandler());
+									partsSG_4.SetFilter(new SGPartsFilter());
+									ISlottable oPartsSB_4 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 4), partsSG_4);
+								sameParts_empty = new object[]{sg_4, oPartsSB_4, new List<ISlottable>(new ISlottable[]{})};
+								yield return sameParts_empty;
+							object[] withOtherParts;
+								SlotGroup sg_5 = MakeSG();
+									sg_5.SetFilterHandler(new FilterHandler());
+									sg_5.SetFilter(new SGNullFilter());
+									ISlottable bow0SB_5 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_5);
+									ISlottable bow1SB_5 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_5);
+									ISlottable wearSB_5 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_5);
+									ISlottable shieldSB_5 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_5);
+									ISlottable mWeaponSB_5 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_5);
+									ISlottable quiverSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
+									ISlottable packSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
+									ISlottable partsSB_5 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_5);
+									sg_5.SetSBHandler(new SBHandler());
+									sg_5.SetSBs(new List<ISlottable>(new ISlottable[]{
+										bow0SB_5, bow1SB_5, wearSB_5, shieldSB_5, mWeaponSB_5, quiverSB_5, packSB_5, partsSB_5
+									}));
+								SlotGroup partsSG_5 = MakeSG();
+									partsSG_5.SetFilterHandler(new FilterHandler());
+									partsSG_5.SetFilter(new SGPartsFilter());
+									ISlottable oPartsSB_5 = MakeSubSBWithItemAndSG(MakePartsInstance(1, 4), partsSG_5);
+								withOtherParts = new object[]{sg_5, oPartsSB_5, new List<ISlottable>(new ISlottable[]{partsSB_5})};
+								yield return withOtherParts;
 						}
 					}
+				[Test]
+				public void Refresh_Always_SetActStateWFA(){
+					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
+						SGActStateHandler handler = new SGActStateHandler(sg);
+						sg.SetSGActStateHandler(handler);
+
+					sg.Refresh();
+					
+					Assert.That(sg.isWaitingForAction, Is.True);
+				}
+				[Test]
+				public void Refresh_Always_SetsFields(){
+					SlotGroup sg = MakeSGWithRealStateHandlersAndRealSlotsHolder();
+
+					sg.Refresh();
+
+					Assert.That(sg.newSBs, Is.Empty);
+					Assert.That(sg.newSlots, Is.Empty);
+				}
+			/*	sse override	*/
 				[TestCaseSource(typeof(ContainsCases))]
 				public void Contains_Vairous_ReturnsAccordingly(List<ISlottable> sbs, IEnumerable<ISlottable> expValid, IEnumerable<ISlottable> expInvalid){
-					SlotGroup sg = MakeSG();
-						sg.SetSBHandler(new SBHandler());
-						sg.SetSBs(sbs);
+					SlotGroup sg = MakeSG_ISBHandler(sbs);
 
 					foreach(var sb in expValid)
 						Assert.That(sg.Contains(sb), Is.True);
 					foreach(var sb in expInvalid)
 						Assert.That(sg.Contains(sb), Is.False);
-					}
+				}
 					class ContainsCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object case0;
@@ -324,26 +255,23 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void FocusSBs_Always_CallsSBRefresh(){
-					SlotGroup sg = MakeSG();
+					SlotGroup sg;
 						List<ISlottable> sbs;
 							ISlottable sbA = MakeSubSB();
 							ISlottable sbB = MakeSubSB();
 							ISlottable sbC = MakeSubSB();
 							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
-						sg.SetSBHandler(new SBHandler());
-						sg.SetSBs(sbs);
+						sg = MakeSG_ISBHandler(sbs);
 					
 					sg.FocusSBs();
 
 					sbA.Received().Refresh();
 					sbB.Received().Refresh();
 					sbC.Received().Refresh();
-					}
+				}
 				[TestCaseSource(typeof(FocusSBsVariousCases))]
 				public void FocusSBs_Various_CallsSBFocusOrDefocus(List<ISlottable> sbs, Dictionary<ISlotSystemElement, bool> dict){
-					SlotGroup sg = MakeSG();
-						sg.SetSBHandler(new SBHandler());
-						sg.SetSBs(sbs);
+					SlotGroup sg = MakeSG_ISBHandler(sbs);
 
 					sg.FocusSBs();
 
@@ -353,7 +281,7 @@ namespace SlotSystemTests{
 						else
 							e.Received().Defocus();
 					}
-					}
+				}
 					class FocusSBsVariousCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable fSBA = MakeSubSB();
@@ -383,90 +311,35 @@ namespace SlotSystemTests{
 					}
 				[Test]
 				public void DefocusSBs_Always_CallsSBRefresh(){
-					SlotGroup sg = MakeSG();
+					SlotGroup sg;
 						List<ISlottable> sbs;
 							ISlottable sbA = MakeSubSB();
 							ISlottable sbB = MakeSubSB();
 							ISlottable sbC = MakeSubSB();
 							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
-						sg.SetSBHandler(new SBHandler());
-						sg.SetSBs(sbs);
+						sg = MakeSG_ISBHandler(sbs);
 					
 					sg.DefocusSBs();
 
 					sbA.Received().Refresh();
 					sbB.Received().Refresh();
 					sbC.Received().Refresh();
-					}
+				}
 				[Test]
 				public void DefocusSBs_Always_CallsSBDefocus(){
-					SlotGroup sg = MakeSG();
+					SlotGroup sg;
 						List<ISlottable> sbs;
 							ISlottable sbA = MakeSubSB();
 							ISlottable sbB = MakeSubSB();
 							ISlottable sbC = MakeSubSB();
 							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
-						sg.SetSBHandler(new SBHandler());
-						sg.SetSBs(sbs);
+						sg = MakeSG_ISBHandler(sbs);
 					
 					sg.DefocusSBs();
 
 					sbA.Received().Defocus();
 					sbB.Received().Defocus();
 					sbC.Received().Defocus();
-					}
-				[Test]
-				public void SetHierarchy_Always_SetsElements(){
-					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
-						GenericInventory inventory = new GenericInventory();
-							BowInstance bow = MakeBowInstance(0);
-							WearInstance wear = MakeWearInstance(0);
-							ShieldInstance shield = MakeShieldInstance(0);
-							MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
-							inventory.Add(bow);
-							inventory.Add(wear);
-							inventory.Add(shield);
-							inventory.Add(mWeapon);
-						SGFilter nullFilter = new SGNullFilter();
-						SGSorter idSorter = new SGItemIDSorter();
-					sg.SetFilterHandler(new FilterHandler());
-					sg.InspectorSetUp(inventory, nullFilter, idSorter, 0);
-					sg.SetCommandsRepo(new SGCommandsRepo(sg));
-					sg.SetHierarchy();
-
-					List<ISlotSystemElement> actualEles = new List<ISlotSystemElement>(sg);
-					Assert.That(actualEles.Count, Is.EqualTo(4));
-				}
-				[Test]
-				public void SetHierarchy_Always_SetsSBsAndSlots(){
-					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
-						GenericInventory inventory = new GenericInventory();
-							BowInstance bow = MakeBowInstance(0);
-							WearInstance wear = MakeWearInstance(0);
-							ShieldInstance shield = MakeShieldInstance(0);
-							MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
-							inventory.Add(bow);
-							inventory.Add(wear);
-							inventory.Add(shield);
-							inventory.Add(mWeapon);
-						SGFilter nullFilter = new SGNullFilter();
-						SGSorter idSorter = new SGItemIDSorter();
-					sg.SetFilterHandler(new FilterHandler());
-					sg.InspectorSetUp(inventory, nullFilter, idSorter, 0);
-					sg.SetCommandsRepo(new SGCommandsRepo(sg));
-
-					sg.SetHierarchy();
-
-					ISlottable bowSB = sg.GetSB(bow);
-					ISlottable wearSB = sg.GetSB(wear);
-					ISlottable shieldSB = sg.GetSB(shield);
-					ISlottable mWeaponSB = sg.GetSB(mWeapon);
-					IEnumerable<ISlottable> actualSBs = new ISlottable[]{bowSB, wearSB, shieldSB, mWeaponSB};
-					Assert.That(actualSBs, Is.All.Not.Null);
-					Assert.That(sg.slots.Count, Is.EqualTo(4));
-					int count = 0;
-					foreach(ISlottable sb in sg)
-						Assert.That(sb.slotID, Is.EqualTo(count ++));
 					}
 				[Test]
 				public void InitializeState_Always_InitializesStates(){
@@ -534,8 +407,8 @@ namespace SlotSystemTests{
 							flag &= object.ReferenceEquals(this.sgActState, other.sgActState);
 						return flag;
 					}
-
 				}
+			/* Transaction */
 				[TestCase(1)]
 				[TestCase(10)]
 				[TestCase(0)]
@@ -770,164 +643,7 @@ namespace SlotSystemTests{
 							yield return new object[]{sbs, expected};
 						}
 					}
-				[TestCaseSource(typeof(SwappableSBsCases))]
-				public void SwappableSBs_SBAreSwappable_ReturnsList(SlotGroup sg, ISlottable sb, List<ISlottable> expected){
-					List<ISlottable> actual = sg.SwappableSBs(sb);
-
-					bool equality = actual.MemberEquals(expected);
-					Assert.That(equality, Is.True);
-					}
-					class SwappableSBsCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							object[] sameSG_empty;
-								SlotGroup sg_0 = MakeSG();
-									sg_0.SetFilterHandler(new FilterHandler());
-									sg_0.SetFilter(new SGNullFilter());
-									ISlottable bow0SB_0 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_0);
-									ISlottable bow1SB_0 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_0);
-									ISlottable wearSB_0 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_0);
-									ISlottable shieldSB_0 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_0);
-									ISlottable mWeaponSB_0 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_0);
-									ISlottable quiverSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
-									ISlottable packSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
-									ISlottable partsSB_0 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_0);
-									sg_0.SetSBHandler(new SBHandler());
-									sg_0.SetSBs(new List<ISlottable>(new ISlottable[]{
-										bow0SB_0, bow1SB_0, wearSB_0, shieldSB_0, mWeaponSB_0, quiverSB_0, packSB_0, partsSB_0
-									}));
-								sameSG_empty = new object[]{sg_0, shieldSB_0, new List<ISlottable>()};
-								yield return sameSG_empty;
-							object[] withBows;
-								SlotGroup sg_1 = MakeSG();
-									sg_1.SetFilterHandler(new FilterHandler());
-									sg_1.SetFilter(new SGNullFilter());
-									ISlottable bow0SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_1);
-									ISlottable bow1SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_1);
-									ISlottable wearSB_1 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_1);
-									ISlottable shieldSB_1 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_1);
-									ISlottable mWeaponSB_1 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_1);
-									ISlottable quiverSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
-									ISlottable packSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
-									ISlottable partsSB_1 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_1);
-									sg_1.SetSBHandler(new SBHandler());
-									sg_1.SetSBs(new List<ISlottable>(new ISlottable[]{
-										bow0SB_1, bow1SB_1, wearSB_1, shieldSB_1, mWeaponSB_1, quiverSB_1, packSB_1, partsSB_1
-									}));
-								SlotGroup bowSG_1 = MakeSG();
-									bowSG_1.SetFilterHandler(new FilterHandler());
-									bowSG_1.SetFilter(new SGBowFilter());
-									ISlottable oBow0SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), bowSG_1);
-								withBows = new object[]{sg_1, oBow0SB_1, new List<ISlottable>(new ISlottable[]{bow0SB_1, bow1SB_1})};
-								yield return withBows;
-							object[] withWears;
-								SlotGroup sg_2 = MakeSG();
-									sg_2.SetFilterHandler(new FilterHandler());
-									sg_2.SetFilter(new SGNullFilter());
-									ISlottable bow0SB_2 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_2);
-									ISlottable bow1SB_2 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_2);
-									ISlottable wearSB_2 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_2);
-									ISlottable shieldSB_2 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_2);
-									ISlottable mWeaponSB_2 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_2);
-									ISlottable quiverSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
-									ISlottable packSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
-									ISlottable partsSB_2 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_2);
-									sg_2.SetSBHandler(new SBHandler());
-									sg_2.SetSBs(new List<ISlottable>(new ISlottable[]{
-										bow0SB_2, bow1SB_2, wearSB_2, shieldSB_2, mWeaponSB_2, quiverSB_2, packSB_2, partsSB_2
-									}));
-								SlotGroup wearSG_2 = MakeSG();
-									wearSG_2.SetFilterHandler(new FilterHandler());
-									wearSG_2.SetFilter(new SGWearFilter());
-									ISlottable oWear0SB_2 = MakeSubSBWithItemAndSG(MakeWearInstance(0), wearSG_2);
-								withWears = new object[]{sg_2, oWear0SB_2, new List<ISlottable>(new ISlottable[]{wearSB_2})};
-								yield return withWears;
-							object[] withCGears;
-								SlotGroup sg_3 = MakeSG();
-									sg_3.SetFilterHandler(new FilterHandler());
-									sg_3.SetFilter(new SGNullFilter());
-									ISlottable bow0SB_3 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_3);
-									ISlottable bow1SB_3 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_3);
-									ISlottable wearSB_3 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_3);
-									ISlottable shieldSB_3 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_3);
-									ISlottable mWeaponSB_3 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_3);
-									ISlottable quiverSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
-									ISlottable packSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
-									ISlottable partsSB_3 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_3);
-									sg_3.SetSBHandler(new SBHandler());
-									sg_3.SetSBs(new List<ISlottable>(new ISlottable[]{
-										bow0SB_3, bow1SB_3, wearSB_3, shieldSB_3, mWeaponSB_3, quiverSB_3, packSB_3, partsSB_3
-									}));
-								SlotGroup cGearsSG_3 = MakeSG();
-									cGearsSG_3.SetFilterHandler(new FilterHandler());
-									cGearsSG_3.SetFilter(new SGCGearsFilter());
-									ISlottable oShieldSB_3 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), cGearsSG_3);
-								withCGears = new object[]{sg_3, oShieldSB_3, new List<ISlottable>(new ISlottable[]{shieldSB_3, mWeaponSB_3, quiverSB_3, packSB_3})};
-								yield return withCGears;
-							object[] sameParts_empty;
-								SlotGroup sg_4 = MakeSG();
-									sg_4.SetFilterHandler(new FilterHandler());
-									sg_4.SetFilter(new SGNullFilter());
-									ISlottable bow0SB_4 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_4);
-									ISlottable bow1SB_4 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_4);
-									ISlottable wearSB_4 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_4);
-									ISlottable shieldSB_4 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_4);
-									ISlottable mWeaponSB_4 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_4);
-									ISlottable quiverSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
-									ISlottable packSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
-									ISlottable partsSB_4 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_4);
-									sg_4.SetSBHandler(new SBHandler());
-									sg_4.SetSBs(new List<ISlottable>(new ISlottable[]{
-										bow0SB_4, bow1SB_4, wearSB_4, shieldSB_4, mWeaponSB_4, quiverSB_4, packSB_4, partsSB_4
-									}));
-								SlotGroup partsSG_4 = MakeSG();
-									partsSG_4.SetFilterHandler(new FilterHandler());
-									partsSG_4.SetFilter(new SGPartsFilter());
-									ISlottable oPartsSB_4 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 4), partsSG_4);
-								sameParts_empty = new object[]{sg_4, oPartsSB_4, new List<ISlottable>(new ISlottable[]{})};
-								yield return sameParts_empty;
-							object[] withOtherParts;
-								SlotGroup sg_5 = MakeSG();
-									sg_5.SetFilterHandler(new FilterHandler());
-									sg_5.SetFilter(new SGNullFilter());
-									ISlottable bow0SB_5 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_5);
-									ISlottable bow1SB_5 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_5);
-									ISlottable wearSB_5 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_5);
-									ISlottable shieldSB_5 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_5);
-									ISlottable mWeaponSB_5 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_5);
-									ISlottable quiverSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
-									ISlottable packSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
-									ISlottable partsSB_5 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_5);
-									sg_5.SetSBHandler(new SBHandler());
-									sg_5.SetSBs(new List<ISlottable>(new ISlottable[]{
-										bow0SB_5, bow1SB_5, wearSB_5, shieldSB_5, mWeaponSB_5, quiverSB_5, packSB_5, partsSB_5
-									}));
-								SlotGroup partsSG_5 = MakeSG();
-									partsSG_5.SetFilterHandler(new FilterHandler());
-									partsSG_5.SetFilter(new SGPartsFilter());
-									ISlottable oPartsSB_5 = MakeSubSBWithItemAndSG(MakePartsInstance(1, 4), partsSG_5);
-								withOtherParts = new object[]{sg_5, oPartsSB_5, new List<ISlottable>(new ISlottable[]{partsSB_5})};
-								yield return withOtherParts;
-						}
-					}
-				[Test]
-				public void Refresh_Always_SetActStateWFA(){
-					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
-						SGActStateHandler handler = new SGActStateHandler(sg);
-						sg.SetSGActStateHandler(handler);
-
-					sg.Refresh();
-					
-					Assert.That(sg.isWaitingForAction, Is.True);
-					}
-				[Test]
-				public void Refresh_Always_SetsFields(){
-					SlotGroup sg = MakeSGWithRealStateHandlersAndRealSlotsHolder();
-
-					sg.Refresh();
-
-					Assert.That(sg.newSBs, Is.Empty);
-					Assert.That(sg.newSlots, Is.Empty);
-					}
+				
 				[TestCaseSource(typeof(ReorderAndUpdateSBsCases))]
 				public void ReorderAndUpdateSBs_Always_CallsSBsSetNewSlotIDAndMoveWithin(ISlottable picked, ISlottable target, List<ISlottable> sbs, Dictionary<ISlottable, int> newSlotIDs){
 						ITransactionCache tac = Substitute.For<ITransactionCache>();

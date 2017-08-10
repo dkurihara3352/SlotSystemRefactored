@@ -187,84 +187,6 @@ namespace SlotSystem{
 			public void SetCommandsRepo(ISGCommandsRepo repo){
 				_commandsRepo = repo;
 			}
-		/*	intrinsic */
-			public Inventory inventory{
-				get{
-					if(_inventory != null)
-						return _inventory;
-					else
-						throw new InvalidOperationException("inventory not set");
-				}
-			}
-				Inventory _inventory;
-				void SetInventory(Inventory inv){
-					_inventory = inv;
-					inv.SetSG(this);
-				}
-			public bool isShrinkable{
-				get{return m_isShrinkable;}
-			}
-				bool m_isShrinkable;
-			public bool isExpandable{
-				get{return m_isExpandable;}
-			}
-				bool m_isExpandable;
-			public bool isPool{
-				get{
-					return ssm.poolBundle.ContainsInHierarchy(this);
-				}
-			}
-			public bool isSGE{
-				get{
-					return ssm.equipBundle.ContainsInHierarchy(this);
-				}
-			}
-			public bool isSGG{
-				get{
-					foreach(ISlotSystemBundle gBundle in ssm.otherBundles){
-						if(gBundle.ContainsInHierarchy(this))
-							return true;
-					}
-					return false;
-				}
-			}
-			public List<ISlottable> SwappableSBs(ISlottable pickedSB){
-				List<ISlottable> result = new List<ISlottable>();
-				foreach(ISlottable sb in this){
-					if(sb != null){
-						if(SlotSystemUtil.AreSwappable(pickedSB, sb))
-							result.Add(sb);
-					}
-				}
-				return result;
-			}
-			public void Refresh(){
-				WaitForAction();
-				SetNewSBs(new List<ISlottable>());
-				SetNewSlots(new List<Slot>());
-			}
-			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
-				SetInventory(inv);
-				SetFilter(filter);
-				SetSorter(sorter);
-				SetInitSlotsCount(initSlotsCount);
-				m_isExpandable = initSlotsCount == 0;
-			}
-			public void InitializeItems(){
-				initItemsCommand.Execute();
-			}
-				public ISGCommand initItemsCommand{
-					get{return commandsRepo.initializeItemsCommand;}
-				}
-			public void InitSBs(List<InventoryItemInstance> items){
-				while(slots.Count < items.Count){
-					items.RemoveAt(slots.Count);
-				}
-				foreach(InventoryItemInstance item in items){
-					ISlottable newSB = CreateSB(item);
-					slots[items.IndexOf(item)].sb = newSB;
-				}
-			}
 		/* Slots */
 			public ISlotsHolder slotsHolder{
 				get{
@@ -455,6 +377,118 @@ namespace SlotSystem{
 			}
 			public override void SetHierarchy(){
 				InitializeItems();
+			}
+		/* Hoverable */
+			public ITransactionCache taCache{
+				get{
+					if(_taCache != null)
+						return _taCache;
+					else
+						throw new System.InvalidOperationException("taCache is not set");
+				}
+			}
+				ITransactionCache _taCache;
+			public void SetTACache(ITransactionCache taCache){
+				_taCache = taCache;
+			}
+			public IHoverable hoverable{
+				get{
+					if(_hoverable != null)
+						return _hoverable;
+					else
+						throw new InvalidOperationException("hoverable not set");
+				}
+			}
+				IHoverable _hoverable;
+			public void SetHoverable(IHoverable hoverable){
+				_hoverable = hoverable;
+			}
+			public void OnHoverEnter(){
+				hoverable.OnHoverEnter();
+			}
+			public void OnHoverExit(){
+				hoverable.OnHoverExit();
+			}
+			public bool isHovered{
+				get{return hoverable.isHovered;}
+			}
+		/*	intrinsic */
+			public Inventory inventory{
+				get{
+					if(_inventory != null)
+						return _inventory;
+					else
+						throw new InvalidOperationException("inventory not set");
+				}
+			}
+				Inventory _inventory;
+				void SetInventory(Inventory inv){
+					_inventory = inv;
+					inv.SetSG(this);
+				}
+			public bool isShrinkable{
+				get{return m_isShrinkable;}
+			}
+				bool m_isShrinkable;
+			public bool isExpandable{
+				get{return m_isExpandable;}
+			}
+				bool m_isExpandable;
+			public bool isPool{
+				get{
+					return ssm.poolBundle.ContainsInHierarchy(this);
+				}
+			}
+			public bool isSGE{
+				get{
+					return ssm.equipBundle.ContainsInHierarchy(this);
+				}
+			}
+			public bool isSGG{
+				get{
+					foreach(ISlotSystemBundle gBundle in ssm.otherBundles){
+						if(gBundle.ContainsInHierarchy(this))
+							return true;
+					}
+					return false;
+				}
+			}
+			public List<ISlottable> SwappableSBs(ISlottable pickedSB){
+				List<ISlottable> result = new List<ISlottable>();
+				foreach(ISlottable sb in this){
+					if(sb != null){
+						if(SlotSystemUtil.AreSwappable(pickedSB, sb))
+							result.Add(sb);
+					}
+				}
+				return result;
+			}
+			public void Refresh(){
+				WaitForAction();
+				SetNewSBs(new List<ISlottable>());
+				SetNewSlots(new List<Slot>());
+			}
+			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
+				SetInventory(inv);
+				SetFilter(filter);
+				SetSorter(sorter);
+				SetInitSlotsCount(initSlotsCount);
+				m_isExpandable = initSlotsCount == 0;
+			}
+			public void InitializeItems(){
+				initItemsCommand.Execute();
+			}
+				public ISGCommand initItemsCommand{
+					get{return commandsRepo.initializeItemsCommand;}
+				}
+			public void InitSBs(List<InventoryItemInstance> items){
+				while(slots.Count < items.Count){
+					items.RemoveAt(slots.Count);
+				}
+				foreach(InventoryItemInstance item in items){
+					ISlottable newSB = CreateSB(item);
+					slots[items.IndexOf(item)].sb = newSB;
+				}
 			}
 		/* Transaction */
 			public ITransactionSGHandler sgHandler{
@@ -716,40 +750,6 @@ namespace SlotSystem{
 			public void ReportTAComp(){
 				sgHandler.AcceptSGTAComp(this);
 			}
-		/* Hoverable */
-			public ITransactionCache taCache{
-				get{
-					if(_taCache != null)
-						return _taCache;
-					else
-						throw new System.InvalidOperationException("taCache is not set");
-				}
-			}
-				ITransactionCache _taCache;
-			public void SetTACache(ITransactionCache taCache){
-				_taCache = taCache;
-			}
-			public IHoverable hoverable{
-				get{
-					if(_hoverable != null)
-						return _hoverable;
-					else
-						throw new InvalidOperationException("hoverable not set");
-				}
-			}
-				IHoverable _hoverable;
-			public void SetHoverable(IHoverable hoverable){
-				_hoverable = hoverable;
-			}
-			public void OnHoverEnter(){
-				hoverable.OnHoverEnter();
-			}
-			public void OnHoverExit(){
-				hoverable.OnHoverExit();
-			}
-			public bool isHovered{
-				get{return hoverable.isHovered;}
-			}
 	}
 	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler, IFilterHandler, ISBHandler{
 		/*	instrinsic	*/
@@ -760,7 +760,7 @@ namespace SlotSystem{
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();
 			void InitSBs(List<InventoryItemInstance> items);
-		/*	Sorter	*/
+		/*	integration	*/
 			void InstantSort();
 			void ToggleAutoSort(bool on);
 		/*	Transaction	*/
