@@ -66,7 +66,7 @@ namespace SlotSystem{
 				selStateHandler.Deselect();
 			}
 			public virtual void InitializeStates(){
-				selStateHandler.InitializeStates();
+				Deactivate();
 			}
 			public void SetAndRunSelProcess(ISSESelProcess process){
 				selStateHandler.SetAndRunSelProcess(process);
@@ -281,6 +281,7 @@ namespace SlotSystem{
 				}	
 	}
 	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, ISSESelStateHandler{
+		void InitializeStates();
 		void SetHierarchy();
 		bool isActivatedOnDefault{get;set;}
 		bool isFocusedInHierarchy{get;}

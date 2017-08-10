@@ -11,7 +11,11 @@ using Utility;
 namespace SlotSystemTests{
 	namespace SlottableTests{
 		[TestFixture]
-		public class SlottableTests: SlotSystemTest {			
+		public class SlottableTests: SlotSystemTest {
+			[Test]
+			public void InitializeStates(){
+				
+			}
 			/*	Fields	*/
 				[Test]
 				public void isHierarchySetUp_SGIsSet_ReturnsTrue(){

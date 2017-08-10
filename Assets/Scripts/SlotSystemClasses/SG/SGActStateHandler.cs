@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,22 +7,23 @@ namespace SlotSystem{
 	public class SGActStateHandler : ISGActStateHandler {
 		/*	Engines	*/
 			/*	Action State	*/
-				ISlotGroup sg;
 				public SGActStateHandler(ISlotGroup sg){
-					this.sg = sg;
+					SetActStateEngine(new SSEStateEngine<ISGActState>());
+					SetStatesRepo(new SGStatesRepo(sg));
+					SetActProcEngine(new SSEProcessEngine<ISGActProcess>());
 				}
 				ISSEStateEngine<ISGActState> actStateEngine{
 					get{
-						if(m_actStateEngine == null)
-							m_actStateEngine = new SSEStateEngine<ISGActState>();
-						return m_actStateEngine;
+						if(_actStateEngine != null)
+							return _actStateEngine;
+						else throw new InvalidOperationException("actStateEngine not set");
 					}
 				}
-					ISSEStateEngine<ISGActState> m_actStateEngine;
+					ISSEStateEngine<ISGActState> _actStateEngine;
 				void SetActStateEngine(ISSEStateEngine<ISGActState> engine){
-					m_actStateEngine = engine;
+					_actStateEngine = engine;
 				}
-				void SetActState(ISGActState state){
+				public void SetActState(ISGActState state){
 					actStateEngine.SetState(state);
 					if(state ==null && actProcess != null)
 						SetAndRunActProcess(null);
@@ -32,14 +34,17 @@ namespace SlotSystem{
 				ISGActState prevActState{
 					get{return actStateEngine.prevState;}
 				}
-				ISGStatesFactory statesFactory{
+				ISGStatesRepo statesRepo{
 					get{
-						if(_statesFactory == null)
-							_statesFactory = new SGStatesFactory(this, sg);
-						return _statesFactory;
+						if(_statesRepo != null)
+							return _statesRepo;
+						else throw new InvalidOperationException("stateRepo not set");
 					}
 				}
-					ISGStatesFactory _statesFactory;
+					ISGStatesRepo _statesRepo;
+				public void SetStatesRepo(ISGStatesRepo repo){
+					_statesRepo = repo;
+				}
 				public void ClearCurActState(){
 					SetActState(null);
 				}
@@ -53,7 +58,7 @@ namespace SlotSystem{
 					SetActState(waitForActionState);
 				}
 					public ISGActState waitForActionState{
-						get{return statesFactory.MakeWaitForActionState();}
+						get{return statesRepo.waitForActionState;}
 					}
 					public bool isWaitingForAction{
 						get{return curActState == waitForActionState;}
@@ -65,7 +70,7 @@ namespace SlotSystem{
 					SetActState(revertState);
 				}
 					public ISGActState revertState{
-						get{return statesFactory.MakeRevertState();}
+						get{return statesRepo.revertState;}
 					}
 					public bool isReverting{
 						get{return curActState == revertState;}
@@ -77,7 +82,7 @@ namespace SlotSystem{
 					SetActState(reorderState);
 				}
 					public ISGActState reorderState{
-						get{return statesFactory.MakeReorderState();}
+						get{return statesRepo.reorderState;}
 					}
 					public bool isReordering{
 						get{return curActState == reorderState;}
@@ -89,7 +94,7 @@ namespace SlotSystem{
 					SetActState(addState);
 				}
 					public ISGActState addState{
-						get{return statesFactory.MakeAddState();}
+						get{return statesRepo.addState;}
 					}
 					public bool isAdding{
 						get{return curActState == addState;}
@@ -101,7 +106,7 @@ namespace SlotSystem{
 					SetActState(removeState);
 				}
 					public ISGActState removeState{
-						get{return statesFactory.MakeRevertState();}
+						get{return statesRepo.removeState;}
 					}
 					public bool isRemoving{
 						get{return curActState == removeState;}
@@ -113,7 +118,7 @@ namespace SlotSystem{
 					SetActState(swapState);
 				}
 					public ISGActState swapState{
-						get{return statesFactory.MakeSwapState();}
+						get{return statesRepo.swapState;}
 					}
 					public bool isSwapping{
 						get{return curActState == swapState;}
@@ -125,7 +130,7 @@ namespace SlotSystem{
 					SetActState(fillState);
 				}
 					public ISGActState fillState{
-						get{return statesFactory.MakeFillState();}
+						get{return statesRepo.fillState;}
 					}
 					public bool isFilling{
 						get{return curActState == fillState;}
@@ -137,7 +142,7 @@ namespace SlotSystem{
 					SetActState(sortState);
 				}
 					public ISGActState sortState{
-						get{return statesFactory.MakeSortState();}
+						get{return statesRepo.sortState;}
 					}
 					public bool isSorting{
 						get{return curActState == sortState;}
@@ -149,11 +154,16 @@ namespace SlotSystem{
 		/*	Action Process	*/
 			ISSEProcessEngine<ISGActProcess> actProcEngine{
 				get{
-					if(m_actProcEngine == null)
-						m_actProcEngine = new SSEProcessEngine<ISGActProcess>();
-					return m_actProcEngine;
+					if(_actProcEngine != null)
+						return _actProcEngine;
+					else
+						throw new InvalidOperationException("actProcEngine not set");
 				}
-				}ISSEProcessEngine<ISGActProcess> m_actProcEngine;
+			}
+				ISSEProcessEngine<ISGActProcess> _actProcEngine;
+			public void SetActProcEngine(ISSEProcessEngine<ISGActProcess> engine){
+				_actProcEngine = engine;
+			}
 			public void SetAndRunActProcess(ISGActProcess process){
 				actProcEngine.SetAndRunProcess(process);
 			}

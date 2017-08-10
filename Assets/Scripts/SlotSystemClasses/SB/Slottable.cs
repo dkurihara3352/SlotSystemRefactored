@@ -6,13 +6,13 @@ using Utility;
 
 namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
+		public override void InitializeStates(){
+			Deactivate();
+			WaitForAction();
+			ClearCurEqpState();
+			Unmark();
+		}
 		/*	States	*/
-			public override void InitializeStates(){
-				selStateHandler.InitializeStates();
-				WaitForAction();
-				ClearCurEqpState();
-				Unmark();
-			}
 			public void InitializeSB(InventoryItemInstance item){
 				SetTACache(ssm.taCache);
 				SetTapCommand(new SBTapCommand());

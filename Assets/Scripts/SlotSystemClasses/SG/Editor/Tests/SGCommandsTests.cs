@@ -25,12 +25,12 @@ namespace SlotSystemTests{
 							items = new InventoryItemInstance[]{bow, wear};
 							stubInv.GetEnumerator().Returns(items.GetEnumerator());
 						List<InventoryItemInstance> list = new List<InventoryItemInstance>(new InventoryItemInstance[]{ bow, wear});
-						mockSG.FilterItem(Arg.Is<List<InventoryItemInstance>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
+						mockSG.FilteredItems(Arg.Is<List<InventoryItemInstance>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
 				
 				comm.Execute();
 
 				Received.InOrder(() => {
-					mockSG.FilterItem(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
+					mockSG.FilteredItems(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
 					mockSG.InitSlots(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
 					mockSG.InitSBs(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
 					mockSG.SyncSBsToSlots();

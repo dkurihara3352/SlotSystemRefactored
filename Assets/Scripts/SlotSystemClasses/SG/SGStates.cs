@@ -19,71 +19,87 @@ namespace SlotSystem{
     public interface ISGActState: ISSEState{
     }
     /* Factory */
-    public class SGStatesFactory: ISGStatesFactory{
+    public class SGStatesRepo: ISGStatesRepo{
         ISGActStateHandler handler;
         ISlotGroup sg;
-        public SGStatesFactory(ISGActStateHandler handler, ISlotGroup sg){
-            this.handler = handler;
+        public SGStatesRepo(ISlotGroup sg){
+            this.handler = sg;
             this.sg = sg;
         }
-        public ISGActState MakeWaitForActionState(){
-            if(_WaitForActionState == null)
-                _WaitForActionState = new SGWaitForActionState(handler, sg);
-            return _WaitForActionState;
+        public ISGActState waitForActionState{
+            get{
+                if(_waitForActionState == null)
+                    _waitForActionState = new SGWaitForActionState(handler, sg);
+                return _waitForActionState;
+            }
         }
-            ISGActState _WaitForActionState;
-        public ISGActState MakeRevertState(){
-            if(_RevertState == null)
-                _RevertState = new SGRevertState(handler, sg);
-            return _RevertState;
+            ISGActState _waitForActionState;
+        public ISGActState revertState{
+            get{
+                if(_revertState == null)
+                    _revertState = new SGRevertState(handler, sg);
+                return _revertState;
+            }
         }
-            ISGActState _RevertState;
-        public ISGActState MakeReorderState(){
-            if(_ReorderState == null)
-                _ReorderState = new SGReorderState(handler, sg);
-            return _ReorderState;
+            ISGActState _revertState;
+        public ISGActState reorderState{
+            get{
+                if(_reorderState == null)
+                    _reorderState = new SGReorderState(handler, sg);
+                return _reorderState;
+            }
         }
-            ISGActState _ReorderState;
-        public ISGActState MakeSortState(){
-            if(_SortState == null)
-                _SortState = new SGSortState(handler, sg);
-            return _SortState;
+            ISGActState _reorderState;
+        public ISGActState sortState{
+            get{
+                if(_sortState == null)
+                    _sortState = new SGSortState(handler, sg);
+                return _sortState;
+            }
         }
-            ISGActState _SortState;
-        public ISGActState MakeFillState(){
-            if(_FillState == null)
-                _FillState = new SGFillState(handler, sg);
-            return _FillState;
+            ISGActState _sortState;
+        public ISGActState fillState{
+            get{
+                if(_fillState == null)
+                    _fillState = new SGFillState(handler, sg);
+                return _fillState;
+            }
         }
-            ISGActState _FillState;
-        public ISGActState MakeSwapState(){
-            if(_SwapState == null)
-                _SwapState = new SGSwapState(handler, sg);
-            return _SwapState;
+            ISGActState _fillState;
+        public ISGActState swapState{
+            get{
+                if(_swapState == null)
+                    _swapState = new SGSwapState(handler, sg);
+                return _swapState;
+            }
         }
-            ISGActState _SwapState;
-        public ISGActState MakeAddState(){
-            if(_AddState == null)
-                _AddState = new SGAddState(handler, sg);
-            return _AddState;
+            ISGActState _swapState;
+        public ISGActState addState{
+            get{
+                if(_addState == null)
+                    _addState = new SGAddState(handler, sg);
+                return _addState;
+            }
         }
-            ISGActState _AddState;
-        public ISGActState MakeRemoveState(){
-            if(_RemoveState == null)
-                _RemoveState = new SGRemoveState(handler, sg);
-            return _RemoveState;
+            ISGActState _addState;
+        public ISGActState removeState{
+            get{
+                if(_removeState == null)
+                    _removeState = new SGRemoveState(handler, sg);
+                return _removeState;
+            }
         }
-            ISGActState _RemoveState;
+            ISGActState _removeState;
     }
-    public interface ISGStatesFactory{
-        ISGActState MakeWaitForActionState();
-        ISGActState MakeRevertState();
-        ISGActState MakeReorderState();
-        ISGActState MakeSortState();
-        ISGActState MakeFillState();
-        ISGActState MakeSwapState();
-        ISGActState MakeAddState();
-        ISGActState MakeRemoveState();
+    public interface ISGStatesRepo{
+        ISGActState waitForActionState{get;}
+        ISGActState revertState{get;}
+        ISGActState reorderState{get;}
+        ISGActState sortState{get;}
+        ISGActState fillState{get;}
+        ISGActState swapState{get;}
+        ISGActState addState{get;}
+        ISGActState removeState{get;}
     }
     /* ConcreteStates */
     public class SGWaitForActionState: SGActState{

@@ -49,12 +49,11 @@ namespace SlotSystem{
 			}
 		public bool hasEmptySlot{
 			get{
-				bool emptyFound = false;
 				foreach(Slot slot in slots){
 					if(slot.sb == null)
-						emptyFound = true;
+						return true;
 				}
-				return emptyFound;
+				return false;
 			}
 		}
 		public void SetInitSlotsCount(int i){
@@ -70,18 +69,28 @@ namespace SlotSystem{
 			}
 			int _initSlotsCount = -1;
 		public void InitSlots(List<InventoryItemInstance> items){
-			List<Slot> newSlots = new List<Slot>();
-			int slotCountToCreate = initSlotsCount == 0? items.Count: initSlotsCount;
-			for(int i = 0; i <slotCountToCreate; i++){
-				Slot newSlot = new Slot();
-				newSlots.Add(newSlot);
-			}
+			int slotCountToCreate = SlotCountsToCreate(items);
+			List<Slot> newSlots = CreateSlots(slotCountToCreate);
 			SetSlots(newSlots);
 		}
-		public void PutSBsInSlots(List<ISlottable> sbs){
-			foreach(Slot slot in slots){
-				slot.sb = sbs[slots.IndexOf(slot)];
+			int SlotCountsToCreate(List<InventoryItemInstance> items){
+				return initSlotsCount == 0? items.Count: initSlotsCount;
 			}
+			List<Slot> CreateSlots(int count){
+				List<Slot> result = new List<Slot>();
+				for(int i = 0; i < count; i ++){
+					Slot newSlot = new Slot();
+					result.Add(newSlot);
+				}
+				return result;
+			}
+		public void PutSBsInSlots(List<ISlottable> sbs){
+			if(slots.Count < sbs.Count)
+				throw new InvalidOperationException("not enough slots to accomodate sbs");
+			else
+				foreach(Slot slot in slots){
+					slot.sb = sbs[slots.IndexOf(slot)];
+				}
 		}
 	}
 	public interface ISlotsHolder{

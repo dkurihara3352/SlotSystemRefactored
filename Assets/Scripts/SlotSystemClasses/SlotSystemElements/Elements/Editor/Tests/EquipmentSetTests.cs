@@ -47,15 +47,15 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetHierarchy_SGsWithInvalidFilter_ThrowsException(){
 				EquipmentSet eSet = MakeEquipmentSet();
-					SlotGroup sgA = MakeSG();
+					SlotGroup sgA = MakeSG_FilterHandler_RSBHandler();
 						sgA.SetElements(new ISlotSystemElement[]{});
 						sgA.SetFilter(new SGBowFilter());
 						sgA.transform.SetParent(eSet.transform);
-					SlotGroup sgB = MakeSG();
+					SlotGroup sgB = MakeSG_FilterHandler_RSBHandler();
 						sgB.SetElements(new ISlotSystemElement[]{});
 						sgB.SetFilter(new SGWearFilter());
 						sgB.transform.SetParent(eSet.transform);
-					SlotGroup sgC = MakeSG();
+					SlotGroup sgC = MakeSG_FilterHandler_RSBHandler();
 						sgC.SetElements(new ISlotSystemElement[]{});
 						sgC.SetFilter(new SGNullFilter());
 						sgC.transform.SetParent(eSet.transform);
@@ -67,15 +67,15 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetHierarchy_ValidTransformChildren_SetsThemSGsAndSetsTheirParentThis(){
 				EquipmentSet eSet = MakeEquipmentSet();
-					SlotGroup xBowSG = MakeSG();
+					SlotGroup xBowSG = MakeSG_FilterHandler_RSBHandler();
 						xBowSG.SetElements(new ISlotSystemElement[]{});
 						xBowSG.SetFilter(new SGBowFilter());
 						xBowSG.transform.SetParent(eSet.transform);
-					SlotGroup xWearSG = MakeSG();
+					SlotGroup xWearSG = MakeSG_FilterHandler_RSBHandler();
 						xWearSG.SetElements(new ISlotSystemElement[]{});
 						xWearSG.SetFilter(new SGWearFilter());
 						xWearSG.transform.SetParent(eSet.transform);
-					SlotGroup xCGearsSG = MakeSG();
+					SlotGroup xCGearsSG = MakeSG_FilterHandler_RSBHandler();
 						xCGearsSG.SetElements(new ISlotSystemElement[]{});
 						xCGearsSG.SetFilter(new SGCGearsFilter());
 						xCGearsSG.transform.SetParent(eSet.transform);

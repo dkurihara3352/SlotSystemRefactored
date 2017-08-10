@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SlotSystemManager : SlotSystemElement, ISlotSystemManager{
+		public override void InitializeStates(){
+			Deactivate();
+			tam.WaitForAction();
+		}
 		public IFocusedSGProvider focusedSGProvider{
 			get{
 				if(_focusedSGProvider != null)

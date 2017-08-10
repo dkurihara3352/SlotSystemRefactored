@@ -68,9 +68,6 @@ namespace SlotSystem{
 			public virtual void Deselect(){
 				Focus();
 			}
-			public virtual void InitializeStates(){
-				Deactivate();
-			}
 			ISSESelStateFactory selStateFactory{
 				get{
 					if(m_selStateFactory == null)
@@ -178,7 +175,6 @@ namespace SlotSystem{
 			bool wasSelected{get;}
 		void Activate();
 		void Deselect();
-		void InitializeStates();
 		void SetAndRunSelProcess(ISSESelProcess process);
 		System.Func<IEnumeratorFake> deactivateCoroutine{get;}
 		System.Func<IEnumeratorFake> focusCoroutine{get;}

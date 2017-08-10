@@ -727,7 +727,6 @@ namespace SlotSystemTests{
 					[Test]
 					public void ActStates_EventSequence(){
 						Slottable sb = MakeSBWithRealStateHandlers();
-								BowInstance bow = MakeBowInstance(0);
 								PartsInstance parts = MakePartsInstance(0, 20);
 							sb.itemHandler.item.Returns(parts);
 							ITransactionCache mockTAC = sb.taCache;

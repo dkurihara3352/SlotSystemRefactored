@@ -71,7 +71,7 @@ namespace SlotSystemTests{
 									ISGActStateHandler handler_6 = Substitute.For<ISGActStateHandler>();
 									SGRemoveState removeState = new SGRemoveState(handler_6, sg_6);
 									sg_6.removeState.Returns(removeState);
-								remove = new object[]{sg_6, sg_6.removeState};
+								remove = new object[]{handler_6, sg_6, sg_6.removeState};
 								yield return remove;
 						}
 					}

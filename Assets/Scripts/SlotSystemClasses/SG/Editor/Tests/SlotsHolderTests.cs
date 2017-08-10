@@ -185,6 +185,71 @@ namespace SlotSystemTests{
 					foreach(ISlottable sb in sbs)
 						yield return (ISlotSystemElement)sb;
 				}
+			[Test]
+			public void InitSlots_InitSlotsCountNonZero_SetsSlotsByInitSlotsCount([NUnit.Framework.Random(1, 100, 5)]int count){
+				SlotsHolder slotsHolder = new SlotsHolder(MakeSubSG());
+					slotsHolder.SetInitSlotsCount(count);
+				
+				slotsHolder.InitSlots(new List<InventoryItemInstance>());
+
+				Assert.That(slotsHolder.slots.Count, Is.EqualTo(count));
+			}
+			[Test]
+			public void InitSlots_InitSlotsCountZero_SetsSlotsByItemsCount([NUnit.Framework.Random(1, 100, 5)]int count){
+				SlotsHolder slotsHolder = new SlotsHolder(MakeSubSG());
+					slotsHolder.SetInitSlotsCount(0);
+				
+				slotsHolder.InitSlots(new List<InventoryItemInstance>(new InventoryItemInstance[count]));
+
+				Assert.That(slotsHolder.slots.Count, Is.EqualTo(count));
+			}
+			[Test]
+			public void PutSBsInSlots_NotEnoughSlots_ThrowsException([NUnit.Framework.Random(0, 100, 3)]int slotsCount){
+				SlotsHolder slotsHolder = new SlotsHolder(MakeSubSG());
+					slotsHolder.SetSlots(new List<Slot>(new Slot[slotsCount]));
+				List<ISlottable> sbs = new List<ISlottable>(new ISlottable[slotsCount +1]);
+
+				Exception ex = Assert.Catch<InvalidOperationException>(()=> slotsHolder.PutSBsInSlots(sbs));
+
+				Assert.That(ex.Message, Is.StringContaining("not enough slots to accomodate sbs"));
+			}
+			[Test]
+			public void PutSBsInSlots_Valid_SetsSlotAccordingly([NUnit.Framework.Random(1, 100, 3)]int slotsCount){
+				SlotsHolder slotsHolder = new SlotsHolder(MakeSubSG());
+					List<Slot> slots = CreateSlots(slotsCount);
+					slotsHolder.SetSlots(slots);
+				List<ISlottable> sbs = CreateSBs(slotsCount);
+
+				slotsHolder.PutSBsInSlots(sbs);
+
+				foreach(var slot in slotsHolder.slots)
+					Assert.That(slot.sb, Is.SameAs(sbs[slotsHolder.slots.IndexOf(slot)]));
+			}
+			[Test]
+			public void hasEmptySlot_HasSlotWithoutSB_ReturnsTrue([NUnit.Framework.Random(1, 100, 3)]int slotCount){
+				SlotsHolder slotsHolder = new SlotsHolder(MakeSubSG());
+					List<Slot> slots = CreateSlotsWithSBs(slotCount);
+					int indexAtEmpty = new System.Random().Next(0, slotCount -1);
+					slots[indexAtEmpty].sb = null;
+					slotsHolder.SetSlots(slots);
+				
+				bool actual = slotsHolder.hasEmptySlot;
+
+				Assert.That(actual, Is.True);
+			}
+			/* helper */
+				List<ISlottable> CreateSBs(int count){
+					List<ISlottable> result = new List<ISlottable>();
+					for(int i = 0; i < count; i ++)
+						result.Add(MakeSubSB());
+					return result;
+				}
+				List<Slot> CreateSlotsWithSBs(int count){
+					List<Slot> slots = CreateSlots(count);
+					foreach(var slot in slots)
+						slot.sb = MakeSubSB();
+					return slots;
+				}
 		}
 	}
 }

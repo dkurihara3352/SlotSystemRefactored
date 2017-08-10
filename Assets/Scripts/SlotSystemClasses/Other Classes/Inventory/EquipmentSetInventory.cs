@@ -38,6 +38,7 @@ namespace SlotSystem{
 			public void SetSG(ISlotGroup sg){
 				m_sg = sg;
 				_slotsHolder = sg;
+				_filterHandler = sg;
 			}
 		public ISlotsHolder slotsHolder{
 			get{
@@ -48,6 +49,15 @@ namespace SlotSystem{
 			}
 		}
 			ISlotsHolder _slotsHolder;
+		public IFilterHandler filterHandler{
+			get{
+				if(_filterHandler != null)
+					return _filterHandler;
+				else
+					throw new InvalidOperationException("filterHandler not set");
+			}
+		}
+			IFilterHandler _filterHandler;
 		protected BowInstance m_equippedBow;
 		protected WearInstance m_equippedWear;
 		protected List<CarriedGearInstance> m_equippedCGears = new List<CarriedGearInstance>();
@@ -56,7 +66,7 @@ namespace SlotSystem{
 			}int m_equippableCGearsCount;
 		public void SetEquippableCGearsCount(int num){
 			m_equippableCGearsCount = num;
-			if(sg != null && sg.filter is SGCGearsFilter && !sg.isExpandable)
+			if(sg != null && filterHandler.filter is SGCGearsFilter && !sg.isExpandable)
 			slotsHolder.SetInitSlotsCount(num);
 		}
 		

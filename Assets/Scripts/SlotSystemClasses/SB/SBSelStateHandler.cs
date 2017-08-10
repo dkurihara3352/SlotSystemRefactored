@@ -19,8 +19,5 @@ namespace SlotSystem{
 		public override void Deselect(){
 			Activate();
 		}
-		public override void InitializeStates(){
-			Deactivate();
-		}
 	}
 }

@@ -93,15 +93,15 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					IEnumerable<ISlotSystemBundle> gBuns;
 						SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
-							SlotGroup sggA = MakeSGWithRealStateHandlers();
+							SlotGroup sggA = MakeSG_RealStateHandlers_RSBHandler();
 								sggA.transform.SetParent(gBun.transform);
 								sggA.SetElements(new ISlotSystemElement[]{});
 								sggA.Focus();
-							SlotGroup sggB = MakeSGWithRealStateHandlers();
+							SlotGroup sggB = MakeSG_RealStateHandlers_RSBHandler();
 								sggB.SetElements(new ISlotSystemElement[]{});
 								sggB.transform.SetParent(gBun.transform);
 								sggB.Focus();
-							SlotGroup sggC = MakeSGWithRealStateHandlers();
+							SlotGroup sggC = MakeSG_RealStateHandlers_RSBHandler();
 								sggC.SetElements(new ISlotSystemElement[]{});
 								sggC.transform.SetParent(gBun.transform);
 								sggC.Focus();
