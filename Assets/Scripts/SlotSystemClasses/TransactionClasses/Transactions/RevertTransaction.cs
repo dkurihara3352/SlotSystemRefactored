@@ -8,21 +8,25 @@ namespace SlotSystem{
 		ISlotGroup m_origSG;
 		ISlotsHolder origSGSlotsHolder;
 		ITransactionIconHandler iconHandler;
+		ISGActStateHandler origSGActStateHandler;
+		ISGTransactionHandler origSGTAHandler;
 		public RevertTransaction(ISlottable pickedSB, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_origSG = m_pickedSB.sg;
-			this.iconHandler = tam.iconHandler;
-			this.origSGSlotsHolder = m_origSG;
+			iconHandler = tam.iconHandler;
+			origSGSlotsHolder = m_origSG;
+			origSGActStateHandler = m_origSG;
+			origSGTAHandler = m_origSG;
 		}
 		public override void Indicate(){}
 		public override void Execute(){
-			m_origSG.Revert();
-			iconHandler.dIcon1.SetDestination(m_origSG, origSGSlotsHolder.GetNewSlot(m_pickedSB.item));
+			origSGActStateHandler.Revert();
+			iconHandler.SetD1Destination(m_origSG, origSGSlotsHolder.GetNewSlot(m_pickedSB.item));
 			m_origSG.OnActionExecute();
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){
-			m_origSG.OnCompleteSlotMovements();
+			origSGTAHandler.OnCompleteSlotMovements();
 			base.OnCompleteTransaction();
 		}
 	}

@@ -12,8 +12,10 @@ namespace SlotSystem{
 	}
     public abstract class SGActState: SGState, ISGActState{
         protected ISGActStateHandler handler;
-        public SGActState(ISGActStateHandler handler, ISlotGroup sg): base(sg){
-            this.handler = handler;
+        protected ISGTransactionHandler sgTAHandler;
+        public SGActState(ISlotGroup sg): base(sg){
+            handler = sg;
+            sgTAHandler = sg;
         }
     }
     public interface ISGActState: ISSEState{
@@ -29,7 +31,7 @@ namespace SlotSystem{
         public ISGActState waitForActionState{
             get{
                 if(_waitForActionState == null)
-                    _waitForActionState = new SGWaitForActionState(handler, sg);
+                    _waitForActionState = new SGWaitForActionState(sg);
                 return _waitForActionState;
             }
         }
@@ -37,7 +39,7 @@ namespace SlotSystem{
         public ISGActState revertState{
             get{
                 if(_revertState == null)
-                    _revertState = new SGRevertState(handler, sg);
+                    _revertState = new SGRevertState(sg);
                 return _revertState;
             }
         }
@@ -45,7 +47,7 @@ namespace SlotSystem{
         public ISGActState reorderState{
             get{
                 if(_reorderState == null)
-                    _reorderState = new SGReorderState(handler, sg);
+                    _reorderState = new SGReorderState(sg);
                 return _reorderState;
             }
         }
@@ -53,7 +55,7 @@ namespace SlotSystem{
         public ISGActState sortState{
             get{
                 if(_sortState == null)
-                    _sortState = new SGSortState(handler, sg);
+                    _sortState = new SGSortState(sg);
                 return _sortState;
             }
         }
@@ -61,7 +63,7 @@ namespace SlotSystem{
         public ISGActState fillState{
             get{
                 if(_fillState == null)
-                    _fillState = new SGFillState(handler, sg);
+                    _fillState = new SGFillState(sg);
                 return _fillState;
             }
         }
@@ -69,7 +71,7 @@ namespace SlotSystem{
         public ISGActState swapState{
             get{
                 if(_swapState == null)
-                    _swapState = new SGSwapState(handler, sg);
+                    _swapState = new SGSwapState(sg);
                 return _swapState;
             }
         }
@@ -77,7 +79,7 @@ namespace SlotSystem{
         public ISGActState addState{
             get{
                 if(_addState == null)
-                    _addState = new SGAddState(handler, sg);
+                    _addState = new SGAddState(sg);
                 return _addState;
             }
         }
@@ -85,7 +87,7 @@ namespace SlotSystem{
         public ISGActState removeState{
             get{
                 if(_removeState == null)
-                    _removeState = new SGRemoveState(handler, sg);
+                    _removeState = new SGRemoveState(sg);
                 return _removeState;
             }
         }
@@ -103,15 +105,15 @@ namespace SlotSystem{
     }
     /* ConcreteStates */
     public class SGWaitForActionState: SGActState{
-        public SGWaitForActionState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGWaitForActionState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             handler.SetAndRunActProcess(null);
         }
     }
     public class SGRevertState: SGActState{
-        public SGRevertState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGRevertState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.RevertAndUpdateSBs();
+            sgTAHandler.RevertAndUpdateSBs();
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -119,9 +121,9 @@ namespace SlotSystem{
         }
     }
     public class SGReorderState: SGActState{
-        public SGReorderState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGReorderState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.ReorderAndUpdateSBs();
+            sgTAHandler.ReorderAndUpdateSBs();
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -129,9 +131,9 @@ namespace SlotSystem{
         }
     }
     public class SGSortState: SGActState{
-        public SGSortState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGSortState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.SortAndUpdateSBs();
+            sgTAHandler.SortAndUpdateSBs();
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -139,9 +141,9 @@ namespace SlotSystem{
         }
     }
     public class SGFillState: SGActState{
-        public SGFillState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGFillState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.FillAndUpdateSBs();
+            sgTAHandler.FillAndUpdateSBs();
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -149,9 +151,9 @@ namespace SlotSystem{
         }
     }
     public class SGSwapState: SGActState{
-        public SGSwapState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGSwapState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.SwapAndUpdateSBs();
+            sgTAHandler.SwapAndUpdateSBs();
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -159,9 +161,9 @@ namespace SlotSystem{
         }
     }
     public class SGAddState: SGActState{
-        public SGAddState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGAddState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.AddAndUpdateSBs();
+            sgTAHandler.AddAndUpdateSBs();
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -169,9 +171,9 @@ namespace SlotSystem{
         }
     }
     public class SGRemoveState: SGActState{
-        public SGRemoveState(ISGActStateHandler handler, ISlotGroup sg): base(handler, sg){}
+        public SGRemoveState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            sg.RemoveAndUpdateSBs();
+            sgTAHandler.RemoveAndUpdateSBs();
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);

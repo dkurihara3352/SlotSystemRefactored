@@ -19,7 +19,7 @@ namespace SlotSystem{
 			SetNewSBs(new List<ISlottable>());
 			SetTACache(ssm.taCache);
 			SetHoverable(new Hoverable(this, taCache));
-			SetSGHandler(ssm.tam.sgHandler);
+			SetSGTAHandler(new SGTransactionHandler(this, ssm.tam));
 			SetSorterHandler(new SorterHandler());
 			SetFilterHandler(new FilterHandler());
 			InitializeStateHandlers();
@@ -491,170 +491,64 @@ namespace SlotSystem{
 				}
 			}
 		/* Transaction */
-			public ITransactionSGHandler sgHandler{
+			public ISGTransactionHandler sgTAHandler{
 				get{
-					if(_sgHandler != null)
-						return _sgHandler;
+					if(_sgTAHandler != null)
+						return _sgTAHandler;
 					else
-						throw new InvalidOperationException("sgHandler not set");
+						throw new InvalidOperationException("sgTAHandler not set");
 				}
 			}
-				ITransactionSGHandler _sgHandler;
-			public void SetSGHandler(ITransactionSGHandler sgHandler){
-				_sgHandler = sgHandler;
+				ISGTransactionHandler _sgTAHandler;
+			public void SetSGTAHandler(ISGTransactionHandler sgTAHandler){
+				_sgTAHandler = sgTAHandler;
+			}
+			public List<ISlottable> ReorderedNewSBs(){
+				return sgTAHandler.ReorderedNewSBs();
+			}
+			public List<ISlottable> SortedNewSBs(){
+				return sgTAHandler.SortedNewSBs();
 			}
 			public void ReorderAndUpdateSBs(){
-				ISlottable sb1 = taCache.pickedSB;
-				ISlottable sb2 = taCache.targetSB;
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-				newSBs.Reorder(sb1, sb2);
+				List<ISlottable> newSBs = ReorderedNewSBs();
 				UpdateSBs(newSBs);
 			}
-			public void RevertAndUpdateSBs(){
-				SetNewSBs(toList);
-				CreateNewSlots();
-				SetSBsActStates();
-			}
 			public void SortAndUpdateSBs(){
-				List<ISlottable> newSBs;
-				if(isExpandable)
-					newSBs = GetSortedSBsWithResize(toList);
-				else
-					newSBs = GetSortedSBsWithoutResize(toList);
-				
+				List<ISlottable> newSBs = SortedNewSBs();
 				UpdateSBs(newSBs);
 			}
 			public void FillAndUpdateSBs(){
-				ISlottable added = GetAddedForFill();
-				ISlottable removed = GetRemovedForFill();
-
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-
-				if(!isPool){
-					if(added != null)
-						CreateNewSBAndFill(added.item, newSBs);
-					if(removed != null)
-						NullifyIndexOf(removed.item, newSBs);
-				}
-				newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
-				UpdateSBs(newSBs);
-			}
-			public ISlottable GetAddedForFill(){
-				ISlottable added;
-				if(sgHandler.sg1 == (ISlotGroup)this)
-					added = null;
-				else
-					added = taCache.pickedSB;
-				return added;
-			}
-			public ISlottable GetRemovedForFill(){
-				ISlottable removed;
-				if(sgHandler.sg1 == (ISlotGroup)this)
-					removed = taCache.pickedSB;
-				else
-					removed = null;
-				return removed;
+				sgTAHandler.FillAndUpdateSBs();
 			}
 			public void SwapAndUpdateSBs(){
-				ISlottable added = GetAddedForSwap();
-				ISlottable removed = GetRemovedForSwap();
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-				
-				CreateNewSBAndSwapInList(added, removed, newSBs);
-
-				newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
-				UpdateSBs(newSBs);
-			}
-			public ISlottable GetAddedForSwap(){
-				ISlottable added = null;
-				if(sgHandler.sg1 == (ISlotGroup)this)
-					added = taCache.targetSB;
-				else
-					added = taCache.pickedSB;
-				return added;
-			}
-			public ISlottable GetRemovedForSwap(){
-				ISlottable removed;
-				if(sgHandler.sg1 == (ISlotGroup)this)
-					removed = taCache.pickedSB;
-				else
-					removed = taCache.targetSB;
-				return removed;
-			}
-			void CreateNewSBAndSwapInList(ISlottable added, ISlottable removed, List<ISlottable> list){
-				if(!isPool){
-					Slottable newSB = CreateSB(added.item);
-					newSB.Unequip();
-					list[list.IndexOf(removed)] = newSB;
-				}
+				sgTAHandler.SwapAndUpdateSBs();
 			}
 			public void AddAndUpdateSBs(){
-				List<InventoryItemInstance> added = taCache.moved;
-				List<ISlottable> newSBs = new List<ISlottable>(toList);
-
-				foreach(InventoryItemInstance itemInst in added){
-					if(!TryChangeStackableQuantity(newSBs, itemInst, true)){
-						CreateNewSBAndFill(itemInst, newSBs);
-					}
-				}
-				newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
-				UpdateSBs(newSBs);
-			}
-			public bool TryChangeStackableQuantity(List<ISlottable> target, InventoryItemInstance item, bool added){
-				bool changed = false;
-				if(item.IsStackable){
-					List<ISlottable> removed = new List<ISlottable>();
-					foreach(ISlottable sb in target){
-						if(sb != null){
-							if(sb.item == item){
-								int newQuantity;
-								if(added)
-									newQuantity = sb.quantity + item.quantity;
-								else
-									newQuantity = sb.quantity - item.quantity;
-								if(newQuantity <= 0)
-									removed.Add(sb);
-								else
-									sb.SetQuantity(newQuantity);
-								changed = true;
-							}
-						}
-					}
-					foreach(ISlottable sb in removed){
-						target[target.IndexOf(sb)] = null;
-						sb.Destroy();
-					}
-				}
-				return changed;
+				sgTAHandler.AddAndUpdateSBs();
 			}
 			public void RemoveAndUpdateSBs(){
-				List<InventoryItemInstance> removed = taCache.moved;
-				List<ISlottable> thisNewSBs = toList;
-				
-				foreach(InventoryItemInstance item in removed){
-					if(!TryChangeStackableQuantity(thisNewSBs, item, false)){
-						NullifyIndexOf(item, thisNewSBs);
-					}
-				}
-				thisNewSBs = SortedSBsIfAutoSortAccordingToExpandability(thisNewSBs);
-				
-				UpdateSBs(thisNewSBs);
+				sgTAHandler.RemoveAndUpdateSBs();
 			}
-			//Transaction Utility
-			public Slottable CreateSB(InventoryItemInstance item){
-				GameObject newSBGO = new GameObject("newSBGO");
-				Slottable newSB = newSBGO.AddComponent<Slottable>();
-				newSB.SetSSM(ssm);
-				newSB.InitializeSB(item);
-				newSB.Defocus();
-				return newSB;
+			public void OnCompleteSlotMovements(){
+				sgTAHandler.OnCompleteSlotMovements();
+			}
+			public void SyncSBsToSlots(){
+				sgTAHandler.SyncSBsToSlots();
+			}
+			public void ReportTAComp(){
+				sgTAHandler.ReportTAComp();
+			}
+			public void RevertAndUpdateSBs(){
+				SetNewSBs(slottables);
+				SetSBsActStates();
+				CreateNewSlots();
 			}
 			public void UpdateSBs(List<ISlottable> newSBs){
 				SetNewSBs(newSBs);
-				CreateNewSlots();
 				SetSBsActStates();
 				List<ISlottable> allSBs = AllSBs(slottables, newSBs);
 				SetSBs(allSBs);
+				CreateNewSlots();
 			}
 			public List<ISlottable> AllSBs(List<ISlottable> sbs, List<ISlottable> newSBs){
 				List<ISlottable> allSBs = new List<ISlottable>(sbs);
@@ -673,56 +567,13 @@ namespace SlotSystem{
 				}
 				SetNewSlots(newSlots);
 			}
-			public void OnCompleteSlotMovements(){
-				foreach(ISlottable sb in this){
-					if(sb != null){
-						if(sb.isToBeRemoved){
-							sb.Destroy();
-						}else{
-							newSlots[sb.newSlotID].sb = sb;
-						}
-					}
-				}
-				SetSlots(newSlots);
-				SyncSBsToSlots();
-			}
-			public void SyncSBsToSlots(){
-				List<ISlottable> newSBs = new List<ISlottable>();
-				foreach(Slot slot in slots){
-					newSBs.Add(slot.sb);
-				}
-				SetSBs(newSBs);
-				foreach(ISlottable sb in this){
-					if(sb != null)
-					sb.SetSlotID(newSBs.IndexOf(sb));
-				}
-			}
-			public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
-				Slottable newSB = CreateSB(addedItem);
-				newSB.Unequip();
-				list.Fill(newSB);
-			}
-			public void NullifyIndexOf(InventoryItemInstance removedItem, List<ISlottable> list){
-				ISlottable rem = null;
-				foreach(ISlottable sb in list){
-					if(sb != null){
-						if(sb.item == removedItem)
-							rem = sb;
-					}
-				}
-				list[list.IndexOf(rem)] = null;
-			}
-			List<ISlottable> SortedSBsIfAutoSortAccordingToExpandability(List<ISlottable> source){
-				List<ISlottable> result = source;
-				if(isAutoSort){
-					if(isExpandable)
-						result = GetSortedSBsWithResize(result);
-					else
-						result = GetSortedSBsWithoutResize(result);
-				}
-				if(result == null)
-					return source;
-				return result;
+			public ISlottable CreateSB(InventoryItemInstance item){
+				GameObject newSBGO = new GameObject("newSBGO");
+				Slottable newSB = newSBGO.AddComponent<Slottable>();
+				newSB.SetSSM(ssm);
+				newSB.InitializeSB(item);
+				newSB.Defocus();
+				return newSB;
 			}
 			public void OnActionComplete(){
 				onActionCompleteCommand.Execute();
@@ -747,11 +598,8 @@ namespace SlotSystem{
 				ssm.MarkEquippedInPool(item, equipped);
 				ssm.SetEquippedOnAllSBs(item, equipped);
 			}
-			public void ReportTAComp(){
-				sgHandler.AcceptSGTAComp(this);
-			}
 	}
-	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler, IFilterHandler, ISBHandler{
+	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler, IFilterHandler, ISBHandler, ISGTransactionHandler{
 		/*	instrinsic	*/
 			Inventory inventory{get;}
 			bool isShrinkable{get;}
@@ -760,24 +608,18 @@ namespace SlotSystem{
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();
 			void InitSBs(List<InventoryItemInstance> items);
+			ISlottable CreateSB(InventoryItemInstance item);
 		/*	integration	*/
 			void InstantSort();
 			void ToggleAutoSort(bool on);
 		/*	Transaction	*/
-			ITransactionSGHandler sgHandler{get;}
 			void ReorderAndUpdateSBs();
-			void RevertAndUpdateSBs();
 			void SortAndUpdateSBs();
-			void FillAndUpdateSBs();
-			void SwapAndUpdateSBs();
-			void AddAndUpdateSBs();
-			void RemoveAndUpdateSBs();
-			void OnCompleteSlotMovements();
-			void SyncSBsToSlots();
+			void UpdateSBs(List<ISlottable> newSBs);
+			void RevertAndUpdateSBs();
 			void OnActionComplete();
 			void UpdateEquipStatesOnAll();
 			void OnActionExecute();
 			void SyncEquipped(InventoryItemInstance item, bool equipped);
-			void ReportTAComp();
 	}
 }

@@ -34,7 +34,9 @@ namespace SlotSystem{
 			get{return m_dIcon1Done;}
 		}
 			bool m_dIcon1Done = true;
-
+		public void SetD1Destination(ISlotGroup sg, Slot slot){
+			dIcon1.SetDestination(sg, slot);
+		}
 		public virtual DraggedIcon dIcon2{
 			get{return m_dIcon2;}
 		}
@@ -54,15 +56,20 @@ namespace SlotSystem{
 			get{return m_dIcon2Done;}
 		}
 			bool m_dIcon2Done = true;
+		public void SetD2Destination(ISlotGroup sg, Slot slot){
+			dIcon2.SetDestination(sg, slot);
+		}
 	}
 	public interface ITransactionIconHandler{
 		void AcceptDITAComp(ISlottable sb);
 		DraggedIcon dIcon1{get;}
 		void SetDIcon1(ISlottable sb);
 		bool dIcon1Done{get;}
+		void SetD1Destination(ISlotGroup sg, Slot slot);
 		DraggedIcon dIcon2{get;}
 		void SetDIcon2(ISlottable sb);
 		bool dIcon2Done{get;}
+		void SetD2Destination(ISlotGroup sg, Slot slot);
 	}
 }
 

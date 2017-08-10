@@ -12,11 +12,13 @@ namespace SlotSystem{
 	}
 		public interface ISGActProcess: ISGProcess{}
 			public class SGTransactionProcess: SGProcess, ISGActProcess{
+				ISGTransactionHandler sgTAHandler;
 				public SGTransactionProcess(ISlotGroup sg, Func<IEnumeratorFake> coroutine): base(sg, coroutine){
+					sgTAHandler = sg;
 				}
 				public override void Expire(){
 					base.Expire();
-					sg.ReportTAComp();
+					sgTAHandler.ReportTAComp();
 				}
 			}
 }

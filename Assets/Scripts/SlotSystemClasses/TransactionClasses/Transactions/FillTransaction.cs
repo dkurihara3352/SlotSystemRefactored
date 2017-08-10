@@ -9,12 +9,20 @@ namespace SlotSystem{
 		ISlotGroup m_origSG;
 		ITransactionIconHandler iconHandler;
 		ISlotsHolder sg2SlotsHolder;
+		ISGActStateHandler sg1ActStateHandler;
+		ISGActStateHandler sg2ActStateHandler;
+		ISGTransactionHandler sg1TAHandler;
+		ISGTransactionHandler sg2TAHandler;
 		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam):base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSG = selected;
 			m_origSG = m_pickedSB.sg;
-			this.iconHandler = tam.iconHandler;
-			this.sg2SlotsHolder = sg2;
+			iconHandler = tam.iconHandler;
+			sg2SlotsHolder = sg2;
+			sg1ActStateHandler = sg1;
+			sg2ActStateHandler = sg2;
+			sg1TAHandler = sg1;
+			sg2TAHandler = sg2;
 		}
 		public override ISlotGroup sg1{
 			get{return m_origSG;}
@@ -24,16 +32,16 @@ namespace SlotSystem{
 		}
 		public override void Indicate(){}
 		public override void Execute(){
-			sg1.Fill();
-			sg2.Fill();
-			iconHandler.dIcon1.SetDestination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.item));
+			sg1ActStateHandler.Fill();
+			sg2ActStateHandler.Fill();
+			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.item));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){
-			sg1.OnCompleteSlotMovements();
-			sg2.OnCompleteSlotMovements();
+			sg1TAHandler.OnCompleteSlotMovements();
+			sg2TAHandler.OnCompleteSlotMovements();
 			base.OnCompleteTransaction();
 		}
 	}

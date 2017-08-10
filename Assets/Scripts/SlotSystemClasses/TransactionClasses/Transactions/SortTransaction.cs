@@ -4,22 +4,28 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SortTransaction: AbsSlotSystemTransaction, ISortTransaction{
-		public ISlotGroup m_selectedSG;
-		public SGSorter m_sorter;
+		ISlotGroup m_selectedSG;
+		SGSorter m_sorter;
+		ISorterHandler sorterHandler;
+		ISGActStateHandler actStateHandler;
+		ISGTransactionHandler taHandler;
 		public SortTransaction(ISlotGroup sg, SGSorter sorter, ITransactionManager tam): base(tam){
 			m_selectedSG = sg;
 			m_sorter = sorter;
+			sorterHandler = sg1;
+			actStateHandler = sg1;
+			taHandler = sg1;
 		}
 		public override ISlotGroup sg1{get{return m_selectedSG;}}
 		public override void Indicate(){}
 		public override void Execute(){
-			sg1.SetSorter(m_sorter);
-			sg1.Sort();
+			sorterHandler.SetSorter(m_sorter);
+			actStateHandler.Sort();
 			sg1.OnActionExecute();
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){
-			sg1.OnCompleteSlotMovements();
+			taHandler.OnCompleteSlotMovements();
 			base.OnCompleteTransaction();
 		}
 	}

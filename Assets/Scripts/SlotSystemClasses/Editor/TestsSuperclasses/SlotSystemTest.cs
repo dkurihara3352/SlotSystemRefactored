@@ -66,7 +66,7 @@ public class SlotSystemTest{
 				sg.InspectorSetUp(Substitute.For<Inventory>(), Substitute.For<SGFilter>(), Substitute.For<SGSorter>(), 0);
 				sg.SetCommandsRepo(Substitute.For<ISGCommandsRepo>());
 				sg.SetHoverable(Substitute.For<IHoverable>());
-				sg.SetSGHandler(sg.ssm.tam.sgHandler);
+				sg.SetSGTAHandler(Substitute.For<ISGTransactionHandler>());
 				sg.SetSelStateHandler(Substitute.For<ISSESelStateHandler>());
 				sg.SetSGActStateHandler(Substitute.For<ISGActStateHandler>());
 			return sg;
