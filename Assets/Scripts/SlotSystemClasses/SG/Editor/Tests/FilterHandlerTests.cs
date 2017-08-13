@@ -35,7 +35,7 @@ namespace SlotSystemTests{
 							nullF_shield_T = new object[]{new SGNullFilter(), shield_0, true};
 							yield return nullF_shield_T;
 						object[] nullF_mWeapon_T;
-							ISlottable mWeapon_0 = MakeSubSBWithItem(MakeMeleeWeaponInstance(0));
+							ISlottable mWeapon_0 = MakeSubSBWithItem(MakeMWeaponInstance(0));
 							nullF_mWeapon_T = new object[]{new SGNullFilter(), mWeapon_0, true};
 							yield return nullF_mWeapon_T;
 						object[] nullF_quiver_T;
@@ -64,7 +64,7 @@ namespace SlotSystemTests{
 							bowF_shield_F = new object[]{new SGBowFilter(), shield_1, false};
 							yield return bowF_shield_F;
 						object[] bowF_mWeapon_F;
-							ISlottable mWeapon_1 = MakeSubSBWithItem(MakeMeleeWeaponInstance(0));
+							ISlottable mWeapon_1 = MakeSubSBWithItem(MakeMWeaponInstance(0));
 							bowF_mWeapon_F = new object[]{new SGBowFilter(), mWeapon_1, false};
 							yield return bowF_mWeapon_F;
 						object[] bowF_quiver_F;
@@ -93,7 +93,7 @@ namespace SlotSystemTests{
 							wearF_shield_F = new object[]{new SGWearFilter(), shield_2, false};
 							yield return wearF_shield_F;
 						object[] wearF_mWeapon_F;
-							ISlottable mWeapon_2 = MakeSubSBWithItem(MakeMeleeWeaponInstance(0));
+							ISlottable mWeapon_2 = MakeSubSBWithItem(MakeMWeaponInstance(0));
 							wearF_mWeapon_F = new object[]{new SGWearFilter(), mWeapon_2, false};
 							yield return wearF_mWeapon_F;
 						object[] wearF_quiver_F;
@@ -122,7 +122,7 @@ namespace SlotSystemTests{
 							cGearsF_shield_T = new object[]{new SGCGearsFilter(), shield_3, true};
 							yield return cGearsF_shield_T;
 						object[] cGearsF_mWeapon_T;
-							ISlottable mWeapon_3 = MakeSubSBWithItem(MakeMeleeWeaponInstance(0));
+							ISlottable mWeapon_3 = MakeSubSBWithItem(MakeMWeaponInstance(0));
 							cGearsF_mWeapon_T = new object[]{new SGCGearsFilter(), mWeapon_3, true};
 							yield return cGearsF_mWeapon_T;
 						object[] cGearsF_quiver_T;
@@ -151,7 +151,7 @@ namespace SlotSystemTests{
 							partsF_shield_F = new object[]{new SGPartsFilter(), shield_4, false};
 							yield return partsF_shield_F;
 						object[] partsF_mWeapon_F;
-							ISlottable mWeapon_4 = MakeSubSBWithItem(MakeMeleeWeaponInstance(0));
+							ISlottable mWeapon_4 = MakeSubSBWithItem(MakeMWeaponInstance(0));
 							partsF_mWeapon_F = new object[]{new SGPartsFilter(), mWeapon_4, false};
 							yield return partsF_mWeapon_F;
 						object[] partsF_quiver_F;

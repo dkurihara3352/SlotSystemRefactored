@@ -22,7 +22,7 @@ namespace SlotSystemTests{
 								BowInstance bowA = MakeBowInstance(0);
 								WearInstance wearA = MakeWearInstance(0);
 								ShieldInstance shieldA = MakeShieldInstance(0);
-								MeleeWeaponInstance mWeaponA = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA = MakeMWeaponInstance(0);
 								pInv.Add(bowA);
 								pInv.Add(wearA);
 								pInv.Add(shieldA);

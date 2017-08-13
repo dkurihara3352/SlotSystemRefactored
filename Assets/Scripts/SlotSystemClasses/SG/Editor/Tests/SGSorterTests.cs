@@ -39,7 +39,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldA0_0 = MakeShieldInstance(0);
 								shieldA0SB_0.item.Returns(shieldA0_0);
 							ISlottable mWeaponA0SB_0 = MakeSubSB();
-								MeleeWeaponInstance mWeaponA0_0 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA0_0 = MakeMWeaponInstance(0);
 								mWeaponA0SB_0.item.Returns(mWeaponA0_0);
 							ISlottable quiverA0SB_0 = MakeSubSB();
 								QuiverInstance quiverA0_0 = MakeQuiverInstance(0);
@@ -104,7 +104,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldA0_1 = MakeShieldInstance(0);
 								shieldA0SB_1.item.Returns(shieldA0_1);
 							ISlottable mWeaponA0SB_1 = MakeSubSB();
-								MeleeWeaponInstance mWeaponA0_1 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA0_1 = MakeMWeaponInstance(0);
 								mWeaponA0SB_1.item.Returns(mWeaponA0_1);
 							ISlottable quiverA0SB_1 = MakeSubSB();
 								QuiverInstance quiverA0_1 = MakeQuiverInstance(0);
@@ -169,7 +169,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldA0_2 = MakeShieldInstance(0);
 								shieldA0SB_2.item.Returns(shieldA0_2);
 							ISlottable mWeaponA0SB_2 = MakeSubSB();
-								MeleeWeaponInstance mWeaponA0_2 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA0_2 = MakeMWeaponInstance(0);
 								mWeaponA0SB_2.item.Returns(mWeaponA0_2);
 							ISlottable quiverA0SB_2 = MakeSubSB();
 								QuiverInstance quiverA0_2 = MakeQuiverInstance(0);
@@ -247,7 +247,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldA0_0 = MakeShieldInstance(0);
 								shieldA0SB_0.item.Returns(shieldA0_0);
 							ISlottable mWeaponA0SB_0 = MakeSubSB();
-								MeleeWeaponInstance mWeaponA0_0 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA0_0 = MakeMWeaponInstance(0);
 								mWeaponA0SB_0.item.Returns(mWeaponA0_0);
 							ISlottable quiverA0SB_0 = MakeSubSB();
 								QuiverInstance quiverA0_0 = MakeQuiverInstance(0);
@@ -307,7 +307,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldA0_1 = MakeShieldInstance(0);
 								shieldA0SB_1.item.Returns(shieldA0_1);
 							ISlottable mWeaponA0SB_1 = MakeSubSB();
-								MeleeWeaponInstance mWeaponA0_1 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA0_1 = MakeMWeaponInstance(0);
 								mWeaponA0SB_1.item.Returns(mWeaponA0_1);
 							ISlottable quiverA0SB_1 = MakeSubSB();
 								QuiverInstance quiverA0_1 = MakeQuiverInstance(0);
@@ -367,7 +367,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldA0_2 = MakeShieldInstance(0);
 								shieldA0SB_2.item.Returns(shieldA0_2);
 							ISlottable mWeaponA0SB_2 = MakeSubSB();
-								MeleeWeaponInstance mWeaponA0_2 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA0_2 = MakeMWeaponInstance(0);
 								mWeaponA0SB_2.item.Returns(mWeaponA0_2);
 							ISlottable quiverA0SB_2 = MakeSubSB();
 								QuiverInstance quiverA0_2 = MakeQuiverInstance(0);

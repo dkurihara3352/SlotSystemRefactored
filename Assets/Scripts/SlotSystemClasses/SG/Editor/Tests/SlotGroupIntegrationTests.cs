@@ -42,7 +42,7 @@ namespace SlotSystemTests{
 							BowInstance bowB_0 = MakeBowInstance(1);
 							WearInstance wearA_0 = MakeWearInstance(0);
 							QuiverInstance quiverA_0 = MakeQuiverInstance(0);
-							MeleeWeaponInstance mWeaponA_0 = MakeMeleeWeaponInstance(0);
+							MeleeWeaponInstance mWeaponA_0 = MakeMWeaponInstance(0);
 							PackInstance packA_0 = MakePackInstance(0);
 							WearInstance wearB_0 = MakeWearInstance(1);
 							partsB_0.SetAcquisitionOrder(0);
@@ -109,7 +109,7 @@ namespace SlotSystemTests{
 							BowInstance bowB_1 = MakeBowInstance(1);
 							WearInstance wearA_1 = MakeWearInstance(0);
 							QuiverInstance quiverA_1 = MakeQuiverInstance(0);
-							MeleeWeaponInstance mWeaponA_1 = MakeMeleeWeaponInstance(0);
+							MeleeWeaponInstance mWeaponA_1 = MakeMWeaponInstance(0);
 							PackInstance packA_1 = MakePackInstance(0);
 							WearInstance wearB_1 = MakeWearInstance(1);
 							partsB_1.SetAcquisitionOrder(0);
@@ -176,7 +176,7 @@ namespace SlotSystemTests{
 							BowInstance bowB_2 = MakeBowInstance(1);
 							WearInstance wearA_2 = MakeWearInstance(0);
 							QuiverInstance quiverA_2 = MakeQuiverInstance(0);
-							MeleeWeaponInstance mWeaponA_2 = MakeMeleeWeaponInstance(0);
+							MeleeWeaponInstance mWeaponA_2 = MakeMWeaponInstance(0);
 							PackInstance packA_2 = MakePackInstance(0);
 							WearInstance wearB_2 = MakeWearInstance(1);
 							partsB_2.SetAcquisitionOrder(0);
@@ -244,7 +244,7 @@ namespace SlotSystemTests{
 						BowInstance bow = MakeBowInstance(0);
 						WearInstance wear = MakeWearInstance(0);
 						ShieldInstance shield = MakeShieldInstance(0);
-						MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
+						MeleeWeaponInstance mWeapon = MakeMWeaponInstance(0);
 						inventory.Add(bow);
 						inventory.Add(wear);
 						inventory.Add(shield);
@@ -269,7 +269,7 @@ namespace SlotSystemTests{
 						BowInstance bow = MakeBowInstance(0);
 						WearInstance wear = MakeWearInstance(0);
 						ShieldInstance shield = MakeShieldInstance(0);
-						MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
+						MeleeWeaponInstance mWeapon = MakeMWeaponInstance(0);
 						inventory.Add(bow);
 						inventory.Add(wear);
 						inventory.Add(shield);

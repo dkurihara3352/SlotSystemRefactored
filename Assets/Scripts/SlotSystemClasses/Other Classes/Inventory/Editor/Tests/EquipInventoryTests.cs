@@ -76,20 +76,20 @@ namespace SlotSystemTests{
                                     yield return fits_1;
                                 object[] fits_2;
                                     ShieldInstance shield_2 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeapon_2 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeapon_2 = MakeMWeaponInstance(0);
                                     IEnumerable<CarriedGearInstance> added_2 = new CarriedGearInstance[]{shield_2, mWeapon_2};
                                     fits_2 = new object[]{2, added_2, added_2};
                                     yield return fits_2;
                                 object[] fits_3;
                                     ShieldInstance shield_3 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeapon_3 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeapon_3 = MakeMWeaponInstance(0);
                                     QuiverInstance quiver_3 = MakeQuiverInstance(0);
                                     IEnumerable<CarriedGearInstance> added_3 = new CarriedGearInstance[]{shield_3, mWeapon_3, quiver_3};
                                     fits_3 = new object[]{3, added_3, added_3};
                                     yield return fits_3;
                                 object[] fits_4;
                                     ShieldInstance shield_4 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeapon_4 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeapon_4 = MakeMWeaponInstance(0);
                                     QuiverInstance quiver_4 = MakeQuiverInstance(0);
                                     PackInstance pack_4 = MakePackInstance(0);
                                     IEnumerable<CarriedGearInstance> added_4 = new CarriedGearInstance[]{shield_4, mWeapon_4, quiver_4, pack_4};
@@ -123,14 +123,14 @@ namespace SlotSystemTests{
                                     yield return fits_1_plus_1;
                                 object[] fits_2_plus_1;
                                     ShieldInstance shield_2 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeapon_2 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeapon_2 = MakeMWeaponInstance(0);
                                     ShieldInstance shield_nf_2 = MakeShieldInstance(0);
                                     List<CarriedGearInstance> fitted_2 = new List<CarriedGearInstance>(new CarriedGearInstance[]{shield_2, mWeapon_2});
                                     fits_2_plus_1 = new object[]{fitted_2, shield_nf_2};
                                     yield return fits_2_plus_1;
                                 object[] fits_3_plus_1;
                                     ShieldInstance shield_3 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeapon_3 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeapon_3 = MakeMWeaponInstance(0);
                                     QuiverInstance quiver_3 = MakeQuiverInstance(0);
                                     ShieldInstance shield_nf_3 = MakeShieldInstance(0);
                                     List<CarriedGearInstance> fitted_3 = new List<CarriedGearInstance>(new CarriedGearInstance[]{shield_3, mWeapon_3, quiver_3});
@@ -138,7 +138,7 @@ namespace SlotSystemTests{
                                     yield return fits_3_plus_1;
                                 object[] fits_4_plus_1;
                                     ShieldInstance shield_4 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeapon_4 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeapon_4 = MakeMWeaponInstance(0);
                                     QuiverInstance quiver_4 = MakeQuiverInstance(0);
                                     PackInstance pack_4 = MakePackInstance(0);
                                     ShieldInstance shield_nf_4 = MakeShieldInstance(0);
@@ -179,7 +179,7 @@ namespace SlotSystemTests{
                                 WearInstance wear_nm = MakeWearInstance(0);
                                 ShieldInstance shield_m = MakeShieldInstance(0);
                                 ShieldInstance shield_nm = MakeShieldInstance(0);
-                                MeleeWeaponInstance mWeapon_m = MakeMeleeWeaponInstance(0);
+                                MeleeWeaponInstance mWeapon_m = MakeMWeaponInstance(0);
                                 QuiverInstance quiver_m = MakeQuiverInstance(0);
                                 PackInstance pack_m = MakePackInstance(0);
                                 List<InventoryItemInstance> case1Added = new List<InventoryItemInstance>(new InventoryItemInstance[]{
@@ -209,7 +209,7 @@ namespace SlotSystemTests{
                                     BowInstance bow_1 = MakeBowInstance(0);
                                     WearInstance wear_1 = MakeWearInstance(0);
                                     ShieldInstance shield_1 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeapon_1 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeapon_1 = MakeMWeaponInstance(0);
                                     QuiverInstance quiver_1 = MakeQuiverInstance(0);
                                     PackInstance pack_1 = MakePackInstance(0);
                                     List<InventoryItemInstance> added_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
@@ -244,7 +244,7 @@ namespace SlotSystemTests{
                                     BowInstance bowA_0 = MakeBowInstance(0);
                                     WearInstance wearA_0 = MakeWearInstance(0);
                                     ShieldInstance shieldA_0 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeaponA_0 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeaponA_0 = MakeMWeaponInstance(0);
                                     QuiverInstance quiverA_0 = MakeQuiverInstance(0);
                                     PackInstance packA_0 = MakePackInstance(0);
                                     List<InventoryItemInstance> added_0 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
@@ -262,7 +262,7 @@ namespace SlotSystemTests{
                                     BowInstance bowA_1 = MakeBowInstance(0);
                                     WearInstance wearA_1 = MakeWearInstance(0);
                                     ShieldInstance shieldA_1 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeaponA_1 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeaponA_1 = MakeMWeaponInstance(0);
                                     QuiverInstance quiverA_1 = MakeQuiverInstance(0);
                                     PackInstance packA_1 = MakePackInstance(0);
                                     List<InventoryItemInstance> added_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
@@ -280,7 +280,7 @@ namespace SlotSystemTests{
                                     BowInstance bowA_2 = MakeBowInstance(0);
                                     WearInstance wearA_2 = MakeWearInstance(0);
                                     ShieldInstance shieldA_2 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeaponA_2 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeaponA_2 = MakeMWeaponInstance(0);
                                     QuiverInstance quiverA_2 = MakeQuiverInstance(0);
                                     PackInstance packA_2 = MakePackInstance(0);
                                     List<InventoryItemInstance> added_2 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
@@ -298,7 +298,7 @@ namespace SlotSystemTests{
                                     BowInstance bowA_3 = MakeBowInstance(0);
                                     WearInstance wearA_3 = MakeWearInstance(0);
                                     ShieldInstance shieldA_3 = MakeShieldInstance(0);
-                                    MeleeWeaponInstance mWeaponA_3 = MakeMeleeWeaponInstance(0);
+                                    MeleeWeaponInstance mWeaponA_3 = MakeMWeaponInstance(0);
                                     QuiverInstance quiverA_3 = MakeQuiverInstance(0);
                                     PackInstance packA_3 = MakePackInstance(0);
                                     List<InventoryItemInstance> added_3 = new List<InventoryItemInstance>(new InventoryItemInstance[]{

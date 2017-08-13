@@ -5,13 +5,13 @@ using UnityEngine;
 using Utility;
 namespace SlotSystem{
 	public class SGTransactionHandler : ISGTransactionHandler {
-		ISlotGroup sg;
+		public ISlotGroup sg;
 		IHoverable hoverable;
-			ITransactionCache taCache{
+			public ITransactionCache taCache{
 				get{return hoverable.taCache;}
 			}
-		ISBHandler sbHandler;
-		ISorterHandler sorterHandler;
+		public ISBHandler sbHandler;
+		public ISorterHandler sorterHandler;
 		ISlotsHolder slotsHolder;
 		public SGTransactionHandler(ISlotGroup sg, ITransactionManager tam){
 			this.sg = sg;
@@ -48,7 +48,7 @@ namespace SlotSystem{
 				result = sorterHandler.GetSortedSBsWithoutResize(sbHandler.slottables);
 			return result;
 		}
-		public void FillAndUpdateSBs(){
+		public List<ISlottable> FilledNewSBs(){
 			ISlottable added = GetAddedForFill();
 			ISlottable removed = GetRemovedForFill();
 
@@ -61,11 +61,11 @@ namespace SlotSystem{
 					NullifyIndexOf(removed.item, newSBs);
 			}
 			newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
-			sg.UpdateSBs(newSBs);
+			return newSBs;
 		}
 		public ISlottable GetAddedForFill(){
 			ISlottable added;
-			if(sgHandler.sg1 == (ISlotGroup)this)
+			if(sgHandler.sg1 == sg)
 				added = null;
 			else
 				added = taCache.pickedSB;
@@ -73,13 +73,13 @@ namespace SlotSystem{
 		}
 		public ISlottable GetRemovedForFill(){
 			ISlottable removed;
-			if(sgHandler.sg1 == (ISlotGroup)this)
+			if(sgHandler.sg1 == sg)
 				removed = taCache.pickedSB;
 			else
 				removed = null;
 			return removed;
 		}
-		public void SwapAndUpdateSBs(){
+		public List<ISlottable> SwappedNewSBs(){
 			ISlottable added = GetAddedForSwap();
 			ISlottable removed = GetRemovedForSwap();
 			List<ISlottable> newSBs = new List<ISlottable>(sbHandler.slottables);
@@ -87,19 +87,19 @@ namespace SlotSystem{
 			CreateNewSBAndSwapInList(added, removed, newSBs);
 
 			newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
-			sg.UpdateSBs(newSBs);
+			return newSBs;			
 		}
 		public ISlottable GetAddedForSwap(){
 			ISlottable added = null;
-			if(sgHandler.sg1 == (ISlotGroup)this)
+			if(sgHandler.sg1 == sg)
 				added = taCache.targetSB;
 			else
 				added = taCache.pickedSB;
 			return added;
 		}
 		public ISlottable GetRemovedForSwap(){
-			ISlottable removed;
-			if(sgHandler.sg1 == (ISlotGroup)this)
+			ISlottable removed = null;
+			if(sgHandler.sg1 == sg)
 				removed = taCache.pickedSB;
 			else
 				removed = taCache.targetSB;
@@ -112,7 +112,7 @@ namespace SlotSystem{
 				list[list.IndexOf(removed)] = newSB;
 			}
 		}
-		public void AddAndUpdateSBs(){
+		public List<ISlottable> AddedNewSBs(){
 			List<InventoryItemInstance> added = taCache.moved;
 			List<ISlottable> newSBs = new List<ISlottable>(sbHandler.slottables);
 
@@ -122,7 +122,7 @@ namespace SlotSystem{
 				}
 			}
 			newSBs = SortedSBsIfAutoSortAccordingToExpandability(newSBs);
-			sg.UpdateSBs(newSBs);
+			return newSBs;
 		}
 		public bool TryChangeStackableQuantity(List<ISlottable> target, InventoryItemInstance item, bool added){
 			bool changed = false;
@@ -151,7 +151,7 @@ namespace SlotSystem{
 			}
 			return changed;
 		}
-		public void RemoveAndUpdateSBs(){
+		public List<ISlottable> RemovedNewSBs(){
 			List<InventoryItemInstance> removed = taCache.moved;
 			List<ISlottable> thisNewSBs = sbHandler.slottables;
 			
@@ -161,8 +161,7 @@ namespace SlotSystem{
 				}
 			}
 			thisNewSBs = SortedSBsIfAutoSortAccordingToExpandability(thisNewSBs);
-			
-			sg.UpdateSBs(thisNewSBs);
+			return thisNewSBs;
 		}
 		public void OnCompleteSlotMovements(){
 			foreach(ISlottable sb in sbHandler.slottables){
@@ -197,26 +196,26 @@ namespace SlotSystem{
 			list.Fill(newSB);
 		}
 		public void NullifyIndexOf(InventoryItemInstance removedItem, List<ISlottable> list){
-			ISlottable rem = null;
-			foreach(ISlottable sb in list){
-				if(sb != null){
-					if(sb.item == removedItem)
-						rem = sb;
+			if(removedItem != null){
+				ISlottable rem = null;
+				foreach(ISlottable sb in list){
+					if(sb != null){
+						if(sb.item == removedItem)
+							rem = sb;
+					}
 				}
+				list[list.IndexOf(rem)] = null;
 			}
-			list[list.IndexOf(rem)] = null;
 		}
-		List<ISlottable> SortedSBsIfAutoSortAccordingToExpandability(List<ISlottable> source){
-			List<ISlottable> result = source;
-			if(sorterHandler.isAutoSort){
-				if(sg.isExpandable)
-					result = sorterHandler.GetSortedSBsWithResize(result);
-				else
-					result = sorterHandler.GetSortedSBsWithoutResize(result);
-			}
-			if(result == null)
+		public List<ISlottable> SortedSBsIfAutoSortAccordingToExpandability(List<ISlottable> source){
+			if(!sorterHandler.isAutoSort)
 				return source;
-			return result;
+			else{
+				if(sg.isExpandable)
+					return sorterHandler.GetSortedSBsWithResize(source);
+				else
+					return sorterHandler.GetSortedSBsWithoutResize(source);
+			}
 		}
 		public void ReportTAComp(){
 			sgHandler.AcceptSGTAComp(sg);
@@ -225,10 +224,10 @@ namespace SlotSystem{
 	public interface ISGTransactionHandler{
 		List<ISlottable> ReorderedNewSBs();
 		List<ISlottable> SortedNewSBs();
-		void FillAndUpdateSBs();
-		void SwapAndUpdateSBs();
-		void AddAndUpdateSBs();
-		void RemoveAndUpdateSBs();
+		List<ISlottable> FilledNewSBs();
+		List<ISlottable> SwappedNewSBs();
+		List<ISlottable> AddedNewSBs();
+		List<ISlottable> RemovedNewSBs();
 		void OnCompleteSlotMovements();
 		void SyncSBsToSlots();
 		void ReportTAComp();

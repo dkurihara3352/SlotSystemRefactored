@@ -291,7 +291,7 @@ public class SlotSystemTest{
 			shieldInst.Item = shieldFake;
 			return shieldInst;
 		}
-		protected static MeleeWeaponInstance MakeMeleeWeaponInstance(int id){
+		protected static MeleeWeaponInstance MakeMWeaponInstance(int id){
 			MeleeWeaponFake mWFake = new MeleeWeaponFake();
 			mWFake.ItemID = 3000 + id;
 			MeleeWeaponInstance mWInst = new MeleeWeaponInstance();
@@ -336,7 +336,7 @@ public class SlotSystemTest{
 			return shield;
 		}
 		protected static MeleeWeaponInstance MakeMeleeWeaponInstWithOrder(int id, int order){
-			MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(id);
+			MeleeWeaponInstance mWeapon = MakeMWeaponInstance(id);
 			mWeapon.SetAcquisitionOrder(order);
 			return mWeapon;
 		}

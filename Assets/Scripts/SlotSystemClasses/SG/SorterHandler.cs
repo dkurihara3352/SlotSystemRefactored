@@ -33,6 +33,7 @@ namespace SlotSystem{
 	public interface ISorterHandler{
 		List<ISlottable> GetSortedSBsWithoutResize(List<ISlottable> source);
 		List<ISlottable> GetSortedSBsWithResize(List<ISlottable> source);
+		SGSorter sorter{get;}
 		void SetSorter(SGSorter sorter);
 		void SetIsAutoSort(bool on);
 		bool isAutoSort{get;}

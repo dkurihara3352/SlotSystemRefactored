@@ -86,60 +86,6 @@ namespace SlotSystemTests{
 
 					mockSG.Received().RevertAndUpdateSBs();
 				}
-				[Test]
-				public void SGReorderState_EnterState_WhenCalled_CallsSGReorderAndUpdateSBs(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGReorderState roState = new SGReorderState(mockSG);
-
-					roState.EnterState();
-
-					mockSG.Received().ReorderAndUpdateSBs();
-				}
-				[Test]
-				public void SGSortState_EnterState_WhenCalled_CallsSGSortAndUpdateSBs(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGSortState sortState = new SGSortState(mockSG);
-
-					sortState.EnterState();
-
-					mockSG.Received().SortAndUpdateSBs();
-				}
-				[Test]
-				public void SGFillState_EnterState_WhenCalled_CallsSGFillAndUpdateSBs(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGFillState fillState = new SGFillState(mockSG);
-
-					fillState.EnterState();
-
-					mockSG.Received().FillAndUpdateSBs();
-				}
-				[Test]
-				public void SGSwapState_EnterState_WhenCalled_CallsSGSwapAndUpdateSBs(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGSwapState fillState = new SGSwapState(mockSG);
-
-					fillState.EnterState();
-
-					mockSG.Received().SwapAndUpdateSBs();
-				}
-				[Test]
-				public void SGAddState_EnterState_WhenCalled_CallsSGAddAndUpdateSBs(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGAddState fillState = new SGAddState(mockSG);
-
-					fillState.EnterState();
-
-					mockSG.Received().AddAndUpdateSBs();
-				}
-				[Test]
-				public void SGRemoveState_EnterState_WhenCalled_CallsSGRemoveAndUpdateSBs(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGRemoveState fillState = new SGRemoveState(mockSG);
-
-					fillState.EnterState();
-
-					mockSG.Received().RemoveAndUpdateSBs();
-				}
 		}
 	}
 }

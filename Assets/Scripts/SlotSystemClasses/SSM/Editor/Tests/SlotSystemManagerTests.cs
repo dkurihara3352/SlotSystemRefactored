@@ -254,7 +254,7 @@ namespace SlotSystemTests{
 									BowInstance bowE = MakeBowInstance(0);
 									WearInstance wearE = MakeWearInstance(0);
 									ShieldInstance shieldE = MakeShieldInstance(0);
-									MeleeWeaponInstance mWeaponE = MakeMeleeWeaponInstance(0);
+									MeleeWeaponInstance mWeaponE = MakeMWeaponInstance(0);
 									BowInstance bowR = MakeBowInstance(0);
 									WearInstance wearR = MakeWearInstance(0);
 									QuiverInstance quiverR = MakeQuiverInstance(0);
@@ -307,7 +307,7 @@ namespace SlotSystemTests{
 									BowInstance bowA = MakeBowInstance(0);
 									WearInstance wearA = MakeWearInstance(0);
 									ShieldInstance shieldA = MakeShieldInstance(0);
-									MeleeWeaponInstance mWeaponA = MakeMeleeWeaponInstance(0);
+									MeleeWeaponInstance mWeaponA = MakeMWeaponInstance(0);
 								allEquippedItems = new List<InventoryItemInstance>(new InventoryItemInstance[]{
 									bowA, wearA, shieldA, mWeaponA
 								});
@@ -330,7 +330,7 @@ namespace SlotSystemTests{
 							BowInstance bowE = MakeBowInstance(0);
 							WearInstance wearE = MakeWearInstance(0);
 							ShieldInstance shieldE = MakeShieldInstance(0);
-							MeleeWeaponInstance mWeaponE = MakeMeleeWeaponInstance(0);
+							MeleeWeaponInstance mWeaponE = MakeMWeaponInstance(0);
 							PartsInstance partsE = MakePartsInstance(0, 20);
 							equipProv.equippedBowInst.Returns(bowE);
 							equipProv.equippedWearInst.Returns(wearE);
@@ -428,7 +428,7 @@ namespace SlotSystemTests{
 								BowInstance bow_0 = MakeBowInstance(0);
 								WearInstance wear_0 = MakeWearInstance(0);
 								ShieldInstance shield_0 = MakeShieldInstance(0);
-								MeleeWeaponInstance mWeapon_0 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon_0 = MakeMWeaponInstance(0);
 								QuiverInstance quiver_0 = MakeQuiverInstance(0);
 								PackInstance pack_0 = MakePackInstance(0);
 								PartsInstance parts_0 = MakePartsInstance(0, 2);
@@ -466,7 +466,7 @@ namespace SlotSystemTests{
 								BowInstance bow_1 = MakeBowInstance(0);
 								WearInstance wear_1 = MakeWearInstance(0);
 								ShieldInstance shield_1 = MakeShieldInstance(0);
-								MeleeWeaponInstance mWeapon_1 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon_1 = MakeMWeaponInstance(0);
 								QuiverInstance quiver_1 = MakeQuiverInstance(0);
 								PackInstance pack_1 = MakePackInstance(0);
 								PartsInstance parts_1 = MakePartsInstance(0, 2);

@@ -56,6 +56,12 @@ namespace SlotSystem{
 			return m_item.ItemID.GetHashCode() + 31;
 		}
 		public static bool operator ==(InventoryItemInstance a, InventoryItemInstance b){
+			if(object.ReferenceEquals(a, null)){
+				return !object.ReferenceEquals(b, null);
+			}
+			if(object.ReferenceEquals(b, null)){
+				return !object.ReferenceEquals(a, null);
+			}
 			return a.Equals(b);
 		}
 		public static bool operator != (InventoryItemInstance a, InventoryItemInstance b){

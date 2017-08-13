@@ -39,7 +39,7 @@ namespace SlotSystemTests{
 							ShieldInstance shieldE = MakeShieldInstance(0);
 							shieldSBE.item.Returns(shieldE);
 						ISlottable mWeaponSBE = MakeSubSB();
-							MeleeWeaponInstance mWeaponE = MakeMeleeWeaponInstance(0);
+							MeleeWeaponInstance mWeaponE = MakeMWeaponInstance(0);
 							mWeaponSBE.item.Returns(mWeaponE);
 						sgeCGearsEles = new ISlotSystemElement[]{shieldSBE, mWeaponSBE};
 						List<CarriedGearInstance> expected = new List<CarriedGearInstance>(new CarriedGearInstance[]{shieldE, mWeaponE});
@@ -75,7 +75,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldE = MakeShieldInstance(0);
 								shieldSBE.item.Returns(shieldE);
 							ISlottable mWeaponSBE = MakeSubSB();
-								MeleeWeaponInstance mWeaponE = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponE = MakeMWeaponInstance(0);
 								mWeaponSBE.item.Returns(mWeaponE);
 							sgeCGearsEles = new ISlotSystemElement[]{shieldSBE, mWeaponSBE};
 						sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());

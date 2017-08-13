@@ -80,7 +80,7 @@ namespace SlotSystemTests{
 									ISlottable bow1SB_0 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_0);
 									ISlottable wearSB_0 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_0);
 									ISlottable shieldSB_0 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_0);
-									ISlottable mWeaponSB_0 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_0);
+									ISlottable mWeaponSB_0 = MakeSubSBWithItemAndSG(MakeMWeaponInstance(0), sg_0);
 									ISlottable quiverSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
 									ISlottable packSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
 									ISlottable partsSB_0 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_0);
@@ -98,7 +98,7 @@ namespace SlotSystemTests{
 									ISlottable bow1SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_1);
 									ISlottable wearSB_1 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_1);
 									ISlottable shieldSB_1 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_1);
-									ISlottable mWeaponSB_1 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_1);
+									ISlottable mWeaponSB_1 = MakeSubSBWithItemAndSG(MakeMWeaponInstance(0), sg_1);
 									ISlottable quiverSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
 									ISlottable packSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
 									ISlottable partsSB_1 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_1);
@@ -120,7 +120,7 @@ namespace SlotSystemTests{
 									ISlottable bow1SB_2 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_2);
 									ISlottable wearSB_2 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_2);
 									ISlottable shieldSB_2 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_2);
-									ISlottable mWeaponSB_2 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_2);
+									ISlottable mWeaponSB_2 = MakeSubSBWithItemAndSG(MakeMWeaponInstance(0), sg_2);
 									ISlottable quiverSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
 									ISlottable packSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
 									ISlottable partsSB_2 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_2);
@@ -142,7 +142,7 @@ namespace SlotSystemTests{
 									ISlottable bow1SB_3 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_3);
 									ISlottable wearSB_3 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_3);
 									ISlottable shieldSB_3 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_3);
-									ISlottable mWeaponSB_3 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_3);
+									ISlottable mWeaponSB_3 = MakeSubSBWithItemAndSG(MakeMWeaponInstance(0), sg_3);
 									ISlottable quiverSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
 									ISlottable packSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
 									ISlottable partsSB_3 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_3);
@@ -164,7 +164,7 @@ namespace SlotSystemTests{
 									ISlottable bow1SB_4 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_4);
 									ISlottable wearSB_4 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_4);
 									ISlottable shieldSB_4 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_4);
-									ISlottable mWeaponSB_4 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_4);
+									ISlottable mWeaponSB_4 = MakeSubSBWithItemAndSG(MakeMWeaponInstance(0), sg_4);
 									ISlottable quiverSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
 									ISlottable packSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
 									ISlottable partsSB_4 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_4);
@@ -186,7 +186,7 @@ namespace SlotSystemTests{
 									ISlottable bow1SB_5 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_5);
 									ISlottable wearSB_5 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_5);
 									ISlottable shieldSB_5 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), sg_5);
-									ISlottable mWeaponSB_5 = MakeSubSBWithItemAndSG(MakeMeleeWeaponInstance(0), sg_5);
+									ISlottable mWeaponSB_5 = MakeSubSBWithItemAndSG(MakeMWeaponInstance(0), sg_5);
 									ISlottable quiverSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
 									ISlottable packSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
 									ISlottable partsSB_5 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_5);
@@ -595,7 +595,7 @@ namespace SlotSystemTests{
 								BowInstance bowA_2 = MakeBowInstance(0);
 								WearInstance wear = MakeWearInstance(0);
 								ShieldInstance shield = MakeShieldInstance(0);
-								MeleeWeaponInstance mWeapon = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon = MakeMWeaponInstance(0);
 								items = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowA_1, bowA_2, wear, shield, mWeapon});
 							List<InventoryItemInstance> expected = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowA_1, bowA_2, wear});
 							yield return new object[]{slots, items, expected};

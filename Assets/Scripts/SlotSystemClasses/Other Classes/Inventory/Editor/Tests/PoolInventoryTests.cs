@@ -33,7 +33,7 @@ namespace SlotSystemTests{
 									BowInstance bow_1 = MakeBowInstance(0);
 									WearInstance wear_1 = MakeWearInstance(0);
 									ShieldInstance shield_1 = MakeShieldInstance(0);
-									MeleeWeaponInstance mWeapon_1 = MakeMeleeWeaponInstance(0);
+									MeleeWeaponInstance mWeapon_1 = MakeMWeaponInstance(0);
 									QuiverInstance quiver_1 = MakeQuiverInstance(0);
 									PackInstance pack_1 = MakePackInstance(0);
 									IEnumerable<InventoryItemInstance> added_1 = new InventoryItemInstance[]{bow_1, wear_1, shield_1, mWeapon_1, quiver_1, pack_1};

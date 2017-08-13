@@ -43,7 +43,7 @@ namespace SlotSystemTests{
 								ShieldInstance shieldA0_0 = MakeShieldInstance(0);
 								shieldA0SB_0.item.Returns(shieldA0_0);
 							ISlottable mWeaponA0SB_0 = MakeSubSB();
-								MeleeWeaponInstance mWeaponA0_0 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeaponA0_0 = MakeMWeaponInstance(0);
 								mWeaponA0SB_0.item.Returns(mWeaponA0_0);
 							ISlottable quiverA0SB_0 = MakeSubSB();
 								QuiverInstance quiverA0_0 = MakeQuiverInstance(0);

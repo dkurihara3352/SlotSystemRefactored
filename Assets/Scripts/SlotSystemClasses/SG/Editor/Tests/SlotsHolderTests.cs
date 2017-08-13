@@ -78,7 +78,7 @@ namespace SlotSystemTests{
 								shieldSB_0.newSlotID.Returns(2);
 								shieldSB_0.item.Returns(shield_0);
 							ISlottable mWeaponSB_0 = MakeSubSB();
-								MeleeWeaponInstance mWeapon_0 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon_0 = MakeMWeaponInstance(0);
 								mWeaponSB_0.newSlotID.Returns(3);
 								mWeaponSB_0.item.Returns(mWeapon_0);
 							List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{bowSB_0, wearSB_0, shieldSB_0, mWeaponSB_0});
@@ -101,7 +101,7 @@ namespace SlotSystemTests{
 								shieldSB_1.newSlotID.Returns(2);
 								shieldSB_1.item.Returns(shield_1);
 							ISlottable mWeaponSB_1 = MakeSubSB();
-								MeleeWeaponInstance mWeapon_1 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon_1 = MakeMWeaponInstance(0);
 								mWeaponSB_1.newSlotID.Returns(3);
 								mWeaponSB_1.item.Returns(mWeapon_1);
 							List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{bowSB_1, wearSB_1, shieldSB_1, mWeaponSB_1});
@@ -124,7 +124,7 @@ namespace SlotSystemTests{
 								shieldSB_2.newSlotID.Returns(2);
 								shieldSB_2.item.Returns(shield_2);
 							ISlottable mWeaponSB_2 = MakeSubSB();
-								MeleeWeaponInstance mWeapon_2 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon_2 = MakeMWeaponInstance(0);
 								mWeaponSB_2.newSlotID.Returns(3);
 								mWeaponSB_2.item.Returns(mWeapon_2);
 							List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{bowSB_2, wearSB_2, shieldSB_2, mWeaponSB_2});
@@ -147,7 +147,7 @@ namespace SlotSystemTests{
 								shieldSB_3.newSlotID.Returns(2);
 								shieldSB_3.item.Returns(shield_3);
 							ISlottable mWeaponSB_3 = MakeSubSB();
-								MeleeWeaponInstance mWeapon_3 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon_3 = MakeMWeaponInstance(0);
 								mWeaponSB_3.newSlotID.Returns(3);
 								mWeaponSB_3.item.Returns(mWeapon_3);
 							List<ISlottable> sbs_3 = new List<ISlottable>(new ISlottable[]{bowSB_3, wearSB_3, shieldSB_3, mWeaponSB_3});
@@ -170,7 +170,7 @@ namespace SlotSystemTests{
 								shieldSB_4.newSlotID.Returns(2);
 								shieldSB_4.item.Returns(shield_4);
 							ISlottable mWeaponSB_4 = MakeSubSB();
-								MeleeWeaponInstance mWeapon_4 = MakeMeleeWeaponInstance(0);
+								MeleeWeaponInstance mWeapon_4 = MakeMWeaponInstance(0);
 								mWeaponSB_4.newSlotID.Returns(3);
 								mWeaponSB_4.item.Returns(mWeapon_4);
 							List<ISlottable> sbs_4 = new List<ISlottable>(new ISlottable[]{bowSB_4, wearSB_4, shieldSB_4, mWeaponSB_4});

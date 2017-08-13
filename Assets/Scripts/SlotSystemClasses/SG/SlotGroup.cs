@@ -297,6 +297,9 @@ namespace SlotSystem{
 			public List<ISlottable> GetSortedSBsWithResize(List<ISlottable> source){
 				return sorterHandler.GetSortedSBsWithResize(source);
 			}
+			public SGSorter sorter{
+				get{return sorterHandler.sorter;}
+			}
 			public void SetSorter(SGSorter sorter){
 				sorterHandler.SetSorter(sorter);
 			}
@@ -509,25 +512,17 @@ namespace SlotSystem{
 			public List<ISlottable> SortedNewSBs(){
 				return sgTAHandler.SortedNewSBs();
 			}
-			public void ReorderAndUpdateSBs(){
-				List<ISlottable> newSBs = ReorderedNewSBs();
-				UpdateSBs(newSBs);
+			public List<ISlottable> FilledNewSBs(){
+				return sgTAHandler.FilledNewSBs();
 			}
-			public void SortAndUpdateSBs(){
-				List<ISlottable> newSBs = SortedNewSBs();
-				UpdateSBs(newSBs);
+			public List<ISlottable> SwappedNewSBs(){
+				return sgTAHandler.SwappedNewSBs();
 			}
-			public void FillAndUpdateSBs(){
-				sgTAHandler.FillAndUpdateSBs();
+			public List<ISlottable> AddedNewSBs(){
+				return sgTAHandler.AddedNewSBs();
 			}
-			public void SwapAndUpdateSBs(){
-				sgTAHandler.SwapAndUpdateSBs();
-			}
-			public void AddAndUpdateSBs(){
-				sgTAHandler.AddAndUpdateSBs();
-			}
-			public void RemoveAndUpdateSBs(){
-				sgTAHandler.RemoveAndUpdateSBs();
+			public List<ISlottable> RemovedNewSBs(){
+				return sgTAHandler.RemovedNewSBs();
 			}
 			public void OnCompleteSlotMovements(){
 				sgTAHandler.OnCompleteSlotMovements();
@@ -613,8 +608,6 @@ namespace SlotSystem{
 			void InstantSort();
 			void ToggleAutoSort(bool on);
 		/*	Transaction	*/
-			void ReorderAndUpdateSBs();
-			void SortAndUpdateSBs();
 			void UpdateSBs(List<ISlottable> newSBs);
 			void RevertAndUpdateSBs();
 			void OnActionComplete();
