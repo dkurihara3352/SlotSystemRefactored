@@ -93,15 +93,21 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					IEnumerable<ISlotSystemBundle> gBuns;
 						SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
-							SlotGroup sggA = MakeSG_RealStateHandlers_RSBHandler();
+							SlotGroup sggA = MakeSG();
+								sggA.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								sggA.SetSBHandler(new SBHandler());
 								sggA.transform.SetParent(gBun.transform);
 								sggA.SetElements(new ISlotSystemElement[]{});
 								sggA.Focus();
-							SlotGroup sggB = MakeSG_RealStateHandlers_RSBHandler();
+							SlotGroup sggB = MakeSG();
+								sggB.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								sggB.SetSBHandler(new SBHandler());
 								sggB.SetElements(new ISlotSystemElement[]{});
 								sggB.transform.SetParent(gBun.transform);
 								sggB.Focus();
-							SlotGroup sggC = MakeSG_RealStateHandlers_RSBHandler();
+							SlotGroup sggC = MakeSG();
+								sggC.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								sggC.SetSBHandler(new SBHandler());
 								sggC.SetElements(new ISlotSystemElement[]{});
 								sggC.transform.SetParent(gBun.transform);
 								sggC.Focus();
@@ -134,15 +140,21 @@ namespace SlotSystemTests{
 						eBun.focusedElement.Returns(eSet);
 					IEnumerable<ISlotSystemBundle> gBuns;
 						SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
-							SlotGroup sggA = MakeSGWithRealStateHandlersAndRealCommands();
+							SlotGroup sggA = MakeSG();
+								sggA.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								sggA.SetSBHandler(new SBHandler());
 								sggA.transform.SetParent(gBun.transform);
 								sggA.SetElements(new ISlotSystemElement[]{});
 								sggA.Focus();
-							SlotGroup sggB = MakeSGWithRealStateHandlersAndRealCommands();
+							SlotGroup sggB = MakeSG();
+								sggB.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								sggB.SetSBHandler(new SBHandler());
 								sggB.SetElements(new ISlotSystemElement[]{});
 								sggB.transform.SetParent(gBun.transform);
 								sggB.Focus();
-							SlotGroup sggC = MakeSGWithRealStateHandlersAndRealCommands();
+							SlotGroup sggC = MakeSG();
+								sggC.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								sggC.SetSBHandler(new SBHandler());
 								sggC.SetElements(new ISlotSystemElement[]{});
 								sggC.transform.SetParent(gBun.transform);
 								sggC.Focus();
@@ -257,14 +269,6 @@ namespace SlotSystemTests{
 				SSESelStateHandler handler = new SSESelStateHandler();
 				bundle.SetSelStateHandler(handler);
 				return bundle;
-			}
-			SlotGroup MakeSGWithSGSelStateHandlerAndTACache(){
-				SlotGroup sg = MakeSG();
-				ITransactionCache taCache = Substitute.For<ITransactionCache>();
-				sg.SetTACache(taCache);
-				SGSelStateHandler sgSelStateHandler = new SGSelStateHandler(sg);
-				sg.SetSelStateHandler(sgSelStateHandler);
-				return sg;
 			}
 			public IEnumerable<ISlotSystemElement> ConvertToSSEs<T>(IEnumerable<T> sgs) where T: ISlotSystemElement{
 				foreach(var sg in sgs)

@@ -11,7 +11,7 @@ namespace SlotSystemTests{
 	[TestFixture]
 	[Category("Integration")]
 	public class SlotSystemManagerIntegrationTests: SlotSystemTest {
-			[Test]
+			[Test][Ignore]
 			public void SetTACacheRecursively_Always_SetsIHoverableTACache(){
 				SlotSystemManager ssm = MakeSSM();
 					SlotSystemBundle pBun = MakeSSBundle();
@@ -28,6 +28,7 @@ namespace SlotSystemTests{
 								pInv.Add(shieldA);
 								pInv.Add(mWeaponA);
 							sgpA.InspectorSetUp(pInv, new SGNullFilter(), new SGItemIDSorter(), 0);
+							sgpA.SetSBFactory(new SBFactory(MakeSubSSM()));
 							sgpA.SetHierarchy();
 							IEnumerable<ISlotSystemElement> xSGPAEles;
 								ISlottable bowSBP = sgpA.GetSB(bowA);

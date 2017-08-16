@@ -24,10 +24,11 @@ public class SlotSystemTest{
 				sb.SetSSM(MakeSubSSM());
 					sb.ssm.tam.Returns(MakeSubTAM());
 					sb.ssm.tam.iconHandler.Returns(Substitute.For<ITransactionIconHandler>());
-				sb.SetTACache(MakeSubTAC());
 				sb.SetTapCommand(Substitute.For<ISBCommand>());
 				sb.SetItemHandler(Substitute.For<IItemHandler>());
-				sb.SetHoverable(Substitute.For<IHoverable>());
+					IHoverable hoverable = Substitute.For<IHoverable>();
+						hoverable.taCache.Returns(MakeSubTAC());
+				sb.SetHoverable(hoverable);
 				sb.SetSlotHandler(Substitute.For<ISlotHandler>());
 				sb.SetSelStateHandler(Substitute.For<ISSESelStateHandler>());
 				sb.SetActStateHandler(Substitute.For<ISBActStateHandler>());
@@ -59,16 +60,18 @@ public class SlotSystemTest{
 				sg.SetSSM(MakeSubSSM());
 					sg.ssm.tam.Returns(MakeSubTAM());
 					sg.ssm.tam.sgHandler.Returns(Substitute.For<ITransactionSGHandler>());
-				sg.SetTACache(MakeSubTAC());
 				sg.SetSlotsHolder(Substitute.For<ISlotsHolder>());
 				sg.SetSorterHandler(Substitute.For<ISorterHandler>());
 				sg.SetFilterHandler(Substitute.For<IFilterHandler>());
 				sg.InspectorSetUp(Substitute.For<Inventory>(), Substitute.For<SGFilter>(), Substitute.For<SGSorter>(), 0);
 				sg.SetCommandsRepo(Substitute.For<ISGCommandsRepo>());
-				sg.SetHoverable(Substitute.For<IHoverable>());
+					IHoverable hoverable = Substitute.For<IHoverable>();
+						hoverable.taCache.Returns(MakeSubTAC());
+				sg.SetHoverable(hoverable);
 				sg.SetSGTAHandler(Substitute.For<ISGTransactionHandler>());
 				sg.SetSelStateHandler(Substitute.For<ISSESelStateHandler>());
 				sg.SetSGActStateHandler(Substitute.For<ISGActStateHandler>());
+				sg.SetSBFactory(Substitute.For<ISBFactory>());
 			return sg;
 		}
 		protected static SlotGroup MakeSGInitWithSubsAndRealSlotsHolder(){

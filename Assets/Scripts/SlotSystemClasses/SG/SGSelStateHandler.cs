@@ -5,9 +5,9 @@ namespace SlotSystem{
 	public class SGSelStateHandler : SSESelStateHandler {
 		ITransactionCache taCache;
 		IHoverable hoverable;
-		public SGSelStateHandler(ISlotGroup sg){
-			this.taCache = sg.taCache;
-			this.hoverable = sg;
+		public SGSelStateHandler(ITransactionCache taCache, IHoverable hoverable){
+			this.taCache = taCache;
+			this.hoverable = hoverable;
 		}
 		public override void Activate(){
 			if(taCache.IsCachedTAResultRevert(hoverable) == false)

@@ -249,13 +249,20 @@ namespace SlotSystemTests{
 						inventory.Add(wear);
 						inventory.Add(shield);
 						inventory.Add(mWeapon);
-				sg.SetSSM(MakeSubSSM());
 				sg.SetSBHandler(new SBHandler());
-				sg.SetSlotsHolder(new SlotsHolder(sg));
-				sg.SetSorterHandler(new SorterHandler());
-				sg.SetFilterHandler(new FilterHandler());
+				ISlotsHolder slotsHolder = new SlotsHolder(sg);
+					slotsHolder.SetInitSlotsCount(0);
+				sg.SetSlotsHolder(slotsHolder);
 				sg.SetCommandsRepo(new SGCommandsRepo(sg));
-				sg.InspectorSetUp(inventory, new SGNullFilter(), new SGItemIDSorter(), 0);
+				sg.SetSBFactory(new SBFactory(MakeSubSSM()));
+				ISorterHandler sorterHandler = new SorterHandler();
+					sorterHandler.SetSorter(new SGItemIDSorter());
+				sg.SetSorterHandler(sorterHandler);
+				IFilterHandler filterHandler = new FilterHandler();
+					filterHandler.SetFilter(new SGNullFilter());
+				sg.SetFilterHandler(filterHandler);
+				sg.SetSGTAHandler(new SGTransactionHandler(sg, MakeSubTAM()));
+				sg.SetInventory(inventory);
 				
 				sg.SetHierarchy();
 
@@ -274,13 +281,20 @@ namespace SlotSystemTests{
 						inventory.Add(wear);
 						inventory.Add(shield);
 						inventory.Add(mWeapon);
-				sg.SetSSM(MakeSubSSM());
 				sg.SetSBHandler(new SBHandler());
-				sg.SetSlotsHolder(new SlotsHolder(sg));
-				sg.SetSorterHandler(new SorterHandler());
-				sg.SetFilterHandler(new FilterHandler());
+				ISlotsHolder slotsHolder = new SlotsHolder(sg);
+					slotsHolder.SetInitSlotsCount(0);
+				sg.SetSlotsHolder(slotsHolder);
 				sg.SetCommandsRepo(new SGCommandsRepo(sg));
-				sg.InspectorSetUp(inventory, new SGNullFilter(), new SGItemIDSorter(), 0);
+				sg.SetSBFactory(new SBFactory(MakeSubSSM()));
+				ISorterHandler sorterHandler = new SorterHandler();
+					sorterHandler.SetSorter(new SGItemIDSorter());
+				sg.SetSorterHandler(sorterHandler);
+				IFilterHandler filterHandler = new FilterHandler();
+					filterHandler.SetFilter(new SGNullFilter());
+				sg.SetFilterHandler(filterHandler);
+				sg.SetSGTAHandler(new SGTransactionHandler(sg, MakeSubTAM()));
+				sg.SetInventory(inventory);
 
 				sg.SetHierarchy();
 

@@ -10,7 +10,7 @@ namespace SlotSystem{
 			WaitForAction();
 		}
 		public void InitializeStateHandlers(){
-			SetSelStateHandler(new SGSelStateHandler(this));
+			SetSelStateHandler(new SGSelStateHandler(taCache, hoverable));
 			SetSGActStateHandler(new SGActStateHandler(this));
 		}
 		public void InitializeSG(){
@@ -420,7 +420,7 @@ namespace SlotSystem{
 				}
 			}
 				Inventory _inventory;
-				void SetInventory(Inventory inv){
+				public void SetInventory(Inventory inv){
 					_inventory = inv;
 					inv.SetSG(this);
 				}
