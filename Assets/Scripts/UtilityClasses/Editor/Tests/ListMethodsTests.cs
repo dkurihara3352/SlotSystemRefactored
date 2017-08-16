@@ -163,6 +163,19 @@ namespace UtilityClassTests{
 					yield return new object[]{case1List, case1Exp};
 				}
 			}
+		[Test][ExpectedException(typeof(System.NullReferenceException))]
+		public void Fill_listNull_ThrowsException(){
+			List<TestElement> nullList = null;
+			nullList.Fill(new TestElement());
+		}
+		[Test]
+		public void Fill_ElementNull_ThrowsException(){
+			List<TestElement> emptyList = new List<TestElement>();
+
+			System.Exception ex = Assert.Catch<System.ArgumentNullException>(() => emptyList.Fill(null));
+
+			Assert.That(ex.Message, Is.StringContaining("element to be filled is null"));
+		}
 		[TestCaseSource(typeof(FillCases))]
 		public void Fill_WhenCalled_SetsExpected(List<TestElement> list, TestElement added, List<TestElement> expected){
 			List<TestElement> testList = new List<TestElement>(list);
@@ -170,7 +183,7 @@ namespace UtilityClassTests{
 			
 			bool equality = testList.MemberEquals(expected);
 			Assert.That(equality, Is.True);
-			}
+		}
 			class FillCases: IEnumerable{
 				public IEnumerator GetEnumerator(){
 					object[] fillInTheFirstEmpty;
@@ -197,9 +210,17 @@ namespace UtilityClassTests{
 						TestElement ele3_2 = new TestElement();
 						TestElement ele4_2 = new TestElement();
 						List<TestElement> list_2 = new List<TestElement>(new TestElement[]{ele1_2, ele2_2, ele3_2});
-					List<TestElement> exp_2 = new List<TestElement>(new TestElement[]{ele1_2, ele2_2, ele3_2, ele4_2});
+						List<TestElement> exp_2 = new List<TestElement>(new TestElement[]{ele1_2, ele2_2, ele3_2, ele4_2});
 						contatenate = new object[]{list_2, ele4_2, exp_2};
 						yield return contatenate;
+					object[] createEntryForEmpty;
+						TestElement ele0_3 = new TestElement();
+						List<TestElement> list_3 = new List<TestElement>();
+						List<TestElement> exp_3 = new List<TestElement>(new TestElement[]{ele0_3});
+						createEntryForEmpty = new object[]{
+							list_3, ele0_3, exp_3
+						};
+						yield return createEntryForEmpty;
 				}
 			}
 		[TestCaseSource(typeof(Count_AlwaysCases))]

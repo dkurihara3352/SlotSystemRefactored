@@ -86,13 +86,16 @@ namespace Utility{
 			list.RemoveAll(element => element == null);
 		}
 		public static void Fill<T>(this IList<T> list, T element){
-			foreach(var ele in list){
-				if(ele == null){
-					list[list.IndexOf(ele)] = element;
-					return;
+			if(element == null)
+				throw new System.ArgumentNullException("element to be filled is null");
+			else
+				foreach(var ele in list){
+					if(ele == null){
+						list[list.IndexOf(ele)] = element;
+						return;
+					}
 				}
-			}
-			list.Add(element);
+				list.Add(element);
 		}
 		public static int Count<T>(this IEnumerable<T> coll){
 			IEnumerator rator = coll.GetEnumerator();

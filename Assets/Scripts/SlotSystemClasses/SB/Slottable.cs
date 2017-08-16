@@ -14,10 +14,9 @@ namespace SlotSystem{
 		}
 		/*	States	*/
 			public void InitializeSB(InventoryItemInstance item){
-				SetTACache(ssm.taCache);
+				SetHoverable(new Hoverable(this, ssm.taCache));
 				SetTapCommand(new SBTapCommand());
 				SetItemHandler(new ItemHandler(item));
-				SetHoverable(new Hoverable(this, taCache));
 				SetSlotHandler(new SlotHandler());
 				InitializeStateHandlers();
 			}
@@ -462,8 +461,8 @@ namespace SlotSystem{
 				return flag;
 			}
 			public void Destroy(){
-				GameObject go = gameObject;
-				DestroyImmediate(go);
+				// GameObject go = gameObject;
+				// DestroyImmediate(go);
 			}
 		/*	SlotSystemElement imple and overrides	*/
 			protected override IEnumerable<ISlotSystemElement> elements{
@@ -486,18 +485,6 @@ namespace SlotSystem{
 				return false;
 			}
 		/*	Transaction	*/
-			public ITransactionCache taCache{
-				get{
-					if(_taCache != null)
-						return _taCache;
-					else
-						throw new InvalidOperationException("taCache not set");
-				}
-			}
-				ITransactionCache _taCache;
-			public void SetTACache(ITransactionCache taCache){
-				_taCache = taCache;
-			}
 			public bool isPickedUp{
 				get{
 					return taCache.pickedSB == (ISlottable)this;
@@ -518,6 +505,12 @@ namespace SlotSystem{
 				IHoverable m_hoverable;
 			public void SetHoverable(IHoverable hoverable){
 				m_hoverable = hoverable;
+			}
+			public ITransactionCache taCache{
+				get{return hoverable.taCache;}
+			}
+			public void SetTACache(ITransactionCache taCache){
+				hoverable.SetTACache(taCache);
 			}
 			public bool isHovered{
 				get{return hoverable.isHovered;}

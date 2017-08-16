@@ -30,7 +30,7 @@ namespace SlotSystem{
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){
-			sg1TAHandler.OnCompleteSlotMovements();
+			sg1TAHandler.UpdateSBs();
 			base.OnCompleteTransaction();
 		}
 	}

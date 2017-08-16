@@ -69,7 +69,7 @@ namespace SlotSystem{
 			items = filterHandler.FilteredItems(items);
 			slotsHolder.InitSlots(items);
 			sg.InitSBs(items);
-			sgTAHandler.SyncSBsToSlots();
+			sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
 			if(sg.isAutoSort)
 				sg.InstantSort();
 		}

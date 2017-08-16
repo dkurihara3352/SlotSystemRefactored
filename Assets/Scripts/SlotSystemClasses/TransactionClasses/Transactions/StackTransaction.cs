@@ -42,8 +42,8 @@ namespace SlotSystem{
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){
-			sg1TAHandler.OnCompleteSlotMovements();
-			sg2TAHandler.OnCompleteSlotMovements();
+			sg1TAHandler.UpdateSBs();
+			sg2TAHandler.UpdateSBs();
 			base.OnCompleteTransaction();
 		}
 	}

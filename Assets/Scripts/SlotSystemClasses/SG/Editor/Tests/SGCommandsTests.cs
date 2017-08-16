@@ -33,7 +33,7 @@ namespace SlotSystemTests{
 					mockSG.FilteredItems(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
 					mockSG.InitSlots(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
 					mockSG.InitSBs(Arg.Is<List<InventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
-					mockSG.SyncSBsToSlots();
+					mockSG.SetSBsFromSlotsAndUpdateSlotIDs();
 				});
 				mockSG.DidNotReceive().InstantSort();
 				}

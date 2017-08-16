@@ -124,7 +124,7 @@ namespace SlotSystem{
         public SGReorderState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.ReorderedNewSBs();
-            sg.UpdateSBs(newSBs);
+            sg.ReadySBsForTransaction(newSBs);
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -135,7 +135,7 @@ namespace SlotSystem{
         public SGSortState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.SortedNewSBs();
-            sg.UpdateSBs(newSBs);
+            sg.ReadySBsForTransaction(newSBs);
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -146,7 +146,7 @@ namespace SlotSystem{
         public SGFillState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.FilledNewSBs();
-            sg.UpdateSBs(newSBs);
+            sg.ReadySBsForTransaction(newSBs);
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -157,7 +157,7 @@ namespace SlotSystem{
         public SGSwapState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.SwappedNewSBs();
-            sg.UpdateSBs(newSBs);
+            sg.ReadySBsForTransaction(newSBs);
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -168,7 +168,7 @@ namespace SlotSystem{
         public SGAddState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.AddedNewSBs();
-            sg.UpdateSBs(newSBs);
+            sg.ReadySBsForTransaction(newSBs);
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
@@ -179,7 +179,7 @@ namespace SlotSystem{
         public SGRemoveState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.RemovedNewSBs();
-            sg.UpdateSBs(newSBs);
+            sg.ReadySBsForTransaction(newSBs);
             if(handler.wasWaitingForAction){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);

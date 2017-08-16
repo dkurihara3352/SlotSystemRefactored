@@ -23,7 +23,7 @@ namespace SlotSystem{
 			m_acquisitionOrder = id;
 		}
 		bool m_isStackable;
-		public bool IsStackable{
+		public bool isStackable{
 			get{
 				return m_item.IsStackable;
 			}

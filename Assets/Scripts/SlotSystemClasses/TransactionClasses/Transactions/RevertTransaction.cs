@@ -26,7 +26,7 @@ namespace SlotSystem{
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){
-			origSGTAHandler.OnCompleteSlotMovements();
+			origSGTAHandler.UpdateSBs();
 			base.OnCompleteTransaction();
 		}
 	}

@@ -50,7 +50,7 @@ namespace SlotSystem{
 					InventoryItemInstance checkedInst = (InventoryItemInstance)it;
 					InventoryItemInstance removedInst = (InventoryItemInstance)item;
 					if(checkedInst == removedInst){
-						if(!removedInst.IsStackable)
+						if(!removedInst.isStackable)
 							itemToRemove = it;
 						else{
 							if(removedInst.quantity > checkedInst.quantity)

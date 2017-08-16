@@ -16,12 +16,13 @@ namespace SlotSystem{
 		public void InitializeSG(){
 			SetCommandsRepo(new SGCommandsRepo(this));
 			SetSlotsHolder(new SlotsHolder(this));
+			SetSBHandler(new SBHandler());
 			SetNewSBs(new List<ISlottable>());
-			SetTACache(ssm.taCache);
-			SetHoverable(new Hoverable(this, taCache));
+			SetHoverable(new Hoverable(this, ssm.taCache));
 			SetSGTAHandler(new SGTransactionHandler(this, ssm.tam));
 			SetSorterHandler(new SorterHandler());
 			SetFilterHandler(new FilterHandler());
+			SetSBFactory(new SBFactory(ssm));
 			InitializeStateHandlers();
 		}
 		/*	states	*/
@@ -382,18 +383,6 @@ namespace SlotSystem{
 				InitializeItems();
 			}
 		/* Hoverable */
-			public ITransactionCache taCache{
-				get{
-					if(_taCache != null)
-						return _taCache;
-					else
-						throw new System.InvalidOperationException("taCache is not set");
-				}
-			}
-				ITransactionCache _taCache;
-			public void SetTACache(ITransactionCache taCache){
-				_taCache = taCache;
-			}
 			public IHoverable hoverable{
 				get{
 					if(_hoverable != null)
@@ -405,6 +394,12 @@ namespace SlotSystem{
 				IHoverable _hoverable;
 			public void SetHoverable(IHoverable hoverable){
 				_hoverable = hoverable;
+			}
+			public ITransactionCache taCache{
+				get{return hoverable.taCache;}
+			}
+			public void SetTACache(ITransactionCache taCache){
+				hoverable.SetTACache(taCache);
 			}
 			public void OnHoverEnter(){
 				hoverable.OnHoverEnter();
@@ -493,6 +488,22 @@ namespace SlotSystem{
 					slots[items.IndexOf(item)].sb = newSB;
 				}
 			}
+		/* SBFactory */
+			public ISBFactory sbFactory{
+				get{
+					if(_sbFactory != null)
+						return _sbFactory;
+					else
+						throw new InvalidOperationException("sbFactory not set");
+				}
+			}
+				ISBFactory _sbFactory;
+				public void SetSBFactory(ISBFactory sbFactory){
+					_sbFactory = sbFactory;
+				}
+			public ISlottable CreateSB(InventoryItemInstance item){
+				return sbFactory.CreateSB(item);
+			}
 		/* Transaction */
 			public ISGTransactionHandler sgTAHandler{
 				get{
@@ -524,11 +535,11 @@ namespace SlotSystem{
 			public List<ISlottable> RemovedNewSBs(){
 				return sgTAHandler.RemovedNewSBs();
 			}
-			public void OnCompleteSlotMovements(){
-				sgTAHandler.OnCompleteSlotMovements();
+			public void UpdateSBs(){
+				sgTAHandler.UpdateSBs();
 			}
-			public void SyncSBsToSlots(){
-				sgTAHandler.SyncSBsToSlots();
+			public void SetSBsFromSlotsAndUpdateSlotIDs(){
+				sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
 			}
 			public void ReportTAComp(){
 				sgTAHandler.ReportTAComp();
@@ -538,7 +549,7 @@ namespace SlotSystem{
 				SetSBsActStates();
 				CreateNewSlots();
 			}
-			public void UpdateSBs(List<ISlottable> newSBs){
+			public void ReadySBsForTransaction(List<ISlottable> newSBs){
 				SetNewSBs(newSBs);
 				SetSBsActStates();
 				List<ISlottable> allSBs = AllSBs(slottables, newSBs);
@@ -561,14 +572,6 @@ namespace SlotSystem{
 					newSlots.Add(newSlot);
 				}
 				SetNewSlots(newSlots);
-			}
-			public ISlottable CreateSB(InventoryItemInstance item){
-				GameObject newSBGO = new GameObject("newSBGO");
-				Slottable newSB = newSBGO.AddComponent<Slottable>();
-				newSB.SetSSM(ssm);
-				newSB.InitializeSB(item);
-				newSB.Defocus();
-				return newSB;
 			}
 			public void OnActionComplete(){
 				onActionCompleteCommand.Execute();
@@ -594,7 +597,7 @@ namespace SlotSystem{
 				ssm.SetEquippedOnAllSBs(item, equipped);
 			}
 	}
-	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler, IFilterHandler, ISBHandler, ISGTransactionHandler{
+	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler, IFilterHandler, ISBFactory, ISBHandler, ISGTransactionHandler{
 		/*	instrinsic	*/
 			Inventory inventory{get;}
 			bool isShrinkable{get;}
@@ -603,12 +606,11 @@ namespace SlotSystem{
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();
 			void InitSBs(List<InventoryItemInstance> items);
-			ISlottable CreateSB(InventoryItemInstance item);
 		/*	integration	*/
 			void InstantSort();
 			void ToggleAutoSort(bool on);
 		/*	Transaction	*/
-			void UpdateSBs(List<ISlottable> newSBs);
+			void ReadySBsForTransaction(List<ISlottable> newSBs);
 			void RevertAndUpdateSBs();
 			void OnActionComplete();
 			void UpdateEquipStatesOnAll();

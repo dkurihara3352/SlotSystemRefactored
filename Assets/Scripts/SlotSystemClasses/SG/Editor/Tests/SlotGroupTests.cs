@@ -418,7 +418,7 @@ namespace SlotSystemTests{
 						sg.SetSBs(sbs);
 						List<ISlottable> newSBs = CreateSBs(count);
 					
-					sg.UpdateSBs(newSBs);
+					sg.ReadySBsForTransaction(newSBs);
 
 					Assert.That(sg.newSlots.Count, Is.EqualTo(count));
 					Assert.That(sg.newSlots, Is.All.InstanceOf(typeof(Slot)));
@@ -428,7 +428,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
 						sg.SetSBs(sbs);
 					
-					sg.UpdateSBs(newSBs);
+					sg.ReadySBsForTransaction(newSBs);
 
 					foreach(ISlottable sb in sg)
 						if(newSBs.Contains(sb))
@@ -464,7 +464,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
 						sg.SetSBs(sbs);
 					
-					sg.UpdateSBs(newSBs);
+					sg.ReadySBsForTransaction(newSBs);
 
 					foreach(ISlottable sb in sg)
 						if(newSBs.Contains(sb) && sbs.Contains(sb))
@@ -477,7 +477,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
 						sg.SetSBs(sbs);
 
-					sg.UpdateSBs(newSBs);
+					sg.ReadySBsForTransaction(newSBs);
 
 					foreach(ISlottable sb in sg)
 						if(!newSBs.Contains(sb))
@@ -490,7 +490,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
 						sg.SetSBs(sbs);
 
-					sg.UpdateSBs(newSBs);
+					sg.ReadySBsForTransaction(newSBs);
 
 					foreach(ISlottable sb in sg)
 						if(!newSBs.Contains(sb))
@@ -503,7 +503,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
 						sg.SetSBs(sbs);
 
-					sg.UpdateSBs(newSBs);
+					sg.ReadySBsForTransaction(newSBs);
 
 					foreach(ISlottable sb in sg)
 						if(!sbs.Contains(sb))
@@ -639,7 +639,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSGInitWithSubsAndRealSlotsHolder();
 						sg.SetSlots(slots);
 					
-					sg.SyncSBsToSlots();
+					sg.SetSBsFromSlotsAndUpdateSlotIDs();
 
 					bool equality = sg.toList.MemberEquals(expected);
 					Assert.That(equality, Is.True);
