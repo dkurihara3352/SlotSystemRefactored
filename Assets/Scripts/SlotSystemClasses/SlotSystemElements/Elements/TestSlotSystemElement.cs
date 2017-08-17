@@ -15,17 +15,9 @@ namespace SlotSystem{
 			PerformInHierarchy(FocusIfAOD);
 		}
 			void FocusIfAOD(ISlotSystemElement ele){
-				if(ele.isActivatedOnDefault)
-					ele.Focus();
-			}
-		public void FocusRecursively(){
-			PerformInHierarchy(FocusInHi);
-			}
-			void FocusInHi(ISlotSystemElement sse){
-				if(sse.isFocusableInHierarchy)
-					sse.Focus();
-				else
-					sse.Defocus();
+				ISSESelStateHandler eleSelStateHandler = ele.GetSelStateHandler();
+				if(ele.IsActivatedOnDefault())
+					eleSelStateHandler.Focus();
 			}
 		public void InitializeStatesRecursively(){
 			PerformInHierarchy(InitializeStateInHi);

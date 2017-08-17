@@ -27,7 +27,7 @@ namespace SlotSystem{
 				ISSEStateEngine<ISBEqpState> m_eqpStateEngine;
 			public void SetEqpState(ISBEqpState state){
 				eqpStateEngine.SetState(state);
-				if(state == null && eqpProcess != null)
+				if(state == null && GetEqpProcess() != null)
 					SetAndRunEqpProcess(null);
 			}
 			ISBEqpState curEqpState{
@@ -47,39 +47,39 @@ namespace SlotSystem{
 			public virtual void ClearCurEqpState(){
 				SetEqpState(null);
 			}
-				public virtual bool isEqpStateNull{
-					get{return curEqpState == null;}
+				public virtual bool IsEqpStateNull(){
+					return curEqpState == null;
 				}
-				public virtual bool wasEqpStateNull{
-					get{return prevEqpState == null;}
+				public virtual bool WasEqpStateNull(){
+					return prevEqpState == null;
 				}				
 			public virtual void Equip(){
 				SetEqpState(equippedState);
 			}
-				public ISBEqpState equippedState{
-					get{return eqpStateRepo.equippedState;}
+				ISBEqpState equippedState{
+					get{return eqpStateRepo.GetEquippedState();}
 				}
-				public virtual bool isEquipped{
-					get{ return curEqpState == equippedState;}
+				public virtual bool IsEquipped(){
+					return curEqpState == equippedState;
 				}
-				public virtual bool wasEquipped{
-					get{return prevEqpState == equippedState;}
+				public virtual bool WasEquipped(){
+					return prevEqpState == equippedState;
 				}
 			public virtual void Unequip(){
 				SetEqpState(unequippedState);
 			}
-				public ISBEqpState unequippedState{
-					get{return eqpStateRepo.unequippedState;}
+				ISBEqpState unequippedState{
+					get{return eqpStateRepo.GetUnequippedState();}
 				}
-				public virtual bool isUnequipped{
-					get{ return curEqpState == unequippedState;}
+				public virtual bool IsUnequipped(){
+					return curEqpState == unequippedState;
 				}
-				public virtual bool wasUnequipped{
-					get{ return prevEqpState == unequippedState;}
+				public virtual bool WasUnequipped(){
+					return prevEqpState == unequippedState;
 				}
 		/*	Equip Process	*/
-			public ISBEqpProcess eqpProcess{
-				get{return eqpProcEngine.process;}
+			public ISBEqpProcess GetEqpProcess(){
+				return eqpProcEngine.GetProcess();
 			}
 			public void SetAndRunEqpProcess(ISBEqpProcess process){
 				eqpProcEngine.SetAndRunProcess(process);
@@ -106,29 +106,27 @@ namespace SlotSystem{
 			public void SetEqpCoroutineRepo(ISBEqpCoroutineRepo repo){
 				_eqpCoroutineRepo = repo;
 			}
-			public System.Func<IEnumeratorFake> equipCoroutine{
-				get{return eqpCoroutineRepo.equipCoroutine;}
+			public System.Func<IEnumeratorFake> GetEquipCoroutine(){
+				return eqpCoroutineRepo.GetEquipCoroutine();
 			}
-			public System.Func<IEnumeratorFake> unequipCoroutine{
-				get{return eqpCoroutineRepo.unequipCoroutine;}
+			public System.Func<IEnumeratorFake> GetUnequipCoroutine(){
+				return eqpCoroutineRepo.GetUnequipCoroutine();
 			}
 	}
 	public interface ISBEqpStateHandler{
 		/* Eqp States */
 			void ClearCurEqpState();
-			bool isEqpStateNull{get;}
-			bool wasEqpStateNull{get;}
+			bool IsEqpStateNull();
+			bool WasEqpStateNull();
 			void Equip();
-			ISBEqpState equippedState{get;}
-			bool isEquipped{get;}
-			bool wasEquipped{get;}
+			bool IsEquipped();
+			bool WasEquipped();
 			void Unequip();
-			ISBEqpState unequippedState{get;}
-			bool isUnequipped{get;}
-			bool wasUnequipped{get;}
-			ISBEqpProcess eqpProcess{get;}
+			bool IsUnequipped();
+			bool WasUnequipped();
+			ISBEqpProcess GetEqpProcess();
 			void SetAndRunEqpProcess(ISBEqpProcess process);
-			System.Func<IEnumeratorFake> unequipCoroutine{get;}
-			System.Func<IEnumeratorFake> equipCoroutine{get;}
+			System.Func<IEnumeratorFake> GetUnequipCoroutine();
+			System.Func<IEnumeratorFake> GetEquipCoroutine();
 	}
 }

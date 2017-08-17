@@ -12,7 +12,7 @@ namespace SlotSystem{
 		public ISlottable GetSB(InventoryItemInstance itemInst){
 			foreach(ISlottable sb in slottables){
 				if(sb != null)
-					if(sb.item == itemInst)
+					if(sb.GetItem() == itemInst)
 						return sb;
 			}
 			return null;
@@ -48,7 +48,7 @@ namespace SlotSystem{
 			get{
 				List<ISlottable> result = new List<ISlottable>();
 				foreach(ISlottable sb in slottables){
-					if(sb != null && sb.isEquipped)
+					if(sb != null && sb.IsEquipped())
 						result.Add(sb);
 				}
 				return result;
@@ -58,8 +58,9 @@ namespace SlotSystem{
 			get{
 				foreach(ISlottable sb in slottables){
 					if(sb != null){
-						if(sb.actProcess  != null)
-							if(sb.actProcess.isRunning)
+						ISBActProcess actProcess = sb.GetActProcess();
+						if(actProcess  != null)
+							if(actProcess.IsRunning())
 								return false;
 					}
 				}

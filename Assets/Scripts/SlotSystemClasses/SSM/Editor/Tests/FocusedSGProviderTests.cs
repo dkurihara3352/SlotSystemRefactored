@@ -17,7 +17,7 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotGroup focusedSG = MakeSubSGWithEmptySBs();
-							pBun.focusedElement.Returns(focusedSG);
+							pBun.GetFocusedElement().Returns(focusedSG);
 					ssm.poolBundle.Returns(pBun);
 					ssm.equipBundle.Returns(MakeSubBundle());
 					ssm.otherBundles.Returns(new ISlotSystemBundle[]{});
@@ -32,7 +32,7 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					ISlotSystemBundle eBun = MakeSubBundle();
 					IEquipmentSet stubFocusedESet = Substitute.For<IEquipmentSet>();
-						eBun.focusedElement.Returns(stubFocusedESet);
+						eBun.GetFocusedElement().Returns(stubFocusedESet);
 					ssm.poolBundle.Returns(MakeSubBundle());
 					ssm.equipBundle.Returns(eBun);
 					ssm.otherBundles.Returns(new ISlotSystemBundle[]{});
@@ -54,7 +54,7 @@ namespace SlotSystemTests{
 									sgeA, sgeB, sgeC
 								};
 							focusedESet.GetEnumerator().Returns(focusedESetEles.GetEnumerator());
-						eBun.focusedElement.Returns(focusedESet);
+						eBun.GetFocusedElement().Returns(focusedESet);
 					ssm.poolBundle.Returns(MakeSubBundle());
 					ssm.equipBundle.Returns(eBun);
 					ssm.otherBundles.Returns(new ISlotSystemBundle[]{});
@@ -71,21 +71,20 @@ namespace SlotSystemTests{
 				focusedSGProvider.AddFocusedSGTo(ele, list);
 
 				Assert.That(list.MemberEquals(expected), Is.True);
-				}
+			}
 				class AddFocusedTo_VariousConfigCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
-						/*	No SG	*/
 							ISlotSystemElement notSG = MakeSubSSE();
-							notSG.isFocused.Returns(true);
-							yield return new object[]{notSG, new ISlotGroup[]{}};
-						/*	Not FocusedInHierarchy	*/
+								ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+								selStateHandler.isFocused.Returns(false);
+								notSG.GetSelStateHandler().Returns(selStateHandler);
+							yield return new TestCaseData(notSG, new ISlotGroup[]{}).SetName("NoSG");
 							ISlotGroup notFocused = MakeSubSG();
-							notFocused.isFocusedInHierarchy.Returns(false);
-							yield return new object[]{notFocused, new ISlotGroup[]{}};
-						/*	Valid	*/
+							notFocused.IsFocusedInHierarchy().Returns(false);
+							yield return new TestCaseData(notFocused, new ISlotGroup[]{}).SetName("NotFocusedInHierarchy");
 							ISlotGroup validSG = MakeSubSGWithEmptySBs();
-							validSG.isFocusedInHierarchy.Returns(true);
-							yield return new object[]{validSG, new ISlotGroup[]{validSG}};		
+							validSG.IsFocusedInHierarchy().Returns(true);
+							yield return new TestCaseData(validSG, new ISlotGroup[]{validSG}).SetName("Valid");
 					}
 			}
 			[Test]
@@ -93,26 +92,31 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					IEnumerable<ISlotSystemBundle> gBuns;
 						SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
+							ISSESelStateHandler gBunSelStateHandler = Substitute.For<ISSESelStateHandler>();
+							gBunSelStateHandler.isFocused.Returns(true);
+						gBun.SetSelStateHandler(gBunSelStateHandler);
 							SlotGroup sggA = MakeSG();
-								sggA.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								ISSESelStateHandler sggASelStateHandler = Substitute.For<ISSESelStateHandler>();
+									sggASelStateHandler.isFocused.Returns(true);
+								sggA.SetSelStateHandler(sggASelStateHandler);
 								sggA.SetSBHandler(new SBHandler());
 								sggA.transform.SetParent(gBun.transform);
 								sggA.SetElements(new ISlotSystemElement[]{});
-								sggA.Focus();
 							SlotGroup sggB = MakeSG();
-								sggB.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								ISSESelStateHandler sggBSelStateHandler = Substitute.For<ISSESelStateHandler>();
+									sggBSelStateHandler.isFocused.Returns(true);
+								sggB.SetSelStateHandler(sggBSelStateHandler);
 								sggB.SetSBHandler(new SBHandler());
 								sggB.SetElements(new ISlotSystemElement[]{});
 								sggB.transform.SetParent(gBun.transform);
-								sggB.Focus();
 							SlotGroup sggC = MakeSG();
-								sggC.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								ISSESelStateHandler sggCSelStateHandler = Substitute.For<ISSESelStateHandler>();
+									sggCSelStateHandler.isFocused.Returns(true);
+								sggC.SetSelStateHandler(sggCSelStateHandler);
 								sggC.SetSBHandler(new SBHandler());
 								sggC.SetElements(new ISlotSystemElement[]{});
 								sggC.transform.SetParent(gBun.transform);
-								sggC.Focus();
 							gBun.SetHierarchy();
-							gBun.Focus();
 						gBuns = new ISlotSystemBundle[]{gBun};
 					ssm.poolBundle.Returns(MakeSubBundle());
 					ssm.equipBundle.Returns(MakeSubBundle());
@@ -129,7 +133,7 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotGroup sgp = MakeSubSG();
-						pBun.focusedElement.Returns(sgp);
+						pBun.GetFocusedElement().Returns(sgp);
 					ISlotSystemBundle eBun = MakeSubBundle();
 						IEquipmentSet eSet = MakeSubESet();
 							ISlotGroup sgeBow = MakeSubSG();
@@ -137,30 +141,38 @@ namespace SlotSystemTests{
 							ISlotGroup sgeCGears = MakeSubSG();
 							IEnumerable<ISlotSystemElement> eSetEles = new ISlotSystemElement[]{sgeBow, sgeWear, sgeCGears};
 							eSet.GetEnumerator().Returns(eSetEles.GetEnumerator());
-						eBun.focusedElement.Returns(eSet);
+						eBun.GetFocusedElement().Returns(eSet);
 					IEnumerable<ISlotSystemBundle> gBuns;
 						SlotSystemBundle gBun = MakeSSBundleWithSelStateHandler();//non sub
+							ISSESelStateHandler gBunSelStateHandler = Substitute.For<ISSESelStateHandler>();
+							gBunSelStateHandler.isFocused.Returns(true);
+						gBun.SetSelStateHandler(gBunSelStateHandler);
 							SlotGroup sggA = MakeSG();
-								sggA.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								ISSESelStateHandler sggASelStateHandler = Substitute.For<ISSESelStateHandler>();
+									sggASelStateHandler.isFocused.Returns(true);
+								sggA.SetSelStateHandler(sggASelStateHandler);
 								sggA.SetSBHandler(new SBHandler());
 								sggA.transform.SetParent(gBun.transform);
 								sggA.SetElements(new ISlotSystemElement[]{});
-								sggA.Focus();
 							SlotGroup sggB = MakeSG();
-								sggB.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								ISSESelStateHandler sggBSelStateHandler = Substitute.For<ISSESelStateHandler>();
+									sggBSelStateHandler.isFocused.Returns(true);
+								sggB.SetSelStateHandler(sggBSelStateHandler);
 								sggB.SetSBHandler(new SBHandler());
 								sggB.SetElements(new ISlotSystemElement[]{});
 								sggB.transform.SetParent(gBun.transform);
-								sggB.Focus();
 							SlotGroup sggC = MakeSG();
-								sggC.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+								ISSESelStateHandler sggCSelStateHandler = Substitute.For<ISSESelStateHandler>();
+									sggCSelStateHandler.isFocused.Returns(true);
+								sggC.SetSelStateHandler(sggCSelStateHandler);
 								sggC.SetSBHandler(new SBHandler());
 								sggC.SetElements(new ISlotSystemElement[]{});
 								sggC.transform.SetParent(gBun.transform);
-								sggC.Focus();
 							gBun.SetHierarchy();
-							gBun.Focus();
 						gBuns = new ISlotSystemBundle[]{gBun};
+					ssm.poolBundle.Returns(MakeSubBundle());
+					ssm.equipBundle.Returns(MakeSubBundle());
+					ssm.otherBundles.Returns(gBuns);
 					ssm.poolBundle.Returns(pBun);
 					ssm.equipBundle.Returns(eBun);
 					ssm.otherBundles.Returns(gBuns);
@@ -178,7 +190,7 @@ namespace SlotSystemTests{
 				ISlotSystemManager ssm = MakeSubSSM();
 					ISlotSystemBundle eBun = MakeSubBundle();
 						IEquipmentSet eSet = MakeSubESet();
-						eBun.focusedElement.Returns(eSet);
+						eBun.GetFocusedElement().Returns(eSet);
 							IEnumerable<ISlotSystemElement> eSetEles;
 								ISlotGroup sgeA = MakeSubSGWithEmptySBs();
 									IEquipmentSetInventory eInv = MakeSubEquipInv();
@@ -214,7 +226,7 @@ namespace SlotSystemTests{
 							pBun.GetEnumerator().Returns(pBunEles.GetEnumerator());
 							IPoolInventory pInv = MakeSubPoolInv();
 								sgpA.inventory.Returns(pInv);
-							pBun.focusedElement.Returns(sgpA);
+							pBun.GetFocusedElement().Returns(sgpA);
 						ssm.poolBundle.Returns(pBun);
 						ssm.equipBundle.Returns(MakeSubBundle());
 						ssm.otherBundles.Returns(new ISlotSystemBundle[]{});
@@ -248,13 +260,15 @@ namespace SlotSystemTests{
 									sge
 								};
 							eSet.GetEnumerator().Returns(eSetEles.GetEnumerator());
-						eBun.focusedElement.Returns(eSet);
+						eBun.GetFocusedElement().Returns(eSet);
 					stubSSM.equipBundle.Returns(eBun);
 				stubFocSGProv = new FocusedSGProvider(stubSSM);
 				ISlotGroup sg = MakeSubSG();
 					sg.isExpandable.Returns(false);
-					sg.isFocused.Returns(focused);
-					sg.isDefocused.Returns(!focused);
+					ISSESelStateHandler sgSelStateHandler = Substitute.For<ISSESelStateHandler>();
+						sgSelStateHandler.isFocused.Returns(focused);
+						sgSelStateHandler.isDefocused.Returns(!focused);
+					sg.GetSelStateHandler().Returns(sgSelStateHandler);
 
 				stubFocSGProv.ChangeEquippableCGearsCount(0, sg);
 

@@ -103,11 +103,13 @@ namespace SlotSystemTests{
 		public void SetSG2_NullToSome_CallSG2Select(){
 			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup mockSG = MakeSubSG();
+				ISSESelStateHandler sgSelStateHandler = Substitute.For<ISSESelStateHandler>();
+				mockSG.GetSelStateHandler().Returns(sgSelStateHandler);
 
 			sgHandler.SetSG2(mockSG);
 
-			mockSG.Received().Select();
-			}
+			sgSelStateHandler.Received().Select();
+		}
 		[Test]
 		public void SetSG2_OtherToSome_SetsSG2(){
 			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
@@ -134,13 +136,15 @@ namespace SlotSystemTests{
 		public void SetSG2_OtherToSome_CallsSG2Select(){
 			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 			ISlotGroup prevSG = MakeSubSG();
-			ISlotGroup mockSG = MakeSubSG();
+			ISlotGroup stubSG = MakeSubSG();
+				ISSESelStateHandler sgSelStateHandler = Substitute.For<ISSESelStateHandler>();
+				stubSG.GetSelStateHandler().Returns(sgSelStateHandler);
 
 			sgHandler.SetSG2(prevSG);
-			sgHandler.SetSG2(mockSG);
+			sgHandler.SetSG2(stubSG);
 
-			mockSG.Received().Select();
-			}
+			sgSelStateHandler.Received().Select();
+		}
 		[Test]
 		public void SetSG2_SomeToNull_SetsSG2Null(){
 			TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());

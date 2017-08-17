@@ -13,17 +13,13 @@ public class SlotSystemTest{
 		foreach(var obj in gos)
 			GameObject.DestroyImmediate(obj);
 	}
-	protected static bool BothNullOrReferenceEquals(object a, object b){
-		if(a == null) return b ==null;
-		else
-			return object.ReferenceEquals(a, b);
-	}
 	/*	Elements	*/
 		protected static Slottable MakeSBInitWithSubs(){
 			Slottable sb = MakeSB();
-				sb.SetSSM(MakeSubSSM());
-					sb.ssm.tam.Returns(MakeSubTAM());
-					sb.ssm.tam.iconHandler.Returns(Substitute.For<ITransactionIconHandler>());
+				ISlotSystemManager ssm = MakeSubSSM();
+				sb.SetSSM(ssm);
+					ssm.tam.Returns(MakeSubTAM());
+					ssm.tam.iconHandler.Returns(Substitute.For<ITransactionIconHandler>());
 				sb.SetTapCommand(Substitute.For<ISBCommand>());
 				sb.SetItemHandler(Substitute.For<IItemHandler>());
 					IHoverable hoverable = Substitute.For<IHoverable>();
@@ -36,16 +32,11 @@ public class SlotSystemTest{
 				sb.SetMrkStateHandler(Substitute.For<ISBMrkStateHandler>());
 			return sb;
 		}
-		protected static Slottable MakeSB_ItemHandler(InventoryItemInstance item){
-			Slottable sb = MakeSBInitWithSubs();
-			sb.SetItemHandler(new ItemHandler(item));
-			return sb;
-		}
 		protected static Slottable MakeSBWithRealStateHandlers(){
 			Slottable sb = MakeSBInitWithSubs();
 				SBSelStateHandler selStateHandler = new SBSelStateHandler(sb);
 				sb.SetSelStateHandler(selStateHandler);
-				SBActStateHandler actStateHandler = new SBActStateHandler(sb, sb.ssm.tam);
+				SBActStateHandler actStateHandler = new SBActStateHandler(sb, sb.GetSSM().tam);
 				sb.SetActStateHandler(actStateHandler);
 				SBEqpStateHandler eqpStateHandler = new SBEqpStateHandler(sb);
 				sb.SetEqpStateHandler(eqpStateHandler);
@@ -57,9 +48,10 @@ public class SlotSystemTest{
 			SlotGroup sg = MakeSG();
 				sg.SetSBHandler(new SBHandler());
 					sg.SetSBs(new List<ISlottable>());
-				sg.SetSSM(MakeSubSSM());
-					sg.ssm.tam.Returns(MakeSubTAM());
-					sg.ssm.tam.sgHandler.Returns(Substitute.For<ITransactionSGHandler>());
+				ISlotSystemManager ssm = MakeSubSSM();
+				sg.SetSSM(ssm);
+					ssm.tam.Returns(MakeSubTAM());
+					ssm.tam.sgHandler.Returns(Substitute.For<ITransactionSGHandler>());
 				sg.SetSlotsHolder(Substitute.For<ISlotsHolder>());
 				sg.SetSorterHandler(Substitute.For<ISorterHandler>());
 				sg.SetFilterHandler(Substitute.For<IFilterHandler>());

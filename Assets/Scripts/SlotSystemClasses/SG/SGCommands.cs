@@ -80,10 +80,10 @@ namespace SlotSystem{
 		public override void Execute(){
 			foreach(ISlottable sb in sg){
 				if(sb != null){
-					InventoryItemInstance item = sb.item;
-					if(sb.isToBeRemoved){
+					InventoryItemInstance item = sb.GetItem();
+					if(sb.IsToBeRemoved()){
 						sg.SyncEquipped(item, false);
-					}else if(sb.isToBeAdded){
+					}else if(sb.IsToBeAdded()){
 						sg.SyncEquipped(item, true);
 					}
 				}

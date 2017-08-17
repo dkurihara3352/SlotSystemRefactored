@@ -15,8 +15,8 @@ namespace SlotSystem{
 			int index = -3;
 			foreach(ISlottable sb in sg){
 				if(sb != null){
-					if(sb.item == itemInst)
-						index = sb.newSlotID;
+					if(sb.GetItem() == itemInst)
+						index = sb.GetNewSlotID();
 				}
 			}
 			if(index != -3)

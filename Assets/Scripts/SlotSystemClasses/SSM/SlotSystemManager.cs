@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SlotSystem{
 	public class SlotSystemManager : SlotSystemElement, ISlotSystemManager{
 		public override void InitializeStates(){
-			Deactivate();
+			_selStateHandler.Deactivate();
 			tam.WaitForAction();
 		}
 		public IFocusedSGProvider focusedSGProvider{
@@ -112,12 +112,12 @@ namespace SlotSystem{
 				if(ele is ISlottable){
 					InventoryItemInstance item = (InventoryItemInstance)obj;
 					ISlottable sb = (ISlottable)ele;
-					/*	assume all sbs are properly set in slottables, not in newSBs	*/
-					if(sb.item == item){
-						if(sb.sg.isFocusedInHierarchy){/*	focused sgp or sge	*/
-							if(!sb.isToBeRemoved)/*	not being removed	*/
+					ISlotGroup sg = sb.GetSG();
+					if(sb.GetItem() == item){
+						if(sg.IsFocusedInHierarchy()){
+							if(!sb.IsToBeRemoved())
 								sb.Equip();
-						}else if(sb.isPool){/*	defocused sgp, setting equipped w/o transition	*/
+						}else if(sb.IsPool()){
 							sb.ClearCurEqpState();
 							sb.Equip();
 						}
@@ -128,12 +128,12 @@ namespace SlotSystem{
 				if(ele is ISlottable){
 					InventoryItemInstance item = (InventoryItemInstance)obj;
 					ISlottable sb = (ISlottable)ele;
-					/*	assume all sbs are properly set in slottables, not int newSBs	*/
-					if(sb.item == item){
-						if(sb.sg.isFocusedInHierarchy){
-							if(!sb.isToBeAdded)
+					ISlotGroup sg = sb.GetSG();
+					if(sb.GetItem() == item){
+						if(sg.IsFocusedInHierarchy()){
+							if(!sb.IsToBeAdded())
 								sb.Unequip();
-						}else if(sb.isPool){/*	defocused sgp	*/
+						}else if(sb.IsPool()){
 							sb.ClearCurEqpState();
 							sb.Unequip();
 						}
@@ -141,14 +141,16 @@ namespace SlotSystem{
 				}
 			}
 		/*	SlotSystemElement	*/
-			public override ISSESelStateHandler selStateHandler{
-				get{
-					if(_selStateHandler == null)
-						_selStateHandler = new SSMSelStateHandler(this);
+			public override ISSESelStateHandler GetSelStateHandler(){
+				if(_selStateHandler != null)
 					return _selStateHandler;
-				}
+				else
+					throw new InvalidOperationException("selStateHandler not set");
 			}
 				ISSESelStateHandler _selStateHandler;
+			public override void SetSelStateHandler(ISSESelStateHandler handler){
+				_selStateHandler = handler;
+			}
 			public ISlotSystemBundle poolBundle{
 				get{return m_poolBundle;}
 			}
@@ -305,7 +307,7 @@ namespace SlotSystem{
 					if(inspected == targetEle){
 						ISlotSystemElement tested = inspected;
 						while(true){
-							ISlotSystemBundle immBundle = tested.immediateBundle;
+							ISlotSystemBundle immBundle = tested.ImmediateBundle();
 							if(immBundle == null)
 								break;
 							ISlotSystemElement containingEle = null;
@@ -313,10 +315,10 @@ namespace SlotSystem{
 								if(e.ContainsInHierarchy(tested) || e == tested)
 									containingEle = e;
 							}
-							immBundle.SetFocusedBundleElement(containingEle);
-							tested = tested.immediateBundle;
+							immBundle.SetFocusedElement(containingEle);
+							tested = tested.ImmediateBundle();
 						}
-						this.Focus();
+						_selStateHandler.Focus();
 					}
 				}
 		

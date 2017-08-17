@@ -4,167 +4,173 @@ using UnityEngine;
 using System;
 namespace SlotSystem{
 	public abstract class SBProcess: SSEProcess, ISBProcess{
-		protected ISlottable sb;
-		public SBProcess(ISlottable sb, Func<IEnumeratorFake> coroutine): base(coroutine){
-			this.sb = sb;
+		public SBProcess(Func<IEnumeratorFake> coroutine): base(coroutine){
 		}
 	}
 	public interface ISBProcess: ISSEProcess{
 	}
 		public interface ISBActProcess: ISBProcess{}
 			public class WaitForPickUpProcess: SBProcess, ISBActProcess{
-				public WaitForPickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
-				}
+				ISlottable sb;
+				public WaitForPickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+					this.sb = sb;
+				} 
 				public override void Expire(){
 					base.Expire();
 					sb.PickUp();
 				}
 			}
 			public class WaitForPointerUpProcess: SBProcess, ISBActProcess{
-				public WaitForPointerUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				ISSESelStateHandler selStateHandler;
+				public WaitForPointerUpProcess(ISSESelStateHandler stateHandler, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+					selStateHandler = stateHandler;
 				}
 				public override void Expire(){
 					base.Expire();
-					sb.Defocus();
+					selStateHandler.Defocus();
 				}
 			}
 			public class WaitForNextTouchProcess: SBProcess, ISBActProcess{
 				ITransactionManager tam;
-				public WaitForNextTouchProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine, ITransactionManager tam): base(sb, coroutine){
+				ISlottable sb;
+				ISSESelStateHandler selStateHandler;
+				public WaitForNextTouchProcess(ISlottable sb, ISSESelStateHandler selStateHandler, ITransactionManager tam, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 					this.tam = tam;
+					this.sb = sb;
+					this.selStateHandler = selStateHandler;
 				}
 				public override void Expire(){
 					base.Expire();
-					if(!sb.isPickedUp){
+					if(!sb.IsPickedUp()){
 						sb.Tap();
 						sb.Refresh();
-						sb.Focus();
+						selStateHandler.Focus();
 					}else{
 						tam.ExecuteTransaction();
 					}
 				}
 			}
 			public class PickUpProcess: SBProcess, ISBActProcess{
-				public PickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public PickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBMoveWithinProcess: SBProcess, ISBActProcess{
-				public SBMoveWithinProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public SBMoveWithinProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBAddProcess: SBProcess, ISBActProcess{
-				public SBAddProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public SBAddProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBRemoveProcess: SBProcess, ISBActProcess{
-				public SBRemoveProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public SBRemoveProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 		public interface ISBEqpProcess: ISBProcess{}
 			public class SBEquipProcess: SBProcess, ISBEqpProcess{
-				public SBEquipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public SBEquipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBUnequipProcess: SBProcess, ISBEqpProcess{
-				public SBUnequipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public SBUnequipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 		public interface ISBMrkProcess: ISBProcess{}
 			public class SBMarkProcess: SBProcess, ISBMrkProcess{
-				public SBMarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public SBMarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBUnmarkProcess: SBProcess, ISBMrkProcess{
-				public SBUnmarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(sb, coroutine){
+				public SBUnmarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 	public class SBActCoroutineRepo: ISBActCoroutineRepo{
-		public Func<IEnumeratorFake> waitForPointerUpCoroutine{
-			get{return _waitForPointerUpCoroutine;}
+		public Func<IEnumeratorFake> GetWaitForPointerUpCoroutine(){
+			return _waitForPointerUpCoroutine;
 		}
 			IEnumeratorFake _waitForPointerUpCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> waitForPickUpCoroutine{
-			get{return _waitForPickUpCoroutine;}
+		public Func<IEnumeratorFake> GetWaitForPickUpCoroutine(){
+			return _waitForPickUpCoroutine;
 		}
 			IEnumeratorFake _waitForPickUpCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> pickUpCoroutine{
-			get{return _pickUpCoroutine;}
+		public Func<IEnumeratorFake> GetPickUpCoroutine(){
+			return _pickUpCoroutine;
 		}
 			IEnumeratorFake _pickUpCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> waitForNextTouchCoroutine{
-			get{return _waitForNextTouchCoroutine;}
+		public Func<IEnumeratorFake> GetWaitForNextTouchCoroutine(){
+			return _waitForNextTouchCoroutine;
 		}
 			IEnumeratorFake _waitForNextTouchCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> removeCoroutine{
-			get{return _removeCoroutine;}
+		public Func<IEnumeratorFake> GetRemoveCoroutine(){
+			return _removeCoroutine;
 		}
 			IEnumeratorFake _removeCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> addCoroutine{
-			get{return _addCoroutine;}
+		public Func<IEnumeratorFake> GetAddCoroutine(){
+			return _addCoroutine;
 		}
 			IEnumeratorFake _addCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> moveWithinCoroutine{
-			get{return _moveWithinCoroutine;}
+		public Func<IEnumeratorFake> GetMoveWithinCoroutine(){
+			return _moveWithinCoroutine;
 		}
 			IEnumeratorFake _moveWithinCoroutine(){
 				return null;
 			}
 	}
 	public interface ISBActCoroutineRepo{
-		Func<IEnumeratorFake> waitForPointerUpCoroutine{get;}
-		Func<IEnumeratorFake> waitForPickUpCoroutine{get;}
-		Func<IEnumeratorFake> pickUpCoroutine{get;}
-		Func<IEnumeratorFake> waitForNextTouchCoroutine{get;}
-		Func<IEnumeratorFake> removeCoroutine{get;}
-		Func<IEnumeratorFake> addCoroutine{get;}
-		Func<IEnumeratorFake> moveWithinCoroutine{get;}
+		Func<IEnumeratorFake> GetWaitForPointerUpCoroutine();
+		Func<IEnumeratorFake> GetWaitForPickUpCoroutine();
+		Func<IEnumeratorFake> GetPickUpCoroutine();
+		Func<IEnumeratorFake> GetWaitForNextTouchCoroutine();
+		Func<IEnumeratorFake> GetRemoveCoroutine();
+		Func<IEnumeratorFake> GetAddCoroutine();
+		Func<IEnumeratorFake> GetMoveWithinCoroutine();
 	}
 	public class SBEqpCoroutineRepo: ISBEqpCoroutineRepo{
-		public Func<IEnumeratorFake> equipCoroutine{
-			get{return _equipCoroutine;}
+		public Func<IEnumeratorFake> GetEquipCoroutine(){
+			return _equipCoroutine;
 		}
 			IEnumeratorFake _equipCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> unequipCoroutine{
-			get{return _unequipCoroutine;}
+		public Func<IEnumeratorFake> GetUnequipCoroutine(){
+			return _unequipCoroutine;
 		}
 			IEnumeratorFake _unequipCoroutine(){
 				return null;
 			}
 	}
 	public interface ISBEqpCoroutineRepo{
-		Func<IEnumeratorFake> equipCoroutine{get;}
-		Func<IEnumeratorFake> unequipCoroutine{get;}
+		Func<IEnumeratorFake> GetEquipCoroutine();
+		Func<IEnumeratorFake> GetUnequipCoroutine();
 	}
 	public class SBMrkCoroutineRepo: ISBMrkCoroutineRepo{
-		public Func<IEnumeratorFake> markCoroutine{
-			get{return _markCoroutine;}
+		public Func<IEnumeratorFake> GetMarkCoroutine(){
+			return _markCoroutine;
 		}
 			IEnumeratorFake _markCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> unmarkCoroutine{
-			get{return _unmarkCoroutine;}
+		public Func<IEnumeratorFake> GetUnmarkCoroutine(){
+			return _unmarkCoroutine;
 		}
 			IEnumeratorFake _unmarkCoroutine(){
 				return null;
 			}
 	}
 	public interface ISBMrkCoroutineRepo{
-		Func<IEnumeratorFake> markCoroutine{get;}
-		Func<IEnumeratorFake> unmarkCoroutine{get;}
+		Func<IEnumeratorFake> GetMarkCoroutine();
+		Func<IEnumeratorFake> GetUnmarkCoroutine();
 	}
 }

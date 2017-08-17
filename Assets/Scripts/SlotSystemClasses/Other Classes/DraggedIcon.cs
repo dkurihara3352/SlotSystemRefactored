@@ -5,8 +5,8 @@ using UnityEngine;
 namespace SlotSystem{
 	public class DraggedIcon{
 		public InventoryItemInstance item{
-			get{return m_item;}
-			}InventoryItemInstance m_item;
+			get{return _item;}
+			}InventoryItemInstance _item;
 		public IconDestination dest{
 			get{return m_dest;}
 			}IconDestination m_dest;
@@ -16,11 +16,12 @@ namespace SlotSystem{
 			}
 		ITransactionIconHandler iconHandler;
 		public ISlottable sb{
-			get{return m_sb;}
-			}ISlottable m_sb;
+			get{return _sb;}
+		}
+			ISlottable _sb;
 		public DraggedIcon(ISlottable sb, ITransactionIconHandler iconHandler){
-			m_sb = sb;
-			m_item = this.sb.item;
+			_sb = sb;
+			_item = this.sb.GetItem();
 			this.iconHandler = iconHandler;
 		}
 		public void CompleteMovement(){

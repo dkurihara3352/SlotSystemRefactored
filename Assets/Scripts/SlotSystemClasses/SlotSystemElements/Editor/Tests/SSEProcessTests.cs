@@ -32,7 +32,7 @@ namespace SlotSystemTests{
 						to.Received().Start();
 					else 
 						to.DidNotReceive().Start();
-				Assert.That(engine.process, Is.SameAs(expectedProcess));
+				Assert.That(engine.GetProcess(), Is.SameAs(expectedProcess));
 			}
 				class SetAndRunProcess_VariousCases: IEnumerable{ public IEnumerator GetEnumerator(){
 					object[] n_n_n_F_F;
@@ -206,8 +206,8 @@ namespace SlotSystemTests{
 				System.Func<IEnumeratorFake> fakeCoroutine = Substitute.For<System.Func<IEnumeratorFake>>();
 				SSEProcess proc = new SSEProcess(fakeCoroutine);
 
-				Assert.That(proc.isRunning, Is.False);
-				Assert.That(proc.coroutineFake, Is.SameAs(fakeCoroutine));
+				Assert.That(proc.IsRunning(), Is.False);
+				Assert.That(proc.GetCoroutine(), Is.SameAs(fakeCoroutine));
 			}
 			[Test]
 			public void SSEProcess_Start_WhenCalled_SetsIsRunningTrueAndCallsCoroutine(){
@@ -216,7 +216,7 @@ namespace SlotSystemTests{
 
 				proc.Start();
 
-				Assert.That(proc.isRunning, Is.True);
+				Assert.That(proc.IsRunning(), Is.True);
 				fakeCoroutine.Received().Invoke();
 			}
 			[Test]
@@ -227,7 +227,7 @@ namespace SlotSystemTests{
 
 				proc.Stop();
 
-				Assert.That(proc.isRunning, Is.False);
+				Assert.That(proc.IsRunning(), Is.False);
 			}
 			[Test]
 			public void SSEProcess_Expire_IsRunning_SetsIsRunningFalse(){
@@ -237,7 +237,7 @@ namespace SlotSystemTests{
 
 				proc.Expire();
 
-				Assert.That(proc.isRunning, Is.False);
+				Assert.That(proc.IsRunning(), Is.False);
 			}
 			/* Helper */
 				SSEProcessEngine<ISSEProcess> MakeProcessEngineWithDefaultProc(ISSEProcess from){

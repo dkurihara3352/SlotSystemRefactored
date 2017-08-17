@@ -13,9 +13,9 @@ namespace SlotSystemTests{
 		public class SlotSystemBundleTests: SlotSystemTest {
 			[TestCaseSource(typeof(SetFocusedBundleElementMemberCases))]
 			public void SetFocusedBundleElement_Member_SetsItAsTheFocused(SlotSystemBundle bun, ISlotSystemElement member){
-				bun.SetFocusedBundleElement(member);
+				bun.SetFocusedElement(member);
 
-				Assert.That(bun.focusedElement, Is.SameAs(member));
+				Assert.That(bun.GetFocusedElement(), Is.SameAs(member));
 			}
 				class SetFocusedBundleElementMemberCases: IEnumerable{
 					public IEnumerator GetEnumerator(){

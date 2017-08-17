@@ -100,7 +100,7 @@ namespace SlotSystem{
 				selProcEngine.SetAndRunProcess(process);
 			}
 			public ISSESelProcess selProcess{
-				get{return selProcEngine.process;}
+				get{return selProcEngine.GetProcess();}
 			}
 			ISSEProcessEngine<ISSESelProcess> selProcEngine{
 				get{

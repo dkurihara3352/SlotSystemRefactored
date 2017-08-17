@@ -5,39 +5,42 @@ using System;
 
 namespace SlotSystem{
 	public class SSEProcess: ISSEProcess{
-		public virtual bool isRunning{
-			get{return m_isRunning;}
+		public virtual bool IsRunning(){
+			return _isRunning;
 		}
-			bool m_isRunning;
-		public System.Func<IEnumeratorFake> coroutineFake{
-			get{return m_coroutineFake;} 
-			set{m_coroutineFake = value;}
+			bool _isRunning;
+		public Func<IEnumeratorFake> GetCoroutine(){
+			return _coroutineFake;
 		}
-			System.Func<IEnumeratorFake> m_coroutineFake;
+		public void SetCoroutine(Func<IEnumeratorFake> coroutine){
+			_coroutineFake = coroutine;
+		}
+			Func<IEnumeratorFake> _coroutineFake;
 		public virtual void Start(){
-			m_isRunning = true;
-			m_coroutineFake();
+			_isRunning = true;
+			_coroutineFake();
 		}
 		public virtual void Stop(){ 
-			if(isRunning)
-				m_isRunning = false; 
+			if(IsRunning())
+				_isRunning = false; 
 		}
 		public virtual void Expire(){
-			if(isRunning)
-				m_isRunning = false; 
+			if(IsRunning())
+				_isRunning = false; 
 		}
 		public bool Equals(ISSEProcess other){
 			if(other != null)
 				return this.GetType().Equals(other.GetType());
 			else return false;
 		}
-		public SSEProcess(System.Func<IEnumeratorFake> coroutine){
-			m_coroutineFake = coroutine;
+		public SSEProcess(Func<IEnumeratorFake> coroutine){
+			_coroutineFake = coroutine;
 		}
 	}
 	public interface ISSEProcess: IEquatable<ISSEProcess>{
-		bool isRunning{get;}
-		System.Func<IEnumeratorFake> coroutineFake{get; set;}
+		bool IsRunning();
+		Func<IEnumeratorFake> GetCoroutine();
+		void SetCoroutine(Func<IEnumeratorFake> coroutine);
 		void Start();
 		void Stop();
 		void Expire();
@@ -46,21 +49,27 @@ namespace SlotSystem{
 	public class SSEProcessEngine<T>: ISSEProcessEngine<T> where T: ISSEProcess{
 		public SSEProcessEngine(){}
 		public SSEProcessEngine(T from){
-			m_process = from;
+			SetProcess(from);
 		}
-		public virtual T process{ get{return m_process;}}protected T m_process;
+		public virtual T GetProcess(){return _process;}
+		void SetProcess(T process){
+			_process = process;
+		}
+		protected T _process;
 		public virtual void SetAndRunProcess(T p){
+			T process = GetProcess();
 			if(p == null || !p.Equals(process)){
 				if(process != null)
 					process.Stop();
-				m_process = p;
+				SetProcess(p);
+				process = GetProcess();
 				if(process != null)
 					process.Start();
 			}
 		}
 	}
 	public interface ISSEProcessEngine<T> where T: ISSEProcess{
-		T process{get;}
+		T GetProcess();
 		void SetAndRunProcess(T process);
 	}
 	/* Factory */

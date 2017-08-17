@@ -18,8 +18,8 @@ namespace SlotSystem{
 		public SwapTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
-			m_origSG = m_pickedSB.sg;
-			m_selectedSG = m_selectedSB.sg;
+			m_origSG = m_pickedSB.GetSG();
+			m_selectedSG = m_selectedSB.GetSG();
 			iconHandler = tam.iconHandler;
 			sg1SlotsHolder = sg1;
 			sg2SlotsHolder = sg2;
@@ -35,9 +35,9 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1ActStateHandler.Swap();
 			sg2ActStateHandler.Swap();
-			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.item));
+			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
 			iconHandler.SetDIcon2(targetSB);
-			iconHandler.SetD2Destination(sg1, sg1SlotsHolder.GetNewSlot(targetSB.item));
+			iconHandler.SetD2Destination(sg1, sg1SlotsHolder.GetNewSlot(targetSB.GetItem()));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();
 			base.Execute();

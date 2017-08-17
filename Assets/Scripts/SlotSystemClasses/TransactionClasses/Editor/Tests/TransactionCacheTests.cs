@@ -186,13 +186,15 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetTargetSB_FromNullToSome_CallsSBSelect(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
-				ISlottable mockSB = MakeSubSB();
+				ISlottable stubSB = MakeSubSB();
+					ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+					stubSB.GetSelStateHandler().Returns(selStateHandler);
 
-				taCache.SetTargetSB(mockSB);
+				taCache.SetTargetSB(stubSB);
 
 
-				mockSB.Received().Select();
-				}
+				selStateHandler.Received().Select();
+			}
 			[Test]
 			public void SetTargetSB_FromNullToSome_SetsItTargetSB(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
@@ -205,14 +207,16 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetTargetSB_FromOtherToSome_CallsSBSelect(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
+				ISlottable prebSB = MakeSubSB();
 				ISlottable stubSB = MakeSubSB();
-				ISlottable mockSB = MakeSubSB();
-				taCache.SetTargetSB(stubSB);
+					ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+					stubSB.GetSelStateHandler().Returns(selStateHandler);
+				taCache.SetTargetSB(prebSB);
 
-				taCache.SetTargetSB(mockSB);
+				taCache.SetTargetSB(stubSB);
 				
-				mockSB.Received().Select();
-				}
+				selStateHandler.Received().Select();
+			}
 			[Test]
 			public void SetTargetSB_FromOtherToSome_SetsItTargetSB(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
@@ -227,24 +231,28 @@ namespace SlotSystemTests{
 			[Test]
 			public void SetTargetSB_FromOtherToSome_CallOtherSBFocus(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
-				ISlottable mockSB = MakeSubSB();
+				ISlottable prevSB = MakeSubSB();
+					ISSESelStateHandler prevSBSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					prevSB.GetSelStateHandler().Returns(prevSBSelStateHandler);
 				ISlottable stubSB = MakeSubSB();
-				taCache.SetTargetSB(mockSB);
+				taCache.SetTargetSB(prevSB);
 
 				taCache.SetTargetSB(stubSB);
 				
-				mockSB.Received().Focus();
-				}
+				prevSBSelStateHandler.Received().Focus();
+			}
 			[Test]
 			public void SetTargetSB_SomeToNull_CallSBFocus(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
-				ISlottable mockSB = MakeSubSB();
-				taCache.SetTargetSB(mockSB);
+				ISlottable stubSB = MakeSubSB();
+					ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+					stubSB.GetSelStateHandler().Returns(selStateHandler);
+				taCache.SetTargetSB(stubSB);
 
 				taCache.SetTargetSB(null);
 
-				mockSB.Received().Focus();
-				}
+				selStateHandler.Received().Focus();
+			}
 			[Test]
 			public void SetTargetSB_SomeToNull_SetsNull(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
@@ -254,26 +262,30 @@ namespace SlotSystemTests{
 				taCache.SetTargetSB(null);
 
 				Assert.That(taCache.targetSB, Is.Null);
-				}
+			}
 			[Test]
 			public void SetTargetSB_SomeToSame_DoesNotCallSelectTwice(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
-				ISlottable mockSB = MakeSubSB();
-				taCache.SetTargetSB(mockSB);
+				ISlottable stubSB = MakeSubSB();
+					ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+					stubSB.GetSelStateHandler().Returns(selStateHandler);
+				taCache.SetTargetSB(stubSB);
 
-				taCache.SetTargetSB(mockSB);
+				taCache.SetTargetSB(stubSB);
 
-				mockSB.Received(1).Select();
-				}
+				selStateHandler.Received(1).Select();
+			}
 			[Test]
 			public void SetTargetSB_SomeToSame_DoesNotCallFocus(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
-				ISlottable mockSB = MakeSubSB();
-				taCache.SetTargetSB(mockSB);
+				ISlottable stubSB = MakeSubSB();
+					ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+					stubSB.GetSelStateHandler().Returns(selStateHandler);
+				taCache.SetTargetSB(stubSB);
 
-				taCache.SetTargetSB(mockSB);
+				taCache.SetTargetSB(stubSB);
 
-				mockSB.DidNotReceive().Focus();
+				selStateHandler.DidNotReceive().Focus();
 			}
 			[Test]
 			public void CreateTransactionResults_WhenCalled_CreateAndStoreSGTAPairInDict(){
@@ -371,6 +383,8 @@ namespace SlotSystemTests{
 					taCache.SetPickedSB(pickedSB);
 					ITransactionFactory stubFac = MakeSubTAFactory();
 						ISlotGroup sgA = MakeSubSG();
+							ISSESelStateHandler sgASelStateHandler = Substitute.For<ISSESelStateHandler>();
+							sgA.GetSelStateHandler().Returns(sgASelStateHandler);
 							IEnumerable<ISlotSystemElement> sgAEles = new ISlotSystemElement[]{};
 							sgA.GetEnumerator().Returns(sgAEles.GetEnumerator());
 						stubFac.MakeTransaction(pickedSB, sgA).Returns(ta);
@@ -381,9 +395,9 @@ namespace SlotSystemTests{
 				taCache.CreateTransactionResults();
 
 				if(ta is IRevertTransaction)
-					sgA.Received().Defocus();
+					sgASelStateHandler.Received().Defocus();
 				else
-					sgA.Received().Focus();
+					sgASelStateHandler.Received().Focus();
 				}
 				class CreateTransactionResultsVariousTACases: IEnumerable{
 					public IEnumerator GetEnumerator(){
@@ -406,6 +420,8 @@ namespace SlotSystemTests{
 						ISlotGroup sg = MakeSubSG();
 							IEnumerable<ISlotSystemElement> sgEles;	
 								ISlottable sb = MakeSubSB();
+									ISSESelStateHandler sbSelStateHandler = Substitute.For<ISSESelStateHandler>();
+									sb.GetSelStateHandler().Returns(sbSelStateHandler);
 								sgEles = new ISlotSystemElement[]{sb};
 							sg.GetEnumerator().Returns(sgEles.GetEnumerator());
 						stubFac.MakeTransaction(pickedSB, sb).Returns(ta);
@@ -417,11 +433,11 @@ namespace SlotSystemTests{
 				taCache.CreateTransactionResults();
 
 				if(ta is IRevertTransaction)
-					sb.Received().Defocus();
+					sbSelStateHandler.Received().Defocus();
 				else if(ta is IFillTransaction)
-					sb.Received().Defocus();
+					sbSelStateHandler.Received().Defocus();
 				else
-					sb.Received().Focus();
+					sbSelStateHandler.Received().Focus();
 				}
 			[Test]
 			public void UpdateField_MatchFoundInTAResultsForHovered_SetsFields(){

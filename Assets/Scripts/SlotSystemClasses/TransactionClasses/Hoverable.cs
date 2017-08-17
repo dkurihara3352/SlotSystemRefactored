@@ -6,7 +6,18 @@ using Utility;
 
 namespace SlotSystem{
 	public class Hoverable : IHoverable{
-		ISlotSystemElement sse;
+		ISSESelStateHandler sseSelStateHandler{
+			get{
+				if(_sseSelStateHandler != null)
+					return _sseSelStateHandler;
+				else 
+					throw new InvalidOperationException("sseSelStateHandler not set");
+			}
+		}
+			ISSESelStateHandler _sseSelStateHandler;
+			public void SetSSESelStateHandler(ISSESelStateHandler handler){
+				_sseSelStateHandler = handler;
+			}
 		public ITransactionCache taCache{
 			get{return _taCache;}
 		}
@@ -14,13 +25,12 @@ namespace SlotSystem{
 		public void SetTACache(ITransactionCache taCache){
 			_taCache = taCache;
 		}
-		public Hoverable(ISlotSystemElement sse, ITransactionCache taCache){
-			this.sse = sse;
+		public Hoverable(ITransactionCache taCache){
 			_taCache = taCache;
 		}
 		public virtual void OnHoverEnter(){
-			if(!sse.isSelStateNull){
-				if(!sse.isDeactivated && !sse.isSelected)
+			if(!sseSelStateHandler.isSelStateNull){
+				if(!sseSelStateHandler.isDeactivated && !sseSelStateHandler.isSelected)
 					SetHovered();
 				else
 					throw new InvalidOperationException("sse needs to be activated and deselected");
@@ -28,8 +38,8 @@ namespace SlotSystem{
 				throw new InvalidOperationException("sse sel state not set");
 		}
 		public virtual void OnHoverExit(){
-			if(!sse.isSelStateNull){
-				if(!sse.isDeactivated){
+			if(!sseSelStateHandler.isSelStateNull){
+				if(!sseSelStateHandler.isDeactivated){
 					if(isHovered)
 						UnsetHovered();
 					else
@@ -52,6 +62,7 @@ namespace SlotSystem{
 	public interface IHoverable{
 		ITransactionCache taCache{get;}
 		void SetTACache(ITransactionCache taCache);
+		void SetSSESelStateHandler(ISSESelStateHandler handler);
 		bool isHovered{get;}
 		void OnHoverEnter();
 		void OnHoverExit();

@@ -25,7 +25,7 @@ namespace SlotSystemTests{
 							ssm.FindParent(sb).Returns(sg);
 						sb.SetSSM(ssm);
 
-					bool actual = sb.isHierarchySetUp;
+					bool actual = sb.IsHierarchySetUp();
 
 					Assert.That(actual, Is.True);
 				}
@@ -39,13 +39,13 @@ namespace SlotSystemTests{
 						sb.SetItemHandler(itemHandler);
 					
 					sb.IncreasePickedAmountUpToQuantity();
-						Assert.That(sb.pickedAmount, Is.EqualTo(1));
+						Assert.That(sb.GetPickedAmount(), Is.EqualTo(1));
 					
 					sb.IncreasePickedAmountUpToQuantity();
-						Assert.That(sb.pickedAmount, Is.EqualTo(2));
+						Assert.That(sb.GetPickedAmount(), Is.EqualTo(2));
 					
 					sb.IncreasePickedAmountUpToQuantity();
-						Assert.That(sb.pickedAmount, Is.EqualTo(2));
+						Assert.That(sb.GetPickedAmount(), Is.EqualTo(2));
 				}
 				[Test]
 				public void IncreasePickedAmountUpToQuantity_isNotStackable_DoesNotIncrease(){
@@ -56,50 +56,72 @@ namespace SlotSystemTests{
 						sb.SetItemHandler(itemHandler);
 					
 					sb.IncreasePickedAmountUpToQuantity();
-						Assert.That(sb.pickedAmount, Is.EqualTo(0));
+						Assert.That(sb.GetPickedAmount(), Is.EqualTo(0));
 					
 					sb.IncreasePickedAmountUpToQuantity();
-						Assert.That(sb.pickedAmount, Is.EqualTo(0));
+						Assert.That(sb.GetPickedAmount(), Is.EqualTo(0));
 					
 					sb.IncreasePickedAmountUpToQuantity();
-						Assert.That(sb.pickedAmount, Is.EqualTo(0));
+						Assert.That(sb.GetPickedAmount(), Is.EqualTo(0));
 				}
 				[Test]
 				public void InitializeStates_Always_InitializesStates(){
-					Slottable sb = MakeSBWithRealStateHandlers();
+					Slottable sb = MakeSB();
+						IHoverable hoverable = new Hoverable(MakeSubTAC());
+						sb.SetHoverable(hoverable);
+						ISSESelStateHandler sbSelStateHandler = new SBSelStateHandler(sb);
+						sb.SetSelStateHandler(sbSelStateHandler);
+						hoverable.SetSSESelStateHandler(sbSelStateHandler);
+						sb.SetActStateHandler(new SBActStateHandler(sb, MakeSubTAM()));
+						sb.SetEqpStateHandler(new SBEqpStateHandler(sb));
+						sb.SetMrkStateHandler(new SBMrkStateHandler(sb));
+						sb.SetSSM(MakeSubSSM());
 
 					sb.InitializeStates();
 
-					Assert.That(sb.isDeactivated, Is.True);
-					Assert.That(sb.wasSelStateNull, Is.True);
-					Assert.That(sb.isWaitingForAction, Is.True);
-					Assert.That(sb.wasActStateNull, Is.True);
-					Assert.That(sb.isEqpStateNull, Is.True);
-					Assert.That(sb.wasEqpStateNull, Is.True);
-					Assert.That(sb.isUnmarked, Is.True);
-					Assert.That(sb.wasMrkStateNull, Is.True);
-					}
+					Assert.That(sbSelStateHandler.isDeactivated, Is.True);
+					Assert.That(sbSelStateHandler.wasSelStateNull, Is.True);
+					Assert.That(sb.IsWaitingForAction(), Is.True);
+					Assert.That(sb.WasActStateNull(), Is.True);
+					Assert.That(sb.IsEqpStateNull(), Is.True);
+					Assert.That(sb.WasEqpStateNull(), Is.True);
+					Assert.That(sb.IsUnmarked(), Is.True);
+					Assert.That(sb.WasMrkStateNull(), Is.True);
+				}
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedUpState(){
-					Slottable sb = MakeSBWithRealStateHandlers();
-					sb.Focus();
+					Slottable sb = MakeSB();
+						IHoverable hoverable = new Hoverable(MakeSubTAC());
+						sb.SetHoverable(hoverable);
+						ISSESelStateHandler sbSelStateHandler = Substitute.For<ISSESelStateHandler>();
+						sb.SetSelStateHandler(sbSelStateHandler);
+						hoverable.SetSSESelStateHandler(sbSelStateHandler);
+						sb.SetActStateHandler(new SBActStateHandler(sb, MakeSubTAM()));
+						sb.SetItemHandler(Substitute.For<IItemHandler>());
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
 					sb.PickUp();
 
-					Assert.That(sb.isPickingUp, Is.True);
-					}
+					Assert.That(sb.IsPickingUp(), Is.True);
+				}
 				[Test]
 				public void Pickup_FromValidPrevActState_SetsPickedAmountOne(){
-					Slottable sb = MakeSBWithRealStateHandlers();
-					sb.Focus();
+					Slottable sb = MakeSB();
+						IHoverable hoverable = new Hoverable(MakeSubTAC());
+						sb.SetHoverable(hoverable);
+						ISSESelStateHandler sbSelStateHandler = Substitute.For<ISSESelStateHandler>();
+						sb.SetSelStateHandler(sbSelStateHandler);
+						hoverable.SetSSESelStateHandler(sbSelStateHandler);
+						sb.SetActStateHandler(new SBActStateHandler(sb, MakeSubTAM()));
+						IItemHandler itemHandler = Substitute.For<IItemHandler>();
+						sb.SetItemHandler(itemHandler);
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 					
 					sb.PickUp();
 
-					Assert.That(sb.pickedAmount, Is.EqualTo(1));
+					itemHandler.Received().SetPickedAmount(1);
 				}
 				Slottable MakeSBforIncrement(InventoryItemInstance item){
 					Slottable sb = MakeSB();
@@ -120,21 +142,27 @@ namespace SlotSystemTests{
 				}
 				[Test]
 				public void Increment_Always_SetsIsPickingUp(){
-					Slottable sb = MakeSBWithRealStateHandlers();
-					sb.Focus();
+					Slottable sb = MakeSB();
+						IHoverable hoverable = new Hoverable(MakeSubTAC());
+						sb.SetHoverable(hoverable);
+						ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+						sb.SetSelStateHandler(selStateHandler);
+						hoverable.SetSSESelStateHandler(selStateHandler);
+						sb.SetActStateHandler(new SBActStateHandler(sb, MakeSubTAM()));
+						sb.SetItemHandler(new ItemHandler(MakeBowInstance(0)));
 					sb.WaitForAction();
 					sb.WaitForPickUp();
 
 					sb.Increment();
 
-					Assert.That(sb.isPickingUp, Is.True);
+					Assert.That(sb.IsPickingUp(), Is.True);
 				}
 				[Test]
 				public void UpdateEquipState_ItemInstIsEquipped_SetsSBEquipped(){
 					Slottable testSB = MakeSBWithRealStateHandlers();
 					BowInstance stubBow = MakeBowInstance(0);
 						stubBow.isEquipped = true;
-						testSB.itemHandler.item.Returns(stubBow);
+						testSB.itemHandler.GetItem().Returns(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
 					ISlotSystemManager stubSSM = MakeSubSSM();
 					stubSSM.FindParent(testSB).Returns(stubSG);
@@ -142,14 +170,14 @@ namespace SlotSystemTests{
 
 					testSB.UpdateEquipState();
 
-					Assert.That(testSB.isEquipped, Is.True);
+					Assert.That(testSB.IsEquipped(), Is.True);
 					}
 				[Test]
 				public void UpdateEquipState_ItemInstIsNotEquipped_SetsSBUnequipped(){
 					Slottable testSB = MakeSBWithRealStateHandlers();
 					BowInstance stubBow = MakeBowInstance(0);
 						stubBow.isEquipped = false;
-						testSB.itemHandler.item.Returns(stubBow);
+						testSB.itemHandler.GetItem().Returns(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
 					ISlotSystemManager stubSSM = MakeSubSSM();
 					stubSSM.FindParent(testSB).Returns(stubSG);
@@ -157,7 +185,7 @@ namespace SlotSystemTests{
 
 					testSB.UpdateEquipState();
 
-					Assert.That(testSB.isUnequipped, Is.True);
+					Assert.That(testSB.IsUnequipped(), Is.True);
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsActStateWFAState(){
@@ -165,15 +193,15 @@ namespace SlotSystemTests{
 					
 					((ISlottable)sb).Refresh();
 
-					Assert.That(sb.isWaitingForAction, Is.True);
+					Assert.That(sb.IsWaitingForAction(), Is.True);
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsPickedAmountZero(){
 					Slottable sb = MakeSBWithRealStateHandlers();
-					sb.pickedAmount = 10;
+					sb.SetPickedAmount(10);
 					((ISlottable)sb).Refresh();
 
-					Assert.That(sb.pickedAmount, Is.EqualTo(0));
+					Assert.That(sb.GetPickedAmount(), Is.EqualTo(0));
 					}
 				[Test]
 				public void Refresh_WhenCalled_SetsNewSlotIDMinus2(){
@@ -182,7 +210,7 @@ namespace SlotSystemTests{
 					sb.SetNewSlotID(3);
 					((ISlottable)sb).Refresh();
 
-					Assert.That(sb.newSlotID, Is.EqualTo(-2));
+					Assert.That(sb.GetNewSlotID(), Is.EqualTo(-2));
 					}
 				[TestCaseSource(typeof(ShareSGAndItemCases))]
 				public void ShareSGAndItem_VariousCombo_ReturnsAccordingly(ISlotGroup sg, ISlotGroup otherSG, InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
@@ -193,8 +221,8 @@ namespace SlotSystemTests{
 					otherSB.SetSSM(stubSSM);
 					stubSSM.FindParent(sb).Returns(sg);
 					stubSSM.FindParent(otherSB).Returns(otherSG);
-					sb.itemHandler.item.Returns(iInst);
-					otherSB.itemHandler.item.Returns(otherIInst);
+					sb.itemHandler.GetItem().Returns(iInst);
+					otherSB.itemHandler.GetItem().Returns(otherIInst);
 
 					Assert.That(sb.ShareSGAndItem(otherSB), Is.EqualTo(expected));
 					}

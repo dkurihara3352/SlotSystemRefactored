@@ -6,7 +6,7 @@ using System;
 namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		public override void InitializeStates(){
-			Deactivate();
+			_selStateHandler.Deactivate();
 			WaitForAction();
 		}
 		public void InitializeStateHandlers(){
@@ -14,25 +14,25 @@ namespace SlotSystem{
 			SetSGActStateHandler(new SGActStateHandler(this));
 		}
 		public void InitializeSG(){
+			ISlotSystemManager ssm = GetSSM();
 			SetCommandsRepo(new SGCommandsRepo(this));
 			SetSlotsHolder(new SlotsHolder(this));
 			SetSBHandler(new SBHandler());
 			SetNewSBs(new List<ISlottable>());
-			SetHoverable(new Hoverable(this, ssm.taCache));
+			SetHoverable(new Hoverable(ssm.taCache));
 			SetSGTAHandler(new SGTransactionHandler(this, ssm.tam));
 			SetSorterHandler(new SorterHandler());
 			SetFilterHandler(new FilterHandler());
 			SetSBFactory(new SBFactory(ssm));
 			InitializeStateHandlers();
+			hoverable.SetSSESelStateHandler(_selStateHandler);
 		}
 		/*	states	*/
-			public override ISSESelStateHandler selStateHandler{
-				get{
-					if(_selStateHandler != null)
-						return _selStateHandler;
-					else
-						throw new InvalidOperationException("selStateHandler not set");
-				}
+			public override ISSESelStateHandler GetSelStateHandler(){
+				if(_selStateHandler != null)
+					return _selStateHandler;
+				else
+					throw new InvalidOperationException("selStateHandler not set");
 			}
 				ISSESelStateHandler _selStateHandler;
 			public override void SetSelStateHandler(ISSESelStateHandler handler){
@@ -168,7 +168,7 @@ namespace SlotSystem{
 				bool flag = true;
 				foreach(ISlottable sb in this){
 					if(sb != null)
-					flag &= !sb.actProcess.isRunning;
+					flag &= !sb.GetActProcess().IsRunning();
 				}
 				if(flag){
 					actProcess.Expire();
@@ -290,7 +290,7 @@ namespace SlotSystem{
 			}
 			public void ToggleAutoSort(bool on){
 				SetIsAutoSort(on);
-				Focus();
+				_selStateHandler.Focus();
 			}
 			public List<ISlottable> GetSortedSBsWithoutResize(List<ISlottable> source){
 				return sorterHandler.GetSortedSBsWithoutResize(source);
@@ -363,19 +363,21 @@ namespace SlotSystem{
 			public void FocusSBs(){
 				foreach(ISlottable sb in this){
 					if(sb != null){
+						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
 						sb.Refresh();
-						if(sb.passesPrePickFilter)
-							sb.Focus();
+						if(sb.PassesPrePickFilter())
+							sbSelStateHandler.Focus();
 						else
-							sb.Defocus();
+							sbSelStateHandler.Defocus();
 					}
 				}
 			}
 			public void DefocusSBs(){
 				foreach(ISlottable sb in this){
 					if(sb != null){
+						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
 						sb.Refresh();
-						sb.Defocus();
+						sbSelStateHandler.Defocus();
 					}
 				}
 			}
@@ -410,6 +412,9 @@ namespace SlotSystem{
 			public bool isHovered{
 				get{return hoverable.isHovered;}
 			}
+			public void SetSSESelStateHandler(ISSESelStateHandler handler){
+				//removed
+			}
 		/*	intrinsic */
 			public Inventory inventory{
 				get{
@@ -434,16 +439,19 @@ namespace SlotSystem{
 				bool m_isExpandable;
 			public bool isPool{
 				get{
+					ISlotSystemManager ssm = GetSSM();
 					return ssm.poolBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGE{
 				get{
+					ISlotSystemManager ssm = GetSSM();
 					return ssm.equipBundle.ContainsInHierarchy(this);
 				}
 			}
 			public bool isSGG{
 				get{
+					ISlotSystemManager ssm = GetSSM();
 					foreach(ISlotSystemBundle gBundle in ssm.otherBundles){
 						if(gBundle.ContainsInHierarchy(this))
 							return true;
@@ -580,6 +588,7 @@ namespace SlotSystem{
 					get{return commandsRepo.onActionCompleteCommand;}
 				}
 			public void UpdateEquipStatesOnAll(){
+				ISlotSystemManager ssm = GetSSM();
 				ssm.UpdateEquipInvAndAllSBsEquipState();
 			}
 			public void OnActionExecute(){
@@ -589,6 +598,7 @@ namespace SlotSystem{
 					get{return commandsRepo.onActionExecuteCommand;}
 				}
 			public void SyncEquipped(InventoryItemInstance item, bool equipped){
+				ISlotSystemManager ssm = GetSSM();
 				if(equipped)
 					inventory.Add(item);
 				else

@@ -106,7 +106,7 @@ namespace SlotSystem{
 				m_actProcEngine = engine;
 			}
 			public virtual ITAMActProcess actProcess{
-				get{return actProcEngine.process;}
+				get{return actProcEngine.GetProcess();}
 			}
 			public IEnumeratorFake probeCoroutine(){
 				return null;

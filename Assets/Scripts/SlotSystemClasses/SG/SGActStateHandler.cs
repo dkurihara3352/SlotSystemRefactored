@@ -172,7 +172,7 @@ namespace SlotSystem{
 					actProcess.Expire();
 			}
 			public ISGActProcess actProcess{
-				get{return actProcEngine.process;}
+				get{return actProcEngine.GetProcess();}
 			}
 			public IEnumeratorFake TransactionCoroutine(){
 				return null;

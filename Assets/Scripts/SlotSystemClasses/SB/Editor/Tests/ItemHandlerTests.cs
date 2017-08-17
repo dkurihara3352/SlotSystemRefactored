@@ -17,10 +17,10 @@ namespace SlotSystemTests{
 					BowInstance bow = MakeBowInstance(0);
 					itemHandler = new ItemHandler(bow);
 
-				Assert.That(itemHandler.item, Is.SameAs(bow));
-				Assert.That(itemHandler.pickedAmount, Is.EqualTo(0));
-				Assert.That(itemHandler.isStackable, Is.False);
-				Assert.That(itemHandler.quantity, Is.EqualTo(1));
+				Assert.That(itemHandler.GetItem(), Is.SameAs(bow));
+				Assert.That(itemHandler.GetPickedAmount(), Is.EqualTo(0));
+				Assert.That(itemHandler.IsStackable(), Is.False);
+				Assert.That(itemHandler.GetQuantity(), Is.EqualTo(1));
 			}
 		}
 	}

@@ -8,39 +8,40 @@ namespace SlotSystem{
 		public ItemHandler(InventoryItemInstance item){
 			_item = item;
 		}
-		public InventoryItemInstance item{
-			get{
-				if(_item != null)
-					return _item;
-				else
-					throw new InvalidOperationException("item not set");
-			}
+		public InventoryItemInstance GetItem(){
+			if(_item != null)
+				return _item;
+			else
+				throw new InvalidOperationException("item not set");
 		}
 			InventoryItemInstance _item;
 		public void SetItem(InventoryItemInstance item){
 			_item = item;
 		}
-		public int pickedAmount{
-			get{return m_pickedAmount;}
-			set{m_pickedAmount = value;}
+		public int GetPickedAmount(){
+			return _pickedAmount;
 		}
-			int m_pickedAmount = 0;
-		public virtual bool isStackable{
-			get{return item.Item.IsStackable;}
+		public void SetPickedAmount(int amount){
+			_pickedAmount = amount;
 		}
-		public int quantity{
-			get{return item.quantity;}
+			int _pickedAmount = 0;
+		public virtual bool IsStackable(){
+			return GetItem().Item.IsStackable;
+		}
+		public int GetQuantity(){
+			return GetItem().quantity;
 		}
 		public void SetQuantity(int quant){
-			item.quantity = quant;
+			GetItem().quantity = quant;
 		}
 	}
 	public interface IItemHandler{
-		InventoryItemInstance item{get;}
+		InventoryItemInstance GetItem();
 		void SetItem(InventoryItemInstance item);
-		int pickedAmount{get;set;}
-		bool isStackable{get;}
-		int quantity{get;}
+		int GetPickedAmount();
+		void SetPickedAmount(int amount);
+		bool IsStackable();
+		int GetQuantity();
 		void SetQuantity(int quant);
 	}
 }

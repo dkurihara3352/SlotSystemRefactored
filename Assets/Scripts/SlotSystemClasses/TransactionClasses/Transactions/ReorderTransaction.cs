@@ -14,7 +14,7 @@ namespace SlotSystem{
 		public ReorderTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSB = selected;
-			m_origSG = m_pickedSB.sg;
+			m_origSG = m_pickedSB.GetSG();
 			iconHandler = tam.iconHandler;
 			sg1SlotsHolder = sg1;
 			sg1ActStateHandler = sg1;
@@ -25,7 +25,7 @@ namespace SlotSystem{
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1ActStateHandler.Reorder();
-			iconHandler.SetD1Destination(sg1, sg1SlotsHolder.GetNewSlot(m_pickedSB.item));
+			iconHandler.SetD1Destination(sg1, sg1SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
 			sg1.OnActionExecute();
 			base.Execute();
 		}

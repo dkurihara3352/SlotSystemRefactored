@@ -23,7 +23,8 @@ namespace SlotSystem{
 			Slottable newSB = newSBGO.AddComponent<Slottable>();
 			newSB.SetSSM(ssm);
 			newSB.InitializeSB(item);
-			newSB.Defocus();
+			ISSESelStateHandler sbSelStateHandler = newSB.GetSelStateHandler();
+			sbSelStateHandler.Defocus();
 			return newSB;
 		}
 	}

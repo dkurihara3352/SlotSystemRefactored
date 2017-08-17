@@ -35,25 +35,25 @@ namespace SlotSystemTests{
 						object[] validBow;
 							ISlottable bowA0SB_0 = MakeSubSB();
 								BowInstance bowA0_0 = MakeBowInstance(0);
-								bowA0SB_0.item.Returns(bowA0_0);
+								bowA0SB_0.GetItem().Returns(bowA0_0);
 							ISlottable wearA0SB_0 = MakeSubSB();
 								WearInstance wearA0_0 = MakeWearInstance(0);
-								wearA0SB_0.item.Returns(wearA0_0);
+								wearA0SB_0.GetItem().Returns(wearA0_0);
 							ISlottable shieldA0SB_0 = MakeSubSB();
 								ShieldInstance shieldA0_0 = MakeShieldInstance(0);
-								shieldA0SB_0.item.Returns(shieldA0_0);
+								shieldA0SB_0.GetItem().Returns(shieldA0_0);
 							ISlottable mWeaponA0SB_0 = MakeSubSB();
 								MeleeWeaponInstance mWeaponA0_0 = MakeMWeaponInstance(0);
-								mWeaponA0SB_0.item.Returns(mWeaponA0_0);
+								mWeaponA0SB_0.GetItem().Returns(mWeaponA0_0);
 							ISlottable quiverA0SB_0 = MakeSubSB();
 								QuiverInstance quiverA0_0 = MakeQuiverInstance(0);
-								quiverA0SB_0.item.Returns(quiverA0_0);
+								quiverA0SB_0.GetItem().Returns(quiverA0_0);
 							ISlottable packA0SB_0 = MakeSubSB();
 								PackInstance packA0_0 = MakePackInstance(0);
-								packA0SB_0.item.Returns(packA0_0);
+								packA0SB_0.GetItem().Returns(packA0_0);
 							ISlottable partsA0SB_0 = MakeSubSB();
 								PartsInstance partsA0_0 = MakePartsInstance(0,2);
-								partsA0SB_0.item.Returns(partsA0_0);
+								partsA0SB_0.GetItem().Returns(partsA0_0);
 							List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{
 								bowA0SB_0,
 								wearA0SB_0,
@@ -89,17 +89,17 @@ namespace SlotSystemTests{
 				class EquippedSBsCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
 						ISlottable eSBA = MakeSubSB();
-							eSBA.isEquipped.Returns(true);
+							eSBA.IsEquipped().Returns(true);
 						ISlottable eSBB = MakeSubSB();
-							eSBB.isEquipped.Returns(true);
+							eSBB.IsEquipped().Returns(true);
 						ISlottable eSBC = MakeSubSB();
-							eSBC.isEquipped.Returns(true);
+							eSBC.IsEquipped().Returns(true);
 						ISlottable uSBA = MakeSubSB();
-							uSBA.isEquipped.Returns(false);
+							uSBA.IsEquipped().Returns(false);
 						ISlottable uSBB = MakeSubSB();
-							uSBB.isEquipped.Returns(false);
+							uSBB.IsEquipped().Returns(false);
 						ISlottable uSBC = MakeSubSB();
-							uSBC.isEquipped.Returns(false);
+							uSBC.IsEquipped().Returns(false);
 						List<ISlottable> case1SBs = new List<ISlottable>(new ISlottable[]{
 							eSBA, eSBB, eSBC, uSBA, uSBB, uSBC
 						});
@@ -238,8 +238,8 @@ namespace SlotSystemTests{
 			static ISlottable MakeSBWithActProc(bool isRunning){
 				ISlottable sb = MakeSubSB();
 					ISSEProcess sbActProc = MakeSubSBActProc();
-						sbActProc.isRunning.Returns(isRunning);
-					sb.actProcess.Returns(sbActProc);
+						sbActProc.IsRunning().Returns(isRunning);
+					sb.GetActProcess().Returns(sbActProc);
 				return sb;
 			}
 		}

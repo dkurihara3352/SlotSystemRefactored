@@ -16,7 +16,7 @@ namespace SlotSystemTests{
 				SBActStateHandler handler = new SBActStateHandler(MakeSubSB(), MakeSubTAM());
 					ISBActProcess mockProc = Substitute.For<ISBActProcess>();
 					ISSEProcessEngine<ISBActProcess> stubEngine = Substitute.For<ISSEProcessEngine<ISBActProcess>>();
-					stubEngine.process.Returns(mockProc);
+					stubEngine.GetProcess().Returns(mockProc);
 					handler.SetActProcessEngine(stubEngine);
 
 				handler.ExpireActProcess();
@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 			public void SetActState_NullAndActProcNotNull_CallsProcEngineSetAndRunNull(){
 				ISSEProcessEngine<ISBActProcess> mockProcEngine;
 				SBActStateHandler handler = MakeActStateHandlerWithProcEngine(out mockProcEngine);
-				mockProcEngine.process.Returns(Substitute.For<ISBActProcess>());
+				mockProcEngine.GetProcess().Returns(Substitute.For<ISBActProcess>());
 				
 				handler.SetActState(null);
 
@@ -37,7 +37,7 @@ namespace SlotSystemTests{
 			public void SetActState_NotNull_DoesNotCallsProcEngineSetAndRunNull(){
 				ISSEProcessEngine<ISBActProcess> mockProcEngine;
 				SBActStateHandler handler = MakeActStateHandlerWithProcEngine(out mockProcEngine);
-				mockProcEngine.process.Returns(Substitute.For<ISBActProcess>());
+				mockProcEngine.GetProcess().Returns(Substitute.For<ISBActProcess>());
 				
 				handler.SetActState(Substitute.For<ISBActState>());
 
@@ -47,7 +47,7 @@ namespace SlotSystemTests{
 			public void SetActState_NullAndActProcNull_DoesNotCallsProcEngineSetAndRunNull(){
 				ISSEProcessEngine<ISBActProcess> mockProcEngine;
 				SBActStateHandler handler = MakeActStateHandlerWithProcEngine(out mockProcEngine);
-				mockProcEngine.process.Returns((ISBActProcess)null);
+				mockProcEngine.GetProcess().Returns((ISBActProcess)null);
 				
 				handler.SetActState((ISBActState)null);
 

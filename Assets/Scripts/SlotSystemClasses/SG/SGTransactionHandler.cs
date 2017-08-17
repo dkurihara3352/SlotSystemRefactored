@@ -118,9 +118,9 @@ namespace SlotSystem{
 				List<ISlottable> result = new List<ISlottable>(source);
 				if(!sg.isPool){
 					if(added != null)
-						CreateNewSBAndFill(added.item, result);
+						CreateNewSBAndFill(added.GetItem(), result);
 					if(removed != null)
-						NullifyIndexAt(removed.item, result);
+						NullifyIndexAt(removed.GetItem(), result);
 				}
 				return result;
 			}
@@ -150,7 +150,7 @@ namespace SlotSystem{
 				ISlottable rem = null;
 				foreach(ISlottable sb in list){
 					if(sb != null){
-						if(sb.item == removedItem)
+						if(sb.GetItem() == removedItem)
 							rem = sb;
 					}
 				}
@@ -188,7 +188,7 @@ namespace SlotSystem{
 			List<ISlottable> SwappedList(ISlottable added, ISlottable removed, List<ISlottable> source){
 				List<ISlottable> result = new List<ISlottable>(source);
 				if(!sg.isPool){
-					ISlottable newSB = sbFactory.CreateSB(added.item);
+					ISlottable newSB = sbFactory.CreateSB(added.GetItem());
 					newSB.Unequip();
 					result[result.IndexOf(removed)] = newSB;
 				}
@@ -219,8 +219,8 @@ namespace SlotSystem{
 					bool found = false;
 					foreach(var sb in sbs){
 						if(sb != null){
-							if(sb.item == item){
-								int newQuantity = sb.quantity + item.quantity;
+							if(sb.GetItem() == item){
+								int newQuantity = sb.GetQuantity() + item.quantity;
 								sb.SetQuantity(newQuantity);
 								found = true;
 								return;
@@ -256,9 +256,9 @@ namespace SlotSystem{
 					ISlottable removed = null;
 					foreach(var sb in sbs)
 						if(sb != null)
-							if(sb.item == item){
+							if(sb.GetItem() == item){
 								found = true;
-								int newQuantity = sb.quantity - item.quantity;
+								int newQuantity = sb.GetQuantity() - item.quantity;
 								if(newQuantity <= 0){
 									removed = sb;
 									break;
@@ -312,7 +312,7 @@ namespace SlotSystem{
 			}
 			public void RemoveAndDestorySBsFrom(List<ISlottable> source){
 				foreach(var sb in source){
-					if(sb != null && sb.isToBeRemoved){
+					if(sb != null && sb.IsToBeRemoved()){
 						int index = source.IndexOf(sb);
 						ISlottable removed = sb;
 						source[index] = null;
@@ -322,8 +322,8 @@ namespace SlotSystem{
 			}
 			void PutSBsInNewSlot(IEnumerable<ISlottable> source){
 				foreach(var sb in source)
-					if(sb != null && !sb.isToBeRemoved)
-						slotsHolder.newSlots[sb.newSlotID].sb = sb;
+					if(sb != null && !sb.IsToBeRemoved())
+						slotsHolder.newSlots[sb.GetNewSlotID()].sb = sb;
 			}
 			void SetNewSlotsToSlots(){
 				slotsHolder.SetSlots(slotsHolder.newSlots);

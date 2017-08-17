@@ -10,10 +10,13 @@ namespace SlotSystem{
 					2) otherSB.SG accepts pickedSB
 					3) not stackable
 			*/
-			if(pickedSB.sg != otherSB.sg){
-				if(otherSB.sg.AcceptsFilter(pickedSB)){
-					if(!(pickedSB.item == otherSB.item && pickedSB.item.Item.IsStackable))
-						if(pickedSB.sg.AcceptsFilter(otherSB))
+			ISlotGroup pickedSG = pickedSB.GetSG();
+			ISlotGroup otherSG = otherSB.GetSG();
+			InventoryItemInstance pickedItem = pickedSB.GetItem();
+			if(pickedSG != otherSG){
+				if(otherSG.AcceptsFilter(pickedSB)){
+					if(!(pickedItem == otherSB.GetItem() && pickedItem.Item.IsStackable))
+						if(pickedSG.AcceptsFilter(otherSB))
 						return true;
 				}
 			}

@@ -23,11 +23,11 @@ namespace SlotSystem{
 		public bool AcceptsFilter(ISlottable pickedSB){
 			if(this.filter is SGNullFilter) return true;
 			else{
-				if(pickedSB.item is BowInstance)
+				if(pickedSB.GetItem() is BowInstance)
 					return this.filter is SGBowFilter;
-				else if(pickedSB.item is WearInstance)
+				else if(pickedSB.GetItem() is WearInstance)
 					return this.filter is SGWearFilter;
-				else if(pickedSB.item is CarriedGearInstance)
+				else if(pickedSB.GetItem() is CarriedGearInstance)
 					return this.filter is SGCGearsFilter;
 				else
 					return this.filter is SGPartsFilter;

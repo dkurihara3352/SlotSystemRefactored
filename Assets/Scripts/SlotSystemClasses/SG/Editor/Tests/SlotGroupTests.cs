@@ -287,25 +287,31 @@ namespace SlotSystemTests{
 
 					foreach(var e in sg){
 						if(dict[e])
-							e.Received().Focus();
+							e.GetSelStateHandler().Received().Focus();
 						else
-							e.Received().Defocus();
+							e.GetSelStateHandler().Received().Defocus();
 					}
 				}
 					class FocusSBsVariousCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							ISlottable fSBA = MakeSubSB();
-								fSBA.passesPrePickFilter.Returns(true);
 							ISlottable fSBB = MakeSubSB();
-								fSBB.passesPrePickFilter.Returns(true);
 							ISlottable fSBC = MakeSubSB();
-								fSBC.passesPrePickFilter.Returns(true);
 							ISlottable dSBA = MakeSubSB();
-								dSBA.passesPrePickFilter.Returns(false);
 							ISlottable dSBB = MakeSubSB();
-								dSBB.passesPrePickFilter.Returns(false);
 							ISlottable dSBC = MakeSubSB();
-								dSBC.passesPrePickFilter.Returns(false);
+								fSBA.PassesPrePickFilter().Returns(true);
+								fSBB.PassesPrePickFilter().Returns(true);
+								fSBC.PassesPrePickFilter().Returns(true);
+								dSBA.PassesPrePickFilter().Returns(false);
+								dSBB.PassesPrePickFilter().Returns(false);
+								dSBC.PassesPrePickFilter().Returns(false);
+								fSBA.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
+								fSBB.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
+								fSBC.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
+								dSBA.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
+								dSBB.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
+								dSBC.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
 							List<ISlottable> sbs = new List<ISlottable>(new ISlottable[]{
 								fSBA, fSBB, fSBC, dSBA, dSBB, dSBC
 							});
@@ -342,25 +348,28 @@ namespace SlotSystemTests{
 							ISlottable sbA = MakeSubSB();
 							ISlottable sbB = MakeSubSB();
 							ISlottable sbC = MakeSubSB();
+							sbA.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
+							sbB.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
+							sbC.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
 							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
 						sg = MakeSG_ISBHandler(sbs);
 					
 					sg.DefocusSBs();
 
-					sbA.Received().Defocus();
-					sbB.Received().Defocus();
-					sbC.Received().Defocus();
+					sbA.GetSelStateHandler().Received().Defocus();
+					sbB.GetSelStateHandler().Received().Defocus();
+					sbC.GetSelStateHandler().Received().Defocus();
 					}
 				[Test]
 				public void InitializeState_Always_InitializesStates(){
 					SlotGroup sg = MakeSG();
-					sg.SetSelStateHandler(new SGSelStateHandler(MakeSubTAC(), Substitute.For<IHoverable>()));
+						ISSESelStateHandler sgSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					sg.SetSelStateHandler(sgSelStateHandler);
 					sg.SetSGActStateHandler(new SGActStateHandler(sg));
 
 					sg.InitializeStates();
 
-					Assert.That(sg.isDeactivated, Is.True);
-					Assert.That(sg.wasSelStateNull, Is.True);
+					sgSelStateHandler.Received().Deactivate();
 					Assert.That(sg.isWaitingForAction, Is.True);
 					Assert.That(sg.wasActStateNull, Is.True);
 				}
@@ -547,11 +556,12 @@ namespace SlotSystemTests{
 
 					for(int i = 0; i< slots.Count; i++){
 						ISlottable sb = slots[i].sb;
-						Assert.That(sb.ssm, Is.SameAs(ssm));
-						Assert.That(sb.item, Is.SameAs(items[i]));
-						Assert.That(sb.isDefocused, Is.True);
-						Assert.That(sb.isEquipped, Is.False);
-						Assert.That(sb.isUnequipped, Is.False);
+						Assert.That(sb.GetSSM(), Is.SameAs(ssm));
+						Assert.That(sb.GetItem(), Is.SameAs(items[i]));
+						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
+						Assert.That(sbSelStateHandler.isDefocused, Is.True);
+						Assert.That(sb.IsEquipped(), Is.False);
+						Assert.That(sb.IsUnequipped(), Is.False);
 					}
 				}
 					class InitSBs_AlwaysCases: IEnumerable{
@@ -572,8 +582,8 @@ namespace SlotSystemTests{
 			/*	helper */
 				static ISlottable MakeSubSBWithItemAndSG(InventoryItemInstance item, SlotGroup sg){
 					ISlottable sb = MakeSubSB();
-						sb.item.Returns(item);
-						sb.sg.Returns(sg);
+						sb.GetItem().Returns(item);
+						sb.GetSG().Returns(sg);
 					return sb;
 				}
 				List<ISlottable> CreateSBs(int count){
@@ -587,8 +597,8 @@ namespace SlotSystemTests{
 				static ISlottable MakeSBWithActProc(bool isRunning){
 					ISlottable sb = MakeSubSB();
 						ISSEProcess sbActProc = MakeSubSBActProc();
-							sbActProc.isRunning.Returns(isRunning);
-						sb.actProcess.Returns(sbActProc);
+							sbActProc.IsRunning().Returns(isRunning);
+						sb.GetActProcess().Returns(sbActProc);
 					return sb;
 				}
 				ISlotSystemManager MakeSSMWithPBunContaining(ISlotGroup sg){

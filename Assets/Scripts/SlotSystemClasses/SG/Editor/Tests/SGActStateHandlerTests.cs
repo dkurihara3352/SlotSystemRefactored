@@ -16,7 +16,7 @@ namespace SlotSystemTests{
 				SGActStateHandler actStateHandler = new SGActStateHandler(MakeSubSG());
 					ISSEProcessEngine<ISGActProcess> mockProcEngine = Substitute.For<ISSEProcessEngine<ISGActProcess>>();
 					actStateHandler.SetActProcEngine(mockProcEngine);
-					mockProcEngine.process.Returns(Substitute.For<ISGActProcess>());
+					mockProcEngine.GetProcess().Returns(Substitute.For<ISGActProcess>());
 
 				actStateHandler.SetActState(null);
 

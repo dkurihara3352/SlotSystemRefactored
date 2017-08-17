@@ -6,91 +6,21 @@ using Utility;
 namespace SlotSystem{
 	public abstract class SlotSystemElement :MonoBehaviour, ISlotSystemElement{
 		/* State Handling */
-			public virtual ISSESelStateHandler selStateHandler{
-				get{
-					if(_selStateHandler == null)
-						_selStateHandler = new SSESelStateHandler();
+			public virtual ISSESelStateHandler GetSelStateHandler(){
+				if(_selStateHandler != null)
 					return _selStateHandler;
-				}
+				else
+					throw new InvalidOperationException("selStateHandler not set");
 			}
 				ISSESelStateHandler _selStateHandler;
 			public virtual void SetSelStateHandler(ISSESelStateHandler handler){
 				_selStateHandler = handler;
 			}
-			public bool isSelStateNull{
-				get{return selStateHandler.isSelStateNull;}
-			}
-			public bool wasSelStateNull{
-				get{return selStateHandler.wasSelStateNull;}
-			}
-			public void Deactivate(){
-				selStateHandler.Deactivate();
-			}
-				public bool isDeactivated{
-					get{return selStateHandler.isDeactivated;}
-				}
-				public bool wasDeactivated{
-					get{return selStateHandler.wasDeactivated;}
-				}
-			public void Focus(){
-				selStateHandler.Focus();
-			}
-				public bool isFocused{
-					get{return selStateHandler.isFocused;}
-				}
-				public bool wasFocused{
-					get{return selStateHandler.wasFocused;}
-				}
-			public void Defocus(){
-				selStateHandler.Defocus();
-			}
-				public bool isDefocused{
-					get{return selStateHandler.isDefocused;}
-				}
-				public bool wasDefocused{
-					get{return selStateHandler.wasDefocused;}
-				}
-			public void Select(){
-				selStateHandler.Select();
-			}
-				public bool isSelected{
-					get{return selStateHandler.isSelected;}
-				}
-				public bool wasSelected{
-					get{return selStateHandler.wasSelected;}
-				}
-			public void Activate(){
-				selStateHandler.Activate();
-			}
-			public void Deselect(){
-				selStateHandler.Deselect();
-			}
 			public virtual void InitializeStates(){
-				Deactivate();
+				GetSelStateHandler().Deactivate();
 			}
-			public void SetAndRunSelProcess(ISSESelProcess process){
-				selStateHandler.SetAndRunSelProcess(process);
-			}
-			public System.Func<IEnumeratorFake> deactivateCoroutine{
-				get{return selStateHandler.deactivateCoroutine;}
-			}
-			public System.Func<IEnumeratorFake> focusCoroutine{
-				get{return selStateHandler.focusCoroutine;}
-			}
-			public System.Func<IEnumeratorFake> defocusCoroutine{
-				get{return selStateHandler.defocusCoroutine;}
-			}
-			public System.Func<IEnumeratorFake> selectCoroutine{
-				get{return selStateHandler.selectCoroutine;}
-			}
-			public void InstantFocus(){
-				selStateHandler.InstantFocus();
-			}
-			public void InstantDefocus(){
-				selStateHandler.InstantDefocus();
-			}
-			public void InstantSelect(){
-				selStateHandler.InstantSelect();
+			public void InitializeSSE(){
+				SetSelStateHandler(new SSESelStateHandler());
 			}
 		/*	public fields	*/
 			public virtual void SetHierarchy(){
@@ -105,109 +35,107 @@ namespace SlotSystem{
 				foreach(var e in this)
 					e.SetParent(this);
 			}
-			public bool isActivatedOnDefault{
-				get{
-					ISlotSystemElement inspected = parent;
-					while(true){
-						if(inspected　== null)
-							break;
-						if(inspected.isActivatedOnDefault)
-							inspected = inspected.parent;
-						else
-							return false;
-					}
-					return m_isActivatedOnDefault;
-				}
-				set{
-					if(isBundleElement && immediateBundle.focusedElement == (ISlotSystemElement)this)
-						m_isActivatedOnDefault = true;
+			public bool IsActivatedOnDefault(){
+				ISlotSystemElement inspected = GetParent();
+				while(true){
+					if(inspected　== null)
+						break;
+					if(inspected.IsActivatedOnDefault())
+						inspected = inspected.GetParent();
 					else
-						m_isActivatedOnDefault = value;
-					}
+						return false;
+				}
+				return _isActivatedOnDefault;
 			}
-				bool m_isActivatedOnDefault = true;
+			public void SetIsActivatedOnDefault(bool activated){
+				if(isBundleElement && ImmediateBundle().GetFocusedElement() == (ISlotSystemElement)this)
+					_isActivatedOnDefault = true;
+				else
+					_isActivatedOnDefault = activated;
+			}
+				bool _isActivatedOnDefault = true;
 			public void ActivateRecursively(){
 				PerformInHierarchy(ActivateInHi);
 			}
 				void ActivateInHi(ISlotSystemElement ele){
-					if(ele.isActivatedOnDefault){
-						if(ele.isFocusableInHierarchy)
-							ele.Activate();
+					ISSESelStateHandler selStateHandler = ele.GetSelStateHandler();
+					if(ele.IsActivatedOnDefault()){
+						if(ele.IsFocusableInHierarchy())
+							selStateHandler.Activate();
 						else
-							ele.Defocus();
+							selStateHandler.Defocus();
 					}
 				}
-			public bool isFocusedInHierarchy{
-				get{
-					ISlotSystemElement inspected = this;
-					while(true){
-						if(inspected　== null)
-							break;
-						if(inspected.isFocused)
-							inspected = inspected.parent;
-						else
-							return false;
+			public bool IsFocusedInHierarchy(){
+				ISlotSystemElement inspected = this;
+				ISSESelStateHandler selStateHandler = inspected.GetSelStateHandler();
+				while(true){
+					if(inspected　== null)
+						break;
+					if(selStateHandler.isFocused){
+						inspected = inspected.GetParent();
+						if(inspected != null)
+							selStateHandler = inspected.GetSelStateHandler();
 					}
-					return true;
+					else
+						return false;
 				}
-			}			
-			public bool isFocusableInHierarchy{
-				get{
-					ISlotSystemElement inspected = this;
-					while(true){
-						if(inspected.immediateBundle == null)
-							break;
-						if(inspected.immediateBundle.focusedElement == inspected || inspected.immediateBundle.focusedElement.ContainsInHierarchy(inspected))
-							inspected = inspected.immediateBundle;
-						else
-							return false;
-					}
-					return true;
+				return true;
+			}
+			public bool IsFocusableInHierarchy(){
+				ISlotSystemElement inspected = this;
+				while(true){
+					ISlotSystemBundle inspectedImmBun = inspected.ImmediateBundle();
+					if(inspectedImmBun == null)
+						break;
+					ISlotSystemElement inspImmBunFocusedEle = inspectedImmBun.GetFocusedElement();
+					if(inspImmBunFocusedEle == inspected || inspImmBunFocusedEle.ContainsInHierarchy(inspected))
+						inspected = inspectedImmBun;
+					else
+						return false;
 				}
+				return true;
 			}
 			public bool isBundleElement{
 				get{
-					return parent is ISlotSystemBundle;
+					return GetParent() is ISlotSystemBundle;
 				}
 			}
-			public ISlotSystemBundle immediateBundle{
-				get{
-					if(parent == null)
-						return null;
-					else if(parent is ISlotSystemBundle)
-						return (ISlotSystemBundle)parent;
-					else
-						return parent.immediateBundle;
-				}
+			public ISlotSystemBundle ImmediateBundle(){
+				ISlotSystemElement parent = GetParent();
+				if(parent == null)
+					return null;
+				else if(parent is ISlotSystemBundle)
+					return (ISlotSystemBundle)parent;
+				else
+					return parent.ImmediateBundle();
 			}
-			public virtual ISlotSystemElement parent{
-				get{return m_parent;}
+			public virtual ISlotSystemElement GetParent(){
+				return _parent;
 			}
-				ISlotSystemElement m_parent;
+				ISlotSystemElement _parent;
 			public void SetParent(ISlotSystemElement par){
-				m_parent = par;
+				_parent = par;
 			}
-			public ISlotSystemManager ssm{
-				get{
-					if(m_ssm != null)
-						return m_ssm;
-					else
-						throw new InvalidOperationException("ssm not set");
-				}
+			public ISlotSystemManager GetSSM(){
+				if(_ssm != null)
+					return _ssm;
+				else
+					throw new InvalidOperationException("ssm not set");
 			}
-				ISlotSystemManager m_ssm;
+				ISlotSystemManager _ssm;
 			public void SetSSM(ISlotSystemElement ssm){
-				m_ssm = (ISlotSystemManager)ssm;
+				_ssm = (ISlotSystemManager)ssm;
 			}
 			public virtual bool ContainsInHierarchy(ISlotSystemElement ele){
 				if(ele != null){
-					ISlotSystemElement testEle = ele.parent;
+					ISlotSystemElement testEle = ele.GetParent();
 					while(true){
 						if(testEle == null)
 							return false;
 						if(testEle == (ISlotSystemElement)this)
 							return true;
-						testEle = testEle.parent;
+						testEle = testEle.GetParent();
 					}
 				}
 				throw new System.ArgumentNullException();
@@ -265,12 +193,11 @@ namespace SlotSystem{
 				}
 			}
 				IEnumerable<ISlotSystemElement> m_elements;
-			public int level{
-				get{
-					if(parent == null)
-						return 0;
-					return parent.level + 1;
-				}
+			public int GetLevel(){
+				ISlotSystemElement parent = GetParent();
+				if(parent == null)
+					return 0;
+				return parent.GetLevel() + 1;
 			}
 			public IEnumerator<ISlotSystemElement> GetEnumerator(){
 				foreach(ISlotSystemElement ele in elements)
@@ -280,16 +207,17 @@ namespace SlotSystem{
 					return GetEnumerator();
 				}	
 	}
-	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>, ISSESelStateHandler{
+	public interface ISlotSystemElement: IEnumerable<ISlotSystemElement>{
 		void InitializeStates();
 		void SetHierarchy();
-		bool isActivatedOnDefault{get;set;}
-		bool isFocusedInHierarchy{get;}
-		bool isFocusableInHierarchy{get;}
-		ISlotSystemBundle immediateBundle{get;}
-		ISlotSystemElement parent{get;}
+		bool IsActivatedOnDefault();
+		void SetIsActivatedOnDefault(bool activated);
+		bool IsFocusedInHierarchy();
+		bool IsFocusableInHierarchy();
+		ISlotSystemBundle ImmediateBundle();
+		ISlotSystemElement GetParent();
 		void SetParent(ISlotSystemElement par);
-		ISlotSystemManager ssm{get;}
+		ISlotSystemManager GetSSM();
 		void SetSSM(ISlotSystemElement ssm);
 		bool ContainsInHierarchy(ISlotSystemElement ele);
 		void PerformInHierarchy(System.Action<ISlotSystemElement> act);
@@ -297,7 +225,7 @@ namespace SlotSystem{
 		void PerformInHierarchy<T>(System.Action<ISlotSystemElement, IList<T>> act, IList<T> list);
 		bool Contains(ISlotSystemElement element);
 		ISlotSystemElement this[int i]{get;}
-		int level{get;}
-		ISSESelStateHandler selStateHandler{get;}
+		int GetLevel();
+		ISSESelStateHandler GetSelStateHandler();
 	}
 }

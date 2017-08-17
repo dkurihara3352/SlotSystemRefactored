@@ -90,9 +90,9 @@ namespace SlotSystemTests{
 				Assert.That(eSet.wearSG, Is.SameAs(xWearSG));
 				Assert.That(eSet.cGearsSG, Is.SameAs(xCGearsSG));
 
-				Assert.That(xBowSG.parent, Is.SameAs(eSet));
-				Assert.That(xWearSG.parent, Is.SameAs(eSet));
-				Assert.That(xCGearsSG.parent, Is.SameAs(eSet));
+				Assert.That(xBowSG.GetParent(), Is.SameAs(eSet));
+				Assert.That(xWearSG.GetParent(), Is.SameAs(eSet));
+				Assert.That(xCGearsSG.GetParent(), Is.SameAs(eSet));
 			}
 			[Test]
 			public void Elements_AfterInspectorSetUp_ReturnsSGs(){

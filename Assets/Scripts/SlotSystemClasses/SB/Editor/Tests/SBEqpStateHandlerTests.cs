@@ -13,7 +13,7 @@ namespace SlotSystemTests{
 			public void SetEqpState_NullAndEqpProcNotNull_CallsProcEngineSetAndRunNull(){
 				ISSEProcessEngine<ISBEqpProcess> mockProcEngine;
 				SBEqpStateHandler handler = MakeEqpStateHandlerWithProcEngine(out mockProcEngine);
-				mockProcEngine.process.Returns(Substitute.For<ISBEqpProcess>());
+				mockProcEngine.GetProcess().Returns(Substitute.For<ISBEqpProcess>());
 				
 				handler.SetEqpState(null);
 
@@ -23,7 +23,7 @@ namespace SlotSystemTests{
 			public void SetEqpState_NotNull_DoesNotCallsProcEngineSetAndRunNull(){
 				ISSEProcessEngine<ISBEqpProcess> mockProcEngine;
 				SBEqpStateHandler handler = MakeEqpStateHandlerWithProcEngine(out mockProcEngine);
-				mockProcEngine.process.Returns(Substitute.For<ISBEqpProcess>());
+				mockProcEngine.GetProcess().Returns(Substitute.For<ISBEqpProcess>());
 				
 				handler.SetEqpState(Substitute.For<ISBEqpState>());
 
@@ -33,7 +33,7 @@ namespace SlotSystemTests{
 			public void SetEqpState_NullAndEqpProcNull_DoesNotCallsProcEngineSetAndRunNull(){
 				ISSEProcessEngine<ISBEqpProcess> mockProcEngine;
 				SBEqpStateHandler handler = MakeEqpStateHandlerWithProcEngine(out mockProcEngine);
-				mockProcEngine.process.Returns((ISBEqpProcess)null);
+				mockProcEngine.GetProcess().Returns((ISBEqpProcess)null);
 				
 				handler.SetEqpState((ISBEqpState)null);
 

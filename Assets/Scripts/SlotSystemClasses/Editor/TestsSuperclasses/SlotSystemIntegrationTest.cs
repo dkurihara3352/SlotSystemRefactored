@@ -28,11 +28,11 @@ namespace SlotSystemTests{
 
 				bun0.InspectorSetUp(sse00);
 
-				sse00.isActivatedOnDefault = false;
+				sse00.SetIsActivatedOnDefault(false);
 
 				sse.SetHierarchyRecursively();
 				
-				Assert.That(sse00.isActivatedOnDefault, Is.Not.False);
+				Assert.That(sse00.IsActivatedOnDefault(), Is.Not.False);
 		}
 	}
 }

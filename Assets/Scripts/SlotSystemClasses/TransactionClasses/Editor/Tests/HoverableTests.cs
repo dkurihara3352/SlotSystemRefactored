@@ -14,40 +14,41 @@ namespace SlotSystemTests{
 		[Test]
 		[ExpectedException(typeof(System.InvalidOperationException))]
 		public void OnHoverEnter_SSEIsSelStateNull_ThrowsException(){
-			Hoverable hoverable;
-				ISlotSystemElement sse = MakeSubSSE();
-					sse.isSelStateNull.Returns(true);
-				hoverable = new Hoverable(sse, MakeSubTAC());
+			Hoverable hoverable = new Hoverable(MakeSubTAC());
+				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					sseSelStateHandler.isSelStateNull.Returns(true);
+				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverEnter();
 		}
 		[Test]
 		[ExpectedException(typeof(System.InvalidOperationException))]
 		public void OnHoverEnter_SSEIsDeactivated_ThrowsException(){
-			Hoverable hoverable;
-				ISlotSystemElement sse = MakeSubSSE();
-					sse.isDeactivated.Returns(true);
-				hoverable = new Hoverable(sse, MakeSubTAC());
+			Hoverable hoverable = new Hoverable(MakeSubTAC());
+				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					sseSelStateHandler.isDeactivated.Returns(true);
+				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverEnter();
 		}
 		[Test]
 		[ExpectedException(typeof(System.InvalidOperationException))]
 		public void OnHoverEnter_SSEIsSelected_ThrowsException(){
-			Hoverable hoverable;
-				ISlotSystemElement sse = MakeSubSSE();
-					sse.isSelected.Returns(true);
-				hoverable = new Hoverable(sse, MakeSubTAC());
+			Hoverable hoverable = new Hoverable(MakeSubTAC());
+				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					sseSelStateHandler.isSelected.Returns(true);
+				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverEnter();
 		}
 		[Test]
 		public void OnHoverEnter_SSEIsFocused_CallsTAMSetHoveredThis(){
 			Hoverable hoverable;
-				ISlotSystemElement stubSSE = MakeSubSSE();
-					stubSSE.isFocused.Returns(true);
-					ITransactionCache mockTAC = MakeSubTAC();
-				hoverable = new Hoverable(stubSSE, mockTAC);
+					ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
+				hoverable = new Hoverable(mockTAC);
+					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+						sseSelStateHandler.isFocused.Returns(true);
+				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 			
 			hoverable.OnHoverEnter();
 
@@ -56,10 +57,11 @@ namespace SlotSystemTests{
 		[Test]
 		public void OnHoverEnter_SSEIsDefocused_CallsTAMSetHoveredThis(){
 			Hoverable hoverable;
-				ISlotSystemElement stubSSE = MakeSubSSE();
-					stubSSE.isDefocused.Returns(true);
-					ITransactionCache mockTAC = MakeSubTAC();
-				hoverable = new Hoverable(stubSSE, mockTAC);
+					ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
+				hoverable = new Hoverable(mockTAC);
+					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+						sseSelStateHandler.isDefocused.Returns(true);
+					hoverable.SetSSESelStateHandler(sseSelStateHandler);
 			
 			hoverable.OnHoverEnter();
 
@@ -68,42 +70,43 @@ namespace SlotSystemTests{
 		
 		[Test][ExpectedException(typeof(System.InvalidOperationException))]
 		public void OnHoverExit_SSEIsSelStateNull_ThrowsException(){
-			Hoverable hoverable;
-				ISlotSystemElement stubSSE = MakeSubSSE();
-					stubSSE.isSelStateNull.Returns(true);
-			hoverable = new Hoverable(stubSSE, MakeSubTAC());
+			Hoverable hoverable = new Hoverable(MakeSubTAC());
+				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					sseSelStateHandler.isSelStateNull.Returns(true);
+				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverExit();
 		}
 		[Test][ExpectedException(typeof(System.InvalidOperationException))]
 		public void OnHoverExit_SSEIsDeactivated_ThrowsException(){
-			Hoverable hoverable;
-				ISlotSystemElement stubSSE = MakeSubSSE();
-					stubSSE.isDeactivated.Returns(true);
-			hoverable = new Hoverable(stubSSE, MakeSubTAC());
+			Hoverable hoverable = new Hoverable(MakeSubTAC());
+				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					sseSelStateHandler.isDeactivated.Returns(true);
+				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverExit();
 		}
 		[Test][ExpectedException(typeof(System.InvalidOperationException))]
 		public void OnHoverExit_IsNotHovered_ThrowsException(){
 			Hoverable hoverable;
-				ISlotSystemElement stubSSE = MakeSubSSE();
-					stubSSE.isDeactivated.Returns(false);
-					ITransactionCache stubTAC = MakeSubTAC();
-				hoverable = new Hoverable(stubSSE, stubTAC);
+					ITransactionCache stubTAC = Substitute.For<ITransactionCache>();
 					stubTAC.hovered.Returns((IHoverable)null);
+				hoverable = new Hoverable(stubTAC);
+					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+						sseSelStateHandler.isDeactivated.Returns(true);
+					hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverExit();
 		}
 		[Test]
 		public void OnHoverExit_IsHoveredAndSSEIsNotDeactivated_CallsTAMOnHoverExitNull(){
-			IHoverable hoverable;
-				ISlotSystemElement stubSSE = MakeSubSSE();
-					stubSSE.isFocused.Returns(true);
-					stubSSE.isDeactivated.Returns(false);
-					ITransactionCache mockTAC = MakeSubTAC();
-				hoverable = new Hoverable(stubSSE, mockTAC);
+			Hoverable hoverable;
+					ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
+				hoverable = new Hoverable(mockTAC);
 					mockTAC.hovered.Returns(hoverable);
+					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
+						sseSelStateHandler.isDeactivated.Returns(false);
+					hoverable.SetSSESelStateHandler(sseSelStateHandler);
 			
 			hoverable.OnHoverExit();
 			

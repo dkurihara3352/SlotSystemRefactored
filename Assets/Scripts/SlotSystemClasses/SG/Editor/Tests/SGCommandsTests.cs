@@ -54,18 +54,18 @@ namespace SlotSystemTests{
 					IEnumerable<ISlotSystemElement> sbs;
 						ISlottable stubSB_A = MakeSubSB();
 							BowInstance bow = MakeBowInstance(0);
-							stubSB_A.newSlotID.Returns(-1);
-							stubSB_A.item.Returns(bow);
-							stubSB_A.isToBeRemoved.Returns(true);
+							stubSB_A.GetNewSlotID().Returns(-1);
+							stubSB_A.GetItem().Returns(bow);
+							stubSB_A.IsToBeRemoved().Returns(true);
 						ISlottable stubSB_B = MakeSubSB();
 							WearInstance wear = MakeWearInstance(0);
-							stubSB_B.slotID.Returns(-1);
-							stubSB_B.item.Returns(wear);
-							stubSB_B.isToBeAdded.Returns(true);
+							stubSB_B.GetSlotID().Returns(-1);
+							stubSB_B.GetItem().Returns(wear);
+							stubSB_B.IsToBeAdded().Returns(true);
 						ISlottable stubSB_C = MakeSubSB();
 							ShieldInstance shield = MakeShieldInstance(0);
-							stubSB_C.slotID.Returns(0);
-							stubSB_C.item.Returns(shield);
+							stubSB_C.GetSlotID().Returns(0);
+							stubSB_C.GetItem().Returns(shield);
 						sbs = new ISlotSystemElement[]{stubSB_A, stubSB_B, stubSB_C};
 				mockSG.GetEnumerator().Returns(sbs.GetEnumerator());
 

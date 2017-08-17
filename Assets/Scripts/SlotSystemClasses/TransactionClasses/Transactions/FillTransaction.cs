@@ -16,7 +16,7 @@ namespace SlotSystem{
 		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam):base(tam){
 			m_pickedSB = pickedSB;
 			m_selectedSG = selected;
-			m_origSG = m_pickedSB.sg;
+			m_origSG = m_pickedSB.GetSG();
 			iconHandler = tam.iconHandler;
 			sg2SlotsHolder = sg2;
 			sg1ActStateHandler = sg1;
@@ -34,7 +34,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1ActStateHandler.Fill();
 			sg2ActStateHandler.Fill();
-			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.item));
+			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();
 			base.Execute();

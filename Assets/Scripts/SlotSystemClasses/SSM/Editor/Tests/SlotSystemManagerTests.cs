@@ -56,7 +56,7 @@ namespace SlotSystemTests{
 				
 				ssm.Initialize();
 				
-				Assert.That(ssm.ssm, Is.SameAs(ssm));
+				Assert.That(ssm.GetSSM(), Is.SameAs(ssm));
 				pBun.Received().PerformInHierarchy(ssm.SetSSMInH);
 				eBun.Received().PerformInHierarchy(ssm.SetSSMInH);
 				foreach(var gBun in gBuns)
@@ -64,7 +64,9 @@ namespace SlotSystemTests{
 				}
 			[Test]
 			public void Initialize_WhenCalled_CallsPIHInitializeState(){
-				SlotSystemManager ssm = MakeSSM_selStateHandler();
+				SlotSystemManager ssm = MakeSSM();
+					ISSESelStateHandler ssmSelStateHandler = Substitute.For<ISSESelStateHandler>();
+					ssm.SetSelStateHandler(ssmSelStateHandler);
 					ISlotSystemBundle pBun = MakeSubBundle();
 						ISlotSystemBundle eBun = MakeSubBundle();
 						IEnumerable<ISlotSystemBundle> gBuns;
@@ -79,8 +81,7 @@ namespace SlotSystemTests{
 
 				ssm.Initialize();
 
-				Assert.That(ssm.isDeactivated, Is.True);
-				Assert.That(ssm.wasSelStateNull, Is.True);
+				ssmSelStateHandler.Received().Deactivate();
 				pBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				eBun.Received().PerformInHierarchy(ssm.InitStatesInHi);
 				foreach(var gBun in gBuns)
@@ -518,32 +519,32 @@ namespace SlotSystemTests{
 						foreach(var gBun in gBuns)
 							gBun.Received().PerformInHierarchy(ssm.Unequip, bow);
 					}
-					}
+				}
 				[Test]
 				public void Equip_MatchesAndSGFocusedInBundleAndSBNewSlotIDNotMinus1_CallsSBEquip(){
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInHierarchy.Returns(true);
+						stubSG.IsFocusedInHierarchy().Returns(true);
 					ISlottable mockSB = MakeSubSB();
-						mockSB.sg.Returns(stubSG);
-						mockSB.item.Returns(bow);
-						mockSB.newSlotID.Returns(0);
+						mockSB.GetSG().Returns(stubSG);
+						mockSB.GetItem().Returns(bow);
+						mockSB.GetNewSlotID().Returns(0);
 					
 					ssm.Equip(mockSB, bow);
 
 					mockSB.Received().Equip();
-					}
+				}
 				[Test]
 				public void Equip_MatchesAndSGNOTFocusedInBundleAndSGIsPool_CallsSBInOrder(){
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInHierarchy.Returns(false);
+						stubSG.IsFocusedInHierarchy().Returns(false);
 					ISlottable mockSB = MakeSubSB();
-						mockSB.sg.Returns(stubSG);
-						mockSB.item.Returns(bow);
-						mockSB.isPool.Returns(true);
+						mockSB.GetSG().Returns(stubSG);
+						mockSB.GetItem().Returns(bow);
+						mockSB.IsPool().Returns(true);
 					
 					ssm.Equip(mockSB, bow);
 
@@ -551,32 +552,32 @@ namespace SlotSystemTests{
 						mockSB.ClearCurEqpState();
 						mockSB.Equip();
 					});
-					}
+				}
 				[Test]
 				public void Unequip_MatchesAndSGFocusedInBundleAndSBSlotIDNotMinus1_CallsSBUnequip(){
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInHierarchy.Returns(true);
+						stubSG.IsFocusedInHierarchy().Returns(true);
 					ISlottable mockSB = MakeSubSB();
-						mockSB.sg.Returns(stubSG);
-						mockSB.item.Returns(bow);
-						mockSB.slotID.Returns(0);
+						mockSB.GetSG().Returns(stubSG);
+						mockSB.GetItem().Returns(bow);
+						mockSB.GetSlotID().Returns(0);
 					
 					ssm.Unequip(mockSB, bow);
 
 					mockSB.Received().Unequip();
-					}
+				}
 				[Test]
 				public void Unequip_MatchesAndSGNOTFocusedInBundleAndSGIsPool_CallsSBInOrder(){
 					SlotSystemManager ssm = MakeSSM();
 					BowInstance bow = MakeBowInstance(0);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.isFocusedInHierarchy.Returns(false);
+						stubSG.IsFocusedInHierarchy().Returns(false);
 					ISlottable mockSB = MakeSubSB();
-						mockSB.sg.Returns(stubSG);
-						mockSB.item.Returns(bow);
-						mockSB.isPool.Returns(true);
+						mockSB.GetSG().Returns(stubSG);
+						mockSB.GetItem().Returns(bow);
+						mockSB.IsPool().Returns(true);
 					
 					ssm.Unequip(mockSB, bow);
 
@@ -584,7 +585,7 @@ namespace SlotSystemTests{
 						mockSB.ClearCurEqpState();
 						mockSB.Unequip();
 					});
-					}
+				}
 				[Test]
 				public void FindParent_WhenCalled_CallAllBundlesPIHCheckAndReportParent(){
 					SlotSystemManager ssm = MakeSSM();
@@ -665,40 +666,6 @@ namespace SlotSystemTests{
 								yield return directChildSB_T;
 						}
 					}
-				[Test]
-				public void Focus_WhenCalled_SetsSelStateFocusedState(){
-					SlotSystemManager ssm = MakeSSM_TAM_selStateHandler();
-
-					ssm.Focus();
-
-					Assert.That(ssm.isFocused, Is.True);
-					}
-				[Test]
-				public void Defocus_WhenCalled_SetsSelStateDefocused(){
-					SlotSystemManager ssm = MakeSSM_TAM_selStateHandler();
-
-					ssm.Defocus();
-
-					Assert.That(ssm.isDefocused, Is.True);
-					}
-				[Test]
-				public void Deactivate_WhenCalled_SetsSelStateDeactivateed(){
-					SlotSystemManager ssm = MakeSSM_TAM_selStateHandler();
-
-					ssm.Deactivate();
-
-					Assert.That(ssm.isDeactivated, Is.True);
-					}
-				// [Test][Category("Methods")]
-				/* Get bakc to this after refactoring isToggleON */
-				public void FocusInBundle_Various_CallsElementsAccordingly(){
-					// SlotSystemManager ssm = MakeSSM();
-					// 	SlotSystemBundle pBun = MakeSSBundle();
-					// 		SlotGroup sgpAll = MakeSG();
-					// 			PoolInventory pInv = new PoolInventory();
-					// 				BowInstance bow = MakeBowInstance(0);
-
-					}
 			/*	SSE imple */
 				[Test]
 				public void SetHierarchy_isElementsSetUp_DoesNotThrowException(){
@@ -762,10 +729,10 @@ namespace SlotSystemTests{
 					Assert.That(ssm.equipBundle, Is.SameAs(eBun));
 					Assert.That(ssm.otherBundles, Is.EqualTo(xGBuns));
 
-					Assert.That(pBun.parent, Is.SameAs(ssm));
-					Assert.That(eBun.parent, Is.SameAs(ssm));
-					Assert.That(gBunA.parent, Is.SameAs(ssm));
-					Assert.That(gBunB.parent, Is.SameAs(ssm));
+					Assert.That(pBun.GetParent(), Is.SameAs(ssm));
+					Assert.That(eBun.GetParent(), Is.SameAs(ssm));
+					Assert.That(gBunA.GetParent(), Is.SameAs(ssm));
+					Assert.That(gBunB.GetParent(), Is.SameAs(ssm));
 				}
 			/*	helper	*/
 				public IEnumerable<ISlotSystemElement> ConvertToSSEs<T>(IEnumerable<T> sgs) where T: ISlotSystemElement{

@@ -7,33 +7,33 @@ using Utility;
 namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
 		public override void InitializeStates(){
-			Deactivate();
+			_selStateHandler.Deactivate();
 			WaitForAction();
 			ClearCurEqpState();
 			Unmark();
 		}
 		/*	States	*/
 			public void InitializeSB(InventoryItemInstance item){
-				SetHoverable(new Hoverable(this, ssm.taCache));
+
+				SetHoverable(new Hoverable(GetSSM().taCache));
 				SetTapCommand(new SBTapCommand());
 				SetItemHandler(new ItemHandler(item));
 				SetSlotHandler(new SlotHandler());
 				InitializeStateHandlers();
+				hoverable.SetSSESelStateHandler(_selStateHandler);
 			}
 			public void InitializeStateHandlers(){
 				_selStateHandler = new SBSelStateHandler(this);
-				_actStateHandler = new SBActStateHandler(this, ssm.tam);
+				_actStateHandler = new SBActStateHandler(this, GetSSM().tam);
 				_eqpStateHandler = new SBEqpStateHandler(this);
 				_mrkStateHandler = new SBMrkStateHandler(this);
 			}
 			/*	Selection state */
-				public override ISSESelStateHandler selStateHandler{
-					get{
-						if(_selStateHandler != null)
-							return _selStateHandler;
-						else
-							throw new InvalidOperationException("selStateHandler not set");
-					}
+				public override ISSESelStateHandler GetSelStateHandler(){
+					if(_selStateHandler != null)
+						return _selStateHandler;
+					else
+						throw new InvalidOperationException("selStateHandler not set");
 				}
 					ISSESelStateHandler _selStateHandler;
 				public override void SetSelStateHandler(ISSESelStateHandler handler){
@@ -55,59 +55,47 @@ namespace SlotSystem{
 				public void ClearCurActState(){
 					actStateHandler.ClearCurActState();
 				}
-					public bool wasActStateNull{
-						get{return actStateHandler.wasActStateNull;}
+					public bool WasActStateNull(){
+						return actStateHandler.WasActStateNull();
 					}
-					public bool isActStateNull{
-						get{return actStateHandler.isActStateNull;}
+					public bool IsActStateNull(){
+						return actStateHandler.IsActStateNull();
 					}
 				public void WaitForAction(){
 					actStateHandler.WaitForAction();
 				}
-					public ISBActState waitForActionState{
-						get{return actStateHandler.waitForActionState;}
+					public bool IsWaitingForAction(){
+						return actStateHandler.IsWaitingForAction();
 					}
-					public bool isWaitingForAction{
-						get{return actStateHandler.isWaitingForAction;}
-					}
-					public bool wasWaitingForAction{
-						get{return actStateHandler.wasWaitingForAction;}
+					public bool WasWaitingForAction(){
+						return actStateHandler.WasWaitingForAction();
 					}
 				public void WaitForPointerUp(){
 					actStateHandler.WaitForPointerUp();
 				}
-					public ISBActState waitForPointerUpState{
-						get{return actStateHandler.waitForPointerUpState;}
+					public bool IsWaitingForPointerUp(){
+						return actStateHandler.IsWaitingForPointerUp();
 					}
-					public bool isWaitingForPointerUp{
-						get{return actStateHandler.isWaitingForPointerUp;}
-					}
-					public bool wasWaitingForPointerUp{
-						get{return actStateHandler.wasWaitingForPointerUp;}
+					public bool WasWaitingForPointerUp(){
+						return actStateHandler.WasWaitingForPointerUp();
 					}
 				public void WaitForPickUp(){
 					actStateHandler.WaitForPickUp();
 				}
-					public ISBActState waitForPickUpState{
-						get{return actStateHandler.waitForPickUpState;}
+					public bool IsWaitingForPickUp(){
+						return actStateHandler.IsWaitingForPickUp();
 					}
-					public bool isWaitingForPickUp{
-						get{return actStateHandler.isWaitingForPickUp;}
-					}
-					public bool wasWaitingForPickUp{
-						get{return actStateHandler.wasWaitingForPickUp;}
+					public bool WasWaitingForPickUp(){
+						return actStateHandler.WasWaitingForPickUp();
 					}
 				public void WaitForNextTouch(){
 					actStateHandler.WaitForNextTouch();
 				}
-					public ISBActState waitForNextTouchState{
-						get{return actStateHandler.waitForNextTouchState;}
+					public bool IsWaitingForNextTouch(){
+						return actStateHandler.IsWaitingForNextTouch();
 					}
-					public bool isWaitingForNextTouch{
-						get{return actStateHandler.isWaitingForNextTouch;}
-					}
-					public bool wasWaitingForNextTouch{
-						get{return actStateHandler.wasWaitingForNextTouch;}
+					public bool WasWaitingForNextTouch(){
+						return actStateHandler.WasWaitingForNextTouch();
 					}
 				public void PickUp(){
 					actStateHandler.PickUp();
@@ -115,53 +103,41 @@ namespace SlotSystem{
 				public void SetPickedUpState(){
 					actStateHandler.SetPickedUpState();
 				}
-					public ISBActState pickedUpState{
-						get{return actStateHandler.pickedUpState;}
+					public bool IsPickingUp(){
+						return actStateHandler.IsPickingUp();
 					}
-					public bool isPickingUp{
-						get{return actStateHandler.isPickingUp;}
-					}
-					public bool wasPickingUp{
-						get{return actStateHandler.wasPickingUp;}
+					public bool WasPickingUp(){
+						return actStateHandler.WasPickingUp();
 					}
 				public void Remove(){
 					actStateHandler.Remove();
 				}
-					public ISBActState removedState{
-						get{return actStateHandler.removedState;}
+					public bool IsRemoving(){
+						return actStateHandler.IsRemoving();
 					}
-					public bool isRemoving{
-						get{return actStateHandler.isRemoving;}
-					}
-					public bool wasRemoving{
-						get{return actStateHandler.wasRemoving;}
+					public bool WasRemoving(){
+						return actStateHandler.WasRemoving();
 					}
 				public void Add(){
 					actStateHandler.Add();
 				}
-					public ISBActState addedState{
-						get{return actStateHandler.addedState;}
+					public bool IsAdding(){
+						return actStateHandler.IsAdding();
 					}
-					public bool isAdding{
-						get{return actStateHandler.isAdding;}
-					}
-					public bool wasAdding{
-						get{return actStateHandler.wasAdding;}
+					public bool WasAdding(){
+						return actStateHandler.WasAdding();
 					}
 				public void MoveWithin(){
 					actStateHandler.MoveWithin();
 				}
-					public ISBActState moveWithinState{
-						get{return actStateHandler.moveWithinState;}
+					public bool IsMovingWithin(){
+						return actStateHandler.IsMovingWithin();
 					}
-					public bool isMovingWithin{
-						get{return actStateHandler.isMovingWithin;}
+					public bool WasMovingWithin(){
+						return actStateHandler.WasMovingWithin();
 					}
-					public bool wasMovingWithin{
-						get{return actStateHandler.wasMovingWithin;}
-					}
-				public ISBActProcess actProcess{
-					get{return actStateHandler.actProcess;}
+				public ISBActProcess GetActProcess(){
+					return actStateHandler.GetActProcess();
 				}
 				public void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine){
 					((SBActStateHandler)actStateHandler).SetActProcessEngine(engine);
@@ -175,26 +151,26 @@ namespace SlotSystem{
 				public void SetActCoroutineRepo(ISBActCoroutineRepo repo){
 					((SBActStateHandler)actStateHandler).SetCoroutineRepo(repo);
 				}
-				public System.Func<IEnumeratorFake> waitForPointerUpCoroutine{
-					get{return actStateHandler.waitForPointerUpCoroutine;}
+				public System.Func<IEnumeratorFake> GetWaitForPointerUpCoroutine(){
+					return actStateHandler.GetWaitForPointerUpCoroutine();
 				}
-				public System.Func<IEnumeratorFake> waitForPickUpCoroutine{
-					get{return actStateHandler.waitForPickUpCoroutine;}
+				public System.Func<IEnumeratorFake> GetWaitForPickUpCoroutine(){
+					return actStateHandler.GetWaitForPickUpCoroutine();
 				}
-				public System.Func<IEnumeratorFake> pickUpCoroutine{
-					get{return actStateHandler.pickUpCoroutine;}
+				public System.Func<IEnumeratorFake> GetPickUpCoroutine(){
+					return actStateHandler.GetPickUpCoroutine();
 				}
-				public System.Func<IEnumeratorFake> waitForNextTouchCoroutine{
-					get{return actStateHandler.waitForNextTouchCoroutine;}
+				public System.Func<IEnumeratorFake> GetWaitForNextTouchCoroutine(){
+					return actStateHandler.GetWaitForNextTouchCoroutine();
 				}
-				public System.Func<IEnumeratorFake> removeCoroutine{
-					get{return actStateHandler.removeCoroutine;}
+				public System.Func<IEnumeratorFake> GetRemoveCoroutine(){
+					return actStateHandler.GetRemoveCoroutine();
 				}
-				public System.Func<IEnumeratorFake> addCoroutine{
-					get{return actStateHandler.addCoroutine;}
+				public System.Func<IEnumeratorFake> GetAddCoroutine(){
+					return actStateHandler.GetAddCoroutine();
 				}
-				public System.Func<IEnumeratorFake> moveWithinCoroutine{
-					get{return actStateHandler.moveWithinCoroutine;}
+				public System.Func<IEnumeratorFake> GetMoveWithinCoroutine(){
+					return actStateHandler.GetMoveWithinCoroutine();
 				}
 				public void OnPointerDown(PointerEventDataFake eventDataMock){
 					actStateHandler.OnPointerDown(eventDataMock);
@@ -224,38 +200,32 @@ namespace SlotSystem{
 				public void ClearCurEqpState(){
 					eqpStateHandler.ClearCurEqpState();
 				}
-				public bool isEqpStateNull{
-					get{return eqpStateHandler.isEqpStateNull;}
+				public bool IsEqpStateNull(){
+					return eqpStateHandler.IsEqpStateNull();
 				}
-				public bool wasEqpStateNull{
-					get{return eqpStateHandler.wasEqpStateNull;}
+				public bool WasEqpStateNull(){
+					return eqpStateHandler.WasEqpStateNull();
 				}
 				public void Equip(){
 					eqpStateHandler.Equip();
 				}
-				public ISBEqpState equippedState{
-					get{return eqpStateHandler.equippedState;}
+				public bool IsEquipped(){
+					return eqpStateHandler.IsEquipped();
 				}
-				public bool isEquipped{
-					get{return eqpStateHandler.isEquipped;}
-				}
-				public bool wasEquipped{
-					get{return eqpStateHandler.wasEquipped;}
+				public bool WasEquipped(){
+					return eqpStateHandler.WasEquipped();
 				}
 				public void Unequip(){
 					eqpStateHandler.Unequip();
 				}
-				public ISBEqpState unequippedState{
-					get{return eqpStateHandler.unequippedState;}
+				public bool IsUnequipped(){
+					return eqpStateHandler.IsUnequipped();
 				}
-				public bool isUnequipped{
-					get{return eqpStateHandler.isUnequipped;}
+				public bool WasUnequipped(){
+					return eqpStateHandler.WasUnequipped();
 				}
-				public bool wasUnequipped{
-					get{return eqpStateHandler.wasUnequipped;}
-				}
-				public ISBEqpProcess eqpProcess{
-					get{return eqpStateHandler.eqpProcess;}
+				public ISBEqpProcess GetEqpProcess(){
+					return eqpStateHandler.GetEqpProcess();
 				}
 				public void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine){
 					((SBEqpStateHandler)eqpStateHandler).SetEqpProcessEngine(engine);
@@ -263,11 +233,11 @@ namespace SlotSystem{
 				public void SetAndRunEqpProcess(ISBEqpProcess process){
 					eqpStateHandler.SetAndRunEqpProcess(process);
 				}
-				public System.Func<IEnumeratorFake> unequipCoroutine{
-					get{return eqpStateHandler.unequipCoroutine;}
+				public System.Func<IEnumeratorFake> GetUnequipCoroutine(){
+					return eqpStateHandler.GetUnequipCoroutine();
 				}
-				public System.Func<IEnumeratorFake> equipCoroutine{
-					get{return eqpStateHandler.equipCoroutine;}
+				public System.Func<IEnumeratorFake> GetEquipCoroutine(){
+					return eqpStateHandler.GetEquipCoroutine();
 				}
 			/*	Mark state	*/
 				ISBMrkStateHandler mrkStateHandler{
@@ -285,38 +255,32 @@ namespace SlotSystem{
 				public void ClearCurMrkState(){
 					mrkStateHandler.ClearCurMrkState();
 				}
-				public bool isMrkStateNull{
-					get{return mrkStateHandler.isMrkStateNull;}
+				public bool IsMrkStateNull(){
+					return mrkStateHandler.IsMrkStateNull();
 				}
-				public bool wasMrkStateNull{
-					get{return mrkStateHandler.wasMrkStateNull;}
+				public bool WasMrkStateNull(){
+					return mrkStateHandler.WasMrkStateNull();
 				}
 				public void Mark(){
 					mrkStateHandler.Mark();
 				}
-				public ISBMrkState	markedState{
-					get{return mrkStateHandler.markedState;}
+				public bool IsMarked(){
+					return mrkStateHandler.IsMarked();
 				}
-				public bool isMarked{
-					get{return mrkStateHandler.isMarked;}
-				}
-				public bool wasMarked{
-					get{return mrkStateHandler.wasMarked;}
+				public bool WasMarked(){
+					return mrkStateHandler.WasMarked();
 				}
 				public void Unmark(){
 					mrkStateHandler.Unmark();
 				}
-				public ISBMrkState unmarkedState{
-					get{return mrkStateHandler.unmarkedState;}
+				public bool IsUnmarked(){
+					return mrkStateHandler.IsUnmarked();
 				}
-				public bool isUnmarked{
-					get{return mrkStateHandler.isUnmarked;}
+				public bool WasUnmarked(){
+					return mrkStateHandler.WasUnmarked();
 				}
-				public bool wasUnmarked{
-					get{return mrkStateHandler.wasUnmarked;}
-				}
-				public ISBMrkProcess mrkProcess{
-					get{return mrkStateHandler.mrkProcess;}
+				public ISBMrkProcess GetMrkProcess(){
+					return mrkStateHandler.GetMrkProcess();
 				}
 				public void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine){
 					((SBMrkStateHandler)mrkStateHandler).SetMrkProcessEngine(engine);
@@ -324,11 +288,11 @@ namespace SlotSystem{
 				public void SetAndRunMrkProcess(ISBMrkProcess process){
 					mrkStateHandler.SetAndRunMrkProcess(process);
 				}
-				public System.Func<IEnumeratorFake> unmarkCoroutine{
-					get{return mrkStateHandler.unmarkCoroutine;}
+				public System.Func<IEnumeratorFake> GetUnmarkCoroutine(){
+					return mrkStateHandler.GetUnmarkCoroutine();
 				}
-				public System.Func<IEnumeratorFake> markCoroutine{
-					get{return mrkStateHandler.markCoroutine;}
+				public System.Func<IEnumeratorFake> GetMarkCoroutine(){
+					return mrkStateHandler.GetMarkCoroutine();
 				}
 		/*	commands	*/
 			public void Tap(){
@@ -352,8 +316,8 @@ namespace SlotSystem{
 				IncreasePickedAmountUpToQuantity();
 			}
 			public void IncreasePickedAmountUpToQuantity(){
-				if(isStackable && quantity > pickedAmount){
-					pickedAmount ++;
+				if(IsStackable() && GetQuantity() > GetPickedAmount()){
+					SetPickedAmount(GetPickedAmount() + 1);
 				}
 			}
 		/* Item Handling */
@@ -368,49 +332,47 @@ namespace SlotSystem{
 			public void SetItemHandler(IItemHandler itemHandler){
 				_itemHandler = itemHandler;
 			}
-			public InventoryItemInstance item{
-				get{return itemHandler.item;}
+			public InventoryItemInstance GetItem(){
+				return itemHandler.GetItem();
 			}
 			public void SetItem(InventoryItemInstance item){
 				itemHandler.SetItem(item);
 			}
-			public int pickedAmount{
-				get{return itemHandler.pickedAmount;}
-				set{itemHandler.pickedAmount = value;}
+			public int GetPickedAmount(){
+				return itemHandler.GetPickedAmount();
 			}
-			public bool isStackable{
-				get{return itemHandler.isStackable;}
+			public void SetPickedAmount(int amount){
+				itemHandler.SetPickedAmount(amount);
 			}
-			public int quantity{
-				get{return itemHandler.quantity;}
+			public bool IsStackable(){
+				return itemHandler.IsStackable();
+			}
+			public int GetQuantity(){
+				return itemHandler.GetQuantity();
 			}
 			public void SetQuantity(int quant){
 				itemHandler.SetQuantity(quant);
 			}
 			public void UpdateEquipState(){
-				if(item.isEquipped) Equip();
+				if(GetItem().isEquipped) Equip();
 				else Unequip();
 			}
 		/* SG And Slots */
-			public ISlotGroup sg{
-				get{
-					if(parent != null)
-						return parent as ISlotGroup;
-					return null;
-				}
+			public ISlotGroup GetSG(){
+				ISlotSystemElement parent = GetParent();
+				if(parent != null)
+					return parent as ISlotGroup;
+				return null;
 			}
-			public virtual bool isPool{
-				get{
-					if(sg != null){
-						return sg.isPool;
-					}else
-						throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
-				}
+			public bool IsPool(){
+				ISlotGroup sg = GetSG();
+				if(sg != null){
+					return sg.isPool;
+				}else
+					throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
 			}
-			public bool isHierarchySetUp{
-				get{
-					return sg != null;
-				}
+			public bool IsHierarchySetUp(){
+				return GetSG() != null;
 			}
 		/* slotHandling */
 			public ISlotHandler slotHandler{
@@ -425,39 +387,34 @@ namespace SlotSystem{
 			public void SetSlotHandler(ISlotHandler slotHandler){
 				_slotHandler = slotHandler;
 			}
-			public int slotID{
-				get{return slotHandler.slotID;}
+			public int GetSlotID(){
+				return slotHandler.GetSlotID();
 			}
 			public void SetSlotID(int i){
 				slotHandler.SetSlotID(i);
 			}
-			public int newSlotID{
-				get{return slotHandler.newSlotID;}
+			public int GetNewSlotID(){
+				return slotHandler.GetNewSlotID();
 			}
 			public void SetNewSlotID(int id){
 				slotHandler.SetNewSlotID(id);
 			}
-			public bool isToBeAdded{
-				get{return slotHandler.isToBeAdded;}
+			public bool IsToBeAdded(){
+				return slotHandler.IsToBeAdded();
 			}
-			public bool isToBeRemoved{
-				get{return slotHandler.isToBeRemoved;}
+			public bool IsToBeRemoved(){
+				return slotHandler.IsToBeRemoved();
 			}
 		/* Others */
-			public bool delayed{
-				get{return m_delayed;}
-				set{m_delayed = value;}
-			}
-				bool m_delayed = true;
 			public void Refresh(){
 				WaitForAction();
-				itemHandler.pickedAmount = 0;
+				itemHandler.SetPickedAmount(0);
 				slotHandler.SetNewSlotID(-2);
 			}
 			public bool ShareSGAndItem(ISlottable other){
 				bool flag = true;
-				flag &= this.sg == other.sg;
-				flag &= this.item == other.item;
+				flag &= this.GetSG() == other.GetSG();
+				flag &= this.GetItem() == other.GetItem();
 				return flag;
 			}
 			public void Destroy(){
@@ -470,13 +427,8 @@ namespace SlotSystem{
 			}
 			public override void SetElements(IEnumerable<ISlotSystemElement> elements){
 			}
-			public override ISlotSystemElement parent{
-				get{
-					if(ssm != null)
-						return ssm.FindParent(this);
-					else
-						throw new System.InvalidOperationException("Slottable.parent: ssm is not set");
-				}
+			public override ISlotSystemElement GetParent(){
+				return GetSSM().FindParent(this);
 			}
 			public override bool Contains(ISlotSystemElement element){
 				return false;
@@ -485,13 +437,11 @@ namespace SlotSystem{
 				return false;
 			}
 		/*	Transaction	*/
-			public bool isPickedUp{
-				get{
-					return taCache.pickedSB == (ISlottable)this;
-				}
+			public bool IsPickedUp(){
+				return taCache.pickedSB == (ISlottable)this;
 			}
-			public bool passesPrePickFilter{
-				get{return !taCache.IsTransactionGoingToBeRevert(this);}
+			public bool PassesPrePickFilter(){
+				return !taCache.IsTransactionGoingToBeRevert(this);
 			}
 		/* hoverable */
 			public IHoverable hoverable{
@@ -521,6 +471,9 @@ namespace SlotSystem{
 			public void OnHoverExit(){
 				hoverable.OnHoverExit();
 			}
+			public void SetSSESelStateHandler(ISSESelStateHandler handler){
+				//going to be removed in due time
+			}
 	}
 	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler, ISBActStateHandler, ISBEqpStateHandler, ISBMrkStateHandler, ISlotHandler{
 		/*	Commands	*/
@@ -528,15 +481,14 @@ namespace SlotSystem{
 		/* Item Handling */
 			void UpdateEquipState();
 		/* SG And Slot */
-			ISlotGroup sg{get;}
-			bool isPool{get;}
-			bool isHierarchySetUp{get;}
+			ISlotGroup GetSG();
+			bool IsPool();
+			bool IsHierarchySetUp();
 		/* Transaction */
-			bool isPickedUp{get;}
-			bool passesPrePickFilter{get;}
+			bool IsPickedUp();
+			bool PassesPrePickFilter();
 		/* Other */
 			void Increment();
-			bool delayed{get;set;}
 			void Refresh();
 			bool ShareSGAndItem(ISlottable other);
 			void Destroy();

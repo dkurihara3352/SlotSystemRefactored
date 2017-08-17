@@ -35,7 +35,7 @@ namespace SlotSystem{
 			ISSEStateEngine<ISBActState> m_actStateEngine;
 		public void SetActState(ISBActState state){
 			actStateEngine.SetState(state);
-			if(state == null && actProcess != null)
+			if(state == null && GetActProcess() != null)
 				SetAndRunActProcess(null);
 		}
 		ISBActState curActState{
@@ -47,7 +47,7 @@ namespace SlotSystem{
 		ISBActStateRepo actStateRepo{
 			get{
 				if(m_actStateRepo == null)
-					m_actStateRepo = new SBActStateRepo(sb, tam, sb.taCache);
+					m_actStateRepo = new SBActStateRepo(sb.GetSelStateHandler(), sb, tam, sb.taCache);
 				return m_actStateRepo;
 			}
 		}
@@ -55,114 +55,114 @@ namespace SlotSystem{
 		public void ClearCurActState(){
 			SetActState(null);
 		}
-			public bool wasActStateNull{
-				get{return prevActState == null;}
+			public bool WasActStateNull(){
+				return prevActState == null;
 			}
-			public bool isActStateNull{
-				get{return curActState == null;}
+			public bool IsActStateNull(){
+				return curActState == null;
 			}
 		public virtual void WaitForAction(){
 			SetActState(waitForActionState);
 		}
-			public ISBActState waitForActionState{
-				get{return actStateRepo.waitForActionState;}
+			ISBActState waitForActionState{
+				get{return actStateRepo.GetWaitForActionState();}
 			}
-			public virtual bool isWaitingForAction{
-				get{return curActState == waitForActionState;}
+			public virtual bool IsWaitingForAction(){
+				return curActState == waitForActionState;
 			}
-			public virtual bool wasWaitingForAction{
-				get{return prevActState == waitForActionState;}
+			public virtual bool WasWaitingForAction(){
+				return prevActState == waitForActionState;
 			}
 		public virtual void WaitForPointerUp(){
 			SetActState(waitForPointerUpState);
 		}
-			public ISBActState waitForPointerUpState{
-				get{return actStateRepo.waitForPointerUpState;}
+			ISBActState waitForPointerUpState{
+				get{return actStateRepo.GetWaitForPointerUpState();}
 			}
-			public virtual bool isWaitingForPointerUp{
-				get{return curActState == waitForPointerUpState;}
+			public virtual bool IsWaitingForPointerUp(){
+				return curActState == waitForPointerUpState;
 			}
-			public virtual bool wasWaitingForPointerUp{
-				get{return prevActState == waitForPointerUpState;}
+			public virtual bool WasWaitingForPointerUp(){
+				return prevActState == waitForPointerUpState;
 			}
 		public virtual void WaitForPickUp(){
 			SetActState(waitForPickUpState);
 		}
-			public ISBActState waitForPickUpState{
-				get{return actStateRepo.waitForPickUpState;}
+			ISBActState waitForPickUpState{
+				get{return actStateRepo.GetWaitForPickUpState();}
 			}
-			public virtual bool isWaitingForPickUp{
-				get{return curActState == waitForPickUpState;}
+			public virtual bool IsWaitingForPickUp(){
+				return curActState == waitForPickUpState;
 			}
-			public virtual bool wasWaitingForPickUp{
-				get{return prevActState == waitForPickUpState;}
+			public virtual bool WasWaitingForPickUp(){
+				return prevActState == waitForPickUpState;
 			}
 		public virtual void WaitForNextTouch(){
 			SetActState(waitForNextTouchState);
 		}
-			public ISBActState waitForNextTouchState{
-				get{return actStateRepo.waitForNextTouchState;}
+			ISBActState waitForNextTouchState{
+				get{return actStateRepo.GetWaitForNextTouchState();}
 			}
-			public virtual bool isWaitingForNextTouch{
-				get{return curActState == waitForNextTouchState;}
+			public virtual bool IsWaitingForNextTouch(){
+				return curActState == waitForNextTouchState;
 			}
-			public virtual bool wasWaitingForNextTouch{
-				get{return prevActState == waitForNextTouchState;}
+			public virtual bool WasWaitingForNextTouch(){
+				return prevActState == waitForNextTouchState;
 			}
 		public virtual void PickUp(){
 			SetActState(pickedUpState);
-			sb.pickedAmount = 1;
+			sb.SetPickedAmount(1);
 		}
 		public void SetPickedUpState(){
 			SetActState(pickedUpState);
 		}
-			public ISBActState pickedUpState{
-				get{return actStateRepo.pickingUpState;}
+			ISBActState pickedUpState{
+				get{return actStateRepo.GetPickingUpState();}
 			}
-			public virtual bool isPickingUp{
-				get{return curActState == pickedUpState;}
+			public virtual bool IsPickingUp(){
+				return curActState == pickedUpState;
 			}
-			public virtual bool wasPickingUp{
-				get{return prevActState == pickedUpState;}
+			public virtual bool WasPickingUp(){
+				return prevActState == pickedUpState;
 			}
 		public virtual void Remove(){
 			SetActState(removedState);
 		}
-			public ISBActState removedState{
-				get{return actStateRepo.removedState;}
+			ISBActState removedState{
+				get{return actStateRepo.GetRemovedState();}
 			}
-			public virtual bool isRemoving{
-				get{return curActState == removedState;}
+			public virtual bool IsRemoving(){
+				return curActState == removedState;
 			}
-			public virtual bool wasRemoving{
-				get{return prevActState == removedState;}
+			public virtual bool WasRemoving(){
+				return prevActState == removedState;
 			}
 		public virtual void Add(){
 			SetActState(addedState);
 		}
-			public ISBActState addedState{
-				get{return actStateRepo.addedState;}
+			ISBActState addedState{
+				get{return actStateRepo.GetAddedState();}
 			}
-			public virtual bool isAdding{
-				get{return curActState == addedState;}
+			public virtual bool IsAdding(){
+				return curActState == addedState;
 			}
-			public virtual bool wasAdding{
-				get{return prevActState == addedState;}
+			public virtual bool WasAdding(){
+				return prevActState == addedState;
 			}
 		public virtual void MoveWithin(){
 			SetActState(moveWithinState);
 		}
-			public ISBActState moveWithinState{
-				get{return actStateRepo.moveWithinState;}
+			ISBActState moveWithinState{
+				get{return actStateRepo.GetMoveWithinState();}
 			}
-			public virtual bool isMovingWithin{
-				get{return curActState == moveWithinState;}
+			public virtual bool IsMovingWithin(){
+				return curActState == moveWithinState;
 			}
-			public virtual bool wasMovingWithin{
-				get{return prevActState == moveWithinState;}
+			public virtual bool WasMovingWithin(){
+				return prevActState == moveWithinState;
 			}
-		public ISBActProcess actProcess{
-			get{return actProcEngine.process;}
+		public ISBActProcess GetActProcess(){
+			return actProcEngine.GetProcess();
 		}
 		public void SetAndRunActProcess(ISBActProcess process){
 			actProcEngine.SetAndRunProcess(process);
@@ -179,6 +179,7 @@ namespace SlotSystem{
 			m_actProcEngine = engine;
 		}
 		public void ExpireActProcess(){
+			ISBActProcess actProcess = GetActProcess();
 			if(actProcess != null)
 				actProcess.Expire();
 		}
@@ -193,26 +194,26 @@ namespace SlotSystem{
 		public void SetCoroutineRepo(ISBActCoroutineRepo coroutineRepo){
 			_coroutineRepo = coroutineRepo;
 		}
-		public System.Func<IEnumeratorFake> waitForPointerUpCoroutine{
-			get{return coroutineRepo.waitForPointerUpCoroutine;}
+		public System.Func<IEnumeratorFake> GetWaitForPointerUpCoroutine(){
+			return coroutineRepo.GetWaitForPointerUpCoroutine();
 		}
-		public System.Func<IEnumeratorFake> waitForPickUpCoroutine{
-			get{return coroutineRepo.waitForPickUpCoroutine;}
+		public System.Func<IEnumeratorFake> GetWaitForPickUpCoroutine(){
+			return coroutineRepo.GetWaitForPickUpCoroutine();
 		}
-		public System.Func<IEnumeratorFake> pickUpCoroutine{
-			get{return coroutineRepo.pickUpCoroutine;}
+		public System.Func<IEnumeratorFake> GetPickUpCoroutine(){
+			return coroutineRepo.GetPickUpCoroutine();
 		}
-		public System.Func<IEnumeratorFake> waitForNextTouchCoroutine{
-			get{return coroutineRepo.waitForNextTouchCoroutine;}
+		public System.Func<IEnumeratorFake> GetWaitForNextTouchCoroutine(){
+			return coroutineRepo.GetWaitForNextTouchCoroutine();
 		}
-		public System.Func<IEnumeratorFake> removeCoroutine{
-			get{return coroutineRepo.removeCoroutine;}
+		public System.Func<IEnumeratorFake> GetRemoveCoroutine(){
+			return coroutineRepo.GetRemoveCoroutine();
 		}
-		public System.Func<IEnumeratorFake> addCoroutine{
-			get{return coroutineRepo.addCoroutine;}
+		public System.Func<IEnumeratorFake> GetAddCoroutine(){
+			return coroutineRepo.GetAddCoroutine();
 		}
-		public System.Func<IEnumeratorFake> moveWithinCoroutine{
-			get{return coroutineRepo.moveWithinCoroutine;}
+		public System.Func<IEnumeratorFake> GetMoveWithinCoroutine(){
+			return coroutineRepo.GetMoveWithinCoroutine();
 		}
 		public void OnPointerDown(PointerEventDataFake eventDataMock){
 			curActState.OnPointerDown();
@@ -229,51 +230,43 @@ namespace SlotSystem{
 	}
 	public interface ISBActStateHandler{
 		void ClearCurActState();
-			bool wasActStateNull{get;}
-			bool isActStateNull{get;}
+			bool WasActStateNull();
+			bool IsActStateNull();
 		void WaitForAction();
-			ISBActState waitForActionState{get;}
-			bool isWaitingForAction{get;}
-			bool wasWaitingForAction{get;}
+			bool IsWaitingForAction();
+			bool WasWaitingForAction();
 		void WaitForPointerUp();
-			ISBActState waitForPointerUpState{get;}
-			bool isWaitingForPointerUp{get;}
-			bool wasWaitingForPointerUp{get;}
+			bool IsWaitingForPointerUp();
+			bool WasWaitingForPointerUp();
 		void WaitForPickUp();
-			ISBActState waitForPickUpState{get;}
-			bool isWaitingForPickUp{get;}
-			bool wasWaitingForPickUp{get;}
+			bool IsWaitingForPickUp();
+			bool WasWaitingForPickUp();
 		void WaitForNextTouch();
-			ISBActState waitForNextTouchState{get;}
-			bool isWaitingForNextTouch{get;}
-			bool wasWaitingForNextTouch{get;}
+			bool IsWaitingForNextTouch();
+			bool WasWaitingForNextTouch();
 		void PickUp();
 		void SetPickedUpState();
-			ISBActState pickedUpState{get;}
-			bool isPickingUp{get;}
-			bool wasPickingUp{get;}
+			bool IsPickingUp();
+			bool WasPickingUp();
 		void Remove();
-			ISBActState removedState{get;}
-			bool isRemoving{get;}
-			bool wasRemoving{get;}
+			bool IsRemoving();
+			bool WasRemoving();
 		void Add();
-			ISBActState addedState{get;}
-			bool isAdding{get;}
-			bool wasAdding{get;}
+			bool IsAdding();
+			bool WasAdding();
 		void MoveWithin();
-			ISBActState moveWithinState{get;}
-			bool isMovingWithin{get;}
-			bool wasMovingWithin{get;}
-		ISBActProcess actProcess{get;}
+			bool IsMovingWithin();
+			bool WasMovingWithin();
+		ISBActProcess GetActProcess();
 		void SetAndRunActProcess(ISBActProcess process);
 		void ExpireActProcess();
-			System.Func<IEnumeratorFake> waitForPointerUpCoroutine{get;}
-			System.Func<IEnumeratorFake> waitForPickUpCoroutine{get;}
-			System.Func<IEnumeratorFake> pickUpCoroutine{get;}
-			System.Func<IEnumeratorFake> waitForNextTouchCoroutine{get;}
-			System.Func<IEnumeratorFake> removeCoroutine{get;}
-			System.Func<IEnumeratorFake> addCoroutine{get;}
-			System.Func<IEnumeratorFake> moveWithinCoroutine{get;}
+			System.Func<IEnumeratorFake> GetWaitForPointerUpCoroutine();
+			System.Func<IEnumeratorFake> GetWaitForPickUpCoroutine();
+			System.Func<IEnumeratorFake> GetPickUpCoroutine();
+			System.Func<IEnumeratorFake> GetWaitForNextTouchCoroutine();
+			System.Func<IEnumeratorFake> GetRemoveCoroutine();
+			System.Func<IEnumeratorFake> GetAddCoroutine();
+			System.Func<IEnumeratorFake> GetMoveWithinCoroutine();
 		void OnPointerDown(PointerEventDataFake eventDataMock);
 		void OnPointerUp(PointerEventDataFake eventDataMock);
 		void OnDeselected(PointerEventDataFake eventDataMock);

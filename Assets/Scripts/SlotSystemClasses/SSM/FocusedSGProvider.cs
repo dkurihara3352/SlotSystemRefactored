@@ -26,7 +26,7 @@ namespace SlotSystem{
 		public ISlotGroup focusedSGP{
 			get{
 				if(poolBundle != null){
-					ISlotSystemElement focusedEle = poolBundle.focusedElement;
+					ISlotSystemElement focusedEle = poolBundle.GetFocusedElement();
 					if(focusedEle != null){
 						ISlotGroup result = focusedEle as ISlotGroup;
 						if(result != null)
@@ -101,13 +101,13 @@ namespace SlotSystem{
 			}
 		}
 		public void AddFocusedSGTo(ISlotSystemElement ele, IList<ISlotGroup> list){
-			if(ele is ISlotGroup && ele.isFocusedInHierarchy)
+			if(ele is ISlotGroup && ele.IsFocusedInHierarchy())
 				list.Add((ISlotGroup)ele);
 		}
 		public IEquipmentSet focusedEqSet{
 			get{
 				if(equipBundle != null){
-					ISlotSystemElement focEle = equipBundle.focusedElement;
+					ISlotSystemElement focEle = equipBundle.GetFocusedElement();
 					if(focEle != null){
 						IEquipmentSet result = focEle as IEquipmentSet;
 						if(result != null) return result;
@@ -145,7 +145,8 @@ namespace SlotSystem{
 		}
 		public void ChangeEquippableCGearsCount(int i, ISlotGroup targetSG){
 			if(!targetSG.isExpandable){
-				if(targetSG.isFocused || targetSG.isDefocused){
+				ISSESelStateHandler targetSGSelStateHandler = targetSG.GetSelStateHandler();
+				if(targetSGSelStateHandler.isFocused || targetSGSelStateHandler.isDefocused){
 					equipInv.SetEquippableCGearsCount(i);
 					targetSG.InitializeItems();
 					ssm.UpdateEquipInvAndAllSBsEquipState();

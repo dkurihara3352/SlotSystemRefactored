@@ -18,7 +18,7 @@ namespace SlotSystem{
 				ISSEStateEngine<ISBMrkState> m_markStateEngine;
 			public void SetMrkState(ISBMrkState state){
 				mrkStateEngine.SetState(state);
-				if(state == null && mrkProcess != null)
+				if(state == null && GetMrkProcess() != null)
 					SetAndRunMrkProcess(null);
 			}
 			ISBMrkState curMrkState{
@@ -38,40 +38,40 @@ namespace SlotSystem{
 			public virtual void ClearCurMrkState(){
 				SetMrkState(null);
 			}
-				public virtual bool isMrkStateNull{
-					get{return curMrkState == null;}
+				public virtual bool IsMrkStateNull(){
+					return curMrkState == null;
 				}
-				public virtual bool wasMrkStateNull{
-					get{return prevMrkState == null;}
+				public virtual bool WasMrkStateNull(){
+					return prevMrkState == null;
 				}
 			public virtual void Mark(){
 				SetMrkState(markedState);
 			}
-				public ISBMrkState markedState{
-					get{return mrkStateRepo.markedState;}
+				ISBMrkState markedState{
+					get{return mrkStateRepo.GetMarkedState();}
 				}
-				public virtual bool isMarked{
-					get{return curMrkState == markedState;}
+				public virtual bool IsMarked(){
+					return curMrkState == markedState;
 				}
-				public virtual bool wasMarked{
-					get{return prevMrkState == markedState;}
+				public virtual bool WasMarked(){
+					return prevMrkState == markedState;
 				}
 			public virtual void Unmark(){
 				SetMrkState(unmarkedState);
 			}
-				public ISBMrkState unmarkedState{
-					get{return mrkStateRepo.unmarkedState;}
+				ISBMrkState unmarkedState{
+					get{return mrkStateRepo.GetUnmarkedState();}
 				}
-				public virtual bool isUnmarked{
-					get{return curMrkState == unmarkedState;}
+				public virtual bool IsUnmarked(){
+					return curMrkState == unmarkedState;
 				}
-				public virtual bool wasUnmarked{
-					get{return prevMrkState == markedState;}
+				public virtual bool WasUnmarked(){
+					return prevMrkState == markedState;
 				}
-			public ISBMrkProcess mrkProcess{
-				get{return mrkProcEngine.process;}
-			}
 		/* Process */
+			public ISBMrkProcess GetMrkProcess(){
+				return mrkProcEngine.GetProcess();
+			}
 			public void SetAndRunMrkProcess(ISBMrkProcess process){
 				mrkProcEngine.SetAndRunProcess(process);
 			}
@@ -97,28 +97,26 @@ namespace SlotSystem{
 			public void SetMrkCoroutineRepo(ISBMrkCoroutineRepo repo){
 				_mrkCoroutineRepo = repo;
 			}
-			public System.Func<IEnumeratorFake> markCoroutine{
-				get{return mrkCoroutineRepo.markCoroutine;}
+			public System.Func<IEnumeratorFake> GetMarkCoroutine(){
+				return mrkCoroutineRepo.GetMarkCoroutine();
 			}
-			public System.Func<IEnumeratorFake> unmarkCoroutine{
-				get{return mrkCoroutineRepo.unmarkCoroutine;}
+			public System.Func<IEnumeratorFake> GetUnmarkCoroutine(){
+				return mrkCoroutineRepo.GetUnmarkCoroutine();
 			}
 	}
 	public interface ISBMrkStateHandler{
 		void ClearCurMrkState();
-		bool isMrkStateNull{get;}
-		bool wasMrkStateNull{get;}
+		bool IsMrkStateNull();
+		bool WasMrkStateNull();
 		void Mark();
-		ISBMrkState	markedState{get;}
-		bool isMarked{get;}
-		bool wasMarked{get;}
+		bool IsMarked();
+		bool WasMarked();
 		void Unmark();
-		ISBMrkState unmarkedState{get;}
-		bool isUnmarked{get;}
-		bool wasUnmarked{get;}
-		ISBMrkProcess mrkProcess{get;}
+		bool IsUnmarked();
+		bool WasUnmarked();
+		ISBMrkProcess GetMrkProcess();
 		void SetAndRunMrkProcess(ISBMrkProcess process);
-		System.Func<IEnumeratorFake> unmarkCoroutine{get;}
-		System.Func<IEnumeratorFake> markCoroutine{get;}
+		System.Func<IEnumeratorFake> GetUnmarkCoroutine();
+		System.Func<IEnumeratorFake> GetMarkCoroutine();
 	}
 }

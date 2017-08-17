@@ -17,11 +17,11 @@ namespace SlotSystem{
 		ISGTransactionHandler sg2TAHandler;
 		public StackTransaction(ISlottable pickedSB ,ISlottable selected, ITransactionManager tam): base(tam){
 			m_pickedSB = pickedSB;
-			m_origSG = pickedSB.sg;
+			m_origSG = pickedSB.GetSG();
 			m_selectedSB = selected;
-			m_selectedSG = m_selectedSB.sg;
-			InventoryItemInstance cache = pickedSB.item;
-			cache.quantity = pickedSB.pickedAmount;
+			m_selectedSG = m_selectedSB.GetSG();
+			InventoryItemInstance cache = pickedSB.GetItem();
+			cache.quantity = pickedSB.GetPickedAmount();
 			itemCache.Add(cache);
 			iconHandler = tam.iconHandler;
 			sg2SlotsHolder = sg2;
@@ -38,7 +38,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			sg1ActStateHandler.Remove();
 			sg2ActStateHandler.Add();
-			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.item));
+			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){
