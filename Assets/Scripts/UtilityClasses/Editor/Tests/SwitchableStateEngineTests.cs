@@ -23,8 +23,8 @@ namespace UtilityClassTests{
 
 			engine.SetState(to);
 
-			Assert.That(engine.curState, Is.SameAs(expCur));
-			Assert.That(engine.prevState, Is.SameAs(expPrev));
+			Assert.That(engine.GetCurState(), Is.SameAs(expCur));
+			Assert.That(engine.GetPrevState(), Is.SameAs(expPrev));
 			if(from != null)
 				if(exitCalled)
 					from.Received().ExitState();
@@ -80,7 +80,7 @@ namespace UtilityClassTests{
 					SetState(state);
 				}
 				public TestStateEngine(ISwitchableState prev, ISwitchableState cur){
-					m_prevState = prev; m_curState = cur;
+					_prevState = prev; _curState = cur;
 				}
 			}
 	}

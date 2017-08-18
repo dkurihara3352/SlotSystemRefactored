@@ -465,9 +465,9 @@ namespace SlotSystemTests{
 						IHoverable stubHovered = Substitute.For<IHoverable>();
 						ISlotSystemTransaction stubTA = Substitute.For<ISlotSystemTransaction>();
 							ISlottable stubTargetSB = MakeSubSB();
-							stubTA.targetSB.Returns(stubTargetSB);
+							stubTA.GetTargetSB().Returns(stubTargetSB);
 							List<IInventoryItemInstance> stubMoved = new List<IInventoryItemInstance>();
-							stubTA.moved.Returns(stubMoved);
+							stubTA.GetMoved().Returns(stubMoved);
 						taResults.Add(stubHovered, stubTA);
 					taCache.SetHovered(stubHovered);
 					taCache.SetTransactionResults(taResults);

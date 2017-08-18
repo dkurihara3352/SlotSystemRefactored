@@ -29,10 +29,10 @@ namespace SlotSystem{
 						SetAndRunActProcess(null);
 				}
 				ISGActState curActState{
-					get{return actStateEngine.curState;}
+					get{return actStateEngine.GetCurState();}
 				}
 				ISGActState prevActState{
-					get{return actStateEngine.prevState;}
+					get{return actStateEngine.GetPrevState();}
 				}
 				ISGStatesRepo statesRepo{
 					get{

@@ -31,10 +31,10 @@ namespace SlotSystem{
 					SetAndRunEqpProcess(null);
 			}
 			ISBEqpState curEqpState{
-				get{return eqpStateEngine.curState;}
+				get{return eqpStateEngine.GetCurState();}
 			}
 			ISBEqpState prevEqpState{
-				get{return eqpStateEngine.prevState;}
+				get{return eqpStateEngine.GetPrevState();}
 			}
 			ISBEqpStateRepo eqpStateRepo{
 				get{

@@ -30,10 +30,10 @@ namespace SlotSystem{
 					SetAndRunActProcess(null);
 			}
 				ITAMActState curActState{
-					get{return actStateEngine.curState;}
+					get{return actStateEngine.GetCurState();}
 				}
 				ITAMActState prevActState{
-					get{return actStateEngine.prevState;}
+					get{return actStateEngine.GetPrevState();}
 				}
 			/* states */
 				ITAMStatesFactory statesFactory{

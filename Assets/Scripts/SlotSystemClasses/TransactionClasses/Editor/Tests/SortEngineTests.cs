@@ -38,8 +38,8 @@ namespace SlotSystemTests{
 						ISortTransaction stubTA = Substitute.For<ISortTransaction>();
 							ISlottable stubTargetSB = MakeSubSB();
 							ISlotGroup stubSG1 = MakeSubSG();
-							stubTA.targetSB.Returns(stubTargetSB);
-							stubTA.sg1.Returns(stubSG1);
+							stubTA.GetTargetSB().Returns(stubTargetSB);
+							stubTA.GetSG1().Returns(stubSG1);
 					stubSortTAFactory.MakeSortTA(stubSG, stubSorter).Returns(stubTA);
 					sortEngine.SetSortTransactionFactory(stubSortTAFactory);
 				

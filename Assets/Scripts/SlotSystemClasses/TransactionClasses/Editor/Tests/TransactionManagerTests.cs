@@ -150,8 +150,8 @@ namespace SlotSystemTests{
 				ISlotSystemTransaction stubTA = Substitute.For<ISlotSystemTransaction>();
 					ISlotGroup stubSG1 = MakeSubSG();
 					ISlotGroup stubSG2 = MakeSubSG();
-					stubTA.sg1.Returns(stubSG1);
-					stubTA.sg2.Returns(stubSG2);
+					stubTA.GetSG1().Returns(stubSG1);
+					stubTA.GetSG2().Returns(stubSG2);
 				TransactionSGHandler sgHandler = new TransactionSGHandler(MakeSubTAMStateHandler());
 				tam.SetSGHandler(sgHandler);
 				

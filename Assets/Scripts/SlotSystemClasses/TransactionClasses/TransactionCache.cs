@@ -202,8 +202,8 @@ namespace SlotSystem{
 			if(transactionResults != null){
 				ISlotSystemTransaction ta = null;
 				if(transactionResults.TryGetValue(taCache.GetHovered(), out ta)){
-					taCache.SetTargetSB(ta.targetSB);
-					taCache.SetMoved(ta.moved);
+					taCache.SetTargetSB(ta.GetTargetSB());
+					taCache.SetMoved(ta.GetMoved());
 					taCache.UpdateFieldsOfTAM(ta);
 				}
 			}

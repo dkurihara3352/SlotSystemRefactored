@@ -22,10 +22,10 @@ namespace SlotSystem{
 					SetAndRunMrkProcess(null);
 			}
 			ISBMrkState curMrkState{
-				get{return mrkStateEngine.curState;}
+				get{return mrkStateEngine.GetCurState();}
 			}
 			ISBMrkState prevMrkState{
-				get{return mrkStateEngine.prevState;}
+				get{return mrkStateEngine.GetPrevState();}
 			}
 			ISBMrkStateRepo mrkStateRepo{
 				get{

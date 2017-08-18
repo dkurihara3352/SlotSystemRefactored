@@ -42,8 +42,8 @@ namespace SlotSystem{
 			}
 			public void UpdateFields(ISlotSystemTransaction ta){
 				ITransactionSGHandler sgHandler = GetSGHandler();
-				sgHandler.SetSG1(ta.sg1);
-				sgHandler.SetSG2(ta.sg2);
+				sgHandler.SetSG1(ta.GetSG1());
+				sgHandler.SetSG2(ta.GetSG2());
 				SetTransaction(ta);
 			}
 		/* Sort Engine */

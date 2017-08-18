@@ -85,10 +85,10 @@ namespace SlotSystem{
 			}
 				ISSEStateEngine<ISSESelState> m_selStateEngine;
 			ISSESelState prevSelState{
-				get{return selStateEngine.prevState;}
+				get{return selStateEngine.GetPrevState();}
 			}
 			ISSESelState curSelState{
-				get{return selStateEngine.curState;}
+				get{return selStateEngine.GetCurState();}
 			}
 			void SetSelState(ISSESelState state){
 				selStateEngine.SetState(state);
