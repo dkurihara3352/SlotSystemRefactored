@@ -25,9 +25,9 @@ namespace SlotSystemTests{
 					
 				ssm.InspectorSetUp(pBun, eBun, gBuns, MakeSubTAM());
 
-				Assert.That(ssm.poolBundle, Is.SameAs(pBun));
-				Assert.That(ssm.equipBundle, Is.SameAs(eBun));
-				bool equality = ssm.otherBundles.MemberEquals(gBuns);
+				Assert.That(ssm.GetPoolBundle(), Is.SameAs(pBun));
+				Assert.That(ssm.GetEquipBundle(), Is.SameAs(eBun));
+				bool equality = ssm.GetOtherBundles().MemberEquals(gBuns);
 				Assert.That(equality, Is.True);
 				}
 			[Test]
@@ -37,7 +37,7 @@ namespace SlotSystemTests{
 
 				ssm.InspectorSetUp(MakeSubBundle(), MakeSubBundle(), new ISlotSystemBundle[]{}, stubTAM);
 
-				Assert.That(ssm.tam, Is.SameAs(stubTAM));
+				Assert.That(ssm.GetTAM(), Is.SameAs(stubTAM));
 			}
 			[Test]
 			public void Initialize_WhenCalled_CallsSetSSMInHierarchy(){
@@ -118,28 +118,28 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 					IFocusedSGProvider stubSGProv = Substitute.For<IFocusedSGProvider>();
 							IEquipmentSetInventory eInv = MakeSubEquipInv();
-								IEnumerable<InventoryItemInstance> eInvEles;
+								IEnumerable<IInventoryItemInstance> eInvEles;
 									BowInstance bowR = MakeBowInstance(0);
 									WearInstance wearR = MakeWearInstance(0);
 									QuiverInstance quiverR = MakeQuiverInstance(0);
 									PackInstance packR = MakePackInstance(0);
-									eInvEles = new InventoryItemInstance[]{
+									eInvEles = new IInventoryItemInstance[]{
 										bowR, wearR, quiverR, packR
 									};
-								eInv.GetEnumerator().Returns(eInvEles.GetEnumerator());
-							stubSGProv.equipInv.Returns(eInv);
-							stubSGProv.poolInv.Returns(new PoolInventory());
+								eInv.GetItems().Returns(new List<IInventoryItemInstance>(eInvEles));
+							stubSGProv.GetEquipInv().Returns(eInv);
+							stubSGProv.GetPoolInv().Returns(new PoolInventory());
 						ssm.SetFocusedSGProvider(stubSGProv);
 					IEquippedProvider stubEquiProv = Substitute.For<IEquippedProvider>();
 							BowInstance bowE = MakeBowInstance(0);
 							WearInstance wearE = MakeWearInstance(0);
-							List<InventoryItemInstance> allEquippedItems = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> allEquippedItems = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bowE, wearE
 							});
-							stubEquiProv.allEquippedItems.Returns(allEquippedItems);
+							stubEquiProv.GetAllEquippedItems().Returns(allEquippedItems);
 						ssm.SetEquippedProvider(stubEquiProv);
 					IAllElementsProvider allEProv = Substitute.For<IAllElementsProvider>();
-						allEProv.allSBs.Returns(new List<ISlottable>());
+						allEProv.GetAllSBs().Returns(new List<ISlottable>());
 						ssm.SetAllElementsProvider(allEProv);
 
 					ssm.UpdateEquipInvAndAllSBsEquipState();
@@ -154,23 +154,23 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 					IFocusedSGProvider stubSGProv = Substitute.For<IFocusedSGProvider>();
 							IEquipmentSetInventory eInv = MakeSubEquipInv();
-								IEnumerable<InventoryItemInstance> eInvEles = new InventoryItemInstance[]{};
-								eInv.GetEnumerator().Returns(eInvEles.GetEnumerator());
+								IEnumerable<IInventoryItemInstance> eInvEles = new IInventoryItemInstance[]{};
+								eInv.GetItems().Returns(new List<IInventoryItemInstance>(eInvEles));
 									BowInstance bowA = MakeBowInstance(0);
 									WearInstance wearA = MakeWearInstance(0);
 									QuiverInstance quiverA = MakeQuiverInstance(0);
 									PackInstance packA = MakePackInstance(0);
-							stubSGProv.equipInv.Returns(eInv);
-							stubSGProv.poolInv.Returns(new PoolInventory());
+							stubSGProv.GetEquipInv().Returns(eInv);
+							stubSGProv.GetPoolInv().Returns(new PoolInventory());
 						ssm.SetFocusedSGProvider(stubSGProv);
 					IEquippedProvider stubEquiProv = Substitute.For<IEquippedProvider>();
-							List<InventoryItemInstance> allEquippedItems = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> allEquippedItems = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bowA, wearA, quiverA, packA
 							});
-							stubEquiProv.allEquippedItems.Returns(allEquippedItems);
+							stubEquiProv.GetAllEquippedItems().Returns(allEquippedItems);
 						ssm.SetEquippedProvider(stubEquiProv);
 					IAllElementsProvider allEProv = Substitute.For<IAllElementsProvider>();
-						allEProv.allSBs.Returns(new List<ISlottable>());
+						allEProv.GetAllSBs().Returns(new List<ISlottable>());
 						ssm.SetAllElementsProvider(allEProv);
 
 					ssm.UpdateEquipInvAndAllSBsEquipState();
@@ -185,7 +185,7 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 					IFocusedSGProvider stubSGProv = Substitute.For<IFocusedSGProvider>();
 							IEquipmentSetInventory eInv = MakeSubEquipInv();
-								IEnumerable<InventoryItemInstance> eInvEles;
+								IEnumerable<IInventoryItemInstance> eInvEles;
 									BowInstance bowR = MakeBowInstance(0);
 									WearInstance wearR = MakeWearInstance(0);
 									QuiverInstance quiverR = MakeQuiverInstance(0);
@@ -194,16 +194,16 @@ namespace SlotSystemTests{
 									WearInstance wearA = MakeWearInstance(0);
 									QuiverInstance quiverA = MakeQuiverInstance(0);
 									PackInstance packA = MakePackInstance(0);
-									eInvEles = new InventoryItemInstance[]{
+									eInvEles = new IInventoryItemInstance[]{
 										bowR,
 										wearR,
 										quiverR,
 										packR,
 									};
-								eInv.GetEnumerator().Returns(eInvEles.GetEnumerator());
-							stubSGProv.equipInv.Returns(eInv);
+								eInv.GetItems().Returns(new List<IInventoryItemInstance>(eInvEles));
+							stubSGProv.GetEquipInv().Returns(eInv);
 							IPoolInventory pInv = MakeSubPoolInv();
-								IEnumerable<InventoryItemInstance> pInvEles = new InventoryItemInstance[]{
+								IEnumerable<IInventoryItemInstance> pInvEles = new IInventoryItemInstance[]{
 									bowR,
 									wearR,
 									quiverR,
@@ -213,36 +213,36 @@ namespace SlotSystemTests{
 									quiverA,
 									packA
 								};
-								pInv.GetEnumerator().Returns(pInvEles.GetEnumerator());
-							stubSGProv.poolInv.Returns(pInv);
+								pInv.GetItems().Returns(new List<IInventoryItemInstance>(pInvEles));
+							stubSGProv.GetPoolInv().Returns(pInv);
 						ssm.SetFocusedSGProvider(stubSGProv);
 					IEquippedProvider stubEquiProv = Substitute.For<IEquippedProvider>();
-							List<InventoryItemInstance> allEquippedItems = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> allEquippedItems = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bowA, wearA, quiverA, packA
 							});
-							stubEquiProv.allEquippedItems.Returns(allEquippedItems);
-							stubEquiProv.equippedBowInst.Returns(bowA);
-							stubEquiProv.equippedWearInst.Returns(wearA);
+							stubEquiProv.GetAllEquippedItems().Returns(allEquippedItems);
+							stubEquiProv.GetEquippedBowInst().Returns(bowA);
+							stubEquiProv.GetEquippedWearInst().Returns(wearA);
 							List<CarriedGearInstance> equippedCGears = new List<CarriedGearInstance>(new CarriedGearInstance[]{
 								quiverA, packA
 							});
-							stubEquiProv.equippedCarriedGears.Returns(equippedCGears);
+							stubEquiProv.GetEquippedCarriedGears().Returns(equippedCGears);
 						ssm.SetEquippedProvider(stubEquiProv);
 					IAllElementsProvider allEProv = Substitute.For<IAllElementsProvider>();
-						allEProv.allSBs.Returns(new List<ISlottable>());
+						allEProv.GetAllSBs().Returns(new List<ISlottable>());
 						ssm.SetAllElementsProvider(allEProv);
 
 					ssm.UpdateEquipInvAndAllSBsEquipState();
 
 					bool flag = true;
-					flag &= bowA.isEquipped == true;
-					flag &= wearA.isEquipped == true;
-					flag &= quiverA.isEquipped == true;
-					flag &= packA.isEquipped == true;
-					flag &= bowR.isEquipped == false;
-					flag &= wearR.isEquipped == false;
-					flag &= quiverR.isEquipped == false;
-					flag &= packR.isEquipped == false;
+					flag &= bowA.GetIsEquipped() == true;
+					flag &= wearA.GetIsEquipped() == true;
+					flag &= quiverA.GetIsEquipped() == true;
+					flag &= packA.GetIsEquipped() == true;
+					flag &= bowR.GetIsEquipped() == false;
+					flag &= wearR.GetIsEquipped() == false;
+					flag &= quiverR.GetIsEquipped() == false;
+					flag &= packR.GetIsEquipped() == false;
 
 					Assert.That(flag, Is.True);
 				}
@@ -251,7 +251,7 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 						IFocusedSGProvider sgProvider = Substitute.For<IFocusedSGProvider>();
 							IEquipmentSetInventory mockEInv = Substitute.For<IEquipmentSetInventory>();
-								IEnumerable<InventoryItemInstance> eInvEles;
+								IEnumerable<IInventoryItemInstance> eInvEles;
 									BowInstance bowE = MakeBowInstance(0);
 									WearInstance wearE = MakeWearInstance(0);
 									ShieldInstance shieldE = MakeShieldInstance(0);
@@ -260,7 +260,7 @@ namespace SlotSystemTests{
 									WearInstance wearR = MakeWearInstance(0);
 									QuiverInstance quiverR = MakeQuiverInstance(0);
 									PackInstance packR = MakePackInstance(0);
-									eInvEles = new InventoryItemInstance[]{
+									eInvEles = new IInventoryItemInstance[]{
 										bowE,
 										wearE,
 										shieldE,
@@ -270,14 +270,14 @@ namespace SlotSystemTests{
 										quiverR,
 										packR
 									};
-								mockEInv.GetEnumerator().Returns(eInvEles.GetEnumerator());
-							sgProvider.equipInv.Returns(mockEInv);
+								mockEInv.GetItems().Returns(new List<IInventoryItemInstance>(eInvEles));
+							sgProvider.GetEquipInv().Returns(mockEInv);
 						ssm.SetFocusedSGProvider(sgProvider);
 						IEquippedProvider stubEquiProv = Substitute.For<IEquippedProvider>();
-							List<InventoryItemInstance> allEquippedItems = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> allEquippedItems = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bowE, wearE, shieldE, mWeaponE
 							});
-							stubEquiProv.allEquippedItems.Returns(allEquippedItems);
+							stubEquiProv.GetAllEquippedItems().Returns(allEquippedItems);
 						ssm.SetEquippedProvider(stubEquiProv);
 						IAllElementsProvider allEProv = Substitute.For<IAllElementsProvider>();
 						ssm.SetAllElementsProvider(allEProv);
@@ -298,21 +298,21 @@ namespace SlotSystemTests{
 					SlotSystemManager ssm = MakeSSM();
 						IFocusedSGProvider sgProvider = Substitute.For<IFocusedSGProvider>();
 							IEquipmentSetInventory mockEInv = Substitute.For<IEquipmentSetInventory>();
-								IEnumerable<InventoryItemInstance> eInvEles;
-									eInvEles = new InventoryItemInstance[]{};
-								mockEInv.GetEnumerator().Returns(eInvEles.GetEnumerator());
-							sgProvider.equipInv.Returns(mockEInv);
+								IEnumerable<IInventoryItemInstance> eInvEles;
+									eInvEles = new IInventoryItemInstance[]{};
+								mockEInv.GetItems().Returns(new List<IInventoryItemInstance>(eInvEles));
+							sgProvider.GetEquipInv().Returns(mockEInv);
 						ssm.SetFocusedSGProvider(sgProvider);
 						IEquippedProvider stubEquiProv = Substitute.For<IEquippedProvider>();
-								List<InventoryItemInstance> allEquippedItems;
+								List<IInventoryItemInstance> allEquippedItems;
 									BowInstance bowA = MakeBowInstance(0);
 									WearInstance wearA = MakeWearInstance(0);
 									ShieldInstance shieldA = MakeShieldInstance(0);
 									MeleeWeaponInstance mWeaponA = MakeMWeaponInstance(0);
-								allEquippedItems = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+								allEquippedItems = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 									bowA, wearA, shieldA, mWeaponA
 								});
-							stubEquiProv.allEquippedItems.Returns(allEquippedItems);
+							stubEquiProv.GetAllEquippedItems().Returns(allEquippedItems);
 						ssm.SetEquippedProvider(stubEquiProv);
 						IAllElementsProvider allEProv = Substitute.For<IAllElementsProvider>();
 						ssm.SetAllElementsProvider(allEProv);
@@ -333,23 +333,23 @@ namespace SlotSystemTests{
 							ShieldInstance shieldE = MakeShieldInstance(0);
 							MeleeWeaponInstance mWeaponE = MakeMWeaponInstance(0);
 							PartsInstance partsE = MakePartsInstance(0, 20);
-							equipProv.equippedBowInst.Returns(bowE);
-							equipProv.equippedWearInst.Returns(wearE);
-							equipProv.equippedCarriedGears.Returns(new List<CarriedGearInstance>(new CarriedGearInstance[]{
+							equipProv.GetEquippedBowInst().Returns(bowE);
+							equipProv.GetEquippedWearInst().Returns(wearE);
+							equipProv.GetEquippedCarriedGears().Returns(new List<CarriedGearInstance>(new CarriedGearInstance[]{
 								shieldE, mWeaponE
 							}));
-							equipProv.equippedParts.Returns(new List<PartsInstance>(new PartsInstance[]{
+							equipProv.GetEquippedParts().Returns(new List<PartsInstance>(new PartsInstance[]{
 								partsE
 							}));
 						ssm.SetEquippedProvider(equipProv);
 						IPoolInventory stubPInv = Substitute.For<IPoolInventory>();
-							IEnumerable<InventoryItemInstance> pInvEles;
+							IEnumerable<IInventoryItemInstance> pInvEles;
 								BowInstance bowU = MakeBowInstance(0);
 								WearInstance wearU = MakeWearInstance(0);
 								QuiverInstance quiverU = MakeQuiverInstance(0);
 								PackInstance packU = MakePackInstance(0);
 								PartsInstance partsU = MakePartsInstance(1, 2);
-								pInvEles = new InventoryItemInstance[]{
+								pInvEles = new IInventoryItemInstance[]{
 									bowE,
 									wearE,
 									shieldE,
@@ -361,25 +361,25 @@ namespace SlotSystemTests{
 									packU,
 									partsU
 								};
-							stubPInv.GetEnumerator().Returns(pInvEles.GetEnumerator());
+							stubPInv.GetItems().Returns(new List<IInventoryItemInstance>(pInvEles));
 						IFocusedSGProvider stubFocSGProv = Substitute.For<IFocusedSGProvider>();
-							stubFocSGProv.poolInv.Returns(stubPInv);
+							stubFocSGProv.GetPoolInv().Returns(stubPInv);
 						ssm.SetFocusedSGProvider(stubFocSGProv);
 						IAllElementsProvider stubAllEProv = Substitute.For<IAllElementsProvider>();
 						ssm.SetAllElementsProvider(stubAllEProv);
 					
 					ssm.UpdateAllItemsEquipStatusInPoolInv();
 
-					Assert.That(bowE.isEquipped, Is.True);
-					Assert.That(wearE.isEquipped, Is.True);
-					Assert.That(shieldE.isEquipped, Is.True);
-					Assert.That(mWeaponE.isEquipped, Is.True);
-					Assert.That(partsE.isEquipped, Is.True);
-					Assert.That(bowU.isEquipped, Is.False);
-					Assert.That(wearU.isEquipped, Is.False);
-					Assert.That(quiverU.isEquipped, Is.False);
-					Assert.That(packU.isEquipped, Is.False);
-					Assert.That(partsU.isEquipped, Is.False);
+					Assert.That(bowE.GetIsEquipped(), Is.True);
+					Assert.That(wearE.GetIsEquipped(), Is.True);
+					Assert.That(shieldE.GetIsEquipped(), Is.True);
+					Assert.That(mWeaponE.GetIsEquipped(), Is.True);
+					Assert.That(partsE.GetIsEquipped(), Is.True);
+					Assert.That(bowU.GetIsEquipped(), Is.False);
+					Assert.That(wearU.GetIsEquipped(), Is.False);
+					Assert.That(quiverU.GetIsEquipped(), Is.False);
+					Assert.That(packU.GetIsEquipped(), Is.False);
+					Assert.That(partsU.GetIsEquipped(), Is.False);
 				}
 				[Test]
 				public void UpdateAllSBsEquipState(){
@@ -392,7 +392,7 @@ namespace SlotSystemTests{
 							allSBs = new List<ISlottable>(new ISlottable[]{
 								sbA, sbB, sbC
 							});
-							stubAllEProv.allSBs.Returns(allSBs);
+							stubAllEProv.GetAllSBs().Returns(allSBs);
 						ssm.SetAllElementsProvider(stubAllEProv);
 					
 					ssm.UpdateAllSBsEquipState();
@@ -403,25 +403,25 @@ namespace SlotSystemTests{
 				}
 				[TestCaseSource(typeof(MarkEquippedInPoolCases))]
 				public void MarkEquippedInPool_WhenCalled_FindItemInPoolAndSetsIsEquippedAccordingly(
-					IEnumerable<InventoryItemInstance> items, 
-					InventoryItemInstance item, 
+					IEnumerable<IInventoryItemInstance> items, 
+					IInventoryItemInstance item, 
 					bool equipped, 
-					List<InventoryItemInstance> xEquipped)
+					List<IInventoryItemInstance> xEquipped)
 				{
 					SlotSystemManager ssm = MakeSSM();
 						IPoolInventory pInv = MakeSubPoolInv();
-							pInv.GetEnumerator().Returns(items.GetEnumerator());
+							pInv.GetItems().Returns(new List<IInventoryItemInstance>(items));
 						IFocusedSGProvider stubFocSGProv = Substitute.For<IFocusedSGProvider>();
-							stubFocSGProv.poolInv.Returns(pInv);
+							stubFocSGProv.GetPoolInv().Returns(pInv);
 						ssm.SetFocusedSGProvider(stubFocSGProv);
 
 					ssm.MarkEquippedInPool(item, equipped);
 
-					foreach(InventoryItemInstance it in stubFocSGProv.poolInv)
+					foreach(IInventoryItemInstance it in pInv.GetItems())
 						if(xEquipped.Contains(it))
-							Assert.That(it.isEquipped, Is.True);
+							Assert.That(it.GetIsEquipped(), Is.True);
 						else
-						 	Assert.That(it.isEquipped, Is.False);
+						 	Assert.That(it.GetIsEquipped(), Is.False);
 					}
 					class MarkEquippedInPoolCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
@@ -433,7 +433,7 @@ namespace SlotSystemTests{
 								QuiverInstance quiver_0 = MakeQuiverInstance(0);
 								PackInstance pack_0 = MakePackInstance(0);
 								PartsInstance parts_0 = MakePartsInstance(0, 2);
-								IEnumerable<InventoryItemInstance> items_0 = new InventoryItemInstance[]{
+								IEnumerable<IInventoryItemInstance> items_0 = new IInventoryItemInstance[]{
 									bow_0, 
 									wear_0, 
 									shield_0, 
@@ -442,7 +442,7 @@ namespace SlotSystemTests{
 									pack_0, 
 									parts_0
 								};
-								IEnumerable<InventoryItemInstance> equipped_0 = new InventoryItemInstance[]{
+								IEnumerable<IInventoryItemInstance> equipped_0 = new IInventoryItemInstance[]{
 									wear_0, 
 									shield_0, 
 									mWeapon_0, 
@@ -451,8 +451,8 @@ namespace SlotSystemTests{
 									parts_0
 								};
 									foreach(var sItem in equipped_0)
-										((InventoryItemInstance)sItem).isEquipped = true;
-								List<InventoryItemInstance> xEquipped_0 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+										((IInventoryItemInstance)sItem).SetIsEquipped(true);
+								List<IInventoryItemInstance> xEquipped_0 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 									bow_0, 
 									wear_0, 
 									shield_0, 
@@ -471,7 +471,7 @@ namespace SlotSystemTests{
 								QuiverInstance quiver_1 = MakeQuiverInstance(0);
 								PackInstance pack_1 = MakePackInstance(0);
 								PartsInstance parts_1 = MakePartsInstance(0, 2);
-								IEnumerable<InventoryItemInstance> items_1 = new InventoryItemInstance[]{
+								IEnumerable<IInventoryItemInstance> items_1 = new IInventoryItemInstance[]{
 									bow_1, 
 									wear_1, 
 									shield_1, 
@@ -480,12 +480,12 @@ namespace SlotSystemTests{
 									pack_1, 
 									parts_1
 								};
-								IEnumerable<InventoryItemInstance> equipped_1 = new InventoryItemInstance[]{
+								IEnumerable<IInventoryItemInstance> equipped_1 = new IInventoryItemInstance[]{
 									bow_1
 								};
 									foreach(var sItem in equipped_1)
-										((InventoryItemInstance)sItem).isEquipped = true;
-								List<InventoryItemInstance> xEquipped_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+										((IInventoryItemInstance)sItem).SetIsEquipped(true);
+								List<IInventoryItemInstance> xEquipped_1 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								});
 								case1 = new object[]{items_1, bow_1, false, xEquipped_1};
 								yield return case1;
@@ -705,7 +705,7 @@ namespace SlotSystemTests{
 						SlotSystemBundle pBun = MakeSSBundle();
 							ISlotGroup stubSGP = MakeSubSG();
 								PoolInventory stubPInv = new PoolInventory();
-								stubSGP.inventory.Returns(stubPInv);
+								stubSGP.GetInventory().Returns(stubPInv);
 							IEnumerable<ISlotSystemElement> pBunEles = new ISlotSystemElement[]{stubSGP};
 							pBun.SetElements(pBunEles);
 							pBun.transform.SetParent(ssm.transform);
@@ -725,9 +725,9 @@ namespace SlotSystemTests{
 
 					ssm.SetHierarchy();
 
-					Assert.That(ssm.poolBundle, Is.SameAs(pBun));
-					Assert.That(ssm.equipBundle, Is.SameAs(eBun));
-					Assert.That(ssm.otherBundles, Is.EqualTo(xGBuns));
+					Assert.That(ssm.GetPoolBundle(), Is.SameAs(pBun));
+					Assert.That(ssm.GetEquipBundle(), Is.SameAs(eBun));
+					Assert.That(ssm.GetOtherBundles(), Is.EqualTo(xGBuns));
 
 					Assert.That(pBun.GetParent(), Is.SameAs(ssm));
 					Assert.That(eBun.GetParent(), Is.SameAs(ssm));

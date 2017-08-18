@@ -20,7 +20,7 @@ namespace SlotSystemTests{
 
 				tam.Refresh();
 
-				Assert.That(stateHandler.isWaitingForAction, Is.True);
+				Assert.That(stateHandler.IsWaitingForAction(), Is.True);
 				}
 
 			[TestCaseSource(typeof(transactionCoroutineCases))]
@@ -29,12 +29,12 @@ namespace SlotSystemTests{
 					TAMActStateHandler tamStateHandler = new TAMActStateHandler(tam);
 					tam.SetActStateHandler(tamStateHandler);
 				ITransactionSGHandler stubSGHandler = Substitute.For<ITransactionSGHandler>();
-					stubSGHandler.sg1Done.Returns(sg1 == null);
-					stubSGHandler.sg2Done.Returns(sg2 == null);
+					stubSGHandler.IsSG1Done().Returns(sg1 == null);
+					stubSGHandler.IsSG2Done().Returns(sg2 == null);
 				tam.SetSGHandler(stubSGHandler);
 				ITransactionIconHandler stubIconHandler = Substitute.For<ITransactionIconHandler>();
-					stubIconHandler.dIcon1Done.Returns(di1 == null);
-					stubIconHandler.dIcon2Done.Returns(di2 == null);
+					stubIconHandler.IsDIcon1Done().Returns(di1 == null);
+					stubIconHandler.IsDIcon2Done().Returns(di2 == null);
 				tam.SetIconHandler(stubIconHandler);
 				ITAMActProcess mockProc = Substitute.For<ITAMActProcess>();
 				tamStateHandler.SetAndRunActProcess(mockProc);
@@ -140,7 +140,7 @@ namespace SlotSystemTests{
 				
 				tam.ExecuteTransaction();
 
-				Assert.That(tamStateHandler.isTransacting, Is.True);
+				Assert.That(tamStateHandler.IsTransacting(), Is.True);
 				}
 			[Test]
 			public void InnerUpdateFields_Always_SetsFields(){
@@ -157,8 +157,8 @@ namespace SlotSystemTests{
 				
 				tam.UpdateFields(stubTA);
 
-				Assert.That(sgHandler.sg1, Is.SameAs(stubSG1));
-				Assert.That(sgHandler.sg2, Is.SameAs(stubSG2));
+				Assert.That(sgHandler.GetSG1(), Is.SameAs(stubSG1));
+				Assert.That(sgHandler.GetSG2(), Is.SameAs(stubSG2));
 				Assert.That(tam.transaction, Is.SameAs(stubTA));
 			}
 		}

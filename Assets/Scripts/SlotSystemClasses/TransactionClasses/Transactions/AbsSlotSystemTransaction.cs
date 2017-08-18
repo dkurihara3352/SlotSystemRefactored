@@ -8,14 +8,20 @@ namespace SlotSystem{
 		protected ITAMActStateHandler tamStateHandler;
 		public AbsSlotSystemTransaction(ITransactionManager tam){
 			this.tam = tam;
-			this.tamStateHandler = tam.actStateHandler;
+			this.tamStateHandler = tam.GetActStateHandler();
 		}
-		protected List<InventoryItemInstance> removed = new List<InventoryItemInstance>();
-		protected List<InventoryItemInstance> added = new List<InventoryItemInstance>();
-		public virtual ISlottable targetSB{get{return null;}}
-		public virtual ISlotGroup sg1{get{return null;}}
-		public virtual ISlotGroup sg2{get{return null;}}
-		public virtual List<InventoryItemInstance> moved{get{return null;}}
+		public virtual ISlottable GetTargetSB(){
+			return null;
+		}
+		public virtual ISlotGroup GetSG1(){
+			return null;
+		}
+		public virtual ISlotGroup GetSG2(){
+			return null;
+		}
+		public virtual List<IInventoryItemInstance> GetMoved(){
+			return null;
+		}
 		public virtual void Indicate(){}
 		public virtual void Execute(){
 			tamStateHandler.Transact();

@@ -13,9 +13,9 @@ namespace SlotSystem{
 			Unmark();
 		}
 		/*	States	*/
-			public void InitializeSB(InventoryItemInstance item){
+			public void InitializeSB(IInventoryItemInstance item){
 
-				SetHoverable(new Hoverable(GetSSM().taCache));
+				SetHoverable(new Hoverable(GetSSM().GetTAC()));
 				SetTapCommand(new SBTapCommand());
 				SetItemHandler(new ItemHandler(item));
 				SetSlotHandler(new SlotHandler());
@@ -24,7 +24,7 @@ namespace SlotSystem{
 			}
 			public void InitializeStateHandlers(){
 				_selStateHandler = new SBSelStateHandler(this);
-				_actStateHandler = new SBActStateHandler(this, GetSSM().tam);
+				_actStateHandler = new SBActStateHandler(this, GetSSM().GetTAM());
 				_eqpStateHandler = new SBEqpStateHandler(this);
 				_mrkStateHandler = new SBMrkStateHandler(this);
 			}
@@ -332,10 +332,10 @@ namespace SlotSystem{
 			public void SetItemHandler(IItemHandler itemHandler){
 				_itemHandler = itemHandler;
 			}
-			public InventoryItemInstance GetItem(){
+			public IInventoryItemInstance GetItem(){
 				return itemHandler.GetItem();
 			}
-			public void SetItem(InventoryItemInstance item){
+			public void SetItem(IInventoryItemInstance item){
 				itemHandler.SetItem(item);
 			}
 			public int GetPickedAmount(){
@@ -354,7 +354,7 @@ namespace SlotSystem{
 				itemHandler.SetQuantity(quant);
 			}
 			public void UpdateEquipState(){
-				if(GetItem().isEquipped) Equip();
+				if(GetItem().GetIsEquipped()) Equip();
 				else Unequip();
 			}
 		/* SG And Slots */
@@ -367,7 +367,7 @@ namespace SlotSystem{
 			public bool IsPool(){
 				ISlotGroup sg = GetSG();
 				if(sg != null){
-					return sg.isPool;
+					return sg.IsPool();
 				}else
 					throw new System.InvalidOperationException("Slottable.isPool: sg is not set");
 			}
@@ -414,7 +414,7 @@ namespace SlotSystem{
 			public bool ShareSGAndItem(ISlottable other){
 				bool flag = true;
 				flag &= this.GetSG() == other.GetSG();
-				flag &= this.GetItem() == other.GetItem();
+				flag &= this.GetItem().Equals(other.GetItem());
 				return flag;
 			}
 			public void Destroy(){
@@ -438,32 +438,32 @@ namespace SlotSystem{
 			}
 		/*	Transaction	*/
 			public bool IsPickedUp(){
-				return taCache.pickedSB == (ISlottable)this;
+				return GetTAC().GetPickedSB() == (ISlottable)this;
 			}
 			public bool PassesPrePickFilter(){
-				return !taCache.IsTransactionGoingToBeRevert(this);
+				return !GetTAC().IsTransactionGoingToBeRevert(this);
 			}
 		/* hoverable */
 			public IHoverable hoverable{
 				get{
-					if(m_hoverable != null)
-						return m_hoverable;
+					if(_hoverable != null)
+						return _hoverable;
 					else
 						throw new InvalidOperationException("hoverable not set");
 				}
 			}
-				IHoverable m_hoverable;
+				IHoverable _hoverable;
 			public void SetHoverable(IHoverable hoverable){
-				m_hoverable = hoverable;
+				_hoverable = hoverable;
 			}
-			public ITransactionCache taCache{
-				get{return hoverable.taCache;}
+			public ITransactionCache GetTAC(){
+				return hoverable.GetTAC();
 			}
 			public void SetTACache(ITransactionCache taCache){
 				hoverable.SetTACache(taCache);
 			}
-			public bool isHovered{
-				get{return hoverable.isHovered;}
+			public bool IsHovered(){
+				return hoverable.IsHovered();
 			}
 			public void OnHoverEnter(){
 				hoverable.OnHoverEnter();

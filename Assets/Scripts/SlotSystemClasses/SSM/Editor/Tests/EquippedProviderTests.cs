@@ -21,12 +21,12 @@ namespace SlotSystemTests{
 						wearSBE.GetItem().Returns(wearE);
 						WearInstance expected = wearE;
 					sgeWear[0].Returns(wearSBE);
-					sgeWear.filter.Returns(new SGWearFilter());
+					sgeWear.GetFilter().Returns(new SGWearFilter());
 				IFocusedSGProvider stubFocSGProv = Substitute.For<IFocusedSGProvider>();
-					stubFocSGProv.focusedSGEWear.Returns(sgeWear);
+					stubFocSGProv.GetFocusedSGEWear().Returns(sgeWear);
 				equiProv = new EquippedProvider(stubFocSGProv);
 
-			WearInstance actual = equiProv.equippedWearInst;
+			WearInstance actual = equiProv.GetEquippedWearInst();
 
 			Assert.That(actual, Is.SameAs(expected));
 		}
@@ -44,12 +44,12 @@ namespace SlotSystemTests{
 						sgeCGearsEles = new ISlotSystemElement[]{shieldSBE, mWeaponSBE};
 						List<CarriedGearInstance> expected = new List<CarriedGearInstance>(new CarriedGearInstance[]{shieldE, mWeaponE});
 					sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());
-					sgeCGears.filter.Returns(new SGCGearsFilter());
+					sgeCGears.GetFilter().Returns(new SGCGearsFilter());
 				IFocusedSGProvider stubFocSGProv = Substitute.For<IFocusedSGProvider>();
-				stubFocSGProv.focusedSGECGears.Returns(sgeCGears);
+				stubFocSGProv.GetFocusedSGECGears().Returns(sgeCGears);
 				equiProv = new EquippedProvider(stubFocSGProv);
 
-			IEnumerable<CarriedGearInstance> actual = equiProv.equippedCarriedGears;
+			IEnumerable<CarriedGearInstance> actual = equiProv.GetEquippedCarriedGears();
 
 			Assert.That(actual.MemberEquals(expected), Is.True);
 		}
@@ -62,13 +62,13 @@ namespace SlotSystemTests{
 							BowInstance bowE = MakeBowInstance(0);
 							bowSBE.GetItem().Returns(bowE);
 						sgeBow[0].Returns(bowSBE);
-						sgeBow.filter.Returns(new SGBowFilter());
+						sgeBow.GetFilter().Returns(new SGBowFilter());
 					ISlotGroup sgeWear = MakeSubSG();
 						ISlottable wearSBE = MakeSubSB();
 							WearInstance wearE = MakeWearInstance(0);
 							wearSBE.GetItem().Returns(wearE);
 						sgeWear[0].Returns(wearSBE);
-						sgeWear.filter.Returns(new SGWearFilter());
+						sgeWear.GetFilter().Returns(new SGWearFilter());
 					ISlotGroup sgeCGears = MakeSubSG();
 						IEnumerable<ISlotSystemElement> sgeCGearsEles;
 							ISlottable shieldSBE = MakeSubSB();
@@ -79,16 +79,16 @@ namespace SlotSystemTests{
 								mWeaponSBE.GetItem().Returns(mWeaponE);
 							sgeCGearsEles = new ISlotSystemElement[]{shieldSBE, mWeaponSBE};
 						sgeCGears.GetEnumerator().Returns(sgeCGearsEles.GetEnumerator());
-						sgeCGears.filter.Returns(new SGCGearsFilter());
-					stubFocSGProv.focusedSGEBow.Returns(sgeBow);
-					stubFocSGProv.focusedSGEWear.Returns(sgeWear);
-					stubFocSGProv.focusedSGECGears.Returns(sgeCGears);
+						sgeCGears.GetFilter().Returns(new SGCGearsFilter());
+					stubFocSGProv.GetFocusedSGEBow().Returns(sgeBow);
+					stubFocSGProv.GetFocusedSGEWear().Returns(sgeWear);
+					stubFocSGProv.GetFocusedSGECGears().Returns(sgeCGears);
 				equiProv = new EquippedProvider(stubFocSGProv);
-				List<InventoryItemInstance> expected = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+				List<IInventoryItemInstance> expected = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 					bowE, wearE, shieldE, mWeaponE
 				});
 
-			List<InventoryItemInstance> actual = equiProv.allEquippedItems;
+			List<IInventoryItemInstance> actual = equiProv.GetAllEquippedItems();
 
 			Assert.That(actual.MemberEquals(expected), Is.True);
 		}

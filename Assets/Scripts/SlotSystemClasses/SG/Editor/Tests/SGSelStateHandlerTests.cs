@@ -21,7 +21,7 @@ namespace SlotSystemTests{
 
 				selStateHandler.Activate();
 
-				Assert.That(selStateHandler.isFocused, Is.True);
+				Assert.That(selStateHandler.IsFocused(), Is.True);
 			}
 			[Test]
 			public void Activate_TACacheResultRevertTrue_SetsIsDefocused(){
@@ -33,7 +33,7 @@ namespace SlotSystemTests{
 
 				selStateHandler.Activate();
 
-				Assert.That(selStateHandler.isDefocused, Is.True);
+				Assert.That(selStateHandler.IsDefocused(), Is.True);
 			}
 		}
 	}

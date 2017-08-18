@@ -25,7 +25,7 @@ namespace SlotSystem{
 				}
 				public void SetActState(ISGActState state){
 					actStateEngine.SetState(state);
-					if(state ==null && actProcess != null)
+					if(state ==null && GetActProcess() != null)
 						SetAndRunActProcess(null);
 				}
 				ISGActState curActState{
@@ -48,107 +48,107 @@ namespace SlotSystem{
 				public void ClearCurActState(){
 					SetActState(null);
 				}
-					public bool isActStateNull{
-						get{return curActState == null;}
+					public bool IsActStateNull(){
+						return curActState == null;
 					}
-					public bool wasActStateNull{
-						get{return prevActState == null;}
+					public bool WasActStateNull(){
+						return prevActState == null;
 					}
 				public void WaitForAction(){
 					SetActState(waitForActionState);
 				}
 					public ISGActState waitForActionState{
-						get{return statesRepo.waitForActionState;}
+						get{return statesRepo.GetWaitForActionState();}
 					}
-					public bool isWaitingForAction{
-						get{return curActState == waitForActionState;}
+					public bool IsWaitingForAction(){
+						return curActState == waitForActionState;
 					}
-					public bool wasWaitingForAction{
-						get{return prevActState == waitForActionState;}
+					public bool WasWaitingForAction(){
+						return prevActState == waitForActionState;
 					}
 				public void Revert(){
 					SetActState(revertState);
 				}
 					public ISGActState revertState{
-						get{return statesRepo.revertState;}
+						get{return statesRepo.GetRevertState();}
 					}
-					public bool isReverting{
-						get{return curActState == revertState;}
+					public bool IsReverting(){
+						return curActState == revertState;
 					}
-					public bool wasReverting{
-						get{return prevActState == revertState;}
+					public bool WasReverting(){
+						return prevActState == revertState;
 					}
 				public void Reorder(){
 					SetActState(reorderState);
 				}
 					public ISGActState reorderState{
-						get{return statesRepo.reorderState;}
+						get{return statesRepo.GetReorderState();}
 					}
-					public bool isReordering{
-						get{return curActState == reorderState;}
+					public bool IsReordering(){
+						return curActState == reorderState;
 					}
-					public bool wasReordering{
-						get{return prevActState == reorderState;}
+					public bool WasReordering(){
+						return prevActState == reorderState;
 					}
 				public void Add(){
 					SetActState(addState);
 				}
 					public ISGActState addState{
-						get{return statesRepo.addState;}
+						get{return statesRepo.GetAddState();}
 					}
-					public bool isAdding{
-						get{return curActState == addState;}
+					public bool IsAdding(){
+						return curActState == addState;
 					}
-					public bool wasAdding{
-						get{return prevActState == addState;}
+					public bool WasAdding(){
+						return prevActState == addState;
 					}
 				public void Remove(){
 					SetActState(removeState);
 				}
 					public ISGActState removeState{
-						get{return statesRepo.removeState;}
+						get{return statesRepo.GetRemoveState();}
 					}
-					public bool isRemoving{
-						get{return curActState == removeState;}
+					public bool IsRemoving(){
+						return curActState == removeState;
 					}
-					public bool wasRemoving{
-						get{return prevActState == removeState;}
+					public bool WasRemoving(){
+						return prevActState == removeState;
 					}
 				public void Swap(){
 					SetActState(swapState);
 				}
 					public ISGActState swapState{
-						get{return statesRepo.swapState;}
+						get{return statesRepo.GetSwapState();}
 					}
-					public bool isSwapping{
-						get{return curActState == swapState;}
+					public bool IsSwapping(){
+						return curActState == swapState;
 					}
-					public bool wasSwapping{
-						get{return prevActState == swapState;}
+					public bool WasSwapping(){
+						return prevActState == swapState;
 					}
 				public void Fill(){
 					SetActState(fillState);
 				}
 					public ISGActState fillState{
-						get{return statesRepo.fillState;}
+						get{return statesRepo.GetFillState();}
 					}
-					public bool isFilling{
-						get{return curActState == fillState;}
+					public bool IsFilling(){
+						return curActState == fillState;
 					}
-					public bool wasFilling{
-						get{return prevActState == fillState;}
+					public bool WasFilling(){
+						return prevActState == fillState;
 					}
 				public void Sort(){
 					SetActState(sortState);
 				}
 					public ISGActState sortState{
-						get{return statesRepo.sortState;}
+						get{return statesRepo.GetSortState();}
 					}
-					public bool isSorting{
-						get{return curActState == sortState;}
+					public bool IsSorting(){
+						return curActState == sortState;
 					}
-					public bool wasSorting{
-						get{return prevActState == sortState;}
+					public bool WasSorting(){
+						return prevActState == sortState;
 					}
 	/*	process	*/
 		/*	Action Process	*/
@@ -168,11 +168,12 @@ namespace SlotSystem{
 				actProcEngine.SetAndRunProcess(process);
 			}
 			public void ExpireActProcess(){
+				ISGActProcess actProcess = GetActProcess();
 				if(actProcess != null) 
 					actProcess.Expire();
 			}
-			public ISGActProcess actProcess{
-				get{return actProcEngine.GetProcess();}
+			public ISGActProcess GetActProcess(){
+				return actProcEngine.GetProcess();
 			}
 			public IEnumeratorFake TransactionCoroutine(){
 				return null;
@@ -180,44 +181,36 @@ namespace SlotSystem{
 	}
 	public interface ISGActStateHandler{
 		void ClearCurActState();
-			bool wasActStateNull{get;}
-			bool isActStateNull{get;}
-		ISGActState waitForActionState{get;}
-			void WaitForAction();
-			bool isWaitingForAction{get;}
-			bool wasWaitingForAction{get;}
-		ISGActState revertState{get;}
-			void Revert();
-			bool isReverting{get;}
-			bool wasReverting{get;}
-		ISGActState reorderState{get;}
-			void Reorder();
-			bool isReordering{get;}
-			bool wasReordering{get;}
-		ISGActState addState{get;}
-			void Add();
-			bool isAdding{get;}
-			bool wasAdding{get;}
-		ISGActState removeState{get;}
-			void Remove();
-			bool isRemoving{get;}
-			bool wasRemoving{get;}
-		ISGActState swapState{get;}
-			void Swap();
-			bool isSwapping{get;}
-			bool wasSwapping{get;}
-		ISGActState fillState{get;}
-			void Fill();
-			bool isFilling{get;}
-			bool wasFilling{get;}
-		ISGActState sortState{get;}
-			void Sort();
-			bool isSorting{get;}
-			bool wasSorting{get;}
+			bool WasActStateNull();
+			bool IsActStateNull();
+		void WaitForAction();
+			bool IsWaitingForAction();
+			bool WasWaitingForAction();
+		void Revert();
+			bool IsReverting();
+			bool WasReverting();
+		void Reorder();
+			bool IsReordering();
+			bool WasReordering();
+		void Add();
+			bool IsAdding();
+			bool WasAdding();
+		void Remove();
+			bool IsRemoving();
+			bool WasRemoving();
+		void Swap();
+			bool IsSwapping();
+			bool WasSwapping();
+		void Fill();
+			bool IsFilling();
+			bool WasFilling();
+		void Sort();
+			bool IsSorting();
+			bool WasSorting();
 	/* Proc */
 		void SetAndRunActProcess(ISGActProcess process);
 		void ExpireActProcess();
-		ISGActProcess actProcess{get;}
+		ISGActProcess GetActProcess();
 		IEnumeratorFake TransactionCoroutine();
 	}
 }

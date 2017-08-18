@@ -4,28 +4,33 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class ReorderTransaction: AbsSlotSystemTransaction, IReorderTransaction{
-		ISlottable m_pickedSB;
-		ISlottable m_selectedSB;
-		ISlotGroup m_origSG;
+		ISlottable _pickedSB;
+		ISlottable _selectedSB;
+		ISlotGroup _origSG;
 		ITransactionIconHandler iconHandler;
 		ISlotsHolder sg1SlotsHolder;
 		ISGActStateHandler sg1ActStateHandler;
 		ISGTransactionHandler sg1TAHandler;
 		public ReorderTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam): base(tam){
-			m_pickedSB = pickedSB;
-			m_selectedSB = selected;
-			m_origSG = m_pickedSB.GetSG();
-			iconHandler = tam.iconHandler;
-			sg1SlotsHolder = sg1;
-			sg1ActStateHandler = sg1;
-			sg1TAHandler = sg1;
+			_pickedSB = pickedSB;
+			_selectedSB = selected;
+			_origSG = _pickedSB.GetSG();
+			iconHandler = tam.GetIconHandler();
+			sg1SlotsHolder = GetSG1();
+			sg1ActStateHandler = GetSG1();
+			sg1TAHandler = GetSG1();
 		}
-		public override ISlottable targetSB{get{return m_selectedSB;}}
-		public override ISlotGroup sg1{get{return m_origSG;}}
+		public override ISlottable GetTargetSB(){
+			return _selectedSB;
+		}
+		public override ISlotGroup GetSG1(){
+			return _origSG;
+		}
 		public override void Indicate(){}
 		public override void Execute(){
+			ISlotGroup sg1 = GetSG1();
 			sg1ActStateHandler.Reorder();
-			iconHandler.SetD1Destination(sg1, sg1SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
+			iconHandler.SetD1Destination(sg1, sg1SlotsHolder.GetNewSlot(_pickedSB.GetItem()));
 			sg1.OnActionExecute();
 			base.Execute();
 		}

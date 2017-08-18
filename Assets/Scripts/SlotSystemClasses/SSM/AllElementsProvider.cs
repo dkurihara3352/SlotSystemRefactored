@@ -8,34 +8,32 @@ namespace SlotSystem{
 		public AllElementsProvider(ISlotSystemManager ssm){
 			this.ssm = ssm;
 		}
-		public List<ISlotGroup> allSGs{
-			get{
-				List<ISlotGroup> result = new List<ISlotGroup>();
-				result.AddRange(allSGPs);
-				result.AddRange(allSGEs);
-				result.AddRange(allSGGs);
-				return result;
-			}
+		public List<ISlotGroup> GetAllSGs(){
+			List<ISlotGroup> result = new List<ISlotGroup>();
+			result.AddRange(allSGPs);
+			result.AddRange(allSGEs);
+			result.AddRange(allSGGs);
+			return result;
 		}
 		public List<ISlotGroup> allSGPs
 		{
 			get{
 				List<ISlotGroup> result = new List<ISlotGroup>();
-				ssm.poolBundle.PerformInHierarchy(AddInSGList, result);
+				ssm.GetPoolBundle().PerformInHierarchy(AddInSGList, result);
 				return result;
 			}
 		}
 		public List<ISlotGroup> allSGEs{
 			get{
 				List<ISlotGroup> result = new List<ISlotGroup>();
-				ssm.equipBundle.PerformInHierarchy(AddInSGList, result);
+				ssm.GetEquipBundle().PerformInHierarchy(AddInSGList, result);
 				return result;
 			}
 		}
 		public List<ISlotGroup> allSGGs{
 			get{
 				List<ISlotGroup> result = new List<ISlotGroup>();
-				foreach(ISlotSystemBundle gBun in ssm.otherBundles){
+				foreach(ISlotSystemBundle gBun in ssm.GetOtherBundles()){
 					gBun.PerformInHierarchy(AddInSGList, result);
 				}
 				return result;
@@ -45,12 +43,10 @@ namespace SlotSystem{
 			if(ele is ISlotGroup)
 			sgs.Add((ISlotGroup)ele);
 		}
-		public List<ISlottable> allSBs{
-			get{
-				List<ISlottable> res = new List<ISlottable>();
-				ssm.PerformInHierarchy(AddSBToRes, res);
-				return res;
-			}
+		public List<ISlottable> GetAllSBs(){
+			List<ISlottable> res = new List<ISlottable>();
+			ssm.PerformInHierarchy(AddSBToRes, res);
+			return res;
 		}
 		public void AddSBToRes(ISlotSystemElement ele, IList<ISlottable> list){
 			if(ele is ISlottable)
@@ -58,7 +54,7 @@ namespace SlotSystem{
 		}
 	}
 	public interface IAllElementsProvider{
-		List<ISlotGroup> allSGs{get;}
-		List<ISlottable> allSBs{get;}
+		List<ISlotGroup> GetAllSGs();
+		List<ISlottable> GetAllSBs();
 	}
 }

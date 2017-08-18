@@ -19,11 +19,10 @@ namespace SlotSystemTests{
 				bool expected)
 			{
 				IFocusedSGProvider focSGPrv = Substitute.For<IFocusedSGProvider>();
-					focSGPrv.focusedSGs.Returns(focusedSGs);
+					focSGPrv.GetFocusedSGs().Returns(focusedSGs);
 				ITransactionManager stubTAM = MakeSubTAM();
 				TransactionCache taCache = new TransactionCache(stubTAM, focSGPrv);
-					// taCache.SetPickedSB(pickedSB);
-					stubTAM.taFactory.Returns(taFac);
+					stubTAM.GetTAFactory().Returns(taFac);
 
 				bool result = taCache.IsTransactionGoingToBeRevert(pickedSB);
 
@@ -96,7 +95,7 @@ namespace SlotSystemTests{
 			public void hovered_ByDefault_IsNull(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());
 
-				Assert.That(taCache.hovered, Is.Null);
+				Assert.That(taCache.GetHovered(), Is.Null);
 			}
 			[Test]
 			public void SetHovered_hoveredNullToSome_SetsItHovered(){
@@ -105,7 +104,7 @@ namespace SlotSystemTests{
 
 				taCache.SetHovered(stubHoverable);
 
-				Assert.That(taCache.hovered, Is.SameAs(stubHoverable));
+				Assert.That(taCache.GetHovered(), Is.SameAs(stubHoverable));
 			}
 			[Test]
 			public void SetHovered_hoveredNullToSome_CallsUpdateFieldsCommandExecute(){
@@ -126,7 +125,7 @@ namespace SlotSystemTests{
 
 				taCache.SetHovered(null);
 
-				Assert.That(taCache.hovered, Is.Null);
+				Assert.That(taCache.GetHovered(), Is.Null);
 			}
 			[Test]
 			public void SetHovered_SomeToNull_DoesNotCallsPrevOnHoverExit(){
@@ -158,7 +157,7 @@ namespace SlotSystemTests{
 
 				taCache.SetHovered(newHoverable);
 
-				Assert.That(taCache.hovered, Is.SameAs(newHoverable));
+				Assert.That(taCache.GetHovered(), Is.SameAs(newHoverable));
 			}
 			[Test]
 			public void SetHovered_SomeToOther_CallsUpdateFieldsCommandExecute(){
@@ -202,7 +201,7 @@ namespace SlotSystemTests{
 
 				taCache.SetTargetSB(stubSB);
 
-				Assert.That(taCache.targetSB, Is.SameAs(stubSB));
+				Assert.That(taCache.GetTargetSB(), Is.SameAs(stubSB));
 				}
 			[Test]
 			public void SetTargetSB_FromOtherToSome_CallsSBSelect(){
@@ -226,7 +225,7 @@ namespace SlotSystemTests{
 
 				taCache.SetTargetSB(stubSB);
 				
-				Assert.That(taCache.targetSB, Is.SameAs(stubSB));
+				Assert.That(taCache.GetTargetSB(), Is.SameAs(stubSB));
 				}
 			[Test]
 			public void SetTargetSB_FromOtherToSome_CallOtherSBFocus(){
@@ -261,7 +260,7 @@ namespace SlotSystemTests{
 
 				taCache.SetTargetSB(null);
 
-				Assert.That(taCache.targetSB, Is.Null);
+				Assert.That(taCache.GetTargetSB(), Is.Null);
 			}
 			[Test]
 			public void SetTargetSB_SomeToSame_DoesNotCallSelectTwice(){
@@ -311,8 +310,8 @@ namespace SlotSystemTests{
 						stubMakeTAFactory.MakeTransaction(pickedSB, sgB).Returns(fillTA);
 						stubMakeTAFactory.MakeTransaction(pickedSB, sgC).Returns(reoTA);
 						List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA, sgB, sgC});
-						focSGPrv.focusedSGs.Returns(sgsList);
-				tam.taFactory.Returns(stubMakeTAFactory);
+						focSGPrv.GetFocusedSGs().Returns(sgsList);
+				tam.GetTAFactory().Returns(stubMakeTAFactory);
 
 				taCache.CreateTransactionResults();
 
@@ -321,8 +320,8 @@ namespace SlotSystemTests{
 				expected.Add(sgB, fillTA);
 				expected.Add(sgC, reoTA);
 
-				Assert.That(taCache.transactionResults.Count, Is.EqualTo(expected.Count));
-				IEnumerator actRator = taCache.transactionResults.GetEnumerator();
+				Assert.That(taCache.GetTransactionResults().Count, Is.EqualTo(expected.Count));
+				IEnumerator actRator = taCache.GetTransactionResults().GetEnumerator();
 				IEnumerator expRator = expected.GetEnumerator();
 				while(actRator.MoveNext() && expRator.MoveNext()){
 					KeyValuePair<IHoverable, ISlotSystemTransaction> actPair = (KeyValuePair<IHoverable, ISlotSystemTransaction>)actRator.Current;
@@ -354,8 +353,8 @@ namespace SlotSystemTests{
 							stubMakeTAFactory.MakeTransaction(pickedSB, sbB).Returns(fillTA);
 							stubMakeTAFactory.MakeTransaction(pickedSB, sbC).Returns(stackTA);
 						List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sg});
-						focSGPrv.focusedSGs.Returns(sgsList);
-				tam.taFactory.Returns(stubMakeTAFactory);
+						focSGPrv.GetFocusedSGs().Returns(sgsList);
+				tam.GetTAFactory().Returns(stubMakeTAFactory);
 				Dictionary<IHoverable, ISlotSystemTransaction> expected = new Dictionary<IHoverable, ISlotSystemTransaction>();
 				expected.Add(sg, revTA);
 				expected.Add(sbA, revTA);
@@ -364,8 +363,8 @@ namespace SlotSystemTests{
 
 				taCache.CreateTransactionResults();
 
-				Assert.That(taCache.transactionResults.Count, Is.EqualTo(expected.Count));
-				IEnumerator actRator = taCache.transactionResults.GetEnumerator();
+				Assert.That(taCache.GetTransactionResults().Count, Is.EqualTo(expected.Count));
+				IEnumerator actRator = taCache.GetTransactionResults().GetEnumerator();
 				IEnumerator expRator = expected.GetEnumerator();
 				while(actRator.MoveNext() && expRator.MoveNext()){
 					KeyValuePair<IHoverable, ISlotSystemTransaction> actPair = (KeyValuePair<IHoverable, ISlotSystemTransaction>)actRator.Current;
@@ -389,8 +388,8 @@ namespace SlotSystemTests{
 							sgA.GetEnumerator().Returns(sgAEles.GetEnumerator());
 						stubFac.MakeTransaction(pickedSB, sgA).Returns(ta);
 						List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA});
-						focSGPrv.focusedSGs.Returns(sgsList);
-				tam.taFactory.Returns(stubFac);
+						focSGPrv.GetFocusedSGs().Returns(sgsList);
+				tam.GetTAFactory().Returns(stubFac);
 
 				taCache.CreateTransactionResults();
 
@@ -427,8 +426,8 @@ namespace SlotSystemTests{
 						stubFac.MakeTransaction(pickedSB, sb).Returns(ta);
 						stubFac.MakeTransaction(pickedSB, sg).Returns(Substitute.For<IRevertTransaction>());
 						List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sg});
-						focSGPrv.focusedSGs.Returns(sgsList);
-				tam.taFactory.Returns(stubFac);
+						focSGPrv.GetFocusedSGs().Returns(sgsList);
+				tam.GetTAFactory().Returns(stubFac);
 
 				taCache.CreateTransactionResults();
 
@@ -446,17 +445,17 @@ namespace SlotSystemTests{
 						IHoverable stubHovered = Substitute.For<IHoverable>();
 						ISlotSystemTransaction stubTA = Substitute.For<ISlotSystemTransaction>();
 							ISlottable stubTargetSB = MakeSubSB();
-							stubTA.targetSB.Returns(stubTargetSB);
-							List<InventoryItemInstance> stubMoved = new List<InventoryItemInstance>();
-							stubTA.moved.Returns(stubMoved);
+							stubTA.GetTargetSB().Returns(stubTargetSB);
+							List<IInventoryItemInstance> stubMoved = new List<IInventoryItemInstance>();
+							stubTA.GetMoved().Returns(stubMoved);
 						taResults.Add(stubHovered, stubTA);
 					taCache.SetHovered(stubHovered);
 					taCache.SetTransactionResults(taResults);
 
 				taCache.UpdateFields();
 
-				Assert.That(taCache.targetSB, Is.SameAs(stubTargetSB));
-				Assert.That(taCache.moved, Is.SameAs(stubMoved));
+				Assert.That(taCache.GetTargetSB(), Is.SameAs(stubTargetSB));
+				Assert.That(taCache.GetMoved(), Is.SameAs(stubMoved));
 			}
 			[Test]
 			public void UpdateField_MatchFoundInTAResultsForHovered_CallsTAMInnerUpdateFields(){
@@ -467,7 +466,7 @@ namespace SlotSystemTests{
 						ISlotSystemTransaction stubTA = Substitute.For<ISlotSystemTransaction>();
 							ISlottable stubTargetSB = MakeSubSB();
 							stubTA.targetSB.Returns(stubTargetSB);
-							List<InventoryItemInstance> stubMoved = new List<InventoryItemInstance>();
+							List<IInventoryItemInstance> stubMoved = new List<IInventoryItemInstance>();
 							stubTA.moved.Returns(stubMoved);
 						taResults.Add(stubHovered, stubTA);
 					taCache.SetHovered(stubHovered);

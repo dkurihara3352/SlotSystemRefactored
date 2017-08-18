@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 				sg.InstantSort();
 
 				List<ISlottable> actual = new List<ISlottable>();
-				foreach(var slot in sg.slots)
+				foreach(var slot in sg.GetSlots())
 					actual.Add(slot.sb);
 				bool equality = actual.MemberEquals(expected);
 				Assert.That(equality, Is.True);
@@ -304,7 +304,7 @@ namespace SlotSystemTests{
 				ISlottable mWeaponSB = sg.GetSB(mWeapon);
 				IEnumerable<ISlottable> actualSBs = new ISlottable[]{bowSB, wearSB, shieldSB, mWeaponSB};
 				Assert.That(actualSBs, Is.All.Not.Null);
-				Assert.That(sg.slots.Count, Is.EqualTo(4));
+				Assert.That(sg.GetSlots().Count, Is.EqualTo(4));
 				int count = 0;
 				foreach(ISlottable sb in sg)
 					Assert.That(sb.GetSlotID(), Is.EqualTo(count ++));

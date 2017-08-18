@@ -19,7 +19,7 @@ namespace SlotSystemTests{
 
 			sgHandler.AcceptSGTAComp(stubSG);
 
-			Assert.That(sgHandler.sg2Done, Is.True);
+			Assert.That(sgHandler.IsSG2Done(), Is.True);
 			}
 		[Test]
 		public void SetSG1_NullToSome_SetsSG1(){
@@ -28,7 +28,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG1(stubSG);
 
-			Assert.That(sgHandler.sg1, Is.SameAs(stubSG));
+			Assert.That(sgHandler.GetSG1(), Is.SameAs(stubSG));
 			}
 		[Test]
 		public void SetSG1_NullToSome_SetsSG1DoneFalse(){
@@ -37,7 +37,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG1(stubSG);
 
-			Assert.That(sgHandler.sg1Done, Is.False);
+			Assert.That(sgHandler.IsSG1Done(), Is.False);
 			}
 		[Test]
 		public void SetSG1_OtherToSome_SetsSG1(){
@@ -48,7 +48,7 @@ namespace SlotSystemTests{
 			sgHandler.SetSG1(prevSG);
 			sgHandler.SetSG1(stubSG);
 
-			Assert.That(sgHandler.sg1, Is.SameAs(stubSG));
+			Assert.That(sgHandler.GetSG1(), Is.SameAs(stubSG));
 			}
 		[Test]
 		public void SetSG1_OtherToSome_SetsSG1DoneFalse(){
@@ -59,7 +59,7 @@ namespace SlotSystemTests{
 			sgHandler.SetSG1(prevSG);
 			sgHandler.SetSG1(stubSG);
 
-			Assert.That(sgHandler.sg1Done, Is.False);
+			Assert.That(sgHandler.IsSG1Done(), Is.False);
 			}
 		[Test]
 		public void SetSG1_SomeToNull_SetsSG1Null(){
@@ -69,7 +69,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG1(null);
 
-			Assert.That(sgHandler.sg1, Is.Null);
+			Assert.That(sgHandler.GetSG1(), Is.Null);
 			}
 		[Test]
 		public void SetSG1_SomeToNull_SetsSG1DoneTrue(){
@@ -79,7 +79,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG1(null);
 
-			Assert.That(sgHandler.sg1Done, Is.True);
+			Assert.That(sgHandler.IsSG1Done(), Is.True);
 			}
 		[Test]
 		public void SetSG2_NullToSome_SetsSG2(){
@@ -88,7 +88,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG2(stubSG);
 
-			Assert.That(sgHandler.sg2, Is.SameAs(stubSG));
+			Assert.That(sgHandler.GetSG2(), Is.SameAs(stubSG));
 			}
 		[Test]
 		public void SetSG2_NullToSome_SetsSG2DoneFalse(){
@@ -97,7 +97,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG2(stubSG);
 
-			Assert.That(sgHandler.sg2Done, Is.False);
+			Assert.That(sgHandler.IsSG2Done(), Is.False);
 			}
 		[Test]
 		public void SetSG2_NullToSome_CallSG2Select(){
@@ -119,7 +119,7 @@ namespace SlotSystemTests{
 			sgHandler.SetSG2(prevSG);
 			sgHandler.SetSG2(stubSG);
 
-			Assert.That(sgHandler.sg2, Is.SameAs(stubSG));
+			Assert.That(sgHandler.GetSG2(), Is.SameAs(stubSG));
 			}
 		[Test]
 		public void SetSG2_OtherToSome_SetsSG2DoneFalse(){
@@ -130,7 +130,7 @@ namespace SlotSystemTests{
 			sgHandler.SetSG2(prevSG);
 			sgHandler.SetSG2(stubSG);
 
-			Assert.That(sgHandler.sg2Done, Is.False);
+			Assert.That(sgHandler.IsSG2Done(), Is.False);
 			}
 		[Test]
 		public void SetSG2_OtherToSome_CallsSG2Select(){
@@ -153,7 +153,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG2(null);
 
-			Assert.That(sgHandler.sg2, Is.Null);
+			Assert.That(sgHandler.GetSG2(), Is.Null);
 			}
 		[Test]
 		public void SetSG2_SomeToNull_SetsSG2DoneTrue(){
@@ -163,7 +163,7 @@ namespace SlotSystemTests{
 
 			sgHandler.SetSG2(null);
 
-			Assert.That(sgHandler.sg2Done, Is.True);
+			Assert.That(sgHandler.IsSG2Done(), Is.True);
 			}
 	}
 }

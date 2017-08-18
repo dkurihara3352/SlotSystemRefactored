@@ -32,40 +32,9 @@ namespace SlotSystemTests{
 
 				Assert.That(equality, Is.False);
 				}
-			[Test]
-			public void CompareTo_Self_ReturnsZero(){
-				BowFake fakeBow = MakeBowFake(0);
-				int result = fakeBow.CompareTo(fakeBow);
-
-				Assert.That(result, Is.EqualTo(0));
-				}
-			[Test]
-			public void CompareTo_AnotherWithGreaterID_ReturnsNegative(){
-				BowFake fakeBow = MakeBowFake(0);
-				BowFake anotherBow = MakeBowFake(1);
-				int result = fakeBow.CompareTo(anotherBow);
-
-				Assert.That(result, Is.LessThan(0));
-				}
-			[Test]
-			public void CompareTo_AnotherWithLesserID_ReturnsPositive(){
-				BowFake fakeBow = MakeBowFake(1);
-				BowFake anotherBow = MakeBowFake(0);
-				int result = fakeBow.CompareTo(anotherBow);
-
-				Assert.That(result, Is.GreaterThan(0));
-				}
-			[Test]
-			public void CompareTo_AnotherWithSameID_ReturnsZero(){
-				BowFake fakeBow = MakeBowFake(1);
-				BowFake anotherBow = MakeBowFake(1);
-				int result = fakeBow.CompareTo(anotherBow);
-
-				Assert.That(result, Is.EqualTo(0));
-				}
 			BowFake MakeBowFake(int id){
 				BowFake fakeBow = new BowFake();
-				fakeBow.ItemID = id;
+				fakeBow.SetItemID(id);
 				return fakeBow;
 			}
 		}

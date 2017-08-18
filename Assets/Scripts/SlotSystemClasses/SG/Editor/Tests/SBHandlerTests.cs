@@ -12,7 +12,7 @@ namespace SlotSystemTests{
 		[TestFixture]
 		public class SBHandlerTests :SlotSystemTest{
 			[TestCaseSource(typeof(GetSBCases))]
-			public void GetSB_Match_ReturnsSB(List<ISlottable> sbs, List<InventoryItemInstance> items){
+			public void GetSB_Match_ReturnsSB(List<ISlottable> sbs, List<IInventoryItemInstance> items){
 				SBHandler sbHandler = new SBHandler();
 					sbHandler.SetSBs(sbs);
 
@@ -22,7 +22,7 @@ namespace SlotSystemTests{
 				}
 			}
 			[TestCaseSource(typeof(GetSBCases))]
-			public void GetSB_NonMatch_ReturnsNull(List<ISlottable> sbs, List<InventoryItemInstance> items){
+			public void GetSB_NonMatch_ReturnsNull(List<ISlottable> sbs, List<IInventoryItemInstance> items){
 				SBHandler sbHandler = new SBHandler();
 					sbHandler.SetSBs(sbs);
 				
@@ -63,7 +63,7 @@ namespace SlotSystemTests{
 								packA0SB_0,
 								partsA0SB_0
 							});
-							List<InventoryItemInstance> items_0 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> items_0 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bowA0_0,
 								wearA0_0,
 								shieldA0_0,
@@ -81,7 +81,7 @@ namespace SlotSystemTests{
 				SBHandler sbHandler = new SBHandler();
 					sbHandler.SetSBs(sbs);
 
-				List<ISlottable> actual = sbHandler.equippedSBs;
+				List<ISlottable> actual = sbHandler.GetEquippedSBs();
 
 				bool equality = actual.MemberEquals(expected);
 				Assert.That(equality, Is.True);
@@ -114,7 +114,7 @@ namespace SlotSystemTests{
 				SBHandler sbHandler = new SBHandler();
 					sbHandler.SetSBs(sbs);
 
-				bool actual = sbHandler.isAllSBActProcDone;
+				bool actual = sbHandler.IsAllSBActProcDone();
 
 				Assert.That(actual, Is.EqualTo(expected));
 			}

@@ -108,7 +108,7 @@ namespace SlotSystem{
                     sb.SetAndRunActProcess(null);
             }
             public override void OnPointerDown(){
-                if(selStateHandler.isFocused){
+                if(selStateHandler.IsFocused()){
                     selStateHandler.Select();
                     sb.WaitForPickUp();
                 }
@@ -200,9 +200,9 @@ namespace SlotSystem{
             ISSESelStateHandler selStateHandler;
             public PickingUpState(ISSESelStateHandler selStateHandler, ISBActStateHandler actStateHandler, ITransactionManager tam, ITransactionCache taCache): base(actStateHandler){
                 this.tam = tam;
-                this.iconHandler = tam.iconHandler;
+                this.iconHandler = tam.GetIconHandler();
                 _taCache = taCache;
-                this.tamStateHandler = tam.actStateHandler;
+                this.tamStateHandler = tam.GetActStateHandler();
                 this.selStateHandler = selStateHandler;
             }
             public override void EnterState(){
@@ -223,7 +223,7 @@ namespace SlotSystem{
                 selStateHandler.Focus();
             }
             public override void OnPointerUp(){
-                if(sb.isHovered && sb.IsStackable())
+                if(sb.IsHovered() && sb.IsStackable())
                     sb.WaitForNextTouch();
                 else
                     tam.ExecuteTransaction();

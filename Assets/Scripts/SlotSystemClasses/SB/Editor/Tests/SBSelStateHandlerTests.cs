@@ -17,12 +17,12 @@ namespace SlotSystemTests{
 					ISlottable sb = MakeSubSB();
 					ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						taCache.IsCachedTAResultRevert(sb).Returns(false);
-					sb.taCache.Returns(taCache);
+					sb.GetTAC().Returns(taCache);
 					selStateHandler = new SBSelStateHandler(sb);
 				
 				selStateHandler.Activate();
 
-				Assert.That(selStateHandler.isFocused, Is.True);
+				Assert.That(selStateHandler.IsFocused(), Is.True);
 			}
 			[Test]
 			public void Activate_TACacheIsTAResultRevertForTrue_SetIsDefocused(){
@@ -30,12 +30,12 @@ namespace SlotSystemTests{
 					ISlottable sb = MakeSubSB();
 					ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						taCache.IsCachedTAResultRevert(sb).Returns(true);
-					sb.taCache.Returns(taCache);
+					sb.GetTAC().Returns(taCache);
 					selStateHandler = new SBSelStateHandler(sb);
 				
 				selStateHandler.Activate();
 
-				Assert.That(selStateHandler.isDefocused, Is.True);
+				Assert.That(selStateHandler.IsDefocused(), Is.True);
 			}
 		}
 	}

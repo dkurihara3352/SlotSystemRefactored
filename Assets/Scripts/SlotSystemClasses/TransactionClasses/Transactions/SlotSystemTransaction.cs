@@ -4,19 +4,19 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public interface ISlotSystemTransaction{
-		ISlottable targetSB{get;}
-		ISlotGroup sg1{get;}
-		ISlotGroup sg2{get;}
-		List<InventoryItemInstance> moved{get;}
+		ISlottable GetTargetSB();
+		ISlotGroup GetSG1();
+		ISlotGroup GetSG2();
+		List<IInventoryItemInstance> GetMoved();
 		void Indicate();
 		void Execute();
 		void OnCompleteTransaction();
 	}
 	public class TestTransaction: ISlotSystemTransaction{
-		public ISlottable targetSB{get;}
-		public ISlotGroup sg1{get;}
-		public ISlotGroup sg2{get;}
-		public List<InventoryItemInstance> moved{get;}
+		public ISlottable GetTargetSB(){return null;}
+		public ISlotGroup GetSG1(){return null;}
+		public ISlotGroup GetSG2(){return null;}
+		public List<IInventoryItemInstance> GetMoved(){return null;;}
 		public void Indicate(){}
 		public void Execute(){}
 		public void OnCompleteTransaction(){}

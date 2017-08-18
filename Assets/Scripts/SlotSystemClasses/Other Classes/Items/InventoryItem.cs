@@ -4,55 +4,47 @@ using UnityEngine;
 using System;
 
 namespace SlotSystem{
-	public class InventoryItem: IEquatable<InventoryItem>, IComparable, IComparable<InventoryItem>{
-		bool m_isStackable;
-		public bool IsStackable{
-			get{return m_isStackable;}
-			set{m_isStackable = value;}
+	public class InventoryItem: IInventoryItem{
+		public bool GetIsStackable(){
+			return _isStackable;
 		}
-
-		int m_itemId;
-		public int ItemID{
-			get{return m_itemId;}
-			set{m_itemId = value;}
+		public void SetIsStackable(bool stackable){
+			_isStackable = stackable;
 		}
+			bool _isStackable;
+		public int GetItemID(){
+			return _itemID;
+		}
+		public void SetItemID(int id){
+			_itemID = id;
+		}
+			int _itemID;
 
 		public override bool Equals(object other){
-			if(!(other is InventoryItem)) return false;
+			if(!(other is IInventoryItem)) return false;
 			else
-				return Equals((InventoryItem)other);
+				return Equals((IInventoryItem)other);
 		}
-		public bool Equals(InventoryItem other){
-			return m_itemId == other.ItemID;
+		public bool Equals(IInventoryItem other){
+			return GetItemID() == other.GetItemID();
 		}
 
 		public override int GetHashCode(){
-			return 31 + m_itemId.GetHashCode();
+			return 31 + _itemID.GetHashCode();
 		}
 
 		public static bool operator == (InventoryItem a, InventoryItem b){
-			return a.ItemID == b.ItemID;
+			return a.GetItemID() == b.GetItemID();
 		}
 
 		public static bool operator != (InventoryItem a, InventoryItem b){
-			return a.ItemID != b.ItemID;
+			return a.GetItemID() != b.GetItemID();
 		}
-		int IComparable.CompareTo(object other){
-			if(!(other is InventoryItem))
-				throw new InvalidOperationException("Compare To: not a InventoryItemMock");
-			return CompareTo((InventoryItem)other);
-		}
-		public int CompareTo(InventoryItem other){
-			if(!(other is InventoryItem))
-				throw new InvalidOperationException("Compare To: not a InventoryItemMock");
-			
-			return this.m_itemId.CompareTo(other.ItemID);
-		}
-		public static bool operator > (InventoryItem a, InventoryItem b){
-			return a.CompareTo(b) > 0;
-		}
-		public static bool operator < (InventoryItem a, InventoryItem b){
-			return a.CompareTo(b) < 0;
-		}
+	}
+	public interface IInventoryItem: IEquatable<IInventoryItem>{
+		bool GetIsStackable();
+		void SetIsStackable(bool stackable);
+		int GetItemID();
+		void SetItemID(int id);
 	}
 }

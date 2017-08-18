@@ -72,7 +72,7 @@ namespace SlotSystem{
 				while(true){
 					if(inspected　== null)
 						break;
-					if(selStateHandler.isFocused){
+					if(selStateHandler.IsFocused()){
 						inspected = inspected.GetParent();
 						if(inspected != null)
 							selStateHandler = inspected.GetSelStateHandler();

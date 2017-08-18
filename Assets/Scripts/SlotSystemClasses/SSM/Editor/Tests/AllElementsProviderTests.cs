@@ -22,12 +22,12 @@ namespace SlotSystemTests{
 						ISlotSystemBundle gBunB = MakeSubBundle();
 						ISlotSystemBundle gBunC = MakeSubBundle();
 						gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};
-					stubSSM.poolBundle.Returns(pBun);
-					stubSSM.equipBundle.Returns(eBun);
-					stubSSM.otherBundles.Returns(gBuns);
+					stubSSM.GetPoolBundle().Returns(pBun);
+					stubSSM.GetEquipBundle().Returns(eBun);
+					stubSSM.GetOtherBundles().Returns(gBuns);
 				allElementProv = new AllElementsProvider(stubSSM);
 
-			List<ISlotGroup> list = allElementProv.allSGs;
+			List<ISlotGroup> list = allElementProv.GetAllSGs();
 			Received.InOrder(() => {
 				pBun.PerformInHierarchy(allElementProv.AddInSGList, Arg.Any<List<ISlotGroup>>());
 				eBun.PerformInHierarchy(allElementProv.AddInSGList, Arg.Any<List<ISlotGroup>>());
@@ -60,7 +60,7 @@ namespace SlotSystemTests{
 			AllElementsProvider allEProv;
 				ISlotSystemManager stubSSM = MakeSubSSM();
 					ISlotSystemBundle pBun = MakeSubBundle();
-				stubSSM.poolBundle.Returns(pBun);
+				stubSSM.GetPoolBundle().Returns(pBun);
 			allEProv = new AllElementsProvider(stubSSM);
 
 			List<ISlotGroup> list = allEProv.allSGPs;
@@ -71,7 +71,7 @@ namespace SlotSystemTests{
 			AllElementsProvider allEProv;
 				ISlotSystemManager stubSSM = MakeSubSSM();
 					ISlotSystemBundle eBun = MakeSubBundle();
-				stubSSM.equipBundle.Returns(eBun);
+				stubSSM.GetEquipBundle().Returns(eBun);
 			allEProv = new AllElementsProvider(stubSSM);
 
 			List<ISlotGroup> list = allEProv.allSGEs;
@@ -86,7 +86,7 @@ namespace SlotSystemTests{
 						ISlotSystemBundle gBunB = MakeSubBundle();
 						ISlotSystemBundle gBunC = MakeSubBundle();
 					gBuns = new ISlotSystemBundle[]{gBunA, gBunB, gBunC};
-				stubSSM.otherBundles.Returns(gBuns);
+				stubSSM.GetOtherBundles().Returns(gBuns);
 			allEProv = new AllElementsProvider(stubSSM);
 
 			List<ISlotGroup> list = allEProv.allSGGs;
@@ -137,7 +137,7 @@ namespace SlotSystemTests{
 						e.PerformInHierarchy(allEProv.AddSBToRes, new List<ISlottable>());
 				});
 			
-			List<ISlottable> list = allEProv.allSBs;
+			List<ISlottable> list = allEProv.GetAllSBs();
 
 			pBun.Received().PerformInHierarchy(allEProv.AddSBToRes, Arg.Any<List<ISlottable>>());
 			eBun.Received().PerformInHierarchy(allEProv.AddSBToRes, Arg.Any<List<ISlottable>>());

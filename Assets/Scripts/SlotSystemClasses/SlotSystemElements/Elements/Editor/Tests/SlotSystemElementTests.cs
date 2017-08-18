@@ -138,7 +138,7 @@ namespace SlotSystemTests{
 					Assert.That(testSSE.isBundleElement, Is.False);
 				}
 				[Test]
-				public void isFocusedInHierarchy_Various_ReturnsAccordingly(){
+				public void IsFocused_InHierarchy_Various_ReturnsAccordingly(){
 					TestSlotSystemElement sseF_0 = MakeTestSSEWithStateHandler();
 						TestSlotSystemElement sseF_0_0 = MakeTestSSEWithStateHandler();
 							TestSlotSystemElement sseF_0_0_0 = MakeTestSSEWithStateHandler();
@@ -203,55 +203,55 @@ namespace SlotSystemTests{
 					Assert.That(sseF_0_1_0_0_0.IsFocusedInHierarchy(), Is.False);
 				}
 				[Test]
-				public void isFocusedInHierarchy_SelfFocusedAndNoParent_ReturnsTrue(){
+				public void IsFocused_InHierarchy_SelfFocusedAndNoParent_ReturnsTrue(){
 					TestSlotSystemElement testSSE = MakeTestSSEWithStateHandler();
 					ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
-						selStateHandler.isFocused.Returns(true);
+						selStateHandler.IsFocused().Returns(true);
 						testSSE.SetSelStateHandler(selStateHandler);
 
 					Assert.That(testSSE.IsFocusedInHierarchy(), Is.True);
 				}
 				[Test]
-				public void isFocusedInHierarchy_SelfNotFocused_ReturnsFalse(){
+				public void IsFocused_InHierarchy_SelfNotFocused_ReturnsFalse(){
 					TestSlotSystemElement testSSE = MakeTestSSEWithStateHandler();
 
 					Assert.That(testSSE.IsFocusedInHierarchy(), Is.False);
 				}
 				[Test]
-				public void isFocusedInHierarchy_SelfFocusedParentNotFocused_ReturnsFalse(){
+				public void IsFocused_InHierarchy_SelfFocusedParentNotFocused_ReturnsFalse(){
 					TestSlotSystemElement sse = MakeTestSSE();
 						ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sseSelStateHandler.isFocused.Returns(true);
+						sseSelStateHandler.IsFocused().Returns(true);
 						sse.SetSelStateHandler(sseSelStateHandler);
 					TestSlotSystemElement stubPar = MakeTestSSE();
 						ISSESelStateHandler parSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						parSelStateHandler.isFocused.Returns(false);
+						parSelStateHandler.IsFocused().Returns(false);
 						stubPar.SetSelStateHandler(parSelStateHandler);
 					sse.SetParent(stubPar);
 					
 					Assert.That(sse.IsFocusedInHierarchy(), Is.False);
 				}
 				[Test]
-				public void isFocusedInHierarchy_SelfAndAllParentsFocused_ReturnsTrue(){
+				public void IsFocused_InHierarchy_SelfAndAllParentsFocused_ReturnsTrue(){
 					TestSlotSystemElement stubPar1 = MakeTestSSE();
 						ISSESelStateHandler par1SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par1SelStateHandler.isFocused.Returns(true);
+						par1SelStateHandler.IsFocused().Returns(true);
 						stubPar1.SetSelStateHandler(par1SelStateHandler);
 					TestSlotSystemElement stubPar2 = MakeTestSSE();
 						ISSESelStateHandler par2SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par2SelStateHandler.isFocused.Returns(true);
+						par2SelStateHandler.IsFocused().Returns(true);
 						stubPar2.SetSelStateHandler(par2SelStateHandler);
 					TestSlotSystemElement stubPar3 = MakeTestSSE();
 						ISSESelStateHandler par3SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par3SelStateHandler.isFocused.Returns(true);
+						par3SelStateHandler.IsFocused().Returns(true);
 						stubPar3.SetSelStateHandler(par3SelStateHandler);
 					TestSlotSystemElement stubPar4 = MakeTestSSE();
 						ISSESelStateHandler par4SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par4SelStateHandler.isFocused.Returns(true);
+						par4SelStateHandler.IsFocused().Returns(true);
 						stubPar4.SetSelStateHandler(par4SelStateHandler);
 					TestSlotSystemElement testSSE = MakeTestSSE();
 						ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sseSelStateHandler.isFocused.Returns(true);
+						sseSelStateHandler.IsFocused().Returns(true);
 						testSSE.SetSelStateHandler(sseSelStateHandler);
 					stubPar2.SetParent(stubPar1);
 					stubPar3.SetParent(stubPar2);
@@ -261,26 +261,26 @@ namespace SlotSystemTests{
 					Assert.That(testSSE.IsFocusedInHierarchy(), Is.True);
 				}
 				[Test]
-				public void isFocusedInHierarchy_SomeNonfocusedAncester_ReturnsFalse(){
+				public void IsFocused_InHierarchy_SomeNonfocusedAncester_ReturnsFalse(){
 					TestSlotSystemElement stubPar1 = MakeTestSSE();
 						ISSESelStateHandler par1SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par1SelStateHandler.isFocused.Returns(true);
+						par1SelStateHandler.IsFocused().Returns(true);
 						stubPar1.SetSelStateHandler(par1SelStateHandler);
 					TestSlotSystemElement stubPar2 = MakeTestSSE();
 						ISSESelStateHandler par2SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par2SelStateHandler.isFocused.Returns(true);
+						par2SelStateHandler.IsFocused().Returns(true);
 						stubPar2.SetSelStateHandler(par2SelStateHandler);
 					TestSlotSystemElement stubPar3 = MakeTestSSE();
 						ISSESelStateHandler par3SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par3SelStateHandler.isFocused.Returns(false);
+						par3SelStateHandler.IsFocused().Returns(false);
 						stubPar3.SetSelStateHandler(par3SelStateHandler);
 					TestSlotSystemElement stubPar4 = MakeTestSSE();
 						ISSESelStateHandler par4SelStateHandler = Substitute.For<ISSESelStateHandler>();
-						par4SelStateHandler.isFocused.Returns(true);
+						par4SelStateHandler.IsFocused().Returns(true);
 						stubPar4.SetSelStateHandler(par4SelStateHandler);
 					TestSlotSystemElement testSSE = MakeTestSSE();
 						ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sseSelStateHandler.isFocused.Returns(true);
+						sseSelStateHandler.IsFocused().Returns(true);
 						testSSE.SetSelStateHandler(sseSelStateHandler);
 					stubPar1.SetElements(new ISlotSystemElement[]{stubPar2});
 					stubPar2.SetElements(new ISlotSystemElement[]{stubPar3});
@@ -1093,11 +1093,11 @@ namespace SlotSystemTests{
 					top.ActivateRecursively();
 
 					foreach(var e in xFocused)
-						Assert.That(e.GetSelStateHandler().isFocused, Is.True);
+						Assert.That(e.GetSelStateHandler().IsFocused(), Is.True);
 					foreach(var e in xDefocused)
-						Assert.That(e.GetSelStateHandler().isDefocused, Is.True);
+						Assert.That(e.GetSelStateHandler().IsDefocused(), Is.True);
 					foreach(var e in xDeactivated)
-						Assert.That(e.GetSelStateHandler().isDeactivated, Is.True);
+						Assert.That(e.GetSelStateHandler().IsDeactivated(), Is.True);
 				}
 					class ActivateRecursivelyCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
@@ -1320,9 +1320,9 @@ namespace SlotSystemTests{
 					sse.RecursiveTestMethod();
 					
 					foreach(ISlotSystemElement ele in xOn)
-						Assert.That(ele.GetSelStateHandler().isFocused, Is.True);
+						Assert.That(ele.GetSelStateHandler().IsFocused(), Is.True);
 					foreach(ISlotSystemElement ele in xOff)
-						Assert.That(ele.GetSelStateHandler().isFocused, Is.False);
+						Assert.That(ele.GetSelStateHandler().IsFocused(), Is.False);
 					}
 					class isActivatedOnDefaultCases: IEnumerable{
 						public IEnumerator GetEnumerator(){

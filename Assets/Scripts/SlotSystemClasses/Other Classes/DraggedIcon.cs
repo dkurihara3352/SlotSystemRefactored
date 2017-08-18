@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class DraggedIcon{
-		public InventoryItemInstance item{
+		public IInventoryItemInstance item{
 			get{return _item;}
-			}InventoryItemInstance _item;
+			}IInventoryItemInstance _item;
 		public IconDestination dest{
 			get{return m_dest;}
 			}IconDestination m_dest;

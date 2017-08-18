@@ -4,8 +4,9 @@ using UnityEngine;
 using System;
 
 namespace SlotSystem{
-	public interface SlottableItem: IEquatable<SlottableItem>, IComparable<SlottableItem>, IComparable{
-		int quantity{get;}
-		bool isStackable{get;}
+	public interface SlottableItem: IEquatable<SlottableItem>{
+		int GetQuantity();
+		void SetQuantity(int quantity);
+		bool IsStackable();
 	}
 }

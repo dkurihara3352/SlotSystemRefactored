@@ -11,8 +11,8 @@ namespace SlotSystem{
 		protected IAllElementsProvider allElesProvider;
 		public SSMCommand(SlotSystemManager ssm){
 			this.ssm = ssm;
-			this.equippedProvider = ssm.equippedProvider;
-			this.allElesProvider = ssm.allElementsProvider;
+			this.equippedProvider = ssm.GetEquippedProvider();
+			this.allElesProvider = ssm.GetAllElementsProvider();
 		}
 		public abstract void Execute();
 	}

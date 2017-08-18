@@ -18,7 +18,7 @@ namespace SlotSystem{
 		public SBFactory(ISlotSystemManager ssm){
 			SetSSM(ssm);
 		}
-		public ISlottable CreateSB(InventoryItemInstance item){
+		public ISlottable CreateSB(IInventoryItemInstance item){
 			GameObject newSBGO = new GameObject("newSBGO");
 			Slottable newSB = newSBGO.AddComponent<Slottable>();
 			newSB.SetSSM(ssm);
@@ -29,6 +29,6 @@ namespace SlotSystem{
 		}
 	}
 	public interface ISBFactory{
-		ISlottable CreateSB(InventoryItemInstance item);
+		ISlottable CreateSB(IInventoryItemInstance item);
 	}
 }

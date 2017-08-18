@@ -77,15 +77,15 @@ namespace SlotSystem{
 			public class SSEDeactivatedState: SSESelState{
 				public SSEDeactivatedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!handler.wasSelStateNull)
-						handler.SetAndRunSelProcess(new SSEDeactivateProcess(handler.deactivateCoroutine));
+					if(!handler.WasSelStateNull())
+						handler.SetAndRunSelProcess(new SSEDeactivateProcess(handler.GetDeactivateCoroutine()));
 				}
 			}
 			public class SSEFocusedState: SSESelState{
 				public SSEFocusedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!handler.wasSelStateNull){
-						handler.SetAndRunSelProcess(new SSEFocusProcess(handler.focusCoroutine));
+					if(!handler.WasSelStateNull()){
+						handler.SetAndRunSelProcess(new SSEFocusProcess(handler.GetFocusCoroutine()));
 					}
 					else
 						handler.InstantFocus();
@@ -94,8 +94,8 @@ namespace SlotSystem{
 			public class SSEDefocusedState: SSESelState{
 				public SSEDefocusedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!handler.wasSelStateNull)
-						handler.SetAndRunSelProcess(new SSEDefocusProcess(handler.defocusCoroutine));
+					if(!handler.WasSelStateNull())
+						handler.SetAndRunSelProcess(new SSEDefocusProcess(handler.GetDefocusCoroutine()));
 					else
 						handler.InstantDefocus();
 				}
@@ -103,8 +103,8 @@ namespace SlotSystem{
 			public class SSESelectedState : SSESelState{
 				public SSESelectedState(ISSESelStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!handler.wasSelStateNull)
-						handler.SetAndRunSelProcess(new SSESelectProcess(handler.selectCoroutine));
+					if(!handler.WasSelStateNull())
+						handler.SetAndRunSelProcess(new SSESelectProcess(handler.GetSelectCoroutine()));
 					else
 						handler.InstantSelect();
 				}

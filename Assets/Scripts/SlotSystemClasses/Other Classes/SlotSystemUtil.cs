@@ -12,10 +12,11 @@ namespace SlotSystem{
 			*/
 			ISlotGroup pickedSG = pickedSB.GetSG();
 			ISlotGroup otherSG = otherSB.GetSG();
-			InventoryItemInstance pickedItem = pickedSB.GetItem();
+			IInventoryItemInstance pickedItem = pickedSB.GetItem();
+			IInventoryItemInstance otherItem = otherSB.GetItem();
 			if(pickedSG != otherSG){
 				if(otherSG.AcceptsFilter(pickedSB)){
-					if(!(pickedItem == otherSB.GetItem() && pickedItem.Item.IsStackable))
+					if(!(pickedItem.Equals(otherItem) && pickedItem.IsStackable()))
 						if(pickedSG.AcceptsFilter(otherSB))
 						return true;
 				}

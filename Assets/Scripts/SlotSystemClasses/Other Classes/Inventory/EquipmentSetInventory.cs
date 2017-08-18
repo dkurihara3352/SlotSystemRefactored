@@ -4,43 +4,18 @@ using UnityEngine;
 using System;
 
 namespace SlotSystem{
-	public class EquipmentSetInventory: IEquipmentSetInventory{
-		public IEnumerator<InventoryItemInstance> GetEnumerator(){
-			foreach(InventoryItemInstance item in m_items){
-				yield return item;
-			}
-			}IEnumerator IEnumerable.GetEnumerator(){
-				return GetEnumerator();
-			}
+	public class EquipmentSetInventory: Inventory, IEquipmentSetInventory{
 		public EquipmentSetInventory(BowInstance initBow, WearInstance initWear, List<CarriedGearInstance> initCGears ,int initCGCount){
-			m_equippedBow = initBow;
-			m_equippedWear = initWear;
-			m_equippedCGears = initCGears;
+			_equippedBow = initBow;
+			_equippedWear = initWear;
+			_equippedCGears = initCGears;
 			SetEquippableCGearsCount(initCGCount);
 		}
-		public bool Contains(InventoryItemInstance item){
-			foreach(InventoryItemInstance it in this){
-				if(it == item)
-					return true;
-			}
-			return false;
+		public override void SetSG(ISlotGroup sg){
+			_slotsHolder = sg;
+			_filterHandler = sg;
 		}
-		public int count{
-			get{return m_items.Count;}
-		}
-		public InventoryItemInstance this[int i]{
-			get{return m_items[i];}
-		}
-		public ISlotGroup sg{
-			get{return m_sg;}
-		}
-			ISlotGroup m_sg;
-			public void SetSG(ISlotGroup sg){
-				m_sg = sg;
-				_slotsHolder = sg;
-				_filterHandler = sg;
-			}
-		public ISlotsHolder slotsHolder{
+		ISlotsHolder slotsHolder{
 			get{
 				if(_slotsHolder != null)
 					return _slotsHolder;
@@ -49,7 +24,7 @@ namespace SlotSystem{
 			}
 		}
 			ISlotsHolder _slotsHolder;
-		public IFilterHandler filterHandler{
+		IFilterHandler filterHandler{
 			get{
 				if(_filterHandler != null)
 					return _filterHandler;
@@ -58,75 +33,102 @@ namespace SlotSystem{
 			}
 		}
 			IFilterHandler _filterHandler;
-		protected BowInstance m_equippedBow;
-		protected WearInstance m_equippedWear;
-		protected List<CarriedGearInstance> m_equippedCGears = new List<CarriedGearInstance>();
-		public int equippableCGearsCount{
-			get{return m_equippableCGearsCount;}
-			}int m_equippableCGearsCount;
+		public BowInstance GetEquippedBow(){
+			return _equippedBow;
+		}
+		public void SetEquippedBow(BowInstance bow){
+			_equippedBow = bow;
+		}
+			BowInstance _equippedBow;
+		public WearInstance GetEquippedWear(){
+			return _equippedWear;
+		}
+		public void SetEquippedWear(WearInstance wear){
+			_equippedWear = wear;
+		}
+			WearInstance _equippedWear;
+		public List<CarriedGearInstance> GetEquippedCarriedGears(){
+			return _equippedCGears;
+		}
+		public void SetEquippedCarriedGears(List<CarriedGearInstance> cGears){
+			_equippedCGears = cGears;
+		}
+			List<CarriedGearInstance> _equippedCGears = new List<CarriedGearInstance>();
+		public int GetEquippableCGearsCount(){
+			return _equippableCGearsCount;
+		}
 		public void SetEquippableCGearsCount(int num){
-			m_equippableCGearsCount = num;
-			if(sg != null && filterHandler.filter is SGCGearsFilter && !sg.isExpandable)
+			_equippableCGearsCount = num;
+			ISlotGroup sg = GetSG();
+			if(sg != null && filterHandler.GetFilter() is SGCGearsFilter && !sg.IsExpandable())
 			slotsHolder.SetInitSlotsCount(num);
 		}
+			int _equippableCGearsCount;
 		
-		protected List<InventoryItemInstance> m_items{
-			get{
-				List<InventoryItemInstance> result = new List<InventoryItemInstance>();
-				if(m_equippedBow != null)
-					result.Add(m_equippedBow);
-				if(m_equippedWear != null)
-					result.Add(m_equippedWear);
-				if(m_equippedCGears.Count != 0){
-					foreach(CarriedGearInstance inst in m_equippedCGears){
-						result.Add((InventoryItemInstance)inst);
-					}
+		public override List<IInventoryItemInstance> GetItems(){
+			List<IInventoryItemInstance> result = new List<IInventoryItemInstance>();
+			if(_equippedBow != null)
+				result.Add(_equippedBow);
+			if(_equippedWear != null)
+				result.Add(_equippedWear);
+			if(_equippedCGears.Count != 0){
+				foreach(CarriedGearInstance inst in _equippedCGears){
+					result.Add((IInventoryItemInstance)inst);
 				}
-				return result;
 			}
+			return result;
 		}
-		public void Add(InventoryItemInstance item){
+		public override void Add(IInventoryItemInstance item){
 			if(item != null){
 				if(item is BowInstance){
 					BowInstance bowInst = (BowInstance)item;
-					m_equippedBow = bowInst;
+					_equippedBow = bowInst;
 				}	
 				else if(item is WearInstance){
 					WearInstance wearInst = (WearInstance)item;
-					m_equippedWear = wearInst;
+					_equippedWear = wearInst;
 				}
 				else if(item is CarriedGearInstance){
-					if(m_equippedCGears.Count < m_equippableCGearsCount)
-						m_equippedCGears.Add((CarriedGearInstance)item);
+					if(_equippedCGears.Count < _equippableCGearsCount)
+						_equippedCGears.Add((CarriedGearInstance)item);
 					else
 						throw new InvalidOperationException("EquipmentSetInventory.Add: trying to add a CarriedGear exceeding the maximum allowed count");
 				}
 			}else
 				throw new ArgumentNullException();
 		}
-		public void Remove(InventoryItemInstance removedItem){
+		public override void Remove(IInventoryItemInstance removedItem){
 			if(removedItem != null){
 				if(removedItem is BowInstance){
-					if((BowInstance)removedItem == m_equippedBow)
-						m_equippedBow = null;
+					if((BowInstance)removedItem == _equippedBow)
+						_equippedBow = null;
 				}else if(removedItem is WearInstance){
-					if((WearInstance)removedItem == m_equippedWear)
-						m_equippedWear = null;
+					if((WearInstance)removedItem == _equippedWear)
+						_equippedWear = null;
 				}else if(removedItem is CarriedGearInstance){
 					CarriedGearInstance spottedOne = null;
-					foreach(CarriedGearInstance cgInst in m_equippedCGears){
+					foreach(CarriedGearInstance cgInst in _equippedCGears){
 						if((CarriedGearInstance)removedItem == cgInst)
 							spottedOne = cgInst;
 					}
 					if(spottedOne != null)
-						m_equippedCGears.Remove(spottedOne);
+						_equippedCGears.Remove(spottedOne);
 				}
 			}else
 				throw new ArgumentNullException();
 		}
 	}
-	public interface IEquipmentSetInventory: Inventory{
-		int equippableCGearsCount{get;}
+	public interface IEquipmentSetInventory: IInventory{
+		BowInstance GetEquippedBow();
+		void SetEquippedBow(BowInstance bow);
+
+		WearInstance GetEquippedWear();
+		void SetEquippedWear(WearInstance wear);
+
+		List<CarriedGearInstance> GetEquippedCarriedGears();
+		void SetEquippedCarriedGears(List<CarriedGearInstance> cGears);
+
+		int GetEquippableCGearsCount();
 		void SetEquippableCGearsCount(int num);
 	}
 }

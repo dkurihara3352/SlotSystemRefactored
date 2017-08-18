@@ -36,15 +36,15 @@ namespace SlotSystem{
 				for(int i = 0; i< transform.childCount; i++){
 					ISlotGroup sg = transform.GetChild(i).GetComponent<ISlotGroup>();
 					if(sg != null){
-						if(sg.filter is SGBowFilter){
+						if(sg.GetFilter() is SGBowFilter){
 							m_bowSG = sg;
 							bowSG.SetParent(this);
 						}
-						else if(sg.filter is SGWearFilter){
+						else if(sg.GetFilter() is SGWearFilter){
 							m_wearSG = sg;
 							wearSG.SetParent(this);
 						}
-						else if(sg.filter is SGCGearsFilter){
+						else if(sg.GetFilter() is SGCGearsFilter){
 							m_cGearsSG = sg;
 							cGearsSG.SetParent(this);
 						}

@@ -30,18 +30,19 @@ namespace SlotSystem{
 		}
 		public TransactionCacheCommand updateFieldsCommand{
 			get{
-				if(m_updateFieldsCommand == null)
-					m_updateFieldsCommand = new UpdateFieldsCommand(this);
-				return m_updateFieldsCommand;
+				if(_updateFieldsCommand == null)
+					_updateFieldsCommand = new UpdateFieldsCommand(this);
+				return _updateFieldsCommand;
 			}
 		}
-			TransactionCacheCommand m_updateFieldsCommand;
+			TransactionCacheCommand _updateFieldsCommand;
 			public void SetUpdateFieldsCommand(TransactionCacheCommand comm){
-				m_updateFieldsCommand = comm;
+				_updateFieldsCommand = comm;
 			}		
 		public void CreateTransactionResults(){
 			Dictionary<IHoverable, ISlotSystemTransaction> result = new Dictionary<IHoverable, ISlotSystemTransaction>();
-			foreach(ISlotGroup sg in focusedSGProvider.focusedSGs){
+			foreach(ISlotGroup sg in focusedSGProvider.GetFocusedSGs()){
+				ISlottable pickedSB = GetPickedSB();
 				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sg);
 				ISSESelStateHandler sgSelStateHandler = sg.GetSelStateHandler();
 				result.Add(sg, ta);
@@ -65,7 +66,7 @@ namespace SlotSystem{
 		}
 		public bool IsTransactionGoingToBeRevert(ISlottable sb){
 			bool res = true;
-			foreach(ISlotGroup targetSG in focusedSGProvider.focusedSGs){
+			foreach(ISlotGroup targetSG in focusedSGProvider.GetFocusedSGs()){
 				ISlotSystemTransaction ta = MakeTransaction(sb, targetSG);
 				if(ta == null)
 					throw new System.InvalidOperationException("SlotSystemManager.PrePickFilter: given hoveredSSE does not yield any transaction. something's wrong baby");
@@ -84,6 +85,7 @@ namespace SlotSystem{
 			return res;
 		}
 		public bool IsCachedTAResultRevert(IHoverable hoverable){
+			Dictionary<IHoverable, ISlotSystemTransaction> transactionResults = GetTransactionResults();
 			if(transactionResults != null){
 				ISlotSystemTransaction ta = null;
 				if(transactionResults.TryGetValue(hoverable, out ta)){
@@ -101,71 +103,65 @@ namespace SlotSystem{
 			return taFactory.MakeTransaction(pickedSB, hovered);
 		}
 		public ITransactionFactory taFactory{
-			get{return tam.taFactory;}
+			get{return tam.GetTAFactory();}
 		}
-		public Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{
-			get{
-					if(m_transactionResults == null)
-						m_transactionResults = new Dictionary<IHoverable, ISlotSystemTransaction>();
-					return m_transactionResults;
-			}
+		public Dictionary<IHoverable, ISlotSystemTransaction> GetTransactionResults(){
+			if(_transactionResults == null)
+				_transactionResults = new Dictionary<IHoverable, ISlotSystemTransaction>();
+			return _transactionResults;
 		}
-			Dictionary<IHoverable, ISlotSystemTransaction> m_transactionResults;
-			public void SetTransactionResults(Dictionary<IHoverable, ISlotSystemTransaction> results){
-				m_transactionResults = results;
-			}
-		public ISlottable pickedSB{
-			get{
-				return m_pickedSB;
-			}
+		public void SetTransactionResults(Dictionary<IHoverable, ISlotSystemTransaction> results){
+			_transactionResults = results;
 		}
-				ISlottable m_pickedSB;
-				public void SetPickedSB(ISlottable sb){
-					this.m_pickedSB = sb;
-				}
+			Dictionary<IHoverable, ISlotSystemTransaction> _transactionResults;
+		public ISlottable GetPickedSB(){
+			return _pickedSB;
+		}
+		public void SetPickedSB(ISlottable sb){
+			this._pickedSB = sb;
+		}
+			ISlottable _pickedSB;
 
-		public ISlottable targetSB{
-			get{return m_targetSB;
-			}
+		public ISlottable GetTargetSB(){
+			return _targetSB;
 		}
-			ISlottable m_targetSB;
-			public void SetTargetSB(ISlottable sb){
-				if(sb == null || sb != targetSB){
-					if(targetSB != null){
-						ISSESelStateHandler targetSBSelStateHandler = targetSB.GetSelStateHandler();
-						targetSBSelStateHandler.Focus();
-					}
-					this.m_targetSB = sb;
-					if(targetSB != null){
-						ISSESelStateHandler targetSBSelStateHandler = targetSB.GetSelStateHandler();
-						targetSBSelStateHandler.Select();
-					}
+		public void SetTargetSB(ISlottable newTargetSB){
+			ISlottable curTargetSB = GetTargetSB();
+			if(newTargetSB == null || newTargetSB != curTargetSB){
+				if(curTargetSB != null){
+					ISSESelStateHandler targetSBSelStateHandler = curTargetSB.GetSelStateHandler();
+					targetSBSelStateHandler.Focus();
+				}
+				_targetSB = newTargetSB;
+				if(newTargetSB != null){
+					ISSESelStateHandler targetSBSelStateHandler = newTargetSB.GetSelStateHandler();
+					targetSBSelStateHandler.Select();
 				}
 			}
-		public IHoverable hovered{
-			get{return m_hovered;
-			}
 		}
-			protected IHoverable m_hovered;
-			public void SetHovered(IHoverable to){
-				if(to == null || to != hovered){
-					if(to != null && hovered != null){
-						hovered.OnHoverExit();
-					}
-					m_hovered = to;
-					if(hovered != null)
-						UpdateFields();
+			ISlottable _targetSB;
+		public IHoverable GetHovered(){
+			return _hovered;
+		}
+		public void SetHovered(IHoverable newHovered){
+			IHoverable curHovered = GetHovered();
+			if(newHovered == null || newHovered != curHovered){
+				if(newHovered != null && curHovered != null){
+					curHovered.OnHoverExit();
 				}
-			}
-		public List<InventoryItemInstance> moved{
-			get{
-				return m_moved;
+				_hovered = newHovered;
+				if(newHovered != null)
+					UpdateFields();
 			}
 		}
-			List<InventoryItemInstance> m_moved;
-			public void SetMoved(List<InventoryItemInstance> moved){
-				this.m_moved = moved;
-			}
+			protected IHoverable _hovered;
+		public List<IInventoryItemInstance> GetMoved(){
+			return _moved;
+		}
+		public void SetMoved(List<IInventoryItemInstance> moved){
+			this._moved = moved;
+		}
+			List<IInventoryItemInstance> _moved;
 		public void ClearFields(){
 			SetPickedSB(null);
 			SetTargetSB(null);
@@ -181,16 +177,16 @@ namespace SlotSystem{
 		bool IsTransactionGoingToBeRevert(ISlottable sb);
 		bool IsCachedTAResultRevert(IHoverable hoverable);
 		void CreateTransactionResults();
-		Dictionary<IHoverable, ISlotSystemTransaction> transactionResults{get;}
+		Dictionary<IHoverable, ISlotSystemTransaction> GetTransactionResults();
 		ISlotSystemTransaction MakeTransaction(ISlottable pickedSB, IHoverable hovered);
-		ISlottable pickedSB{get;}
+		ISlottable GetPickedSB();
 		void SetPickedSB(ISlottable sb);
-		ISlottable targetSB{get;}
+		ISlottable GetTargetSB();
 		void SetTargetSB(ISlottable sb);
-		IHoverable hovered{get;}
+		IHoverable GetHovered();
 		void SetHovered(IHoverable to);
-		List<InventoryItemInstance> moved{get;}
-		void SetMoved(List<InventoryItemInstance> moved);
+		List<IInventoryItemInstance> GetMoved();
+		void SetMoved(List<IInventoryItemInstance> moved);
 		void UpdateFieldsOfTAM(ISlotSystemTransaction ta);
 	}
 	public interface TransactionCacheCommand{
@@ -202,9 +198,10 @@ namespace SlotSystem{
 			this.taCache = taCache;
 		}
 		public void Execute(){
-			if(taCache.transactionResults != null){
+			Dictionary<IHoverable, ISlotSystemTransaction> transactionResults = taCache.GetTransactionResults();
+			if(transactionResults != null){
 				ISlotSystemTransaction ta = null;
-				if(taCache.transactionResults.TryGetValue(taCache.hovered, out ta)){
+				if(transactionResults.TryGetValue(taCache.GetHovered(), out ta)){
 					taCache.SetTargetSB(ta.targetSB);
 					taCache.SetMoved(ta.moved);
 					taCache.UpdateFieldsOfTAM(ta);

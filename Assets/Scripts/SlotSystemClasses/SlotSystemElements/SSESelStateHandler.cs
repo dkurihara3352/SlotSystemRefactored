@@ -8,11 +8,11 @@ namespace SlotSystem{
 			public void ClearCurSelState(){
 				SetSelState(null);
 			}
-				public bool isSelStateNull{
-					get{return curSelState == null;}
+				public bool IsSelStateNull(){
+					return curSelState == null;
 				}
-				public bool wasSelStateNull{
-					get{return prevSelState == null;}
+				public bool WasSelStateNull(){
+					return prevSelState == null;
 				}
 			public virtual void Deactivate(){
 				SetSelState(deactivatedState);
@@ -20,11 +20,11 @@ namespace SlotSystem{
 				ISSESelState deactivatedState{
 					get{return selStateFactory.MakeDeactivatedState();}
 				}
-				public bool isDeactivated{
-					get{return curSelState == deactivatedState;}
+				public bool IsDeactivated(){
+					return curSelState == deactivatedState;
 				}
-				public bool wasDeactivated{
-					get{return prevSelState == deactivatedState;}
+				public bool WasDeactivated(){
+					return prevSelState == deactivatedState;
 				}
 			public virtual void Defocus(){
 				SetSelState(defocusedState);
@@ -32,11 +32,11 @@ namespace SlotSystem{
 				ISSESelState defocusedState{
 					get{return selStateFactory.MakeDefocusedState();}
 				}
-				public bool isDefocused{
-					get{return curSelState == defocusedState;}
+				public bool IsDefocused(){
+					return curSelState == defocusedState;
 				}
-				public bool wasDefocused{
-					get{return prevSelState == defocusedState;}
+				public bool WasDefocused(){
+					return prevSelState == defocusedState;
 				}
 			public virtual void Focus(){
 				SetSelState(focusedState);
@@ -44,11 +44,11 @@ namespace SlotSystem{
 				ISSESelState focusedState{
 					get{return selStateFactory.MakeFocusedState();}
 				}
-				public bool isFocused{
-					get{return curSelState == focusedState;}
+				public bool IsFocused(){
+					return curSelState == focusedState;
 				}
-				public bool wasFocused{
-					get{return prevSelState == focusedState;}
+				public bool WasFocused(){
+					return prevSelState == focusedState;
 				}
 			public virtual void Select(){
 				SetSelState(selectedState);
@@ -56,11 +56,11 @@ namespace SlotSystem{
 				ISSESelState selectedState{
 					get{return selStateFactory.MakeSelectedState();}
 				}
-				public bool isSelected{
-					get{return curSelState == selectedState;}
+				public bool IsSelected(){
+					return curSelState == selectedState;
 				}
-				public bool wasSelected{
-					get{return prevSelState == selectedState;}
+				public bool WasSelected(){
+					return prevSelState == selectedState;
 				}
 			public virtual void Activate(){
 				Focus();
@@ -92,15 +92,15 @@ namespace SlotSystem{
 			}
 			void SetSelState(ISSESelState state){
 				selStateEngine.SetState(state);
-				if(state == null && selProcess != null)
+				if(state == null && GetSelProcess() != null)
 					SetAndRunSelProcess(null);
 			}
 		/*	process	*/
 			public void SetAndRunSelProcess(ISSESelProcess process){
 				selProcEngine.SetAndRunProcess(process);
 			}
-			public ISSESelProcess selProcess{
-				get{return selProcEngine.GetProcess();}
+			public ISSESelProcess GetSelProcess(){
+				return selProcEngine.GetProcess();
 			}
 			ISSEProcessEngine<ISSESelProcess> selProcEngine{
 				get{
@@ -114,17 +114,17 @@ namespace SlotSystem{
 				m_selProcEngine = engine;
 			}
 			/* Coroutines */
-				public System.Func<IEnumeratorFake> deactivateCoroutine{
-					get{return coroutineFactory.MakeDeactivateCoroutine();}
+				public System.Func<IEnumeratorFake> GetDeactivateCoroutine(){
+					return coroutineFactory.MakeDeactivateCoroutine();
 				}
-				public System.Func<IEnumeratorFake> focusCoroutine{
-					get{return coroutineFactory.MakeFocusCoroutine();}
+				public System.Func<IEnumeratorFake> GetFocusCoroutine(){
+					return coroutineFactory.MakeFocusCoroutine();
 				}
-				public System.Func<IEnumeratorFake> defocusCoroutine{
-					get{return coroutineFactory.MakeDefocusCoroutine();}
+				public System.Func<IEnumeratorFake> GetDefocusCoroutine(){
+					return coroutineFactory.MakeDefocusCoroutine();
 				}
-				public System.Func<IEnumeratorFake> selectCoroutine{
-					get{return coroutineFactory.MakeSelectCoroutine();}
+				public System.Func<IEnumeratorFake> GetSelectCoroutine(){
+					return coroutineFactory.MakeSelectCoroutine();
 				}
 				ISSECoroutineFactory coroutineFactory{
 					get{
@@ -159,27 +159,28 @@ namespace SlotSystem{
 			}
 	}
 	public interface ISSESelStateHandler{
-		bool isSelStateNull{get;}
-		bool wasSelStateNull{get;}
+			bool IsSelStateNull();
+			bool WasSelStateNull();
 		void Deactivate();
-			bool isDeactivated{get;}
-			bool wasDeactivated{get;}
+			bool IsDeactivated();
+			bool WasDeactivated();
 		void Focus();
-			bool isFocused{get;}
-			bool wasFocused{get;}
+			bool IsFocused();
+			bool WasFocused();
 		void Defocus();
-			bool isDefocused{get;}
-			bool wasDefocused{get;}
+			bool IsDefocused();
+			bool WasDefocused();
 		void Select();
-			bool isSelected{get;}
-			bool wasSelected{get;}
+			bool IsSelected();
+			bool WasSelected();
 		void Activate();
 		void Deselect();
 		void SetAndRunSelProcess(ISSESelProcess process);
-		System.Func<IEnumeratorFake> deactivateCoroutine{get;}
-		System.Func<IEnumeratorFake> focusCoroutine{get;}
-		System.Func<IEnumeratorFake> defocusCoroutine{get;}
-		System.Func<IEnumeratorFake> selectCoroutine{get;}
+		ISSESelProcess GetSelProcess();
+		System.Func<IEnumeratorFake> GetDeactivateCoroutine();
+		System.Func<IEnumeratorFake> GetFocusCoroutine();
+		System.Func<IEnumeratorFake> GetDefocusCoroutine();
+		System.Func<IEnumeratorFake> GetSelectCoroutine();
 		void InstantFocus();
 		void InstantDefocus();
 		void InstantSelect();

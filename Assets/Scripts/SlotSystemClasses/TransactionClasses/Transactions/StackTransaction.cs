@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class StackTransaction: AbsSlotSystemTransaction, IStackTransaction{
-		ISlottable m_pickedSB;
-		ISlotGroup m_origSG;
-		ISlottable m_selectedSB;
-		ISlotGroup m_selectedSG;
-		List<InventoryItemInstance> itemCache = new List<InventoryItemInstance>();
+		ISlottable _pickedSB;
+		ISlotGroup _origSG;
+		ISlottable _selectedSB;
+		ISlotGroup _selectedSG;
+		List<IInventoryItemInstance> itemCache = new List<IInventoryItemInstance>();
 		ITransactionIconHandler iconHandler;
 		ISlotsHolder sg2SlotsHolder;
 		ISGActStateHandler sg1ActStateHandler;
@@ -16,29 +16,39 @@ namespace SlotSystem{
 		ISGTransactionHandler sg1TAHandler;
 		ISGTransactionHandler sg2TAHandler;
 		public StackTransaction(ISlottable pickedSB ,ISlottable selected, ITransactionManager tam): base(tam){
-			m_pickedSB = pickedSB;
-			m_origSG = pickedSB.GetSG();
-			m_selectedSB = selected;
-			m_selectedSG = m_selectedSB.GetSG();
-			InventoryItemInstance cache = pickedSB.GetItem();
-			cache.quantity = pickedSB.GetPickedAmount();
+			_pickedSB = pickedSB;
+			_origSG = pickedSB.GetSG();
+			ISlotGroup sg1 = GetSG1();
+			_selectedSB = selected;
+			_selectedSG = _selectedSB.GetSG();
+			ISlotGroup sg2 = GetSG2();
+			IInventoryItemInstance cache = pickedSB.GetItem();
+			cache.SetQuantity(pickedSB.GetPickedAmount());
 			itemCache.Add(cache);
-			iconHandler = tam.iconHandler;
+			iconHandler = tam.GetIconHandler();
 			sg2SlotsHolder = sg2;
 			sg1ActStateHandler = sg1;
 			sg2ActStateHandler = sg2;
 			sg1TAHandler = sg1;
 			sg2TAHandler = sg2;
 		}
-		public override ISlottable targetSB{get{return m_selectedSB;}}
-		public override ISlotGroup sg1{get{return m_origSG;}}
-		public override ISlotGroup sg2{get{return m_selectedSG;}}
-		public override List<InventoryItemInstance> moved{get{return itemCache;}}
+		public override ISlottable GetTargetSB(){
+			return _selectedSB;
+		}
+		public override ISlotGroup GetSG1(){
+			return _origSG;
+		}
+		public override ISlotGroup GetSG2(){
+			return _selectedSG;
+		}
+		public override List<IInventoryItemInstance> GetMoved(){
+			return itemCache;
+		}
 		public override void Indicate(){}
 		public override void Execute(){
 			sg1ActStateHandler.Remove();
 			sg2ActStateHandler.Add();
-			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
+			iconHandler.SetD1Destination(GetSG2(), sg2SlotsHolder.GetNewSlot(_pickedSB.GetItem()));
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){

@@ -22,86 +22,68 @@ namespace SlotSystem{
     }
     /* Factory */
     public class SGStatesRepo: ISGStatesRepo{
-        ISGActStateHandler handler;
         ISlotGroup sg;
         public SGStatesRepo(ISlotGroup sg){
-            this.handler = sg;
             this.sg = sg;
         }
-        public ISGActState waitForActionState{
-            get{
-                if(_waitForActionState == null)
-                    _waitForActionState = new SGWaitForActionState(sg);
-                return _waitForActionState;
-            }
+        public ISGActState GetWaitForActionState(){
+            if(_waitForActionState == null)
+                _waitForActionState = new SGWaitForActionState(sg);
+            return _waitForActionState;
         }
             ISGActState _waitForActionState;
-        public ISGActState revertState{
-            get{
-                if(_revertState == null)
-                    _revertState = new SGRevertState(sg);
-                return _revertState;
-            }
+        public ISGActState GetRevertState(){
+            if(_revertState == null)
+                _revertState = new SGRevertState(sg);
+            return _revertState;
         }
             ISGActState _revertState;
-        public ISGActState reorderState{
-            get{
-                if(_reorderState == null)
-                    _reorderState = new SGReorderState(sg);
-                return _reorderState;
-            }
+        public ISGActState GetReorderState(){
+            if(_reorderState == null)
+                _reorderState = new SGReorderState(sg);
+            return _reorderState;
         }
             ISGActState _reorderState;
-        public ISGActState sortState{
-            get{
-                if(_sortState == null)
-                    _sortState = new SGSortState(sg);
-                return _sortState;
-            }
+        public ISGActState GetSortState(){
+            if(_sortState == null)
+                _sortState = new SGSortState(sg);
+            return _sortState;
         }
             ISGActState _sortState;
-        public ISGActState fillState{
-            get{
-                if(_fillState == null)
-                    _fillState = new SGFillState(sg);
-                return _fillState;
-            }
+        public ISGActState GetFillState(){
+            if(_fillState == null)
+                _fillState = new SGFillState(sg);
+            return _fillState;
         }
             ISGActState _fillState;
-        public ISGActState swapState{
-            get{
-                if(_swapState == null)
-                    _swapState = new SGSwapState(sg);
-                return _swapState;
-            }
+        public ISGActState GetSwapState(){
+            if(_swapState == null)
+                _swapState = new SGSwapState(sg);
+            return _swapState;
         }
             ISGActState _swapState;
-        public ISGActState addState{
-            get{
-                if(_addState == null)
-                    _addState = new SGAddState(sg);
-                return _addState;
-            }
+        public ISGActState GetAddState(){
+            if(_addState == null)
+                _addState = new SGAddState(sg);
+            return _addState;
         }
             ISGActState _addState;
-        public ISGActState removeState{
-            get{
-                if(_removeState == null)
-                    _removeState = new SGRemoveState(sg);
-                return _removeState;
-            }
+        public ISGActState GetRemoveState(){
+            if(_removeState == null)
+                _removeState = new SGRemoveState(sg);
+            return _removeState;
         }
             ISGActState _removeState;
     }
     public interface ISGStatesRepo{
-        ISGActState waitForActionState{get;}
-        ISGActState revertState{get;}
-        ISGActState reorderState{get;}
-        ISGActState sortState{get;}
-        ISGActState fillState{get;}
-        ISGActState swapState{get;}
-        ISGActState addState{get;}
-        ISGActState removeState{get;}
+        ISGActState GetWaitForActionState();
+        ISGActState GetRevertState();
+        ISGActState GetReorderState();
+        ISGActState GetSortState();
+        ISGActState GetFillState();
+        ISGActState GetSwapState();
+        ISGActState GetAddState();
+        ISGActState GetRemoveState();
     }
     /* ConcreteStates */
     public class SGWaitForActionState: SGActState{
@@ -114,7 +96,7 @@ namespace SlotSystem{
         public SGRevertState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             sg.RevertAndUpdateSBs();
-            if(handler.wasWaitingForAction){
+            if(handler.WasWaitingForAction()){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
             }
@@ -125,7 +107,7 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.ReorderedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.wasWaitingForAction){
+            if(handler.WasWaitingForAction()){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
             }
@@ -136,7 +118,7 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.SortedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.wasWaitingForAction){
+            if(handler.WasWaitingForAction()){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
             }
@@ -147,7 +129,7 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.FilledNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.wasWaitingForAction){
+            if(handler.WasWaitingForAction()){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
             }
@@ -158,7 +140,7 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.SwappedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.wasWaitingForAction){
+            if(handler.WasWaitingForAction()){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
             }
@@ -169,7 +151,7 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.AddedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.wasWaitingForAction){
+            if(handler.WasWaitingForAction()){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
             }
@@ -180,7 +162,7 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.RemovedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.wasWaitingForAction){
+            if(handler.WasWaitingForAction()){
                 SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
                 handler.SetAndRunActProcess(process);
             }

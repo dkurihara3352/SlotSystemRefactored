@@ -32,7 +32,7 @@ namespace SlotSystemTests{
 				ITransactionSGHandler mockSGHd = MakeSubSGHandler();
 				SortEngine sortEngine = new SortEngine(mockTAM, mockSGHd);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.taCache.Returns(mockTAC);
+						stubSG.GetTAC().Returns(mockTAC);
 					SGSorter stubSorter = Substitute.For<SGSorter>();
 					ISortTransactionFactory stubSortTAFactory = Substitute.For<ISortTransactionFactory>();
 						ISortTransaction stubTA = Substitute.For<ISortTransaction>();

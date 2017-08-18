@@ -9,16 +9,17 @@ namespace SlotSystem{
 			this.tamStateHandler = tamStateHandler;
 		}
 		public void AcceptDITAComp(ISlottable sb){
+			DraggedIcon dIcon1 = GetDIcon1();
+			DraggedIcon dIcon2 = GetDIcon2();
 			if(dIcon2 != null && sb == dIcon2.sb) m_dIcon2Done = true;
 			else if(dIcon1 != null && sb == dIcon1.sb) m_dIcon1Done = true;
-			if(tamStateHandler.isTransacting){
+			if(tamStateHandler.IsTransacting()){
 				tamStateHandler.transactionCoroutine();
 			}
 		}
-		public virtual DraggedIcon dIcon1{
-			get{return m_dIcon1;}
+		public virtual DraggedIcon GetDIcon1(){
+			return m_dIcon1;
 		}
-			DraggedIcon m_dIcon1;
 		public virtual void SetDIcon1(ISlottable sb){
 			if(sb != null){
 				DraggedIcon di = new DraggedIcon(sb, this);
@@ -30,17 +31,17 @@ namespace SlotSystem{
 			else
 				m_dIcon1Done = false;
 		}
-		public bool dIcon1Done{
-			get{return m_dIcon1Done;}
+			DraggedIcon m_dIcon1;
+		public bool IsDIcon1Done(){
+			return m_dIcon1Done;
 		}
 			bool m_dIcon1Done = true;
 		public void SetD1Destination(ISlotGroup sg, Slot slot){
-			dIcon1.SetDestination(sg, slot);
+			GetDIcon1().SetDestination(sg, slot);
 		}
-		public virtual DraggedIcon dIcon2{
-			get{return m_dIcon2;}
+		public virtual DraggedIcon GetDIcon2(){
+			return m_dIcon2;
 		}
-			DraggedIcon m_dIcon2;
 		public virtual void SetDIcon2(ISlottable sb){
 			if(sb != null){
 				DraggedIcon di = new DraggedIcon(sb, this);
@@ -52,23 +53,24 @@ namespace SlotSystem{
 			else
 				m_dIcon2Done = false;
 		}
-		public bool dIcon2Done{
-			get{return m_dIcon2Done;}
+			DraggedIcon m_dIcon2;
+		public bool IsDIcon2Done(){
+			return m_dIcon2Done;
+		}
+		public void SetD2Destination(ISlotGroup sg, Slot slot){
+			GetDIcon2().SetDestination(sg, slot);
 		}
 			bool m_dIcon2Done = true;
-		public void SetD2Destination(ISlotGroup sg, Slot slot){
-			dIcon2.SetDestination(sg, slot);
-		}
 	}
 	public interface ITransactionIconHandler{
 		void AcceptDITAComp(ISlottable sb);
-		DraggedIcon dIcon1{get;}
+		DraggedIcon GetDIcon1();
 		void SetDIcon1(ISlottable sb);
-		bool dIcon1Done{get;}
+		bool IsDIcon1Done();
 		void SetD1Destination(ISlotGroup sg, Slot slot);
-		DraggedIcon dIcon2{get;}
+		DraggedIcon GetDIcon2();
 		void SetDIcon2(ISlottable sb);
-		bool dIcon2Done{get;}
+		bool IsDIcon2Done();
 		void SetD2Destination(ISlotGroup sg, Slot slot);
 	}
 }

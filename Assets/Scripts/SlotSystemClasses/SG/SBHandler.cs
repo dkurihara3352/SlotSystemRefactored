@@ -9,68 +9,62 @@ namespace SlotSystem{
 			SetSBs(new List<ISlottable>());
 			SetNewSBs(new List<ISlottable>());
 		}
-		public ISlottable GetSB(InventoryItemInstance itemInst){
-			foreach(ISlottable sb in slottables){
+		public ISlottable GetSB(IInventoryItemInstance itemInst){
+			foreach(ISlottable sb in GetSBs()){
 				if(sb != null)
 					if(sb.GetItem() == itemInst)
 						return sb;
 			}
 			return null;
 		}
-		public bool HasItem(InventoryItemInstance itemInst){
+		public bool HasItem(IInventoryItemInstance itemInst){
 			return GetSB(itemInst) != null;
 		}
-		public List<ISlottable> slottables{
-			get{
-				if(_slottables != null)
-					return _slottables;
-				else
-					throw new InvalidOperationException("sbs not set");
-			}
+		public List<ISlottable> GetSBs(){
+			if(_slottables != null)
+				return _slottables;
+			else
+				throw new InvalidOperationException("sbs not set");
+		}
+		public void SetSBs(List<ISlottable> sbs){
+			_slottables = sbs;
 		}
 			List<ISlottable> _slottables;
-			public void SetSBs(List<ISlottable> sbs){
-				_slottables = sbs;
-			}
-		public List<ISlottable> newSBs{
-			get{
-				if(_newSBs != null)
-					return _newSBs;
-				else
-					throw new InvalidOperationException("newSBs not Set");
-			}
+		public List<ISlottable> GetNewSBs(){
+			if(_newSBs != null)
+				return _newSBs;
+			else
+				throw new InvalidOperationException("newSBs not Set");
+		}
+		public void SetNewSBs(List<ISlottable> sbs){
+			_newSBs = sbs;
 		}
 			List<ISlottable> _newSBs;
-			public void SetNewSBs(List<ISlottable> sbs){
-				_newSBs = sbs;
+		public List<ISlottable> GetEquippedSBs(){
+			List<ISlottable> result = new List<ISlottable>();
+			foreach(ISlottable sb in GetSBs()){
+				if(sb != null && sb.IsEquipped())
+					result.Add(sb);
 			}
-		public List<ISlottable> equippedSBs{
-			get{
-				List<ISlottable> result = new List<ISlottable>();
-				foreach(ISlottable sb in slottables){
-					if(sb != null && sb.IsEquipped())
-						result.Add(sb);
-				}
-				return result;
-			}
+			return result;
 		}
-		public bool isAllSBActProcDone{
-			get{
-				foreach(ISlottable sb in slottables){
-					if(sb != null){
-						ISBActProcess actProcess = sb.GetActProcess();
-						if(actProcess  != null)
-							if(actProcess.IsRunning())
-								return false;
-					}
+		public bool IsAllSBActProcDone(){
+			foreach(ISlottable sb in GetSBs()){
+				if(sb != null){
+					ISBActProcess actProcess = sb.GetActProcess();
+					if(actProcess  != null)
+						if(actProcess.IsRunning())
+							return false;
 				}
-				return true;
 			}
+			return true;
 		}
 		public void SetSBsActStates(){
 			List<ISlottable> moveWithins = new List<ISlottable>();
 			List<ISlottable> removed = new List<ISlottable>();
 			List<ISlottable> added = new List<ISlottable>();
+			List<ISlottable> slottables = GetSBs();
+			List<ISlottable> newSBs = GetNewSBs();
 			foreach(ISlottable sb in slottables){
 				if(sb != null){
 					if(newSBs.Contains(sb))
@@ -100,14 +94,14 @@ namespace SlotSystem{
 		}
 	}
 	public interface ISBHandler{
-		List<ISlottable> slottables{get;}
+		List<ISlottable> GetSBs();
 		void SetSBs(List<ISlottable> sbs);
-		List<ISlottable> newSBs{get;}
+		List<ISlottable> GetNewSBs();
 		void SetNewSBs(List<ISlottable> newSBs);
 		void SetSBsActStates();
-		ISlottable GetSB(InventoryItemInstance item);
-		bool HasItem(InventoryItemInstance item);
-		List<ISlottable> equippedSBs{get;}
-		bool isAllSBActProcDone{get;}
+		ISlottable GetSB(IInventoryItemInstance item);
+		bool HasItem(IInventoryItemInstance item);
+		List<ISlottable> GetEquippedSBs();
+		bool IsAllSBActProcDone();
 	}
 }

@@ -5,17 +5,17 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class ItemHandler : IItemHandler {
-		public ItemHandler(InventoryItemInstance item){
+		public ItemHandler(IInventoryItemInstance item){
 			_item = item;
 		}
-		public InventoryItemInstance GetItem(){
+		public IInventoryItemInstance GetItem(){
 			if(_item != null)
 				return _item;
 			else
 				throw new InvalidOperationException("item not set");
 		}
-			InventoryItemInstance _item;
-		public void SetItem(InventoryItemInstance item){
+			IInventoryItemInstance _item;
+		public void SetItem(IInventoryItemInstance item){
 			_item = item;
 		}
 		public int GetPickedAmount(){
@@ -26,18 +26,18 @@ namespace SlotSystem{
 		}
 			int _pickedAmount = 0;
 		public virtual bool IsStackable(){
-			return GetItem().Item.IsStackable;
+			return GetItem().IsStackable();
 		}
 		public int GetQuantity(){
-			return GetItem().quantity;
+			return GetItem().GetQuantity();
 		}
 		public void SetQuantity(int quant){
-			GetItem().quantity = quant;
+			GetItem().SetQuantity(quant);
 		}
 	}
 	public interface IItemHandler{
-		InventoryItemInstance GetItem();
-		void SetItem(InventoryItemInstance item);
+		IInventoryItemInstance GetItem();
+		void SetItem(IInventoryItemInstance item);
 		int GetPickedAmount();
 		void SetPickedAmount(int amount);
 		bool IsStackable();

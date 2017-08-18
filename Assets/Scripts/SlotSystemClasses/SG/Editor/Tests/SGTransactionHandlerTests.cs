@@ -15,13 +15,13 @@ namespace SlotSystemTests{
 			public void ReorderedNewSBs_Always_CreateAndReturnsReorderdSBs(ISlottable picked, ISlottable target, List<ISlottable> source, IEnumerable<ISlottable> expected){
 				SGTransactionHandler sgTAHandler = new SGTransactionHandler(MakeSubSG(), MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
-						sbHandler.slottables.Returns(new List<ISlottable>(source));
+						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
 					sgTAHandler.SetSBHandler(sbHandler);
 					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
-						taCache.pickedSB.Returns(picked);
-						taCache.targetSB.Returns(target);
-						hoverable.taCache.Returns(taCache);
+						taCache.GetPickedSB().Returns(picked);
+						taCache.GetTargetSB().Returns(target);
+						hoverable.GetTAC().Returns(taCache);
 					sgTAHandler.SetHoverable(hoverable);
 				
 				List<ISlottable> actual = sgTAHandler.ReorderedNewSBs();
@@ -84,10 +84,10 @@ namespace SlotSystemTests{
 			public void SortedNewSBs_Various_CreatesAndReturnsSortedAndResizedSBsAccordingly(bool isExpandable, SGSorter sorter, List<ISlottable> source, List<ISlottable> expected){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.isExpandable.Returns(isExpandable);
+						sg.IsExpandable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
-						sbHandler.slottables.Returns(new List<ISlottable>(source));
+						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
 					sgTAHandler.SetSBHandler(sbHandler);
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(sorter);
@@ -381,33 +381,33 @@ namespace SlotSystemTests{
 					}
 				}
 			[TestCaseSource(typeof(FilledNewSBsCases))]
-			public void FilledNewSBs_Various_CreatesAndReturnsNewSBsAccordingly(List<ISlottable> source, bool isPool, bool isAdded, bool isAutoSort, bool isExpandable, List<ISlottable> expected, int addedIndex, InventoryItemInstance addedItem){
+			public void FilledNewSBs_Various_CreatesAndReturnsNewSBsAccordingly(List<ISlottable> source, bool isPool, bool isAdded, bool isAutoSort, bool isExpandable, List<ISlottable> expected, int addedIndex, IInventoryItemInstance addedItem){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.isExpandable.Returns(isExpandable);
-						sg.isPool.Returns(isPool);
+						sg.IsExpandable().Returns(isExpandable);
+						sg.IsPool().Returns(isPool);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(new SGItemIDSorter());
 						sorterHandler.SetIsAutoSort(isAutoSort);
 					sgTAHandler.SetSorterHandler(sorterHandler);
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
-						sbHandler.slottables.Returns(new List<ISlottable>(source));
+						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
 					sgTAHandler.SetSBHandler(sbHandler);
 					ISlotSystemManager ssm = MakeSubSSM();
 					ISBFactory sbFactory = new SBFactory(ssm);
 					sgTAHandler.SetSBFactory(sbFactory);
 					ITransactionSGHandler sgHandler = Substitute.For<ITransactionSGHandler>();
 						if(!isAdded)
-							sgHandler.sg1.Returns(sg);
+							sgHandler.GetSG1().Returns(sg);
 						else
-							sgHandler.sg1.Returns((ISlotGroup)null);
+							sgHandler.GetSG1().Returns((ISlotGroup)null);
 					sgTAHandler.SetSGHandler(sgHandler);
 					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						ISlottable pickedSB = MakeSubSBWithItem(addedItem);
-						taCache.pickedSB.Returns(pickedSB);
-						hoverable.taCache.Returns(taCache);
+						taCache.GetPickedSB().Returns(pickedSB);
+						hoverable.GetTAC().Returns(taCache);
 					sgTAHandler.SetHoverable(hoverable);
 				
 				List<ISlottable> actual = sgTAHandler.FilledNewSBs();
@@ -433,7 +433,6 @@ namespace SlotSystemTests{
 								ISlottable quiverSB_0 = MakeSubSBWithItem(MakeQuiverInstWithOrder(0, 5));
 								ISlottable shieldSB_0 = MakeSubSBWithItem(MakeShieldInstWithOrder(0, 6));
 								ISlottable bow0SB_0 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 7));
-								ISlottable bow1SB_0 = MakeSubSBWithItem(MakeBowInstWithOrder(0, 8));
 								source_0 = new List<ISlottable>(new ISlottable[]{
 									partsSB_0,
 									bow2SB_0,
@@ -479,7 +478,7 @@ namespace SlotSystemTests{
 									bow0SB_1,
 									null
 								});
-							InventoryItemInstance added_1 = bow1SB_1.GetItem();
+							IInventoryItemInstance added_1 = bow1SB_1.GetItem();
 							case1 = new TestCaseData(
 								source_1, false, true, false, false, source_1, 3, added_1
 							);
@@ -525,7 +524,7 @@ namespace SlotSystemTests{
 									null,
 									null
 								});
-								InventoryItemInstance added_2 = bow1SB_2.GetItem();
+								IInventoryItemInstance added_2 = bow1SB_2.GetItem();
 							case2 = new TestCaseData(
 								source_2, false, true, true, false, exp_2, 2, added_2
 							);
@@ -567,7 +566,7 @@ namespace SlotSystemTests{
 									packSB_3,
 									partsSB_3
 								});
-								InventoryItemInstance added_3 = bow1SB_3.GetItem();
+								IInventoryItemInstance added_3 = bow1SB_3.GetItem();
 							case3 = new TestCaseData(
 								source_3, false, true, true, true, exp_3, 2, added_3
 							);
@@ -612,7 +611,7 @@ namespace SlotSystemTests{
 									bow0SB_4,
 									null
 								});
-							InventoryItemInstance removed_4 = quiverSB_4.GetItem();
+							IInventoryItemInstance removed_4 = quiverSB_4.GetItem();
 							case4 = new TestCaseData(
 								source_4, false, false, false, false, exp_4, -1, removed_4
 							);
@@ -657,7 +656,7 @@ namespace SlotSystemTests{
 									null,
 									null
 								});
-								InventoryItemInstance removed_5 = bow0SB_5.GetItem();
+								IInventoryItemInstance removed_5 = bow0SB_5.GetItem();
 							case5 = new TestCaseData(
 								source_5, false, false, true, false, exp_5, -1, removed_5
 							);
@@ -696,7 +695,7 @@ namespace SlotSystemTests{
 									packSB_6,
 									partsSB_6
 								});
-								InventoryItemInstance removed_6 = bow0SB_6.GetItem();
+								IInventoryItemInstance removed_6 = bow0SB_6.GetItem();
 							case6 = new TestCaseData(
 								source_6, false, false, true, true, exp_6, -1, removed_6
 							);
@@ -879,7 +878,7 @@ namespace SlotSystemTests{
 					}
 				}
 			[TestCaseSource(typeof(NullifyIndexAtCases))]
-			public void NullifyIndexAt_Always_FindByItemAndReplaceWithNull(List<ISlottable> source, InventoryItemInstance item, IEnumerable<ISlottable> expected){
+			public void NullifyIndexAt_Always_FindByItemAndReplaceWithNull(List<ISlottable> source, IInventoryItemInstance item, IEnumerable<ISlottable> expected){
 				SGTransactionHandler sgTAHandler = new SGTransactionHandler(MakeSubSG(), MakeSubTAM());
 				List<ISlottable> actual = new List<ISlottable>(source);
 
@@ -960,11 +959,11 @@ namespace SlotSystemTests{
 			{
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.isPool.Returns(isPool);
-						sg.isExpandable.Returns(isExpandable);
+						sg.IsPool().Returns(isPool);
+						sg.IsExpandable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
-						sbHandler.slottables.Returns(new List<ISlottable>(source));
+						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
 					sgTAHandler.SetSBHandler(sbHandler);
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(sorter);
@@ -975,21 +974,21 @@ namespace SlotSystemTests{
 					sgTAHandler.SetSBFactory(sbFactory);
 					ITransactionSGHandler sgHandler = Substitute.For<ITransactionSGHandler>();
 						if(sg1This)
-							sgHandler.sg1.Returns(sg);
+							sgHandler.GetSG1().Returns(sg);
 						else
-							sgHandler.sg1.Returns((ISlotGroup)null);
+							sgHandler.GetSG1().Returns((ISlotGroup)null);
 					sgTAHandler.SetSGHandler(sgHandler);
 					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						if(sg1This){
-							taCache.pickedSB.Returns(removed);
-							taCache.targetSB.Returns(added);
+							taCache.GetPickedSB().Returns(removed);
+							taCache.GetTargetSB().Returns(added);
 						}
 						else{
-							taCache.pickedSB.Returns(added);
-							taCache.targetSB.Returns(removed);
+							taCache.GetPickedSB().Returns(added);
+							taCache.GetTargetSB().Returns(removed);
 						}
-						hoverable.taCache.Returns(taCache);
+						hoverable.GetTAC().Returns(taCache);
 					sgTAHandler.SetHoverable(hoverable);
 				
 				List<ISlottable> actual = sgTAHandler.SwappedNewSBs();
@@ -1555,22 +1554,22 @@ namespace SlotSystemTests{
 				bool isExpandable, 
 				SGSorter sorter,  
 				List<ISlottable> source, 
-				List<InventoryItemInstance> added,
+				List<IInventoryItemInstance> added,
 				List<ISlottable> expected)
 			{
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.isExpandable.Returns(isExpandable);
+						sg.IsExpandable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
-						sbHandler.slottables.Returns(new List<ISlottable>(source));
+						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
 					sgTAHandler.SetSBHandler(sbHandler);
 					ISBFactory sbFactory = new SBFactory(MakeSubSSM());
 					sgTAHandler.SetSBFactory(sbFactory);
 					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
-						taCache.moved.Returns(added);
-						hoverable.taCache.Returns(taCache);
+						taCache.GetMoved().Returns(added);
+						hoverable.GetTAC().Returns(taCache);
 					sgTAHandler.SetHoverable(hoverable);
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(sorter);
@@ -1611,7 +1610,7 @@ namespace SlotSystemTests{
 								bowSB_0
 							});
 							SGSorter idSorter_0 = new SGItemIDSorter();
-							List<InventoryItemInstance> added_0 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> added_0 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bow1SB_a_0.GetItem(),
 								quiverSB_a_0.GetItem(),
 								partsSB_a_0.GetItem(),
@@ -1670,7 +1669,7 @@ namespace SlotSystemTests{
 								null
 							});
 							SGSorter idSorter_1 = new SGItemIDSorter();
-							List<InventoryItemInstance> added_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> added_1 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bow1SB_a_1.GetItem(),
 								quiverSB_a_1.GetItem(),
 								partsSB_a_1.GetItem(),
@@ -1729,7 +1728,7 @@ namespace SlotSystemTests{
 								null
 							});
 							SGSorter idSorter_2 = new SGItemIDSorter();
-							List<InventoryItemInstance> added_2 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> added_2 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								bow1SB_a_2.GetItem(),
 								quiverSB_a_2.GetItem(),
 								partsSB_a_2.GetItem(),
@@ -1759,7 +1758,7 @@ namespace SlotSystemTests{
 					}
 				}
 			[TestCaseSource(typeof(IncreasedSBsCases))]
-			public void IncreasedSBs_Always_IncreaseQuantityOrCreateAndFill(List<InventoryItemInstance> added, List<ISlottable> source, List<ISlottable> expected){
+			public void IncreasedSBs_Always_IncreaseQuantityOrCreateAndFill(List<IInventoryItemInstance> added, List<ISlottable> source, List<ISlottable> expected){
 				SGTransactionHandler sgTAHandler;
 					sgTAHandler = new SGTransactionHandler(MakeSubSG(), MakeSubTAM());
 					ISBFactory sbFactory = new SBFactory(MakeSubSSM());
@@ -1797,7 +1796,7 @@ namespace SlotSystemTests{
 							PartsInstance partsA1_0 = MakePartsInstance(1, 7);
 							PartsInstance partsA2_0 = MakePartsInstance(2, 10);
 							PartsInstance partsA3_0 = MakePartsInstance(3, 2);
-							List<InventoryItemInstance> added_0 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> added_0 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								partsA0_0,
 								partsA1_0,
 								partsA2_0,
@@ -1851,7 +1850,7 @@ namespace SlotSystemTests{
 							QuiverInstance quiverA_1 = MakeQuiverInstance(0);
 							MeleeWeaponInstance mWeaponA_1 = MakeMWeaponInstance(0);
 							ShieldInstance shieldA_1 = MakeShieldInstance(0);
-							List<InventoryItemInstance> added_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> added_1 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								packA_1,
 								quiverA_1,
 								mWeaponA_1,
@@ -1882,16 +1881,16 @@ namespace SlotSystemTests{
 				bool isExpandable, 
 				SGSorter sorter,  
 				List<ISlottable> source, 
-				List<InventoryItemInstance> removed,
+				List<IInventoryItemInstance> removed,
 				List<ISlottable> expected)
 			{
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.isPool.Returns(isPool);
-						sg.isExpandable.Returns(isExpandable);
+						sg.IsPool().Returns(isPool);
+						sg.IsExpandable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
-						sbHandler.slottables.Returns(new List<ISlottable>(source));
+						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
 					sgTAHandler.SetSBHandler(sbHandler);
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(sorter);
@@ -1899,8 +1898,8 @@ namespace SlotSystemTests{
 					sgTAHandler.SetSorterHandler(sorterHandler);
 					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
-						taCache.moved.Returns(removed);
-						hoverable.taCache.Returns(taCache);
+						taCache.GetMoved().Returns(removed);
+						hoverable.GetTAC().Returns(taCache);
 					sgTAHandler.SetHoverable(hoverable);
 
 				
@@ -1935,7 +1934,7 @@ namespace SlotSystemTests{
 								null
 							});
 							SGSorter idSorter_1 = new SGItemIDSorter();
-							List<InventoryItemInstance> removed_1 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> removed_1 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								wearSB_1.GetItem(),
 								shieldSB_1.GetItem(),
 								partsSB_a_1.GetItem(),
@@ -1988,7 +1987,7 @@ namespace SlotSystemTests{
 								null
 							});
 							SGSorter idSorter_2 = new SGItemIDSorter();
-							List<InventoryItemInstance> removed_2 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> removed_2 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								wearSB_2.GetItem(),
 								shieldSB_2.GetItem(),
 								partsSB_a_2.GetItem(),
@@ -2041,7 +2040,7 @@ namespace SlotSystemTests{
 								null
 							});
 							SGSorter idSorter_3 = new SGItemIDSorter();
-							List<InventoryItemInstance> removed_3 = new List<InventoryItemInstance>(new InventoryItemInstance[]{
+							List<IInventoryItemInstance> removed_3 = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
 								wearSB_3.GetItem(),
 								shieldSB_3.GetItem(),
 								partsSB_a_3.GetItem(),
@@ -2076,7 +2075,7 @@ namespace SlotSystemTests{
 				
 				sgTAHandler.UpdateSBs();
 
-				List<ISlottable> actual = ExtractSBsFromSlots(slotsHolder.slots);
+				List<ISlottable> actual = ExtractSBsFromSlots(slotsHolder.GetSlots());
 
 				Assert.That(actual, Is.EqualTo(expected));
 				foreach(var sb in actual){
@@ -2322,14 +2321,14 @@ namespace SlotSystemTests{
 			public void SortedSBsIfAutoSortAccordingToExpandablity_Always_ReturnsAccordingly(bool isAutoSort, bool isExpandable, List<ISlottable> source ,List<ISlottable> expected){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.isExpandable.Returns(isExpandable);
+						sg.IsExpandable().Returns(isExpandable);
 						sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(new SGItemIDSorter());
 						sorterHandler.SetIsAutoSort(isAutoSort);
 					sgTAHandler.SetSorterHandler(sorterHandler);
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
-						sbHandler.slottables.Returns(source);
+						sbHandler.GetSBs().Returns(source);
 					sgTAHandler.SetSBHandler(sbHandler);
 
 				List<ISlottable> actual = sgTAHandler.SortedSBsIfAutoSortAccordingToExpandability(source);
@@ -2445,17 +2444,17 @@ namespace SlotSystemTests{
 			public void SetSBsFromSlotsAndUpdateSlotIDs_Always_UpdatesSlottables(List<Slot> slots, List<ISlottable> expected){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.slottables.Returns(new List<ISlottable>());
-						sg.slots.Returns(slots);
-						sg.When(x => x.SetSBs(Arg.Is<List<ISlottable>>(y => y.MemberEquals(expected)))).Do(z => sg.slottables.Returns(expected));
+						sg.GetSBs().Returns(new List<ISlottable>());
+						sg.GetSlots().Returns(slots);
+						sg.When(x => x.SetSBs(Arg.Is<List<ISlottable>>(y => y.MemberEquals(expected)))).Do(z => sg.GetSBs().Returns(expected));
 				sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 
 				sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
 
-				bool equality = sg.slottables.MemberEquals(expected);
+				bool equality = sg.GetSBs().MemberEquals(expected);
 				Assert.That(equality, Is.True);
-				foreach(var sb in sg.slottables)
-					sb.Received().SetSlotID(sg.slottables.IndexOf(sb));
+				foreach(var sb in sg.GetSBs())
+					sb.Received().SetSlotID(sg.GetSBs().IndexOf(sb));
 			}
 				class SetSBsFromSlotsAndUpdateSlotIDsCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
@@ -2512,23 +2511,23 @@ namespace SlotSystemTests{
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
 						ITransactionCache taCache = MakeSubTAC();
-							taCache.pickedSB.Returns(pickedSB);
-							taCache.targetSB.Returns(targetSB);
-						sg.taCache.Returns(taCache);
+							taCache.GetPickedSB().Returns(pickedSB);
+							taCache.GetTargetSB().Returns(targetSB);
+						sg.GetTAC().Returns(taCache);
 					ITransactionManager tam = MakeSubTAM();
 						ITransactionSGHandler sgHandler = Substitute.For<ITransactionSGHandler>();
 						if(thisSG)
-							sgHandler.sg1.Returns(sg);
+							sgHandler.GetSG1().Returns(sg);
 						else
-							sgHandler.sg1.Returns((ISlotGroup)null);
-						tam.sgHandler.Returns(sgHandler);
+							sgHandler.GetSG1().Returns((ISlotGroup)null);
+						tam.GetSGHandler().Returns(sgHandler);
 				sgTAHandler = new SGTransactionHandler(sg, tam);
 				return sgTAHandler;
 			}
 			public void AssertItemAndQuantityEquality(ISlottable sb, ISlottable other){
 				if(sb != null){
 					Assert.That(other, Is.Not.Null);
-					Assert.That(sb.GetItem().Item.ItemID, Is.EqualTo(other.GetItem().Item.ItemID));
+					Assert.That(sb.GetItem().GetItemID(), Is.EqualTo(other.GetItem().GetItemID()));
 					Assert.That(sb.GetQuantity(), Is.EqualTo(other.GetQuantity()));
 				}else
 					Assert.That(other, Is.Null);
@@ -2545,11 +2544,11 @@ namespace SlotSystemTests{
 					}
 				}
 			}
-			static ISlottable MakeSubSBWithItemQuantitySettable(InventoryItemInstance item){
+			static ISlottable MakeSubSBWithItemQuantitySettable(IInventoryItemInstance item){
 				ISlottable sb = MakeSubSB();
 				sb.GetItem().Returns(item);
-				sb.GetQuantity().Returns(item.quantity);
-				int count = item.quantity;
+				sb.GetQuantity().Returns(item.GetQuantity());
+				int count = item.GetQuantity();
 				sb.SetQuantity(Arg.Do<int>(x => count = x));
 				sb.When(x => x.SetQuantity(Arg.Any<int>())).Do(x => sb.GetQuantity().Returns(count));
 				return sb;
@@ -2571,19 +2570,19 @@ namespace SlotSystemTests{
 			void ResetQuantity(List<ISlottable> sbs){
 				foreach(var sb in sbs)
 					if(sb != null)
-					sb.SetQuantity(sb.GetItem().quantity);
+					sb.SetQuantity(sb.GetItem().GetQuantity());
 			}
-			static ISlottable MakeSubSBWithItem(InventoryItemInstance item){
+			static ISlottable MakeSubSBWithItem(IInventoryItemInstance item){
 				ISlottable sb = MakeSubSB();
 					sb.GetItem().Returns(item);
-					sb.GetQuantity().Returns(item.quantity);
+					sb.GetQuantity().Returns(item.GetQuantity());
 				return sb;
 			}
-			public void AssertCreatedSB(ISlottable sb, InventoryItemInstance addedItem, ISlotSystemManager ssm){
+			public void AssertCreatedSB(ISlottable sb, IInventoryItemInstance addedItem, ISlotSystemManager ssm){
 				Assert.That(sb.GetItem(), Is.SameAs(addedItem));
 				Assert.That(sb.GetSSM(), Is.SameAs(ssm));
 				ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
-				Assert.That(sbSelStateHandler.isDefocused, Is.True);
+				Assert.That(sbSelStateHandler.IsDefocused(), Is.True);
 				Assert.That(sb.IsUnequipped(), Is.True);
 				Assert.That(sb, Is.Not.Null.And.InstanceOf(typeof(Slottable)));
 			}

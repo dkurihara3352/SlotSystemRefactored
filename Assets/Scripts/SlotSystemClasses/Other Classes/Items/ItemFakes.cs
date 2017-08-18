@@ -5,38 +5,38 @@ using UnityEngine;
 namespace SlotSystem{
 	public class BowFake: InventoryItem{
 		public BowFake(){
-			IsStackable = false;
+			SetIsStackable(false);
 		}
 	}
 	public class WearFake: InventoryItem{
 		public WearFake(){
-			IsStackable = false;
+			SetIsStackable(false);
 		}
 	}
 	public abstract class CarriedGearFake: InventoryItem{}
 	public class MeleeWeaponFake: CarriedGearFake{
 		public MeleeWeaponFake(){
-			IsStackable = false;
+			SetIsStackable(false);
 		}
 	}
 	public class PackFake: CarriedGearFake{
 		public PackFake(){
-			IsStackable = false;
+			SetIsStackable(false);
 		}
 	}
 	public class QuiverFake: CarriedGearFake{
 		public QuiverFake(){
-			IsStackable = false;
+			SetIsStackable(false);
 		}
 	}
 	public class ShieldFake: CarriedGearFake{
 		public ShieldFake(){
-			IsStackable = false;
+			SetIsStackable(false);
 		}
 	}
 	public class PartsFake: InventoryItem{
 		public PartsFake(){
-			IsStackable = true;
+			SetIsStackable(true);
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace SlotSystem{
 				_hoverable = hoverable;
 			}
 			public ITransactionCache taCache{
-				get{return hoverable.taCache;}
+				get{return hoverable.GetTAC();}
 			}
 		public ISBFactory sbFactory{
 			get{
@@ -88,35 +88,35 @@ namespace SlotSystem{
 			SetSorterHandler(sg);
 			SetSlotsHolder(sg);
 			SetSBFactory(sg);
-			SetSGHandler(tam.sgHandler);
+			SetSGHandler(tam.GetSGHandler());
 		}
 		public List<ISlottable> ReorderedNewSBs(){
-			List<ISlottable> result = new List<ISlottable>(sbHandler.slottables);
-			ISlottable sb1 = taCache.pickedSB;
-			ISlottable sb2 = taCache.targetSB;
+			List<ISlottable> result = new List<ISlottable>(sbHandler.GetSBs());
+			ISlottable sb1 = taCache.GetPickedSB();
+			ISlottable sb2 = taCache.GetTargetSB();
 			result.Reorder(sb1, sb2);
 			return result;
 		}
 		public List<ISlottable> SortedNewSBs(){
 			List<ISlottable> result;
-			if(sg.isExpandable)
-				result = sorterHandler.GetSortedSBsWithResize(sbHandler.slottables);
+			if(sg.IsExpandable())
+				result = sorterHandler.GetSortedSBsWithResize(sbHandler.GetSBs());
 			else
-				result = sorterHandler.GetSortedSBsWithoutResize(sbHandler.slottables);
+				result = sorterHandler.GetSortedSBsWithoutResize(sbHandler.GetSBs());
 			return result;
 		}
 		public List<ISlottable> FilledNewSBs(){
 			ISlottable added = GetAddedForFill();
 			ISlottable removed = GetRemovedForFill();
 
-			List<ISlottable> result = FilledOrNulledSBs(sbHandler.slottables, added, removed);
+			List<ISlottable> result = FilledOrNulledSBs(sbHandler.GetSBs(), added, removed);
 
 			result = SortedSBsIfAutoSortAccordingToExpandability(result);
 			return result;
 		}
 			List<ISlottable> FilledOrNulledSBs(List<ISlottable> source, ISlottable added, ISlottable removed){
 				List<ISlottable> result = new List<ISlottable>(source);
-				if(!sg.isPool){
+				if(!sg.IsPool()){
 					if(added != null)
 						CreateNewSBAndFill(added.GetItem(), result);
 					if(removed != null)
@@ -126,26 +126,26 @@ namespace SlotSystem{
 			}
 			public ISlottable GetAddedForFill(){
 				ISlottable added;
-				if(sgHandler.sg1 == sg)
+				if(sgHandler.GetSG1() == sg)
 					added = null;
 				else
-					added = taCache.pickedSB;
+					added = taCache.GetPickedSB();
 				return added;
 			}
 			public ISlottable GetRemovedForFill(){
 				ISlottable removed;
-				if(sgHandler.sg1 == sg)
-					removed = taCache.pickedSB;
+				if(sgHandler.GetSG1() == sg)
+					removed = taCache.GetPickedSB();
 				else
 					removed = null;
 				return removed;
 			}
-		public void CreateNewSBAndFill(InventoryItemInstance addedItem, List<ISlottable> list){
+		public void CreateNewSBAndFill(IInventoryItemInstance addedItem, List<ISlottable> list){
 			ISlottable newSB = sbFactory.CreateSB(addedItem);
 			newSB.Unequip();
 			list.Fill(newSB);
 		}
-		public void NullifyIndexAt(InventoryItemInstance removedItem, List<ISlottable> list){
+		public void NullifyIndexAt(IInventoryItemInstance removedItem, List<ISlottable> list){
 			if(removedItem != null){
 				ISlottable rem = null;
 				foreach(ISlottable sb in list){
@@ -164,30 +164,30 @@ namespace SlotSystem{
 			ISlottable added = GetAddedForSwap();
 			ISlottable removed = GetRemovedForSwap();
 
-			List<ISlottable> result = SwappedList(added, removed, sbHandler.slottables);
+			List<ISlottable> result = SwappedList(added, removed, sbHandler.GetSBs());
 
 			result = SortedSBsIfAutoSortAccordingToExpandability(result);
 			return result;			
 		}
 			public ISlottable GetAddedForSwap(){
 				ISlottable added = null;
-				if(sgHandler.sg1 == sg)
-					added = taCache.targetSB;
+				if(sgHandler.GetSG1() == sg)
+					added = taCache.GetTargetSB();
 				else
-					added = taCache.pickedSB;
+					added = taCache.GetPickedSB();
 				return added;
 			}
 			public ISlottable GetRemovedForSwap(){
 				ISlottable removed = null;
-				if(sgHandler.sg1 == sg)
-					removed = taCache.pickedSB;
+				if(sgHandler.GetSG1() == sg)
+					removed = taCache.GetPickedSB();
 				else
-					removed = taCache.targetSB;
+					removed = taCache.GetTargetSB();
 				return removed;
 			}
 			List<ISlottable> SwappedList(ISlottable added, ISlottable removed, List<ISlottable> source){
 				List<ISlottable> result = new List<ISlottable>(source);
-				if(!sg.isPool){
+				if(!sg.IsPool()){
 					ISlottable newSB = sbFactory.CreateSB(added.GetItem());
 					newSB.Unequip();
 					result[result.IndexOf(removed)] = newSB;
@@ -195,32 +195,32 @@ namespace SlotSystem{
 				return result;
 			}
 		public List<ISlottable> AddedNewSBs(){
-			List<InventoryItemInstance> added = taCache.moved;
+			List<IInventoryItemInstance> added = taCache.GetMoved();
 
-			List<ISlottable> result = IncreasedSBs(added, sbHandler.slottables);
+			List<ISlottable> result = IncreasedSBs(added, sbHandler.GetSBs());
 
 			result = SortedSBsIfAutoSortAccordingToExpandability(result);
 			return result;
 		}
-			public List<ISlottable> IncreasedSBs(List<InventoryItemInstance> added, List<ISlottable> source){
+			public List<ISlottable> IncreasedSBs(List<IInventoryItemInstance> added, List<ISlottable> source){
 				List<ISlottable> result = new List<ISlottable>(source);
-				foreach(InventoryItemInstance item in added){
-					if(item.isStackable)
+				foreach(IInventoryItemInstance item in added){
+					if(item.IsStackable())
 						IncreaseQuantityOfSBInList(result, item);
 					else
 						CreateNewSBAndFill(item, result);
 				}
 				return result;
 			}
-			public void IncreaseQuantityOfSBInList(List<ISlottable> sbs, InventoryItemInstance item){
-				if(!item.isStackable)
+			public void IncreaseQuantityOfSBInList(List<ISlottable> sbs, IInventoryItemInstance item){
+				if(!item.IsStackable())
 					throw new ArgumentException("item is not stackable");
 				else{
 					bool found = false;
 					foreach(var sb in sbs){
 						if(sb != null){
-							if(sb.GetItem() == item){
-								int newQuantity = sb.GetQuantity() + item.quantity;
+							if(sb.GetItem().Equals(item)){
+								int newQuantity = sb.GetQuantity() + item.GetQuantity();
 								sb.SetQuantity(newQuantity);
 								found = true;
 								return;
@@ -232,33 +232,33 @@ namespace SlotSystem{
 				}
 			}
 		public List<ISlottable> RemovedNewSBs(){
-			List<InventoryItemInstance> removed = taCache.moved;
+			List<IInventoryItemInstance> removed = taCache.GetMoved();
 
-			List<ISlottable> result = DecreasedSBs(removed, sbHandler.slottables);
+			List<ISlottable> result = DecreasedSBs(removed, sbHandler.GetSBs());
 			
 			result = SortedSBsIfAutoSortAccordingToExpandability(result);
 			return result;
 		}
-			List<ISlottable> DecreasedSBs(List<InventoryItemInstance> removed, List<ISlottable> source){
+			List<ISlottable> DecreasedSBs(List<IInventoryItemInstance> removed, List<ISlottable> source){
 				List<ISlottable> result = new List<ISlottable>(source);
-				foreach(InventoryItemInstance item in removed)
-					if(item.isStackable)
+				foreach(IInventoryItemInstance item in removed)
+					if(item.IsStackable())
 						DecreaseQuantityOfSBInList(result, item);
 					else
 						NullifyIndexAt(item, result);
 				return result;
 			}
-			public void DecreaseQuantityOfSBInList(List<ISlottable> sbs, InventoryItemInstance item){
-				if(!item.isStackable)
+			public void DecreaseQuantityOfSBInList(List<ISlottable> sbs, IInventoryItemInstance item){
+				if(!item.IsStackable())
 					throw new ArgumentException("item is not stackable");
 				else{
 					bool found = false;
 					ISlottable removed = null;
 					foreach(var sb in sbs)
 						if(sb != null)
-							if(sb.GetItem() == item){
+							if(sb.GetItem().Equals(item)){
 								found = true;
-								int newQuantity = sb.GetQuantity() - item.quantity;
+								int newQuantity = sb.GetQuantity() - item.GetQuantity();
 								if(newQuantity <= 0){
 									removed = sb;
 									break;
@@ -277,11 +277,11 @@ namespace SlotSystem{
 		public void SetSBsFromSlotsAndUpdateSlotIDs(){
 			List<ISlottable> result = ExtractSBsFromSlots();
 			sbHandler.SetSBs(result);
-			UpdateSlotIDs(sbHandler.slottables);
+			UpdateSlotIDs(sbHandler.GetSBs());
 		}
 			List<ISlottable> ExtractSBsFromSlots(){
 				List<ISlottable> result = new List<ISlottable>();
-				foreach(Slot slot in slotsHolder.slots){
+				foreach(Slot slot in slotsHolder.GetSlots()){
 					result.Add(slot.sb);
 				}
 				return result;
@@ -293,15 +293,16 @@ namespace SlotSystem{
 				}
 			}
 		public void UpdateSBs(){
-			MakeSureNewSlotsAreReady(sbHandler.slottables);
-			RemoveAndDestorySBsFrom(sbHandler.slottables);
-			PutSBsInNewSlot(sbHandler.slottables);
+			MakeSureNewSlotsAreReady(sbHandler.GetSBs());
+			RemoveAndDestorySBsFrom(sbHandler.GetSBs());
+			PutSBsInNewSlot(sbHandler.GetSBs());
 			SetNewSlotsToSlots();
 			SetSBsFromSlotsAndUpdateSlotIDs();
 		}
 			void MakeSureNewSlotsAreReady(List<ISlottable> sbs){
 				int count = sbs.Count;
-				if(slotsHolder.newSlots == null || slotsHolder.newSlots.Count < count)
+				List<Slot> newSlots = slotsHolder.GetNewSlots();
+				if(newSlots == null || newSlots.Count < count)
 					slotsHolder.SetNewSlots(CreateSlots(count));
 			}
 			List<Slot> CreateSlots(int count){
@@ -314,7 +315,6 @@ namespace SlotSystem{
 				foreach(var sb in source){
 					if(sb != null && sb.IsToBeRemoved()){
 						int index = source.IndexOf(sb);
-						ISlottable removed = sb;
 						source[index] = null;
 						sb.Destroy();
 					}
@@ -323,16 +323,16 @@ namespace SlotSystem{
 			void PutSBsInNewSlot(IEnumerable<ISlottable> source){
 				foreach(var sb in source)
 					if(sb != null && !sb.IsToBeRemoved())
-						slotsHolder.newSlots[sb.GetNewSlotID()].sb = sb;
+						slotsHolder.GetNewSlots()[sb.GetNewSlotID()].sb = sb;
 			}
 			void SetNewSlotsToSlots(){
-				slotsHolder.SetSlots(slotsHolder.newSlots);
+				slotsHolder.SetSlots(slotsHolder.GetNewSlots());
 			}
 		public List<ISlottable> SortedSBsIfAutoSortAccordingToExpandability(List<ISlottable> source){
-			if(!sorterHandler.isAutoSort)
+			if(!sorterHandler.IsAutoSort())
 				return source;
 			else{
-				if(sg.isExpandable)
+				if(sg.IsExpandable())
 					return sorterHandler.GetSortedSBsWithResize(source);
 				else
 					return sorterHandler.GetSortedSBsWithoutResize(source);

@@ -19,35 +19,29 @@ namespace SlotSystem{
 		public SGCommandsRepo(ISlotGroup sg){
 			this.sg = sg;
 		}
-		public ISGCommand initializeItemsCommand{
-			get{				
-				if(_initializeItemsCommand == null)
-					_initializeItemsCommand = new SGInitItemsCommand(sg);
-				return _initializeItemsCommand;
-			}
+		public ISGCommand GetInitializeItemsCommand(){
+			if(_initializeItemsCommand == null)
+				_initializeItemsCommand = new SGInitItemsCommand(sg);
+			return _initializeItemsCommand;
 		}
 			ISGCommand _initializeItemsCommand;
-		public ISGCommand onActionCompleteCommand{
-			get{
-				if(_onActionCompleteCommand == null)
-					_onActionCompleteCommand = new SGEmptyCommand(sg);
-				return _onActionCompleteCommand;
-			}
+		public ISGCommand GetOnActionCompleteCommand(){
+			if(_onActionCompleteCommand == null)
+				_onActionCompleteCommand = new SGEmptyCommand(sg);
+			return _onActionCompleteCommand;
 		}
 			ISGCommand _onActionCompleteCommand;
-		public ISGCommand onActionExecuteCommand{
-			get{
-				if(_onActionExecuteCommand == null)
-					_onActionExecuteCommand = new SGUpdateEquipAtExecutionCommand(sg);
-				return _onActionExecuteCommand;
-			}
+		public ISGCommand GetOnActionExecuteCommand(){
+			if(_onActionExecuteCommand == null)
+				_onActionExecuteCommand = new SGUpdateEquipAtExecutionCommand(sg);
+			return _onActionExecuteCommand;
 		}
 			ISGCommand _onActionExecuteCommand;
 	}
 	public interface ISGCommandsRepo{
-		ISGCommand initializeItemsCommand{get;}
-		ISGCommand onActionCompleteCommand{get;}
-		ISGCommand onActionExecuteCommand{get;}
+		ISGCommand GetInitializeItemsCommand();
+		ISGCommand GetOnActionCompleteCommand();
+		ISGCommand GetOnActionExecuteCommand();
 	}
 	public class SGEmptyCommand: SGCommand, ISGEmptyCommand{
 		public SGEmptyCommand(ISlotGroup sg): base(sg){}
@@ -65,12 +59,13 @@ namespace SlotSystem{
 			sgTAHandler = sg;
 		}
 		public override void Execute(){
-			List<InventoryItemInstance> items = new List<InventoryItemInstance>(sg.inventory);
+			IInventory inventory = sg.GetInventory();
+			List<IInventoryItemInstance> items = new List<IInventoryItemInstance>(inventory.GetItems());
 			items = filterHandler.FilteredItems(items);
 			slotsHolder.InitSlots(items);
 			sg.InitSBs(items);
 			sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
-			if(sg.isAutoSort)
+			if(sg.IsAutoSort())
 				sg.InstantSort();
 		}
 	}
@@ -80,7 +75,7 @@ namespace SlotSystem{
 		public override void Execute(){
 			foreach(ISlottable sb in sg){
 				if(sb != null){
-					InventoryItemInstance item = sb.GetItem();
+					IInventoryItemInstance item = sb.GetItem();
 					if(sb.IsToBeRemoved()){
 						sg.SyncEquipped(item, false);
 					}else if(sb.IsToBeAdded()){

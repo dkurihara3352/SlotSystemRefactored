@@ -16,7 +16,7 @@ namespace SlotSystemTests{
 		public void OnHoverEnter_SSEIsSelStateNull_ThrowsException(){
 			Hoverable hoverable = new Hoverable(MakeSubTAC());
 				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-					sseSelStateHandler.isSelStateNull.Returns(true);
+					sseSelStateHandler.IsSelStateNull().Returns(true);
 				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverEnter();
@@ -26,7 +26,7 @@ namespace SlotSystemTests{
 		public void OnHoverEnter_SSEIsDeactivated_ThrowsException(){
 			Hoverable hoverable = new Hoverable(MakeSubTAC());
 				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-					sseSelStateHandler.isDeactivated.Returns(true);
+					sseSelStateHandler.IsDeactivated().Returns(true);
 				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverEnter();
@@ -36,7 +36,7 @@ namespace SlotSystemTests{
 		public void OnHoverEnter_SSEIsSelected_ThrowsException(){
 			Hoverable hoverable = new Hoverable(MakeSubTAC());
 				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-					sseSelStateHandler.isSelected.Returns(true);
+					sseSelStateHandler.IsSelected().Returns(true);
 				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverEnter();
@@ -47,7 +47,7 @@ namespace SlotSystemTests{
 					ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
 				hoverable = new Hoverable(mockTAC);
 					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sseSelStateHandler.isFocused.Returns(true);
+						sseSelStateHandler.IsFocused().Returns(true);
 				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 			
 			hoverable.OnHoverEnter();
@@ -60,7 +60,7 @@ namespace SlotSystemTests{
 					ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
 				hoverable = new Hoverable(mockTAC);
 					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sseSelStateHandler.isDefocused.Returns(true);
+						sseSelStateHandler.IsDefocused().Returns(true);
 					hoverable.SetSSESelStateHandler(sseSelStateHandler);
 			
 			hoverable.OnHoverEnter();
@@ -72,7 +72,7 @@ namespace SlotSystemTests{
 		public void OnHoverExit_SSEIsSelStateNull_ThrowsException(){
 			Hoverable hoverable = new Hoverable(MakeSubTAC());
 				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-					sseSelStateHandler.isSelStateNull.Returns(true);
+					sseSelStateHandler.IsSelStateNull().Returns(true);
 				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverExit();
@@ -81,7 +81,7 @@ namespace SlotSystemTests{
 		public void OnHoverExit_SSEIsDeactivated_ThrowsException(){
 			Hoverable hoverable = new Hoverable(MakeSubTAC());
 				ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-					sseSelStateHandler.isDeactivated.Returns(true);
+					sseSelStateHandler.IsDeactivated().Returns(true);
 				hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverExit();
@@ -90,10 +90,10 @@ namespace SlotSystemTests{
 		public void OnHoverExit_IsNotHovered_ThrowsException(){
 			Hoverable hoverable;
 					ITransactionCache stubTAC = Substitute.For<ITransactionCache>();
-					stubTAC.hovered.Returns((IHoverable)null);
+					stubTAC.GetHovered().Returns((IHoverable)null);
 				hoverable = new Hoverable(stubTAC);
 					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sseSelStateHandler.isDeactivated.Returns(true);
+						sseSelStateHandler.IsDeactivated().Returns(true);
 					hoverable.SetSSESelStateHandler(sseSelStateHandler);
 
 			hoverable.OnHoverExit();
@@ -103,9 +103,9 @@ namespace SlotSystemTests{
 			Hoverable hoverable;
 					ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
 				hoverable = new Hoverable(mockTAC);
-					mockTAC.hovered.Returns(hoverable);
+					mockTAC.GetHovered().Returns(hoverable);
 					ISSESelStateHandler sseSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sseSelStateHandler.isDeactivated.Returns(false);
+						sseSelStateHandler.IsDeactivated().Returns(false);
 					hoverable.SetSSESelStateHandler(sseSelStateHandler);
 			
 			hoverable.OnHoverExit();

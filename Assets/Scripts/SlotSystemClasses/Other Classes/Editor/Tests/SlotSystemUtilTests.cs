@@ -23,8 +23,8 @@ namespace SlotSystemTests{
 				stubSB_B.GetItem().Returns(stubBowInst_B);
 				stubSG_A.AcceptsFilter(stubSB_B).Returns(true);
 				stubSG_B.AcceptsFilter(stubSB_A).Returns(true);
-				stubSG_A.filter.Returns(new SGBowFilter());
-				stubSG_B.filter.Returns(new SGBowFilter());
+				stubSG_A.GetFilter().Returns(new SGBowFilter());
+				stubSG_B.GetFilter().Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.True);
 				}
@@ -41,8 +41,8 @@ namespace SlotSystemTests{
 				stubSB_B.GetItem().Returns(stubBowInst_B);
 				stubSG.AcceptsFilter(stubSB_B).Returns(true);
 				stubSG.AcceptsFilter(stubSB_A).Returns(true);
-				stubSG.filter.Returns(new SGBowFilter());
-				stubSG.filter.Returns(new SGBowFilter());
+				stubSG.GetFilter().Returns(new SGBowFilter());
+				stubSG.GetFilter().Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.False);
 				}
@@ -60,8 +60,8 @@ namespace SlotSystemTests{
 				stubSB_B.GetItem().Returns(stubBowInst_B);
 				stubSG_A.AcceptsFilter(stubSB_B).Returns(false);
 				stubSG_B.AcceptsFilter(stubSB_A).Returns(false);
-				stubSG_A.filter.Returns(new SGBowFilter());
-				stubSG_B.filter.Returns(new SGBowFilter());
+				stubSG_A.GetFilter().Returns(new SGBowFilter());
+				stubSG_B.GetFilter().Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.False);
 				}
@@ -79,8 +79,8 @@ namespace SlotSystemTests{
 				stubSB_B.GetItem().Returns(stubParts_B);
 				stubSG_A.AcceptsFilter(stubSB_B).Returns(false);
 				stubSG_B.AcceptsFilter(stubSB_A).Returns(false);
-				stubSG_A.filter.Returns(new SGBowFilter());
-				stubSG_B.filter.Returns(new SGBowFilter());
+				stubSG_A.GetFilter().Returns(new SGBowFilter());
+				stubSG_B.GetFilter().Returns(new SGBowFilter());
 				
 				Assert.That(SlotSystemUtil.AreSwappable(stubSB_A, stubSB_B), Is.False);
 				}

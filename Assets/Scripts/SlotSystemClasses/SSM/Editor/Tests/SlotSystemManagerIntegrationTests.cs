@@ -93,19 +93,19 @@ namespace SlotSystemTests{
 				
 				ssm.SetTACacheRecursively();
 
-				Assert.That(sgpA.taCache, Is.SameAs(stubTAC));
-					Assert.That(bowSBP.taCache, Is.SameAs(stubTAC));
-					Assert.That(wearSBP.taCache, Is.SameAs(stubTAC));
-					Assert.That(shieldSBP.taCache, Is.SameAs(stubTAC));
-					Assert.That(mWeaponSBP.taCache, Is.SameAs(stubTAC));
-				Assert.That(sgpB.taCache, Is.SameAs(stubTAC));
-				Assert.That(sgeBow.taCache, Is.SameAs(stubTAC));
-				Assert.That(sgeWear.taCache, Is.SameAs(stubTAC));
-				Assert.That(sgeCGears.taCache, Is.SameAs(stubTAC));
-				Assert.That(sggAA.taCache, Is.SameAs(stubTAC));
-				Assert.That(sggAB.taCache, Is.SameAs(stubTAC));
-				Assert.That(sggAAA.taCache, Is.SameAs(stubTAC));
-				Assert.That(sggAAB.taCache, Is.SameAs(stubTAC));
+				Assert.That(sgpA.GetTAC(), Is.SameAs(stubTAC));
+					Assert.That(bowSBP.GetTAC(), Is.SameAs(stubTAC));
+					Assert.That(wearSBP.GetTAC(), Is.SameAs(stubTAC));
+					Assert.That(shieldSBP.GetTAC(), Is.SameAs(stubTAC));
+					Assert.That(mWeaponSBP.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sgpB.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sgeBow.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sgeWear.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sgeCGears.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sggAA.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sggAB.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sggAAA.GetTAC(), Is.SameAs(stubTAC));
+				Assert.That(sggAAB.GetTAC(), Is.SameAs(stubTAC));
 			}
 		/* helper */
 	}

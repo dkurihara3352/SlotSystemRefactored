@@ -62,7 +62,7 @@ namespace SlotSystem{
 		public TAMProbingState(ITransactionManager tam, ITAMActStateHandler handler): base(tam, handler){
 		}
 		public override void EnterState(){
-			if(handler.wasWaitingForAction)
+			if(handler.WasWaitingForAction())
 				handler.SetAndRunActProcess(new TAMProbeProcess(tam, handler.probeCoroutine));
 			else
 				throw new System.InvalidOperationException("TAMProbingState: Entering from an invalid state");

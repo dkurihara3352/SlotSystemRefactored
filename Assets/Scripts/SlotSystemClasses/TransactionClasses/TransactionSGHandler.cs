@@ -9,66 +9,70 @@ namespace SlotSystem{
 			this.tamStateHandler = tamStateHandler;
 		}
 		public void AcceptSGTAComp(ISlotGroup sg){
-			if(sg2 != null && sg == sg2) m_sg2Done = true;
-			else if(sg1 != null && sg == sg1) m_sg1Done = true;
-			if(tamStateHandler.isTransacting){
+			ISlotGroup sg1 = GetSG1();
+			ISlotGroup sg2 = GetSG2();
+			if(sg2 != null && sg == sg2) _sg2Done = true;
+			else if(sg1 != null && sg == sg1) _sg1Done = true;
+			if(tamStateHandler.IsTransacting()){
 				tamStateHandler.transactionCoroutine();
 			}
 		}
-		public ISlotGroup sg1{
-			get{return m_sg1;}
+		public ISlotGroup GetSG1(){
+			return _sg1;
 		}
-			ISlotGroup m_sg1;
-		public void SetSG1(ISlotGroup to){
-			if(to == null || to != sg1){
-				if(sg1 != null){
-					ISSESelStateHandler sg1SelStateHandler = sg1.GetSelStateHandler();
+			ISlotGroup _sg1;
+		public void SetSG1(ISlotGroup newSG1){
+			ISlotGroup curSG1 = GetSG1();
+			if(newSG1 == null || newSG1 != curSG1){
+				if(curSG1 != null){
+					ISSESelStateHandler sg1SelStateHandler = curSG1.GetSelStateHandler();
 					sg1SelStateHandler.Activate();
 				}
-				this.m_sg1 = to;
-				if(sg1 != null)
-					m_sg1Done = false;
+				_sg1 = newSG1;
+				if(newSG1 != null)
+					_sg1Done = false;
 				else
-					m_sg1Done = true;
+					_sg1Done = true;
 			}
 		}
-		public bool sg1Done{
-			get{return m_sg1Done;}
+		public bool IsSG1Done(){
+			return _sg1Done;
 		}
-			bool m_sg1Done = true;
-		public ISlotGroup sg2{
-			get{return m_sg2;}
+			bool _sg1Done = true;
+		public ISlotGroup GetSG2(){
+			return _sg2;
 		}
-			ISlotGroup m_sg2;
-		public void SetSG2(ISlotGroup sg){
-			if(sg == null || sg != sg2){
-				if(sg2 != null){
-					ISSESelStateHandler sg2SelStateHandler = sg2.GetSelStateHandler();
+			ISlotGroup _sg2;
+		public void SetSG2(ISlotGroup newSG2){
+			ISlotGroup curSG2 = GetSG2();
+			if(newSG2 == null || newSG2 != curSG2){
+				if(curSG2 != null){
+					ISSESelStateHandler sg2SelStateHandler = curSG2.GetSelStateHandler();
 					sg2SelStateHandler.Activate();
 				}
-				this.m_sg2 = sg;
-				if(sg2 != null){
-					ISSESelStateHandler newSG2SelStateHandler = sg2.GetSelStateHandler();
+				_sg2 = newSG2;
+				if(newSG2 != null){
+					ISSESelStateHandler newSG2SelStateHandler = newSG2.GetSelStateHandler();
 					newSG2SelStateHandler.Select();
 				}
-				if(sg2 != null)
-					m_sg2Done = false;
+				if(newSG2 != null)
+					_sg2Done = false;
 				else
-					m_sg2Done = true;
+					_sg2Done = true;
 			}
 		}
-		public bool sg2Done{
-			get{return m_sg2Done;}
+		public bool IsSG2Done(){
+			return _sg2Done;
 		}
-			bool m_sg2Done = true;
+			bool _sg2Done = true;
 	}
 	public interface ITransactionSGHandler{
 		void AcceptSGTAComp(ISlotGroup sg);
-		ISlotGroup sg1{get;}
+		ISlotGroup GetSG1();
 		void SetSG1(ISlotGroup to);
-		bool sg1Done{get;}
-		ISlotGroup sg2{get;}
+		bool IsSG1Done();
+		ISlotGroup GetSG2();
 		void SetSG2(ISlotGroup sg);
-		bool sg2Done{get;}
+		bool IsSG2Done();
 	}
 }

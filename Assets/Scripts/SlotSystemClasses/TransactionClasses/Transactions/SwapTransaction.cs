@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class SwapTransaction: AbsSlotSystemTransaction, ISwapTransaction{
-		ISlottable m_pickedSB;
-		ISlotGroup m_origSG;
-		ISlottable m_selectedSB;
-		ISlotGroup m_selectedSG;
+		ISlottable _pickedSB;
+		ISlotGroup _origSG;
+		ISlottable _selectedSB;
+		ISlotGroup _selectedSG;
 		ITransactionIconHandler iconHandler;
 		ISlotsHolder sg1SlotsHolder;
 		ISlotsHolder sg2SlotsHolder;
@@ -16,11 +16,13 @@ namespace SlotSystem{
 		ISGTransactionHandler sg1TAHandler;
 		ISGTransactionHandler sg2TAHandler;
 		public SwapTransaction(ISlottable pickedSB, ISlottable selected, ITransactionManager tam): base(tam){
-			m_pickedSB = pickedSB;
-			m_selectedSB = selected;
-			m_origSG = m_pickedSB.GetSG();
-			m_selectedSG = m_selectedSB.GetSG();
-			iconHandler = tam.iconHandler;
+			_pickedSB = pickedSB;
+			_selectedSB = selected;
+			_origSG = _pickedSB.GetSG();
+			ISlotGroup sg1 = GetSG1();
+			_selectedSG = _selectedSB.GetSG();
+			ISlotGroup sg2 = GetSG2();
+			iconHandler = tam.GetIconHandler();
 			sg1SlotsHolder = sg1;
 			sg2SlotsHolder = sg2;
 			sg1ActStateHandler = sg1;
@@ -28,14 +30,23 @@ namespace SlotSystem{
 			sg1TAHandler = sg1;
 			sg2TAHandler = sg2;
 		}
-		public override ISlottable targetSB{get{return m_selectedSB;}}
-		public override ISlotGroup sg1{get{return m_origSG;}}
-		public override ISlotGroup sg2{get{return m_selectedSG;}}
+		public override ISlottable GetTargetSB(){
+			return _selectedSB;
+		}
+		public override ISlotGroup GetSG1(){
+			return _origSG;
+		}
+		public override ISlotGroup GetSG2(){
+			return _selectedSG;
+		}
 		public override void Indicate(){}
 		public override void Execute(){
+			ISlottable targetSB = GetTargetSB();
+			ISlotGroup sg1 = GetSG1();
+			ISlotGroup sg2 = GetSG2();
 			sg1ActStateHandler.Swap();
 			sg2ActStateHandler.Swap();
-			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
+			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(_pickedSB.GetItem()));
 			iconHandler.SetDIcon2(targetSB);
 			iconHandler.SetD2Destination(sg1, sg1SlotsHolder.GetNewSlot(targetSB.GetItem()));
 			sg1.OnActionExecute();

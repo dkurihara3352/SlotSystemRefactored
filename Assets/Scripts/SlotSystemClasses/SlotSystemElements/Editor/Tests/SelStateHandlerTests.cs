@@ -15,12 +15,12 @@ namespace SlotSystemTests{
 			public void SelStateFields_ByDefault_AreSetDefault(){
 				SSESelStateHandler handler = new SSESelStateHandler();
 
-				Assert.That(handler.isDeactivated, Is.False);
-				Assert.That(handler.isFocused, Is.False);
-				Assert.That(handler.isDefocused, Is.False);
-				Assert.That(handler.isSelected, Is.False);
-				Assert.That(handler.isSelStateNull, Is.True);
-				Assert.That(handler.wasSelStateNull, Is.True);
+				Assert.That(handler.IsDeactivated(), Is.False);
+				Assert.That(handler.IsFocused(), Is.False);
+				Assert.That(handler.IsDefocused(), Is.False);
+				Assert.That(handler.IsSelected(), Is.False);
+				Assert.That(handler.IsSelStateNull(), Is.True);
+				Assert.That(handler.WasSelStateNull(), Is.True);
 			}
 			[Test]
 			public void Activate_Always_SetsFocused(){
@@ -28,7 +28,7 @@ namespace SlotSystemTests{
 
 				handler.Activate();
 
-				Assert.That(handler.isFocused, Is.True);
+				Assert.That(handler.IsFocused(), Is.True);
 			}
 			[Test]
 			public void Deactivate_WhenCalled_SetsCurSelStateDeactivated(){
@@ -36,10 +36,10 @@ namespace SlotSystemTests{
 				
 				handler.Deactivate();
 
-				Assert.That(handler.isDeactivated, Is.True);
-				Assert.That(handler.isDefocused, Is.False);
-				Assert.That(handler.isFocused, Is.False);
-				Assert.That(handler.isSelected, Is.False);
+				Assert.That(handler.IsDeactivated(), Is.True);
+				Assert.That(handler.IsDefocused(), Is.False);
+				Assert.That(handler.IsFocused(), Is.False);
+				Assert.That(handler.IsSelected(), Is.False);
 			}
 			[Test]
 			public void Deactivate_WasSelStateNull_DoesNotSetSelProc(){
@@ -47,7 +47,7 @@ namespace SlotSystemTests{
 
 				handler.Deactivate();
 
-				Assert.That(handler.selProcess, Is.Null);
+				Assert.That(handler.GetSelProcess(), Is.Null);
 			}
 			[Test]
 			public void Deactivate_IsNotSelStateInit_SetsSelProcDeactivateProc(){
@@ -56,7 +56,7 @@ namespace SlotSystemTests{
 
 				handler.Deactivate();
 
-				Assert.That(handler.selProcess, Is.TypeOf(typeof(SSEDeactivateProcess)));
+				Assert.That(handler.GetSelProcess(), Is.TypeOf(typeof(SSEDeactivateProcess)));
 				}
 			[Test]
 			public void Deactivate_FromNullToDeaToDea_DoesNotSetSelProc(){
@@ -65,7 +65,7 @@ namespace SlotSystemTests{
 
 				handler.Deactivate();
 
-				Assert.That(handler.selProcess, Is.Null);
+				Assert.That(handler.GetSelProcess(), Is.Null);
 			}
 			[Test]
 			public void Focus_WhenCalled_SetsCurSelStateFocused(){
@@ -73,10 +73,10 @@ namespace SlotSystemTests{
 				
 				handler.Focus();
 
-				Assert.That(handler.isDeactivated, Is.False);
-				Assert.That(handler.isDefocused, Is.False);
-				Assert.That(handler.isFocused, Is.True);
-				Assert.That(handler.isSelected, Is.False);
+				Assert.That(handler.IsDeactivated(), Is.False);
+				Assert.That(handler.IsDefocused(), Is.False);
+				Assert.That(handler.IsFocused(), Is.True);
+				Assert.That(handler.IsSelected(), Is.False);
 			}
 
 			[Test]
@@ -85,7 +85,7 @@ namespace SlotSystemTests{
 
 				handler.Focus();
 
-				Assert.That(handler.selProcess, Is.Null);
+				Assert.That(handler.GetSelProcess(), Is.Null);
 				}
 			[Test]
 			public void Focus_IsSelStateInit_CallsInstantFocus(){
@@ -106,7 +106,7 @@ namespace SlotSystemTests{
 
 				handler.Focus();
 
-				Assert.That(handler.selProcess, Is.TypeOf(typeof(SSEFocusProcess)));
+				Assert.That(handler.GetSelProcess(), Is.TypeOf(typeof(SSEFocusProcess)));
 				}
 			[Test]
 			public void Defocus_WhenCalled_SetCurStateToDefocusd(){
@@ -114,10 +114,10 @@ namespace SlotSystemTests{
 				
 				handler.Defocus();
 
-				Assert.That(handler.isDeactivated, Is.False);
-				Assert.That(handler.isDefocused, Is.True);
-				Assert.That(handler.isFocused, Is.False);
-				Assert.That(handler.isSelected, Is.False);
+				Assert.That(handler.IsDeactivated(), Is.False);
+				Assert.That(handler.IsDefocused(), Is.True);
+				Assert.That(handler.IsFocused(), Is.False);
+				Assert.That(handler.IsSelected(), Is.False);
 				}
 			[Test]
 			public void Defocus_IsSelStateInit_DoesNotSetSelProc(){
@@ -125,7 +125,7 @@ namespace SlotSystemTests{
 
 				handler.Defocus();
 
-				Assert.That(handler.selProcess, Is.Null);
+				Assert.That(handler.GetSelProcess(), Is.Null);
 				}
 			[Test]
 			public void Defocus_IsSelStateInit_CallsInstantDefocus(){
@@ -146,7 +146,7 @@ namespace SlotSystemTests{
 
 				handler.Defocus();
 
-				Assert.That(handler.selProcess, Is.TypeOf(typeof(SSEDefocusProcess)));
+				Assert.That(handler.GetSelProcess(), Is.TypeOf(typeof(SSEDefocusProcess)));
 				}
 			[Test]
 			public void Select_WhenCalled_SetCurStateToSelected(){
@@ -154,10 +154,10 @@ namespace SlotSystemTests{
 				
 				handler.Select();
 
-				Assert.That(handler.isDeactivated, Is.False);
-				Assert.That(handler.isDefocused, Is.False);
-				Assert.That(handler.isFocused, Is.False);
-				Assert.That(handler.isSelected, Is.True);
+				Assert.That(handler.IsDeactivated(), Is.False);
+				Assert.That(handler.IsDefocused(), Is.False);
+				Assert.That(handler.IsFocused(), Is.False);
+				Assert.That(handler.IsSelected(), Is.True);
 				}
 			[Test]
 			public void Select_IsSelStateInit_DoesNotSetSelProc(){
@@ -165,7 +165,7 @@ namespace SlotSystemTests{
 
 				handler.Select();
 
-				Assert.That(handler.selProcess, Is.Null);
+				Assert.That(handler.GetSelProcess(), Is.Null);
 				}
 			[Test]
 			public void Select_IsSelStateInit_CallsInstantSelect(){
@@ -186,7 +186,7 @@ namespace SlotSystemTests{
 
 				handler.Select();
 
-				Assert.That(handler.selProcess, Is.TypeOf(typeof(SSESelectProcess)));
+				Assert.That(handler.GetSelProcess(), Is.TypeOf(typeof(SSESelectProcess)));
 				}
 			[TestCaseSource(typeof(SetAndRunSelProcess_ISSESelProcessOrNullCases))]
 			public void SetAndRunSelProcess_ISSESelProcessOrNull_CallsSelProcEngineSAR(ISSESelProcess process){

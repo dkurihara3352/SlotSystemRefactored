@@ -20,11 +20,11 @@ namespace SlotSystemTests{
 							ISlottable sbB = MakeSBWithActProc(false);
 							ISlottable sbC = MakeSBWithActProc(false);
 							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
-						sbHandler.slottables.Returns(sbs);
+						sbHandler.GetSBs().Returns(sbs);
 					sg.SetSBHandler(sbHandler);
 					ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
 							ISGActProcess mockActProc = MakeSubSGActProc();
-						actStateHandler.actProcess.Returns(mockActProc);
+						actStateHandler.GetActProcess().Returns(mockActProc);
 					sg.SetSGActStateHandler(actStateHandler);
 				sg.SetAndRunActProcess(mockActProc);
 
@@ -39,7 +39,7 @@ namespace SlotSystemTests{
 						ISlotSystemManager stubSSM = MakeSSMWithPBunContaining(sg);
 						sg.SetSSM(stubSSM);
 
-					bool actual = sg.isPool;
+					bool actual = sg.IsPool();
 
 					Assert.That(actual, Is.True);
 				}
@@ -49,7 +49,7 @@ namespace SlotSystemTests{
 						ISlotSystemManager stubSSM = MakeSSMWithEBunContaining(sg);
 						sg.SetSSM(stubSSM);
 
-					bool actual = sg.isSGE;
+					bool actual = sg.IsSGE();
 
 					Assert.That(actual, Is.True);
 				}
@@ -59,7 +59,7 @@ namespace SlotSystemTests{
 						ISlotSystemManager stubSSM = MakeSSMWithGBunContaining(sg);
 						sg.SetSSM(stubSSM);
 
-					bool actual = sg.isSGG;
+					bool actual = sg.IsSGG();
 
 					Assert.That(actual, Is.True);
 				}
@@ -214,7 +214,7 @@ namespace SlotSystemTests{
 
 					sg.Refresh();
 					
-					Assert.That(sg.isWaitingForAction, Is.True);
+					Assert.That(sg.IsWaitingForAction(), Is.True);
 				}
 				[Test]
 				public void Refresh_Always_SetsFields(){
@@ -228,8 +228,8 @@ namespace SlotSystemTests{
 
 					sg.Refresh();
 
-					Assert.That(sg.newSBs, Is.Empty);
-					Assert.That(sg.newSlots, Is.Empty);
+					Assert.That(sg.GetNewSBs(), Is.Empty);
+					Assert.That(sg.GetNewSlots(), Is.Empty);
 				}
 			/*	sse override	*/
 				[TestCaseSource(typeof(ContainsCases))]
@@ -370,8 +370,8 @@ namespace SlotSystemTests{
 					sg.InitializeStates();
 
 					sgSelStateHandler.Received().Deactivate();
-					Assert.That(sg.isWaitingForAction, Is.True);
-					Assert.That(sg.wasActStateNull, Is.True);
+					Assert.That(sg.IsWaitingForAction(), Is.True);
+					Assert.That(sg.WasActStateNull(), Is.True);
 				}
 				[TestCase(0)]
 				[TestCase(10)]
@@ -387,16 +387,16 @@ namespace SlotSystemTests{
 					
 					sg.InspectorSetUp(genInv, filter, sorter, initSlotsCount);
 
-					Assert.That(sg.inventory, Is.SameAs(genInv));
-					Assert.That(sg.filter, Is.SameAs(filter));
-					Assert.That(sorterHandler.sorter, Is.SameAs(sorter));
-					Assert.That(sg.initSlotsCount, Is.EqualTo(initSlotsCount));
-					Assert.That(sg.isExpandable, Is.EqualTo(initSlotsCount == 0));
+					Assert.That(sg.GetInventory(), Is.SameAs(genInv));
+					Assert.That(sg.GetFilter(), Is.SameAs(filter));
+					Assert.That(sorterHandler.GetSorter(), Is.SameAs(sorter));
+					Assert.That(sg.GetInitSlotsCount(), Is.EqualTo(initSlotsCount));
+					Assert.That(sg.IsExpandable(), Is.EqualTo(initSlotsCount == 0));
 				}
 				class SGSetUpFieldsData: IEquatable<SGSetUpFieldsData>{
 					public string name;
 					public SGFilter filter;
-					public Inventory inventory;
+					public IInventory inventory;
 					public ISGCommand OnACompComm;
 					public ISGCommand oAExecComm;
 					public bool isShrinkable;
@@ -404,7 +404,7 @@ namespace SlotSystemTests{
 					public bool isExpandable;
 					public SSEState sgSelState;
 					public SSEState sgActState;
-					public SGSetUpFieldsData(string name, SGFilter filter, Inventory inventory, ISGCommand OnACompComm, ISGCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
+					public SGSetUpFieldsData(string name, SGFilter filter, IInventory inventory, ISGCommand OnACompComm, ISGCommand oAExecComm, bool isShrinkable, int initSlotsCount, bool isExpandable, SSEState sgSelState, SSEState sgActState){
 						this.name = name;
 						this.filter = filter;
 						this.inventory = inventory;
@@ -445,8 +445,8 @@ namespace SlotSystemTests{
 					
 					sg.CreateNewSlots();
 
-					Assert.That(sg.newSlots.Count, Is.EqualTo(count));
-					foreach(var slot in sg.newSlots)
+					Assert.That(sg.GetNewSlots().Count, Is.EqualTo(count));
+					foreach(var slot in sg.GetNewSlots())
 						Assert.That(slot.sb, Is.Null);
 				}
 				[Test]
@@ -461,7 +461,7 @@ namespace SlotSystemTests{
 					
 					sg.RevertAndUpdateSBs();
 					
-					bool equality = sg.newSBs.MemberEquals(sbs);
+					bool equality = sg.GetNewSBs().MemberEquals(sbs);
 					Assert.That(equality, Is.True);
 				}
 				[TestCase(1)]
@@ -478,8 +478,8 @@ namespace SlotSystemTests{
 					
 					sg.RevertAndUpdateSBs();
 
-					Assert.That(sg.newSlots.Count, Is.EqualTo(count));
-					foreach(var slot in sg.newSlots)
+					Assert.That(sg.GetNewSlots().Count, Is.EqualTo(count));
+					foreach(var slot in sg.GetNewSlots())
 						Assert.That(slot.sb, Is.Null);
 				}
 				[Test]
@@ -513,7 +513,7 @@ namespace SlotSystemTests{
 						sb.Received().MoveWithin();
 				}
 				[TestCaseSource(typeof(InitSBs_SlotsNotEnoughCases))]
-				public void InitSBs_SlotsNotEnough_RemoveNonFittableItems(List<Slot> slots, List<InventoryItemInstance> items, List<InventoryItemInstance> expected){
+				public void InitSBs_SlotsNotEnough_RemoveNonFittableItems(List<Slot> slots, List<IInventoryItemInstance> items, List<IInventoryItemInstance> expected){
 					SlotGroup sg = MakeSG();
 						ISlotsHolder slotsHolder = new SlotsHolder(sg);
 							slotsHolder.SetSlots(slots);
@@ -529,21 +529,21 @@ namespace SlotSystemTests{
 					class InitSBs_SlotsNotEnoughCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							List<Slot> slots = CreateSlots(4);
-							List<InventoryItemInstance> items;
+							List<IInventoryItemInstance> items;
 								BowInstance bowA = MakeBowInstance(0);
 								BowInstance bowA_1 = MakeBowInstance(0);
 								BowInstance bowA_2 = MakeBowInstance(0);
 								WearInstance wear = MakeWearInstance(0);
 								ShieldInstance shield = MakeShieldInstance(0);
 								MeleeWeaponInstance mWeapon = MakeMWeaponInstance(0);
-								items = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowA_1, bowA_2, wear, shield, mWeapon});
-							List<InventoryItemInstance> expected = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowA_1, bowA_2, wear});
+								items = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bowA, bowA_1, bowA_2, wear, shield, mWeapon});
+							List<IInventoryItemInstance> expected = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bowA, bowA_1, bowA_2, wear});
 							yield return new object[]{slots, items, expected};
 
 						}
 					}
 				[TestCaseSource(typeof(InitSBs_AlwaysCases))]
-				public void InitSBs_Always_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<InventoryItemInstance> items){
+				public void InitSBs_Always_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<IInventoryItemInstance> items){
 					SlotGroup sg = MakeSG();
 						ISlotsHolder slotsHolder = new SlotsHolder(sg);
 							slotsHolder.SetSlots(slots);
@@ -559,7 +559,7 @@ namespace SlotSystemTests{
 						Assert.That(sb.GetSSM(), Is.SameAs(ssm));
 						Assert.That(sb.GetItem(), Is.SameAs(items[i]));
 						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
-						Assert.That(sbSelStateHandler.isDefocused, Is.True);
+						Assert.That(sbSelStateHandler.IsDefocused(), Is.True);
 						Assert.That(sb.IsEquipped(), Is.False);
 						Assert.That(sb.IsUnequipped(), Is.False);
 					}
@@ -568,19 +568,19 @@ namespace SlotSystemTests{
 						public IEnumerator GetEnumerator(){
 							ISlotSystemManager ssm = MakeSubSSM();
 							List<Slot> slots = CreateSlots(4);
-							List<InventoryItemInstance> items;
+							List<IInventoryItemInstance> items;
 								BowInstance bowA = MakeBowInstance(0);
 								BowInstance bowB = MakeBowInstance(1);
 								BowInstance bowC = MakeBowInstance(2);
 								BowInstance bowD = MakeBowInstance(3);
-								items = new List<InventoryItemInstance>(new InventoryItemInstance[]{bowA, bowB, bowC, bowD});
+								items = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bowA, bowB, bowC, bowD});
 							yield return new object[]{
 								ssm, slots, items
 							};
 						}
 					}
 			/*	helper */
-				static ISlottable MakeSubSBWithItemAndSG(InventoryItemInstance item, SlotGroup sg){
+				static ISlottable MakeSubSBWithItemAndSG(IInventoryItemInstance item, SlotGroup sg){
 					ISlottable sb = MakeSubSB();
 						sb.GetItem().Returns(item);
 						sb.GetSG().Returns(sg);
@@ -605,14 +605,14 @@ namespace SlotSystemTests{
 					ISlotSystemManager stubSSM = MakeSubSSM();
 						ISlotSystemBundle stubPBun = MakeSubBundle();
 							stubPBun.ContainsInHierarchy(sg).Returns(true);
-						stubSSM.poolBundle.Returns(stubPBun);
+						stubSSM.GetPoolBundle().Returns(stubPBun);
 					return stubSSM;
 				}
 				ISlotSystemManager MakeSSMWithEBunContaining(ISlotGroup sg){
 					ISlotSystemManager stubSSM = MakeSubSSM();
 						ISlotSystemBundle stubEBun = MakeSubBundle();
 							stubEBun.ContainsInHierarchy(sg).Returns(true);
-						stubSSM.equipBundle.Returns(stubEBun);
+						stubSSM.GetEquipBundle().Returns(stubEBun);
 					return stubSSM;
 				}
 				ISlotSystemManager MakeSSMWithGBunContaining(ISlotGroup sg){
@@ -621,7 +621,7 @@ namespace SlotSystemTests{
 							ISlotSystemBundle stubGBun = MakeSubBundle();
 								stubGBun.ContainsInHierarchy(sg).Returns(true);
 							gBuns = new ISlotSystemBundle[]{stubGBun};
-						stubSSM.otherBundles.Returns(gBuns);
+						stubSSM.GetOtherBundles().Returns(gBuns);
 					return stubSSM;
 				}
 		}

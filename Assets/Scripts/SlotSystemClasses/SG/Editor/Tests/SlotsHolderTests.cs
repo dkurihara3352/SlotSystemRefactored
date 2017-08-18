@@ -26,7 +26,7 @@ namespace SlotSystemTests{
 					slots = new List<Slot>(new Slot[]{slotA, slotB, slotC});
 					slotsHolder.SetSlots(slots);
 
-				bool actual = slotsHolder.hasEmptySlot;
+				bool actual = slotsHolder.HasEmptySlot();
 
 				Assert.That(actual, Is.True);
 			}
@@ -46,12 +46,12 @@ namespace SlotSystemTests{
 					slots = new List<Slot>(new Slot[]{slotA, slotB, slotC});
 					slotsHolder.SetSlots(slots);
 
-				bool actual = slotsHolder.hasEmptySlot;
+				bool actual = slotsHolder.HasEmptySlot();
 
 				Assert.That(actual, Is.False);
 			}
 			[TestCaseSource(typeof(GetNewSlotCases))]
-			public void GetNewSlot_itemFound_ReturnsNewSlot(List<ISlottable> sbs ,List<Slot> newSlots, InventoryItemInstance item, Slot expected){
+			public void GetNewSlot_itemFound_ReturnsNewSlot(List<ISlottable> sbs ,List<Slot> newSlots, IInventoryItemInstance item, Slot expected){
 				SlotsHolder slotsHolder;
 					ISlotGroup sg = MakeSubSG();
 					sg.GetEnumerator().Returns(SSEsFromISlottables(sbs).GetEnumerator());
@@ -190,18 +190,18 @@ namespace SlotSystemTests{
 				SlotsHolder slotsHolder = new SlotsHolder(MakeSubSG());
 					slotsHolder.SetInitSlotsCount(count);
 				
-				slotsHolder.InitSlots(new List<InventoryItemInstance>());
+				slotsHolder.InitSlots(new List<IInventoryItemInstance>());
 
-				Assert.That(slotsHolder.slots.Count, Is.EqualTo(count));
+				Assert.That(slotsHolder.GetSlots().Count, Is.EqualTo(count));
 			}
 			[Test]
 			public void InitSlots_InitSlotsCountZero_SetsSlotsByItemsCount([NUnit.Framework.Random(1, 100, 5)]int count){
 				SlotsHolder slotsHolder = new SlotsHolder(MakeSubSG());
 					slotsHolder.SetInitSlotsCount(0);
 				
-				slotsHolder.InitSlots(new List<InventoryItemInstance>(new InventoryItemInstance[count]));
+				slotsHolder.InitSlots(new List<IInventoryItemInstance>(new IInventoryItemInstance[count]));
 
-				Assert.That(slotsHolder.slots.Count, Is.EqualTo(count));
+				Assert.That(slotsHolder.GetSlots().Count, Is.EqualTo(count));
 			}
 			[Test]
 			public void PutSBsInSlots_NotEnoughSlots_ThrowsException([NUnit.Framework.Random(0, 100, 3)]int slotsCount){
@@ -222,8 +222,8 @@ namespace SlotSystemTests{
 
 				slotsHolder.PutSBsInSlots(sbs);
 
-				foreach(var slot in slotsHolder.slots)
-					Assert.That(slot.sb, Is.SameAs(sbs[slotsHolder.slots.IndexOf(slot)]));
+				foreach(var slot in slotsHolder.GetSlots())
+					Assert.That(slot.sb, Is.SameAs(sbs[slotsHolder.GetSlots().IndexOf(slot)]));
 			}
 			[Test]
 			public void hasEmptySlot_HasSlotWithoutSB_ReturnsTrue([NUnit.Framework.Random(1, 100, 3)]int slotCount){
@@ -233,7 +233,7 @@ namespace SlotSystemTests{
 					slots[indexAtEmpty].sb = null;
 					slotsHolder.SetSlots(slots);
 				
-				bool actual = slotsHolder.hasEmptySlot;
+				bool actual = slotsHolder.HasEmptySlot();
 
 				Assert.That(actual, Is.True);
 			}

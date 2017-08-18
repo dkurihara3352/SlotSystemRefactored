@@ -79,8 +79,8 @@ namespace SlotSystemTests{
 
 					sb.InitializeStates();
 
-					Assert.That(sbSelStateHandler.isDeactivated, Is.True);
-					Assert.That(sbSelStateHandler.wasSelStateNull, Is.True);
+					Assert.That(sbSelStateHandler.IsDeactivated(), Is.True);
+					Assert.That(sbSelStateHandler.WasSelStateNull(), Is.True);
 					Assert.That(sb.IsWaitingForAction(), Is.True);
 					Assert.That(sb.WasActStateNull(), Is.True);
 					Assert.That(sb.IsEqpStateNull(), Is.True);
@@ -123,20 +123,20 @@ namespace SlotSystemTests{
 
 					itemHandler.Received().SetPickedAmount(1);
 				}
-				Slottable MakeSBforIncrement(InventoryItemInstance item){
+				Slottable MakeSBforIncrement(IInventoryItemInstance item){
 					Slottable sb = MakeSB();
 						ISlotSystemManager ssm = MakeSubSSM();
 						ITransactionManager stubTAM = MakeSubTAM();
 							ITransactionIconHandler subIconHd = MakeSubIconHandler();
-							stubTAM.iconHandler.Returns(subIconHd);
-							ssm.tam.Returns(stubTAM);
+							stubTAM.GetIconHandler().Returns(subIconHd);
+							ssm.GetTAM().Returns(stubTAM);
 						ITransactionCache stubTAC = MakeSubTAC();
 						sb.SetSSM(ssm);
 						sb.SetTACache(stubTAC);
 						SBSelStateHandler selStateHandler = new SBSelStateHandler(sb);
 						sb.SetSelStateHandler(selStateHandler);
 						ITAMActStateHandler tamStateHandler = MakeSubTAMStateHandler();
-							stubTAM.actStateHandler.Returns(tamStateHandler);
+							stubTAM.GetActStateHandler().Returns(tamStateHandler);
 						sb.SetItem(item);
 					return sb;
 				}
@@ -161,7 +161,7 @@ namespace SlotSystemTests{
 				public void UpdateEquipState_ItemInstIsEquipped_SetsSBEquipped(){
 					Slottable testSB = MakeSBWithRealStateHandlers();
 					BowInstance stubBow = MakeBowInstance(0);
-						stubBow.isEquipped = true;
+						stubBow.SetIsEquipped(true);
 						testSB.itemHandler.GetItem().Returns(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
 					ISlotSystemManager stubSSM = MakeSubSSM();
@@ -176,7 +176,7 @@ namespace SlotSystemTests{
 				public void UpdateEquipState_ItemInstIsNotEquipped_SetsSBUnequipped(){
 					Slottable testSB = MakeSBWithRealStateHandlers();
 					BowInstance stubBow = MakeBowInstance(0);
-						stubBow.isEquipped = false;
+						stubBow.SetIsEquipped(false);
 						testSB.itemHandler.GetItem().Returns(stubBow);
 					ISlotGroup stubSG = MakeSubSG();
 					ISlotSystemManager stubSSM = MakeSubSSM();
@@ -213,7 +213,7 @@ namespace SlotSystemTests{
 					Assert.That(sb.GetNewSlotID(), Is.EqualTo(-2));
 					}
 				[TestCaseSource(typeof(ShareSGAndItemCases))]
-				public void ShareSGAndItem_VariousCombo_ReturnsAccordingly(ISlotGroup sg, ISlotGroup otherSG, InventoryItemInstance iInst, InventoryItemInstance otherIInst, bool expected){
+				public void ShareSGAndItem_VariousCombo_ReturnsAccordingly(ISlotGroup sg, ISlotGroup otherSG, IInventoryItemInstance iInst, IInventoryItemInstance otherIInst, bool expected){
 					Slottable sb = MakeSBWithRealStateHandlers();
 					Slottable otherSB = MakeSBWithRealStateHandlers();
 					ISlotSystemManager stubSSM = MakeSubSSM();
@@ -225,7 +225,7 @@ namespace SlotSystemTests{
 					otherSB.itemHandler.GetItem().Returns(otherIInst);
 
 					Assert.That(sb.ShareSGAndItem(otherSB), Is.EqualTo(expected));
-					}
+				}
 					class ShareSGAndItemCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
 							object[] sameSG_sameNonStackable_T;

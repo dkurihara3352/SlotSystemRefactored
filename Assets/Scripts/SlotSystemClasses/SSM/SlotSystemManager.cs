@@ -7,44 +7,38 @@ namespace SlotSystem{
 	public class SlotSystemManager : SlotSystemElement, ISlotSystemManager{
 		public override void InitializeStates(){
 			_selStateHandler.Deactivate();
-			tam.WaitForAction();
+			GetTAM().WaitForAction();
 		}
-		public IFocusedSGProvider focusedSGProvider{
-			get{
-				if(_focusedSGProvider != null)
-					return _focusedSGProvider;
-				else
-					throw new InvalidOperationException("focusedSGProvider not set");
-			}
+		public IFocusedSGProvider GetFocusedSGProvider(){
+			if(_focusedSGProvider != null)
+				return _focusedSGProvider;
+			else
+				throw new InvalidOperationException("focusedSGProvider not set");
 		}
-			IFocusedSGProvider _focusedSGProvider;
 		public void SetFocusedSGProvider(IFocusedSGProvider focusedSGProvider){
 			_focusedSGProvider = focusedSGProvider;
 		}
-		public IEquippedProvider equippedProvider{
-			get{
-				if(_equippedProvider != null)
-					return _equippedProvider;
-				else
-					throw new InvalidOperationException("equippedProvider not set");
-			}
+			IFocusedSGProvider _focusedSGProvider;
+		public IEquippedProvider GetEquippedProvider(){
+			if(_equippedProvider != null)
+				return _equippedProvider;
+			else
+				throw new InvalidOperationException("equippedProvider not set");
 		}
-			IEquippedProvider _equippedProvider;
 		public void SetEquippedProvider(IEquippedProvider equippedProvider){
 			_equippedProvider = equippedProvider;
 		}
-		public IAllElementsProvider allElementsProvider{
-			get{
-				if(_allElementsProvider != null)
-					return _allElementsProvider;
-				else
-					throw new InvalidOperationException("allElementsProvider not set");
-			}
+			IEquippedProvider _equippedProvider;
+		public IAllElementsProvider GetAllElementsProvider(){
+			if(_allElementsProvider != null)
+				return _allElementsProvider;
+			else
+				throw new InvalidOperationException("allElementsProvider not set");
 		}
-			IAllElementsProvider _allElementsProvider;
 		public void SetAllElementsProvider(IAllElementsProvider allElementsProvider){
 			_allElementsProvider = allElementsProvider;
 		}
+			IAllElementsProvider _allElementsProvider;
 		ISSMCommand UpdateEquipInvAndAllSBsEquipStateCommand{
 			get{
 				if(_updateEquipInvAndAllSBsEquipStateCommand == null)
@@ -60,49 +54,72 @@ namespace SlotSystem{
 			UpdateEquipInvAndAllSBsEquipStateCommand.Execute();
 		}
 		public void RemoveFromEquipInv(){
-			List<InventoryItemInstance> removed = new List<InventoryItemInstance>();
-			foreach(InventoryItemInstance itemInInv in focusedSGProvider.equipInv){
-				if(!equippedProvider.allEquippedItems.Contains(itemInInv))
-					removed.Add(itemInInv);
+			List<IInventoryItemInstance> removed = new List<IInventoryItemInstance>();
+			IEquipmentSetInventory equipInv = GetFocusedSGProvider().GetEquipInv();
+			foreach(IInventoryItemInstance item in equipInv.GetItems()){
+				if(!IsAllEquippedItemsContains(item))
+					removed.Add(item);
 			}
-			foreach(InventoryItemInstance item in removed){
-				focusedSGProvider.equipInv.Remove(item);
+			foreach(IInventoryItemInstance item in removed){
+				equipInv.Remove(item);
 			}
 		}
+			bool IsAllEquippedItemsContains(IInventoryItemInstance item){
+				return GetEquippedProvider().GetAllEquippedItems().Contains(item);
+			}
 		public void AddToEquipInv(){
-			List<InventoryItemInstance> added = new List<InventoryItemInstance>();
-			foreach(InventoryItemInstance itemInAct in equippedProvider.allEquippedItems){
-				if(!focusedSGProvider.equipInv.Contains(itemInAct))
+			List<IInventoryItemInstance> added = new List<IInventoryItemInstance>();
+			IEquipmentSetInventory equipInv = GetFocusedSGProvider().GetEquipInv();
+			foreach(IInventoryItemInstance itemInAct in GetEquippedProvider().GetAllEquippedItems()){
+				if(!equipInv.GetItems().Contains(itemInAct))
 					added.Add(itemInAct);
 			}
-			foreach(InventoryItemInstance item in added){
-				focusedSGProvider.equipInv.Add(item);
+			foreach(IInventoryItemInstance item in added){
+				equipInv.Add(item);
 			}
 		}
 		public void UpdateAllItemsEquipStatusInPoolInv(){
-			foreach(InventoryItemInstance itemInst in focusedSGProvider.poolInv){
-				if(itemInst is BowInstance)
-					itemInst.isEquipped = itemInst == equippedProvider.equippedBowInst;
-				else if (itemInst is WearInstance)
-					itemInst.isEquipped = itemInst == equippedProvider.equippedWearInst;
-				else if(itemInst is CarriedGearInstance)
-					itemInst.isEquipped = equippedProvider.equippedCarriedGears != null && equippedProvider.equippedCarriedGears.Contains((CarriedGearInstance)itemInst);
-				else if(itemInst is PartsInstance)
-					itemInst.isEquipped = equippedProvider.equippedParts != null && equippedProvider.equippedParts.Contains((PartsInstance)itemInst);
+			IPoolInventory poolInv = GetFocusedSGProvider().GetPoolInv();
+			IEquippedProvider equiProv = GetEquippedProvider();
+			BowInstance equippedBow = equiProv.GetEquippedBowInst();
+			WearInstance equippedWear = equiProv.GetEquippedWearInst();
+			List<CarriedGearInstance> equippedCGears = equiProv.GetEquippedCarriedGears();
+			List<PartsInstance> equippedParts = equiProv.GetEquippedParts();
+
+			foreach(IInventoryItemInstance itemInst in poolInv.GetItems()){
+				if(itemInst is BowInstance){
+					bool itemIsEquippedBow = ((BowInstance)itemInst).Equals(equippedBow);
+					itemInst.SetIsEquipped(itemIsEquippedBow);
+				}
+				else if (itemInst is WearInstance){
+					bool itemIsEquippedWear = ((WearInstance)itemInst).Equals(equippedWear);
+					itemInst.SetIsEquipped(itemIsEquippedWear);
+				}
+				else if(itemInst is CarriedGearInstance){
+					bool itemIsEquippedCGears = equippedCGears != null &&
+						equippedCGears.Contains((CarriedGearInstance)itemInst);
+					itemInst.SetIsEquipped(itemIsEquippedCGears);
+				}
+				else if(itemInst is PartsInstance){
+					bool itemIsEquippedCGears = equippedParts != null &&
+						equippedParts.Contains((PartsInstance)itemInst);
+					itemInst.SetIsEquipped(itemIsEquippedCGears);
+				}
 			}
 		}
 		public void UpdateAllSBsEquipState(){
-			foreach(ISlottable sb in allElementsProvider.allSBs){
+			foreach(ISlottable sb in GetAllElementsProvider().GetAllSBs()){
 				sb.UpdateEquipState();
 			}
 		}
-		public void MarkEquippedInPool(InventoryItemInstance item, bool equipped){
-			foreach(InventoryItemInstance itemInInv in focusedSGProvider.poolInv){
+		public void MarkEquippedInPool(IInventoryItemInstance item, bool equipped){
+			IPoolInventory poolInv = GetFocusedSGProvider().GetPoolInv();
+			foreach(IInventoryItemInstance itemInInv in poolInv.GetItems()){
 				if(itemInInv == item)
-					itemInInv.isEquipped = equipped;
+					itemInInv.SetIsEquipped(equipped);
 			}
 		}
-		public void SetEquippedOnAllSBs(InventoryItemInstance item, bool equipped){
+		public void SetEquippedOnAllSBs(IInventoryItemInstance item, bool equipped){
 			if(equipped)
 				PerformInHierarchy(Equip, item);
 			else
@@ -110,7 +127,7 @@ namespace SlotSystem{
 		}
 			public void Equip(ISlotSystemElement ele, object obj){
 				if(ele is ISlottable){
-					InventoryItemInstance item = (InventoryItemInstance)obj;
+					IInventoryItemInstance item = (IInventoryItemInstance)obj;
 					ISlottable sb = (ISlottable)ele;
 					ISlotGroup sg = sb.GetSG();
 					if(sb.GetItem() == item){
@@ -126,7 +143,7 @@ namespace SlotSystem{
 			}
 			public void Unequip(ISlotSystemElement ele, object obj){
 				if(ele is ISlottable){
-					InventoryItemInstance item = (InventoryItemInstance)obj;
+					IInventoryItemInstance item = (IInventoryItemInstance)obj;
 					ISlottable sb = (ISlottable)ele;
 					ISlotGroup sg = sb.GetSG();
 					if(sb.GetItem() == item){
@@ -151,74 +168,69 @@ namespace SlotSystem{
 			public override void SetSelStateHandler(ISSESelStateHandler handler){
 				_selStateHandler = handler;
 			}
-			public ISlotSystemBundle poolBundle{
-				get{return m_poolBundle;}
+			public ISlotSystemBundle GetPoolBundle(){
+				return _poolBundle;
 			}
-				ISlotSystemBundle m_poolBundle;
-			public ISlotSystemBundle equipBundle{
-				get{return m_equipBundle;}
+				ISlotSystemBundle _poolBundle;
+			public ISlotSystemBundle GetEquipBundle(){
+				return _equipBundle;
 			}
-				ISlotSystemBundle m_equipBundle;
+				ISlotSystemBundle _equipBundle;
 			public List<IEquipmentSet> equipmentSets{
 				get{
 					List<IEquipmentSet> result = new List<IEquipmentSet>();
-					foreach(ISlotSystemElement ele in equipBundle){
+					foreach(ISlotSystemElement ele in GetEquipBundle()){
 						result.Add((IEquipmentSet)ele);
 					}
 					return result;
 				}
 			}
-			public IEnumerable<ISlotSystemBundle> otherBundles{
-				get{
-					if(m_otherBundles == null)
-						m_otherBundles = new ISlotSystemBundle[]{};
-					return m_otherBundles;}
+			public IEnumerable<ISlotSystemBundle> GetOtherBundles(){
+				if(_otherBundles == null)
+					_otherBundles = new ISlotSystemBundle[]{};
+				return _otherBundles;
 			}
-				IEnumerable<ISlotSystemBundle> m_otherBundles;
+				IEnumerable<ISlotSystemBundle> _otherBundles;
 			protected override IEnumerable<ISlotSystemElement> elements{
 				get{
-					yield return poolBundle;
-					yield return equipBundle;
-					foreach(var ele in otherBundles)
+					yield return GetPoolBundle();
+					yield return GetEquipBundle();
+					foreach(var ele in GetOtherBundles())
 						yield return ele;
 				}
 			}
 			public override void SetElements(IEnumerable<ISlotSystemElement> elements){
 				throw new InvalidOperationException("not valid for this object. Use InspectorSetUp instead.");
 			}
-			public ITransactionManager tam{
-				get{
-					if(_tam != null)
-						return _tam;
-					else
-						throw new InvalidOperationException("tam no set");
-				}
+			public ITransactionManager GetTAM(){
+				if(_tam != null)
+					return _tam;
+				else
+					throw new InvalidOperationException("tam no set");
 			}
 				ITransactionManager _tam;
 			public void SetTAM(ITransactionManager tam){
 				_tam = tam;
 			}
-			public ITransactionCache taCache{
-				get{
-					if(_taCache != null)
-						return _taCache;
-					else
-						throw new InvalidOperationException("tac not set");
-				}
+			public ITransactionCache GetTAC(){
+				if(_taCache != null)
+					return _taCache;
+				else
+					throw new InvalidOperationException("tac not set");
 			}
 				ITransactionCache _taCache;
 			public void SetTACache(ITransactionCache taCache){
 				_taCache = taCache;
 			}
 			public void InspectorSetUp(ISlotSystemBundle pBun, ISlotSystemBundle eBun, IEnumerable<ISlotSystemBundle> gBuns, ITransactionManager tam){
-				m_poolBundle = pBun;
-				m_equipBundle = eBun;
-				m_otherBundles = gBuns;
-				_tam = tam;
+				_poolBundle = pBun;
+				_equipBundle = eBun;
+				_otherBundles = gBuns;
+				SetTAM(tam);
 			}
 			bool isElementsSetUp{
 				get{
-					return poolBundle != null && equipBundle != null;
+					return GetPoolBundle() != null && GetEquipBundle() != null;
 				}
 			}
 			public override void SetHierarchy(){
@@ -229,14 +241,14 @@ namespace SlotSystem{
 							ISlotSystemBundle bun = transform.GetChild(i).GetComponent<ISlotSystemBundle>();
 							if(bun != null){
 								if(bun[0] is IEquipmentSet){
-									m_equipBundle = bun;
-									equipBundle.SetParent(this);
+									_equipBundle = bun;
+									GetEquipBundle().SetParent(this);
 								}
 								else if(bun[0] is ISlotGroup){
 									ISlotGroup sg = (ISlotGroup)bun[0];
-									if(sg.inventory is PoolInventory){
-										m_poolBundle = bun;
-										poolBundle.SetParent(this);
+									if(sg.GetInventory() is PoolInventory){
+										_poolBundle = bun;
+										GetPoolBundle().SetParent(this);
 									}
 									else
 										genericBundles.Add(bun);
@@ -246,19 +258,19 @@ namespace SlotSystem{
 							}else
 								throw new InvalidOperationException("some child does not have ISlotSystemBundle component");
 						}
-						m_otherBundles = genericBundles;
-						foreach(var bun in otherBundles)
+						_otherBundles = genericBundles;
+						foreach(var bun in GetOtherBundles())
 							bun.SetParent(this);
-						if(poolBundle == null)
+						if(GetPoolBundle() == null)
 							throw new InvalidOperationException("poolBundle is not set");
-						if(equipBundle == null)
+						if(GetEquipBundle() == null)
 							throw new InvalidOperationException("equipBundle is not set");
 					}else
 						throw new InvalidOperationException("there has to be at least two transform children");
 				}
 			}
 			public void Initialize(){
-				_taCache = new TransactionCache(tam, focusedSGProvider);
+				_taCache = new TransactionCache(GetTAM(), GetFocusedSGProvider());
 				SetSSMRecursively();
 				SetTACacheRecursively();
 				InitializeStatesRecursively();
@@ -274,7 +286,7 @@ namespace SlotSystem{
 			}
 				void SetTACacheInHi(ISlotSystemElement ele){
 					if(ele is IHoverable)
-						((IHoverable)ele).SetTACache(taCache);
+						((IHoverable)ele).SetTACache(GetTAC());
 				}
 
 			public void InitializeStatesRecursively(){
@@ -326,17 +338,17 @@ namespace SlotSystem{
 	public interface ISlotSystemManager: ISlotSystemElement{
 		void Initialize();
 		void UpdateEquipInvAndAllSBsEquipState();
-		void MarkEquippedInPool(InventoryItemInstance item, bool equipped);
-		void SetEquippedOnAllSBs(InventoryItemInstance item, bool equipped);
-		ISlotSystemBundle poolBundle{get;}
-		ISlotSystemBundle equipBundle{get;}
-		IEnumerable<ISlotSystemBundle> otherBundles{get;}
+		void MarkEquippedInPool(IInventoryItemInstance item, bool equipped);
+		void SetEquippedOnAllSBs(IInventoryItemInstance item, bool equipped);
+		ISlotSystemBundle GetPoolBundle();
+		ISlotSystemBundle GetEquipBundle();
+		IEnumerable<ISlotSystemBundle> GetOtherBundles();
 		ISlotSystemElement FindParent(ISlotSystemElement ele);
 		void FindAndFocusInBundle(ISlotSystemElement ele);
-		IEquippedProvider equippedProvider{get;}
-		IFocusedSGProvider focusedSGProvider{get;}
-		IAllElementsProvider allElementsProvider{get;}
-		ITransactionManager tam{get;}
-		ITransactionCache taCache{get;}
+		IEquippedProvider GetEquippedProvider();
+		IFocusedSGProvider GetFocusedSGProvider();
+		IAllElementsProvider GetAllElementsProvider();
+		ITransactionManager GetTAM();
+		ITransactionCache GetTAC();
 	}
 }

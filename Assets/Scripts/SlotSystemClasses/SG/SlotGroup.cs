@@ -10,7 +10,7 @@ namespace SlotSystem{
 			WaitForAction();
 		}
 		public void InitializeStateHandlers(){
-			SetSelStateHandler(new SGSelStateHandler(taCache, hoverable));
+			SetSelStateHandler(new SGSelStateHandler(GetTAC(), hoverable));
 			SetSGActStateHandler(new SGActStateHandler(this));
 		}
 		public void InitializeSG(){
@@ -19,8 +19,8 @@ namespace SlotSystem{
 			SetSlotsHolder(new SlotsHolder(this));
 			SetSBHandler(new SBHandler());
 			SetNewSBs(new List<ISlottable>());
-			SetHoverable(new Hoverable(ssm.taCache));
-			SetSGTAHandler(new SGTransactionHandler(this, ssm.tam));
+			SetHoverable(new Hoverable(ssm.GetTAC()));
+			SetSGTAHandler(new SGTransactionHandler(this, ssm.GetTAM()));
 			SetSorterHandler(new SorterHandler());
 			SetFilterHandler(new FilterHandler());
 			SetSBFactory(new SBFactory(ssm));
@@ -53,107 +53,83 @@ namespace SlotSystem{
 			public void ClearCurActState(){
 				actStateHandler.ClearCurActState();
 			}
-				public bool wasActStateNull{
-					get{return actStateHandler.wasActStateNull;}
+				public bool WasActStateNull(){
+					return actStateHandler.WasActStateNull();
 				}
-				public bool isActStateNull{
-					get{return actStateHandler.isActStateNull;}
+				public bool IsActStateNull(){
+					return actStateHandler.IsActStateNull();
 				}
-			public ISGActState waitForActionState{
-				get{return actStateHandler.waitForActionState;}
+			public void WaitForAction(){
+				actStateHandler.WaitForAction();
 			}
-				public void WaitForAction(){
-					actStateHandler.WaitForAction();
+				public bool IsWaitingForAction(){
+					return actStateHandler.IsWaitingForAction();
 				}
-				public bool isWaitingForAction{
-					get{return actStateHandler.isWaitingForAction;}
+				public bool WasWaitingForAction(){
+					return actStateHandler.WasWaitingForAction();
 				}
-				public bool wasWaitingForAction{
-					get{return actStateHandler.wasWaitingForAction;}
-				}
-			public ISGActState revertState{
-				get{return actStateHandler.revertState;}
+			public void Revert(){
+				actStateHandler.Revert();
 			}
-				public void Revert(){
-					actStateHandler.Revert();
+				public bool IsReverting(){
+					return actStateHandler.IsReverting();
 				}
-				public bool isReverting{
-					get{return actStateHandler.isReverting;}
+				public bool WasReverting(){
+					return actStateHandler.WasReverting();
 				}
-				public bool wasReverting{
-					get{return actStateHandler.wasReverting;}
-				}
-			public ISGActState reorderState{
-				get{return actStateHandler.reorderState;}
+			public void Reorder(){
+				actStateHandler.Reorder();
 			}
-				public void Reorder(){
-					actStateHandler.Reorder();
+				public bool IsReordering(){
+					return actStateHandler.IsReordering();
 				}
-				public bool isReordering{
-					get{return actStateHandler.isReordering;}
+				public bool WasReordering(){
+					return actStateHandler.WasReordering();
 				}
-				public bool wasReordering{
-					get{return actStateHandler.wasReordering;}
-				}
-			public ISGActState addState{
-				get{return actStateHandler.addState;}
+			public void Add(){
+				actStateHandler.Add();
 			}
-				public void Add(){
-					actStateHandler.Add();
+				public bool IsAdding(){
+					return actStateHandler.IsAdding();
 				}
-				public bool isAdding{
-					get{return actStateHandler.isAdding;}
+				public bool WasAdding(){
+					return actStateHandler.WasAdding();
 				}
-				public bool wasAdding{
-					get{return actStateHandler.wasAdding;}
-				}
-			public ISGActState removeState{
-				get{return actStateHandler.removeState;}
+			public void Remove(){
+				actStateHandler.Remove();
 			}
-				public void Remove(){
-					actStateHandler.Remove();
+				public bool IsRemoving(){
+					return actStateHandler.IsRemoving();
 				}
-				public bool isRemoving{
-					get{return actStateHandler.isRemoving;}
+				public bool WasRemoving(){
+					return actStateHandler.WasRemoving();
 				}
-				public bool wasRemoving{
-					get{return actStateHandler.wasRemoving;}
-				}
-			public ISGActState swapState{
-				get{return actStateHandler.swapState;}
+			public void Swap(){
+				actStateHandler.Swap();
 			}
-				public void Swap(){
-					actStateHandler.Swap();
+				public bool IsSwapping(){
+					return actStateHandler.IsSwapping();
 				}
-				public bool isSwapping{
-					get{return actStateHandler.isSwapping;}
+				public bool WasSwapping(){
+					return actStateHandler.WasSwapping();
 				}
-				public bool wasSwapping{
-					get{return actStateHandler.wasSwapping;}
-				}
-			public ISGActState fillState{
-				get{return actStateHandler.fillState;}
+			public void Fill(){
+				actStateHandler.Fill();
 			}
-				public void Fill(){
-					actStateHandler.Fill();
+				public bool IsFilling(){
+					return actStateHandler.IsFilling();
 				}
-				public bool isFilling{
-					get{return actStateHandler.isFilling;}
+				public bool WasFilling(){
+					return actStateHandler.WasFilling();
 				}
-				public bool wasFilling{
-					get{return actStateHandler.wasFilling;}
-				}
-			public ISGActState sortState{
-				get{return actStateHandler.sortState;}
+			public void Sort(){
+				actStateHandler.Sort();
 			}
-				public void Sort(){
-					actStateHandler.Sort();
+				public bool IsSorting(){
+					return actStateHandler.IsSorting();
 				}
-				public bool isSorting{
-					get{return actStateHandler.isSorting;}
-				}
-				public bool wasSorting{
-					get{return actStateHandler.wasSorting;}
+				public bool WasSorting(){
+					return actStateHandler.WasSorting();
 				}
 			public void SetAndRunActProcess(ISGActProcess process){
 				actStateHandler.SetAndRunActProcess(process);
@@ -161,8 +137,8 @@ namespace SlotSystem{
 			public void ExpireActProcess(){
 				actStateHandler.ExpireActProcess();
 			}
-			public ISGActProcess actProcess{
-				get{return actStateHandler.actProcess;}
+			public ISGActProcess GetActProcess(){
+				return actStateHandler.GetActProcess();
 			}
 			public IEnumeratorFake TransactionCoroutine(){
 				bool flag = true;
@@ -171,7 +147,7 @@ namespace SlotSystem{
 					flag &= !sb.GetActProcess().IsRunning();
 				}
 				if(flag){
-					actProcess.Expire();
+					GetActProcess().Expire();
 				}
 				return null;
 			}
@@ -201,31 +177,31 @@ namespace SlotSystem{
 			public void SetSlotsHolder(ISlotsHolder slotsHolder){
 				_slotsHolder = slotsHolder;
 			}
-			public List<Slot> slots{
-				get{return slotsHolder.slots;}
+			public List<Slot> GetSlots(){
+				return slotsHolder.GetSlots();
 			}
 			public void SetSlots(List<Slot> slots){
 				slotsHolder.SetSlots(slots);
 			}
-			public bool hasEmptySlot{
-				get{return slotsHolder.hasEmptySlot;}
+			public bool HasEmptySlot(){
+				return slotsHolder.HasEmptySlot();
 			}
-			public List<Slot> newSlots{
-				get{return slotsHolder.newSlots;}
+			public List<Slot> GetNewSlots(){
+				return slotsHolder.GetNewSlots();
 			}
 			public void SetNewSlots(List<Slot> newSlots){
 				slotsHolder.SetNewSlots(newSlots);
 			}
-			public Slot GetNewSlot(InventoryItemInstance item){
+			public Slot GetNewSlot(IInventoryItemInstance item){
 				return slotsHolder.GetNewSlot(item);
 			}
 			public void SetInitSlotsCount(int count){
 				slotsHolder.SetInitSlotsCount(count);
 			}
-			public int initSlotsCount{
-				get{return slotsHolder.initSlotsCount;}
+			public int GetInitSlotsCount(){
+				return slotsHolder.GetInitSlotsCount();
 			}
-			public void InitSlots(List<InventoryItemInstance> items){
+			public void InitSlots(List<IInventoryItemInstance> items){
 				slotsHolder.InitSlots(items);
 			}
 			public void PutSBsInSlots(List<ISlottable> sbs){
@@ -244,14 +220,14 @@ namespace SlotSystem{
 			public void SetSBHandler(ISBHandler sbHandler){
 				_sbHandler = sbHandler;
 			}
-			public List<ISlottable> slottables{
-				get{return sbHandler.slottables;}
+			public List<ISlottable> GetSBs(){
+				return sbHandler.GetSBs();
 			}
 			public void SetSBs(List<ISlottable> sbs){
 				sbHandler.SetSBs(sbs);
 			}
-			public List<ISlottable> newSBs{
-				get{return sbHandler.newSBs;}
+			public List<ISlottable> GetNewSBs(){
+				return sbHandler.GetNewSBs();
 			}
 			public void SetNewSBs(List<ISlottable> newSBs){
 				sbHandler.SetNewSBs(newSBs);
@@ -259,17 +235,17 @@ namespace SlotSystem{
 			public void SetSBsActStates(){
 				sbHandler.SetSBsActStates();
 			}
-			public ISlottable GetSB(InventoryItemInstance item){
+			public ISlottable GetSB(IInventoryItemInstance item){
 				return sbHandler.GetSB(item);
 			}
-			public bool HasItem(InventoryItemInstance item){
+			public bool HasItem(IInventoryItemInstance item){
 				return sbHandler.HasItem(item);
 			}
-			public List<ISlottable> equippedSBs{
-				get{return sbHandler.equippedSBs;}
+			public List<ISlottable> GetEquippedSBs(){
+				return sbHandler.GetEquippedSBs();
 			}
-			public bool isAllSBActProcDone{
-				get{return sbHandler.isAllSBActProcDone;}
+			public bool IsAllSBActProcDone(){
+				return sbHandler.IsAllSBActProcDone();
 			}
 		/*	sorter	*/
 			public ISorterHandler sorterHandler{
@@ -285,7 +261,7 @@ namespace SlotSystem{
 				_sorterHandler = sorterHandler;
 			}
 			public void InstantSort(){
-				List<ISlottable> sortedSBs = GetSortedSBsWithoutResize(slottables);
+				List<ISlottable> sortedSBs = GetSortedSBsWithoutResize(GetSBs());
 				PutSBsInSlots(sortedSBs);
 			}
 			public void ToggleAutoSort(bool on){
@@ -298,8 +274,8 @@ namespace SlotSystem{
 			public List<ISlottable> GetSortedSBsWithResize(List<ISlottable> source){
 				return sorterHandler.GetSortedSBsWithResize(source);
 			}
-			public SGSorter sorter{
-				get{return sorterHandler.sorter;}
+			public SGSorter GetSorter(){
+				return sorterHandler.GetSorter();
 			}
 			public void SetSorter(SGSorter sorter){
 				sorterHandler.SetSorter(sorter);
@@ -307,8 +283,8 @@ namespace SlotSystem{
 			public void SetIsAutoSort(bool on){
 				sorterHandler.SetIsAutoSort(on);
 			}
-			public bool isAutoSort{
-				get{return sorterHandler.isAutoSort;}
+			public bool IsAutoSort(){
+				return sorterHandler.IsAutoSort();
 			}
 		/*	filter	*/
 			public IFilterHandler filterHandler{
@@ -323,11 +299,11 @@ namespace SlotSystem{
 			public void SetFilterHandler(IFilterHandler filterHandler){
 				_filterHandler = filterHandler;
 			}
-			public List<InventoryItemInstance> FilteredItems(List<InventoryItemInstance> items){
+			public List<IInventoryItemInstance> FilteredItems(List<IInventoryItemInstance> items){
 				return filterHandler.FilteredItems(items);
 			}
-			public SGFilter filter{
-				get{return filterHandler.filter;}
+			public SGFilter GetFilter(){
+				return filterHandler.GetFilter();
 			}
 			public bool AcceptsFilter(ISlottable pickedSB){
 				return filterHandler.AcceptsFilter(pickedSB);
@@ -338,7 +314,7 @@ namespace SlotSystem{
 		/*	SlotSystemElement implementation	*/
 			protected override IEnumerable<ISlotSystemElement> elements{
 				get{
-					foreach(ISlottable sb in slottables)
+					foreach(ISlottable sb in GetSBs())
 						yield return (ISlotSystemElement)sb;
 				}
 			}
@@ -353,11 +329,11 @@ namespace SlotSystem{
 				SetSBs(sbs);
 			}
 			public List<ISlottable> toList{
-				get{return slottables;}
+				get{return GetSBs();}
 			}
 			public override bool Contains(ISlotSystemElement element){
 				if(element is ISlottable)
-					return slottables.Contains((ISlottable)element);
+					return GetSBs().Contains((ISlottable)element);
 				return false;
 			}
 			public void FocusSBs(){
@@ -397,8 +373,8 @@ namespace SlotSystem{
 			public void SetHoverable(IHoverable hoverable){
 				_hoverable = hoverable;
 			}
-			public ITransactionCache taCache{
-				get{return hoverable.taCache;}
+			public ITransactionCache GetTAC(){
+				return hoverable.GetTAC();
 			}
 			public void SetTACache(ITransactionCache taCache){
 				hoverable.SetTACache(taCache);
@@ -409,55 +385,47 @@ namespace SlotSystem{
 			public void OnHoverExit(){
 				hoverable.OnHoverExit();
 			}
-			public bool isHovered{
-				get{return hoverable.isHovered;}
+			public bool IsHovered(){
+				return hoverable.IsHovered();
 			}
 			public void SetSSESelStateHandler(ISSESelStateHandler handler){
 				//removed
 			}
 		/*	intrinsic */
-			public Inventory inventory{
-				get{
-					if(_inventory != null)
-						return _inventory;
-					else
-						throw new InvalidOperationException("inventory not set");
-				}
+			public IInventory GetInventory(){
+				if(_inventory != null)
+					return _inventory;
+				else
+					throw new InvalidOperationException("inventory not set");
 			}
-				Inventory _inventory;
-				public void SetInventory(Inventory inv){
-					_inventory = inv;
-					inv.SetSG(this);
-				}
-			public bool isShrinkable{
-				get{return m_isShrinkable;}
+			public void SetInventory(IInventory inv){
+				_inventory = inv;
+				inv.SetSG(this);
 			}
-				bool m_isShrinkable;
-			public bool isExpandable{
-				get{return m_isExpandable;}
+				IInventory _inventory;
+			public bool IsShrinkable(){
+				return _isShrinkable;
 			}
-				bool m_isExpandable;
-			public bool isPool{
-				get{
-					ISlotSystemManager ssm = GetSSM();
-					return ssm.poolBundle.ContainsInHierarchy(this);
-				}
+				bool _isShrinkable;
+			public bool IsExpandable(){
+				return _isExpandable;
 			}
-			public bool isSGE{
-				get{
-					ISlotSystemManager ssm = GetSSM();
-					return ssm.equipBundle.ContainsInHierarchy(this);
-				}
+				bool _isExpandable;
+			public bool IsPool(){
+				ISlotSystemManager ssm = GetSSM();
+				return ssm.GetPoolBundle().ContainsInHierarchy(this);
 			}
-			public bool isSGG{
-				get{
-					ISlotSystemManager ssm = GetSSM();
-					foreach(ISlotSystemBundle gBundle in ssm.otherBundles){
-						if(gBundle.ContainsInHierarchy(this))
-							return true;
-					}
-					return false;
+			public bool IsSGE(){
+				ISlotSystemManager ssm = GetSSM();
+				return ssm.GetEquipBundle().ContainsInHierarchy(this);
+			}
+			public bool IsSGG(){
+				ISlotSystemManager ssm = GetSSM();
+				foreach(ISlotSystemBundle gBundle in ssm.GetOtherBundles()){
+					if(gBundle.ContainsInHierarchy(this))
+						return true;
 				}
+				return false;
 			}
 			public List<ISlottable> SwappableSBs(ISlottable pickedSB){
 				List<ISlottable> result = new List<ISlottable>();
@@ -474,24 +442,25 @@ namespace SlotSystem{
 				SetNewSBs(new List<ISlottable>());
 				SetNewSlots(new List<Slot>());
 			}
-			public void InspectorSetUp(Inventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
+			public void InspectorSetUp(IInventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
 				SetInventory(inv);
 				SetFilter(filter);
 				SetSorter(sorter);
 				SetInitSlotsCount(initSlotsCount);
-				m_isExpandable = initSlotsCount == 0;
+				_isExpandable = initSlotsCount == 0;
 			}
 			public void InitializeItems(){
 				initItemsCommand.Execute();
 			}
 				public ISGCommand initItemsCommand{
-					get{return commandsRepo.initializeItemsCommand;}
+					get{return commandsRepo.GetInitializeItemsCommand();}
 				}
-			public void InitSBs(List<InventoryItemInstance> items){
+			public void InitSBs(List<IInventoryItemInstance> items){
+				List<Slot> slots = GetSlots();
 				while(slots.Count < items.Count){
 					items.RemoveAt(slots.Count);
 				}
-				foreach(InventoryItemInstance item in items){
+				foreach(IInventoryItemInstance item in items){
 					ISlottable newSB = CreateSB(item);
 					slots[items.IndexOf(item)].sb = newSB;
 				}
@@ -509,7 +478,7 @@ namespace SlotSystem{
 				public void SetSBFactory(ISBFactory sbFactory){
 					_sbFactory = sbFactory;
 				}
-			public ISlottable CreateSB(InventoryItemInstance item){
+			public ISlottable CreateSB(IInventoryItemInstance item){
 				return sbFactory.CreateSB(item);
 			}
 		/* Transaction */
@@ -553,14 +522,14 @@ namespace SlotSystem{
 				sgTAHandler.ReportTAComp();
 			}
 			public void RevertAndUpdateSBs(){
-				SetNewSBs(slottables);
+				SetNewSBs(GetSBs());
 				SetSBsActStates();
 				CreateNewSlots();
 			}
 			public void ReadySBsForTransaction(List<ISlottable> newSBs){
 				SetNewSBs(newSBs);
 				SetSBsActStates();
-				List<ISlottable> allSBs = AllSBs(slottables, newSBs);
+				List<ISlottable> allSBs = AllSBs(GetSBs(), newSBs);
 				SetSBs(allSBs);
 				CreateNewSlots();
 			}
@@ -575,7 +544,7 @@ namespace SlotSystem{
 			}
 			public void CreateNewSlots(){
 				List<Slot> newSlots = new List<Slot>();
-				for(int i = 0; i < newSBs.Count; i++){
+				for(int i = 0; i < GetNewSBs().Count; i++){
 					Slot newSlot = new Slot();
 					newSlots.Add(newSlot);
 				}
@@ -585,7 +554,7 @@ namespace SlotSystem{
 				onActionCompleteCommand.Execute();
 			}
 				public ISGCommand onActionCompleteCommand{
-					get{return commandsRepo.onActionCompleteCommand;}
+					get{return commandsRepo.GetOnActionCompleteCommand();}
 				}
 			public void UpdateEquipStatesOnAll(){
 				ISlotSystemManager ssm = GetSSM();
@@ -595,10 +564,11 @@ namespace SlotSystem{
 				onActionExecuteCommand.Execute();
 			}
 				public ISGCommand onActionExecuteCommand{
-					get{return commandsRepo.onActionExecuteCommand;}
+					get{return commandsRepo.GetOnActionExecuteCommand();}
 				}
-			public void SyncEquipped(InventoryItemInstance item, bool equipped){
+			public void SyncEquipped(IInventoryItemInstance item, bool equipped){
 				ISlotSystemManager ssm = GetSSM();
+				IInventory inventory = GetInventory();
 				if(equipped)
 					inventory.Add(item);
 				else
@@ -609,13 +579,13 @@ namespace SlotSystem{
 	}
 	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler, IFilterHandler, ISBFactory, ISBHandler, ISGTransactionHandler{
 		/*	instrinsic	*/
-			Inventory inventory{get;}
-			bool isShrinkable{get;}
-			bool isExpandable{get;}
-			bool isPool{get;}
+			IInventory GetInventory();
+			bool IsShrinkable();
+			bool IsExpandable();
+			bool IsPool();
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();
-			void InitSBs(List<InventoryItemInstance> items);
+			void InitSBs(List<IInventoryItemInstance> items);
 		/*	integration	*/
 			void InstantSort();
 			void ToggleAutoSort(bool on);
@@ -625,6 +595,6 @@ namespace SlotSystem{
 			void OnActionComplete();
 			void UpdateEquipStatesOnAll();
 			void OnActionExecute();
-			void SyncEquipped(InventoryItemInstance item, bool equipped);
+			void SyncEquipped(IInventoryItemInstance item, bool equipped);
 	}
 }

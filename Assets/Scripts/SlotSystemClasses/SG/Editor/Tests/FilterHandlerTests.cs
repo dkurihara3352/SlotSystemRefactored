@@ -169,7 +169,7 @@ namespace SlotSystemTests{
 					}
 				}
 		/* helper */
-			static ISlottable MakeSubSBWithItem(InventoryItemInstance item){
+			static ISlottable MakeSubSBWithItem(IInventoryItemInstance item){
 				ISlottable stubSB = MakeSubSB();
 					stubSB.GetItem().Returns(item);
 				return stubSB;

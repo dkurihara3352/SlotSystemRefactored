@@ -4,25 +4,25 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class RevertTransaction: AbsSlotSystemTransaction, IRevertTransaction{
-		ISlottable m_pickedSB;
-		ISlotGroup m_origSG;
+		ISlottable _pickedSB;
+		ISlotGroup _origSG;
 		ISlotsHolder origSGSlotsHolder;
 		ITransactionIconHandler iconHandler;
 		ISGActStateHandler origSGActStateHandler;
 		ISGTransactionHandler origSGTAHandler;
 		public RevertTransaction(ISlottable pickedSB, ITransactionManager tam): base(tam){
-			m_pickedSB = pickedSB;
-			m_origSG = m_pickedSB.GetSG();
-			iconHandler = tam.iconHandler;
-			origSGSlotsHolder = m_origSG;
-			origSGActStateHandler = m_origSG;
-			origSGTAHandler = m_origSG;
+			_pickedSB = pickedSB;
+			_origSG = _pickedSB.GetSG();
+			iconHandler = tam.GetIconHandler();
+			origSGSlotsHolder = _origSG;
+			origSGActStateHandler = _origSG;
+			origSGTAHandler = _origSG;
 		}
 		public override void Indicate(){}
 		public override void Execute(){
 			origSGActStateHandler.Revert();
-			iconHandler.SetD1Destination(m_origSG, origSGSlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
-			m_origSG.OnActionExecute();
+			iconHandler.SetD1Destination(_origSG, origSGSlotsHolder.GetNewSlot(_pickedSB.GetItem()));
+			_origSG.OnActionExecute();
 			base.Execute();
 		}
 		public override void OnCompleteTransaction(){

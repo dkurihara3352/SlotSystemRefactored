@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace SlotSystem{
 	public class FillTransaction: AbsSlotSystemTransaction, IFillTransaction{
-		ISlottable m_pickedSB;
-		ISlotGroup m_selectedSG;
-		ISlotGroup m_origSG;
+		ISlottable _pickedSB;
+		ISlotGroup _selectedSG;
+		ISlotGroup _origSG;
 		ITransactionIconHandler iconHandler;
 		ISlotsHolder sg2SlotsHolder;
 		ISGActStateHandler sg1ActStateHandler;
@@ -14,27 +14,29 @@ namespace SlotSystem{
 		ISGTransactionHandler sg1TAHandler;
 		ISGTransactionHandler sg2TAHandler;
 		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam):base(tam){
-			m_pickedSB = pickedSB;
-			m_selectedSG = selected;
-			m_origSG = m_pickedSB.GetSG();
-			iconHandler = tam.iconHandler;
-			sg2SlotsHolder = sg2;
-			sg1ActStateHandler = sg1;
-			sg2ActStateHandler = sg2;
-			sg1TAHandler = sg1;
-			sg2TAHandler = sg2;
+			_pickedSB = pickedSB;
+			_selectedSG = selected;
+			_origSG = _pickedSB.GetSG();
+			iconHandler = tam.GetIconHandler();
+			sg2SlotsHolder = GetSG2();
+			sg1ActStateHandler = GetSG1();
+			sg2ActStateHandler = GetSG2();
+			sg1TAHandler = GetSG1();
+			sg2TAHandler = GetSG2();
 		}
-		public override ISlotGroup sg1{
-			get{return m_origSG;}
+		public override ISlotGroup GetSG1(){
+			return _origSG;
 		}
-		public override ISlotGroup sg2{
-			get{return m_selectedSG;}
+		public override ISlotGroup GetSG2(){
+			return _selectedSG;
 		}
 		public override void Indicate(){}
 		public override void Execute(){
+			ISlotGroup sg1 = GetSG1();
+			ISlotGroup sg2 = GetSG2();
 			sg1ActStateHandler.Fill();
 			sg2ActStateHandler.Fill();
-			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(m_pickedSB.GetItem()));
+			iconHandler.SetD1Destination(sg2, sg2SlotsHolder.GetNewSlot(_pickedSB.GetItem()));
 			sg1.OnActionExecute();
 			sg2.OnActionExecute();
 			base.Execute();

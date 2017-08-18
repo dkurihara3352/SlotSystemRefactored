@@ -18,19 +18,19 @@ namespace SlotSystem{
 			public void SetSSESelStateHandler(ISSESelStateHandler handler){
 				_sseSelStateHandler = handler;
 			}
-		public ITransactionCache taCache{
-			get{return _taCache;}
+		public ITransactionCache GetTAC(){
+			return _taCache;
 		}
-			ITransactionCache _taCache;
 		public void SetTACache(ITransactionCache taCache){
 			_taCache = taCache;
 		}
+			ITransactionCache _taCache;
 		public Hoverable(ITransactionCache taCache){
 			_taCache = taCache;
 		}
 		public virtual void OnHoverEnter(){
-			if(!sseSelStateHandler.isSelStateNull){
-				if(!sseSelStateHandler.isDeactivated && !sseSelStateHandler.isSelected)
+			if(!sseSelStateHandler.IsSelStateNull()){
+				if(!sseSelStateHandler.IsDeactivated() && !sseSelStateHandler.IsSelected())
 					SetHovered();
 				else
 					throw new InvalidOperationException("sse needs to be activated and deselected");
@@ -38,9 +38,9 @@ namespace SlotSystem{
 				throw new InvalidOperationException("sse sel state not set");
 		}
 		public virtual void OnHoverExit(){
-			if(!sseSelStateHandler.isSelStateNull){
-				if(!sseSelStateHandler.isDeactivated){
-					if(isHovered)
+			if(!sseSelStateHandler.IsSelStateNull()){
+				if(!sseSelStateHandler.IsDeactivated()){
+					if(IsHovered())
 						UnsetHovered();
 					else
 						throw new InvalidOperationException("hoverable is not set hovered");
@@ -49,21 +49,21 @@ namespace SlotSystem{
 			}else
 				throw new InvalidOperationException("sse' sel state not set");
 		}
-		public virtual bool isHovered{
-			get{return taCache.hovered == this;}
+		public virtual bool IsHovered(){
+			return GetTAC().GetHovered() == this;
 		}
 		void SetHovered(){
-			taCache.SetHovered(this);
+			GetTAC().SetHovered(this);
 		}
 		void UnsetHovered(){
-			taCache.SetHovered(null);
+			GetTAC().SetHovered(null);
 		}
 	}
 	public interface IHoverable{
-		ITransactionCache taCache{get;}
+		ITransactionCache GetTAC();
 		void SetTACache(ITransactionCache taCache);
 		void SetSSESelStateHandler(ISSESelStateHandler handler);
-		bool isHovered{get;}
+		bool IsHovered();
 		void OnHoverEnter();
 		void OnHoverExit();
 	}
