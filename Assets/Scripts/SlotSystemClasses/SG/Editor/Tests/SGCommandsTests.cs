@@ -14,10 +14,13 @@ namespace SlotSystemTests{
 
 			[Test]
 			public void SGInitItemsCommand_Execute_IsNotAutoSort_CallsSGVariousButInstantSort(){
+				SGInitItemsCommand comm;
 					ISlotGroup mockSG = MakeSubSG();
-				SGInitItemsCommand comm = new SGInitItemsCommand(mockSG);
+						ISlotsHolder slotsHolder = Substitute.For<ISlotsHolder>();
+						mockSG.GetSlotsHolder().Returns(slotsHolder);
+						ISorterHandler sorterHandler = Substitute.For<ISorterHandler>();
+							sorterHandler.IsAutoSort().Returns(false);
 						IInventory stubInv = Substitute.For<IInventory>();
-						mockSG.IsAutoSort().Returns(false);
 						mockSG.GetInventory().Returns(stubInv);
 						IEnumerable<IInventoryItemInstance> items;
 							BowInstance bow = MakeBowInstance(0);
@@ -25,15 +28,20 @@ namespace SlotSystemTests{
 							items = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bow, wear});
 							stubInv.GetItems().Returns(items);
 						List<IInventoryItemInstance> list = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{ bow, wear});
-						mockSG.FilteredItems(Arg.Is<List<IInventoryItemInstance>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
+						IFilterHandler filterHandler = Substitute.For<IFilterHandler>();
+							filterHandler.FilteredItems(Arg.Is<List<IInventoryItemInstance>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
+						mockSG.GetFilterHandler().Returns(filterHandler);
+						ISGTransactionHandler sgTAHandler = Substitute.For<ISGTransactionHandler>();
+						mockSG.GetSGTAHandler().Returns(sgTAHandler);
+					comm = new SGInitItemsCommand(mockSG);
 				
 				comm.Execute();
 
 				Received.InOrder(() => {
-					mockSG.FilteredItems(Arg.Is<List<IInventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
-					mockSG.InitSlots(Arg.Is<List<IInventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
+					filterHandler.FilteredItems(Arg.Is<List<IInventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
+					slotsHolder.InitSlots(Arg.Is<List<IInventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
 					mockSG.InitSBs(Arg.Is<List<IInventoryItemInstance>>(x => x.Contains(bow) && x.Contains(wear)));
-					mockSG.SetSBsFromSlotsAndUpdateSlotIDs();
+					sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
 				});
 				mockSG.DidNotReceive().InstantSort();
 				}
@@ -44,8 +52,10 @@ namespace SlotSystemTests{
 					IInventory stubInv = Substitute.For<IInventory>();
 						stubInv.GetItems().Returns(new List<IInventoryItemInstance>());
 					mockSG.GetInventory().Returns(stubInv);
+					ISorterHandler sorterHandler = Substitute.For<ISorterHandler>();
+						sorterHandler.IsAutoSort().Returns(true);
+					mockSG.GetSorterHandler().Returns(sorterHandler);
 				SGInitItemsCommand comm = new SGInitItemsCommand(mockSG);
-				mockSG.IsAutoSort().Returns(true);
 				comm.Execute();
 
 				mockSG.Received().InstantSort();

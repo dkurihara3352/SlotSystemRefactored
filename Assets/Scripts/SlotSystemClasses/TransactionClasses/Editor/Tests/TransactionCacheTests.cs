@@ -34,6 +34,8 @@ namespace SlotSystemTests{
 							ISlottable pickedSB_0 = MakeSubSB();
 							List<ISlotGroup> focusedSGs_0;
 								ISlotGroup sg0_0 = MakeSubSG();
+									IHoverable hoverable0_0 = Substitute.For<IHoverable>();
+									sg0_0.GetHoverable().Returns(hoverable0_0);
 									IEnumerable<ISlotSystemElement> sg0Eles_0;
 										ISlottable sb00_0 = MakeSubSB();
 										ISlottable sb01_0 = MakeSubSB();
@@ -41,6 +43,8 @@ namespace SlotSystemTests{
 										sg0Eles_0 = new ISlotSystemElement[]{sb00_0, sb01_0, sb02_0};
 									sg0_0.GetEnumerator().Returns(sg0Eles_0.GetEnumerator());
 								ISlotGroup sg1_0 = MakeSubSG();
+									IHoverable hoverable1_0 = Substitute.For<IHoverable>();
+									sg1_0.GetHoverable().Returns(hoverable1_0);
 									IEnumerable<ISlotSystemElement> sg1Eles_0;
 										ISlottable sb10_0 = MakeSubSB();
 										ISlottable sb11_0 = MakeSubSB();
@@ -49,11 +53,11 @@ namespace SlotSystemTests{
 									sg1_0.GetEnumerator().Returns(sg1Eles_0.GetEnumerator());
 								focusedSGs_0 = new List<ISlotGroup>(new ISlotGroup[]{sg0_0, sg1_0});
 							ITransactionFactory taFac_0 = Substitute.For<ITransactionFactory>();
-								taFac_0.MakeTransaction(pickedSB_0, sg0_0).Returns(Substitute.For<IRevertTransaction>());
+								taFac_0.MakeTransaction(pickedSB_0, hoverable0_0).Returns(Substitute.For<IRevertTransaction>());
 									taFac_0.MakeTransaction(pickedSB_0, sb00_0).Returns(Substitute.For<IRevertTransaction>());
 									taFac_0.MakeTransaction(pickedSB_0, sb01_0).Returns(Substitute.For<IRevertTransaction>());
 									taFac_0.MakeTransaction(pickedSB_0, sb02_0).Returns(Substitute.For<IRevertTransaction>());
-								taFac_0.MakeTransaction(pickedSB_0, sg1_0).Returns(Substitute.For<IRevertTransaction>());
+								taFac_0.MakeTransaction(pickedSB_0, hoverable1_0).Returns(Substitute.For<IRevertTransaction>());
 									taFac_0.MakeTransaction(pickedSB_0, sb10_0).Returns(Substitute.For<IRevertTransaction>());
 									taFac_0.MakeTransaction(pickedSB_0, sb11_0).Returns(Substitute.For<IRevertTransaction>());
 									taFac_0.MakeTransaction(pickedSB_0, sb12_0).Returns(Substitute.For<IRevertTransaction>());
@@ -64,6 +68,8 @@ namespace SlotSystemTests{
 							ISlottable pickedSB_1 = MakeSubSB();
 							List<ISlotGroup> focusedSGs_1;
 								ISlotGroup sg0_1 = MakeSubSG();
+									IHoverable hoverable0_1 = Substitute.For<IHoverable>();
+									sg0_1.GetHoverable().Returns(hoverable0_1);
 									IEnumerable<ISlotSystemElement> sg0Eles_1;
 										ISlottable sb00_1 = MakeSubSB();
 										ISlottable sb01_1 = MakeSubSB();
@@ -71,6 +77,8 @@ namespace SlotSystemTests{
 										sg0Eles_1 = new ISlotSystemElement[]{sb00_1, sb01_1, sb02_1};
 									sg0_1.GetEnumerator().Returns(sg0Eles_1.GetEnumerator());
 								ISlotGroup sg1_1 = MakeSubSG();
+									IHoverable hoverable1_1 = Substitute.For<IHoverable>();
+									sg1_1.GetHoverable().Returns(hoverable1_1);
 									IEnumerable<ISlotSystemElement> sg1Eles_1;
 										ISlottable sb10_1 = MakeSubSB();
 										ISlottable sb11_1 = MakeSubSB();
@@ -79,11 +87,11 @@ namespace SlotSystemTests{
 									sg1_1.GetEnumerator().Returns(sg1Eles_1.GetEnumerator());
 								focusedSGs_1 = new List<ISlotGroup>(new ISlotGroup[]{sg0_1, sg1_1});
 							ITransactionFactory taFac_1 = Substitute.For<ITransactionFactory>();
-								taFac_1.MakeTransaction(pickedSB_1, sg0_1).Returns(Substitute.For<IRevertTransaction>());
+								taFac_1.MakeTransaction(pickedSB_1, hoverable0_1).Returns(Substitute.For<IRevertTransaction>());
 									taFac_1.MakeTransaction(pickedSB_1, sb00_1).Returns(Substitute.For<IRevertTransaction>());
 									taFac_1.MakeTransaction(pickedSB_1, sb01_1).Returns(Substitute.For<IRevertTransaction>());
 									taFac_1.MakeTransaction(pickedSB_1, sb02_1).Returns(Substitute.For<IRevertTransaction>());
-								taFac_1.MakeTransaction(pickedSB_1, sg1_1).Returns(Substitute.For<IRevertTransaction>());
+								taFac_1.MakeTransaction(pickedSB_1, hoverable1_1).Returns(Substitute.For<IRevertTransaction>());
 									taFac_1.MakeTransaction(pickedSB_1, sb10_1).Returns(Substitute.For<IRevertTransaction>());
 									taFac_1.MakeTransaction(pickedSB_1, sb11_1).Returns(Substitute.For<IRevertTransaction>());
 									taFac_1.MakeTransaction(pickedSB_1, sb12_1).Returns(Substitute.For<IReorderTransaction>());
@@ -297,18 +305,24 @@ namespace SlotSystemTests{
 						ISlotGroup sgA = MakeSubSG();
 							IEnumerable<ISlotSystemElement> sgAEles = new ISlotSystemElement[]{};
 							sgA.GetEnumerator().Returns(sgAEles.GetEnumerator());
+							IHoverable hoverableA = Substitute.For<IHoverable>();
+							sgA.GetHoverable().Returns(hoverableA);
 						ISlotGroup sgB = MakeSubSG();
 							IEnumerable<ISlotSystemElement> sgBEles = new ISlotSystemElement[]{};
 							sgB.GetEnumerator().Returns(sgBEles.GetEnumerator());
+							IHoverable hoverableB = Substitute.For<IHoverable>();
+							sgB.GetHoverable().Returns(hoverableB);
 						ISlotGroup sgC = MakeSubSG();
 							IEnumerable<ISlotSystemElement> sgCEles = new ISlotSystemElement[]{};
 							sgC.GetEnumerator().Returns(sgCEles.GetEnumerator());
+							IHoverable hoverableC = Substitute.For<IHoverable>();
+							sgC.GetHoverable().Returns(hoverableC);
 						IRevertTransaction revTA = Substitute.For<IRevertTransaction>();
 						IFillTransaction fillTA = Substitute.For<IFillTransaction>();
 						IReorderTransaction reoTA = Substitute.For<IReorderTransaction>();
-						stubMakeTAFactory.MakeTransaction(pickedSB, sgA).Returns(revTA);
-						stubMakeTAFactory.MakeTransaction(pickedSB, sgB).Returns(fillTA);
-						stubMakeTAFactory.MakeTransaction(pickedSB, sgC).Returns(reoTA);
+						stubMakeTAFactory.MakeTransaction(pickedSB, hoverableA).Returns(revTA);
+						stubMakeTAFactory.MakeTransaction(pickedSB, hoverableB).Returns(fillTA);
+						stubMakeTAFactory.MakeTransaction(pickedSB, hoverableC).Returns(reoTA);
 						List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA, sgB, sgC});
 						focSGPrv.GetFocusedSGs().Returns(sgsList);
 				tam.GetTAFactory().Returns(stubMakeTAFactory);
@@ -316,9 +330,9 @@ namespace SlotSystemTests{
 				taCache.CreateTransactionResults();
 
 				Dictionary<IHoverable, ISlotSystemTransaction> expected = new Dictionary<IHoverable, ISlotSystemTransaction>();
-				expected.Add(sgA, revTA);
-				expected.Add(sgB, fillTA);
-				expected.Add(sgC, reoTA);
+				expected.Add(hoverableA, revTA);
+				expected.Add(hoverableB, fillTA);
+				expected.Add(hoverableC, reoTA);
 
 				Assert.That(taCache.GetTransactionResults().Count, Is.EqualTo(expected.Count));
 				IEnumerator actRator = taCache.GetTransactionResults().GetEnumerator();
@@ -338,6 +352,8 @@ namespace SlotSystemTests{
 					ISlottable pickedSB = MakeSubSB();
 					taCache.SetPickedSB(pickedSB);
 						ISlotGroup sg = MakeSubSG();
+							IHoverable hoverable = Substitute.For<IHoverable>();
+							sg.GetHoverable().Returns(hoverable);
 							IEnumerable<ISlotSystemElement> sgEles;
 								ISlottable sbA = MakeSubSB();
 								ISlottable sbB = MakeSubSB();
@@ -348,7 +364,7 @@ namespace SlotSystemTests{
 						IFillTransaction fillTA = Substitute.For<IFillTransaction>();
 						IStackTransaction stackTA = Substitute.For<IStackTransaction>();
 					ITransactionFactory stubMakeTAFactory = MakeSubTAFactory();
-						stubMakeTAFactory.MakeTransaction(pickedSB, sg).Returns(revTA);
+						stubMakeTAFactory.MakeTransaction(pickedSB, hoverable).Returns(revTA);
 							stubMakeTAFactory.MakeTransaction(pickedSB, sbA).Returns(revTA);
 							stubMakeTAFactory.MakeTransaction(pickedSB, sbB).Returns(fillTA);
 							stubMakeTAFactory.MakeTransaction(pickedSB, sbC).Returns(stackTA);
@@ -356,7 +372,7 @@ namespace SlotSystemTests{
 						focSGPrv.GetFocusedSGs().Returns(sgsList);
 				tam.GetTAFactory().Returns(stubMakeTAFactory);
 				Dictionary<IHoverable, ISlotSystemTransaction> expected = new Dictionary<IHoverable, ISlotSystemTransaction>();
-				expected.Add(sg, revTA);
+				expected.Add(hoverable, revTA);
 				expected.Add(sbA, revTA);
 				expected.Add(sbB, fillTA);
 				expected.Add(sbC, stackTA);
@@ -372,7 +388,7 @@ namespace SlotSystemTests{
 					Assert.That(actPair.Key, Is.SameAs(expPair.Key));
 					Assert.That(actPair.Value, Is.TypeOf(expPair.Value.GetType()));
 				}
-				}
+			}
 			[TestCaseSource(typeof(CreateTransactionResultsVariousTACases))]
 			public void CreateTransactionResults_VariousTA_CallsSGDefocusSelfOrFocusSelfAccordingly(ISlotSystemTransaction ta){
 				ITransactionManager tam = Substitute.For<ITransactionManager>();
@@ -382,11 +398,13 @@ namespace SlotSystemTests{
 					taCache.SetPickedSB(pickedSB);
 					ITransactionFactory stubFac = MakeSubTAFactory();
 						ISlotGroup sgA = MakeSubSG();
+							IHoverable hoverableA = Substitute.For<IHoverable>();
+							sgA.GetHoverable().Returns(hoverableA);
 							ISSESelStateHandler sgASelStateHandler = Substitute.For<ISSESelStateHandler>();
 							sgA.GetSelStateHandler().Returns(sgASelStateHandler);
 							IEnumerable<ISlotSystemElement> sgAEles = new ISlotSystemElement[]{};
 							sgA.GetEnumerator().Returns(sgAEles.GetEnumerator());
-						stubFac.MakeTransaction(pickedSB, sgA).Returns(ta);
+						stubFac.MakeTransaction(pickedSB, hoverableA).Returns(ta);
 						List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sgA});
 						focSGPrv.GetFocusedSGs().Returns(sgsList);
 				tam.GetTAFactory().Returns(stubFac);
@@ -397,7 +415,7 @@ namespace SlotSystemTests{
 					sgASelStateHandler.Received().Defocus();
 				else
 					sgASelStateHandler.Received().Focus();
-				}
+			}
 				class CreateTransactionResultsVariousTACases: IEnumerable{
 					public IEnumerator GetEnumerator(){
 						yield return Substitute.For<IRevertTransaction>();
@@ -417,6 +435,8 @@ namespace SlotSystemTests{
 					taCache.SetPickedSB(pickedSB);
 					ITransactionFactory stubFac = MakeSubTAFactory();
 						ISlotGroup sg = MakeSubSG();
+							IHoverable hoverable = Substitute.For<IHoverable>();
+							sg.GetHoverable().Returns(hoverable);
 							IEnumerable<ISlotSystemElement> sgEles;	
 								ISlottable sb = MakeSubSB();
 									ISSESelStateHandler sbSelStateHandler = Substitute.For<ISSESelStateHandler>();
@@ -424,7 +444,7 @@ namespace SlotSystemTests{
 								sgEles = new ISlotSystemElement[]{sb};
 							sg.GetEnumerator().Returns(sgEles.GetEnumerator());
 						stubFac.MakeTransaction(pickedSB, sb).Returns(ta);
-						stubFac.MakeTransaction(pickedSB, sg).Returns(Substitute.For<IRevertTransaction>());
+						stubFac.MakeTransaction(pickedSB, hoverable).Returns(Substitute.For<IRevertTransaction>());
 						List<ISlotGroup> sgsList = new List<ISlotGroup>(new ISlotGroup[]{sg});
 						focSGPrv.GetFocusedSGs().Returns(sgsList);
 				tam.GetTAFactory().Returns(stubFac);
@@ -437,7 +457,7 @@ namespace SlotSystemTests{
 					sbSelStateHandler.Received().Defocus();
 				else
 					sbSelStateHandler.Received().Focus();
-				}
+			}
 			[Test]
 			public void UpdateField_MatchFoundInTAResultsForHovered_SetsFields(){
 				TransactionCache taCache = new TransactionCache(MakeSubTAM(), MakeSubFocSGPrv());

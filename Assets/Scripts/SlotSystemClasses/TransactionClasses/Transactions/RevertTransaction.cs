@@ -14,9 +14,9 @@ namespace SlotSystem{
 			_pickedSB = pickedSB;
 			_origSG = _pickedSB.GetSG();
 			iconHandler = tam.GetIconHandler();
-			origSGSlotsHolder = _origSG;
-			origSGActStateHandler = _origSG;
-			origSGTAHandler = _origSG;
+			origSGSlotsHolder = _origSG.GetSlotsHolder();
+			origSGActStateHandler = _origSG.GetSGActStateHandler();
+			origSGTAHandler = _origSG.GetSGTAHandler();
 		}
 		public override void Indicate(){}
 		public override void Execute(){

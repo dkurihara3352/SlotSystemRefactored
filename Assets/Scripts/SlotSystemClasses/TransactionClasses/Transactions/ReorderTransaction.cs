@@ -15,10 +15,11 @@ namespace SlotSystem{
 			_pickedSB = pickedSB;
 			_selectedSB = selected;
 			_origSG = _pickedSB.GetSG();
+			ISlotGroup sg1 = GetSG1();
 			iconHandler = tam.GetIconHandler();
-			sg1SlotsHolder = GetSG1();
-			sg1ActStateHandler = GetSG1();
-			sg1TAHandler = GetSG1();
+			sg1SlotsHolder = sg1.GetSlotsHolder();
+			sg1ActStateHandler = sg1.GetSGActStateHandler();
+			sg1TAHandler = sg1.GetSGTAHandler();
 		}
 		public override ISlottable GetTargetSB(){
 			return _selectedSB;

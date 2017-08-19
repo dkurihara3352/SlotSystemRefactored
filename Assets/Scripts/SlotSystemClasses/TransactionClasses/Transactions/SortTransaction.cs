@@ -11,10 +11,11 @@ namespace SlotSystem{
 		ISGTransactionHandler taHandler;
 		public SortTransaction(ISlotGroup sg, SGSorter sorter, ITransactionManager tam): base(tam){
 			_selectedSG = sg;
+			ISlotGroup sg1 = GetSG1();
 			_sorter = sorter;
-			sorterHandler = GetSG1();
-			actStateHandler = GetSG1();
-			taHandler = GetSG1();
+			sorterHandler = sg1.GetSorterHandler();
+			actStateHandler = sg1.GetSGActStateHandler();
+			taHandler = sg1.GetSGTAHandler();
 		}
 		public override ISlotGroup GetSG1(){
 			return _selectedSG;

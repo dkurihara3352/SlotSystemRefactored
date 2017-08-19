@@ -14,21 +14,26 @@ namespace SlotSystemTests{
 			/*	ActState	*/
 				[Test]
 				public void SGWaitForActionState_EnterState_WhenCalled_SetsSGActProcNull(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGWaitForActionState sgwfaState = new SGWaitForActionState(mockSG);
+					ISlotGroup sg = MakeSubSG();
+						ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
+						sg.GetSGActStateHandler().Returns(actStateHandler);
+					SGWaitForActionState sgwfaState = new SGWaitForActionState(sg);
+
 
 					sgwfaState.EnterState();
 
-					mockSG.Received().SetAndRunActProcess(null);
+					actStateHandler.Received().SetAndRunActProcess(null);
 				}
 				[Test]
 				public void SGRevertState_EnterState_WhenCalled_CallsSGUpdateToRevert(){
-					ISlotGroup mockSG = MakeSubSG();
-					SGRevertState revState = new SGRevertState(mockSG);
+					ISlotGroup sg = MakeSubSG();
+						ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
+						sg.GetSGActStateHandler().Returns(actStateHandler);
+					SGRevertState revState = new SGRevertState(sg);
 
 					revState.EnterState();
 
-					mockSG.Received().RevertAndUpdateSBs();
+					sg.Received().RevertAndUpdateSBs();
 				}
 		}
 	}

@@ -5,17 +5,15 @@ using Utility;
 
 namespace SlotSystem{
 	public abstract class SGState: SSEState{
-        protected ISlotGroup sg;
-        public SGState(ISlotGroup sg){
-            this.sg = sg;
-        }
 	}
     public abstract class SGActState: SGState, ISGActState{
-        protected ISGActStateHandler handler;
+        protected ISlotGroup sg;
+        protected ISGActStateHandler actStateHandler;
         protected ISGTransactionHandler sgTAHandler;
-        public SGActState(ISlotGroup sg): base(sg){
-            handler = sg;
-            sgTAHandler = sg;
+        public SGActState(ISlotGroup sg){
+            this.sg = sg;
+            this.actStateHandler = sg.GetSGActStateHandler();
+            sgTAHandler = sg.GetSGTAHandler();
         }
     }
     public interface ISGActState: ISSEState{
@@ -23,8 +21,10 @@ namespace SlotSystem{
     /* Factory */
     public class SGStatesRepo: ISGStatesRepo{
         ISlotGroup sg;
-        public SGStatesRepo(ISlotGroup sg){
+        ISGActStateHandler actStateHandler;
+        public SGStatesRepo(ISlotGroup sg, ISGActStateHandler actStateHandler){
             this.sg = sg;
+            this.actStateHandler = actStateHandler;
         }
         public ISGActState GetWaitForActionState(){
             if(_waitForActionState == null)
@@ -89,38 +89,41 @@ namespace SlotSystem{
     public class SGWaitForActionState: SGActState{
         public SGWaitForActionState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
-            handler.SetAndRunActProcess(null);
+            actStateHandler.SetAndRunActProcess(null);
         }
     }
     public class SGRevertState: SGActState{
-        public SGRevertState(ISlotGroup sg): base(sg){}
+        public SGRevertState(ISlotGroup sg): base(sg){
+        }
         public override void EnterState(){
             sg.RevertAndUpdateSBs();
-            if(handler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
-                handler.SetAndRunActProcess(process);
+            if(actStateHandler.WasWaitingForAction()){
+                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     }
     public class SGReorderState: SGActState{
-        public SGReorderState(ISlotGroup sg): base(sg){}
+        public SGReorderState(ISlotGroup sg): base(sg){
+        }
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.ReorderedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
-                handler.SetAndRunActProcess(process);
+            if(actStateHandler.WasWaitingForAction()){
+                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     }
     public class SGSortState: SGActState{
-        public SGSortState(ISlotGroup sg): base(sg){}
+        public SGSortState(ISlotGroup sg): base(sg){
+        }
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.SortedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
-                handler.SetAndRunActProcess(process);
+            if(actStateHandler.WasWaitingForAction()){
+                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     }
@@ -129,9 +132,9 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.FilledNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
-                handler.SetAndRunActProcess(process);
+            if(actStateHandler.WasWaitingForAction()){
+                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     }
@@ -140,9 +143,9 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.SwappedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
-                handler.SetAndRunActProcess(process);
+            if(actStateHandler.WasWaitingForAction()){
+                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     }
@@ -151,9 +154,9 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.AddedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
-                handler.SetAndRunActProcess(process);
+            if(actStateHandler.WasWaitingForAction()){
+                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     }
@@ -162,9 +165,9 @@ namespace SlotSystem{
         public override void EnterState(){
             List<ISlottable> newSBs = sgTAHandler.RemovedNewSBs();
             sg.ReadySBsForTransaction(newSBs);
-            if(handler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, handler.TransactionCoroutine);
-                handler.SetAndRunActProcess(process);
+            if(actStateHandler.WasWaitingForAction()){
+                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     }

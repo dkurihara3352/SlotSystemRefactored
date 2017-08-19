@@ -14,7 +14,7 @@ namespace SlotSystem{
 			public class SGTransactionProcess: SGProcess, ISGActProcess{
 				ISGTransactionHandler sgTAHandler;
 				public SGTransactionProcess(ISlotGroup sg, Func<IEnumeratorFake> coroutine): base(sg, coroutine){
-					sgTAHandler = sg;
+					sgTAHandler = sg.GetSGTAHandler();
 				}
 				public override void Expire(){
 					base.Expire();

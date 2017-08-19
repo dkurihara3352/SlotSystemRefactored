@@ -32,7 +32,9 @@ namespace SlotSystemTests{
 				ITransactionSGHandler mockSGHd = MakeSubSGHandler();
 				SortEngine sortEngine = new SortEngine(mockTAM, mockSGHd);
 					ISlotGroup stubSG = MakeSubSG();
-						stubSG.GetTAC().Returns(mockTAC);
+							IHoverable hoverable = Substitute.For<IHoverable>();
+							stubSG.GetHoverable().Returns(hoverable);
+							hoverable.GetTAC().Returns(mockTAC);
 					SGSorter stubSorter = Substitute.For<SGSorter>();
 					ISortTransactionFactory stubSortTAFactory = Substitute.For<ISortTransactionFactory>();
 						ISortTransaction stubTA = Substitute.For<ISortTransaction>();

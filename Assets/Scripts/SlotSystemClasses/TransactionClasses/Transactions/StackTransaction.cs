@@ -26,11 +26,11 @@ namespace SlotSystem{
 			cache.SetQuantity(pickedSB.GetPickedAmount());
 			itemCache.Add(cache);
 			iconHandler = tam.GetIconHandler();
-			sg2SlotsHolder = sg2;
-			sg1ActStateHandler = sg1;
-			sg2ActStateHandler = sg2;
-			sg1TAHandler = sg1;
-			sg2TAHandler = sg2;
+			sg2SlotsHolder = sg2.GetSlotsHolder();
+			sg1ActStateHandler = sg1.GetSGActStateHandler();
+			sg2ActStateHandler = sg2.GetSGActStateHandler();
+			sg1TAHandler = sg1.GetSGTAHandler();
+			sg2TAHandler = sg2.GetSGTAHandler();
 		}
 		public override ISlottable GetTargetSB(){
 			return _selectedSB;

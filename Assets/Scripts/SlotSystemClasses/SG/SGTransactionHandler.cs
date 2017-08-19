@@ -83,11 +83,11 @@ namespace SlotSystem{
 			}
 		public SGTransactionHandler(ISlotGroup sg, ITransactionManager tam){
 			this.sg = sg;
-			SetHoverable(sg);
-			SetSBHandler(sg);
-			SetSorterHandler(sg);
-			SetSlotsHolder(sg);
-			SetSBFactory(sg);
+			SetHoverable(sg.GetHoverable());
+			SetSBHandler(sg.GetSBHandler());
+			SetSorterHandler(sg.GetSorterHandler());
+			SetSlotsHolder(sg.GetSlotsHolder());
+			SetSBFactory(sg.GetSBFactory());
 			SetSGHandler(tam.GetSGHandler());
 		}
 		public List<ISlottable> ReorderedNewSBs(){

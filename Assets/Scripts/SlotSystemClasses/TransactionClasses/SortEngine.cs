@@ -13,7 +13,8 @@ namespace SlotSystem{
 		}
 		public void SortSG(ISlotGroup sg, SGSorter sorter){
 			ISlotSystemTransaction sortTransaction = sortFA.MakeSortTA(sg, sorter);
-			sg.GetTAC().SetTargetSB(sortTransaction.GetTargetSB());
+			IHoverable hoverable = sg.GetHoverable();
+			hoverable.GetTAC().SetTargetSB(sortTransaction.GetTargetSB());
 			sgHandler.SetSG1(sortTransaction.GetSG1());
 			tam.SetTransaction(sortTransaction);
 			tam.ExecuteTransaction();

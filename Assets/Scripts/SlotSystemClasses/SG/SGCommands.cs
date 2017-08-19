@@ -53,10 +53,12 @@ namespace SlotSystem{
 		ISlotsHolder slotsHolder;
 		IFilterHandler filterHandler;
 		ISGTransactionHandler sgTAHandler;
+		ISorterHandler sorterHandler;
 		public SGInitItemsCommand(ISlotGroup sg): base(sg){
-			slotsHolder = sg;
-			filterHandler = sg;
-			sgTAHandler = sg;
+			slotsHolder = sg.GetSlotsHolder();
+			filterHandler = sg.GetFilterHandler();
+			sgTAHandler = sg.GetSGTAHandler();
+			sorterHandler = sg.GetSorterHandler();
 		}
 		public override void Execute(){
 			IInventory inventory = sg.GetInventory();
@@ -65,7 +67,7 @@ namespace SlotSystem{
 			slotsHolder.InitSlots(items);
 			sg.InitSBs(items);
 			sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
-			if(sg.IsAutoSort())
+			if(sorterHandler.IsAutoSort())
 				sg.InstantSort();
 		}
 	}

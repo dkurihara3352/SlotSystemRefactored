@@ -7,10 +7,11 @@ namespace SlotSystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		public override void InitializeStates(){
 			_selStateHandler.Deactivate();
-			WaitForAction();
+			GetSGActStateHandler().WaitForAction();
 		}
 		public void InitializeStateHandlers(){
-			SetSelStateHandler(new SGSelStateHandler(GetTAC(), hoverable));
+			IHoverable hoverable = GetHoverable();
+			SetSelStateHandler(new SGSelStateHandler(hoverable.GetTAC(), hoverable));
 			SetSGActStateHandler(new SGActStateHandler(this));
 		}
 		public void InitializeSG(){
@@ -18,14 +19,13 @@ namespace SlotSystem{
 			SetCommandsRepo(new SGCommandsRepo(this));
 			SetSlotsHolder(new SlotsHolder(this));
 			SetSBHandler(new SBHandler());
-			SetNewSBs(new List<ISlottable>());
 			SetHoverable(new Hoverable(ssm.GetTAC()));
 			SetSGTAHandler(new SGTransactionHandler(this, ssm.GetTAM()));
 			SetSorterHandler(new SorterHandler());
 			SetFilterHandler(new FilterHandler());
 			SetSBFactory(new SBFactory(ssm));
 			InitializeStateHandlers();
-			hoverable.SetSSESelStateHandler(_selStateHandler);
+			GetHoverable().SetSSESelStateHandler(_selStateHandler);
 		}
 		/*	states	*/
 			public override ISSESelStateHandler GetSelStateHandler(){
@@ -38,107 +38,15 @@ namespace SlotSystem{
 			public override void SetSelStateHandler(ISSESelStateHandler handler){
 				_selStateHandler = handler;
 			}
-			ISGActStateHandler actStateHandler{
-				get{
-					if(_actStateHandler != null)
-						return _actStateHandler;
-					else
-						throw new System.InvalidOperationException("actStateHandler not set");
-				}
+			public ISGActStateHandler GetSGActStateHandler(){
+				if(_actStateHandler != null)
+					return _actStateHandler;
+				else
+					throw new System.InvalidOperationException("actStateHandler not set");
 			}
 				ISGActStateHandler _actStateHandler;
 			public void SetSGActStateHandler(ISGActStateHandler handler){
 				_actStateHandler = handler;
-			}
-			public void ClearCurActState(){
-				actStateHandler.ClearCurActState();
-			}
-				public bool WasActStateNull(){
-					return actStateHandler.WasActStateNull();
-				}
-				public bool IsActStateNull(){
-					return actStateHandler.IsActStateNull();
-				}
-			public void WaitForAction(){
-				actStateHandler.WaitForAction();
-			}
-				public bool IsWaitingForAction(){
-					return actStateHandler.IsWaitingForAction();
-				}
-				public bool WasWaitingForAction(){
-					return actStateHandler.WasWaitingForAction();
-				}
-			public void Revert(){
-				actStateHandler.Revert();
-			}
-				public bool IsReverting(){
-					return actStateHandler.IsReverting();
-				}
-				public bool WasReverting(){
-					return actStateHandler.WasReverting();
-				}
-			public void Reorder(){
-				actStateHandler.Reorder();
-			}
-				public bool IsReordering(){
-					return actStateHandler.IsReordering();
-				}
-				public bool WasReordering(){
-					return actStateHandler.WasReordering();
-				}
-			public void Add(){
-				actStateHandler.Add();
-			}
-				public bool IsAdding(){
-					return actStateHandler.IsAdding();
-				}
-				public bool WasAdding(){
-					return actStateHandler.WasAdding();
-				}
-			public void Remove(){
-				actStateHandler.Remove();
-			}
-				public bool IsRemoving(){
-					return actStateHandler.IsRemoving();
-				}
-				public bool WasRemoving(){
-					return actStateHandler.WasRemoving();
-				}
-			public void Swap(){
-				actStateHandler.Swap();
-			}
-				public bool IsSwapping(){
-					return actStateHandler.IsSwapping();
-				}
-				public bool WasSwapping(){
-					return actStateHandler.WasSwapping();
-				}
-			public void Fill(){
-				actStateHandler.Fill();
-			}
-				public bool IsFilling(){
-					return actStateHandler.IsFilling();
-				}
-				public bool WasFilling(){
-					return actStateHandler.WasFilling();
-				}
-			public void Sort(){
-				actStateHandler.Sort();
-			}
-				public bool IsSorting(){
-					return actStateHandler.IsSorting();
-				}
-				public bool WasSorting(){
-					return actStateHandler.WasSorting();
-				}
-			public void SetAndRunActProcess(ISGActProcess process){
-				actStateHandler.SetAndRunActProcess(process);
-			}
-			public void ExpireActProcess(){
-				actStateHandler.ExpireActProcess();
-			}
-			public ISGActProcess GetActProcess(){
-				return actStateHandler.GetActProcess();
 			}
 			public IEnumeratorFake TransactionCoroutine(){
 				bool flag = true;
@@ -147,7 +55,7 @@ namespace SlotSystem{
 					flag &= !sb.GetActProcess().IsRunning();
 				}
 				if(flag){
-					GetActProcess().Expire();
+					GetSGActStateHandler().ExpireActProcess();
 				}
 				return null;
 			}
@@ -165,156 +73,62 @@ namespace SlotSystem{
 				_commandsRepo = repo;
 			}
 		/* Slots */
-			public ISlotsHolder slotsHolder{
-				get{
-					if(_slotsHolder != null)
-						return _slotsHolder;
-					else
-						throw new InvalidOperationException("slotsHolder not set");
-				}
+			public ISlotsHolder GetSlotsHolder(){
+				if(_slotsHolder != null)
+					return _slotsHolder;
+				else
+					throw new InvalidOperationException("slotsHolder not set");
 			}
 				ISlotsHolder _slotsHolder;
 			public void SetSlotsHolder(ISlotsHolder slotsHolder){
 				_slotsHolder = slotsHolder;
 			}
-			public List<Slot> GetSlots(){
-				return slotsHolder.GetSlots();
-			}
-			public void SetSlots(List<Slot> slots){
-				slotsHolder.SetSlots(slots);
-			}
-			public bool HasEmptySlot(){
-				return slotsHolder.HasEmptySlot();
-			}
-			public List<Slot> GetNewSlots(){
-				return slotsHolder.GetNewSlots();
-			}
-			public void SetNewSlots(List<Slot> newSlots){
-				slotsHolder.SetNewSlots(newSlots);
-			}
-			public Slot GetNewSlot(IInventoryItemInstance item){
-				return slotsHolder.GetNewSlot(item);
-			}
-			public void SetInitSlotsCount(int count){
-				slotsHolder.SetInitSlotsCount(count);
-			}
-			public int GetInitSlotsCount(){
-				return slotsHolder.GetInitSlotsCount();
-			}
-			public void InitSlots(List<IInventoryItemInstance> items){
-				slotsHolder.InitSlots(items);
-			}
-			public void PutSBsInSlots(List<ISlottable> sbs){
-				slotsHolder.PutSBsInSlots(sbs);
-			}
 		/* SB */
-			public ISBHandler sbHandler{
-				get{
-					if(_sbHandler != null)
-						return _sbHandler;
-					else
-						throw new InvalidOperationException("sbHandler not set");
-				}
+			public ISBHandler GetSBHandler(){
+				if(_sbHandler != null)
+					return _sbHandler;
+				else
+					throw new InvalidOperationException("sbHandler not set");
 			}
-				ISBHandler _sbHandler;
 			public void SetSBHandler(ISBHandler sbHandler){
 				_sbHandler = sbHandler;
 			}
-			public List<ISlottable> GetSBs(){
-				return sbHandler.GetSBs();
-			}
-			public void SetSBs(List<ISlottable> sbs){
-				sbHandler.SetSBs(sbs);
-			}
-			public List<ISlottable> GetNewSBs(){
-				return sbHandler.GetNewSBs();
-			}
-			public void SetNewSBs(List<ISlottable> newSBs){
-				sbHandler.SetNewSBs(newSBs);
-			}
-			public void SetSBsActStates(){
-				sbHandler.SetSBsActStates();
-			}
-			public ISlottable GetSB(IInventoryItemInstance item){
-				return sbHandler.GetSB(item);
-			}
-			public bool HasItem(IInventoryItemInstance item){
-				return sbHandler.HasItem(item);
-			}
-			public List<ISlottable> GetEquippedSBs(){
-				return sbHandler.GetEquippedSBs();
-			}
-			public bool IsAllSBActProcDone(){
-				return sbHandler.IsAllSBActProcDone();
-			}
+				ISBHandler _sbHandler;
 		/*	sorter	*/
-			public ISorterHandler sorterHandler{
-				get{
-					if(_sorterHandler != null)
-						return _sorterHandler;
-					else
-						throw new InvalidOperationException("sorterHandler not set");
-				}
+			public ISorterHandler GetSorterHandler(){
+				if(_sorterHandler != null)
+					return _sorterHandler;
+				else
+					throw new InvalidOperationException("sorterHandler not set");
 			}
-				ISorterHandler _sorterHandler;
 			public void SetSorterHandler(ISorterHandler sorterHandler){
 				_sorterHandler = sorterHandler;
 			}
+				ISorterHandler _sorterHandler;
 			public void InstantSort(){
-				List<ISlottable> sortedSBs = GetSortedSBsWithoutResize(GetSBs());
-				PutSBsInSlots(sortedSBs);
+				List<ISlottable> sbs = GetSBHandler().GetSBs();
+				List<ISlottable> sortedSBs = GetSorterHandler().GetSortedSBsWithoutResize(sbs);
+				GetSlotsHolder().PutSBsInSlots(sortedSBs);
 			}
 			public void ToggleAutoSort(bool on){
-				SetIsAutoSort(on);
-				_selStateHandler.Focus();
-			}
-			public List<ISlottable> GetSortedSBsWithoutResize(List<ISlottable> source){
-				return sorterHandler.GetSortedSBsWithoutResize(source);
-			}
-			public List<ISlottable> GetSortedSBsWithResize(List<ISlottable> source){
-				return sorterHandler.GetSortedSBsWithResize(source);
-			}
-			public SGSorter GetSorter(){
-				return sorterHandler.GetSorter();
-			}
-			public void SetSorter(SGSorter sorter){
-				sorterHandler.SetSorter(sorter);
-			}
-			public void SetIsAutoSort(bool on){
-				sorterHandler.SetIsAutoSort(on);
-			}
-			public bool IsAutoSort(){
-				return sorterHandler.IsAutoSort();
+				GetSorterHandler().SetIsAutoSort(on);
+				GetSelStateHandler().Focus();
 			}
 		/*	filter	*/
-			public IFilterHandler filterHandler{
-				get{
-					if(_filterHandler != null)
-						return _filterHandler;
-					else
-						throw new InvalidOperationException("filterHandler not set");
-				}
+			public IFilterHandler GetFilterHandler(){
+				if(_filterHandler != null)
+					return _filterHandler;
+				else
+					throw new InvalidOperationException("filterHandler not set");
 			}
-				IFilterHandler _filterHandler;
 			public void SetFilterHandler(IFilterHandler filterHandler){
 				_filterHandler = filterHandler;
 			}
-			public List<IInventoryItemInstance> FilteredItems(List<IInventoryItemInstance> items){
-				return filterHandler.FilteredItems(items);
-			}
-			public SGFilter GetFilter(){
-				return filterHandler.GetFilter();
-			}
-			public bool AcceptsFilter(ISlottable pickedSB){
-				return filterHandler.AcceptsFilter(pickedSB);
-			}
-			public void SetFilter(SGFilter filter){
-				filterHandler.SetFilter(filter);
-			}
+				IFilterHandler _filterHandler;
 		/*	SlotSystemElement implementation	*/
 			protected override IEnumerable<ISlotSystemElement> elements{
 				get{
-					foreach(ISlottable sb in GetSBs())
+					foreach(ISlottable sb in GetSBHandler().GetSBs())
 						yield return (ISlotSystemElement)sb;
 				}
 			}
@@ -326,14 +140,12 @@ namespace SlotSystem{
 					}else
 						throw new System.ArgumentException("parameter needs to be a collection of only ISlottable or null");
 				}
-				SetSBs(sbs);
-			}
-			public List<ISlottable> toList{
-				get{return GetSBs();}
+				GetSBHandler().SetSBs(sbs);
 			}
 			public override bool Contains(ISlotSystemElement element){
+				List<ISlottable> sbs = GetSBHandler().GetSBs();
 				if(element is ISlottable)
-					return GetSBs().Contains((ISlottable)element);
+					return sbs.Contains((ISlottable)element);
 				return false;
 			}
 			public void FocusSBs(){
@@ -361,36 +173,16 @@ namespace SlotSystem{
 				InitializeItems();
 			}
 		/* Hoverable */
-			public IHoverable hoverable{
-				get{
-					if(_hoverable != null)
-						return _hoverable;
-					else
-						throw new InvalidOperationException("hoverable not set");
-				}
+			public IHoverable GetHoverable(){
+				if(_hoverable != null)
+					return _hoverable;
+				else
+					throw new InvalidOperationException("hoverable not set");
 			}
-				IHoverable _hoverable;
 			public void SetHoverable(IHoverable hoverable){
 				_hoverable = hoverable;
 			}
-			public ITransactionCache GetTAC(){
-				return hoverable.GetTAC();
-			}
-			public void SetTACache(ITransactionCache taCache){
-				hoverable.SetTACache(taCache);
-			}
-			public void OnHoverEnter(){
-				hoverable.OnHoverEnter();
-			}
-			public void OnHoverExit(){
-				hoverable.OnHoverExit();
-			}
-			public bool IsHovered(){
-				return hoverable.IsHovered();
-			}
-			public void SetSSESelStateHandler(ISSESelStateHandler handler){
-				//removed
-			}
+				IHoverable _hoverable;
 		/*	intrinsic */
 			public IInventory GetInventory(){
 				if(_inventory != null)
@@ -438,15 +230,15 @@ namespace SlotSystem{
 				return result;
 			}
 			public void Refresh(){
-				WaitForAction();
-				SetNewSBs(new List<ISlottable>());
-				SetNewSlots(new List<Slot>());
+				GetSGActStateHandler().WaitForAction();
+				GetSBHandler().SetNewSBs(new List<ISlottable>());
+				GetSlotsHolder().SetNewSlots(new List<Slot>());
 			}
 			public void InspectorSetUp(IInventory inv, SGFilter filter, SGSorter sorter, int initSlotsCount){
 				SetInventory(inv);
-				SetFilter(filter);
-				SetSorter(sorter);
-				SetInitSlotsCount(initSlotsCount);
+				GetFilterHandler().SetFilter(filter);
+				GetSorterHandler().SetSorter(sorter);
+				GetSlotsHolder().SetInitSlotsCount(initSlotsCount);
 				_isExpandable = initSlotsCount == 0;
 			}
 			public void InitializeItems(){
@@ -456,81 +248,49 @@ namespace SlotSystem{
 					get{return commandsRepo.GetInitializeItemsCommand();}
 				}
 			public void InitSBs(List<IInventoryItemInstance> items){
-				List<Slot> slots = GetSlots();
+				List<Slot> slots = GetSlotsHolder().GetSlots();
 				while(slots.Count < items.Count){
 					items.RemoveAt(slots.Count);
 				}
 				foreach(IInventoryItemInstance item in items){
-					ISlottable newSB = CreateSB(item);
+					ISlottable newSB = GetSBFactory().CreateSB(item);
 					slots[items.IndexOf(item)].sb = newSB;
 				}
 			}
 		/* SBFactory */
-			public ISBFactory sbFactory{
-				get{
-					if(_sbFactory != null)
-						return _sbFactory;
-					else
-						throw new InvalidOperationException("sbFactory not set");
-				}
+			public ISBFactory GetSBFactory(){
+				if(_sbFactory != null)
+					return _sbFactory;
+				else
+					throw new InvalidOperationException("sbFactory not set");
+			}
+			public void SetSBFactory(ISBFactory sbFactory){
+				_sbFactory = sbFactory;
 			}
 				ISBFactory _sbFactory;
-				public void SetSBFactory(ISBFactory sbFactory){
-					_sbFactory = sbFactory;
-				}
-			public ISlottable CreateSB(IInventoryItemInstance item){
-				return sbFactory.CreateSB(item);
-			}
 		/* Transaction */
-			public ISGTransactionHandler sgTAHandler{
-				get{
-					if(_sgTAHandler != null)
-						return _sgTAHandler;
-					else
-						throw new InvalidOperationException("sgTAHandler not set");
-				}
+			public ISGTransactionHandler GetSGTAHandler(){
+				if(_sgTAHandler != null)
+					return _sgTAHandler;
+				else
+					throw new InvalidOperationException("sgTAHandler not set");
 			}
-				ISGTransactionHandler _sgTAHandler;
 			public void SetSGTAHandler(ISGTransactionHandler sgTAHandler){
 				_sgTAHandler = sgTAHandler;
 			}
-			public List<ISlottable> ReorderedNewSBs(){
-				return sgTAHandler.ReorderedNewSBs();
-			}
-			public List<ISlottable> SortedNewSBs(){
-				return sgTAHandler.SortedNewSBs();
-			}
-			public List<ISlottable> FilledNewSBs(){
-				return sgTAHandler.FilledNewSBs();
-			}
-			public List<ISlottable> SwappedNewSBs(){
-				return sgTAHandler.SwappedNewSBs();
-			}
-			public List<ISlottable> AddedNewSBs(){
-				return sgTAHandler.AddedNewSBs();
-			}
-			public List<ISlottable> RemovedNewSBs(){
-				return sgTAHandler.RemovedNewSBs();
-			}
-			public void UpdateSBs(){
-				sgTAHandler.UpdateSBs();
-			}
-			public void SetSBsFromSlotsAndUpdateSlotIDs(){
-				sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
-			}
-			public void ReportTAComp(){
-				sgTAHandler.ReportTAComp();
-			}
+				ISGTransactionHandler _sgTAHandler;
 			public void RevertAndUpdateSBs(){
-				SetNewSBs(GetSBs());
-				SetSBsActStates();
+				ISBHandler sbHandler = GetSBHandler();
+				sbHandler.SetNewSBs(sbHandler.GetSBs());
+				sbHandler.SetSBsActStates();
 				CreateNewSlots();
 			}
 			public void ReadySBsForTransaction(List<ISlottable> newSBs){
-				SetNewSBs(newSBs);
-				SetSBsActStates();
-				List<ISlottable> allSBs = AllSBs(GetSBs(), newSBs);
-				SetSBs(allSBs);
+				ISBHandler sbHandler = GetSBHandler();
+				sbHandler.SetNewSBs(newSBs);
+				sbHandler.SetSBsActStates();
+				List<ISlottable> allSBs = AllSBs(sbHandler.GetSBs(), newSBs);
+				sbHandler.SetSBs(allSBs);
 				CreateNewSlots();
 			}
 			public List<ISlottable> AllSBs(List<ISlottable> sbs, List<ISlottable> newSBs){
@@ -544,11 +304,11 @@ namespace SlotSystem{
 			}
 			public void CreateNewSlots(){
 				List<Slot> newSlots = new List<Slot>();
-				for(int i = 0; i < GetNewSBs().Count; i++){
+				for(int i = 0; i < GetSBHandler().GetNewSBs().Count; i++){
 					Slot newSlot = new Slot();
 					newSlots.Add(newSlot);
 				}
-				SetNewSlots(newSlots);
+				GetSlotsHolder().SetNewSlots(newSlots);
 			}
 			public void OnActionComplete(){
 				onActionCompleteCommand.Execute();
@@ -577,7 +337,15 @@ namespace SlotSystem{
 				ssm.SetEquippedOnAllSBs(item, equipped);
 			}
 	}
-	public interface ISlotGroup: ISlotSystemElement, IHoverable, ISGActStateHandler, ISlotsHolder, ISorterHandler, IFilterHandler, ISBFactory, ISBHandler, ISGTransactionHandler{
+	public interface ISlotGroup: ISlotSystemElement{
+			ISGActStateHandler GetSGActStateHandler();
+			IHoverable GetHoverable();
+			ISlotsHolder GetSlotsHolder();
+			ISorterHandler GetSorterHandler();
+			IFilterHandler GetFilterHandler();
+			ISBFactory GetSBFactory();
+			ISBHandler GetSBHandler();
+			ISGTransactionHandler GetSGTAHandler();
 		/*	instrinsic	*/
 			IInventory GetInventory();
 			bool IsShrinkable();

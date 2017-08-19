@@ -2444,17 +2444,21 @@ namespace SlotSystemTests{
 			public void SetSBsFromSlotsAndUpdateSlotIDs_Always_UpdatesSlottables(List<Slot> slots, List<ISlottable> expected){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.GetSBs().Returns(new List<ISlottable>());
-						sg.GetSlots().Returns(slots);
-						sg.When(x => x.SetSBs(Arg.Is<List<ISlottable>>(y => y.MemberEquals(expected)))).Do(z => sg.GetSBs().Returns(expected));
+						ISBHandler sbHandler = Substitute.For<ISBHandler>();
+						sg.GetSBHandler().Returns(sbHandler);
+						sbHandler.GetSBs().Returns(new List<ISlottable>());
+						ISlotsHolder slotsHolder = Substitute.For<ISlotsHolder>();
+							slotsHolder.GetSlots().Returns(slots);
+						sg.GetSlotsHolder().Returns(slotsHolder);
+						sbHandler.When(x => x.SetSBs(Arg.Is<List<ISlottable>>(y => y.MemberEquals(expected)))).Do(z => sbHandler.GetSBs().Returns(expected));
 				sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 
 				sgTAHandler.SetSBsFromSlotsAndUpdateSlotIDs();
 
-				bool equality = sg.GetSBs().MemberEquals(expected);
-				Assert.That(equality, Is.True);
-				foreach(var sb in sg.GetSBs())
-					sb.Received().SetSlotID(sg.GetSBs().IndexOf(sb));
+				List<ISlottable> actual = sbHandler.GetSBs();
+				Assert.That(actual, Is.EqualTo(expected));
+				foreach(var sb in actual)
+					sb.Received().SetSlotID(actual.IndexOf(sb));
 			}
 				class SetSBsFromSlotsAndUpdateSlotIDsCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
@@ -2513,7 +2517,9 @@ namespace SlotSystemTests{
 						ITransactionCache taCache = MakeSubTAC();
 							taCache.GetPickedSB().Returns(pickedSB);
 							taCache.GetTargetSB().Returns(targetSB);
-						sg.GetTAC().Returns(taCache);
+						IHoverable hoverable = Substitute.For<IHoverable>();
+						sg.GetHoverable().Returns(hoverable);
+						hoverable.GetTAC().Returns(taCache);
 					ITransactionManager tam = MakeSubTAM();
 						ITransactionSGHandler sgHandler = Substitute.For<ITransactionSGHandler>();
 						if(thisSG)

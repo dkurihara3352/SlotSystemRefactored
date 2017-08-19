@@ -12,8 +12,8 @@ namespace SlotSystem{
 			SetEquippableCGearsCount(initCGCount);
 		}
 		public override void SetSG(ISlotGroup sg){
-			_slotsHolder = sg;
-			_filterHandler = sg;
+			_slotsHolder = sg.GetSlotsHolder();
+			_filterHandler = sg.GetFilterHandler();
 		}
 		ISlotsHolder slotsHolder{
 			get{

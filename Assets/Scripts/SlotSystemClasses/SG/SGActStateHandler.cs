@@ -9,7 +9,7 @@ namespace SlotSystem{
 			/*	Action State	*/
 				public SGActStateHandler(ISlotGroup sg){
 					SetActStateEngine(new SSEStateEngine<ISGActState>());
-					SetStatesRepo(new SGStatesRepo(sg));
+					SetStatesRepo(new SGStatesRepo(sg, this));
 					SetActProcEngine(new SSEProcessEngine<ISGActProcess>());
 				}
 				ISSEStateEngine<ISGActState> actStateEngine{

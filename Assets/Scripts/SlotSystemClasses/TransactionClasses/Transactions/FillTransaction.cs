@@ -16,13 +16,15 @@ namespace SlotSystem{
 		public FillTransaction(ISlottable pickedSB, ISlotGroup selected, ITransactionManager tam):base(tam){
 			_pickedSB = pickedSB;
 			_selectedSG = selected;
+			ISlotGroup sg2 = GetSG2();
 			_origSG = _pickedSB.GetSG();
+			ISlotGroup sg1 = GetSG1();
 			iconHandler = tam.GetIconHandler();
-			sg2SlotsHolder = GetSG2();
-			sg1ActStateHandler = GetSG1();
-			sg2ActStateHandler = GetSG2();
-			sg1TAHandler = GetSG1();
-			sg2TAHandler = GetSG2();
+			sg2SlotsHolder = sg2.GetSlotsHolder();
+			sg1ActStateHandler = sg1.GetSGActStateHandler();
+			sg2ActStateHandler = sg2.GetSGActStateHandler();
+			sg1TAHandler = sg1.GetSGTAHandler();
+			sg2TAHandler = sg2.GetSGTAHandler();
 		}
 		public override ISlotGroup GetSG1(){
 			return _origSG;

@@ -16,21 +16,25 @@ namespace SlotSystemTests{
 			public void InstantSort_Always_ReorderSlotSBs(List<ISlottable> sbs, SGSorter sorter, List<ISlottable> expected){
 				List<ISlottable> source = new List<ISlottable>(sbs);
 				SlotGroup sg = MakeSG();
-					sg.SetSorterHandler(new SorterHandler());
+					ISorterHandler sorterHandler = new SorterHandler();
+						sorterHandler.SetSorter(sorter);
+					sg.SetSorterHandler(sorterHandler);
 					sg.SetSBHandler(new SBHandler());
 					sg.SetSlotsHolder(new SlotsHolder(sg));
-				sg.SetSorter(sorter);
-				sg.SetSBs(source);
+					ISBHandler sbHandler = new SBHandler();
+					sbHandler.SetSBs(source);
+					sg.SetSBHandler(sbHandler);
 				List<Slot> slots = CreateSlots(source.Count);
-				sg.SetSlots(slots);
+				ISlotsHolder slotsHolder = new SlotsHolder(sg);
+					slotsHolder.SetSlots(slots);
+				sg.SetSlotsHolder(slotsHolder);
 
 				sg.InstantSort();
 
 				List<ISlottable> actual = new List<ISlottable>();
-				foreach(var slot in sg.GetSlots())
+				foreach(var slot in slots)
 					actual.Add(slot.sb);
-				bool equality = actual.MemberEquals(expected);
-				Assert.That(equality, Is.True);
+				Assert.That(actual, Is.EqualTo(expected));
 			}
 				class InstantSortCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
@@ -261,6 +265,8 @@ namespace SlotSystemTests{
 				IFilterHandler filterHandler = new FilterHandler();
 					filterHandler.SetFilter(new SGNullFilter());
 				sg.SetFilterHandler(filterHandler);
+				IHoverable hoverable = Substitute.For<IHoverable>();
+				sg.SetHoverable(hoverable);
 				sg.SetSGTAHandler(new SGTransactionHandler(sg, MakeSubTAM()));
 				sg.SetInventory(inventory);
 				
@@ -281,7 +287,8 @@ namespace SlotSystemTests{
 						inventory.Add(wear);
 						inventory.Add(shield);
 						inventory.Add(mWeapon);
-				sg.SetSBHandler(new SBHandler());
+				ISBHandler sbHandler = new SBHandler();
+				sg.SetSBHandler(sbHandler);
 				ISlotsHolder slotsHolder = new SlotsHolder(sg);
 					slotsHolder.SetInitSlotsCount(0);
 				sg.SetSlotsHolder(slotsHolder);
@@ -293,18 +300,20 @@ namespace SlotSystemTests{
 				IFilterHandler filterHandler = new FilterHandler();
 					filterHandler.SetFilter(new SGNullFilter());
 				sg.SetFilterHandler(filterHandler);
+				IHoverable hoverable = Substitute.For<IHoverable>();
+				sg.SetHoverable(hoverable);
 				sg.SetSGTAHandler(new SGTransactionHandler(sg, MakeSubTAM()));
 				sg.SetInventory(inventory);
 
 				sg.SetHierarchy();
 
-				ISlottable bowSB = sg.GetSB(bow);
-				ISlottable wearSB = sg.GetSB(wear);
-				ISlottable shieldSB = sg.GetSB(shield);
-				ISlottable mWeaponSB = sg.GetSB(mWeapon);
+				ISlottable bowSB = sbHandler.GetSB(bow);
+				ISlottable wearSB = sbHandler.GetSB(wear);
+				ISlottable shieldSB = sbHandler.GetSB(shield);
+				ISlottable mWeaponSB = sbHandler.GetSB(mWeapon);
 				IEnumerable<ISlottable> actualSBs = new ISlottable[]{bowSB, wearSB, shieldSB, mWeaponSB};
 				Assert.That(actualSBs, Is.All.Not.Null);
-				Assert.That(sg.GetSlots().Count, Is.EqualTo(4));
+				Assert.That(slotsHolder.GetSlots().Count, Is.EqualTo(4));
 				int count = 0;
 				foreach(ISlottable sb in sg)
 					Assert.That(sb.GetSlotID(), Is.EqualTo(count ++));

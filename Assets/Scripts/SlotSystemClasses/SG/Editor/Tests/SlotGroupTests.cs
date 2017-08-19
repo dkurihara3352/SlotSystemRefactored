@@ -23,14 +23,11 @@ namespace SlotSystemTests{
 						sbHandler.GetSBs().Returns(sbs);
 					sg.SetSBHandler(sbHandler);
 					ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
-							ISGActProcess mockActProc = MakeSubSGActProc();
-						actStateHandler.GetActProcess().Returns(mockActProc);
 					sg.SetSGActStateHandler(actStateHandler);
-				sg.SetAndRunActProcess(mockActProc);
 
 				sg.TransactionCoroutine();
 				
-				mockActProc.Received().Expire();
+				actStateHandler.Received().ExpireActProcess();
 			}
 			/*	intrinsic	*/
 				[Test]
@@ -74,8 +71,11 @@ namespace SlotSystemTests{
 						public IEnumerator GetEnumerator(){
 							object[] sameSG_empty;
 								SlotGroup sg_0 = MakeSG();
-									sg_0.SetFilterHandler(new FilterHandler());
-									sg_0.SetFilter(new SGNullFilter());
+									IFilterHandler filterHandler_0 = new FilterHandler();
+										filterHandler_0.SetFilter(new SGNullFilter());
+									sg_0.SetFilterHandler(filterHandler_0);
+									ISBHandler sbHandler_0 = new SBHandler();
+									sg_0.SetSBHandler(sbHandler_0);
 									ISlottable bow0SB_0 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_0);
 									ISlottable bow1SB_0 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_0);
 									ISlottable wearSB_0 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_0);
@@ -84,16 +84,18 @@ namespace SlotSystemTests{
 									ISlottable quiverSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
 									ISlottable packSB_0 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_0);
 									ISlottable partsSB_0 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_0);
-									sg_0.SetSBHandler(new SBHandler());
-									sg_0.SetSBs(new List<ISlottable>(new ISlottable[]{
+									sbHandler_0.SetSBs(new List<ISlottable>(new ISlottable[]{
 										bow0SB_0, bow1SB_0, wearSB_0, shieldSB_0, mWeaponSB_0, quiverSB_0, packSB_0, partsSB_0
 									}));
 								sameSG_empty = new object[]{sg_0, shieldSB_0, new List<ISlottable>()};
 								yield return sameSG_empty;
 							object[] withBows;
 								SlotGroup sg_1 = MakeSG();
-									sg_1.SetFilterHandler(new FilterHandler());
-									sg_1.SetFilter(new SGNullFilter());
+									IFilterHandler filterHandler_1 = new FilterHandler();
+										filterHandler_1.SetFilter(new SGNullFilter());
+									sg_1.SetFilterHandler(filterHandler_1);
+									ISBHandler sbHandler_1 = new SBHandler();
+									sg_1.SetSBHandler(sbHandler_1);
 									ISlottable bow0SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_1);
 									ISlottable bow1SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_1);
 									ISlottable wearSB_1 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_1);
@@ -102,20 +104,23 @@ namespace SlotSystemTests{
 									ISlottable quiverSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
 									ISlottable packSB_1 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_1);
 									ISlottable partsSB_1 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_1);
-									sg_1.SetSBHandler(new SBHandler());
-									sg_1.SetSBs(new List<ISlottable>(new ISlottable[]{
+									sbHandler_1.SetSBs(new List<ISlottable>(new ISlottable[]{
 										bow0SB_1, bow1SB_1, wearSB_1, shieldSB_1, mWeaponSB_1, quiverSB_1, packSB_1, partsSB_1
 									}));
 								SlotGroup bowSG_1 = MakeSG();
-									bowSG_1.SetFilterHandler(new FilterHandler());
-									bowSG_1.SetFilter(new SGBowFilter());
+									IFilterHandler bowSGFilterHandler_1 = new FilterHandler();
+										bowSGFilterHandler_1.SetFilter(new SGBowFilter());
+									bowSG_1.SetFilterHandler(bowSGFilterHandler_1);
 									ISlottable oBow0SB_1 = MakeSubSBWithItemAndSG(MakeBowInstance(0), bowSG_1);
 								withBows = new object[]{sg_1, oBow0SB_1, new List<ISlottable>(new ISlottable[]{bow0SB_1, bow1SB_1})};
 								yield return withBows;
 							object[] withWears;
 								SlotGroup sg_2 = MakeSG();
-									sg_2.SetFilterHandler(new FilterHandler());
-									sg_2.SetFilter(new SGNullFilter());
+									IFilterHandler filterHandler_2 = new FilterHandler();
+										filterHandler_2.SetFilter(new SGNullFilter());
+									sg_2.SetFilterHandler(filterHandler_2);
+									ISBHandler sbHandler_2 = new SBHandler();
+									sg_2.SetSBHandler(sbHandler_2);
 									ISlottable bow0SB_2 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_2);
 									ISlottable bow1SB_2 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_2);
 									ISlottable wearSB_2 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_2);
@@ -124,20 +129,23 @@ namespace SlotSystemTests{
 									ISlottable quiverSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
 									ISlottable packSB_2 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_2);
 									ISlottable partsSB_2 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_2);
-									sg_2.SetSBHandler(new SBHandler());
-									sg_2.SetSBs(new List<ISlottable>(new ISlottable[]{
+									sbHandler_2.SetSBs(new List<ISlottable>(new ISlottable[]{
 										bow0SB_2, bow1SB_2, wearSB_2, shieldSB_2, mWeaponSB_2, quiverSB_2, packSB_2, partsSB_2
 									}));
 								SlotGroup wearSG_2 = MakeSG();
-									wearSG_2.SetFilterHandler(new FilterHandler());
-									wearSG_2.SetFilter(new SGWearFilter());
+									IFilterHandler wearSGFilterHandler_2 = new FilterHandler();
+										wearSGFilterHandler_2.SetFilter(new SGWearFilter());
+									wearSG_2.SetFilterHandler(wearSGFilterHandler_2);
 									ISlottable oWear0SB_2 = MakeSubSBWithItemAndSG(MakeWearInstance(0), wearSG_2);
 								withWears = new object[]{sg_2, oWear0SB_2, new List<ISlottable>(new ISlottable[]{wearSB_2})};
 								yield return withWears;
 							object[] withCGears;
 								SlotGroup sg_3 = MakeSG();
-									sg_3.SetFilterHandler(new FilterHandler());
-									sg_3.SetFilter(new SGNullFilter());
+									IFilterHandler filterHandler_3 = new FilterHandler();
+										filterHandler_3.SetFilter(new SGNullFilter());
+									sg_3.SetFilterHandler(filterHandler_3);
+									ISBHandler sbHandler_3 = new SBHandler();
+									sg_3.SetSBHandler(sbHandler_3);
 									ISlottable bow0SB_3 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_3);
 									ISlottable bow1SB_3 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_3);
 									ISlottable wearSB_3 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_3);
@@ -146,20 +154,23 @@ namespace SlotSystemTests{
 									ISlottable quiverSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
 									ISlottable packSB_3 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_3);
 									ISlottable partsSB_3 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_3);
-									sg_3.SetSBHandler(new SBHandler());
-									sg_3.SetSBs(new List<ISlottable>(new ISlottable[]{
+									sbHandler_3.SetSBs(new List<ISlottable>(new ISlottable[]{
 										bow0SB_3, bow1SB_3, wearSB_3, shieldSB_3, mWeaponSB_3, quiverSB_3, packSB_3, partsSB_3
 									}));
 								SlotGroup cGearsSG_3 = MakeSG();
-									cGearsSG_3.SetFilterHandler(new FilterHandler());
-									cGearsSG_3.SetFilter(new SGCGearsFilter());
+									IFilterHandler cGearsFilterHandler_3 = new FilterHandler();
+										cGearsFilterHandler_3.SetFilter(new SGCGearsFilter());
+									cGearsSG_3.SetFilterHandler(cGearsFilterHandler_3);
 									ISlottable oShieldSB_3 = MakeSubSBWithItemAndSG(MakeShieldInstance(0), cGearsSG_3);
 								withCGears = new object[]{sg_3, oShieldSB_3, new List<ISlottable>(new ISlottable[]{shieldSB_3, mWeaponSB_3, quiverSB_3, packSB_3})};
 								yield return withCGears;
 							object[] sameParts_empty;
 								SlotGroup sg_4 = MakeSG();
-									sg_4.SetFilterHandler(new FilterHandler());
-									sg_4.SetFilter(new SGNullFilter());
+									IFilterHandler filterHandler_4 = new FilterHandler();
+										filterHandler_4.SetFilter(new SGNullFilter());
+									sg_4.SetFilterHandler(filterHandler_4);
+									ISBHandler sbHandler_4 = new SBHandler();
+									sg_4.SetSBHandler(sbHandler_4);
 									ISlottable bow0SB_4 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_4);
 									ISlottable bow1SB_4 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_4);
 									ISlottable wearSB_4 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_4);
@@ -168,20 +179,23 @@ namespace SlotSystemTests{
 									ISlottable quiverSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
 									ISlottable packSB_4 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_4);
 									ISlottable partsSB_4 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_4);
-									sg_4.SetSBHandler(new SBHandler());
-									sg_4.SetSBs(new List<ISlottable>(new ISlottable[]{
+									sbHandler_4.SetSBs(new List<ISlottable>(new ISlottable[]{
 										bow0SB_4, bow1SB_4, wearSB_4, shieldSB_4, mWeaponSB_4, quiverSB_4, packSB_4, partsSB_4
 									}));
 								SlotGroup partsSG_4 = MakeSG();
-									partsSG_4.SetFilterHandler(new FilterHandler());
-									partsSG_4.SetFilter(new SGPartsFilter());
+									IFilterHandler partsSGFilterHandler_4 = new FilterHandler();
+										partsSGFilterHandler_4.SetFilter(new SGPartsFilter());
+									partsSG_4.SetFilterHandler(partsSGFilterHandler_4);
 									ISlottable oPartsSB_4 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 4), partsSG_4);
 								sameParts_empty = new object[]{sg_4, oPartsSB_4, new List<ISlottable>(new ISlottable[]{})};
 								yield return sameParts_empty;
 							object[] withOtherParts;
 								SlotGroup sg_5 = MakeSG();
-									sg_5.SetFilterHandler(new FilterHandler());
-									sg_5.SetFilter(new SGNullFilter());
+									IFilterHandler filterHandler_5 = new FilterHandler();
+										filterHandler_5.SetFilter(new SGNullFilter());
+									sg_5.SetFilterHandler(filterHandler_5);
+									ISBHandler sbHandler_5 = new SBHandler();
+									sg_5.SetSBHandler(sbHandler_5);
 									ISlottable bow0SB_5 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_5);
 									ISlottable bow1SB_5 = MakeSubSBWithItemAndSG(MakeBowInstance(0), sg_5);
 									ISlottable wearSB_5 = MakeSubSBWithItemAndSG(MakeWearInstance(0), sg_5);
@@ -190,13 +204,13 @@ namespace SlotSystemTests{
 									ISlottable quiverSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
 									ISlottable packSB_5 = MakeSubSBWithItemAndSG(MakeQuiverInstance(0), sg_5);
 									ISlottable partsSB_5 = MakeSubSBWithItemAndSG(MakePartsInstance(0, 1), sg_5);
-									sg_5.SetSBHandler(new SBHandler());
-									sg_5.SetSBs(new List<ISlottable>(new ISlottable[]{
+									sbHandler_5.SetSBs(new List<ISlottable>(new ISlottable[]{
 										bow0SB_5, bow1SB_5, wearSB_5, shieldSB_5, mWeaponSB_5, quiverSB_5, packSB_5, partsSB_5
 									}));
 								SlotGroup partsSG_5 = MakeSG();
-									partsSG_5.SetFilterHandler(new FilterHandler());
-									partsSG_5.SetFilter(new SGPartsFilter());
+									IFilterHandler partsSGFilterHandler_5 = new FilterHandler();
+										partsSGFilterHandler_5.SetFilter(new SGPartsFilter());
+									partsSG_5.SetFilterHandler(partsSGFilterHandler_5);
 									ISlottable oPartsSB_5 = MakeSubSBWithItemAndSG(MakePartsInstance(1, 4), partsSG_5);
 								withOtherParts = new object[]{sg_5, oPartsSB_5, new List<ISlottable>(new ISlottable[]{partsSB_5})};
 								yield return withOtherParts;
@@ -211,10 +225,12 @@ namespace SlotSystemTests{
 						sg.SetSBHandler(sbHandler);
 						ISlotsHolder slotsHolder = new SlotsHolder(sg);
 						sg.SetSlotsHolder(slotsHolder);
+						ISGTransactionHandler sgTAHandler = Substitute.For<ISGTransactionHandler>();
+						sg.SetSGTAHandler(sgTAHandler);
 
 					sg.Refresh();
 					
-					Assert.That(sg.IsWaitingForAction(), Is.True);
+					Assert.That(sgActStateHandler.IsWaitingForAction(), Is.True);
 				}
 				[Test]
 				public void Refresh_Always_SetsFields(){
@@ -225,11 +241,13 @@ namespace SlotSystemTests{
 						sg.SetSBHandler(sbHandler);
 						ISlotsHolder slotsHolder = new SlotsHolder(sg);
 						sg.SetSlotsHolder(slotsHolder);
+						ISGTransactionHandler sgTAHandler = Substitute.For<ISGTransactionHandler>();
+						sg.SetSGTAHandler(sgTAHandler);
 
 					sg.Refresh();
 
-					Assert.That(sg.GetNewSBs(), Is.Empty);
-					Assert.That(sg.GetNewSlots(), Is.Empty);
+					Assert.That(sbHandler.GetNewSBs(), Is.Empty);
+					Assert.That(slotsHolder.GetNewSlots(), Is.Empty);
 				}
 			/*	sse override	*/
 				[TestCaseSource(typeof(ContainsCases))]
@@ -364,14 +382,17 @@ namespace SlotSystemTests{
 				public void InitializeState_Always_InitializesStates(){
 					SlotGroup sg = MakeSG();
 						ISSESelStateHandler sgSelStateHandler = Substitute.For<ISSESelStateHandler>();
-					sg.SetSelStateHandler(sgSelStateHandler);
-					sg.SetSGActStateHandler(new SGActStateHandler(sg));
+						sg.SetSelStateHandler(sgSelStateHandler);
+						ISGActStateHandler sgActStateHandler = new SGActStateHandler(sg);
+						sg.SetSGActStateHandler(sgActStateHandler);
+						ISGTransactionHandler sgTAHandler = Substitute.For<ISGTransactionHandler>();
+						sg.SetSGTAHandler(sgTAHandler);
 
 					sg.InitializeStates();
 
 					sgSelStateHandler.Received().Deactivate();
-					Assert.That(sg.IsWaitingForAction(), Is.True);
-					Assert.That(sg.WasActStateNull(), Is.True);
+					Assert.That(sgActStateHandler.IsWaitingForAction(), Is.True);
+					Assert.That(sgActStateHandler.WasActStateNull(), Is.True);
 				}
 				[TestCase(0)]
 				[TestCase(10)]
@@ -382,15 +403,18 @@ namespace SlotSystemTests{
 						SGSorter sorter = new SGItemIDSorter();
 						SorterHandler sorterHandler = new SorterHandler();
 						sg.SetSorterHandler(sorterHandler);
-						sg.SetFilterHandler(new FilterHandler());
+						IFilterHandler filterHandler = Substitute.For<IFilterHandler>();
+						sg.SetFilterHandler(filterHandler);
 						sg.SetSlotsHolder(new SlotsHolder(sg));
+						ISlotsHolder slotsHolder = Substitute.For<ISlotsHolder>();
+						sg.SetSlotsHolder(slotsHolder);
 					
 					sg.InspectorSetUp(genInv, filter, sorter, initSlotsCount);
 
 					Assert.That(sg.GetInventory(), Is.SameAs(genInv));
-					Assert.That(sg.GetFilter(), Is.SameAs(filter));
+					filterHandler.Received().SetFilter(filter);
 					Assert.That(sorterHandler.GetSorter(), Is.SameAs(sorter));
-					Assert.That(sg.GetInitSlotsCount(), Is.EqualTo(initSlotsCount));
+					slotsHolder.Received().SetInitSlotsCount(initSlotsCount);
 					Assert.That(sg.IsExpandable(), Is.EqualTo(initSlotsCount == 0));
 				}
 				class SGSetUpFieldsData: IEquatable<SGSetUpFieldsData>{
@@ -438,15 +462,16 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						SlotsHolder slotsHolder = new SlotsHolder(sg);
 						sg.SetSlotsHolder(slotsHolder);
-						sg.SetSBHandler(new SBHandler());
-						sg.SetSBs(new List<ISlottable>());
+						ISBHandler sbHandler = new SBHandler();
+						sg.SetSBHandler(sbHandler);
 						List<ISlottable> newSBs = CreateSBs(count);
-						sg.SetNewSBs(newSBs);
+						sbHandler.SetNewSBs(newSBs);
 					
 					sg.CreateNewSlots();
 
-					Assert.That(sg.GetNewSlots().Count, Is.EqualTo(count));
-					foreach(var slot in sg.GetNewSlots())
+					List<Slot> actual = slotsHolder.GetNewSlots();
+					Assert.That(actual.Count, Is.EqualTo(count));
+					foreach(var slot in actual)
 						Assert.That(slot.sb, Is.Null);
 				}
 				[Test]
@@ -461,8 +486,7 @@ namespace SlotSystemTests{
 					
 					sg.RevertAndUpdateSBs();
 					
-					bool equality = sg.GetNewSBs().MemberEquals(sbs);
-					Assert.That(equality, Is.True);
+					Assert.That(sbHandler.GetNewSBs(), Is.EqualTo(sbs));
 				}
 				[TestCase(1)]
 				[TestCase(3)]
@@ -478,8 +502,9 @@ namespace SlotSystemTests{
 					
 					sg.RevertAndUpdateSBs();
 
-					Assert.That(sg.GetNewSlots().Count, Is.EqualTo(count));
-					foreach(var slot in sg.GetNewSlots())
+					List<Slot> actual = slotsHolder.GetNewSlots();
+					Assert.That(actual.Count, Is.EqualTo(count));
+					foreach(var slot in actual)
 						Assert.That(slot.sb, Is.Null);
 				}
 				[Test]
@@ -494,8 +519,7 @@ namespace SlotSystemTests{
 					
 					sg.RevertAndUpdateSBs();
 					
-					bool equality = sg.toList.MemberEquals(sbs);
-					Assert.That(equality, Is.True);
+					Assert.That(sbHandler.GetSBs(), Is.EqualTo(sbs));
 				}
 				[Test]
 				public void RevertAndUpdateSBs_Always_CallSBsMoveWithin(){

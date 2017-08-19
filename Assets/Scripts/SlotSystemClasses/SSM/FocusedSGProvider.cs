@@ -56,7 +56,8 @@ namespace SlotSystem{
 		public ISlotGroup GetFocusedSGEBow(){
 			if(focusedSGEs != null){
 				foreach(ISlotGroup sg in focusedSGEs){
-					if(sg.GetFilter() is SGBowFilter)
+					IFilterHandler filterHandler = sg.GetFilterHandler();
+					if(filterHandler.GetFilter() is SGBowFilter)
 						return sg;
 				}
 				throw new System.InvalidOperationException("SlotSystemManager.focusedSGEBow: there's no sg set with SGBowFilter in focusedSGEs");
@@ -66,7 +67,8 @@ namespace SlotSystem{
 		public ISlotGroup GetFocusedSGEWear(){
 			if(focusedSGEs != null){
 				foreach(ISlotGroup sg in focusedSGEs){
-					if(sg.GetFilter() is SGWearFilter)
+					IFilterHandler filterHandler = sg.GetFilterHandler();
+					if(filterHandler.GetFilter() is SGWearFilter)
 						return sg;
 				}
 				throw new System.InvalidOperationException("SlotSystemManager.focusedSGEWear: there's no sg set with SGWearFilter in focusedSGEs");
@@ -76,7 +78,8 @@ namespace SlotSystem{
 		public ISlotGroup GetFocusedSGECGears(){
 			if(focusedSGEs != null){
 				foreach(ISlotGroup sg in focusedSGEs){
-					if(sg.GetFilter() is SGCGearsFilter)
+					IFilterHandler filterHandler = sg.GetFilterHandler();
+					if(filterHandler.GetFilter() is SGCGearsFilter)
 						return sg;
 				}
 				throw new System.InvalidOperationException("SlotSystemManager.focusedSGECGears: there's no sg set with SGCGearsFilter in focusedSGEs");
