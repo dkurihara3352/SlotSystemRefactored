@@ -15,9 +15,11 @@ namespace SlotSystemTests{
 			public void Activate_TACacheIsTAResultRevertForFalse_SetIsFocused(){
 				SBSelStateHandler selStateHandler;
 					ISlottable sb = MakeSubSB();
+						IHoverable hoverable = Substitute.For<IHoverable>();
+						sb.GetHoverable().Returns(hoverable);
 					ITransactionCache taCache = Substitute.For<ITransactionCache>();
-						taCache.IsCachedTAResultRevert(sb).Returns(false);
-					sb.GetTAC().Returns(taCache);
+						taCache.IsCachedTAResultRevert(hoverable).Returns(false);
+					hoverable.GetTAC().Returns(taCache);
 					selStateHandler = new SBSelStateHandler(sb);
 				
 				selStateHandler.Activate();
@@ -28,9 +30,11 @@ namespace SlotSystemTests{
 			public void Activate_TACacheIsTAResultRevertForTrue_SetIsDefocused(){
 				SBSelStateHandler selStateHandler;
 					ISlottable sb = MakeSubSB();
+						IHoverable hoverable = Substitute.For<IHoverable>();
+						sb.GetHoverable().Returns(hoverable);
 					ITransactionCache taCache = Substitute.For<ITransactionCache>();
-						taCache.IsCachedTAResultRevert(sb).Returns(true);
-					sb.GetTAC().Returns(taCache);
+						taCache.IsCachedTAResultRevert(hoverable).Returns(true);
+					hoverable.GetTAC().Returns(taCache);
 					selStateHandler = new SBSelStateHandler(sb);
 				
 				selStateHandler.Activate();

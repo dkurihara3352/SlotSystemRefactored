@@ -13,12 +13,13 @@ namespace SlotSystemTests{
 			[Test]
 			public void WaitForPickUpProcess_Expire_WhenCalled_CallsSBPickUp(){
 				ISlottable mockSB = MakeSubSB();
-				WaitForPickUpProcess wfpuProc = new WaitForPickUpProcess(mockSB, FakeCoroutine);
+				ISBActStateHandler actStateHandler = Substitute.For<ISBActStateHandler>();
+				WaitForPickUpProcess wfpuProc = new WaitForPickUpProcess(actStateHandler, FakeCoroutine);
 				
 				wfpuProc.Expire();
 
-				mockSB.Received().PickUp();
-				}
+				actStateHandler.Received().PickUp();
+			}
 			[Test]
 			public void WaitForPointerUpProcess_Expire_WhenCalled_CallsSBDefocus(){
 				ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();

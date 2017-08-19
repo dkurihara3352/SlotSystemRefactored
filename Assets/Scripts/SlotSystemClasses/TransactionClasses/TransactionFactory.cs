@@ -12,6 +12,7 @@ namespace SlotSystem{
 			ISlotGroup origSG = pickedSB.GetSG();
 				IFilterHandler origSGFilterHandler = origSG.GetFilterHandler();
 				ISBHandler origSGSBHandler = origSG.GetSBHandler();
+			IItemHandler pickedSBItemHandler = pickedSB.GetItemHandler();
 			if(hovered != null){
 				if(hovered is ISlotGroup){
 					ISlotGroup hovSG = (ISlotGroup)hovered;
@@ -20,7 +21,7 @@ namespace SlotSystem{
 					ISBHandler hovSGSBHandler = hovSG.GetSBHandler();
 					if(hovSGFilterHandler.AcceptsFilter(pickedSB)){
 						if(hovSG != origSG && origSG.IsShrinkable()){
-							if(hovSGSBHandler.HasItem(pickedSB.GetItem()) && pickedSB.IsStackable())
+							if(hovSGSBHandler.HasItem(pickedSB.GetItem()) && pickedSBItemHandler.IsStackable())
 								return new StackTransaction(pickedSB, hovSGSBHandler.GetSB(pickedSB.GetItem()), tam);
 								
 							if(hovSGSlotsHolder.HasEmptySlot()){
@@ -58,7 +59,7 @@ namespace SlotSystem{
 							if(pickedSB.GetItem() == hovSB.GetItem()){
 								if(hovSBSG.IsPool() && origSG.IsShrinkable())
 									return new FillTransaction(pickedSB, hovSBSG, tam);
-								if(pickedSB.IsStackable())
+								if(pickedSBItemHandler.IsStackable())
 									return new StackTransaction(pickedSB, hovSB, tam);
 							}else{
 								if(hovSBSGSBHandler.HasItem(pickedSB.GetItem())){

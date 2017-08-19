@@ -25,6 +25,12 @@ namespace SlotSystem{
 			_pickedAmount = amount;
 		}
 			int _pickedAmount = 0;
+		public void IncreasePickedAmount(){
+			int pickedAmount = GetPickedAmount();
+			if(IsStackable() && GetQuantity() > pickedAmount){
+				SetPickedAmount(pickedAmount + 1);
+			}
+		}
 		public virtual bool IsStackable(){
 			return GetItem().IsStackable();
 		}
@@ -40,6 +46,7 @@ namespace SlotSystem{
 		void SetItem(IInventoryItemInstance item);
 		int GetPickedAmount();
 		void SetPickedAmount(int amount);
+		void IncreasePickedAmount();
 		bool IsStackable();
 		int GetQuantity();
 		void SetQuantity(int quant);

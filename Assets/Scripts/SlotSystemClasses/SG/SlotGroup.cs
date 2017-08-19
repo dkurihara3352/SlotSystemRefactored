@@ -52,7 +52,7 @@ namespace SlotSystem{
 				bool flag = true;
 				foreach(ISlottable sb in this){
 					if(sb != null)
-					flag &= !sb.GetActProcess().IsRunning();
+					flag &= !sb.IsActProcessRunning();
 				}
 				if(flag){
 					GetSGActStateHandler().ExpireActProcess();

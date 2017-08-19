@@ -22,6 +22,19 @@ namespace SlotSystemTests{
 				Assert.That(itemHandler.IsStackable(), Is.False);
 				Assert.That(itemHandler.GetQuantity(), Is.EqualTo(1));
 			}
+			[Test]
+			public void IncreasePickedAmount_itemIsStackable_IncreasesPickedAmountUptoQuantity([NUnit.Framework.Random(1, 10, 1)]int quantity){
+				IInventoryItemInstance item = Substitute.For<IInventoryItemInstance>();
+					item.IsStackable().Returns(true);
+					item.GetQuantity().Returns(quantity);
+				ItemHandler itemHandler = new ItemHandler(item);
+
+				for(int i = 0; i < quantity + 1; i ++){
+					itemHandler.IncreasePickedAmount();
+				}
+
+				Assert.That(itemHandler.GetQuantity(), Is.EqualTo(quantity));
+			}
 		}
 	}
 }

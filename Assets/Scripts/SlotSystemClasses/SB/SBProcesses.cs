@@ -11,13 +11,13 @@ namespace SlotSystem{
 	}
 		public interface ISBActProcess: ISBProcess{}
 			public class WaitForPickUpProcess: SBProcess, ISBActProcess{
-				ISlottable sb;
-				public WaitForPickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
-					this.sb = sb;
+				ISBActStateHandler actStateHandler;
+				public WaitForPickUpProcess(ISBActStateHandler actStateHandler, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+					this.actStateHandler = actStateHandler;
 				} 
 				public override void Expire(){
 					base.Expire();
-					sb.PickUp();
+					actStateHandler.PickUp();
 				}
 			}
 			public class WaitForPointerUpProcess: SBProcess, ISBActProcess{
@@ -34,10 +34,10 @@ namespace SlotSystem{
 				ITransactionManager tam;
 				ISlottable sb;
 				ISSESelStateHandler selStateHandler;
-				public WaitForNextTouchProcess(ISlottable sb, ISSESelStateHandler selStateHandler, ITransactionManager tam, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public WaitForNextTouchProcess(ISlottable sb, ITransactionManager tam, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 					this.tam = tam;
 					this.sb = sb;
-					this.selStateHandler = selStateHandler;
+					this.selStateHandler = sb.GetSelStateHandler();
 				}
 				public override void Expire(){
 					base.Expire();
@@ -51,37 +51,37 @@ namespace SlotSystem{
 				}
 			}
 			public class PickUpProcess: SBProcess, ISBActProcess{
-				public PickUpProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public PickUpProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBMoveWithinProcess: SBProcess, ISBActProcess{
-				public SBMoveWithinProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public SBMoveWithinProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBAddProcess: SBProcess, ISBActProcess{
-				public SBAddProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public SBAddProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBRemoveProcess: SBProcess, ISBActProcess{
-				public SBRemoveProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public SBRemoveProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 		public interface ISBEqpProcess: ISBProcess{}
 			public class SBEquipProcess: SBProcess, ISBEqpProcess{
-				public SBEquipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public SBEquipProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBUnequipProcess: SBProcess, ISBEqpProcess{
-				public SBUnequipProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public SBUnequipProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 		public interface ISBMrkProcess: ISBProcess{}
 			public class SBMarkProcess: SBProcess, ISBMrkProcess{
-				public SBMarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public SBMarkProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 			public class SBUnmarkProcess: SBProcess, ISBMrkProcess{
-				public SBUnmarkProcess(ISlottable sb, System.Func<IEnumeratorFake> coroutine): base(coroutine){
+				public SBUnmarkProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				}
 			}
 	public class SBActCoroutineRepo: ISBActCoroutineRepo{

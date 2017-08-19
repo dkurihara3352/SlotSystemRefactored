@@ -216,12 +216,13 @@ namespace SlotSystem{
 				if(!item.IsStackable())
 					throw new ArgumentException("item is not stackable");
 				else{
+					List<IItemHandler> itemHandlers = ExtractItemHandlers(sbs);
 					bool found = false;
-					foreach(var sb in sbs){
-						if(sb != null){
-							if(sb.GetItem().Equals(item)){
-								int newQuantity = sb.GetQuantity() + item.GetQuantity();
-								sb.SetQuantity(newQuantity);
+					foreach(var itemHandler in itemHandlers){
+						if(itemHandler != null){
+							if(itemHandler.GetItem().Equals(item)){
+								int newQuantity = itemHandler.GetQuantity() + item.GetQuantity();
+								itemHandler.SetQuantity(newQuantity);
 								found = true;
 								return;
 							}
@@ -230,6 +231,15 @@ namespace SlotSystem{
 					if(!found)
 						throw new InvalidOperationException("sbs does not contain matching sb");
 				}
+			}
+			List<IItemHandler> ExtractItemHandlers(IEnumerable<ISlottable> sbs){
+				List<IItemHandler> result = new List<IItemHandler>();
+				foreach(ISlottable sb in sbs)
+					if(sb != null)
+						result.Add(sb.GetItemHandler());
+					else
+						result.Add(null);
+				return result;
 			}
 		public List<ISlottable> RemovedNewSBs(){
 			List<IInventoryItemInstance> removed = taCache.GetMoved();
@@ -255,17 +265,19 @@ namespace SlotSystem{
 					bool found = false;
 					ISlottable removed = null;
 					foreach(var sb in sbs)
-						if(sb != null)
+						if(sb != null){
+							IItemHandler itemHandler = sb.GetItemHandler();
 							if(sb.GetItem().Equals(item)){
 								found = true;
-								int newQuantity = sb.GetQuantity() - item.GetQuantity();
+								int newQuantity = itemHandler.GetQuantity() - item.GetQuantity();
 								if(newQuantity <= 0){
 									removed = sb;
 									break;
 								}else
-									sb.SetQuantity(newQuantity);
+									itemHandler.SetQuantity(newQuantity);
 									return;
 							}
+						}
 					if(removed != null){
 						sbs[sbs.IndexOf(removed)] = null;
 						removed.Destroy();

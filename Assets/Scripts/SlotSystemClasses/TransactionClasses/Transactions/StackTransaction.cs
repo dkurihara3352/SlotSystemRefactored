@@ -23,7 +23,7 @@ namespace SlotSystem{
 			_selectedSG = _selectedSB.GetSG();
 			ISlotGroup sg2 = GetSG2();
 			IInventoryItemInstance cache = pickedSB.GetItem();
-			cache.SetQuantity(pickedSB.GetPickedAmount());
+			cache.SetQuantity(pickedSB.GetItemHandler().GetPickedAmount());
 			itemCache.Add(cache);
 			iconHandler = tam.GetIconHandler();
 			sg2SlotsHolder = sg2.GetSlotsHolder();

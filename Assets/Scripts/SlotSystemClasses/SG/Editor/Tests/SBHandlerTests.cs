@@ -239,7 +239,9 @@ namespace SlotSystemTests{
 				ISlottable sb = MakeSubSB();
 					ISSEProcess sbActProc = MakeSubSBActProc();
 						sbActProc.IsRunning().Returns(isRunning);
-					sb.GetActProcess().Returns(sbActProc);
+					ISBActStateHandler actStateHandler = Substitute.For<ISBActStateHandler>();
+						actStateHandler.GetActProcess().Returns(sbActProc);
+					sb.GetActStateHandler().Returns(actStateHandler);
 				return sb;
 			}
 		}

@@ -43,19 +43,20 @@ namespace SlotSystem{
 			Dictionary<IHoverable, ISlotSystemTransaction> result = new Dictionary<IHoverable, ISlotSystemTransaction>();
 			foreach(ISlotGroup sg in focusedSGProvider.GetFocusedSGs()){
 				ISlottable pickedSB = GetPickedSB();
-				IHoverable hoverable = sg.GetHoverable();
-				ISlotSystemTransaction ta = MakeTransaction(pickedSB, hoverable);
+				IHoverable sgHoverable = sg.GetHoverable();
+				ISlotSystemTransaction ta = MakeTransaction(pickedSB, sgHoverable);
 				ISSESelStateHandler sgSelStateHandler = sg.GetSelStateHandler();
-				result.Add(hoverable, ta);
+				result.Add(sgHoverable, ta);
 				if(ta is IRevertTransaction)
 					sgSelStateHandler.Defocus();
 				else
 					sgSelStateHandler.Focus();
 				foreach(ISlottable sb in sg){
 					if(sb != null){
-						ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sb);
+						IHoverable sbHoverable = sb.GetHoverable();
+						ISlotSystemTransaction ta2 = MakeTransaction(pickedSB, sbHoverable);
 						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
-						result.Add(sb, ta2);
+						result.Add(sbHoverable, ta2);
 						if(ta2 is IRevertTransaction || ta2 is IFillTransaction)
 							sbSelStateHandler.Defocus();
 						else
@@ -78,7 +79,7 @@ namespace SlotSystem{
 				}
 				foreach(ISlottable targetSB in targetSG){
 					if(sb != null)
-						if(!(MakeTransaction(sb, targetSB) is IRevertTransaction)){
+						if(!(MakeTransaction(sb, targetSB.GetHoverable()) is IRevertTransaction)){
 							res = false; break;
 						}
 				}

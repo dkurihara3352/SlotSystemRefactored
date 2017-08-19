@@ -7,15 +7,15 @@ using Utility;
 namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
 		public override void InitializeStates(){
-			_selStateHandler.Deactivate();
-			WaitForAction();
+			GetSelStateHandler().Deactivate();
+			GetActStateHandler().WaitForAction();
 			ClearCurEqpState();
 			Unmark();
 		}
 		/*	States	*/
 			public void InitializeSB(IInventoryItemInstance item){
-
-				SetHoverable(new Hoverable(GetSSM().GetTAC()));
+				IHoverable hoverable = new Hoverable(GetSSM().GetTAC());
+				SetHoverable(hoverable);
 				SetTapCommand(new SBTapCommand());
 				SetItemHandler(new ItemHandler(item));
 				SetSlotHandler(new SlotHandler());
@@ -40,149 +40,31 @@ namespace SlotSystem{
 					_selStateHandler = handler;
 				}
 			/*	Action State */
-				public ISBActStateHandler actStateHandler{
-					get{
-						if(_actStateHandler != null)
-							return _actStateHandler;
-						else
-							throw new InvalidOperationException("actStateHandler not set");
-					}
+				public ISBActStateHandler GetActStateHandler(){
+					if(_actStateHandler != null)
+						return _actStateHandler;
+					else
+						throw new InvalidOperationException("actStateHandler not set");
 				}
-					ISBActStateHandler _actStateHandler;
 				public void SetActStateHandler(ISBActStateHandler actStateHandler){
 					_actStateHandler = actStateHandler;
 				}
-				public void ClearCurActState(){
-					actStateHandler.ClearCurActState();
+					ISBActStateHandler _actStateHandler;
+				public bool IsActProcessRunning(){
+					return GetActStateHandler().IsActProcessRunning();
 				}
-					public bool WasActStateNull(){
-						return actStateHandler.WasActStateNull();
-					}
-					public bool IsActStateNull(){
-						return actStateHandler.IsActStateNull();
-					}
-				public void WaitForAction(){
-					actStateHandler.WaitForAction();
-				}
-					public bool IsWaitingForAction(){
-						return actStateHandler.IsWaitingForAction();
-					}
-					public bool WasWaitingForAction(){
-						return actStateHandler.WasWaitingForAction();
-					}
-				public void WaitForPointerUp(){
-					actStateHandler.WaitForPointerUp();
-				}
-					public bool IsWaitingForPointerUp(){
-						return actStateHandler.IsWaitingForPointerUp();
-					}
-					public bool WasWaitingForPointerUp(){
-						return actStateHandler.WasWaitingForPointerUp();
-					}
-				public void WaitForPickUp(){
-					actStateHandler.WaitForPickUp();
-				}
-					public bool IsWaitingForPickUp(){
-						return actStateHandler.IsWaitingForPickUp();
-					}
-					public bool WasWaitingForPickUp(){
-						return actStateHandler.WasWaitingForPickUp();
-					}
-				public void WaitForNextTouch(){
-					actStateHandler.WaitForNextTouch();
-				}
-					public bool IsWaitingForNextTouch(){
-						return actStateHandler.IsWaitingForNextTouch();
-					}
-					public bool WasWaitingForNextTouch(){
-						return actStateHandler.WasWaitingForNextTouch();
-					}
-				public void PickUp(){
-					actStateHandler.PickUp();
-				}
-				public void SetPickedUpState(){
-					actStateHandler.SetPickedUpState();
-				}
-					public bool IsPickingUp(){
-						return actStateHandler.IsPickingUp();
-					}
-					public bool WasPickingUp(){
-						return actStateHandler.WasPickingUp();
-					}
-				public void Remove(){
-					actStateHandler.Remove();
-				}
-					public bool IsRemoving(){
-						return actStateHandler.IsRemoving();
-					}
-					public bool WasRemoving(){
-						return actStateHandler.WasRemoving();
-					}
-				public void Add(){
-					actStateHandler.Add();
-				}
-					public bool IsAdding(){
-						return actStateHandler.IsAdding();
-					}
-					public bool WasAdding(){
-						return actStateHandler.WasAdding();
-					}
 				public void MoveWithin(){
-					actStateHandler.MoveWithin();
+					GetActStateHandler().MoveWithin();
 				}
-					public bool IsMovingWithin(){
-						return actStateHandler.IsMovingWithin();
-					}
-					public bool WasMovingWithin(){
-						return actStateHandler.WasMovingWithin();
-					}
-				public ISBActProcess GetActProcess(){
-					return actStateHandler.GetActProcess();
+				public void Add(){
+					GetActStateHandler().Add();
 				}
-				public void SetActProcessEngine(ISSEProcessEngine<ISBActProcess> engine){
-					((SBActStateHandler)actStateHandler).SetActProcessEngine(engine);
+				public void Remove(){
+					GetActStateHandler().Remove();
 				}
-				public void SetAndRunActProcess(ISBActProcess process){
-					actStateHandler.SetAndRunActProcess(process);
-				}
-				public void ExpireActProcess(){
-					actStateHandler.ExpireActProcess();
-				}
-				public void SetActCoroutineRepo(ISBActCoroutineRepo repo){
-					((SBActStateHandler)actStateHandler).SetCoroutineRepo(repo);
-				}
-				public System.Func<IEnumeratorFake> GetWaitForPointerUpCoroutine(){
-					return actStateHandler.GetWaitForPointerUpCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetWaitForPickUpCoroutine(){
-					return actStateHandler.GetWaitForPickUpCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetPickUpCoroutine(){
-					return actStateHandler.GetPickUpCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetWaitForNextTouchCoroutine(){
-					return actStateHandler.GetWaitForNextTouchCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetRemoveCoroutine(){
-					return actStateHandler.GetRemoveCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetAddCoroutine(){
-					return actStateHandler.GetAddCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetMoveWithinCoroutine(){
-					return actStateHandler.GetMoveWithinCoroutine();
-				}
-				public void OnPointerDown(PointerEventDataFake eventDataMock){
-					actStateHandler.OnPointerDown(eventDataMock);
-				}
-				public void OnPointerUp(PointerEventDataFake eventDataMock){
-					actStateHandler.OnPointerUp(eventDataMock);
-				}
-				public void OnDeselected(PointerEventDataFake eventDataMock){
-					actStateHandler.OnDeselected(eventDataMock);
-				}
-				public void OnEndDrag(PointerEventDataFake eventDataMock){
-					actStateHandler.OnEndDrag(eventDataMock);
+				public void PickUp(){
+					GetActStateHandler().PickUp();
+					GetItemHandler().SetPickedAmount(1);
 				}
 			/*	Equip State	*/
 				ISBEqpStateHandler eqpStateHandler{
@@ -312,49 +194,24 @@ namespace SlotSystem{
 			}
 		/*	public fields	*/
 			public void Increment(){
-				SetPickedUpState();
-				IncreasePickedAmountUpToQuantity();
-			}
-			public void IncreasePickedAmountUpToQuantity(){
-				if(IsStackable() && GetQuantity() > GetPickedAmount()){
-					SetPickedAmount(GetPickedAmount() + 1);
-				}
+				GetActStateHandler().SetPickedUpState();
+				GetItemHandler().IncreasePickedAmount();
 			}
 		/* Item Handling */
-			public IItemHandler itemHandler{
-				get{
-					if(_itemHandler != null)
-						return _itemHandler;
-					else throw new InvalidOperationException("itemHandler not set");
-				}
+			public IItemHandler GetItemHandler(){
+				if(_itemHandler != null)
+					return _itemHandler;
+				else throw new InvalidOperationException("itemHandler not set");
 			}
-				IItemHandler _itemHandler;
 			public void SetItemHandler(IItemHandler itemHandler){
 				_itemHandler = itemHandler;
 			}
+				IItemHandler _itemHandler;
 			public IInventoryItemInstance GetItem(){
-				return itemHandler.GetItem();
-			}
-			public void SetItem(IInventoryItemInstance item){
-				itemHandler.SetItem(item);
-			}
-			public int GetPickedAmount(){
-				return itemHandler.GetPickedAmount();
-			}
-			public void SetPickedAmount(int amount){
-				itemHandler.SetPickedAmount(amount);
-			}
-			public bool IsStackable(){
-				return itemHandler.IsStackable();
-			}
-			public int GetQuantity(){
-				return itemHandler.GetQuantity();
-			}
-			public void SetQuantity(int quant){
-				itemHandler.SetQuantity(quant);
+				return GetItemHandler().GetItem();
 			}
 			public void UpdateEquipState(){
-				if(GetItem().GetIsEquipped()) Equip();
+				if(GetItemHandler().GetItem().GetIsEquipped()) Equip();
 				else Unequip();
 			}
 		/* SG And Slots */
@@ -407,8 +264,8 @@ namespace SlotSystem{
 			}
 		/* Others */
 			public void Refresh(){
-				WaitForAction();
-				itemHandler.SetPickedAmount(0);
+				GetActStateHandler().WaitForAction();
+				GetItemHandler().SetPickedAmount(0);
 				slotHandler.SetNewSlotID(-2);
 			}
 			public bool ShareSGAndItem(ISlottable other){
@@ -438,44 +295,33 @@ namespace SlotSystem{
 			}
 		/*	Transaction	*/
 			public bool IsPickedUp(){
-				return GetTAC().GetPickedSB() == (ISlottable)this;
+				return GetHoverable().GetTAC().GetPickedSB() == (ISlottable)this;
 			}
 			public bool PassesPrePickFilter(){
-				return !GetTAC().IsTransactionGoingToBeRevert(this);
+				return !GetHoverable().GetTAC().IsTransactionGoingToBeRevert(this);
 			}
 		/* hoverable */
-			public IHoverable hoverable{
-				get{
-					if(_hoverable != null)
-						return _hoverable;
-					else
-						throw new InvalidOperationException("hoverable not set");
-				}
+			public IHoverable GetHoverable(){
+				if(_hoverable != null)
+					return _hoverable;
+				else
+					throw new InvalidOperationException("hoverable not set");
 			}
-				IHoverable _hoverable;
 			public void SetHoverable(IHoverable hoverable){
 				_hoverable = hoverable;
 			}
-			public ITransactionCache GetTAC(){
-				return hoverable.GetTAC();
-			}
-			public void SetTACache(ITransactionCache taCache){
-				hoverable.SetTACache(taCache);
-			}
-			public bool IsHovered(){
-				return hoverable.IsHovered();
-			}
-			public void OnHoverEnter(){
-				hoverable.OnHoverEnter();
-			}
-			public void OnHoverExit(){
-				hoverable.OnHoverExit();
-			}
-			public void SetSSESelStateHandler(ISSESelStateHandler handler){
-				//going to be removed in due time
-			}
+				IHoverable _hoverable;
 	}
-	public interface ISlottable: ISlotSystemElement, IHoverable, IItemHandler, ISBActStateHandler, ISBEqpStateHandler, ISBMrkStateHandler, ISlotHandler{
+	public interface ISlottable: ISlotSystemElement, ISBEqpStateHandler, ISBMrkStateHandler, ISlotHandler{
+			IHoverable GetHoverable();
+			IItemHandler GetItemHandler();
+				IInventoryItemInstance GetItem();
+			ISBActStateHandler GetActStateHandler();
+				bool IsActProcessRunning();
+				void PickUp();
+				void MoveWithin();
+				void Remove();
+				void Add();
 		/*	Commands	*/
 			void Tap();
 		/* Item Handling */

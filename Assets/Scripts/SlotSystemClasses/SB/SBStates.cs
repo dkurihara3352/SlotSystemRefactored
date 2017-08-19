@@ -6,14 +6,13 @@ using System;
 
 namespace SlotSystem{
 	public abstract class SBState: SSEState{
-        protected ISlottable sb;
-        public SBState(ISlottable sb){
-            this.sb = sb;
-        }
 	}
     /* ActState */
         public abstract class SBActState: SBState, ISBActState{
-            public SBActState(ISBActStateHandler actStateHandler) : base((ISlottable)actStateHandler){}
+            protected ISBActStateHandler actStateHandler;
+            public SBActState(ISBActStateHandler actStateHandler){
+                this.actStateHandler = actStateHandler;
+            }
             public virtual void OnPointerDown(){}
             public virtual void OnPointerUp(){}
             public virtual void OnDeselected(){}
@@ -32,39 +31,40 @@ namespace SlotSystem{
             ITransactionCache taCache;
             ISSESelStateHandler selStateHandler;
             ISBActStateHandler actStateHandler;
-            public SBActStateRepo(ISSESelStateHandler selStateHandler, ISBActStateHandler actStateHandler, ITransactionManager tam, ITransactionCache taCache){
+            ISlottable sb;
+            public SBActStateRepo(ISlottable sb, ITransactionManager tam, ITransactionCache taCache){
                 this.tam = tam;
                 this.taCache = taCache;
-                this.selStateHandler = selStateHandler;
-                this.actStateHandler = actStateHandler;
+                this.selStateHandler = sb.GetSelStateHandler();
+                this.actStateHandler = sb.GetActStateHandler();
             }
             public ISBActState GetWaitForActionState(){
                 if(_waitForActionState == null)
-                    _waitForActionState = new WaitForActionState(selStateHandler, actStateHandler);
+                    _waitForActionState = new WaitForActionState(sb);
                 return _waitForActionState;
             }
                 ISBActState _waitForActionState;
             public ISBActState GetWaitForPickUpState(){
                 if(_waitForPickUpState == null)
-                    _waitForPickUpState = new WaitForPickUpState(selStateHandler, actStateHandler);
+                    _waitForPickUpState = new WaitForPickUpState(sb);
                 return _waitForPickUpState;
             }
                 ISBActState _waitForPickUpState;
             public ISBActState GetWaitForPointerUpState(){
                 if(_waitForPointerUpState == null)
-                    _waitForPointerUpState = new WaitForPointerUpState(selStateHandler, actStateHandler);
+                    _waitForPointerUpState = new WaitForPointerUpState(sb);
                 return _waitForPointerUpState;
             }
                 ISBActState _waitForPointerUpState;
             public ISBActState GetWaitForNextTouchState(){
                 if(_waitForNextTouchState == null)
-                    _waitForNextTouchState = new WaitForNextTouchState(selStateHandler, actStateHandler, tam);
+                    _waitForNextTouchState = new WaitForNextTouchState(sb, tam);
                 return _waitForNextTouchState;
             }
                 ISBActState _waitForNextTouchState;
             public ISBActState GetPickingUpState(){
                 if(_pickingUpState == null)
-                    _pickingUpState = new PickingUpState(selStateHandler, actStateHandler, tam, taCache);
+                    _pickingUpState = new PickingUpState(sb, tam, taCache);
                 return _pickingUpState;
             }
                 ISBActState _pickingUpState;
@@ -100,36 +100,38 @@ namespace SlotSystem{
         }
         public class WaitForActionState: SBActState{//up state
             ISSESelStateHandler selStateHandler;
-            public WaitForActionState(ISSESelStateHandler selStateHandler, ISBActStateHandler actStateHandler): base(actStateHandler){
-                this.selStateHandler = selStateHandler;
+            public WaitForActionState(ISlottable sb): base(sb.GetActStateHandler()){
+                this.selStateHandler = sb.GetSelStateHandler();
             }
             public override void EnterState(){
-                if(!sb.WasActStateNull())
-                    sb.SetAndRunActProcess(null);
+                if(!actStateHandler.WasActStateNull())
+                    actStateHandler.SetAndRunActProcess(null);
             }
             public override void OnPointerDown(){
                 if(selStateHandler.IsFocused()){
                     selStateHandler.Select();
-                    sb.WaitForPickUp();
+                    actStateHandler.WaitForPickUp();
                 }
                 else
-                    sb.WaitForPointerUp();
+                    actStateHandler.WaitForPointerUp();
             }
         }
         public class WaitForPickUpState: SBActState{//down state
             ISSESelStateHandler selStateHandler;
-            public WaitForPickUpState(ISSESelStateHandler selStateHandler, ISBActStateHandler actStateHandler): base(actStateHandler){
-                this.selStateHandler = selStateHandler;
+            ISlottable sb;
+            public WaitForPickUpState(ISlottable sb): base(sb.GetActStateHandler()){
+                this.selStateHandler = sb.GetSelStateHandler();
+                this.sb = sb;
             }
             public override void EnterState(){
-                if(sb.WasWaitingForAction()){
-                    ISBActProcess wfpuProcess = new WaitForPickUpProcess(sb, sb.GetWaitForPickUpCoroutine());
-                    sb.SetAndRunActProcess(wfpuProcess);
+                if(actStateHandler.WasWaitingForAction()){
+                    ISBActProcess wfpuProcess = new WaitForPickUpProcess(actStateHandler, actStateHandler.GetWaitForPickUpCoroutine());
+                    actStateHandler.SetAndRunActProcess(wfpuProcess);
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than WaitForActionState");
             }
             public override void OnPointerUp(){
-                sb.WaitForNextTouch();
+                actStateHandler.WaitForNextTouch();
             }
             public override void OnEndDrag(){
                 sb.Refresh();                    
@@ -138,43 +140,47 @@ namespace SlotSystem{
         }
         public class WaitForPointerUpState: SBActState{//down state
             ISSESelStateHandler selStateHandler;
-            public WaitForPointerUpState(ISSESelStateHandler selStateHandler, ISBActStateHandler actStateHandler): base(actStateHandler){
-                this.selStateHandler = selStateHandler;
+            ISlottable sb;
+            public WaitForPointerUpState(ISlottable sb): base(sb.GetActStateHandler()){
+                this.selStateHandler = sb.GetSelStateHandler();
+                this.sb = sb;
             }
             public override void EnterState(){
-                if(sb.WasWaitingForAction()){
-                    ISBActProcess wfPtuProcess = new WaitForPointerUpProcess(selStateHandler, sb.GetWaitForPointerUpCoroutine());
-                    sb.SetAndRunActProcess(wfPtuProcess);
+                if(actStateHandler.WasWaitingForAction()){
+                    ISBActProcess wfPtuProcess = new WaitForPointerUpProcess(selStateHandler, actStateHandler.GetWaitForPointerUpCoroutine());
+                    actStateHandler.SetAndRunActProcess(wfPtuProcess);
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than WaitForActionState");
-                }
+            }
             public override void OnPointerUp(){
                 sb.Tap();
                 sb.Refresh();
                 selStateHandler.Defocus();
-                }
+            }
             public override void OnEndDrag(){
                 sb.Refresh();
                 selStateHandler.Defocus();
-                }
+            }
         }
         public class WaitForNextTouchState: SBActState{//up state
             ITransactionManager tam;
             ISSESelStateHandler selStateHandler;
-            public WaitForNextTouchState(ISSESelStateHandler selStateHandler, ISBActStateHandler actStateHandler, ITransactionManager tam): base(actStateHandler){
+            ISlottable sb;
+            public WaitForNextTouchState(ISlottable sb, ITransactionManager tam): base(sb.GetActStateHandler()){
                 this.tam = tam;
-                this.selStateHandler = selStateHandler;
+                this.selStateHandler = sb.GetSelStateHandler();
+                this.sb = sb;
             }
             public override void EnterState(){
-                if(sb.WasPickingUp() || sb.WasWaitingForPickUp()){
-                    ISBActProcess wfntProcess = new WaitForNextTouchProcess(sb, selStateHandler, tam, sb.GetWaitForNextTouchCoroutine());
-                    sb.SetAndRunActProcess(wfntProcess);
+                if(actStateHandler.WasPickingUp() || actStateHandler.WasWaitingForPickUp()){
+                    ISBActProcess wfntProcess = new WaitForNextTouchProcess(sb, tam, actStateHandler.GetWaitForNextTouchCoroutine());
+                    actStateHandler.SetAndRunActProcess(wfntProcess);
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than PickingUpState or WaitForPickUpState");
             }
             public override void OnPointerDown(){
                 if(!sb.IsPickedUp())
-                    sb.PickUp();
+                    actStateHandler.PickUp();
                 else{
                     sb.Increment();
                 }
@@ -198,33 +204,38 @@ namespace SlotSystem{
                 ITransactionCache _taCache;
             ITAMActStateHandler tamStateHandler;
             ISSESelStateHandler selStateHandler;
-            public PickingUpState(ISSESelStateHandler selStateHandler, ISBActStateHandler actStateHandler, ITransactionManager tam, ITransactionCache taCache): base(actStateHandler){
+            IHoverable sbHoverable;
+            IItemHandler itemHandler;
+            ISlottable sb;
+            public PickingUpState(ISlottable sb, ITransactionManager tam, ITransactionCache taCache): base(sb.GetActStateHandler()){
                 this.tam = tam;
                 this.iconHandler = tam.GetIconHandler();
                 _taCache = taCache;
                 this.tamStateHandler = tam.GetActStateHandler();
-                this.selStateHandler = selStateHandler;
+                this.selStateHandler = sb.GetSelStateHandler();
+                sbHoverable = sb.GetHoverable();
+                itemHandler = sb.GetItemHandler();
             }
             public override void EnterState(){
-                if(sb.WasWaitingForPickUp() || sb.WasWaitingForNextTouch()){
-                    sb.OnHoverEnter();
+                if(actStateHandler.WasWaitingForPickUp() || actStateHandler.WasWaitingForNextTouch()){
+                    sbHoverable.OnHoverEnter();
                     taCache.SetPickedSB(sb);
                     iconHandler.SetDIcon1(sb);
                     tamStateHandler.Probe();
                     taCache.CreateTransactionResults();
                     taCache.UpdateFields();
+                    ISBActProcess pickedUpProcess = new PickUpProcess(actStateHandler.GetPickUpCoroutine());
+                    actStateHandler.SetAndRunActProcess(pickedUpProcess);
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than WaitForPickUpState or WaitForNextTouchState");
-                ISBActProcess pickedUpProcess = new PickUpProcess(sb, sb.GetPickUpCoroutine());
-                sb.SetAndRunActProcess(pickedUpProcess);
             }
             public override void OnDeselected(){
                 sb.Refresh();
                 selStateHandler.Focus();
             }
             public override void OnPointerUp(){
-                if(sb.IsHovered() && sb.IsStackable())
-                    sb.WaitForNextTouch();
+                if(sbHoverable.IsHovered() && itemHandler.IsStackable())
+                    actStateHandler.WaitForNextTouch();
                 else
                     tam.ExecuteTransaction();
             }
@@ -235,28 +246,28 @@ namespace SlotSystem{
         public class SBAddedState: SBActState{
             public SBAddedState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBAddProcess process = new SBAddProcess(sb, sb.GetAddCoroutine());
-                sb.SetAndRunActProcess(process);
+                SBAddProcess process = new SBAddProcess(actStateHandler.GetAddCoroutine());
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBRemovedState: SBActState{
             public SBRemovedState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBRemoveProcess process = new SBRemoveProcess(sb, sb.GetRemoveCoroutine());
-                sb.SetAndRunActProcess(process);
+                SBRemoveProcess process = new SBRemoveProcess(actStateHandler.GetRemoveCoroutine());
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class MoveWithinState: SBActState{
             public MoveWithinState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBMoveWithinProcess process = new SBMoveWithinProcess(sb, sb.GetMoveWithinCoroutine());
-                sb.SetAndRunActProcess(process);
+                SBMoveWithinProcess process = new SBMoveWithinProcess(actStateHandler.GetMoveWithinCoroutine());
+                actStateHandler.SetAndRunActProcess(process);
             }
         }
     /* EqpState */
         public abstract class SBEqpState: SBState, ISBEqpState{
             protected ISBEqpStateHandler eqpStateHandler;
-            public SBEqpState(ISlottable sb): base(sb){
+            public SBEqpState(ISlottable sb){
                 this.eqpStateHandler = sb;
             }
         }
@@ -286,26 +297,32 @@ namespace SlotSystem{
             ISBEqpState GetUnequippedState();
         }
         public class SBEquippedState: SBEqpState{
-            public SBEquippedState(ISlottable sb): base(sb){}
+            ISlottable sb;
+            public SBEquippedState(ISlottable sb): base(sb){
+                this.sb = sb;
+            }
             public override void EnterState(){
                 if(!sb.IsHierarchySetUp())
                     return;
                 if(sb.IsPool()){
                     if(eqpStateHandler.IsUnequipped()){
-                        ISBEqpProcess process = new SBEquipProcess(sb, eqpStateHandler.GetEquipCoroutine());
+                        ISBEqpProcess process = new SBEquipProcess(eqpStateHandler.GetEquipCoroutine());
                         eqpStateHandler.SetAndRunEqpProcess(process);
                     }
                 }
             }
         }
         public class SBUnequippedState: SBEqpState{
-            public SBUnequippedState(ISlottable sb): base(sb){}
+            ISlottable sb;
+            public SBUnequippedState(ISlottable sb): base(sb){
+                this.sb = sb;
+            }
             public override void EnterState(){
                 if(!sb.IsHierarchySetUp()) 
                     return;
                 if(sb.IsPool()){
                     if(eqpStateHandler.IsEquipped()){
-                        ISBEqpProcess process = new SBUnequipProcess(sb, eqpStateHandler.GetUnequipCoroutine());
+                        ISBEqpProcess process = new SBUnequipProcess(eqpStateHandler.GetUnequipCoroutine());
                         eqpStateHandler.SetAndRunEqpProcess(process);
                     }
                 }
@@ -314,7 +331,7 @@ namespace SlotSystem{
     /* MrkState */
         public abstract class SBMrkState: SBState, ISBMrkState{
             protected ISBMrkStateHandler mrkStateHandler;
-            public SBMrkState(ISlottable sb): base(sb){
+            public SBMrkState(ISlottable sb){
                 mrkStateHandler = sb;
             }
         }
@@ -343,26 +360,32 @@ namespace SlotSystem{
             ISBMrkState GetUnmarkedState();
         }
         public class SBMarkedState: SBMrkState{
-            public SBMarkedState(ISlottable sb): base(sb){}
+            ISlottable sb;
+            public SBMarkedState(ISlottable sb): base(sb){
+                this.sb = sb;
+            }
             public override void EnterState(){
                 if(!sb.IsHierarchySetUp())
                     return;
                 if(sb.IsPool()){
                     if(mrkStateHandler.IsUnmarked()){
-                        ISBMrkProcess process = new SBMarkProcess(sb, mrkStateHandler.GetMarkCoroutine());
+                        ISBMrkProcess process = new SBMarkProcess(mrkStateHandler.GetMarkCoroutine());
                         mrkStateHandler.SetAndRunMrkProcess(process);
                     }
                 }
             }
         }
         public class SBUnmarkedState: SBMrkState{
-            public SBUnmarkedState(ISlottable sb): base (sb){}
+            ISlottable sb;
+            public SBUnmarkedState(ISlottable sb): base (sb){
+                this.sb = sb;
+            }
             public override void EnterState(){
                 if(!sb.IsHierarchySetUp())
                     return;
                 if(sb.IsPool()){
                     if(mrkStateHandler.IsMarked()){
-                        ISBMrkProcess process = new SBUnmarkProcess(sb, mrkStateHandler.GetUnmarkCoroutine());
+                        ISBMrkProcess process = new SBUnmarkProcess(mrkStateHandler.GetUnmarkCoroutine());
                         mrkStateHandler.SetAndRunMrkProcess(process);
                     }
                 }

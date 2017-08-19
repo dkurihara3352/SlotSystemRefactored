@@ -51,10 +51,8 @@ namespace SlotSystem{
 		public bool IsAllSBActProcDone(){
 			foreach(ISlottable sb in GetSBs()){
 				if(sb != null){
-					ISBActProcess actProcess = sb.GetActProcess();
-					if(actProcess  != null)
-						if(actProcess.IsRunning())
-							return false;
+					if(sb.IsActProcessRunning())
+						return false;
 				}
 			}
 			return true;

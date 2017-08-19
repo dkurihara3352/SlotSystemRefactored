@@ -47,7 +47,7 @@ namespace SlotSystem{
 		ISBActStateRepo actStateRepo{
 			get{
 				if(m_actStateRepo == null)
-					m_actStateRepo = new SBActStateRepo(sb.GetSelStateHandler(), sb, tam, sb.GetTAC());
+					m_actStateRepo = new SBActStateRepo(sb, tam, sb.GetHoverable().GetTAC());
 				return m_actStateRepo;
 			}
 		}
@@ -111,7 +111,6 @@ namespace SlotSystem{
 			}
 		public virtual void PickUp(){
 			SetActState(pickedUpState);
-			sb.SetPickedAmount(1);
 		}
 		public void SetPickedUpState(){
 			SetActState(pickedUpState);
@@ -163,6 +162,12 @@ namespace SlotSystem{
 			}
 		public ISBActProcess GetActProcess(){
 			return actProcEngine.GetProcess();
+		}
+		public bool IsActProcessRunning(){
+			ISBActProcess actProcess = GetActProcess();
+			if(actProcess != null)
+				return actProcess.IsRunning();
+			return false;
 		}
 		public void SetAndRunActProcess(ISBActProcess process){
 			actProcEngine.SetAndRunProcess(process);
@@ -258,6 +263,7 @@ namespace SlotSystem{
 			bool IsMovingWithin();
 			bool WasMovingWithin();
 		ISBActProcess GetActProcess();
+		bool IsActProcessRunning();
 		void SetAndRunActProcess(ISBActProcess process);
 		void ExpireActProcess();
 			System.Func<IEnumeratorFake> GetWaitForPointerUpCoroutine();

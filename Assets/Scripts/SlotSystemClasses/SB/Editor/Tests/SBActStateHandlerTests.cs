@@ -53,12 +53,13 @@ namespace SlotSystemTests{
 
 				mockProcEngine.DidNotReceive().SetAndRunProcess((ISBActProcess) null);
 			}
-			SBActStateHandler MakeActStateHandlerWithProcEngine(out ISSEProcessEngine<ISBActProcess> engine){
-				SBActStateHandler handler = new SBActStateHandler(MakeSubSB(), MakeSubTAM());
-				engine = Substitute.For<ISSEProcessEngine<ISBActProcess>>();
-				handler.SetActProcessEngine(engine);
-				return handler;
-			}
+			/* Helper */
+				SBActStateHandler MakeActStateHandlerWithProcEngine(out ISSEProcessEngine<ISBActProcess> engine){
+					SBActStateHandler handler = new SBActStateHandler(MakeSubSB(), MakeSubTAM());
+					engine = Substitute.For<ISSEProcessEngine<ISBActProcess>>();
+					handler.SetActProcessEngine(engine);
+					return handler;
+				}
 		}
 	}
 }

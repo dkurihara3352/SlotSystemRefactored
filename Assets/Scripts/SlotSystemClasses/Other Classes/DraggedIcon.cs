@@ -21,7 +21,7 @@ namespace SlotSystem{
 			ISlottable _sb;
 		public DraggedIcon(ISlottable sb, ITransactionIconHandler iconHandler){
 			_sb = sb;
-			_item = this.sb.GetItem();
+			_item = sb.GetItem();
 			this.iconHandler = iconHandler;
 		}
 		public void CompleteMovement(){
