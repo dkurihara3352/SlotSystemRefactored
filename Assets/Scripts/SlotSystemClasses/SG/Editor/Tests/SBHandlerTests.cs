@@ -110,7 +110,7 @@ namespace SlotSystemTests{
 					}
 				}
 				[TestCaseSource(typeof(IsAllSBsActProcDoneCases))]
-			public void isAllSBsActProcDone_Various_ReturnsAccordingly(List<ISlottable> sbs, bool expected){
+			public void IsAllSBActProcDone_Various_ReturnsAccordingly(List<ISlottable> sbs, bool expected){
 				SBHandler sbHandler = new SBHandler();
 					sbHandler.SetSBs(sbs);
 
@@ -121,30 +121,42 @@ namespace SlotSystemTests{
 				class IsAllSBsActProcDoneCases: IEnumerable{
 					public IEnumerator GetEnumerator(){
 						object[] mixed_F;
-							ISlottable vSBA_0 = MakeSBWithActProc(false);
-							ISlottable vSBB_0 = MakeSBWithActProc(false);
-							ISlottable vSBC_0 = MakeSBWithActProc(false);
-							ISlottable iSBA_0 = MakeSBWithActProc(true);
-							ISlottable iSBB_0 = MakeSBWithActProc(true);
-							ISlottable iSBC_0 = MakeSBWithActProc(true);
+							ISlottable vSBA_0 = MakeSubSB();
+								vSBA_0.IsActProcessRunning().Returns(false);
+							ISlottable vSBB_0 = MakeSubSB();
+								vSBB_0.IsActProcessRunning().Returns(false);
+							ISlottable vSBC_0 = MakeSubSB();
+								vSBC_0.IsActProcessRunning().Returns(false);
+							ISlottable iSBA_0 = MakeSubSB();
+								iSBA_0.IsActProcessRunning().Returns(true);
+							ISlottable iSBB_0 = MakeSubSB();
+								iSBB_0.IsActProcessRunning().Returns(true);
+							ISlottable iSBC_0 = MakeSubSB();
+								iSBC_0.IsActProcessRunning().Returns(true);
 							List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{
 								vSBA_0, vSBB_0, vSBC_0, iSBA_0, iSBB_0, iSBC_0
 							});
 							mixed_F = new object[]{sbs_0, false};
 							yield return mixed_F;
 						object[] allDone_T;
-							ISlottable vSBA_1 = MakeSBWithActProc(false);
-							ISlottable vSBB_1 = MakeSBWithActProc(false);
-							ISlottable vSBC_1 = MakeSBWithActProc(false);
+							ISlottable vSBA_1 = MakeSubSB();
+								vSBA_1.IsActProcessRunning().Returns(false);
+							ISlottable vSBB_1 = MakeSubSB();
+								vSBB_1.IsActProcessRunning().Returns(false);
+							ISlottable vSBC_1 = MakeSubSB();
+								vSBC_1.IsActProcessRunning().Returns(false);
 							List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{
 								vSBA_1, vSBB_1, vSBC_1
 							});
 							allDone_T = new object[]{sbs_1, true};
 							yield return allDone_T;
 						object[] allNotDone_F;
-							ISlottable iSBA_2 = MakeSBWithActProc(true);
-							ISlottable iSBB_2 = MakeSBWithActProc(true);
-							ISlottable iSBC_2 = MakeSBWithActProc(true);
+							ISlottable iSBA_2 = MakeSubSB();
+								iSBA_2.IsActProcessRunning().Returns(true);
+							ISlottable iSBB_2 = MakeSubSB();
+								iSBB_2.IsActProcessRunning().Returns(true);
+							ISlottable iSBC_2 = MakeSubSB();
+								iSBC_2.IsActProcessRunning().Returns(true);
 							List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{
 								iSBA_2, iSBB_2, iSBC_2
 							});

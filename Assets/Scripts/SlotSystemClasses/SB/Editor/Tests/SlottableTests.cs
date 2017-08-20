@@ -42,7 +42,6 @@ namespace SlotSystemTests{
 						sb.SetActStateHandler(sbActStateHandler);
 						IItemHandler itemHandler = Substitute.For<IItemHandler>();
 						sb.SetItemHandler(itemHandler);
-						sb.SetActStateHandler(new SBActStateHandler(sb, MakeSubTAM()));
 						sb.SetEqpStateHandler(new SBEqpStateHandler(sb));
 						sb.SetMrkStateHandler(new SBMrkStateHandler(sb));
 						sb.SetSSM(MakeSubSSM());

@@ -30,10 +30,10 @@ namespace SlotSystemTests{
 				selStateHandler.Received().Defocus();
 				}
 			[Test]
-			public void WaitForNextTouchProcess_Expire_SBIsPickedUp_CallsSBExecuteTransaction(){
+			public void WaitForNextTouchProcess_Expire_IsPickedUp_Calls_ExecuteTransaction(){
 				ISlottable stubSB = MakeSubSB();
 				ITransactionManager mockTAM = MakeSubTAM();
-				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(stubSB, Substitute.For<ISSESelStateHandler>(), mockTAM, FakeCoroutine);
+				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(stubSB, mockTAM, FakeCoroutine);
 				stubSB.IsPickedUp().Returns(true);
 
 				wfntProc.Expire();
@@ -41,12 +41,14 @@ namespace SlotSystemTests{
 				mockTAM.Received().ExecuteTransaction();
 			}
 			[Test]
-			public void WaitForNextTouchProcess_Expire_SBIsNOTPickedUp_CallsSBVarious(){
-				ISlottable mockSB = MakeSubSB();
-				ITransactionManager stubTAM = MakeSubTAM();
-				ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
-				WaitForNextTouchProcess wfntProc = new WaitForNextTouchProcess(mockSB, selStateHandler, stubTAM, FakeCoroutine);
-				mockSB.IsPickedUp().Returns(false);
+			public void WaitForNextTouchProcess_Expire_SBIsNOTPickedUp_Calls_Various(){
+				WaitForNextTouchProcess wfntProc;
+					ISlottable mockSB = MakeSubSB();
+						ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+						mockSB.GetSelStateHandler().Returns(selStateHandler);
+					mockSB.IsPickedUp().Returns(false);
+				wfntProc = new WaitForNextTouchProcess(mockSB, MakeSubTAM(), FakeCoroutine);
+				
 
 				wfntProc.Expire();
 

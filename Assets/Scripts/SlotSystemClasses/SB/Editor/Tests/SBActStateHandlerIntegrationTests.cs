@@ -26,24 +26,146 @@ namespace SlotSystemTests{
 
 				Assert.That(actStateHandler.GetActProcess(), Is.Null);
 			}
-		/* helpers */
+		/* Sequence */
+			[Test]
+			public void ActStates_EventSequence(){
+				SBActStateHandler handler;
+					ISlottable sb = Substitute.For<ISlottable>();
+						ISSESelStateHandler selStateHandler = Substitute.For<ISSESelStateHandler>();
+						sb.GetSelStateHandler().Returns(selStateHandler);
+						IItemHandler itemHandler = Substitute.For<IItemHandler>();
+						sb.GetItemHandler().Returns(itemHandler);
+						IHoverable hoverable = Substitute.For<IHoverable>();
+						sb.GetHoverable().Returns(hoverable);
+					ITransactionManager tam = Substitute.For<ITransactionManager>();
+					handler = new SBActStateHandler(sb, tam);
+						sb.GetActStateHandler().Returns(handler);
+				PointerEventDataFake eventData = new PointerEventDataFake();
+				/*	
+					WFA IsWaitingForAction
+					(IsFocused)
+					Down IsWFPickUp
+					(!(IStackable && IsHovered))
+					Exp	IsPickingUp
+					(!(IsHovered && IsStackable))
+					Up ExecTA
+				*/
+					handler.WaitForAction();
+						Assert.That(handler.IsWaitingForAction(), Is.True);
+					
+						selStateHandler.IsFocused().Returns(true);
+					handler.OnPointerDown(eventData);
+						Assert.That(handler.IsWaitingForPickUp(), Is.True);
+					
+						itemHandler.IsStackable().Returns(true);
+						hoverable.IsHovered().Returns(false);
+					handler.ExpireActProcess();
+						Assert.That(handler.IsPickingUp(), Is.True);
+					
+						hoverable.IsHovered().Returns(false);
+					handler.OnPointerUp(eventData);
+						tam.Received(1).ExecuteTransaction();
+				/*
+					WFA		IsWaitingForAction
+					(IsFocused)
+					Down	IsWaitingForPickingUp
+					(IsStackable && IsHovered)
+					Exp		IsPickingUp
+					(IsStackable && IsHovered)
+					Up		IsWaitingForNextTouch
+					(IsPickedUp)
+					Exp		ExecTA
+				*/
+					handler.WaitForAction();
+						Assert.That(handler.IsWaitingForAction(), Is.True);
 
-			PointerEventDataFake eventData{get{return new PointerEventDataFake();}}
-			void AssertRefreshCalled(ISlottable sb){
-				Assert.That(sb.IsWaitingForAction(), Is.True);
-				Assert.That(sb.GetItemHandler().GetPickedAmount(), Is.EqualTo(0));
-				Assert.That(sb.GetNewSlotID(), Is.EqualTo(-2));
+						selStateHandler.IsFocused().Returns(true);
+					handler.OnPointerDown(eventData);
+						Assert.That(handler.IsWaitingForPickUp(), Is.True);
+					
+						itemHandler.IsStackable().Returns(true);
+						hoverable.IsHovered().Returns(true);
+					handler.ExpireActProcess();
+						Assert.That(handler.IsPickingUp(), Is.True);
+
+						itemHandler.IsStackable().Returns(true);
+						hoverable.IsHovered().Returns(true);
+					handler.OnPointerUp(eventData);
+						Assert.That(handler.IsWaitingForNextTouch(), Is.True);
+
+						sb.IsPickedUp().Returns(true);
+					handler.ExpireActProcess();
+						tam.Received(2).ExecuteTransaction();
+				/*	
+					WFA		IsWaitingForAction
+					(IsFocused)
+					Down	IsWFPickUp
+					(IsStackable && IsHovered)
+					Exp		IsPickingUp
+					(IsStackable && IsHovered)
+					Up		IsWaitingForNextTouch
+					(IsPickedUp)
+					Down	Increment
+				*/
+					handler.WaitForAction();
+
+						selStateHandler.IsFocused().Returns(true);
+					handler.OnPointerDown(eventData);
+						Assert.That(handler.IsWaitingForPickUp(), Is.True);
+					
+						itemHandler.IsStackable().Returns(true);
+						hoverable.IsHovered().Returns(true);
+					handler.ExpireActProcess();
+						Assert.That(handler.IsPickingUp(), Is.True);
+
+						itemHandler.IsStackable().Returns(true);
+						hoverable.IsHovered().Returns(true);
+					
+					handler.OnPointerUp(eventData);
+						Assert.That(handler.IsWaitingForNextTouch(), Is.True);
+
+						sb.IsPickedUp().Returns(true);
+					handler.OnPointerDown(eventData);
+						sb.Received().Increment();
+				/*
+					WFA		IsWaitingForAction
+					(IsFocused)
+					Down	IsWaitingForPickUp
+					Up		IsWaitingForNextTouch
+					(!IsPickedUp)
+					Down	IsPickingUp
+				*/
+					handler.WaitForAction();
+
+						selStateHandler.IsFocused().Returns(true);
+					handler.OnPointerDown(eventData);
+						Assert.That(handler.IsWaitingForPickUp(), Is.True);
+					
+					handler.OnPointerUp(eventData);
+						Assert.That(handler.IsWaitingForNextTouch(), Is.True);
+
+						sb.IsPickedUp().Returns(false);
+					handler.OnPointerDown(eventData);
+						Assert.That(handler.IsPickingUp(), Is.True);
+				/*	
+					WFA		IsWaitingForAction
+					(!IsFocused)
+					Down	IsWaitingForPointerUp
+					Up		Tap Refresh Defocus
+				*/
+					handler.WaitForAction();
+						Assert.That(handler.IsWaitingForAction(), Is.True);
+
+						selStateHandler.IsFocused().Returns(false);
+					handler.OnPointerDown(eventData);
+						Assert.That(handler.IsWaitingForPointerUp(), Is.True);
+					
+					handler.OnPointerUp(eventData);
+						sb.Received().Tap();
+						sb.Received().Refresh();
+						selStateHandler.Received().Defocus();
 			}
-			void SetUpForRefreshCall(ISlottable sb){
-				sb.GetItemHandler().SetPickedAmount(20);
-				sb.SetNewSlotID(6);
-			}
-			public void AssertSBActProcessIsSetAndRunning(ISlottable sb, Type procType, System.Func<IEnumeratorFake> coroutine){
-				ISBActProcess actualProc = sb.GetActProcess();
-				Assert.That(actualProc, Is.TypeOf(procType));
-				Assert.That(actualProc.IsRunning(), Is.True);
-				coroutine.Received().Invoke();
-			}
+		/* helpers */
 		}
 	}
 }

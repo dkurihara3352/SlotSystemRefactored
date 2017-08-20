@@ -37,6 +37,7 @@ namespace SlotSystem{
                 this.taCache = taCache;
                 this.selStateHandler = sb.GetSelStateHandler();
                 this.actStateHandler = sb.GetActStateHandler();
+                this.sb = sb;
             }
             public ISBActState GetWaitForActionState(){
                 if(_waitForActionState == null)
@@ -215,6 +216,7 @@ namespace SlotSystem{
                 this.selStateHandler = sb.GetSelStateHandler();
                 sbHoverable = sb.GetHoverable();
                 itemHandler = sb.GetItemHandler();
+                this.sb = sb;
             }
             public override void EnterState(){
                 if(actStateHandler.WasWaitingForPickUp() || actStateHandler.WasWaitingForNextTouch()){

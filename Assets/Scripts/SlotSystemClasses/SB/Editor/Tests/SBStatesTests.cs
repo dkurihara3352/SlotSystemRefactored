@@ -127,7 +127,7 @@ namespace SlotSystemTests{
 						WaitForPointerUpState wfptuState;
 							ISlottable sb = MakeSubSB();
 								ISBActStateHandler actStateHandler = Substitute.For<ISBActStateHandler>();
-								actStateHandler.WasWaitingForAction().Returns(false);
+								actStateHandler.WasWaitingForAction().Returns(true);
 							sb.GetActStateHandler().Returns(actStateHandler);
 						wfptuState = new WaitForPointerUpState(sb);
 						
@@ -206,12 +206,12 @@ namespace SlotSystemTests{
 						sbActStateHandler.Received().SetAndRunActProcess(Arg.Any<WaitForNextTouchProcess>());
 					}
 					[Test]
-					public void WaitForNextTouchState_OnPointerDown_IsPicked_Calls_PickUP(){
+					public void WaitForNextTouchState_OnPointerDown_IsNotPickedUp_Calls_PickUP(){
 						WaitForNextTouchState wfntState;
 							ISlottable sb = MakeSubSB();
 								ISBActStateHandler sbActStateHandler = Substitute.For<ISBActStateHandler>();
 								sb.GetActStateHandler().Returns(sbActStateHandler);
-							sb.IsPickedUp().Returns(true);
+							sb.IsPickedUp().Returns(false);
 						wfntState = new WaitForNextTouchState(sb, MakeSubTAM());						
 						
 						wfntState.OnPointerDown();
@@ -219,12 +219,12 @@ namespace SlotSystemTests{
 						sbActStateHandler.Received().PickUp();
 					}
 					[Test]
-					public void WaitForNextTouchState_OnPointerDown_IsNotPicked_Calls_Increment(){
+					public void WaitForNextTouchState_OnPointerDown_IsPickedUp_Calls_Increment(){
 						WaitForNextTouchState wfntState;
 							ISlottable sb = MakeSubSB();
 								ISBActStateHandler sbActStateHandler = Substitute.For<ISBActStateHandler>();
 								sb.GetActStateHandler().Returns(sbActStateHandler);
-							sb.IsPickedUp().Returns(false);
+							sb.IsPickedUp().Returns(true);
 						wfntState = new WaitForNextTouchState(sb, MakeSubTAM());						
 						
 						wfntState.OnPointerDown();
@@ -239,7 +239,7 @@ namespace SlotSystemTests{
 								sb.GetSelStateHandler().Returns(selStateHandler);
 						wfntState = new WaitForNextTouchState(sb, MakeSubTAM());						
 						
-						wfntState.OnPointerDown();
+						wfntState.OnDeselected();
 
 						sb.Received().Refresh();
 						selStateHandler.Received().Focus();
@@ -422,16 +422,34 @@ namespace SlotSystemTests{
 								sb.IsHierarchySetUp().Returns(true);
 								sb.IsPool().Returns(false);
 							equipState = new SBEquippedState(sb);
+						
+						equipState.EnterState();
 
 						sb.DidNotReceive().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
 					}
 					[Test]
-					public void SBEquippedState_EnterState_IsHierarchySetUpAndIsPool_Calls_SetAndRunSBEquipProc(){
+					public void SBEquippedState_EnterState_IsHierarchySetUpAndIsPoolAndIsNotUnequipped_DoesNotCall_SetAndRunSBEquipProc(){
 						SBEquippedState equipState;
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(true);
 								sb.IsPool().Returns(true);
+								sb.IsUnequipped().Returns(false);
 							equipState = new SBEquippedState(sb);
+
+						equipState.EnterState();
+
+						sb.DidNotReceive().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
+					}
+					[Test]
+					public void SBEquippedState_EnterState_IsHierarchySetUpAndIsPoolAndIsUnequipped_Calls_SetAndRunSBEquipProc(){
+						SBEquippedState equipState;
+							ISlottable sb = MakeSubSB();
+								sb.IsHierarchySetUp().Returns(true);
+								sb.IsPool().Returns(true);
+								sb.IsUnequipped().Returns(true);
+							equipState = new SBEquippedState(sb);
+
+						equipState.EnterState();
 
 						sb.Received().SetAndRunEqpProcess(Arg.Any<SBEquipProcess>());
 					}
@@ -441,6 +459,8 @@ namespace SlotSystemTests{
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(false);
 							unequipState = new SBUnequippedState(sb);
+
+						unequipState.EnterState();
 
 						sb.DidNotReceive().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
 					}
@@ -452,15 +472,33 @@ namespace SlotSystemTests{
 								sb.IsPool().Returns(false);
 							unequipState = new SBUnequippedState(sb);
 
+						unequipState.EnterState();
+
 						sb.DidNotReceive().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
 					}
 					[Test]
-					public void SBUnequippedState_EnterState_IsHierarchySetUpAndIsPool_Calls_SetAndRunSBUnequipProc(){
+					public void SBUnequippedState_EnterState_IsHierarchySetUpAndIsPoolAndIsNotEquipped_DoesNotCall_SetAndRunSBUnequipProc(){
 						SBUnequippedState unequipState;
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(true);
 								sb.IsPool().Returns(true);
+								sb.IsEquipped().Returns(false);
 							unequipState = new SBUnequippedState(sb);
+
+						unequipState.EnterState();
+
+						sb.DidNotReceive().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
+					}
+					[Test]
+					public void SBUnequippedState_EnterState_IsHierarchySetUpAndIsPoolAndIsEquipped_Calls_SetAndRunSBUnequipProc(){
+						SBUnequippedState unequipState;
+							ISlottable sb = MakeSubSB();
+								sb.IsHierarchySetUp().Returns(true);
+								sb.IsPool().Returns(true);
+								sb.IsEquipped().Returns(true);
+							unequipState = new SBUnequippedState(sb);
+
+						unequipState.EnterState();
 
 						sb.Received().SetAndRunEqpProcess(Arg.Any<SBUnequipProcess>());
 					}
@@ -470,6 +508,8 @@ namespace SlotSystemTests{
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(false);
 							markedState = new SBMarkedState(sb);
+
+						markedState.EnterState();
 
 						sb.DidNotReceive().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
 					}
@@ -481,163 +521,85 @@ namespace SlotSystemTests{
 								sb.IsPool().Returns(false);
 							markedState = new SBMarkedState(sb);
 
+						markedState.EnterState();
+
 						sb.DidNotReceive().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
 					}
 					[Test]
-					public void SBMarkedState_EnterState_IsHierarchySetUpAndIsPool_Calls_SetAndRunSBMarkProc(){
+					public void SBMarkedState_EnterState_IsHierarchySetUpAndIsPoolAndIsNotUnmarked_DoesNotCall_SetAndRunSBMarkProc(){
 						SBMarkedState markedState;
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(true);
 								sb.IsPool().Returns(true);
+								sb.IsUnmarked().Returns(false);
 							markedState = new SBMarkedState(sb);
+
+						markedState.EnterState();
+
+						sb.DidNotReceive().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
+					}
+					[Test]
+					public void SBMarkedState_EnterState_IsHierarchySetUpAndIsPoolAndIsUnmarked_Calls_SetAndRunSBMarkProc(){
+						SBMarkedState markedState;
+							ISlottable sb = MakeSubSB();
+								sb.IsHierarchySetUp().Returns(true);
+								sb.IsPool().Returns(true);
+								sb.IsUnmarked().Returns(true);
+							markedState = new SBMarkedState(sb);
+
+						markedState.EnterState();
 
 						sb.Received().SetAndRunMrkProcess(Arg.Any<SBMarkProcess>());
 					}
 					[Test]
 					public void SBUnmarkedState_EnterState_IsNotHierarchySetUp_DoesNotCall_SetAndRunSBUnmarkProc(){
-						SBUnmarkedState markedState;
+						SBUnmarkedState unmarkedState;
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(false);
-							markedState = new SBUnmarkedState(sb);
+							unmarkedState = new SBUnmarkedState(sb);
+
+						unmarkedState.EnterState();
 
 						sb.DidNotReceive().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
 					}
 					[Test]
 					public void SBUnmarkedState_EnterState_IsHierarchySetUpAndIsNotPool_DoesNotCall_SetAndRunSBUnmarkProc(){
-						SBUnmarkedState markedState;
+						SBUnmarkedState unmarkedState;
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(true);
 								sb.IsPool().Returns(false);
-							markedState = new SBUnmarkedState(sb);
+							unmarkedState = new SBUnmarkedState(sb);
+
+						unmarkedState.EnterState();
 
 						sb.DidNotReceive().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
 					}
 					[Test]
-					public void SBUnmarkedState_EnterState_IsHierarchySetUpAndIsPool_Calls_SetAndRunSBUnmarkProc(){
-						SBUnmarkedState markedState;
+					public void SBUnmarkedState_EnterState_IsHierarchySetUpAndIsPoolAndIsNotMarked_DoesNotCall_SetAndRunSBUnmarkProc(){
+						SBUnmarkedState unmarkedState;
 							ISlottable sb = MakeSubSB();
 								sb.IsHierarchySetUp().Returns(true);
 								sb.IsPool().Returns(true);
-							markedState = new SBUnmarkedState(sb);
+								sb.IsMarked().Returns(false);
+							unmarkedState = new SBUnmarkedState(sb);
+
+						unmarkedState.EnterState();
+
+						sb.DidNotReceive().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
+					}
+					[Test]
+					public void SBUnmarkedState_EnterState_IsHierarchySetUpAndIsPoolAndIsMarked_Calls_SetAndRunSBUnmarkProc(){
+						SBUnmarkedState unmarkedState;
+							ISlottable sb = MakeSubSB();
+								sb.IsHierarchySetUp().Returns(true);
+								sb.IsPool().Returns(true);
+								sb.IsMarked().Returns(true);
+							unmarkedState = new SBUnmarkedState(sb);
+
+						unmarkedState.EnterState();
 
 						sb.Received().SetAndRunMrkProcess(Arg.Any<SBUnmarkProcess>());
 					}
-				/* Sequence */
-					[Test]
-					public void ActStates_EventSequence(){
-						Slottable sb = MakeSB();
-								PartsInstance parts = MakePartsInstance(0, 20);
-							IItemHandler itemHandler = Substitute.For<IItemHandler>();
-								itemHandler.GetItem().Returns(parts);
-							IHoverable hoverable = Substitute.For<IHoverable>();
-								ITransactionCache mockTAC = Substitute.For<ITransactionCache>();
-								hoverable.GetTAC().Returns(mockTAC);
-							sb.SetHoverable(hoverable);
-							sb.SetItemHandler(itemHandler);
-							ISlotSystemManager ssm = Substitute.For<ISlotSystemManager>();
-								ITransactionManager mockTAM = Substitute.For<ITransactionManager>();
-								ssm.GetTAM().Returns(mockTAM);
-							sb.SetSSM(ssm);
-							ISBCommand mockTapComm = Substitute.For<ISBCommand>();
-							sb.SetTapCommand(mockTapComm);
-							ISSESelStateHandler selStateHandler = new SBSelStateHandler(sb);
-							sb.SetSelStateHandler(selStateHandler);
-							ISBActStateHandler actStateHandler = new SBActStateHandler(sb, mockTAM);
-							sb.SetActStateHandler(actStateHandler);
-							ISlotHandler slotHandler = Substitute.For<ISlotHandler>();
-							sb.SetSlotHandler(slotHandler);
-						PointerEventDataFake eventData = new PointerEventDataFake();
-						//focused !(stackable && hovered) WFA_down WFPickUp_exp PickingUp_up execTA
-								selStateHandler.Focus();
-								mockTAC.GetPickedSB().Returns((ISlotSystemElement)null);
-								mockTAC.GetHovered().Returns((IHoverable)null);
-							sb.WaitForAction();
-								Assert.That(sb.IsWaitingForAction(), Is.True);
-							
-							sb.OnPointerDown(eventData);
-								Assert.That(sb.IsWaitingForPickUp(), Is.True);
-							
-							sb.ExpireActProcess();
-								Assert.That(sb.IsPickingUp(), Is.True);
-								mockTAC.GetHovered().Returns((IHoverable)null);
-							
-							sb.OnPointerUp(eventData);
-								mockTAM.Received(1).ExecuteTransaction();
-						//focused stackable && hovered WFA_down WFPickUp_exp PickingUp_up WFNT_exp execTA
-								selStateHandler.Focus();
-								// sb.itemHandler.item.Returns(parts);
-								itemHandler.IsStackable().Returns(true);
-								mockTAC.GetPickedSB().Returns((ISlotSystemElement)null);
-								mockTAC.GetHovered().Returns((IHoverable)null);
-							sb.WaitForAction();
-
-							sb.OnPointerDown(eventData);
-								Assert.That(sb.IsWaitingForPickUp(), Is.True);
-							
-							sb.ExpireActProcess();
-								Assert.That(sb.IsPickingUp(), Is.True);
-								mockTAC.GetHovered().Returns(sb.GetHoverable());
-								mockTAC.GetPickedSB().Returns(sb);
-
-								sb.GetHoverable().IsHovered().Returns(true);
-							sb.OnPointerUp(eventData);
-								Assert.That(sb.IsWaitingForNextTouch(), Is.True);
-							
-							sb.ExpireActProcess();
-								mockTAM.Received(2).ExecuteTransaction();
-						//focused stackable && hovered WFA_down WFPickUp_exp PickingUp_up WFNT_down increment
-								selStateHandler.Focus();
-								itemHandler.GetItem().Returns(parts);
-								mockTAC.GetPickedSB().Returns((ISlotSystemElement)null);
-								mockTAC.GetHovered().Returns((IHoverable)null);
-							sb.WaitForAction();
-
-							sb.OnPointerDown(eventData);
-								Assert.That(sb.IsWaitingForPickUp(), Is.True);
-							
-							sb.ExpireActProcess();
-								Assert.That(sb.IsPickingUp(), Is.True);
-								// Assert.That(sb.GetPickedAmount(), Is.EqualTo(1));
-								itemHandler.Received().SetPickedAmount(1);
-								mockTAC.GetPickedSB().Returns(sb);
-								mockTAC.GetHovered().Returns(sb.GetHoverable());
-							
-							sb.OnPointerUp(eventData);
-								Assert.That(sb.IsWaitingForNextTouch(), Is.True);
-							
-							sb.OnPointerDown(eventData);
-								itemHandler.Received().SetPickedAmount(itemHandler.GetPickedAmount() + 1);
-						//defocused WFA_down WFPointerUp_up tap
-								selStateHandler.Defocus();
-								mockTAC.GetPickedSB().Returns((ISlotSystemElement)null);
-								mockTAC.GetHovered().Returns((IHoverable)null);
-							sb.WaitForAction();
-								Assert.That(selStateHandler.IsDefocused(), Is.True);
-								Assert.That(sb.IsWaitingForAction(), Is.True);
-							
-							sb.OnPointerDown(eventData);
-								Assert.That(sb.IsWaitingForPointerUp(), Is.True);
-							
-							sb.OnPointerUp(eventData);
-								mockTapComm.Received(1).Execute(sb);
-						//focused WFA_down WFPickUp_up WFNT_down PickingUp pickedAmount 1
-								selStateHandler.Focus();
-								mockTAC.GetPickedSB().Returns((ISlotSystemElement)null);
-								mockTAC.GetHovered().Returns((IHoverable)null);
-							sb.WaitForAction();
-
-							sb.OnPointerDown(eventData);
-								Assert.That(sb.IsWaitingForPickUp(), Is.True);
-							
-							sb.OnPointerUp(eventData);
-								Assert.That(sb.IsWaitingForNextTouch(), Is.True);
-							
-							sb.OnPointerDown(eventData);
-								Assert.That(sb.IsPickingUp(), Is.True);
-								itemHandler.Received().SetPickedAmount(1);
-					}
-					
-
 		}
 	}
 }
