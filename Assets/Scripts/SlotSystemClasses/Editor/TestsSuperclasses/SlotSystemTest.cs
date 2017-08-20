@@ -23,9 +23,8 @@ public class SlotSystemTest{
 					ssm.GetTAM().Returns(tam);
 				sb.SetTapCommand(Substitute.For<ISBCommand>());
 				sb.SetItemHandler(Substitute.For<IItemHandler>());
-					IHoverable hoverable = Substitute.For<IHoverable>();
-						hoverable.GetTAC().Returns(MakeSubTAC());
-				sb.SetHoverable(hoverable);
+				sb.SetTAC(Substitute.For<ITransactionCache>());
+				sb.SetHoverable(Substitute.For<IHoverable>());
 				sb.SetSlotHandler(Substitute.For<ISlotHandler>());
 				sb.SetSelStateHandler(Substitute.For<ISSESelStateHandler>());
 				sb.SetActStateHandler(Substitute.For<ISBActStateHandler>());

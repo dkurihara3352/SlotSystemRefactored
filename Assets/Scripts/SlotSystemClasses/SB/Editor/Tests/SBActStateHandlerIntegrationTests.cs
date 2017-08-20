@@ -21,7 +21,6 @@ namespace SlotSystemTests{
 			}
 			[Test]
 			public void processes_ByDefault_AreNull(){
-				Slottable sb = MakeSBWithRealStateHandlers();
 				ISBActStateHandler actStateHandler = new SBActStateHandler(MakeSubSB(), MakeSubTAM());
 
 				Assert.That(actStateHandler.GetActProcess(), Is.Null);

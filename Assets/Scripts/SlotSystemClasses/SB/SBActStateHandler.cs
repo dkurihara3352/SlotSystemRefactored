@@ -47,7 +47,7 @@ namespace SlotSystem{
 		ISBActStateRepo actStateRepo{
 			get{
 				if(m_actStateRepo == null)
-					m_actStateRepo = new SBActStateRepo(sb, tam, sb.GetHoverable().GetTAC());
+					m_actStateRepo = new SBActStateRepo(sb, tam);
 				return m_actStateRepo;
 			}
 		}

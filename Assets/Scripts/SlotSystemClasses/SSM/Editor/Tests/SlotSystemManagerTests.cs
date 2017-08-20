@@ -235,14 +235,14 @@ namespace SlotSystemTests{
 					ssm.UpdateEquipInvAndAllSBsEquipState();
 
 					bool flag = true;
-					flag &= bowA.GetIsEquipped() == true;
-					flag &= wearA.GetIsEquipped() == true;
-					flag &= quiverA.GetIsEquipped() == true;
-					flag &= packA.GetIsEquipped() == true;
-					flag &= bowR.GetIsEquipped() == false;
-					flag &= wearR.GetIsEquipped() == false;
-					flag &= quiverR.GetIsEquipped() == false;
-					flag &= packR.GetIsEquipped() == false;
+					flag &= bowA.IsEquipped() == true;
+					flag &= wearA.IsEquipped() == true;
+					flag &= quiverA.IsEquipped() == true;
+					flag &= packA.IsEquipped() == true;
+					flag &= bowR.IsEquipped() == false;
+					flag &= wearR.IsEquipped() == false;
+					flag &= quiverR.IsEquipped() == false;
+					flag &= packR.IsEquipped() == false;
 
 					Assert.That(flag, Is.True);
 				}
@@ -370,16 +370,16 @@ namespace SlotSystemTests{
 					
 					ssm.UpdateAllItemsEquipStatusInPoolInv();
 
-					Assert.That(bowE.GetIsEquipped(), Is.True);
-					Assert.That(wearE.GetIsEquipped(), Is.True);
-					Assert.That(shieldE.GetIsEquipped(), Is.True);
-					Assert.That(mWeaponE.GetIsEquipped(), Is.True);
-					Assert.That(partsE.GetIsEquipped(), Is.True);
-					Assert.That(bowU.GetIsEquipped(), Is.False);
-					Assert.That(wearU.GetIsEquipped(), Is.False);
-					Assert.That(quiverU.GetIsEquipped(), Is.False);
-					Assert.That(packU.GetIsEquipped(), Is.False);
-					Assert.That(partsU.GetIsEquipped(), Is.False);
+					Assert.That(bowE.IsEquipped(), Is.True);
+					Assert.That(wearE.IsEquipped(), Is.True);
+					Assert.That(shieldE.IsEquipped(), Is.True);
+					Assert.That(mWeaponE.IsEquipped(), Is.True);
+					Assert.That(partsE.IsEquipped(), Is.True);
+					Assert.That(bowU.IsEquipped(), Is.False);
+					Assert.That(wearU.IsEquipped(), Is.False);
+					Assert.That(quiverU.IsEquipped(), Is.False);
+					Assert.That(packU.IsEquipped(), Is.False);
+					Assert.That(partsU.IsEquipped(), Is.False);
 				}
 				[Test]
 				public void UpdateAllSBsEquipState(){
@@ -419,9 +419,9 @@ namespace SlotSystemTests{
 
 					foreach(IInventoryItemInstance it in pInv.GetItems())
 						if(xEquipped.Contains(it))
-							Assert.That(it.GetIsEquipped(), Is.True);
+							Assert.That(it.IsEquipped(), Is.True);
 						else
-						 	Assert.That(it.GetIsEquipped(), Is.False);
+						 	Assert.That(it.IsEquipped(), Is.False);
 					}
 					class MarkEquippedInPoolCases: IEnumerable{
 						public IEnumerator GetEnumerator(){
@@ -562,7 +562,9 @@ namespace SlotSystemTests{
 					ISlottable mockSB = MakeSubSB();
 						mockSB.GetSG().Returns(stubSG);
 						mockSB.GetItem().Returns(bow);
-						mockSB.GetSlotID().Returns(0);
+						ISlotHandler slotHandler = Substitute.For<ISlotHandler>();
+							slotHandler.GetSlotID().Returns(0);
+						mockSB.GetSlotHandler().Returns(slotHandler);
 					
 					ssm.Unequip(mockSB, bow);
 

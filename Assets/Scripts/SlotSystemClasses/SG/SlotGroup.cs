@@ -11,7 +11,7 @@ namespace SlotSystem{
 		}
 		public void InitializeStateHandlers(){
 			IHoverable hoverable = GetHoverable();
-			SetSelStateHandler(new SGSelStateHandler(hoverable.GetTAC(), hoverable));
+			SetSelStateHandler(new SGSelStateHandler(GetTAC(), hoverable));
 			SetSGActStateHandler(new SGActStateHandler(this));
 		}
 		public void InitializeSG(){
@@ -269,6 +269,16 @@ namespace SlotSystem{
 			}
 				ISBFactory _sbFactory;
 		/* Transaction */
+			public ITransactionCache GetTAC(){
+				if(_taCache != null)
+					return _taCache;
+				else
+					throw new InvalidOperationException("taCache not set");
+			}
+			public void SetTAC(ITransactionCache taCache){
+				_taCache = taCache;
+			}
+				ITransactionCache _taCache;
 			public ISGTransactionHandler GetSGTAHandler(){
 				if(_sgTAHandler != null)
 					return _sgTAHandler;
@@ -338,6 +348,8 @@ namespace SlotSystem{
 			}
 	}
 	public interface ISlotGroup: ISlotSystemElement{
+
+			ITransactionCache GetTAC();
 			ISGActStateHandler GetSGActStateHandler();
 			IHoverable GetHoverable();
 			ISlotsHolder GetSlotsHolder();

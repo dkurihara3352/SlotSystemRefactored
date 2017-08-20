@@ -18,9 +18,9 @@ namespace SlotSystem{
 			public void SetHoverable(IHoverable hoverable){
 				_hoverable = hoverable;
 			}
-			public ITransactionCache taCache{
-				get{return hoverable.GetTAC();}
-			}
+		public ITransactionCache taCache{
+			get{return sg.GetTAC();}
+		}
 		public ISBFactory sbFactory{
 			get{
 				if(_sbFactory != null)

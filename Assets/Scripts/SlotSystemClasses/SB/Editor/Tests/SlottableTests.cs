@@ -42,18 +42,18 @@ namespace SlotSystemTests{
 						sb.SetActStateHandler(sbActStateHandler);
 						IItemHandler itemHandler = Substitute.For<IItemHandler>();
 						sb.SetItemHandler(itemHandler);
-						sb.SetEqpStateHandler(new SBEqpStateHandler(sb));
-						sb.SetMrkStateHandler(new SBMrkStateHandler(sb));
+						ISBEqpStateHandler eqpStateHandler = Substitute.For<ISBEqpStateHandler>();
+						sb.SetEqpStateHandler(eqpStateHandler);
+						ISBMrkStateHandler mrkStateHandler = Substitute.For<ISBMrkStateHandler>();
+						sb.SetMrkStateHandler(mrkStateHandler);
 						sb.SetSSM(MakeSubSSM());
 
 					sb.InitializeStates();
 
 					sbSelStateHandler.Received().Deactivate();
 					sbActStateHandler.Received().WaitForAction();
-					Assert.That(sb.IsEqpStateNull(), Is.True);
-					Assert.That(sb.WasEqpStateNull(), Is.True);
-					Assert.That(sb.IsUnmarked(), Is.True);
-					Assert.That(sb.WasMrkStateNull(), Is.True);
+					eqpStateHandler.Received().ClearCurEqpState();
+					mrkStateHandler.Received().Unmark();
 				}
 				[Test]
 				public void PickUp_Always_CallsDelegateMethods(){

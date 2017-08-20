@@ -29,13 +29,11 @@ namespace SlotSystem{
         public class SBActStateRepo: SBStateRepo, ISBActStateRepo{
             ITransactionManager tam;
             ITransactionCache taCache;
-            ISSESelStateHandler selStateHandler;
             ISBActStateHandler actStateHandler;
             ISlottable sb;
-            public SBActStateRepo(ISlottable sb, ITransactionManager tam, ITransactionCache taCache){
+            public SBActStateRepo(ISlottable sb, ITransactionManager tam){
                 this.tam = tam;
-                this.taCache = taCache;
-                this.selStateHandler = sb.GetSelStateHandler();
+                this.taCache = sb.GetTAC();
                 this.actStateHandler = sb.GetActStateHandler();
                 this.sb = sb;
             }
@@ -65,7 +63,7 @@ namespace SlotSystem{
                 ISBActState _waitForNextTouchState;
             public ISBActState GetPickingUpState(){
                 if(_pickingUpState == null)
-                    _pickingUpState = new PickingUpState(sb, tam, taCache);
+                    _pickingUpState = new PickingUpState(sb, tam);
                 return _pickingUpState;
             }
                 ISBActState _pickingUpState;
@@ -208,12 +206,12 @@ namespace SlotSystem{
             IHoverable sbHoverable;
             IItemHandler itemHandler;
             ISlottable sb;
-            public PickingUpState(ISlottable sb, ITransactionManager tam, ITransactionCache taCache): base(sb.GetActStateHandler()){
+            public PickingUpState(ISlottable sb, ITransactionManager tam): base(sb.GetActStateHandler()){
                 this.tam = tam;
-                this.iconHandler = tam.GetIconHandler();
-                _taCache = taCache;
-                this.tamStateHandler = tam.GetActStateHandler();
-                this.selStateHandler = sb.GetSelStateHandler();
+                iconHandler = tam.GetIconHandler();
+                _taCache = sb.GetTAC();
+                tamStateHandler = tam.GetActStateHandler();
+                selStateHandler = sb.GetSelStateHandler();
                 sbHoverable = sb.GetHoverable();
                 itemHandler = sb.GetItemHandler();
                 this.sb = sb;
@@ -270,7 +268,7 @@ namespace SlotSystem{
         public abstract class SBEqpState: SBState, ISBEqpState{
             protected ISBEqpStateHandler eqpStateHandler;
             public SBEqpState(ISlottable sb){
-                this.eqpStateHandler = sb;
+                this.eqpStateHandler = sb.GetEqpStateHandler();
             }
         }
         public interface ISBEqpState: ISSEState{}
@@ -279,7 +277,7 @@ namespace SlotSystem{
             protected ISBEqpStateHandler eqpStateHandler;
             public SBEqpStateRepo(ISlottable sb){
                 this.sb = sb;
-                this.eqpStateHandler = sb;
+                this.eqpStateHandler = sb.GetEqpStateHandler();
             }
             public ISBEqpState GetEquippedState(){
                 if(_equippedState == null)
@@ -334,7 +332,7 @@ namespace SlotSystem{
         public abstract class SBMrkState: SBState, ISBMrkState{
             protected ISBMrkStateHandler mrkStateHandler;
             public SBMrkState(ISlottable sb){
-                mrkStateHandler = sb;
+                mrkStateHandler = sb.GetMrkStateHandler();
             }
         }
         public interface ISBMrkState: ISSEState{

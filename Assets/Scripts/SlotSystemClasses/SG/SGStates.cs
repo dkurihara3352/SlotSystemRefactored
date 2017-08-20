@@ -21,10 +21,8 @@ namespace SlotSystem{
     /* Factory */
     public class SGStatesRepo: ISGStatesRepo{
         ISlotGroup sg;
-        ISGActStateHandler actStateHandler;
-        public SGStatesRepo(ISlotGroup sg, ISGActStateHandler actStateHandler){
+        public SGStatesRepo(ISlotGroup sg){
             this.sg = sg;
-            this.actStateHandler = actStateHandler;
         }
         public ISGActState GetWaitForActionState(){
             if(_waitForActionState == null)

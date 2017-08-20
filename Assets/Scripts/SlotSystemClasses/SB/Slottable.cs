@@ -10,11 +10,13 @@ namespace SlotSystem{
 			GetSelStateHandler().Deactivate();
 			GetActStateHandler().WaitForAction();
 			ClearCurEqpState();
-			Unmark();
+			GetMrkStateHandler().Unmark();
 		}
 		/*	States	*/
 			public void InitializeSB(IInventoryItemInstance item){
-				IHoverable hoverable = new Hoverable(GetSSM().GetTAC());
+				ITransactionCache tac = GetSSM().GetTAC();
+				SetTAC(tac);
+				IHoverable hoverable = new Hoverable(tac);
 				SetHoverable(hoverable);
 				SetTapCommand(new SBTapCommand());
 				SetItemHandler(new ItemHandler(item));
@@ -67,115 +69,42 @@ namespace SlotSystem{
 					GetItemHandler().SetPickedAmount(1);
 				}
 			/*	Equip State	*/
-				ISBEqpStateHandler eqpStateHandler{
-					get{
-						if(_eqpStateHandler != null)
-							return _eqpStateHandler;
-						else
-							throw new InvalidOperationException("eqpStateHandler not set");
-					}
+				public ISBEqpStateHandler GetEqpStateHandler(){
+					if(_eqpStateHandler != null)
+						return _eqpStateHandler;
+					else
+						throw new InvalidOperationException("eqpStateHandler not set");
 				}
-					ISBEqpStateHandler _eqpStateHandler;
 				public void SetEqpStateHandler(ISBEqpStateHandler handler){
 					_eqpStateHandler = handler;
 				}
-				public void ClearCurEqpState(){
-					eqpStateHandler.ClearCurEqpState();
-				}
-				public bool IsEqpStateNull(){
-					return eqpStateHandler.IsEqpStateNull();
-				}
-				public bool WasEqpStateNull(){
-					return eqpStateHandler.WasEqpStateNull();
-				}
-				public void Equip(){
-					eqpStateHandler.Equip();
-				}
+					ISBEqpStateHandler _eqpStateHandler;
 				public bool IsEquipped(){
-					return eqpStateHandler.IsEquipped();
-				}
-				public bool WasEquipped(){
-					return eqpStateHandler.WasEquipped();
-				}
-				public void Unequip(){
-					eqpStateHandler.Unequip();
+					return GetEqpStateHandler().IsEquipped();
 				}
 				public bool IsUnequipped(){
-					return eqpStateHandler.IsUnequipped();
+					return GetEqpStateHandler().IsUnequipped();
 				}
-				public bool WasUnequipped(){
-					return eqpStateHandler.WasUnequipped();
+				public void Equip(){
+					GetEqpStateHandler().Equip();
 				}
-				public ISBEqpProcess GetEqpProcess(){
-					return eqpStateHandler.GetEqpProcess();
+				public void Unequip(){
+					GetEqpStateHandler().Unequip();
 				}
-				public void SetEqpProcessEngine(ISSEProcessEngine<ISBEqpProcess> engine){
-					((SBEqpStateHandler)eqpStateHandler).SetEqpProcessEngine(engine);
-				}
-				public void SetAndRunEqpProcess(ISBEqpProcess process){
-					eqpStateHandler.SetAndRunEqpProcess(process);
-				}
-				public System.Func<IEnumeratorFake> GetUnequipCoroutine(){
-					return eqpStateHandler.GetUnequipCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetEquipCoroutine(){
-					return eqpStateHandler.GetEquipCoroutine();
+				public void ClearCurEqpState(){
+					GetEqpStateHandler().ClearCurEqpState();
 				}
 			/*	Mark state	*/
-				ISBMrkStateHandler mrkStateHandler{
-					get{
-						if(_mrkStateHandler != null)
-							return _mrkStateHandler;
-						else
-							throw new InvalidOperationException("mrkStateHandler not set");
-					}
+				public ISBMrkStateHandler GetMrkStateHandler(){
+					if(_mrkStateHandler != null)
+						return _mrkStateHandler;
+					else
+						throw new InvalidOperationException("mrkStateHandler not set");
 				}
-					ISBMrkStateHandler _mrkStateHandler;
 				public void SetMrkStateHandler(ISBMrkStateHandler mrkStateHandler){
 					_mrkStateHandler = mrkStateHandler;
 				}
-				public void ClearCurMrkState(){
-					mrkStateHandler.ClearCurMrkState();
-				}
-				public bool IsMrkStateNull(){
-					return mrkStateHandler.IsMrkStateNull();
-				}
-				public bool WasMrkStateNull(){
-					return mrkStateHandler.WasMrkStateNull();
-				}
-				public void Mark(){
-					mrkStateHandler.Mark();
-				}
-				public bool IsMarked(){
-					return mrkStateHandler.IsMarked();
-				}
-				public bool WasMarked(){
-					return mrkStateHandler.WasMarked();
-				}
-				public void Unmark(){
-					mrkStateHandler.Unmark();
-				}
-				public bool IsUnmarked(){
-					return mrkStateHandler.IsUnmarked();
-				}
-				public bool WasUnmarked(){
-					return mrkStateHandler.WasUnmarked();
-				}
-				public ISBMrkProcess GetMrkProcess(){
-					return mrkStateHandler.GetMrkProcess();
-				}
-				public void SetMrkProcessEngine(ISSEProcessEngine<ISBMrkProcess> engine){
-					((SBMrkStateHandler)mrkStateHandler).SetMrkProcessEngine(engine);
-				}
-				public void SetAndRunMrkProcess(ISBMrkProcess process){
-					mrkStateHandler.SetAndRunMrkProcess(process);
-				}
-				public System.Func<IEnumeratorFake> GetUnmarkCoroutine(){
-					return mrkStateHandler.GetUnmarkCoroutine();
-				}
-				public System.Func<IEnumeratorFake> GetMarkCoroutine(){
-					return mrkStateHandler.GetMarkCoroutine();
-				}
+					ISBMrkStateHandler _mrkStateHandler;
 		/*	commands	*/
 			public void Tap(){
 				tapCommand.Execute(this);
@@ -211,7 +140,7 @@ namespace SlotSystem{
 				return GetItemHandler().GetItem();
 			}
 			public void UpdateEquipState(){
-				if(GetItemHandler().GetItem().GetIsEquipped()) Equip();
+				if(GetItem().IsEquipped()) Equip();
 				else Unequip();
 			}
 		/* SG And Slots */
@@ -232,46 +161,41 @@ namespace SlotSystem{
 				return GetSG() != null;
 			}
 		/* slotHandling */
-			public ISlotHandler slotHandler{
-				get{
-					if(_slotHandler != null)
-						return _slotHandler;
-					else
-						throw new InvalidOperationException("slotHandler not set");
-				}
+			public ISlotHandler GetSlotHandler(){
+				if(_slotHandler != null)
+					return _slotHandler;
+				else
+					throw new InvalidOperationException("slotHandler not set");
 			}
-				ISlotHandler _slotHandler;
 			public void SetSlotHandler(ISlotHandler slotHandler){
 				_slotHandler = slotHandler;
 			}
-			public int GetSlotID(){
-				return slotHandler.GetSlotID();
-			}
-			public void SetSlotID(int i){
-				slotHandler.SetSlotID(i);
-			}
-			public int GetNewSlotID(){
-				return slotHandler.GetNewSlotID();
-			}
-			public void SetNewSlotID(int id){
-				slotHandler.SetNewSlotID(id);
-			}
+				ISlotHandler _slotHandler;
 			public bool IsToBeAdded(){
-				return slotHandler.IsToBeAdded();
+				return GetSlotHandler().IsToBeAdded();
 			}
 			public bool IsToBeRemoved(){
-				return slotHandler.IsToBeRemoved();
+				return GetSlotHandler().IsToBeRemoved();
+			}
+			public void SetSlotID(int id){
+				GetSlotHandler().SetSlotID(id);
+			}
+			public int GetNewSlotID(){
+				return GetSlotHandler().GetNewSlotID();
+			}
+			public void SetNewSlotID(int id){
+				GetSlotHandler().SetNewSlotID(id);
 			}
 		/* Others */
 			public void Refresh(){
 				GetActStateHandler().WaitForAction();
 				GetItemHandler().SetPickedAmount(0);
-				slotHandler.SetNewSlotID(-2);
+				SetNewSlotID(-2);
 			}
 			public bool ShareSGAndItem(ISlottable other){
 				bool flag = true;
-				flag &= this.GetSG() == other.GetSG();
-				flag &= this.GetItem().Equals(other.GetItem());
+				flag &= GetSG() == other.GetSG();
+				flag &= GetItem().Equals(other.GetItem());
 				return flag;
 			}
 			public void Destroy(){
@@ -294,11 +218,21 @@ namespace SlotSystem{
 				return false;
 			}
 		/*	Transaction	*/
+			public ITransactionCache GetTAC(){
+				if(_taCache != null)
+					return _taCache;
+				else
+					throw new InvalidOperationException("taCache not set");
+			}
+			public void SetTAC(ITransactionCache taCache){
+				_taCache = taCache;
+			}
+				ITransactionCache _taCache;
 			public bool IsPickedUp(){
-				return GetHoverable().GetTAC().GetPickedSB() == (ISlottable)this;
+				return GetTAC().GetPickedSB() == (ISlottable)this;
 			}
 			public bool PassesPrePickFilter(){
-				return !GetHoverable().GetTAC().IsTransactionGoingToBeRevert(this);
+				return !GetTAC().IsTransactionGoingToBeRevert(this);
 			}
 		/* hoverable */
 			public IHoverable GetHoverable(){
@@ -312,7 +246,8 @@ namespace SlotSystem{
 			}
 				IHoverable _hoverable;
 	}
-	public interface ISlottable: ISlotSystemElement, ISBEqpStateHandler, ISBMrkStateHandler, ISlotHandler{
+	public interface ISlottable: ISlotSystemElement{
+			ITransactionCache GetTAC();
 			IHoverable GetHoverable();
 			IItemHandler GetItemHandler();
 				IInventoryItemInstance GetItem();
@@ -322,6 +257,19 @@ namespace SlotSystem{
 				void MoveWithin();
 				void Remove();
 				void Add();
+			ISBEqpStateHandler GetEqpStateHandler();
+				bool IsEquipped();
+				bool IsUnequipped();
+				void Equip();
+				void Unequip();
+				void ClearCurEqpState();
+			ISBMrkStateHandler GetMrkStateHandler();
+			ISlotHandler GetSlotHandler();
+				bool IsToBeRemoved();
+				bool IsToBeAdded();
+				void SetSlotID(int id);
+				int GetNewSlotID();
+				void SetNewSlotID(int id);
 		/*	Commands	*/
 			void Tap();
 		/* Item Handling */

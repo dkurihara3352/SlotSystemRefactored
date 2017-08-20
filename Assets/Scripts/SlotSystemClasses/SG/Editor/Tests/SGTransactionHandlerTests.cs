@@ -13,16 +13,16 @@ namespace SlotSystemTests{
 		public class SGTransactionHandlerTests: SlotSystemTest {
 			[TestCaseSource(typeof(ReorderedNewSBsCases))]
 			public void ReorderedNewSBs_Always_CreateAndReturnsReorderdSBs(ISlottable picked, ISlottable target, List<ISlottable> source, IEnumerable<ISlottable> expected){
-				SGTransactionHandler sgTAHandler = new SGTransactionHandler(MakeSubSG(), MakeSubTAM());
+				SGTransactionHandler sgTAHandler;
+					ISlotGroup sg = MakeSubSG();
+					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
 						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
 					sgTAHandler.SetSBHandler(sbHandler);
-					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						taCache.GetPickedSB().Returns(picked);
 						taCache.GetTargetSB().Returns(target);
-						hoverable.GetTAC().Returns(taCache);
-					sgTAHandler.SetHoverable(hoverable);
+						sg.GetTAC().Returns(taCache);
 				
 				List<ISlottable> actual = sgTAHandler.ReorderedNewSBs();
 
@@ -403,12 +403,10 @@ namespace SlotSystemTests{
 						else
 							sgHandler.GetSG1().Returns((ISlotGroup)null);
 					sgTAHandler.SetSGHandler(sgHandler);
-					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						ISlottable pickedSB = MakeSubSBWithItem(addedItem);
 						taCache.GetPickedSB().Returns(pickedSB);
-						hoverable.GetTAC().Returns(taCache);
-					sgTAHandler.SetHoverable(hoverable);
+						sg.GetTAC().Returns(taCache);
 				
 				List<ISlottable> actual = sgTAHandler.FilledNewSBs();
 
@@ -978,7 +976,6 @@ namespace SlotSystemTests{
 						else
 							sgHandler.GetSG1().Returns((ISlotGroup)null);
 					sgTAHandler.SetSGHandler(sgHandler);
-					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						if(sg1This){
 							taCache.GetPickedSB().Returns(removed);
@@ -988,8 +985,7 @@ namespace SlotSystemTests{
 							taCache.GetPickedSB().Returns(added);
 							taCache.GetTargetSB().Returns(removed);
 						}
-						hoverable.GetTAC().Returns(taCache);
-					sgTAHandler.SetHoverable(hoverable);
+						sg.GetTAC().Returns(taCache);
 				
 				List<ISlottable> actual = sgTAHandler.SwappedNewSBs();
 				
@@ -1566,11 +1562,9 @@ namespace SlotSystemTests{
 					sgTAHandler.SetSBHandler(sbHandler);
 					ISBFactory sbFactory = new SBFactory(MakeSubSSM());
 					sgTAHandler.SetSBFactory(sbFactory);
-					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						taCache.GetMoved().Returns(added);
-						hoverable.GetTAC().Returns(taCache);
-					sgTAHandler.SetHoverable(hoverable);
+						sg.GetTAC().Returns(taCache);
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(sorter);
 						sorterHandler.SetIsAutoSort(isAutoSort);
@@ -1896,12 +1890,9 @@ namespace SlotSystemTests{
 						sorterHandler.SetSorter(sorter);
 						sorterHandler.SetIsAutoSort(isAutoSort);
 					sgTAHandler.SetSorterHandler(sorterHandler);
-					IHoverable hoverable = Substitute.For<IHoverable>();
 						ITransactionCache taCache = Substitute.For<ITransactionCache>();
 						taCache.GetMoved().Returns(removed);
-						hoverable.GetTAC().Returns(taCache);
-					sgTAHandler.SetHoverable(hoverable);
-
+						sg.GetTAC().Returns(taCache);
 				
 				List<ISlottable> actual = sgTAHandler.RemovedNewSBs();
 				
@@ -2517,9 +2508,7 @@ namespace SlotSystemTests{
 						ITransactionCache taCache = MakeSubTAC();
 							taCache.GetPickedSB().Returns(pickedSB);
 							taCache.GetTargetSB().Returns(targetSB);
-						IHoverable hoverable = Substitute.For<IHoverable>();
-						sg.GetHoverable().Returns(hoverable);
-						hoverable.GetTAC().Returns(taCache);
+						sg.GetTAC().Returns(taCache);
 					ITransactionManager tam = MakeSubTAM();
 						ITransactionSGHandler sgHandler = Substitute.For<ITransactionSGHandler>();
 						if(thisSG)

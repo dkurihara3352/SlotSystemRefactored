@@ -12,9 +12,8 @@ namespace SlotSystem{
 			this.sgHandler = sgHandler;
 		}
 		public void SortSG(ISlotGroup sg, SGSorter sorter){
-			ISlotSystemTransaction sortTransaction = sortFA.MakeSortTA(sg, sorter);
-			IHoverable hoverable = sg.GetHoverable();
-			hoverable.GetTAC().SetTargetSB(sortTransaction.GetTargetSB());
+			ISortTransaction sortTransaction = sortFA.MakeSortTA(sg, sorter);
+			sortTransaction.SetTargetSBOnTAC();
 			sgHandler.SetSG1(sortTransaction.GetSG1());
 			tam.SetTransaction(sortTransaction);
 			tam.ExecuteTransaction();

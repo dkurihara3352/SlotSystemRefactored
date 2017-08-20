@@ -60,7 +60,6 @@ namespace SlotSystem{
 		}
 	}
 	public interface IHoverable{
-		ITransactionCache GetTAC();
 		void SetTACache(ITransactionCache taCache);
 		void SetSSESelStateHandler(ISSESelStateHandler handler);
 		bool IsHovered();

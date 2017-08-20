@@ -12,7 +12,6 @@ namespace SlotSystemTests{
 		public class SBProcessesTests: SlotSystemTest{
 			[Test]
 			public void WaitForPickUpProcess_Expire_WhenCalled_CallsSBPickUp(){
-				ISlottable mockSB = MakeSubSB();
 				ISBActStateHandler actStateHandler = Substitute.For<ISBActStateHandler>();
 				WaitForPickUpProcess wfpuProc = new WaitForPickUpProcess(actStateHandler, FakeCoroutine);
 				

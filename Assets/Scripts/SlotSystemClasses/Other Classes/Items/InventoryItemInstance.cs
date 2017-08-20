@@ -22,7 +22,7 @@ namespace SlotSystem{
 		public int GetItemID(){
 			return GetInventoryItem().GetItemID();
 		}
-		public bool GetIsEquipped(){
+		public bool IsEquipped(){
 			return _isEquipped;
 		}
 		public void SetIsEquipped(bool equipped){
@@ -88,7 +88,7 @@ namespace SlotSystem{
 		InventoryItem GetInventoryItem();
 		void SetInventoryItem(InventoryItem item);
 		int GetItemID();
-		bool GetIsEquipped();
+		bool IsEquipped();
 		void SetIsEquipped(bool equipped);
 		bool GetIsMarked();
 		void SetIsMarked(bool marked);
