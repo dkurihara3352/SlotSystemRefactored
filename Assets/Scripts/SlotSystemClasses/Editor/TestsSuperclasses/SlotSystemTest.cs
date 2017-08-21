@@ -13,6 +13,13 @@ public class SlotSystemTest{
 		foreach(var obj in gos)
 			GameObject.DestroyImmediate(obj);
 	}
+	public void AssertCreatedSB(ISlottable sb, IInventoryItemInstance addedItem, ISlotSystemManager ssm){
+		Assert.That(sb.GetItem(), Is.SameAs(addedItem));
+		Assert.That(sb.GetSSM(), Is.SameAs(ssm));
+		ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
+		Assert.That(sbSelStateHandler.IsDefocused(), Is.True);
+		Assert.That(sb, Is.Not.Null.And.InstanceOf(typeof(Slottable)));
+	}
 	/*	Elements	*/
 		protected static Slottable MakeSBInitWithSubs(){
 			Slottable sb = MakeSB();

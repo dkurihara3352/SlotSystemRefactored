@@ -19,6 +19,12 @@ namespace SlotSystem{
 			_focusedSGProvider = focusedSGProvider;
 		}
 			IFocusedSGProvider _focusedSGProvider;
+			public IPoolInventory GetPoolInv(){
+				return GetFocusedSGProvider().GetPoolInv();
+			}
+			public IEquipmentSetInventory GetEquipInv(){
+				return GetFocusedSGProvider().GetEquipInv();
+			}
 		public IEquippedProvider GetEquippedProvider(){
 			if(_equippedProvider != null)
 				return _equippedProvider;
@@ -55,7 +61,7 @@ namespace SlotSystem{
 		}
 		public void RemoveFromEquipInv(){
 			List<IInventoryItemInstance> removed = new List<IInventoryItemInstance>();
-			IEquipmentSetInventory equipInv = GetFocusedSGProvider().GetEquipInv();
+			IEquipmentSetInventory equipInv = GetEquipInv();
 			foreach(IInventoryItemInstance item in equipInv.GetItems()){
 				if(!IsAllEquippedItemsContains(item))
 					removed.Add(item);
@@ -65,11 +71,11 @@ namespace SlotSystem{
 			}
 		}
 			bool IsAllEquippedItemsContains(IInventoryItemInstance item){
-				return GetEquippedProvider().GetAllEquippedItems().Contains(item);
+				return GetEquippedProvider().AllEquippedItemsContain(item);
 			}
 		public void AddToEquipInv(){
 			List<IInventoryItemInstance> added = new List<IInventoryItemInstance>();
-			IEquipmentSetInventory equipInv = GetFocusedSGProvider().GetEquipInv();
+			IEquipmentSetInventory equipInv = GetEquipInv();
 			foreach(IInventoryItemInstance itemInAct in GetEquippedProvider().GetAllEquippedItems()){
 				if(!equipInv.GetItems().Contains(itemInAct))
 					added.Add(itemInAct);
@@ -79,32 +85,12 @@ namespace SlotSystem{
 			}
 		}
 		public void UpdateAllItemsEquipStatusInPoolInv(){
-			IPoolInventory poolInv = GetFocusedSGProvider().GetPoolInv();
+			IPoolInventory poolInv = GetPoolInv();
 			IEquippedProvider equiProv = GetEquippedProvider();
-			BowInstance equippedBow = equiProv.GetEquippedBowInst();
-			WearInstance equippedWear = equiProv.GetEquippedWearInst();
-			List<CarriedGearInstance> equippedCGears = equiProv.GetEquippedCarriedGears();
-			List<PartsInstance> equippedParts = equiProv.GetEquippedParts();
 
 			foreach(IInventoryItemInstance itemInst in poolInv.GetItems()){
-				if(itemInst is BowInstance){
-					bool itemIsEquippedBow = ((BowInstance)itemInst).Equals(equippedBow);
-					itemInst.SetIsEquipped(itemIsEquippedBow);
-				}
-				else if (itemInst is WearInstance){
-					bool itemIsEquippedWear = ((WearInstance)itemInst).Equals(equippedWear);
-					itemInst.SetIsEquipped(itemIsEquippedWear);
-				}
-				else if(itemInst is CarriedGearInstance){
-					bool itemIsEquippedCGears = equippedCGears != null &&
-						equippedCGears.Contains((CarriedGearInstance)itemInst);
-					itemInst.SetIsEquipped(itemIsEquippedCGears);
-				}
-				else if(itemInst is PartsInstance){
-					bool itemIsEquippedCGears = equippedParts != null &&
-						equippedParts.Contains((PartsInstance)itemInst);
-					itemInst.SetIsEquipped(itemIsEquippedCGears);
-				}
+				if(itemInst.IsContainedInEquippedItems(equiProv))
+					itemInst.SetIsEquipped(true);
 			}
 		}
 		public void UpdateAllSBsEquipState(){
@@ -113,7 +99,7 @@ namespace SlotSystem{
 			}
 		}
 		public void MarkEquippedInPool(IInventoryItemInstance item, bool equipped){
-			IPoolInventory poolInv = GetFocusedSGProvider().GetPoolInv();
+			IPoolInventory poolInv = GetPoolInv();
 			foreach(IInventoryItemInstance itemInInv in poolInv.GetItems()){
 				if(itemInInv == item)
 					itemInInv.SetIsEquipped(equipped);
@@ -172,10 +158,16 @@ namespace SlotSystem{
 				return _poolBundle;
 			}
 				ISlotSystemBundle _poolBundle;
+			public bool PoolBundleContains(ISlotGroup sg){
+				return GetPoolBundle().ContainsInHierarchy(sg);
+			}
 			public ISlotSystemBundle GetEquipBundle(){
 				return _equipBundle;
 			}
 				ISlotSystemBundle _equipBundle;
+			public bool EquipBundleContains(ISlotGroup sg){
+				return GetEquipBundle().ContainsInHierarchy(sg);
+			}
 			public List<IEquipmentSet> equipmentSets{
 				get{
 					List<IEquipmentSet> result = new List<IEquipmentSet>();
@@ -191,6 +183,12 @@ namespace SlotSystem{
 				return _otherBundles;
 			}
 				IEnumerable<ISlotSystemBundle> _otherBundles;
+			public bool OtherBundlesContain(ISlotGroup sg){
+				foreach(var bundle in GetOtherBundles())
+					if(bundle.ContainsInHierarchy(sg))
+						return true;
+				return false;
+			}
 			protected override IEnumerable<ISlotSystemElement> elements{
 				get{
 					yield return GetPoolBundle();
@@ -341,12 +339,17 @@ namespace SlotSystem{
 		void MarkEquippedInPool(IInventoryItemInstance item, bool equipped);
 		void SetEquippedOnAllSBs(IInventoryItemInstance item, bool equipped);
 		ISlotSystemBundle GetPoolBundle();
+		bool PoolBundleContains(ISlotGroup sg);
 		ISlotSystemBundle GetEquipBundle();
+		bool EquipBundleContains(ISlotGroup sg);
 		IEnumerable<ISlotSystemBundle> GetOtherBundles();
+		bool OtherBundlesContain(ISlotGroup sg);
 		ISlotSystemElement FindParent(ISlotSystemElement ele);
 		void FindAndFocusInBundle(ISlotSystemElement ele);
 		IEquippedProvider GetEquippedProvider();
 		IFocusedSGProvider GetFocusedSGProvider();
+			IPoolInventory GetPoolInv();
+			IEquipmentSetInventory GetEquipInv();
 		IAllElementsProvider GetAllElementsProvider();
 		ITransactionManager GetTAM();
 		ITransactionCache GetTAC();

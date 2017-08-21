@@ -60,7 +60,7 @@ namespace SlotSystem{
 		public void SetEquippableCGearsCount(int num){
 			_equippableCGearsCount = num;
 			ISlotGroup sg = GetSG();
-			if(sg != null && filterHandler.GetFilter() is SGCGearsFilter && !sg.IsExpandable())
+			if(sg != null && filterHandler.GetFilter() is SGCGearsFilter && !sg.IsResizable())
 			slotsHolder.SetInitSlotsCount(num);
 		}
 			int _equippableCGearsCount;

@@ -99,7 +99,7 @@ namespace SlotSystem{
 		}
 		public List<ISlottable> SortedNewSBs(){
 			List<ISlottable> result;
-			if(sg.IsExpandable())
+			if(sg.IsResizable())
 				result = sorterHandler.GetSortedSBsWithResize(sbHandler.GetSBs());
 			else
 				result = sorterHandler.GetSortedSBsWithoutResize(sbHandler.GetSBs());
@@ -344,7 +344,7 @@ namespace SlotSystem{
 			if(!sorterHandler.IsAutoSort())
 				return source;
 			else{
-				if(sg.IsExpandable())
+				if(sg.IsResizable())
 					return sorterHandler.GetSortedSBsWithResize(source);
 				else
 					return sorterHandler.GetSortedSBsWithoutResize(source);

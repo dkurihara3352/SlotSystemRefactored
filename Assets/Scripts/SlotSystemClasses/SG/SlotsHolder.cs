@@ -6,14 +6,14 @@ using UnityEngine;
 namespace SlotSystem{
 	public class SlotsHolder : ISlotsHolder {
 		public SlotsHolder(ISlotGroup sg){
-			_sg = sg;
+			this.sg = sg;
 			SetNewSlots(new List<Slot>());
 			SetSlots(new List<Slot>());
 		}
-			ISlotGroup _sg;
+			ISlotGroup sg;
 		public Slot GetNewSlot(IInventoryItemInstance itemInst){
 			int index = -3;
-			foreach(ISlottable sb in _sg){
+			foreach(ISlottable sb in sg){
 				if(sb != null){
 					if(sb.GetItem() == itemInst)
 						index = sb.GetNewSlotID();
@@ -33,6 +33,9 @@ namespace SlotSystem{
 			_slots = slots;
 		}
 			List<Slot> _slots;
+		public int GetSlotsCount(){
+			return GetSlots().Count;
+		}
 		public List<Slot> GetNewSlots(){
 			if(_newSlots != null)
 				return _newSlots;
@@ -69,14 +72,14 @@ namespace SlotSystem{
 				int initCount = GetInitSlotsCount();
 				return initCount == 0? items.Count: initCount;
 			}
-			List<Slot> CreateSlots(int count){
-				List<Slot> result = new List<Slot>();
-				for(int i = 0; i < count; i ++){
-					Slot newSlot = new Slot();
-					result.Add(newSlot);
-				}
-				return result;
+		public List<Slot> CreateSlots(int count){
+			List<Slot> result = new List<Slot>();
+			for(int i = 0; i < count; i ++){
+				Slot newSlot = new Slot();
+				result.Add(newSlot);
 			}
+			return result;
+		}
 		public void PutSBsInSlots(List<ISlottable> sbs){
 			List<Slot> slots = GetSlots();
 			if(slots.Count < sbs.Count)
@@ -86,11 +89,22 @@ namespace SlotSystem{
 					slot.sb = sbs[slots.IndexOf(slot)];
 				}
 		}
+		public void MakeSureSlotsAreReady(List<IInventoryItemInstance> items){
+			if(items.Count > GetSlotsCount())
+				if(!sg.IsResizable())
+					throw new InvalidOperationException("sg is not expandable and the count of items to init exceeds that of slots");
+				else{
+					List<Slot> slots = CreateSlots(items.Count);
+					SetSlots(slots);
+				}
+		}
 	}
 	public interface ISlotsHolder{
 		List<Slot> GetSlots();
 		void SetSlots(List<Slot> slots);
 		bool HasEmptySlot();
+		int GetSlotsCount();
+		List<Slot> CreateSlots(int count);
 		Slot GetNewSlot(IInventoryItemInstance item);
 		List<Slot> GetNewSlots();
 		void SetNewSlots(List<Slot> newSlots);
@@ -98,5 +112,6 @@ namespace SlotSystem{
 		int GetInitSlotsCount();
 		void InitSlots(List<IInventoryItemInstance> items);
 		void PutSBsInSlots(List<ISlottable> sbs);
+		void MakeSureSlotsAreReady(List<IInventoryItemInstance> items);
 	}
 }

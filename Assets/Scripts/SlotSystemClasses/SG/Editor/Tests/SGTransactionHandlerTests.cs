@@ -84,7 +84,7 @@ namespace SlotSystemTests{
 			public void SortedNewSBs_Various_CreatesAndReturnsSortedAndResizedSBsAccordingly(bool isExpandable, SGSorter sorter, List<ISlottable> source, List<ISlottable> expected){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.IsExpandable().Returns(isExpandable);
+						sg.IsResizable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
 						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
@@ -384,7 +384,7 @@ namespace SlotSystemTests{
 			public void FilledNewSBs_Various_CreatesAndReturnsNewSBsAccordingly(List<ISlottable> source, bool isPool, bool isAdded, bool isAutoSort, bool isExpandable, List<ISlottable> expected, int addedIndex, IInventoryItemInstance addedItem){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.IsExpandable().Returns(isExpandable);
+						sg.IsResizable().Returns(isExpandable);
 						sg.IsPool().Returns(isPool);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISorterHandler sorterHandler = new SorterHandler();
@@ -958,7 +958,7 @@ namespace SlotSystemTests{
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
 						sg.IsPool().Returns(isPool);
-						sg.IsExpandable().Returns(isExpandable);
+						sg.IsResizable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
 						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
@@ -1555,7 +1555,7 @@ namespace SlotSystemTests{
 			{
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.IsExpandable().Returns(isExpandable);
+						sg.IsResizable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
 						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
@@ -1881,7 +1881,7 @@ namespace SlotSystemTests{
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
 						sg.IsPool().Returns(isPool);
-						sg.IsExpandable().Returns(isExpandable);
+						sg.IsResizable().Returns(isExpandable);
 					sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISBHandler sbHandler = Substitute.For<ISBHandler>();
 						sbHandler.GetSBs().Returns(new List<ISlottable>(source));
@@ -2312,7 +2312,7 @@ namespace SlotSystemTests{
 			public void SortedSBsIfAutoSortAccordingToExpandablity_Always_ReturnsAccordingly(bool isAutoSort, bool isExpandable, List<ISlottable> source ,List<ISlottable> expected){
 				SGTransactionHandler sgTAHandler;
 					ISlotGroup sg = MakeSubSG();
-						sg.IsExpandable().Returns(isExpandable);
+						sg.IsResizable().Returns(isExpandable);
 						sgTAHandler = new SGTransactionHandler(sg, MakeSubTAM());
 					ISorterHandler sorterHandler = new SorterHandler();
 						sorterHandler.SetSorter(new SGItemIDSorter());
@@ -2541,6 +2541,8 @@ namespace SlotSystemTests{
 			}
 			static ISlottable MakeSubSBWithItemQuantitySettable(IInventoryItemInstance item){
 				ISlottable sb = MakeSubSB();
+					sb.GetAcquisitionOrder().Returns(item.GetAcquisitionOrder());
+					sb.GetItemID().Returns(item.GetItemID());
 					IItemHandler itemHandler = Substitute.For<IItemHandler>();
 					sb.GetItemHandler().Returns(itemHandler);
 					itemHandler.GetItem().Returns(item);
@@ -2573,18 +2575,12 @@ namespace SlotSystemTests{
 			static ISlottable MakeSubSBWithItem(IInventoryItemInstance item){
 				ISlottable sb = MakeSubSB();
 					sb.GetItem().Returns(item);
+					sb.GetItemID().Returns(item.GetItemID());
+					sb.GetAcquisitionOrder().Returns(item.GetAcquisitionOrder());
 					IItemHandler itemHandler = Substitute.For<IItemHandler>();
 					sb.GetItemHandler().Returns(itemHandler);
 					itemHandler.GetQuantity().Returns(item.GetQuantity());
 				return sb;
-			}
-			public void AssertCreatedSB(ISlottable sb, IInventoryItemInstance addedItem, ISlotSystemManager ssm){
-				Assert.That(sb.GetItem(), Is.SameAs(addedItem));
-				Assert.That(sb.GetSSM(), Is.SameAs(ssm));
-				ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
-				Assert.That(sbSelStateHandler.IsDefocused(), Is.True);
-				Assert.That(sb.IsUnequipped(), Is.True);
-				Assert.That(sb, Is.Not.Null.And.InstanceOf(typeof(Slottable)));
 			}
 			void DebugSBs(IEnumerable<ISlottable> sbs){
 				foreach(var sb in sbs)

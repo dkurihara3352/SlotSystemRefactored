@@ -10,29 +10,23 @@ namespace SlotSystem{
 		}
 		public BowInstance GetEquippedBowInst(){
 			ISlotGroup focusedSGEBow = focusedSGProvider.GetFocusedSGEBow();
-			if(focusedSGEBow != null){
-				ISlottable sb = focusedSGEBow[0] as ISlottable;
-				if(sb != null){
-					BowInstance result = sb.GetItem() as BowInstance;
-					if(result != null) return result;
-					throw new System.InvalidOperationException("SlotSystemManager.equippedBowInst: focusedSGEBow's sb item is not set right");
-				}
-				throw new System.InvalidOperationException("SlotSystemManager.equippedBowInst: focusedSGEBow's indexer not set right");
+			ISlottable sb = focusedSGEBow[0] as ISlottable;
+			if(sb != null){
+				BowInstance result = sb.GetItem() as BowInstance;
+				if(result != null) return result;
+				throw new InvalidOperationException("focusedSGEBow's sb item is not set right");
 			}
-			throw new System.InvalidOperationException("SlotSystemManager.equippedBowInst: focusedSGEBow is not set");
+			throw new InvalidOperationException("focusedSGEBow's indexer not set right");
 		}
 		public WearInstance GetEquippedWearInst(){
 			ISlotGroup focusedSGEWear = focusedSGProvider.GetFocusedSGEWear();
-			if(focusedSGEWear != null){
-				ISlottable sb = focusedSGEWear[0] as ISlottable;
-				if(sb!=null){
-					WearInstance result = ((ISlottable)focusedSGEWear[0]).GetItem() as WearInstance;
-					if(result != null) return result;
-					throw new System.InvalidOperationException("SlotSystemManager.equippedWearInst: focusedSGEWear's sb item is not set right");
-				}
-				throw new System.InvalidOperationException("SlotSystemManager.equippedWearInst: focusedSGEWear's indexer not set right");
+			ISlottable sb = focusedSGEWear[0] as ISlottable;
+			if(sb!=null){
+				WearInstance result = ((ISlottable)focusedSGEWear[0]).GetItem() as WearInstance;
+				if(result != null) return result;
+				throw new InvalidOperationException("focusedSGEWear's sb item is not set right");
 			}
-			throw new System.InvalidOperationException("SlotSystemManager.equippedWearInst: focusedSGEWear is not set");
+			throw new InvalidOperationException("focusedSGEWear's indexer not set right");
 		}
 		public List<CarriedGearInstance> GetEquippedCarriedGears(){
 			ISlotGroup focusedSGECGears = focusedSGProvider.GetFocusedSGECGears();
@@ -42,7 +36,7 @@ namespace SlotSystem{
 					if(sb != null) result.Add((CarriedGearInstance)sb.GetItem());
 				return result;
 			}
-			throw new System.InvalidOperationException("SlotSystemManager.equippedCGearsInst: focusedSGECGears is not set");
+			throw new InvalidOperationException("focusedSGECGears is not set");
 		}
 		public List<IInventoryItemInstance> GetAllEquippedItems(){
 			List<IInventoryItemInstance> items = new List<IInventoryItemInstance>();
@@ -52,6 +46,9 @@ namespace SlotSystem{
 				items.Add(cgItem);
 			}
 			return items;
+		}
+		public bool AllEquippedItemsContain(IInventoryItemInstance item){
+			return GetAllEquippedItems().Contains(item);
 		}
 		public List<PartsInstance> GetEquippedParts(){
 			List<PartsInstance> items = new List<PartsInstance>();
@@ -63,6 +60,7 @@ namespace SlotSystem{
 		WearInstance GetEquippedWearInst();
 		List<CarriedGearInstance> GetEquippedCarriedGears();
 		List<IInventoryItemInstance> GetAllEquippedItems();
+		bool AllEquippedItemsContain(IInventoryItemInstance item);
 		List<PartsInstance> GetEquippedParts();
 	}
 }

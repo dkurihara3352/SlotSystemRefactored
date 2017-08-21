@@ -40,6 +40,12 @@ namespace SlotSystem{
 		public void SetQuantity(int quant){
 			GetItem().SetQuantity(quant);
 		}
+		public int GetItemID(){
+			return GetItem().GetItemID();
+		}
+		public int GetAcquisitionOrder(){
+			return GetItem().GetAcquisitionOrder();
+		}
 	}
 	public interface IItemHandler{
 		IInventoryItemInstance GetItem();
@@ -50,5 +56,7 @@ namespace SlotSystem{
 		bool IsStackable();
 		int GetQuantity();
 		void SetQuantity(int quant);
+		int GetItemID();
+		int GetAcquisitionOrder();
 	}
 }

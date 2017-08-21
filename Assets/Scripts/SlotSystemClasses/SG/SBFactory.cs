@@ -27,8 +27,18 @@ namespace SlotSystem{
 			sbSelStateHandler.Defocus();
 			return newSB;
 		}
+		public List<ISlottable> CreateSBs(IEnumerable<IInventoryItemInstance> items){
+			List<ISlottable> result = new List<ISlottable>();
+			foreach(var item in items)
+				if(item != null)
+					result.Add(CreateSB(item));
+				else
+					result.Add(null);
+			return result;
+		}
 	}
 	public interface ISBFactory{
 		ISlottable CreateSB(IInventoryItemInstance item);
+		List<ISlottable> CreateSBs(IEnumerable<IInventoryItemInstance> items);
 	}
 }

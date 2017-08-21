@@ -40,6 +40,9 @@ namespace SlotSystem{
 			_newSBs = sbs;
 		}
 			List<ISlottable> _newSBs;
+		public int GetNewSBsCount(){
+			return GetNewSBs().Count;
+		}
 		public List<ISlottable> GetEquippedSBs(){
 			List<ISlottable> result = new List<ISlottable>();
 			foreach(ISlottable sb in GetSBs()){
@@ -95,6 +98,7 @@ namespace SlotSystem{
 		List<ISlottable> GetSBs();
 		void SetSBs(List<ISlottable> sbs);
 		List<ISlottable> GetNewSBs();
+		int GetNewSBsCount();
 		void SetNewSBs(List<ISlottable> newSBs);
 		void SetSBsActStates();
 		ISlottable GetSB(IInventoryItemInstance item);

@@ -83,6 +83,9 @@ namespace SlotSystem{
 			public void SetSlotsHolder(ISlotsHolder slotsHolder){
 				_slotsHolder = slotsHolder;
 			}
+			public bool HasEmptySlot(){
+				return GetSlotsHolder().HasEmptySlot();
+			}
 		/* SB */
 			public ISBHandler GetSBHandler(){
 				if(_sbHandler != null)
@@ -94,6 +97,12 @@ namespace SlotSystem{
 				_sbHandler = sbHandler;
 			}
 				ISBHandler _sbHandler;
+			public ISlottable GetSB(IInventoryItemInstance item){
+				return GetSBHandler().GetSB(item);
+			}
+			public bool HasItem(IInventoryItemInstance item){
+				return GetSBHandler().HasItem(item);
+			}
 		/*	sorter	*/
 			public ISorterHandler GetSorterHandler(){
 				if(_sorterHandler != null)
@@ -105,6 +114,9 @@ namespace SlotSystem{
 				_sorterHandler = sorterHandler;
 			}
 				ISorterHandler _sorterHandler;
+			public bool IsAutoSort(){
+				return GetSorterHandler().IsAutoSort();
+			}
 			public void InstantSort(){
 				List<ISlottable> sbs = GetSBHandler().GetSBs();
 				List<ISlottable> sortedSBs = GetSorterHandler().GetSortedSBsWithoutResize(sbs);
@@ -125,6 +137,9 @@ namespace SlotSystem{
 				_filterHandler = filterHandler;
 			}
 				IFilterHandler _filterHandler;
+			public bool AcceptsFilter(ISlottable sb){
+				return GetFilterHandler().AcceptsFilter(sb);
+			}
 		/*	SlotSystemElement implementation	*/
 			protected override IEnumerable<ISlotSystemElement> elements{
 				get{
@@ -151,21 +166,19 @@ namespace SlotSystem{
 			public void FocusSBs(){
 				foreach(ISlottable sb in this){
 					if(sb != null){
-						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
 						sb.Refresh();
 						if(sb.PassesPrePickFilter())
-							sbSelStateHandler.Focus();
+							sb.Focus();
 						else
-							sbSelStateHandler.Defocus();
+							sb.Defocus();
 					}
 				}
 			}
 			public void DefocusSBs(){
 				foreach(ISlottable sb in this){
 					if(sb != null){
-						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
 						sb.Refresh();
-						sbSelStateHandler.Defocus();
+						sb.Defocus();
 					}
 				}
 			}
@@ -195,29 +208,22 @@ namespace SlotSystem{
 				inv.SetSG(this);
 			}
 				IInventory _inventory;
-			public bool IsShrinkable(){
+			public bool AllowsOneWayTransaction(){
 				return _isShrinkable;
 			}
 				bool _isShrinkable;
-			public bool IsExpandable(){
+			public bool IsResizable(){
 				return _isExpandable;
 			}
 				bool _isExpandable;
 			public bool IsPool(){
-				ISlotSystemManager ssm = GetSSM();
-				return ssm.GetPoolBundle().ContainsInHierarchy(this);
+				return GetSSM().PoolBundleContains(this);
 			}
 			public bool IsSGE(){
-				ISlotSystemManager ssm = GetSSM();
-				return ssm.GetEquipBundle().ContainsInHierarchy(this);
+				return GetSSM().EquipBundleContains(this);
 			}
 			public bool IsSGG(){
-				ISlotSystemManager ssm = GetSSM();
-				foreach(ISlotSystemBundle gBundle in ssm.GetOtherBundles()){
-					if(gBundle.ContainsInHierarchy(this))
-						return true;
-				}
-				return false;
+				return GetSSM().OtherBundlesContain(this);
 			}
 			public List<ISlottable> SwappableSBs(ISlottable pickedSB){
 				List<ISlottable> result = new List<ISlottable>();
@@ -248,15 +254,12 @@ namespace SlotSystem{
 					get{return commandsRepo.GetInitializeItemsCommand();}
 				}
 			public void InitSBs(List<IInventoryItemInstance> items){
-				List<Slot> slots = GetSlotsHolder().GetSlots();
-				while(slots.Count < items.Count){
-					items.RemoveAt(slots.Count);
-				}
-				foreach(IInventoryItemInstance item in items){
-					ISlottable newSB = GetSBFactory().CreateSB(item);
-					slots[items.IndexOf(item)].sb = newSB;
-				}
+				ISlotsHolder slotsHolder = GetSlotsHolder();
+				slotsHolder.MakeSureSlotsAreReady(items);
+				List<ISlottable> newSBs = GetSBFactory().CreateSBs(items);
+				slotsHolder.PutSBsInSlots(newSBs);
 			}
+
 		/* SBFactory */
 			public ISBFactory GetSBFactory(){
 				if(_sbFactory != null)
@@ -293,17 +296,19 @@ namespace SlotSystem{
 				ISBHandler sbHandler = GetSBHandler();
 				sbHandler.SetNewSBs(sbHandler.GetSBs());
 				sbHandler.SetSBsActStates();
-				CreateNewSlots();
+				
+				CreateAndSetNewSlots(sbHandler.GetNewSBsCount());
 			}
 			public void ReadySBsForTransaction(List<ISlottable> newSBs){
 				ISBHandler sbHandler = GetSBHandler();
 				sbHandler.SetNewSBs(newSBs);
 				sbHandler.SetSBsActStates();
-				List<ISlottable> allSBs = AllSBs(sbHandler.GetSBs(), newSBs);
+				List<ISlottable> allSBs = GetAllSBs(sbHandler.GetSBs(), newSBs);
 				sbHandler.SetSBs(allSBs);
-				CreateNewSlots();
+
+				CreateAndSetNewSlots(newSBs.Count);
 			}
-			public List<ISlottable> AllSBs(List<ISlottable> sbs, List<ISlottable> newSBs){
+			public List<ISlottable> GetAllSBs(List<ISlottable> sbs, List<ISlottable> newSBs){
 				List<ISlottable> allSBs = new List<ISlottable>(sbs);
 				List<ISlottable> added = new List<ISlottable>();
 				foreach(var sb in newSBs)
@@ -312,13 +317,10 @@ namespace SlotSystem{
 				allSBs.AddRange(added);
 				return allSBs;
 			}
-			public void CreateNewSlots(){
-				List<Slot> newSlots = new List<Slot>();
-				for(int i = 0; i < GetSBHandler().GetNewSBs().Count; i++){
-					Slot newSlot = new Slot();
-					newSlots.Add(newSlot);
-				}
-				GetSlotsHolder().SetNewSlots(newSlots);
+			public void CreateAndSetNewSlots(int count){
+				ISlotsHolder slotsHolder = GetSlotsHolder();
+				List<Slot> newSlots = slotsHolder.CreateSlots(count);
+				slotsHolder.SetNewSlots(newSlots);
 			}
 			public void OnActionComplete(){
 				onActionCompleteCommand.Execute();
@@ -353,15 +355,20 @@ namespace SlotSystem{
 			ISGActStateHandler GetSGActStateHandler();
 			IHoverable GetHoverable();
 			ISlotsHolder GetSlotsHolder();
+				bool HasEmptySlot();
 			ISorterHandler GetSorterHandler();
+				bool IsAutoSort();
 			IFilterHandler GetFilterHandler();
+				bool AcceptsFilter(ISlottable sb);
 			ISBFactory GetSBFactory();
 			ISBHandler GetSBHandler();
+				ISlottable GetSB(IInventoryItemInstance item);
+				bool HasItem(IInventoryItemInstance item);
 			ISGTransactionHandler GetSGTAHandler();
 		/*	instrinsic	*/
 			IInventory GetInventory();
-			bool IsShrinkable();
-			bool IsExpandable();
+			bool AllowsOneWayTransaction();
+			bool IsResizable();
 			bool IsPool();
 			List<ISlottable> SwappableSBs(ISlottable pickedSB);
 			void InitializeItems();

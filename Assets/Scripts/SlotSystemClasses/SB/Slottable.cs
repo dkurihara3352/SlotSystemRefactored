@@ -139,6 +139,15 @@ namespace SlotSystem{
 			public IInventoryItemInstance GetItem(){
 				return GetItemHandler().GetItem();
 			}
+			public int GetAcquisitionOrder(){
+				return GetItemHandler().GetAcquisitionOrder();
+			}
+			public int GetItemID(){
+				return GetItemHandler().GetItemID();
+			}
+			public bool IsStackable(){
+				return GetItemHandler().IsStackable();
+			}
 			public void UpdateEquipState(){
 				if(GetItem().IsEquipped()) Equip();
 				else Unequip();
@@ -251,6 +260,9 @@ namespace SlotSystem{
 			IHoverable GetHoverable();
 			IItemHandler GetItemHandler();
 				IInventoryItemInstance GetItem();
+				int GetAcquisitionOrder();
+				int GetItemID();
+				bool IsStackable();
 			ISBActStateHandler GetActStateHandler();
 				bool IsActProcessRunning();
 				void PickUp();

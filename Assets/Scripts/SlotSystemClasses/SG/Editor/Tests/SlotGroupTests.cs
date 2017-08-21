@@ -30,36 +30,6 @@ namespace SlotSystemTests{
 				actStateHandler.Received().ExpireActProcess();
 			}
 			/*	intrinsic	*/
-				[Test]
-				public void isPool_SSMPBunContainsInHierarchyThis_ReturnsTrue(){
-					SlotGroup sg = MakeSG();
-						ISlotSystemManager stubSSM = MakeSSMWithPBunContaining(sg);
-						sg.SetSSM(stubSSM);
-
-					bool actual = sg.IsPool();
-
-					Assert.That(actual, Is.True);
-				}
-				[Test]
-				public void isSGE_SSMEBunContainsInHierarchyThis_ReturnsTrue(){
-					SlotGroup sg = MakeSG();
-						ISlotSystemManager stubSSM = MakeSSMWithEBunContaining(sg);
-						sg.SetSSM(stubSSM);
-
-					bool actual = sg.IsSGE();
-
-					Assert.That(actual, Is.True);
-				}
-				[Test]
-				public void isSGG_SSMGBunContainsInHierarchyThis_ReturnsTrue(){
-					SlotGroup sg = MakeSG();
-						ISlotSystemManager stubSSM = MakeSSMWithGBunContaining(sg);
-						sg.SetSSM(stubSSM);
-
-					bool actual = sg.IsSGG();
-
-					Assert.That(actual, Is.True);
-				}
 				[TestCaseSource(typeof(SwappableSBsCases))]
 				public void SwappableSBs_SBAreSwappable_ReturnsList(SlotGroup sg, ISlottable sb, List<ISlottable> expected){
 					List<ISlottable> actual = sg.SwappableSBs(sb);
@@ -305,9 +275,9 @@ namespace SlotSystemTests{
 
 					foreach(var e in sg){
 						if(dict[e])
-							e.GetSelStateHandler().Received().Focus();
+							e.Received().Focus();
 						else
-							e.GetSelStateHandler().Received().Defocus();
+							e.Received().Defocus();
 					}
 				}
 					class FocusSBsVariousCases: IEnumerable{
@@ -324,12 +294,6 @@ namespace SlotSystemTests{
 								dSBA.PassesPrePickFilter().Returns(false);
 								dSBB.PassesPrePickFilter().Returns(false);
 								dSBC.PassesPrePickFilter().Returns(false);
-								fSBA.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
-								fSBB.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
-								fSBC.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
-								dSBA.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
-								dSBB.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
-								dSBC.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
 							List<ISlottable> sbs = new List<ISlottable>(new ISlottable[]{
 								fSBA, fSBB, fSBC, dSBA, dSBB, dSBC
 							});
@@ -366,18 +330,15 @@ namespace SlotSystemTests{
 							ISlottable sbA = MakeSubSB();
 							ISlottable sbB = MakeSubSB();
 							ISlottable sbC = MakeSubSB();
-							sbA.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
-							sbB.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
-							sbC.GetSelStateHandler().Returns(Substitute.For<ISSESelStateHandler>());
 							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
 						sg = MakeSG_ISBHandler(sbs);
 					
 					sg.DefocusSBs();
 
-					sbA.GetSelStateHandler().Received().Defocus();
-					sbB.GetSelStateHandler().Received().Defocus();
-					sbC.GetSelStateHandler().Received().Defocus();
-					}
+					sbA.Received().Defocus();
+					sbB.Received().Defocus();
+					sbC.Received().Defocus();
+				}
 				[Test]
 				public void InitializeState_Always_InitializesStates(){
 					SlotGroup sg = MakeSG();
@@ -415,7 +376,7 @@ namespace SlotSystemTests{
 					filterHandler.Received().SetFilter(filter);
 					Assert.That(sorterHandler.GetSorter(), Is.SameAs(sorter));
 					slotsHolder.Received().SetInitSlotsCount(initSlotsCount);
-					Assert.That(sg.IsExpandable(), Is.EqualTo(initSlotsCount == 0));
+					Assert.That(sg.IsResizable(), Is.EqualTo(initSlotsCount == 0));
 				}
 				class SGSetUpFieldsData: IEquatable<SGSetUpFieldsData>{
 					public string name;
@@ -467,7 +428,7 @@ namespace SlotSystemTests{
 						List<ISlottable> newSBs = CreateSBs(count);
 						sbHandler.SetNewSBs(newSBs);
 					
-					sg.CreateNewSlots();
+					sg.CreateAndSetNewSlots(count);
 
 					List<Slot> actual = slotsHolder.GetNewSlots();
 					Assert.That(actual.Count, Is.EqualTo(count));
@@ -536,73 +497,48 @@ namespace SlotSystemTests{
 					foreach(ISlottable sb in sg)
 						sb.Received().MoveWithin();
 				}
-				[TestCaseSource(typeof(InitSBs_SlotsNotEnoughCases))]
-				public void InitSBs_SlotsNotEnough_RemoveNonFittableItems(List<Slot> slots, List<IInventoryItemInstance> items, List<IInventoryItemInstance> expected){
+				[Test]
+				public void InitSBs_IsNotExpandableAndSlotsNotEnough_ThrowsException([NUnit.Framework.Random(1, 10, 1)]int itemCount){
 					SlotGroup sg = MakeSG();
+						sg.SetFilterHandler(Substitute.For<IFilterHandler>());
+						sg.SetSorterHandler(Substitute.For<ISorterHandler>());
 						ISlotsHolder slotsHolder = new SlotsHolder(sg);
+							slotsHolder.SetSlots(new List<Slot>(new Slot[itemCount -1]));
+						sg.SetSlotsHolder(slotsHolder);
+						sg.SetSBFactory(Substitute.For<ISBFactory>());
+					sg.InspectorSetUp(Substitute.For<IInventory>(), Substitute.For<SGFilter>(), Substitute.For<SGSorter>(), itemCount -1);
+					List<IInventoryItemInstance> items = new List<IInventoryItemInstance>(new IInventoryItemInstance[itemCount]);
+
+					Exception ex = Assert.Catch<InvalidOperationException>(() => sg.InitSBs(items));
+
+					Assert.That(ex.Message, Is.StringContaining("sg is not expandable and the count of items to init exceeds that of slots"));
+				}
+				[Test]
+				public void InitSBs_SlotsAreReady_CreateSBsAndPutThemInSlots([NUnit.Framework.Random(1, 10, 1)]int itemsCount){
+					SlotGroup sg = MakeSG();
+						sg.SetFilterHandler(Substitute.For<IFilterHandler>());
+						sg.SetSorterHandler(Substitute.For<ISorterHandler>());
+						SlotsHolder slotsHolder = new SlotsHolder(sg);
+							List<Slot> slots = slotsHolder.CreateSlots(itemsCount);
 							slotsHolder.SetSlots(slots);
 						sg.SetSlotsHolder(slotsHolder);
-						ISBFactory sbFactory = new SBFactory(MakeSubSSM());
+						ISlotSystemManager ssm = MakeSubSSM();
+						SBFactory sbFactory = new SBFactory(ssm);
 						sg.SetSBFactory(sbFactory);
-					
+					sg.InspectorSetUp(Substitute.For<IInventory>(), Substitute.For<SGFilter>(), Substitute.For<SGSorter>(), 0);
+					List<IInventoryItemInstance> items = new List<IInventoryItemInstance>();
+					for(int i = 0; i < itemsCount; i++)
+						items.Add(Substitute.For<IInventoryItemInstance>());
+
 					sg.InitSBs(items);
 
-					bool equality = items.MemberEquals(expected);
-					Assert.That(equality, Is.True);					
+					List<ISlottable> actual = new List<ISlottable>();
+					foreach(var slot in slotsHolder.GetSlots())
+						actual.Add(slot.sb);
+					Assert.That(actual.Count, Is.EqualTo(items.Count));
+					foreach(var sb in actual)
+						AssertCreatedSB(sb, items[actual.IndexOf(sb)], ssm);
 				}
-					class InitSBs_SlotsNotEnoughCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							List<Slot> slots = CreateSlots(4);
-							List<IInventoryItemInstance> items;
-								BowInstance bowA = MakeBowInstance(0);
-								BowInstance bowA_1 = MakeBowInstance(0);
-								BowInstance bowA_2 = MakeBowInstance(0);
-								WearInstance wear = MakeWearInstance(0);
-								ShieldInstance shield = MakeShieldInstance(0);
-								MeleeWeaponInstance mWeapon = MakeMWeaponInstance(0);
-								items = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bowA, bowA_1, bowA_2, wear, shield, mWeapon});
-							List<IInventoryItemInstance> expected = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bowA, bowA_1, bowA_2, wear});
-							yield return new object[]{slots, items, expected};
-
-						}
-					}
-				[TestCaseSource(typeof(InitSBs_AlwaysCases))]
-				public void InitSBs_Always_CreatesAndSetsSBsInSlots(ISlotSystemManager ssm ,List<Slot> slots, List<IInventoryItemInstance> items){
-					SlotGroup sg = MakeSG();
-						ISlotsHolder slotsHolder = new SlotsHolder(sg);
-							slotsHolder.SetSlots(slots);
-						sg.SetSlotsHolder(slotsHolder);
-						ISBFactory sbFactory = new SBFactory(ssm);
-						sg.SetSBFactory(sbFactory);
-						
-					
-					sg.InitSBs(items);
-
-					for(int i = 0; i< slots.Count; i++){
-						ISlottable sb = slots[i].sb;
-						Assert.That(sb.GetSSM(), Is.SameAs(ssm));
-						Assert.That(sb.GetItem(), Is.SameAs(items[i]));
-						ISSESelStateHandler sbSelStateHandler = sb.GetSelStateHandler();
-						Assert.That(sbSelStateHandler.IsDefocused(), Is.True);
-						Assert.That(sb.IsEquipped(), Is.False);
-						Assert.That(sb.IsUnequipped(), Is.False);
-					}
-				}
-					class InitSBs_AlwaysCases: IEnumerable{
-						public IEnumerator GetEnumerator(){
-							ISlotSystemManager ssm = MakeSubSSM();
-							List<Slot> slots = CreateSlots(4);
-							List<IInventoryItemInstance> items;
-								BowInstance bowA = MakeBowInstance(0);
-								BowInstance bowB = MakeBowInstance(1);
-								BowInstance bowC = MakeBowInstance(2);
-								BowInstance bowD = MakeBowInstance(3);
-								items = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bowA, bowB, bowC, bowD});
-							yield return new object[]{
-								ssm, slots, items
-							};
-						}
-					}
 			/*	helper */
 				static ISlottable MakeSubSBWithItemAndSG(IInventoryItemInstance item, SlotGroup sg){
 					ISlottable sb = MakeSubSB();

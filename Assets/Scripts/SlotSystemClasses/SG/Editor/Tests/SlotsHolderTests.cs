@@ -237,6 +237,31 @@ namespace SlotSystemTests{
 
 				Assert.That(actual, Is.True);
 			}
+			[Test]
+			public void MakeSureSlotsAreReady_IsNotExpandableAndItemsCountExceedsSlotCount_ThrowsException(){
+				SlotsHolder slotsHolder;
+				ISlotGroup sg = MakeSubSG();
+					sg.IsResizable().Returns(false);
+					slotsHolder = new SlotsHolder(sg);
+				List<IInventoryItemInstance> items = new List<IInventoryItemInstance>(new IInventoryItemInstance[2]);
+				
+				Exception ex = Assert.Catch<InvalidOperationException>(() => slotsHolder.MakeSureSlotsAreReady(items));
+
+				Assert.That(ex.Message, Is.StringContaining("sg is not expandable and the count of items to init exceeds that of slots"));
+			}
+			[Test]
+			public void MakeSureSlotsAreReady_IsExpandableAndItemsCountExceedsSlotCount_CreatesAndSetsSlots([NUnit.Framework.Random(1, 10, 1)]int itemsCount){
+				SlotsHolder slotsHolder;
+				ISlotGroup sg = MakeSubSG();
+					sg.IsResizable().Returns(true);
+					slotsHolder = new SlotsHolder(sg);
+				slotsHolder.SetSlots(new List<Slot>());
+				List<IInventoryItemInstance> items = new List<IInventoryItemInstance>(new IInventoryItemInstance[itemsCount]);
+				
+				slotsHolder.MakeSureSlotsAreReady(items);
+
+				Assert.That(slotsHolder.GetSlotsCount(), Is.EqualTo(itemsCount));
+			}
 			/* helper */
 				List<ISlottable> CreateSBs(int count){
 					List<ISlottable> result = new List<ISlottable>();

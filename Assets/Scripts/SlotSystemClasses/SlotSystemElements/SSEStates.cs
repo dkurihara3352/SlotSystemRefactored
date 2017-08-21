@@ -6,8 +6,6 @@ using Utility;
 namespace SlotSystem{
 	/* StateEngine */
 		public class SSEStateEngine<T>: SwitchableStateEngine<T>, ISSEStateEngine<T> where T: ISSEState{
-			public SSEStateEngine(){
-			}
 		}
 		public interface ISSEStateEngine<T>: ISwitchableStateEngine<T> where T: ISSEState{}
 	/* StateFacotory */

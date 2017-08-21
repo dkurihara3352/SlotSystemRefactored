@@ -249,7 +249,6 @@ namespace SlotSystemTests{
 				[Test]
 				public void RemoveFromEquipInv_Always_CallsEInvRemoveMatches(){
 					SlotSystemManager ssm = MakeSSM();
-						IFocusedSGProvider sgProvider = Substitute.For<IFocusedSGProvider>();
 							IEquipmentSetInventory mockEInv = Substitute.For<IEquipmentSetInventory>();
 								IEnumerable<IInventoryItemInstance> eInvEles;
 									BowInstance bowE = MakeBowInstance(0);
@@ -271,13 +270,13 @@ namespace SlotSystemTests{
 										packR
 									};
 								mockEInv.GetItems().Returns(new List<IInventoryItemInstance>(eInvEles));
-							sgProvider.GetEquipInv().Returns(mockEInv);
-						ssm.SetFocusedSGProvider(sgProvider);
+						ssm.SetFocusedSGProvider(Substitute.For<IFocusedSGProvider>());
+						ssm.GetEquipInv().Returns(mockEInv);
 						IEquippedProvider stubEquiProv = Substitute.For<IEquippedProvider>();
-							List<IInventoryItemInstance> allEquippedItems = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{
-								bowE, wearE, shieldE, mWeaponE
-							});
-							stubEquiProv.GetAllEquippedItems().Returns(allEquippedItems);
+							stubEquiProv.AllEquippedItemsContain(bowE).Returns(true);
+							stubEquiProv.AllEquippedItemsContain(wearE).Returns(true);
+							stubEquiProv.AllEquippedItemsContain(shieldE).Returns(true);
+							stubEquiProv.AllEquippedItemsContain(mWeaponE).Returns(true);
 						ssm.SetEquippedProvider(stubEquiProv);
 						IAllElementsProvider allEProv = Substitute.For<IAllElementsProvider>();
 						ssm.SetAllElementsProvider(allEProv);

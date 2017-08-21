@@ -47,8 +47,8 @@ namespace SlotSystem{
 		}
 		public class AcquisitionOrderComparer: Comparer<ISlottable>{
 			public override int Compare(ISlottable x, ISlottable y){
-				int xAcqOrder = x.GetItem().GetAcquisitionOrder();
-				int yAcqOrder = y.GetItem().GetAcquisitionOrder();
+				int xAcqOrder = x.GetAcquisitionOrder();
+				int yAcqOrder = y.GetAcquisitionOrder();
 				if(xAcqOrder.Equals(yAcqOrder)) 
 					return 0;
 				return xAcqOrder.CompareTo(yAcqOrder);
@@ -56,8 +56,8 @@ namespace SlotSystem{
 		}
 		public class ItemIDOrderComparer: Comparer<ISlottable>{
 			public override int Compare(ISlottable x, ISlottable y){
-				int xItemID = x.GetItem().GetItemID();
-				int yItemID = y.GetItem().GetItemID();
+				int xItemID = x.GetItemID();
+				int yItemID = y.GetItemID();
 
 				if(xItemID.Equals(yItemID))
 					return new AcquisitionOrderComparer().Compare(x, y);

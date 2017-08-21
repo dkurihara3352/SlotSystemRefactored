@@ -240,7 +240,7 @@ namespace SlotSystemTests{
 			public void ChangeEquippableCGearsCount_TargetSGIsExpandable_ThrowsException(){
 				FocusedSGProvider focSGProv = new FocusedSGProvider(MakeSubSSM());
 				ISlotGroup sg = MakeSubSG();
-				sg.IsExpandable().Returns(true);
+				sg.IsResizable().Returns(true);
 
 				Exception ex = Assert.Catch<InvalidOperationException>(()=> focSGProv.ChangeEquippableCGearsCount(0, sg));
 				
@@ -248,33 +248,32 @@ namespace SlotSystemTests{
 			}
 			[TestCase(true)]
 			[TestCase(false)]
-			public void ChangeEquippableCGearsCount_TargetSGIsNOTExpandableAndSGIsFocusedOrDefocused_CallsEInvAndSGInOrder(bool focused){
-				FocusedSGProvider stubFocSGProv;
-					ISlotSystemManager stubSSM = MakeSubSSM();
-						ISlotSystemBundle eBun = MakeSubBundle();
-							IEquipmentSet eSet = Substitute.For<IEquipmentSet>();
-								ISlotGroup sge = MakeSubSG();
-									IEquipmentSetInventory eInv = MakeSubEquipInv();
-									sge.GetInventory().Returns(eInv);
-								IEnumerable<ISlotSystemElement> eSetEles = new ISlotSystemElement[]{
-									sge
-								};
-							eSet.GetEnumerator().Returns(eSetEles.GetEnumerator());
-						eBun.GetFocusedElement().Returns(eSet);
-					stubSSM.GetEquipBundle().Returns(eBun);
-				stubFocSGProv = new FocusedSGProvider(stubSSM);
-				ISlotGroup sg = MakeSubSG();
-					sg.IsExpandable().Returns(false);
-					ISSESelStateHandler sgSelStateHandler = Substitute.For<ISSESelStateHandler>();
-						sgSelStateHandler.IsFocused().Returns(focused);
-						sgSelStateHandler.IsDefocused().Returns(!focused);
-					sg.GetSelStateHandler().Returns(sgSelStateHandler);
-
-				stubFocSGProv.ChangeEquippableCGearsCount(0, sg);
-
+			public void ChangeEquippableCGearsCount_TargetSGIsNOTExpandableAndSGIsFocusedOrDefocused_Calls_Various(bool isFocused){
+				FocusedSGProvider focSGProv;
+					ISlotSystemManager ssm = MakeSubSSM();
+						ISlotSystemBundle eBun = Substitute.For<ISlotSystemBundle>();
+								IEquipmentSet eSet = Substitute.For<IEquipmentSet>();
+									ISlotGroup sge = MakeSubSG();	
+									IEquipmentSetInventory equipInv = Substitute.For<IEquipmentSetInventory>();
+									sge.GetInventory().Returns(equipInv);
+								IEnumerable<ISlotSystemElement> eSetEles = new ISlotSystemElement[]{sge};
+								eSet.GetEnumerator().Returns(eSetEles.GetEnumerator());
+								eBun.GetFocusedElement().Returns(eSet);
+						ssm.GetEquipBundle().Returns(eBun);
+						
+					focSGProv = new FocusedSGProvider(ssm);
+					ISlotGroup sg = MakeSubSG();
+						sg.IsResizable().Returns(false);
+						sg.IsFocused().Returns(isFocused);
+						sg.IsDefocused().Returns(!isFocused);
+					int count = 2;
+					
+				focSGProv.ChangeEquippableCGearsCount(count, sg);
+				
 				Received.InOrder(() => {
-					eInv.SetEquippableCGearsCount(0);
+					equipInv.SetEquippableCGearsCount(count);
 					sg.InitializeItems();
+					ssm.UpdateEquipInvAndAllSBsEquipState();
 				});
 			}
 		/* Test */

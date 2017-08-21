@@ -12,9 +12,24 @@ namespace SlotSystem{
 				else
 					throw new InvalidOperationException("selStateHandler not set");
 			}
-				ISSESelStateHandler _selStateHandler;
 			public virtual void SetSelStateHandler(ISSESelStateHandler handler){
 				_selStateHandler = handler;
+			}
+				ISSESelStateHandler _selStateHandler;
+			public void Activate(){
+				GetSelStateHandler().Activate();
+			}
+			public void Focus(){
+				GetSelStateHandler().Focus();
+			}
+			public void Defocus(){
+				GetSelStateHandler().Defocus();
+			}
+			public bool IsFocused(){
+				return GetSelStateHandler().IsFocused();
+			}
+			public bool IsDefocused(){
+				return GetSelStateHandler().IsDefocused();
 			}
 			public virtual void InitializeStates(){
 				GetSelStateHandler().Deactivate();
@@ -58,25 +73,20 @@ namespace SlotSystem{
 				PerformInHierarchy(ActivateInHi);
 			}
 				void ActivateInHi(ISlotSystemElement ele){
-					ISSESelStateHandler selStateHandler = ele.GetSelStateHandler();
 					if(ele.IsActivatedOnDefault()){
 						if(ele.IsFocusableInHierarchy())
-							selStateHandler.Activate();
+							ele.Activate();
 						else
-							selStateHandler.Defocus();
+							ele.Defocus();
 					}
 				}
 			public bool IsFocusedInHierarchy(){
 				ISlotSystemElement inspected = this;
-				ISSESelStateHandler selStateHandler = inspected.GetSelStateHandler();
 				while(true){
 					if(inspected　== null)
 						break;
-					if(selStateHandler.IsFocused()){
+					if(inspected.IsFocused())
 						inspected = inspected.GetParent();
-						if(inspected != null)
-							selStateHandler = inspected.GetSelStateHandler();
-					}
 					else
 						return false;
 				}
@@ -227,5 +237,10 @@ namespace SlotSystem{
 		ISlotSystemElement this[int i]{get;}
 		int GetLevel();
 		ISSESelStateHandler GetSelStateHandler();
+		void Activate();
+		void Focus();
+		void Defocus();
+		bool IsFocused();
+		bool IsDefocused();
 	}
 }

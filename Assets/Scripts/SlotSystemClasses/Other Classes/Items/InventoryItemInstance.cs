@@ -46,6 +46,12 @@ namespace SlotSystem{
 		public bool IsStackable(){
 			return GetInventoryItem().GetIsStackable();
 		}
+		public virtual bool IsContainedInEquippedItems(IEquippedProvider equipProv){
+			List<IInventoryItemInstance> equippedItems = equipProv.GetAllEquippedItems();
+			if(equippedItems.Contains(this))
+				return true;
+			return false;
+		}
 		public override bool Equals(object other){
 			if(!(other is SlottableItem))
 				return false;
@@ -92,5 +98,6 @@ namespace SlotSystem{
 		void SetIsEquipped(bool equipped);
 		bool GetIsMarked();
 		void SetIsMarked(bool marked);
+		bool IsContainedInEquippedItems(IEquippedProvider equipProv);
 	}
 }

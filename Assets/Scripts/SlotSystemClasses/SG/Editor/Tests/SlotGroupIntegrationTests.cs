@@ -59,26 +59,16 @@ namespace SlotSystemTests{
 							mWeaponA_0.SetAcquisitionOrder(7);
 							packA_0.SetAcquisitionOrder(8);
 							wearB_0.SetAcquisitionOrder(9);
-							ISlottable partsBSB_0 = MakeSubSB();
-								partsBSB_0.GetItem().Returns(partsB_0);
-							ISlottable bowASB_0 = MakeSubSB();
-								bowASB_0.GetItem().Returns(bowA_0);
-							ISlottable shieldASB_0 = MakeSubSB();
-								shieldASB_0.GetItem().Returns(shieldA_0);
-							ISlottable partsASB_0 = MakeSubSB();
-								partsASB_0.GetItem().Returns(partsA_0);
-							ISlottable bowBSB_0 = MakeSubSB();
-								bowBSB_0.GetItem().Returns(bowB_0);
-							ISlottable wearASB_0 = MakeSubSB();
-								wearASB_0.GetItem().Returns(wearA_0);
-							ISlottable quiverASB_0 = MakeSubSB();
-								quiverASB_0.GetItem().Returns(quiverA_0);
-							ISlottable mWeaponASB_0 = MakeSubSB();
-								mWeaponASB_0.GetItem().Returns(mWeaponA_0);
-							ISlottable packASB_0 = MakeSubSB();
-								packASB_0.GetItem().Returns(packA_0);
-							ISlottable wearBSB_0 = MakeSubSB();
-								wearBSB_0.GetItem().Returns(wearA_0);
+							ISlottable partsBSB_0 = MakeSubSBWithItem(partsB_0);
+							ISlottable bowASB_0 = MakeSubSBWithItem(bowA_0);
+							ISlottable shieldASB_0 = MakeSubSBWithItem(shieldA_0);
+							ISlottable partsASB_0 = MakeSubSBWithItem(partsA_0);
+							ISlottable bowBSB_0 = MakeSubSBWithItem(bowB_0);
+							ISlottable wearASB_0 = MakeSubSBWithItem(wearA_0);
+							ISlottable quiverASB_0 = MakeSubSBWithItem(quiverA_0);
+							ISlottable mWeaponASB_0 = MakeSubSBWithItem(mWeaponA_0);
+							ISlottable packASB_0 = MakeSubSBWithItem(packA_0);
+							ISlottable wearBSB_0 = MakeSubSBWithItem(wearA_0);
 							List<ISlottable> sbs_0 = new List<ISlottable>(new ISlottable[]{
 								partsBSB_0, 
 								bowASB_0, 
@@ -126,26 +116,16 @@ namespace SlotSystemTests{
 							mWeaponA_1.SetAcquisitionOrder(7);
 							packA_1.SetAcquisitionOrder(8);
 							wearB_1.SetAcquisitionOrder(9);
-							ISlottable partsBSB_1 = MakeSubSB();
-								partsBSB_1.GetItem().Returns(partsB_1);
-							ISlottable bowASB_1 = MakeSubSB();
-								bowASB_1.GetItem().Returns(bowA_1);
-							ISlottable shieldASB_1 = MakeSubSB();
-								shieldASB_1.GetItem().Returns(shieldA_1);
-							ISlottable partsASB_1 = MakeSubSB();
-								partsASB_1.GetItem().Returns(partsA_1);
-							ISlottable bowBSB_1 = MakeSubSB();
-								bowBSB_1.GetItem().Returns(bowB_1);
-							ISlottable wearASB_1 = MakeSubSB();
-								wearASB_1.GetItem().Returns(wearA_1);
-							ISlottable quiverASB_1 = MakeSubSB();
-								quiverASB_1.GetItem().Returns(quiverA_1);
-							ISlottable mWeaponASB_1 = MakeSubSB();
-								mWeaponASB_1.GetItem().Returns(mWeaponA_1);
-							ISlottable packASB_1 = MakeSubSB();
-								packASB_1.GetItem().Returns(packA_1);
-							ISlottable wearBSB_1 = MakeSubSB();
-								wearBSB_1.GetItem().Returns(wearA_1);
+							ISlottable partsBSB_1 = MakeSubSBWithItem(partsB_1);
+							ISlottable bowASB_1 = MakeSubSBWithItem(bowA_1);
+							ISlottable shieldASB_1 = MakeSubSBWithItem(shieldA_1);
+							ISlottable partsASB_1 = MakeSubSBWithItem(partsA_1);
+							ISlottable bowBSB_1 = MakeSubSBWithItem(bowB_1);
+							ISlottable wearASB_1 = MakeSubSBWithItem(wearA_1);
+							ISlottable quiverASB_1 = MakeSubSBWithItem(quiverA_1);
+							ISlottable mWeaponASB_1 = MakeSubSBWithItem(mWeaponA_1);
+							ISlottable packASB_1 = MakeSubSBWithItem(packA_1);
+							ISlottable wearBSB_1 = MakeSubSBWithItem(wearA_1);
 							List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{
 								partsBSB_1, 
 								bowASB_1, 
@@ -193,26 +173,16 @@ namespace SlotSystemTests{
 							mWeaponA_2.SetAcquisitionOrder(7);
 							packA_2.SetAcquisitionOrder(8);
 							wearB_2.SetAcquisitionOrder(9);
-							ISlottable partsBSB_2 = MakeSubSB();
-								partsBSB_2.GetItem().Returns(partsB_2);
-							ISlottable bowASB_2 = MakeSubSB();
-								bowASB_2.GetItem().Returns(bowA_2);
-							ISlottable shieldASB_2 = MakeSubSB();
-								shieldASB_2.GetItem().Returns(shieldA_2);
-							ISlottable partsASB_2 = MakeSubSB();
-								partsASB_2.GetItem().Returns(partsA_2);
-							ISlottable bowBSB_2 = MakeSubSB();
-								bowBSB_2.GetItem().Returns(bowB_2);
-							ISlottable wearASB_2 = MakeSubSB();
-								wearASB_2.GetItem().Returns(wearA_2);
-							ISlottable quiverASB_2 = MakeSubSB();
-								quiverASB_2.GetItem().Returns(quiverA_2);
-							ISlottable mWeaponASB_2 = MakeSubSB();
-								mWeaponASB_2.GetItem().Returns(mWeaponA_2);
-							ISlottable packASB_2 = MakeSubSB();
-								packASB_2.GetItem().Returns(packA_2);
-							ISlottable wearBSB_2 = MakeSubSB();
-								wearBSB_2.GetItem().Returns(wearB_2);
+							ISlottable partsBSB_2 = MakeSubSBWithItem(partsB_2);
+							ISlottable bowASB_2 = MakeSubSBWithItem(bowA_2);
+							ISlottable shieldASB_2 = MakeSubSBWithItem(shieldA_2);
+							ISlottable partsASB_2 = MakeSubSBWithItem(partsA_2);
+							ISlottable bowBSB_2 = MakeSubSBWithItem(bowB_2);
+							ISlottable wearASB_2 = MakeSubSBWithItem(wearA_2);
+							ISlottable quiverASB_2 = MakeSubSBWithItem(quiverA_2);
+							ISlottable mWeaponASB_2 = MakeSubSBWithItem(mWeaponA_2);
+							ISlottable packASB_2 = MakeSubSBWithItem(packA_2);
+							ISlottable wearBSB_2 = MakeSubSBWithItem(wearB_2);
 							List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{
 								partsBSB_2, 
 								bowASB_2, 
@@ -317,6 +287,14 @@ namespace SlotSystemTests{
 				int count = 0;
 				foreach(ISlottable sb in sg)
 					Assert.That(sb.GetSlotHandler().GetSlotID(), Is.EqualTo(count ++));
+			}
+		/* helper */
+			static ISlottable MakeSubSBWithItem(IInventoryItemInstance item){
+				ISlottable sb = MakeSubSB();
+					sb.GetItem().Returns(item);
+					sb.GetItemID().Returns(item.GetItemID());
+					sb.GetAcquisitionOrder().Returns(item.GetAcquisitionOrder());
+				return sb;
 			}
 		}
 	}
