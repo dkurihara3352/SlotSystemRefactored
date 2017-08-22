@@ -498,7 +498,7 @@ namespace SlotSystemTests{
 						sb.Received().MoveWithin();
 				}
 				[Test]
-				public void InitSBs_IsNotExpandableAndSlotsNotEnough_ThrowsException([NUnit.Framework.Random(1, 10, 1)]int itemCount){
+				public void InitSBs_IsNotExpandableAndSlotsNotEnough_ThrowsException([NUnit.Framework.Random(2, 10, 1)]int itemCount){
 					SlotGroup sg = MakeSG();
 						sg.SetFilterHandler(Substitute.For<IFilterHandler>());
 						sg.SetSorterHandler(Substitute.For<ISorterHandler>());

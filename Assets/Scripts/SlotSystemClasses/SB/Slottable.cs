@@ -6,23 +6,24 @@ using Utility;
 
 namespace SlotSystem{
 	public class Slottable : SlotSystemElement, ISlottable{
-		public override void InitializeStates(){
-			GetSelStateHandler().Deactivate();
-			GetActStateHandler().WaitForAction();
-			ClearCurEqpState();
-			GetMrkStateHandler().Unmark();
-		}
-		/*	States	*/
 			public void InitializeSB(IInventoryItemInstance item){
 				ITransactionCache tac = GetSSM().GetTAC();
 				SetTAC(tac);
 				IHoverable hoverable = new Hoverable(tac);
 				SetHoverable(hoverable);
-				SetTapCommand(new SBTapCommand());
+				SetTapCommand(new SBTapCommand(this));
+				SetPickUpCommand(new SBPickUpCommand(this));
 				SetItemHandler(new ItemHandler(item));
 				SetSlotHandler(new SlotHandler());
 				InitializeStateHandlers();
-				hoverable.SetSSESelStateHandler(_selStateHandler);
+				hoverable.SetSSESelStateHandler(GetSelStateHandler());
+			}
+		/*	States	*/
+			public override void InitializeStates(){
+				GetSelStateHandler().Deactivate();
+				GetActStateHandler().WaitForAction();
+				ClearCurEqpState();
+				GetMrkStateHandler().Unmark();
 			}
 			public void InitializeStateHandlers(){
 				_selStateHandler = new SBSelStateHandler(this);
@@ -67,6 +68,15 @@ namespace SlotSystem{
 				public void PickUp(){
 					GetActStateHandler().PickUp();
 					GetItemHandler().SetPickedAmount(1);
+					GetPickUpCommand().Execute();
+				}
+				public ISBCommand GetPickUpCommand(){
+					Debug.Assert(_pickUpCommand != null);
+					return _pickUpCommand;
+				}
+					ISBCommand _pickUpCommand;
+				public void SetPickUpCommand(ISBCommand pickUpCommand){
+					_pickUpCommand = pickUpCommand;
 				}
 			/*	Equip State	*/
 				public ISBEqpStateHandler GetEqpStateHandler(){
@@ -107,15 +117,13 @@ namespace SlotSystem{
 					ISBMrkStateHandler _mrkStateHandler;
 		/*	commands	*/
 			public void Tap(){
-				tapCommand.Execute(this);
+				GetTapCommand().Execute();
 			}
-			public ISBCommand tapCommand{
-				get{
-					if(_tapCommand != null)
-						return _tapCommand;
-					else
-						throw new InvalidOperationException("tapCommand not set");
-				}
+			public ISBCommand GetTapCommand(){
+				if(_tapCommand != null)
+					return _tapCommand;
+				else
+					throw new InvalidOperationException("tapCommand not set");
 			}
 				ISBCommand _tapCommand;
 			public void SetTapCommand(ISBCommand comm){
