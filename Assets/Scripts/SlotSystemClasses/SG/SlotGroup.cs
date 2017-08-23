@@ -350,7 +350,6 @@ namespace SlotSystem{
 			}
 	}
 	public interface ISlotGroup: ISlotSystemElement{
-
 			ITransactionCache GetTAC();
 			ISGActStateHandler GetSGActStateHandler();
 			IHoverable GetHoverable();

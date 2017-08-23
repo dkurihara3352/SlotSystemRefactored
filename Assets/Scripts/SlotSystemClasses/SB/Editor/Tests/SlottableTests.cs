@@ -12,7 +12,7 @@ namespace SlotSystemTests{
 	namespace SlottableTests{
 		[TestFixture]
 		public class SlottableTests: SlotSystemTest {
-			[Test][Ignore]
+			[Test]
 			public void InitializeSB_Always_PerformsSetUp(){
 				Slottable sb = MakeSB();
 					ITransactionCache taCache = MakeSubTAC();
@@ -23,15 +23,36 @@ namespace SlotSystemTests{
 				
 				sb.InitializeSB(item);
 
-				Assert.That(sb.GetTAC(), Is.Not.SameAs(taCache));
-				Assert.That((sb.GetHoverable() is Hoverable), Is.Not.True);
-				Assert.That((sb.GetTapCommand() is SBTapCommand), Is.Not.True);
-				Assert.That((sb.GetPickUpCommand() is SBPickUpCommand), Is.Not.True);
-				Assert.That((sb.GetItemHandler() is ItemHandler), Is.Not.True);
-				Assert.That((sb.GetSlotHandler() is SlotHandler), Is.Not.True);
-				Assert.That((sb.GetSelStateHandler() is SBSelStateHandler), Is.Not.True);
-				Assert.That((sb.GetSelStateHandler() is SBSelStateHandler), Is.Not.True);
+				Assert.That(sb.GetTAC(), Is.SameAs(taCache));
+				Assert.That((sb.GetHoverable() is Hoverable), Is.True);
+				Assert.That((sb.GetTapCommand() is SBTapCommand), Is.True);
+				Assert.That((sb.GetPickUpCommand() is SBPickUpCommand), Is.True);
+				Assert.That((sb.GetItemHandler() is ItemHandler), Is.True);
+				Assert.That((sb.GetSlotHandler() is SlotHandler), Is.True);
+				Assert.That((sb.GetSelStateHandler() is SBSelStateHandler), Is.True);
+				Assert.That((sb.GetActStateHandler() is SBActStateHandler), Is.True);
+				Assert.That((sb.GetEqpStateHandler() is SBEqpStateHandler), Is.True);
+				Assert.That((sb.GetMrkStateHandler() is SBMrkStateHandler), Is.True);
 			}
+			[TestCaseSource(typeof(SetEquipPickUpCommandCases))]
+			public void SetPickUpEquipCommand_Various_Sets_PickUpCommandAccordingly<T>(IInventoryItemInstance item, T command) where T: SBPickUpEquipCommand{
+				Slottable sb = MakeSB();
+					SBPickUpEquipCommand actual = sb.GetPickUpEquipCommand(item);
+
+				Assert.That(actual, Is.Not.Null);
+				Assert.That((actual is T), Is.True);
+			}
+				class SetEquipPickUpCommandCases: IEnumerable{
+					public IEnumerator GetEnumerator(){
+						yield return new TestCaseData(MakeBowInstance(0), new SBPickUpEquipBowCommand(MakeSubSB())).SetName("Bow:		SBPickUpEquipBowCommand");
+						yield return new TestCaseData(MakeWearInstance(0), new SBPickUpEquipWearCommand(MakeSubSB())).SetName("Wear:		SBPickUpEquipWearCommand");
+						yield return new TestCaseData(MakeShieldInstance(0), new SBPickUpEquipCGearsCommand(MakeSubSB())).SetName("Shield:		SBPickUpEquipCGearsCommand");
+						yield return new TestCaseData(MakeMWeaponInstance(0), new SBPickUpEquipCGearsCommand(MakeSubSB())).SetName("MWeapon:	SBPickUpEquipCGearsCommand");
+						yield return new TestCaseData(MakeQuiverInstance(0), new SBPickUpEquipCGearsCommand(MakeSubSB())).SetName("Quiver:		SBPickUpEquipCGearsCommand");
+						yield return new TestCaseData(MakePackInstance(0), new SBPickUpEquipCGearsCommand(MakeSubSB())).SetName("Pack:		SBPickUpEquipCGearsCommand");
+						yield return new TestCaseData(MakePartsInstance(0, 2), new SBPickUpEquipPartsCommand(MakeSubSB())).SetName("Parts:		SBPickUpEquipPartsCommand");
+					}
+				}
 			[Test]
 			public void isHierarchySetUp_SGIsSet_ReturnsTrue(){
 				Slottable sb = MakeSB();

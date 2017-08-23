@@ -12,7 +12,8 @@ namespace SlotSystem{
 				IHoverable hoverable = new Hoverable(tac);
 				SetHoverable(hoverable);
 				SetTapCommand(new SBTapCommand(this));
-				SetPickUpCommand(new SBPickUpCommand(this));
+				SBPickUpEquipCommand pickUpEquipCommand = GetPickUpEquipCommand(item);
+				SetPickUpCommand(pickUpEquipCommand);
 				SetItemHandler(new ItemHandler(item));
 				SetSlotHandler(new SlotHandler());
 				InitializeStateHandlers();
@@ -77,6 +78,18 @@ namespace SlotSystem{
 					ISBCommand _pickUpCommand;
 				public void SetPickUpCommand(ISBCommand pickUpCommand){
 					_pickUpCommand = pickUpCommand;
+				}
+				public SBPickUpEquipCommand GetPickUpEquipCommand(IInventoryItemInstance item){
+					if(item is BowInstance)
+						return new SBPickUpEquipBowCommand(this);
+					else if(item is WearInstance)
+						return new SBPickUpEquipWearCommand(this);
+					else if(item is CarriedGearInstance)
+						return new SBPickUpEquipCGearsCommand(this);
+					else if (item is PartsInstance)
+						return new SBPickUpEquipPartsCommand(this);
+					else
+						return new SBPickUpEquipCommand(this);
 				}
 			/*	Equip State	*/
 				public ISBEqpStateHandler GetEqpStateHandler(){

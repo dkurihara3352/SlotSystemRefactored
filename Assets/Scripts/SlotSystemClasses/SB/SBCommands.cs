@@ -41,4 +41,8 @@ namespace SlotSystem{
 		public SBPickUpEquipCGearsCommand(ISlottable sb): base(sb){}
 		public override void Execute(){}
 	}
+	public class SBPickUpEquipPartsCommand: SBPickUpEquipCommand{
+		public SBPickUpEquipPartsCommand(ISlottable sb): base(sb){}
+		public override void Execute(){}
+	}
 }
