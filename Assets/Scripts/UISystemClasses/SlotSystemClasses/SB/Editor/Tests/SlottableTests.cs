@@ -27,8 +27,8 @@ namespace SlotSystemTests{
 				Assert.That((sb.GetHoverable() is Hoverable), Is.True);
 				Assert.That((sb.GetTapCommand() is SBTapCommand), Is.True);
 				Assert.That((sb.GetPickUpCommand() is SBPickUpCommand), Is.True);
-				Assert.That((sb.GetItemHandler() is ItemHandler), Is.True);
-				Assert.That((sb.GetSlotHandler() is SlotHandler), Is.True);
+				Assert.That((sb.ItemHandler() is ItemHandler), Is.True);
+				Assert.That((sb.SlotHandler() is SlotHandler), Is.True);
 				Assert.That((sb.UISelStateHandler() is SBSelStateHandler), Is.True);
 				Assert.That((sb.ActStateHandler() is SBActStateHandler), Is.True);
 			}

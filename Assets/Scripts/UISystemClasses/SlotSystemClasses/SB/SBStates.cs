@@ -7,6 +7,66 @@ using System;
 namespace UISystem{
 	public abstract class SBState: UIState{
 	}
+    /* SelState */
+        public abstract class SBSelState: SBState, ISBSelState{
+            protected ISBSelStateHandler sbSelStateHandler;
+            public SBSelState(ISBSelStateHandler selStateHandler){
+                this.sbSelStateHandler = selStateHandler;
+            }
+        }
+        public interface ISBSelState: IUIState{
+        }
+        public class SBSelStateRepo: ISBSelStateRepo{
+            ISBSelStateHandler sbSelStateHandler;
+            public SBSelStateRepo(ISBSelStateHandler handler){
+                sbSelStateHandler = handler;
+            }
+            public ISBSelState SelectableState(){
+                if(_selectableState == null)
+                    _selectableState = new SBSelectableState(sbSelStateHandler);
+                return _selectableState;
+            }
+                ISBSelState _selectableState;
+            public ISBSelState UnselectableState(){
+                if(_unselectableState == null) 
+                    _unselectableState = new SBUnselectableState(sbSelStateHandler);
+                return _unselectableState;
+            }
+                ISBSelState _unselectableState;
+            public ISBSelState SelectedState(){
+                if(_selectedState == null) 
+                    _selectedState = new SBSelectedState(sbSelStateHandler);
+                return _selectedState;
+            }
+                ISBSelState _selectedState;
+        }
+        public interface ISBSelStateRepo{
+            ISBSelState SelectableState();
+            ISBSelState UnselectableState();
+            ISBSelState SelectedState();
+        }
+        public class SBSelectableState: SBSelState{
+            public SBSelectableState(ISBSelStateHandler handler): base(handler){}
+            public override void EnterState(){
+                SBMakeSelectableProcess process = new SBMakeSelectableProcess(sbSelStateHandler.MakeSelectableCoroutine());
+                sbSelStateHandler.SetAndRunSelProcess(process);
+            }
+        }
+        public class SBUnselectableState: SBSelState{
+            public SBUnselectableState(ISBSelStateHandler handler): base(handler){}
+            public override void EnterState(){
+                SBMakeUnselectableProcess process = new SBMakeUnselectableProcess(sbSelStateHandler.MakeUnselectableCoroutine());
+                sbSelStateHandler.SetAndRunSelProcess(process);
+            }
+        }
+        public class SBSelectedState: SBSelState{
+            public SBSelectedState(ISBSelStateHandler handler): base(handler){}
+            public override void EnterState(){
+                SBSelectProcess process = new SBSelectProcess(sbSelStateHandler.SelectCoroutine());
+                sbSelStateHandler.SetAndRunSelProcess(process);
+            }
+        }
+
     /* ActState */
         public abstract class SBActState: SBState, ISBActState{
             protected ISBActStateHandler actStateHandler;
@@ -35,6 +95,18 @@ namespace UISystem{
                 return _travellingState;
             }
                 ISBActState _travellingState;
+            public ISBActState LiftingState(){
+                if(_liftingState == null)
+                    _liftingState = new SBLiftingState(actStateHandler);
+                return _liftingState;
+            }
+                ISBActState _liftingState;
+            public ISBActState LandingState(){
+                if(_landingState == null)
+                    _landingState = new SBLandingState(actStateHandler);
+                return _landingState;
+            }
+                ISBActState _landingState;
             public ISBActState AppearingState(){
                 if(_appearingState == null)
                     _appearingState = new SBAppearingState(actStateHandler);
@@ -51,7 +123,7 @@ namespace UISystem{
         public interface ISBActStateRepo{
             ISBActState WaitingForActionState();
             ISBActState TravellingState();
-            ISBActState LiftedState();
+            ISBActState LiftingState();
             ISBActState LandingState();
             ISBActState AppearingState();
             ISBActState DisappearingState();
@@ -59,42 +131,42 @@ namespace UISystem{
         public class SBWaitingForActionState: SBActState{
             public SBWaitingForActionState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBWaitForActionProcess process = new SBWaitForActionProcess(actStateHandler.GetAddCoroutine());
+                SBWaitForActionProcess process = new SBWaitForActionProcess(actStateHandler.WaitForActionCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBTravellingState: SBActState{
             public SBTravellingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBTravelProcess process = new SBTravelProcess(actStateHandler.GetAddCoroutine());
+                SBTravelProcess process = new SBTravelProcess(actStateHandler.TravelCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
-        public class SBLiftedState: SBActState{
-            public SBLiftedState(ISBActStateHandler actStateHandler): base(actStateHandler){}
+        public class SBLiftingState: SBActState{
+            public SBLiftingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBLiftProcess process = new SBLiftProcess(actStateHandler.GetAddCoroutine());
+                SBLiftProcess process = new SBLiftProcess(actStateHandler.LiftCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBLandingState: SBActState{
             public SBLandingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBLandProcess process = new SBLandProcess(actStateHandler.GetAddCoroutine());
+                SBLandProcess process = new SBLandProcess(actStateHandler.LandCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBAppearingState: SBActState{
             public SBAppearingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBAppearProcess process = new SBAppearProcess(actStateHandler.GetAddCoroutine());
+                SBAppearProcess process = new SBAppearProcess(actStateHandler.AppearCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBDisappearingState: SBActState{
             public SBDisappearingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
             public override void EnterState(){
-                SBDisappearProcess process = new SBDisappearProcess(actStateHandler.GetRemoveCoroutine());
+                SBDisappearProcess process = new SBDisappearProcess(actStateHandler.DisappearCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }

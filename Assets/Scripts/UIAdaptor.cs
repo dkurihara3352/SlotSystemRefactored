@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UISystem;
 
-public class UIAdaptor : MonoBehaviour {
-	public RectTransform rectTrans;
+public class UIAdaptor : MonoBehaviour{
+	public RectTransformFake rectTrans;
 	UIElement uiEle;
 	// Use this for initialization
 	void Start () {

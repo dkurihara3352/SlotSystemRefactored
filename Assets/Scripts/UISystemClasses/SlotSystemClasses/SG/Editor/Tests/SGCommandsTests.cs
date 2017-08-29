@@ -21,12 +21,12 @@ namespace SlotSystemTests{
 						ISorterHandler sorterHandler = Substitute.For<ISorterHandler>();
 							sorterHandler.IsAutoSort().Returns(false);
 						IInventory stubInv = Substitute.For<IInventory>();
-						mockSG.GetInventory().Returns(stubInv);
+						mockSG.Inventory().Returns(stubInv);
 						IEnumerable<IInventoryItemInstance> items;
 							BowInstance bow = MakeBowInstance(0);
 							WearInstance wear = MakeWearInstance(0);
 							items = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{bow, wear});
-							stubInv.GetItems().Returns(items);
+							stubInv.Items().Returns(items);
 						List<IInventoryItemInstance> list = new List<IInventoryItemInstance>(new IInventoryItemInstance[]{ bow, wear});
 						IFilterHandler filterHandler = Substitute.For<IFilterHandler>();
 							filterHandler.FilteredItems(Arg.Is<List<IInventoryItemInstance>>( x => x.Contains(bow) && x.Contains(wear))).Returns(list);
@@ -50,8 +50,8 @@ namespace SlotSystemTests{
 			public void SGInitItemsCommand_Execute_SGIsAutoSort_CallsSGInstantSort(){
 				ISlotGroup mockSG = MakeSubSG();
 					IInventory stubInv = Substitute.For<IInventory>();
-						stubInv.GetItems().Returns(new List<IInventoryItemInstance>());
-					mockSG.GetInventory().Returns(stubInv);
+						stubInv.Items().Returns(new List<IInventoryItemInstance>());
+					mockSG.Inventory().Returns(stubInv);
 					ISorterHandler sorterHandler = Substitute.For<ISorterHandler>();
 						sorterHandler.IsAutoSort().Returns(true);
 					mockSG.GetSorterHandler().Returns(sorterHandler);

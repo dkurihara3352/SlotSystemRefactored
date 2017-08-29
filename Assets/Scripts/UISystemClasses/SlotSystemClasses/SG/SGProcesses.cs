@@ -21,4 +21,30 @@ namespace UISystem{
 					sgTAHandler.ReportTAComp();
 				}
 			}
+	public class SGSelCoroutineRepo: IUISelCoroutineRepo{
+		public Func<IEnumeratorFake> DeactivateCoroutine(){
+			return SGDeactivateCoroutine;
+		}
+			IEnumeratorFake SGDeactivateCoroutine(){
+				return null;
+			}
+		public Func<IEnumeratorFake> MakeSelectableCoroutine(){
+			return SGMakeSelectableCoroutine;
+		}
+			IEnumeratorFake SGMakeSelectableCoroutine(){
+				return null;
+			}
+		public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+			return SGMakeUnselectableCoroutine;
+		}
+			IEnumeratorFake SGMakeUnselectableCoroutine(){
+				return null;
+			}
+		public Func<IEnumeratorFake> SelectCoroutine(){
+			return SGSelectCoroutine;
+		}
+			IEnumeratorFake SGSelectCoroutine(){
+				return null;
+			}
+	}
 }

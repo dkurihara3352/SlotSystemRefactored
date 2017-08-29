@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
 	public class SlotSystemManager : UIElement, ISlotSystemManager{
-		public SlotSystemManager(IUIElement uiElement, RectTransform rectTrans): base(rectTrans){
+		public SlotSystemManager(IUIElement uiElement, RectTransformFake rectTrans): base(rectTrans){
 			this.uiElement = uiElement;
 		}
 			IUIElement uiElement;
@@ -36,6 +36,7 @@ namespace UISystem{
 				return _onSSMSelectedCommand;
 			}
 			IOnSSMSelectedCommand _onSSMSelectedCommand;
+		public void Refresh(){}
 		/* Events and triggers */
 			public void SetPickedSB(ISlottable pickedSB){
 				ISlottable prevPickedSB = GetPickedSB();
@@ -95,18 +96,29 @@ namespace UISystem{
 				if(SBDropped != null)
 					SBDropped.Invoke(this, e);
 			}
+			public void UpdateInventory(IInventory inventory){
+				OnInventoryUpdated(new InventoryEventArgs(inventory));
+			}
+			public event EventHandler<InventoryEventArgs> InventoryUpdated;
+			protected virtual void OnInventoryUpdated(InventoryEventArgs e){
+				if(InventoryUpdated != null)
+					InventoryUpdated.Invoke(this, e);
+			}
 	}
 	public interface ISlotSystemManager: IUIElement{
 		List<ISlotSystemElement> SlotSystemElements();
+		void Refresh();
 		void OnSSMFocus(object source, ISlotSystemManager ssm);
 		void SetPickedSB(ISlottable sb);
 		void SetHoveredSG(ISlotGroup sg);
 		void SetHoveredSlot(ISlot slot);
 		void Drop();
+		void UpdateInventory(IInventory inventory);
 		event EventHandler<SBEventArgs> SBPickedUp;
 		event EventHandler<SGEventArgs> SGHoverEntered;
 		event EventHandler<SlotEventArgs> SlotHoverEntered;
 		event EventHandler<SBEventArgs> SBDropped;
+		event EventHandler<InventoryEventArgs> InventoryUpdated;
 	}
 	public interface IInventorySystemSSM{}
 	public class SBEventArgs: EventArgs{
@@ -125,6 +137,12 @@ namespace UISystem{
 		public readonly ISlot slot;
 		public SlotEventArgs(ISlot slot){
 			this.slot = slot;
+		}
+	}
+	public class InventoryEventArgs: EventArgs{
+		public readonly IInventory inventory;
+		public InventoryEventArgs(IInventory inventory){
+			this.inventory = inventory;
 		}
 	}
 }

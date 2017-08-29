@@ -13,7 +13,7 @@ namespace UISystem{
 			equippedElementsProvider = equippedProvider;
 		}
 		public void InitializeEquipToolInventories(){
-			List<IInventoryItemInstance> allItems = poolInventory.GetItems();
+			List<IInventoryItemInstance> allItems = poolInventory.Items();
 			List<IInventoryItemInstance> unequippedItems = new List<IInventoryItemInstance>();
 			BowInstance equippedBow = null;
 			WearInstance equippedWear = null;

@@ -4,7 +4,34 @@ using UnityEngine;
 
 namespace UISystem{
 	public class UISelStateHandler : IUISelStateHandler {
+		public UISelStateHandler(){
+			_selStateRepo = new UISelStateRepo(this);
+			_selStateEngine = new UIStateEngine<IUISelState>();
+			_selProcEngine = new UIProcessEngine<IUISelProcess>();
+			_coroutineRepo = new UISelCoroutineRepo();
+		}
 		/*	state	*/
+			IUIStateEngine<IUISelState> SelStateEngine(){
+				Debug.Assert(_selStateEngine != null);
+				return _selStateEngine;
+			}
+				IUIStateEngine<IUISelState> _selStateEngine;
+			IUISelStateRepo SelStateRepo(){
+				Debug.Assert(_selStateRepo != null);
+				return _selStateRepo;
+			}
+				IUISelStateRepo _selStateRepo;
+			IUISelState prevSelState{
+				get{return SelStateEngine().GetPrevState();}
+			}
+			IUISelState curSelState{
+				get{return SelStateEngine().GetCurState();}
+			}
+			void SetSelState(IUISelState state){
+				SelStateEngine().SetState(state);
+				if(state == null && GetSelProcess() != null)
+					SetAndRunSelProcess(null);
+			}
 			public void ClearCurSelState(){
 				SetSelState(null);
 			}
@@ -18,7 +45,7 @@ namespace UISystem{
 				SetSelState(deactivatedState);
 			}
 				IUISelState deactivatedState{
-					get{return selStateFactory.MakeDeactivatedState();}
+					get{return SelStateRepo().DeactivatedState();}
 				}
 				public bool IsDeactivated(){
 					return curSelState == deactivatedState;
@@ -30,7 +57,7 @@ namespace UISystem{
 				SetSelState(defocusedState);
 			}
 				IUISelState defocusedState{
-					get{return selStateFactory.MakeDefocusedState();}
+					get{return SelStateRepo().UnselectableState();}
 				}
 				public bool IsUnselectable(){
 					return curSelState == defocusedState;
@@ -42,7 +69,7 @@ namespace UISystem{
 				SetSelState(focusedState);
 			}
 				IUISelState focusedState{
-					get{return selStateFactory.MakeFocusedState();}
+					get{return SelStateRepo().SelectableState();}
 				}
 				public bool IsSelectable(){
 					return curSelState == focusedState;
@@ -54,7 +81,7 @@ namespace UISystem{
 				SetSelState(selectedState);
 			}
 				IUISelState selectedState{
-					get{return selStateFactory.MakeSelectedState();}
+					get{return SelStateRepo().SelectedState();}
 				}
 				public bool IsSelected(){
 					return curSelState == selectedState;
@@ -68,73 +95,40 @@ namespace UISystem{
 			public virtual void Deselect(){
 				MakeSelectable();
 			}
-			IUISelStateFactory selStateFactory{
-				get{
-					if(m_selStateFactory == null)
-						m_selStateFactory = new UISelStateFacotory(this);
-					return m_selStateFactory;
-				}
-			}
-				IUISelStateFactory m_selStateFactory;
-			IUIStateEngine<IUISelState> selStateEngine{
-				get{
-					if(m_selStateEngine == null)
-						m_selStateEngine = new UIStateEngine<IUISelState>();
-					return m_selStateEngine;
-				}
-			}
-				IUIStateEngine<IUISelState> m_selStateEngine;
-			IUISelState prevSelState{
-				get{return selStateEngine.GetPrevState();}
-			}
-			IUISelState curSelState{
-				get{return selStateEngine.GetCurState();}
-			}
-			void SetSelState(IUISelState state){
-				selStateEngine.SetState(state);
-				if(state == null && GetSelProcess() != null)
-					SetAndRunSelProcess(null);
-			}
 		/*	process	*/
+			IUIProcessEngine<IUISelProcess> SelProcEngine(){
+				Debug.Assert(_selProcEngine != null);
+				return _selProcEngine;
+			}
+				IUIProcessEngine<IUISelProcess> _selProcEngine;
+			public void SetSelProcEngine(IUIProcessEngine<IUISelProcess> engine){
+				_selProcEngine = engine;
+			}
 			public void SetAndRunSelProcess(IUISelProcess process){
-				selProcEngine.SetAndRunProcess(process);
+				SelProcEngine().SetAndRunProcess(process);
 			}
 			public IUISelProcess GetSelProcess(){
-				return selProcEngine.GetProcess();
-			}
-			IUIProcessEngine<IUISelProcess> selProcEngine{
-				get{
-					if(m_selProcEngine == null)
-						m_selProcEngine = new UIProcessEngine<IUISelProcess>();
-					return m_selProcEngine;
-				}
-			}
-				IUIProcessEngine<IUISelProcess> m_selProcEngine;
-			public void SetSelProcEngine(IUIProcessEngine<IUISelProcess> engine){
-				m_selProcEngine = engine;
+				return SelProcEngine().GetProcess();
 			}
 			/* Coroutines */
-				public System.Func<IEnumeratorFake> GetDeactivateCoroutine(){
-					return coroutineFactory.MakeDeactivateCoroutine();
+				IUISelCoroutineRepo CoroutineRepo(){
+					Debug.Assert(_coroutineRepo != null);
+					return _coroutineRepo;
 				}
-				public System.Func<IEnumeratorFake> GetFocusCoroutine(){
-					return coroutineFactory.MakeFocusCoroutine();
+					IUISelCoroutineRepo _coroutineRepo;
+				public void SetSelCoroutineRepo(IUISelCoroutineRepo repo){_coroutineRepo = repo;}
+				public System.Func<IEnumeratorFake> DeactivateCoroutine(){
+					return CoroutineRepo().DeactivateCoroutine();
 				}
-				public System.Func<IEnumeratorFake> GetDefocusCoroutine(){
-					return coroutineFactory.MakeDefocusCoroutine();
+				public System.Func<IEnumeratorFake> MakeSelectableCoroutine(){
+					return CoroutineRepo().MakeSelectableCoroutine();
 				}
-				public System.Func<IEnumeratorFake> GetSelectCoroutine(){
-					return coroutineFactory.MakeSelectCoroutine();
+				public System.Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+					return CoroutineRepo().MakeUnselectableCoroutine();
 				}
-				IUICoroutineFactory coroutineFactory{
-					get{
-						if(m_coroutineFactory == null)
-							m_coroutineFactory = new UICoroutineFactory();
-						return m_coroutineFactory;
-					}
+				public System.Func<IEnumeratorFake> SelectCoroutine(){
+					return CoroutineRepo().SelectCoroutine();
 				}
-					IUICoroutineFactory m_coroutineFactory;
-					public void SetCoroutineFactory(IUICoroutineFactory factory){m_coroutineFactory = factory;}
 
 		/* Instant Methods */
 			IInstantCommands instantCommands{
@@ -148,13 +142,13 @@ namespace UISystem{
 				public void SetInstantCommands(IInstantCommands comms){
 					m_instantCommands = comms;
 				}
-			public virtual void InstantDefocus(){
+			public virtual void MakeUnselectableInstantly(){
 				instantCommands.ExecuteInstantDefocus();
 			}
-			public virtual void InstantFocus(){
+			public virtual void MakeSelectableInstantly(){
 				instantCommands.ExecuteInstantFocus();
 			}
-			public virtual void InstantSelect(){
+			public virtual void SelectInstantly(){
 				instantCommands.ExecuteInstantSelect();
 			}
 	}
@@ -177,12 +171,13 @@ namespace UISystem{
 		void Deselect();
 		void SetAndRunSelProcess(IUISelProcess process);
 		IUISelProcess GetSelProcess();
-		System.Func<IEnumeratorFake> GetDeactivateCoroutine();
-		System.Func<IEnumeratorFake> GetFocusCoroutine();
-		System.Func<IEnumeratorFake> GetDefocusCoroutine();
-		System.Func<IEnumeratorFake> GetSelectCoroutine();
-		void InstantFocus();
-		void InstantDefocus();
-		void InstantSelect();
+		void SetSelCoroutineRepo(IUISelCoroutineRepo repo);
+		System.Func<IEnumeratorFake> DeactivateCoroutine();
+		System.Func<IEnumeratorFake> MakeSelectableCoroutine();
+		System.Func<IEnumeratorFake> MakeUnselectableCoroutine();
+		System.Func<IEnumeratorFake> SelectCoroutine();
+		void MakeSelectableInstantly();
+		void MakeUnselectableInstantly();
+		void SelectInstantly();
 	}
 }

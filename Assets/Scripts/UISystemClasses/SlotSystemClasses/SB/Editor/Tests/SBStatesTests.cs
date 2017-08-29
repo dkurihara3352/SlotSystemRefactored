@@ -342,7 +342,7 @@ namespace SlotSystemTests{
 								sb.GetHoverable().Returns(hoverable);
 								IItemHandler itemHandler = Substitute.For<IItemHandler>();
 									itemHandler.IsStackable().Returns(true);
-								sb.GetItemHandler().Returns(itemHandler);
+								sb.ItemHandler().Returns(itemHandler);
 								ISBActStateHandler actStateHandler = Substitute.For<ISBActStateHandler>();
 								sb.ActStateHandler().Returns(actStateHandler);
 							puState = new PickingUpState(sb, MakeSubTAM());
@@ -360,7 +360,7 @@ namespace SlotSystemTests{
 								sb.GetHoverable().Returns(hoverable);
 								IItemHandler itemHandler = Substitute.For<IItemHandler>();
 									itemHandler.IsStackable().Returns(false);
-								sb.GetItemHandler().Returns(itemHandler);
+								sb.ItemHandler().Returns(itemHandler);
 								ITransactionManager tam = MakeSubTAM();
 							puState = new PickingUpState(sb, tam);
 						

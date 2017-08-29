@@ -81,4 +81,30 @@ namespace UISystem{
 			Func<IEnumeratorFake> GetPickUpCoroutine();
 			Func<IEnumeratorFake> GetWaitForNextTouchCoroutine();
 		}
+		public class SlotSelCoroutineRepo: IUISelCoroutineRepo{
+			public Func<IEnumeratorFake> DeactivateCoroutine(){
+				return SlotDeactivateCoroutine;
+			}
+				IEnumeratorFake SlotDeactivateCoroutine(){
+					return null;
+				}
+			public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+				return SlotMakeUnselectableCoroutine;
+			}
+				IEnumeratorFake SlotMakeUnselectableCoroutine(){
+					return null;
+				}
+			public Func<IEnumeratorFake> MakeSelectableCoroutine(){
+				return SlotMakeSelectableCoroutine;
+			}
+				IEnumeratorFake SlotMakeSelectableCoroutine(){
+					return null;
+				}
+			public Func<IEnumeratorFake> SelectCoroutine(){
+				return SlotSelectCoroutine;
+			}
+				IEnumeratorFake SlotSelectCoroutine(){
+					return null;
+				}
+		}
 }

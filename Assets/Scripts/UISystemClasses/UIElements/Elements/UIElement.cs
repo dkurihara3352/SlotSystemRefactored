@@ -5,8 +5,8 @@ using UnityEngine;
 using Utility;
 namespace UISystem{
 	public class UIElement : IUIElement{
-		RectTransform rectTransform;
-		public UIElement(RectTransform rectTrans){
+		RectTransformFake rectTransform;
+		public UIElement(RectTransformFake rectTrans){
 			rectTransform = rectTrans;
 		}
 		/* State Handling */

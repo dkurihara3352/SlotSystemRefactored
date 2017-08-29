@@ -20,8 +20,8 @@ namespace SlotSystemTests{
 						foreach(var item in addedItems)
 							poolInv.Add(item);
 						
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
-						foreach(var item in poolInv.GetItems()){
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
+						foreach(var item in poolInv.Items()){
 							IInventoryItemInstance itemInst = (IInventoryItemInstance)item;
 							Assert.That(itemInst.GetQuantity(), Is.EqualTo(1));
 						}
@@ -49,7 +49,7 @@ namespace SlotSystemTests{
 						foreach(var item in addedItems)
 							poolInv.Add(item);
 
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 						Assert.That(expected[0].GetQuantity(), Is.EqualTo(expectedCount));
 					}
 						class AddSameStackableCases: IEnumerable{
@@ -81,7 +81,7 @@ namespace SlotSystemTests{
 						poolInv.Add(partsInst_A);
 						poolInv.Add(partsInst_B);
 
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 						Assert.That(partsInst_A.GetQuantity(), Is.EqualTo(1));
 						Assert.That(partsInst_B.GetQuantity(), Is.EqualTo(1));
 					}
@@ -119,7 +119,7 @@ namespace SlotSystemTests{
 						foreach(var item in addedItems)
 							poolInv.Add(item);
 						
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 
 						foreach(KeyValuePair<IInventoryItemInstance, int> pair in itemQuantityDict){
 							Assert.That(pair.Key.GetQuantity(), Is.EqualTo(pair.Value));
@@ -169,7 +169,7 @@ namespace SlotSystemTests{
 							foreach(var item in removedItems)
 								poolInv.Remove(item);
 							
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 					}
 						class RemoveNonStackableCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
@@ -212,7 +212,7 @@ namespace SlotSystemTests{
 						foreach(var item in removed)
 							poolInv.Remove(item);
 						
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 					}
 						class RemoveNonMemberCases: IEnumerable{
 							public IEnumerator GetEnumerator(){
@@ -249,7 +249,7 @@ namespace SlotSystemTests{
 						foreach(var item in removed)
 							poolInv.Remove(item);
 						
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 						foreach(KeyValuePair<IInventoryItemInstance, int> pair in quantDict){
 							Assert.That(pair.Key.GetQuantity(), Is.EqualTo(pair.Value));
 					}
@@ -295,7 +295,7 @@ namespace SlotSystemTests{
 						foreach(var item in removed)
 							poolInv.Remove(item);
 						
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 						foreach(KeyValuePair<IInventoryItemInstance, int> pair in quantDict){
 							Assert.That(pair.Key.GetQuantity(), Is.EqualTo(pair.Value));
 					}
@@ -346,7 +346,7 @@ namespace SlotSystemTests{
 						foreach(var item in removed)
 							poolInv.Remove(item);
 						
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 						foreach(KeyValuePair<IInventoryItemInstance, int> pair in quantDict){
 							Assert.That(pair.Key.GetQuantity(), Is.EqualTo(pair.Value));
 					}
@@ -401,7 +401,7 @@ namespace SlotSystemTests{
 						foreach(var item in removed)
 							poolInv.Remove(item);
 						
-						Assert.That(poolInv.GetItems(), Is.EqualTo(expected));
+						Assert.That(poolInv.Items(), Is.EqualTo(expected));
 						foreach(KeyValuePair<IInventoryItemInstance, int> pair in indexDict){
 							Assert.That(pair.Key.AcquisitionOrder(), Is.EqualTo(pair.Value));
 						}

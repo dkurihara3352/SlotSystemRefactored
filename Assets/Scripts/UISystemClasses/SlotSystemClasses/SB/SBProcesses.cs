@@ -7,6 +7,43 @@ namespace UISystem{
 		public SBProcess(Func<IEnumeratorFake> coroutine): base(coroutine){
 		}
 	}
+	/* Sel Proc */
+		public interface ISBSelProcess: IUIProcess{}
+			public class SBMakeSelectableProcess: SBProcess, ISBSelProcess{
+				public SBMakeSelectableProcess(Func<IEnumeratorFake> coroutine): base(coroutine){}
+			}
+			public class SBMakeUnselectableProcess: SBProcess, ISBSelProcess{
+				public SBMakeUnselectableProcess(Func<IEnumeratorFake> coroutine): base(coroutine){}
+			}
+			public class SBSelectProcess: SBProcess, ISBSelProcess{
+				public SBSelectProcess(Func<IEnumeratorFake> coroutine): base(coroutine){}
+			}
+		public interface ISBSelCoroutineRepo{
+			Func<IEnumeratorFake> MakeSelectableCoroutine();
+			Func<IEnumeratorFake> MakeUnselectableCoroutine();
+			Func<IEnumeratorFake> SelectCoroutine();
+		}
+		public class SBSelCoroutineRepo: ISBSelCoroutineRepo{
+			public Func<IEnumeratorFake> MakeSelectableCoroutine(){
+				return _makeSelectableCoroutine;
+			}
+				IEnumeratorFake _makeSelectableCoroutine(){
+					return null;
+				}
+			public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+				return _makeUnselectableCoroutine;
+			}
+				IEnumeratorFake _makeUnselectableCoroutine(){
+					return null;
+				}
+			public Func<IEnumeratorFake> SelectCoroutine(){
+				return _selectCoroutine;
+			}
+				IEnumeratorFake _selectCoroutine(){
+					return null;
+				}
+		}
+	/* Act Proc */
 		public interface ISBActProcess: IUIProcess{}
 			
 			public class SBWaitForActionProcess: SBProcess, ISBActProcess{

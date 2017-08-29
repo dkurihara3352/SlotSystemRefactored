@@ -9,52 +9,52 @@ namespace UISystem{
 		}
 		public interface IUIStateEngine<T>: ISwitchableStateEngine<T> where T: IUIState{}
 	/* StateFacotory */
-		public class UISelStateFacotory: IUISelStateFactory{
+		public class UISelStateRepo: IUISelStateRepo{
 			protected IUISelStateHandler handler;
-			public UISelStateFacotory(IUISelStateHandler handler){
+			public UISelStateRepo(IUISelStateHandler handler){
 				this.handler = handler;
 			}
-			public IUISelState MakeDeactivatedState(){
+			public IUISelState DeactivatedState(){
 				return deactivatedState;}
 			IUISelState deactivatedState{
 				get{
-					if(m_deactivatedState ==null)
-						m_deactivatedState = new UIDeactivatedState(handler);
-					return m_deactivatedState;}}
-			IUISelState m_deactivatedState;
+					if(_deactivatedState ==null)
+						_deactivatedState = new UIDeactivatedState(handler);
+					return _deactivatedState;}}
+			IUISelState _deactivatedState;
 
-			public IUISelState MakeDefocusedState(){
-				return defocusedState;}
-			IUISelState defocusedState{
+			public IUISelState UnselectableState(){
+				return unselectableState;}
+			IUISelState unselectableState{
 				get{
-					if(m_defocusedState ==null)
-						m_defocusedState = new UIDefocusedState(handler);
-					return m_defocusedState;}}
-			IUISelState m_defocusedState;
+					if(_unselectableState ==null)
+						_unselectableState = new UIUnselectableState(handler);
+					return _unselectableState;}}
+			IUISelState _unselectableState;
 			
-			public IUISelState MakeFocusedState(){
-				return focusedState;}
-			IUISelState focusedState{
+			public IUISelState SelectableState(){
+				return selectableState;}
+			IUISelState selectableState{
 				get{
-					if(m_focusedState ==null)
-						m_focusedState = new UIFocusedState(handler);
-					return m_focusedState;}}
-			IUISelState m_focusedState;
+					if(_selectableState ==null)
+						_selectableState = new UISelectableState(handler);
+					return _selectableState;}}
+			IUISelState _selectableState;
 			
-			public IUISelState MakeSelectedState(){
+			public IUISelState SelectedState(){
 				return selectedState;}
 			IUISelState selectedState{
 				get{
-					if(m_selectedState ==null)
-						m_selectedState = new UISelectedState(handler);
-					return m_selectedState;}}
-			IUISelState m_selectedState;
+					if(_selectedState ==null)
+						_selectedState = new UISelectedState(handler);
+					return _selectedState;}}
+			IUISelState _selectedState;
 		}
-		public interface IUISelStateFactory{
-			IUISelState MakeDeactivatedState();
-			IUISelState MakeDefocusedState();
-			IUISelState MakeFocusedState();
-			IUISelState MakeSelectedState();
+		public interface IUISelStateRepo{
+			IUISelState DeactivatedState();
+			IUISelState SelectableState();
+			IUISelState UnselectableState();
+			IUISelState SelectedState();
 		}
 	/* State */
 		public abstract class UIState: IUIState{
@@ -76,35 +76,35 @@ namespace UISystem{
 				public UIDeactivatedState(IUISelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.WasSelStateNull())
-						handler.SetAndRunSelProcess(new UIDeactivateProcess(handler.GetDeactivateCoroutine()));
+						handler.SetAndRunSelProcess(new UIDeactivateProcess(handler.DeactivateCoroutine()));
 				}
 			}
-			public class UIFocusedState: UISelState{
-				public UIFocusedState(IUISelStateHandler handler): base(handler){}
+			public class UISelectableState: UISelState{
+				public UISelectableState(IUISelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.WasSelStateNull()){
-						handler.SetAndRunSelProcess(new UIFocusProcess(handler.GetFocusCoroutine()));
+						handler.SetAndRunSelProcess(new UIFocusProcess(handler.MakeSelectableCoroutine()));
 					}
 					else
-						handler.InstantFocus();
+						handler.MakeSelectableInstantly();
 				}
 			}
-			public class UIDefocusedState: UISelState{
-				public UIDefocusedState(IUISelStateHandler handler): base(handler){}
+			public class UIUnselectableState: UISelState{
+				public UIUnselectableState(IUISelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.WasSelStateNull())
-						handler.SetAndRunSelProcess(new UIDefocusProcess(handler.GetDefocusCoroutine()));
+						handler.SetAndRunSelProcess(new UIDefocusProcess(handler.MakeUnselectableCoroutine()));
 					else
-						handler.InstantDefocus();
+						handler.MakeUnselectableInstantly();
 				}
 			}
 			public class UISelectedState : UISelState{
 				public UISelectedState(IUISelStateHandler handler): base(handler){}
 				public override void EnterState(){
 					if(!handler.WasSelStateNull())
-						handler.SetAndRunSelProcess(new UISelectProcess(handler.GetSelectCoroutine()));
+						handler.SetAndRunSelProcess(new UISelectProcess(handler.SelectCoroutine()));
 					else
-						handler.InstantSelect();
+						handler.SelectInstantly();
 				}
 			
 			}

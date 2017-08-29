@@ -14,7 +14,7 @@ namespace UISystem{
 			equipManager.UpdateEquipStatus();
 		}
 		public void SyncEquipped(IInventoryItemInstance item, bool equipped){
-			IInventory inventory = sg.GetInventory();
+			IInventory inventory = sg.Inventory();
 			if(equipped)
 				inventory.Add(item);
 			else

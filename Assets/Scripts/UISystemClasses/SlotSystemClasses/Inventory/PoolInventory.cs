@@ -6,7 +6,7 @@ namespace UISystem{
 	public class PoolInventory: Inventory, IPoolInventory{
 		public void Add(IInventoryItemInstance addedItem){
 			if(addedItem != null){
-				List<IInventoryItemInstance> items = GetItems();
+				List<IInventoryItemInstance> items = Items();
 				foreach(IInventoryItemInstance item in items){
 					CheckForNonDuplicate(item, addedItem);
 					if(item.Equals(addedItem)){
@@ -29,7 +29,7 @@ namespace UISystem{
 		}
 		public void Remove(IInventoryItemInstance removedItem){
 			if(removedItem != null){
-				List<IInventoryItemInstance> items = GetItems();
+				List<IInventoryItemInstance> items = Items();
 				IInventoryItemInstance itemToRemove = null;
 				foreach(IInventoryItemInstance item in items){
 					if(item.Equals(removedItem)){
@@ -59,7 +59,7 @@ namespace UISystem{
 			target.SetQuantity(newCheckedInstQuantity);
 		}
 		void IndexItems(){
-			List<IInventoryItemInstance> items = GetItems();
+			List<IInventoryItemInstance> items = Items();
 			for(int i = 0; i < items.Count; i ++){
 				((IInventoryItemInstance)items[i]).SetAcquisitionOrder(i);
 			}

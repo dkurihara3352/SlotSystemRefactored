@@ -374,7 +374,7 @@ namespace SlotSystemTests{
 					sg.InspectorSetUp(sgToolHandler, genInv, filter, sorter, initSlotsCount);
 
 					Assert.That(sg.GetToolHandler(), Is.SameAs(sgToolHandler));
-					Assert.That(sg.GetInventory(), Is.SameAs(genInv));
+					Assert.That(sg.Inventory(), Is.SameAs(genInv));
 					filterHandler.Received().SetFilter(filter);
 					Assert.That(sorterHandler.GetSorter(), Is.SameAs(sorter));
 					slotsHolder.Received().SetInitSlotsCount(initSlotsCount);

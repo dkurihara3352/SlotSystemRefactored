@@ -4,22 +4,22 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
 	public class SlotSystemElement : UIElement, ISlotSystemElement{
-		ISlotSystemManager GetSlotSystemManager(){
+		public ISlotSystemManager SSM(){
 			return _ssm;
 		}
 		public void SetSSM(ISlotSystemManager ssm){
 			_ssm = ssm;
 		}
 			ISlotSystemManager _ssm;
-		public SlotSystemElement(){
-			ISlotSystemManager ssm = GetSlotSystemManager();
+		public SlotSystemElement(RectTransformFake rectTrans): base(rectTrans){
+			ISlotSystemManager ssm = SSM();
 			ssm.SBPickedUp += OnSBPickedUp;
 			ssm.SlotHoverEntered += OnSlotHoverEntered;
 			ssm.SGHoverEntered += OnSGHoverEntered;
 			ssm.SBDropped += OnSBDropped;
 		}
 		~SlotSystemElement(){
-			ISlotSystemManager ssm = GetSlotSystemManager();
+			ISlotSystemManager ssm = SSM();
 			ssm.SBPickedUp -= OnSBPickedUp;
 			ssm.SlotHoverEntered -= OnSlotHoverEntered;
 			ssm.SGHoverEntered -= OnSGHoverEntered;
@@ -71,6 +71,7 @@ namespace UISystem{
 			}
 	}
 	public interface ISlotSystemElement{
+		ISlotSystemManager SSM();
 		void SetSSM(ISlotSystemManager ssm);
 		void OnSBPickedUp(object source, SBEventArgs e);
 		void OnSlotHoverEntered(object source, SlotEventArgs e);

@@ -73,37 +73,37 @@ namespace UISystem{
 		void SetAndRunProcess(T process);
 	}
 	/* Factory */
-	public class UICoroutineFactory: IUICoroutineFactory{
-		public Func<IEnumeratorFake> MakeDeactivateCoroutine(){
-			return DefaultSSEDeactivateCoroutine;
+	public class UISelCoroutineRepo: IUISelCoroutineRepo{
+		public Func<IEnumeratorFake> DeactivateCoroutine(){
+			return UIDeactivateCoroutine;
 		}
-			IEnumeratorFake DefaultSSEDeactivateCoroutine(){
+			IEnumeratorFake UIDeactivateCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> MakeDefocusCoroutine(){
-			return DefaultSSEDefocusCoroutine;
+		public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+			return UIUnselectableCoroutine;
 		}
-			IEnumeratorFake DefaultSSEDefocusCoroutine(){
+			IEnumeratorFake UIUnselectableCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> MakeFocusCoroutine(){
-			return DefaultSSEFocusCoroutine;
+		public Func<IEnumeratorFake> MakeSelectableCoroutine(){
+			return UISelectableCoroutine;
 		}
-			IEnumeratorFake DefaultSSEFocusCoroutine(){
+			IEnumeratorFake UISelectableCoroutine(){
 				return null;
 			}
-		public Func<IEnumeratorFake> MakeSelectCoroutine(){
-			return DefaultSSESelectCoroutine;
+		public Func<IEnumeratorFake> SelectCoroutine(){
+			return UISelectCoroutine;
 		}
-			IEnumeratorFake DefaultSSESelectCoroutine(){
+			IEnumeratorFake UISelectCoroutine(){
 				return null;
 			}
 	}
-	public interface IUICoroutineFactory{
-		Func<IEnumeratorFake> MakeDeactivateCoroutine();
-		Func<IEnumeratorFake> MakeDefocusCoroutine();
-		Func<IEnumeratorFake> MakeFocusCoroutine();
-		Func<IEnumeratorFake> MakeSelectCoroutine();
+	public interface IUISelCoroutineRepo{
+		Func<IEnumeratorFake> DeactivateCoroutine();
+		Func<IEnumeratorFake> MakeUnselectableCoroutine();
+		Func<IEnumeratorFake> MakeSelectableCoroutine();
+		Func<IEnumeratorFake> SelectCoroutine();
 	}
 	/* SelProces */
 	public abstract class UISelProcess: UIProcess, IUISelProcess{

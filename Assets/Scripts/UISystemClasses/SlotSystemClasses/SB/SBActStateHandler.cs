@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
@@ -37,46 +38,82 @@ namespace UISystem{
 		ISBActStateRepo actStateRepo{
 			get{
 				if(m_actStateRepo == null)
-					m_actStateRepo = new SBActStateRepo(sb, tam);
+					m_actStateRepo = new SBActStateRepo(sb);
 				return m_actStateRepo;
 			}
 		}
 			ISBActStateRepo m_actStateRepo;
-		public virtual void Remove(){
-			SetActState(removedState);
+		public virtual void WaitForAction(){
+			SetActState(waitingForActionState);
 		}
-			ISBActState removedState{
-				get{return actStateRepo.GetRemovedState();}
+			ISBActState waitingForActionState{
+				get{return actStateRepo.WaitingForActionState();}
 			}
-			public virtual bool IsRemoving(){
-				return curActState == removedState;
+			public virtual bool IsWaitingForAction(){
+				return curActState == waitingForActionState;
 			}
-			public virtual bool WasRemoving(){
-				return prevActState == removedState;
+			public virtual bool WasWaitingForAction(){
+				return prevActState == waitingForActionState;
 			}
-		public virtual void Add(){
-			SetActState(addedState);
+		public virtual void Travel(ISlotGroup slotGroup, ISlot slot){
+			SetActState(travellingState);
 		}
-			ISBActState addedState{
-				get{return actStateRepo.GetAddedState();}
+			ISBActState travellingState{
+				get{return actStateRepo.TravellingState();}
 			}
-			public virtual bool IsAdding(){
-				return curActState == addedState;
+			public virtual bool IsTravelling(){
+				return curActState == travellingState;
 			}
-			public virtual bool WasAdding(){
-				return prevActState == addedState;
+			public virtual bool wasTravelling(){
+				return prevActState == travellingState;
 			}
-		public virtual void MoveWithin(){
-			SetActState(moveWithinState);
+		public virtual void Lift(){
+			SetActState(liftingState);
 		}
-			ISBActState moveWithinState{
-				get{return actStateRepo.GetMoveWithinState();}
+			ISBActState liftingState{
+				get{return actStateRepo.LiftingState();}
+			}
+			public virtual bool IsLifting(){
+				return curActState == liftingState;
+			}
+			public virtual bool WasLifting(){
+				return prevActState == liftingState;
+			}
+		public virtual void Land(){
+			SetActState(landingState);
+		}
+			ISBActState landingState{
+				get{return actStateRepo.LandingState();}
+			}
+			public virtual bool IsLanding(){
+				return curActState == landingState;
+			}
+			public virtual bool WasLanding(){
+				return prevActState == landingState;
+			}
+		public virtual void Appear(){
+			SetActState(appearingState);
+		}
+			ISBActState appearingState{
+				get{return actStateRepo.AppearingState();}
+			}
+			public virtual bool IsAppearing(){
+				return curActState == appearingState;
+			}
+			public virtual bool WasAppearing(){
+				return prevActState == appearingState;
+			}
+		public virtual void Disappear(){
+			SetActState(disappearingState);
+		}
+			ISBActState disappearingState{
+				get{return actStateRepo.DisappearingState();}
 			}
 			public virtual bool IsMovingWithin(){
-				return curActState == moveWithinState;
+				return curActState == disappearingState;
 			}
 			public virtual bool WasMovingWithin(){
-				return prevActState == moveWithinState;
+				return prevActState == disappearingState;
 			}
 		public ISBActProcess GetActProcess(){
 			return actProcEngine.GetProcess();
@@ -106,63 +143,51 @@ namespace UISystem{
 			if(actProcess != null)
 				actProcess.Expire();
 		}
-		ISlotActCoroutineRepo coroutineRepo{
+		ISBActCoroutineRepo coroutineRepo{
 			get{
 				if(_coroutineRepo == null)
-					_coroutineRepo = new SlotActCoroutineRepo();
+					_coroutineRepo = new SBActCoroutineRepo();
 				return _coroutineRepo;
 			}
 		}
-			ISlotActCoroutineRepo _coroutineRepo;
-		public void SetCoroutineRepo(ISlotActCoroutineRepo coroutineRepo){
+			ISBActCoroutineRepo _coroutineRepo;
+		public void SetCoroutineRepo(ISBActCoroutineRepo coroutineRepo){
 			_coroutineRepo = coroutineRepo;
 		}
-		public System.Func<IEnumeratorFake> GetWaitForPointerUpCoroutine(){
-			return coroutineRepo.GetWaitForPointerUpCoroutine();
+		public Func<IEnumeratorFake> WaitForActionCoroutine(){
+			return coroutineRepo.WaitForActionCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetWaitForPickUpCoroutine(){
-			return coroutineRepo.GetWaitForPickUpCoroutine();
+		public Func<IEnumeratorFake> TravelCoroutine(){
+			return coroutineRepo.TravelCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetPickUpCoroutine(){
-			return coroutineRepo.GetPickUpCoroutine();
+		public Func<IEnumeratorFake> LiftCoroutine(){
+			return coroutineRepo.LiftCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetWaitForNextTouchCoroutine(){
-			return coroutineRepo.GetWaitForNextTouchCoroutine();
+		public Func<IEnumeratorFake> LandCoroutine(){
+			return coroutineRepo.LandCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetRemoveCoroutine(){
-			return coroutineRepo.GetRemoveCoroutine();
+		public Func<IEnumeratorFake> AppearCoroutine(){
+			return coroutineRepo.AppearCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetAddCoroutine(){
-			return coroutineRepo.GetAddCoroutine();
-		}
-		public System.Func<IEnumeratorFake> GetMoveWithinCoroutine(){
-			return coroutineRepo.GetMoveWithinCoroutine();
-		}
-		public void OnPointerDown(PointerEventDataFake eventDataMock){
-			curActState.OnPointerDown();
-		}
-		public void OnPointerUp(PointerEventDataFake eventDataMock){
-			curActState.OnPointerUp();
-		}
-		public void OnDeselected(PointerEventDataFake eventDataMock){
-			curActState.OnDeselected();
-		}
-		public void OnEndDrag(PointerEventDataFake eventDataMock){
-			curActState.OnEndDrag();
+		public Func<IEnumeratorFake> DisappearCoroutine(){
+			return coroutineRepo.DisappearCoroutine();
 		}
 	}
 	public interface ISBActStateHandler{
 		void WaitForAction();
-		ISBActProcess GetActProcess();
+		void Travel(ISlotGroup sg, ISlot slot);
+		void Lift();
+		void Land();
+		void Appear();
+		void Disappear();
 		bool IsActProcessRunning();
-		void SetAndRunActProcess(ISBActProcess process);
 		void ExpireActProcess();
-			System.Func<IEnumeratorFake> GetRemoveCoroutine();
-			System.Func<IEnumeratorFake> GetAddCoroutine();
-			System.Func<IEnumeratorFake> GetMoveWithinCoroutine();
-		void OnPointerDown(PointerEventDataFake eventDataMock);
-		void OnPointerUp(PointerEventDataFake eventDataMock);
-		void OnDeselected(PointerEventDataFake eventDataMock);
-		void OnEndDrag(PointerEventDataFake eventDataMock);
+		void SetAndRunActProcess(ISBActProcess actProcess);
+		Func<IEnumeratorFake> WaitForActionCoroutine();
+		Func<IEnumeratorFake> TravelCoroutine();
+		Func<IEnumeratorFake> LiftCoroutine();
+		Func<IEnumeratorFake> LandCoroutine();
+		Func<IEnumeratorFake> AppearCoroutine();
+		Func<IEnumeratorFake> DisappearCoroutine();
 	}
 }

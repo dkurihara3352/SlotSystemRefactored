@@ -1640,15 +1640,15 @@ namespace SlotSystemTests{
 							ISlottable shieldSB_1 = MakeSubSBWithItemQuantitySettable(MakeShieldInstance(0));
 							ISlottable mWeaponSB_1 = MakeSubSBWithItemQuantitySettable(MakeMWeaponInstance(0));
 							ISlottable partsSB_1 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(0, 1));
-								partsSB_1.GetItemHandler().Quantity().Returns(1);
+								partsSB_1.ItemHandler().Quantity().Returns(1);
 							ISlottable parts1SB_1 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(1, 2));
-								parts1SB_1.GetItemHandler().Quantity().Returns(2);
+								parts1SB_1.ItemHandler().Quantity().Returns(2);
 							ISlottable bow1SB_a_1 = MakeSubSBWithItemQuantitySettable(MakeBowInstance(1));
 							ISlottable quiverSB_a_1 = MakeSubSBWithItemQuantitySettable(MakeQuiverInstance(1));
 							ISlottable partsSB_a_1 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(0, 6));
-								partsSB_a_1.GetItemHandler().Quantity().Returns(6);
+								partsSB_a_1.ItemHandler().Quantity().Returns(6);
 							ISlottable parts1SB_a_1 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(1, 3));
-								parts1SB_a_1.GetItemHandler().Quantity().Returns(3);
+								parts1SB_a_1.ItemHandler().Quantity().Returns(3);
 							List<ISlottable> sbs_1 = new List<ISlottable>(new ISlottable[]{
 								parts1SB_1,
 								wearSB_1,
@@ -1699,15 +1699,15 @@ namespace SlotSystemTests{
 							ISlottable shieldSB_2 = MakeSubSBWithItemQuantitySettable(MakeShieldInstance(0));
 							ISlottable mWeaponSB_2 = MakeSubSBWithItemQuantitySettable(MakeMWeaponInstance(0));
 							ISlottable partsSB_2 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(0, 1));
-								partsSB_2.GetItemHandler().Quantity().Returns(1);
+								partsSB_2.ItemHandler().Quantity().Returns(1);
 							ISlottable parts1SB_2 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(1, 2));
-								parts1SB_2.GetItemHandler().Quantity().Returns(2);
+								parts1SB_2.ItemHandler().Quantity().Returns(2);
 							ISlottable bow1SB_a_2 = MakeSubSBWithItemQuantitySettable(MakeBowInstance(1));
 							ISlottable quiverSB_a_2 = MakeSubSBWithItemQuantitySettable(MakeQuiverInstance(1));
 							ISlottable partsSB_a_2 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(0, 6));
-								partsSB_a_2.GetItemHandler().Quantity().Returns(6);
+								partsSB_a_2.ItemHandler().Quantity().Returns(6);
 							ISlottable parts1SB_a_2 = MakeSubSBWithItemQuantitySettable(MakePartsInstance(1, 3));
-								parts1SB_a_2.GetItemHandler().Quantity().Returns(3);
+								parts1SB_a_2.ItemHandler().Quantity().Returns(3);
 							List<ISlottable> sbs_2 = new List<ISlottable>(new ISlottable[]{
 								parts1SB_2,
 								wearSB_2,
@@ -2523,7 +2523,7 @@ namespace SlotSystemTests{
 				if(sb != null){
 					Assert.That(other, Is.Not.Null);
 					Assert.That(sb.GetItem().ItemID(), Is.EqualTo(other.GetItem().ItemID()));
-					Assert.That(sb.GetItemHandler().Quantity(), Is.EqualTo(other.GetItemHandler().Quantity()));
+					Assert.That(sb.ItemHandler().Quantity(), Is.EqualTo(other.ItemHandler().Quantity()));
 				}else
 					Assert.That(other, Is.Null);
 			}
@@ -2544,7 +2544,7 @@ namespace SlotSystemTests{
 					sb.GetAcquisitionOrder().Returns(item.AcquisitionOrder());
 					sb.GetItemID().Returns(item.ItemID());
 					IItemHandler itemHandler = Substitute.For<IItemHandler>();
-					sb.GetItemHandler().Returns(itemHandler);
+					sb.ItemHandler().Returns(itemHandler);
 					itemHandler.Item().Returns(item);
 					sb.GetItem().Returns(item);
 				itemHandler.Quantity().Returns(item.GetQuantity());
@@ -2557,20 +2557,20 @@ namespace SlotSystemTests{
 			public void TestMakeSubSBWithItemQuantitySettable(){
 				ISlottable sb = MakeSubSBWithItemQuantitySettable(MakeBowInstance(0));
 
-				Assert.That(sb.GetItemHandler().Quantity(), Is.EqualTo(1));
+				Assert.That(sb.ItemHandler().Quantity(), Is.EqualTo(1));
 
-				sb.GetItemHandler().SetQuantity(10);
+				sb.ItemHandler().SetQuantity(10);
 
-				Assert.That(sb.GetItemHandler().Quantity(), Is.EqualTo(10));
+				Assert.That(sb.ItemHandler().Quantity(), Is.EqualTo(10));
 
-				sb.GetItemHandler().SetQuantity(2);
+				sb.ItemHandler().SetQuantity(2);
 
-				Assert.That(sb.GetItemHandler().Quantity(), Is.EqualTo(2));
+				Assert.That(sb.ItemHandler().Quantity(), Is.EqualTo(2));
 			}
 			void ResetQuantity(List<ISlottable> sbs){
 				foreach(var sb in sbs)
 					if(sb != null)
-					sb.GetItemHandler().SetQuantity(sb.GetItem().GetQuantity());
+					sb.ItemHandler().SetQuantity(sb.GetItem().GetQuantity());
 			}
 			static ISlottable MakeSubSBWithItem(IInventoryItemInstance item){
 				ISlottable sb = MakeSubSB();
@@ -2578,7 +2578,7 @@ namespace SlotSystemTests{
 					sb.GetItemID().Returns(item.ItemID());
 					sb.GetAcquisitionOrder().Returns(item.AcquisitionOrder());
 					IItemHandler itemHandler = Substitute.For<IItemHandler>();
-					sb.GetItemHandler().Returns(itemHandler);
+					sb.ItemHandler().Returns(itemHandler);
 					itemHandler.Quantity().Returns(item.GetQuantity());
 				return sb;
 			}

@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace UISystem{
 	public class Slot: SlotSystemElement, ISlot{
+		public Slot(RectTransformFake rectTrans): base(rectTrans){
+			
+		}
 		ISlottable m_sb;
 		public ISlottable sb{
 			get{return m_sb;}
@@ -14,9 +17,17 @@ namespace UISystem{
 			get{return m_position;}
 			set{m_position = value;}
 		}
+		void InitializeSlotID(){}
+		void InitializeSelStateHandler(){
+			SetSelStateHandler(new SlotSelStateHandler(this));
+		}
 	}
 	public interface ISlot: ISlotSystemElement, IUIElement{
+		void MakeSBSelectable();
+		void MakeSBUnselectable();
+		void SelectSB();
 		int GetID();
+		void SetID(int id);
 		ISlotGroup GetSlotGroup();
 		ISlottable GetSlottable();
 		IHoverable Hoverable();

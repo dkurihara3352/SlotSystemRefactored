@@ -233,7 +233,7 @@ namespace SlotSystemTests{
                         foreach(var item in removed)
                             equipInv.Remove(item);
                         
-                        Assert.That(equipInv.GetItems(), Is.EqualTo(expected));
+                        Assert.That(equipInv.Items(), Is.EqualTo(expected));
                     }
                         class ItemsCases: IEnumerable{
                             public IEnumerator GetEnumerator(){

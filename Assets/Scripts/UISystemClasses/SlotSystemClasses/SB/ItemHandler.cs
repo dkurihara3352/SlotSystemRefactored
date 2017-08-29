@@ -54,6 +54,5 @@ namespace UISystem{
 		int Quantity();
 		void SetQuantity(int quant);
 		int ItemID();
-		int GetAcquisitionOrder();
 	}
 }

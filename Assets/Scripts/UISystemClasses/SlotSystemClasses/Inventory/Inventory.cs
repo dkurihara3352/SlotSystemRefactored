@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UISystem{
 	public abstract class Inventory: IInventory{
-		public virtual List<IInventoryItemInstance> GetItems(){
+		public virtual List<IInventoryItemInstance> Items(){
 			if(_items == null)
 				_items = new List<IInventoryItemInstance>();
 			return _items;
@@ -19,7 +19,7 @@ namespace UISystem{
 			ISlotGroup _sg;
 	}
 	public interface IInventory{
-		List<IInventoryItemInstance> GetItems();
+		List<IInventoryItemInstance> Items();
 		ISlotGroup GetSG();
 		void SetSG(ISlotGroup sg);
 	}

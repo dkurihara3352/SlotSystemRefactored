@@ -286,7 +286,7 @@ namespace SlotSystemTests{
 				Assert.That(slotsHolder.GetSlots().Count, Is.EqualTo(4));
 				int count = 0;
 				foreach(ISlottable sb in sg)
-					Assert.That(sb.GetSlotHandler().GetSlotID(), Is.EqualTo(count ++));
+					Assert.That(sb.SlotHandler().GetSlotID(), Is.EqualTo(count ++));
 			}
 		/* helper */
 			static ISlottable MakeSubSBWithItem(IInventoryItemInstance item){

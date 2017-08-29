@@ -7,7 +7,7 @@ namespace UISystem{
 		public UnequippedItemsInventory(List<IInventoryItemInstance> items){
 			_unequippedItems = items;
 		}
-		public override List<IInventoryItemInstance> GetItems(){
+		public override List<IInventoryItemInstance> Items(){
 			Debug.Assert(_unequippedItems != null);
 			return _unequippedItems;
 		}
@@ -15,7 +15,7 @@ namespace UISystem{
 		public void UpdateInventory(BowInstance equippedBow, WearInstance equippedWear, List<CarriedGearInstance> equippedCGears){
 			List<IInventoryItemInstance> allEquippedItems = GetAllEquippedItems(equippedBow, equippedWear, equippedCGears);
 			foreach(var item in allEquippedItems){
-				List<IInventoryItemInstance> items = GetItems();
+				List<IInventoryItemInstance> items = Items();
 				if(items.Contains(item))
 					items.Remove(item);
 			}
@@ -29,7 +29,7 @@ namespace UISystem{
 			return result;
 		}
 		public void UpdateItemsEquipState(){
-			foreach(var item in GetItems())
+			foreach(var item in Items())
 				item.SetEquippability(false);
 		}
 	}

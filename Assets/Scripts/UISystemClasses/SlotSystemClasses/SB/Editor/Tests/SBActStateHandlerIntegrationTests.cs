@@ -33,7 +33,7 @@ namespace SlotSystemTests{
 						IUISelStateHandler selStateHandler = Substitute.For<IUISelStateHandler>();
 						sb.UISelStateHandler().Returns(selStateHandler);
 						IItemHandler itemHandler = Substitute.For<IItemHandler>();
-						sb.GetItemHandler().Returns(itemHandler);
+						sb.ItemHandler().Returns(itemHandler);
 						IHoverable hoverable = Substitute.For<IHoverable>();
 						sb.GetHoverable().Returns(hoverable);
 					ITransactionManager tam = Substitute.For<ITransactionManager>();

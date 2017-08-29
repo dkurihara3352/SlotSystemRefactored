@@ -6,10 +6,11 @@ using Utility;
 
 namespace UISystem{
 	public class Slottable : ISlottable{
-		public void InitializeSB(IInventoryItemInstance item){
+		public void InitializeSB(ISlot slot, IInventoryItemInstance item){
 			SetItemHandler(new ItemHandler(item));
-			SetSlotHandler(new SlotHandler());
+			SetSlot(slot);
 			InitializeStateHandlers();
+			InitializeStates();
 		}
 		public ISBToolHandler GetToolHandler(){
 			Debug.Assert(_sbToolHandler != null);
@@ -20,94 +21,65 @@ namespace UISystem{
 			_sbToolHandler = toolHandler;
 		}
 		/*	States	*/
-			public override void InitializeStates(){
-				UISelStateHandler().Deactivate();
-				ActStateHandler().WaitForAction();
+			public void InitializeStates(){
+				MakeUnselectable();
+				WaitForAction();
 				GetToolHandler().InitializeStates();
 			}
 			public void InitializeStateHandlers(){
-				_selStateHandler = new SBSelStateHandler(this);
+				_selStateHandler = new SBSelStateHandler();
 				_actStateHandler = new SBActStateHandler(this);
 			}
-			/*	Selection state */
-				public override IUISelStateHandler UISelStateHandler(){
-					if(_selStateHandler != null)
-						return _selStateHandler;
-					else
-						throw new InvalidOperationException("selStateHandler not set");
+			/*	SB Selection state */
+				ISBSelStateHandler SelStateHandler(){
+					Debug.Assert(_selStateHandler != null);
+					return _selStateHandler;
 				}
-					IUISelStateHandler _selStateHandler;
-				public override void SetSelStateHandler(IUISelStateHandler handler){
-					_selStateHandler = handler;
+					ISBSelStateHandler _selStateHandler;
+				public void MakeSelectable(){
+					SelStateHandler().MakeSelectable();
+				}
+				public void MakeUnselectable(){
+					SelStateHandler().MakeUnselectable();
+				}
+				public void Select(){
+					SelStateHandler().Select();
 				}
 			/*	Action State */
-				public ISBActStateHandler ActStateHandler(){
-					if(_actStateHandler != null)
-						return _actStateHandler;
-					else
-						throw new InvalidOperationException("actStateHandler not set");
+				ISBActStateHandler ActStateHandler(){
+					Debug.Assert(_actStateHandler != null);
+					return _actStateHandler;
 				}
+					ISBActStateHandler _actStateHandler;
 				public void SetActStateHandler(ISBActStateHandler actStateHandler){
 					_actStateHandler = actStateHandler;
 				}
-					ISBActStateHandler _actStateHandler;
+				public void WaitForAction(){
+					ActStateHandler().WaitForAction();
+				}
+				public void Travel(ISlotGroup slotGroup, ISlot slot){
+					ActStateHandler().Travel(slotGroup, slot);
+				}
+				public void Lift(){
+					ActStateHandler().Lift();
+				}
+				public void Land(){
+					ActStateHandler().Land();
+				}
+				public void Appear(){
+					ActStateHandler().Appear();
+				}
+				public void Disappear(){
+					ActStateHandler().Disappear();
+				}
 				public bool IsActProcessRunning(){
 					return ActStateHandler().IsActProcessRunning();
 				}
-				public void MoveWithin(){
-					ActStateHandler().MoveWithin();
+				public void ExpireActProcess(){
+					ActStateHandler().ExpireActProcess();
 				}
-				public void Add(){
-					ActStateHandler().Add();
-				}
-				public void Remove(){
-					ActStateHandler().Remove();
-				}
-				public void PickUp(){
-					GetItemHandler().SetPickedAmount(1);
-					GetPickUpCommand().Execute();
-				}
-				public ISBCommand GetPickUpCommand(){
-					Debug.Assert(_pickUpCommand != null);
-					return _pickUpCommand;
-				}
-					ISBCommand _pickUpCommand;
-				public void SetPickUpCommand(ISBCommand pickUpCommand){
-					_pickUpCommand = pickUpCommand;
-				}
-				public SBPickUpEquipCommand GetPickUpEquipCommand(IInventoryItemInstance item){
-					if(item is BowInstance)
-						return new SBPickUpEquipBowCommand(this);
-					else if(item is WearInstance)
-						return new SBPickUpEquipWearCommand(this);
-					else if(item is CarriedGearInstance)
-						return new SBPickUpEquipCGearsCommand(this);
-					else if (item is PartsInstance)
-						return new SBPickUpEquipPartsCommand(this);
-					else
-						return new SBPickUpEquipCommand(this);
-				}
-		/*	commands	*/
-			public void Tap(){
-				GetTapCommand().Execute();
-			}
-			public ISBCommand GetTapCommand(){
-				if(_tapCommand != null)
-					return _tapCommand;
-				else
-					throw new InvalidOperationException("tapCommand not set");
-			}
-				ISBCommand _tapCommand;
-			public void SetTapCommand(ISBCommand comm){
-				_tapCommand = comm;
-			}
-		/*	public fields	*/
-			public void Increment(){
-				ActStateHandler().SetPickedUpState();
-				GetItemHandler().IncreasePickedAmount();
-			}
 		/* Item Handling */
-			public IItemHandler GetItemHandler(){
+			public IItemHandler ItemHandler(){
 				if(_itemHandler != null)
 					return _itemHandler;
 				else throw new InvalidOperationException("itemHandler not set");
@@ -116,137 +88,66 @@ namespace UISystem{
 				_itemHandler = itemHandler;
 			}
 				IItemHandler _itemHandler;
-			public IInventoryItemInstance GetItem(){
-				return GetItemHandler().Item();
-			}
-			public int GetAcquisitionOrder(){
-				return GetItemHandler().GetAcquisitionOrder();
+			public ISlottableItem GetItem(){
+				return ItemHandler().Item();
 			}
 			public int GetItemID(){
-				return GetItemHandler().ItemID();
+				return ItemHandler().ItemID();
 			}
 			public bool IsStackable(){
-				return GetItemHandler().IsStackable();
+				return ItemHandler().IsStackable();
 			}
-		/* SG And Slots */
-			public ISlotGroup GetSG(){
-				IUIElement parent = GetParent();
-				if(parent != null)
-					return parent as ISlotGroup;
-				return null;
-			}
-			public bool IsHierarchySetUp(){
-				return GetSG() != null;
-			}
-		/* slotHandling */
-			public ISlotHandler GetSlotHandler(){
-				if(_slotHandler != null)
-					return _slotHandler;
-				else
-					throw new InvalidOperationException("slotHandler not set");
-			}
-			public void SetSlotHandler(ISlotHandler slotHandler){
-				_slotHandler = slotHandler;
-			}
-				ISlotHandler _slotHandler;
-			public bool IsToBeAdded(){
-				return GetSlotHandler().IsToBeAdded();
-			}
-			public bool IsToBeRemoved(){
-				return GetSlotHandler().IsToBeRemoved();
-			}
-			public void SetSlotID(int id){
-				GetSlotHandler().SetSlotID(id);
-			}
-			public int GetNewSlotID(){
-				return GetSlotHandler().GetNewSlotID();
-			}
-			public void SetNewSlotID(int id){
-				GetSlotHandler().SetNewSlotID(id);
+			public void Increment(){
+				ItemHandler().IncreasePickedAmount();
 			}
 		/* Others */
+			public ISlot Slot(){
+				return _slot;
+			}
+			public void SetSlot(ISlot slot){
+				_slot = slot;
+			}
+				ISlot _slot;
+			public ISlotGroup SlotGroup(){
+				Slot().SlotGroup();
+			}
 			public void Refresh(){
 				ActStateHandler().WaitForAction();
-				GetItemHandler().SetPickedAmount(0);
-				SetNewSlotID(-2);
+				ItemHandler().SetPickedAmount(0);
 			}
 			public bool ShareSGAndItem(ISlottable other){
 				bool flag = true;
-				flag &= GetSG() == other.GetSG();
+				flag &= SlotGroup() == other.SlotGroup();
 				flag &= GetItem().Equals(other.GetItem());
 				return flag;
 			}
 			public void Destroy(){
-				// GameObject go = gameObject;
-				// DestroyImmediate(go);
 			}
-		/*	SlotSystemElement imple and overrides	*/
-			protected override IEnumerable<IUIElement> elements{
-				get{return new IUIElement[]{};}
-			}
-			public override void SetElements(IEnumerable<IUIElement> elements){
-			}
-			public override IUIElement GetParent(){
-				return GetSSM().FindParent(this);
-			}
-			public override bool Contains(IUIElement element){
-				return false;
-			}
-			public override bool ContainsInHierarchy(IUIElement element){
-				return false;
-			}
-		/*	Transaction	*/
-			public ITransactionCache GetTAC(){
-				if(_taCache != null)
-					return _taCache;
-				else
-					throw new InvalidOperationException("taCache not set");
-			}
-			public void SetTAC(ITransactionCache taCache){
-				_taCache = taCache;
-			}
-				ITransactionCache _taCache;
-			public bool IsPickedUp(){
-				return GetTAC().GetPickedSB() == (ISlottable)this;
-			}
-			public bool PassesPrePickFilter(){
-				return !GetTAC().IsTransactionGoingToBeRevert(this);
-			}
-		/* hoverable */
-			public IHoverable GetHoverable(){
-				if(_hoverable != null)
-					return _hoverable;
-				else
-					throw new InvalidOperationException("hoverable not set");
-			}
-			public void SetHoverable(IHoverable hoverable){
-				_hoverable = hoverable;
-			}
-				IHoverable _hoverable;
 	}
 	public interface ISlottable{
+		ISBSelStateHandler SelStateHandler();
+			void MakeSelectable();
+			void MakeUnselectable();
+			void Select();
+		ISBActStateHandler ActStateHandler();
+			void WaitForAction();
+			void Travel(ISlotGroup slotGroup, ISlot slot);
+			void Lift();
+			void Land();
+			void Appear();
+			void Disappear();
+			bool IsActProcessRunning();
+			void ExpireActProcess();
 		ISBToolHandler GetToolHandler();
 		void SetToolHandler(ISBToolHandler handler);
-		IItemHandler GetItemHandler();
+		IItemHandler ItemHandler();
 			IInventoryItemInstance GetItem();
-			int GetAcquisitionOrder();
 			int GetItemID();
 			bool IsStackable();
-		ISBActStateHandler ActStateHandler();
-			bool IsActProcessRunning();
-			void WaitForAction();
-			void PickUp();
-			void Travel(ISlotGroup sg, ISlot slot);
-			void SlotIn();
-			void Remove();
-			void Add();
-		ISlotHandler GetSlotHandler();
-			bool IsToBeRemoved();
-			bool IsToBeAdded();
-			ISlot Slot();
-			void SetSlot(ISlot slot);
-		ISlotGroup GetSG();
 		/* Other */
+		ISlot Slot();
+		void SetSlot(ISlot slot);
+		ISlotGroup SlotGroup();
 		void Refresh();
 		void Destroy();
 	}

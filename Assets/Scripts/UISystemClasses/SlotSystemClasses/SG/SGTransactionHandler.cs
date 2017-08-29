@@ -87,7 +87,7 @@ namespace UISystem{
 			SetSBHandler(sg.GetSBHandler());
 			SetSorterHandler(sg.GetSorterHandler());
 			SetSlotsHolder(sg.GetSlotsHolder());
-			SetSBFactory(sg.GetSBFactory());
+			SetSBFactory(sg.SBFactory());
 			SetSGHandler(tam.GetSGHandler());
 		}
 		public List<ISlottable> ReorderedNewSBs(){
@@ -230,7 +230,7 @@ namespace UISystem{
 				List<IItemHandler> result = new List<IItemHandler>();
 				foreach(ISlottable sb in sbs)
 					if(sb != null)
-						result.Add(sb.GetItemHandler());
+						result.Add(sb.ItemHandler());
 					else
 						result.Add(null);
 				return result;
@@ -260,7 +260,7 @@ namespace UISystem{
 					ISlottable removed = null;
 					foreach(var sb in sbs)
 						if(sb != null){
-							IItemHandler itemHandler = sb.GetItemHandler();
+							IItemHandler itemHandler = sb.ItemHandler();
 							if(sb.GetItem().Equals(item)){
 								found = true;
 								int newQuantity = itemHandler.Quantity() - item.GetQuantity();

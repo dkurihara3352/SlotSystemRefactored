@@ -58,7 +58,7 @@ namespace UISystem{
 		}
 			List<CarriedGearInstance> _equippedCGears = new List<CarriedGearInstance>();
 		
-		public override List<IInventoryItemInstance> GetItems(){
+		public override List<IInventoryItemInstance> Items(){
 			List<IInventoryItemInstance> result = new List<IInventoryItemInstance>();
 			result.Add(_equippedBow);
 			result.Add(_equippedWear);
@@ -83,7 +83,7 @@ namespace UISystem{
 			SetEquippedCarriedGears(equippedCGears);
 		}
 		public void UpdateItemsEquipState(){
-			foreach(var item in GetItems())
+			foreach(var item in Items())
 				item.SetEquippability(true);
 		}
 	}
