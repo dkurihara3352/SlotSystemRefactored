@@ -4,169 +4,51 @@ using UnityEngine;
 using Utility;
 
 namespace UISystem{
-	public abstract class SGState: UIState{
-	}
-    public abstract class SGActState: SGState, ISGActState{
+    public abstract class SGActState: UIState, ISGActState{
         protected ISlotGroup sg;
         protected ISGActStateHandler actStateHandler;
-        protected ISGTransactionHandler sgTAHandler;
         public SGActState(ISlotGroup sg){
             this.sg = sg;
-            this.actStateHandler = sg.GetSGActStateHandler();
-            sgTAHandler = sg.GetSGTAHandler();
+            this.actStateHandler = sg.ActStateHandler();
         }
     }
     public interface ISGActState: IUIState{
     }
-    /* Factory */
-    public class SGStatesRepo: ISGStatesRepo{
+    /* Repo */
+    public class SGActStateRepo: ISGActStateRepo{
         ISlotGroup sg;
-        public SGStatesRepo(ISlotGroup sg){
+        public SGActStateRepo(ISlotGroup sg){
             this.sg = sg;
         }
-        public ISGActState GetWaitForActionState(){
+        public ISGActState WaitingForActionState(){
             if(_waitForActionState == null)
-                _waitForActionState = new SGWaitForActionState(sg);
+                _waitForActionState = new SGWaitingForActionState(sg);
             return _waitForActionState;
         }
             ISGActState _waitForActionState;
-        public ISGActState GetRevertState(){
-            if(_revertState == null)
-                _revertState = new SGRevertState(sg);
-            return _revertState;
+        public ISGActState ResizingState(){
+            if(_resizingState == null)
+                _resizingState = new SGResizingState(sg);
+            return _resizingState;
         }
-            ISGActState _revertState;
-        public ISGActState GetReorderState(){
-            if(_reorderState == null)
-                _reorderState = new SGReorderState(sg);
-            return _reorderState;
-        }
-            ISGActState _reorderState;
-        public ISGActState GetSortState(){
-            if(_sortState == null)
-                _sortState = new SGSortState(sg);
-            return _sortState;
-        }
-            ISGActState _sortState;
-        public ISGActState GetFillState(){
-            if(_fillState == null)
-                _fillState = new SGFillState(sg);
-            return _fillState;
-        }
-            ISGActState _fillState;
-        public ISGActState GetSwapState(){
-            if(_swapState == null)
-                _swapState = new SGSwapState(sg);
-            return _swapState;
-        }
-            ISGActState _swapState;
-        public ISGActState GetAddState(){
-            if(_addState == null)
-                _addState = new SGAddState(sg);
-            return _addState;
-        }
-            ISGActState _addState;
-        public ISGActState GetRemoveState(){
-            if(_removeState == null)
-                _removeState = new SGRemoveState(sg);
-            return _removeState;
-        }
-            ISGActState _removeState;
+            ISGActState _resizingState;
     }
-    public interface ISGStatesRepo{
-        ISGActState GetWaitForActionState();
-        ISGActState GetRevertState();
-        ISGActState GetReorderState();
-        ISGActState GetSortState();
-        ISGActState GetFillState();
-        ISGActState GetSwapState();
-        ISGActState GetAddState();
-        ISGActState GetRemoveState();
+    public interface ISGActStateRepo{
+        ISGActState WaitingForActionState();
+        ISGActState ResizingState();
     }
     /* ConcreteStates */
-    public class SGWaitForActionState: SGActState{
-        public SGWaitForActionState(ISlotGroup sg): base(sg){}
+    public class SGWaitingForActionState: SGActState{
+        public SGWaitingForActionState(ISlotGroup sg): base(sg){}
         public override void EnterState(){
             actStateHandler.SetAndRunActProcess(null);
         }
     }
-    public class SGRevertState: SGActState{
-        public SGRevertState(ISlotGroup sg): base(sg){
+    public class SGResizingState: SGActState{
+        public SGResizingState(ISlotGroup sg): base(sg){
         }
         public override void EnterState(){
-            sg.RevertAndUpdateSBs();
-            if(actStateHandler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
-                actStateHandler.SetAndRunActProcess(process);
-            }
-        }
-    }
-    public class SGReorderState: SGActState{
-        public SGReorderState(ISlotGroup sg): base(sg){
-        }
-        public override void EnterState(){
-            List<ISlottable> newSBs = sgTAHandler.ReorderedNewSBs();
-            sg.ReadySBsForTransaction(newSBs);
-            if(actStateHandler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
-                actStateHandler.SetAndRunActProcess(process);
-            }
-        }
-    }
-    public class SGSortState: SGActState{
-        public SGSortState(ISlotGroup sg): base(sg){
-        }
-        public override void EnterState(){
-            List<ISlottable> newSBs = sgTAHandler.SortedNewSBs();
-            sg.ReadySBsForTransaction(newSBs);
-            if(actStateHandler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
-                actStateHandler.SetAndRunActProcess(process);
-            }
-        }
-    }
-    public class SGFillState: SGActState{
-        public SGFillState(ISlotGroup sg): base(sg){}
-        public override void EnterState(){
-            List<ISlottable> newSBs = sgTAHandler.FilledNewSBs();
-            sg.ReadySBsForTransaction(newSBs);
-            if(actStateHandler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
-                actStateHandler.SetAndRunActProcess(process);
-            }
-        }
-    }
-    public class SGSwapState: SGActState{
-        public SGSwapState(ISlotGroup sg): base(sg){}
-        public override void EnterState(){
-            List<ISlottable> newSBs = sgTAHandler.SwappedNewSBs();
-            sg.ReadySBsForTransaction(newSBs);
-            if(actStateHandler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
-                actStateHandler.SetAndRunActProcess(process);
-            }
-        }
-    }
-    public class SGAddState: SGActState{
-        public SGAddState(ISlotGroup sg): base(sg){}
-        public override void EnterState(){
-            List<ISlottable> newSBs = sgTAHandler.AddedNewSBs();
-            sg.ReadySBsForTransaction(newSBs);
-            if(actStateHandler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
-                actStateHandler.SetAndRunActProcess(process);
-            }
-        }
-    }
-    public class SGRemoveState: SGActState{
-        public SGRemoveState(ISlotGroup sg): base(sg){}
-        public override void EnterState(){
-            List<ISlottable> newSBs = sgTAHandler.RemovedNewSBs();
-            sg.ReadySBsForTransaction(newSBs);
-            if(actStateHandler.WasWaitingForAction()){
-                SGTransactionProcess process = new SGTransactionProcess(sg, actStateHandler.TransactionCoroutine);
-                actStateHandler.SetAndRunActProcess(process);
-            }
+            actStateHandler.SetAndRunActProcess(new SGResizeProcess(sg, actStateHandler.ResizeCoroutine()));
         }
     }
 }

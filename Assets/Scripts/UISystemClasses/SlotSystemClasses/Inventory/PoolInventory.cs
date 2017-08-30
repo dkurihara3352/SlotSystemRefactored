@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace UISystem{
 	public class PoolInventory: Inventory, IPoolInventory{
-		public void Add(IInventoryItemInstance addedItem){
+		public void Add(Item addedItem){
 			if(addedItem != null){
-				List<IInventoryItemInstance> items = Items();
-				foreach(IInventoryItemInstance item in items){
+				List<Item> items = Items();
+				foreach(Item item in items){
 					CheckForNonDuplicate(item, addedItem);
 					if(item.Equals(addedItem)){
 						IncreaseAndSetQuanitity(item, addedItem);
@@ -19,19 +19,19 @@ namespace UISystem{
 			}else
 				throw new System.ArgumentNullException();
 		}
-		void CheckForNonDuplicate(IInventoryItemInstance item, IInventoryItemInstance other){
+		void CheckForNonDuplicate(Item item, Item other){
 			if(object.ReferenceEquals(item, other))
 				throw new System.InvalidOperationException("PoolInventory.Add: cannot add multiple same IInventoryItemInstances. Try instantiate another instance with the same InventoryItem instead");
 		}
-		void IncreaseAndSetQuanitity(IInventoryItemInstance item, IInventoryItemInstance addedItem){
+		void IncreaseAndSetQuanitity(Item item, Item addedItem){
 			int newQuantity = item.GetQuantity() + addedItem.GetQuantity();
 			item.SetQuantity(newQuantity);
 		}
-		public void Remove(IInventoryItemInstance removedItem){
+		public void Remove(Item removedItem){
 			if(removedItem != null){
-				List<IInventoryItemInstance> items = Items();
-				IInventoryItemInstance itemToRemove = null;
-				foreach(IInventoryItemInstance item in items){
+				List<Item> items = Items();
+				Item itemToRemove = null;
+				foreach(Item item in items){
 					if(item.Equals(removedItem)){
 						if(!removedItem.IsStackable())
 							itemToRemove = item;
@@ -50,23 +50,23 @@ namespace UISystem{
 			}else
 				throw new System.ArgumentNullException();
 		}
-		void CheckForRemovedQuantityNonExceedance(IInventoryItemInstance target, IInventoryItemInstance removedItem){
+		void CheckForRemovedQuantityNonExceedance(Item target, Item removedItem){
 			if(removedItem.GetQuantity() > target.GetQuantity())
 				throw new System.InvalidOperationException("PoolInventory.Remove: cannot remove by greater quantity than there is");	
 		}
-		void DecreaseAndSetQuantity(IInventoryItemInstance target, IInventoryItemInstance removedItem){
+		void DecreaseAndSetQuantity(Item target, Item removedItem){
 			int newCheckedInstQuantity = target.GetQuantity() - removedItem.GetQuantity();
 			target.SetQuantity(newCheckedInstQuantity);
 		}
 		void IndexItems(){
-			List<IInventoryItemInstance> items = Items();
+			List<Item> items = Items();
 			for(int i = 0; i < items.Count; i ++){
-				((IInventoryItemInstance)items[i]).SetAcquisitionOrder(i);
+				((Item)items[i]).SetAcquisitionOrder(i);
 			}
 		}
 	}
 	public interface IPoolInventory: IInventory{
-		void Add(IInventoryItemInstance addedItem);
-		void Remove(IInventoryItemInstance removedItem);
+		void Add(Item addedItem);
+		void Remove(Item removedItem);
 	}
 }

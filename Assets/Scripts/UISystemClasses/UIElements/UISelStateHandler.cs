@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace UISystem{
 	public class UISelStateHandler : IUISelStateHandler {
-		public UISelStateHandler(){
-			_selStateRepo = new UISelStateRepo(this);
+		public UISelStateHandler(IUISelCoroutineRepo selCoroutineRepo){
+			SetSelStateRepo(new UISelStateRepo(this));
+			SetSelCoroutineRepo(selCoroutineRepo);
 			_selStateEngine = new UIStateEngine<IUISelState>();
 			_selProcEngine = new UIProcessEngine<IUISelProcess>();
-			_coroutineRepo = new UISelCoroutineRepo();
 		}
 		/*	state	*/
 			IUIStateEngine<IUISelState> SelStateEngine(){
@@ -21,6 +21,9 @@ namespace UISystem{
 				return _selStateRepo;
 			}
 				IUISelStateRepo _selStateRepo;
+			public void SetSelStateRepo(IUISelStateRepo repo){
+				_selStateRepo = repo;
+			}
 			IUISelState prevSelState{
 				get{return SelStateEngine().GetPrevState();}
 			}
@@ -90,6 +93,7 @@ namespace UISystem{
 					return prevSelState == selectedState;
 				}
 			public virtual void Activate(){
+				
 				MakeSelectable();
 			}
 			public virtual void Deselect(){

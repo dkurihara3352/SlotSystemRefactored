@@ -10,7 +10,7 @@ namespace UISystem{
 			rectTransform = rectTrans;
 		}
 		/* State Handling */
-			public virtual IUISelStateHandler UISelStateHandler(){
+			public virtual IUISelStateHandler SelStateHandler(){
 				if(_selStateHandler != null)
 					return _selStateHandler;
 				else
@@ -21,31 +21,51 @@ namespace UISystem{
 			}
 				IUISelStateHandler _selStateHandler;
 			public void Activate(){
-				UISelStateHandler().Activate();
+				SelStateHandler().Activate();
+				ActivateChildren();
 			}
+				void ActivateChildren(){
+					foreach(var ele in this)
+						ele.Activate();
+				}
 			public void Deactivate(){
-				UISelStateHandler().Deactivate();
+				SelStateHandler().Deactivate();
+				DeactivateChildren();
 			}
+				void DeactivateChildren(){
+					foreach(var ele in this)
+						ele.Deactivate();
+				}
 			public void MakeSelectable(){
-				UISelStateHandler().MakeSelectable();
+				SelStateHandler().MakeSelectable();
+				MakeChildrenSelectable();
 			}
+				void MakeChildrenSelectable(){
+					foreach(var ele in this)
+						ele.MakeSelectable();
+				}
 			public void MakeUnselectable(){
-				UISelStateHandler().MakeUnselectable();
+				SelStateHandler().MakeUnselectable();
+				MakeChildrenUnselectable();
+			}
+				void MakeChildrenUnselectable(){
+					foreach(var ele in this)
+						ele.MakeUnselectable();
+				}
+			public void Select(){
+				SelStateHandler().Select();
 			}
 			public bool IsSelectable(){
-				return UISelStateHandler().IsSelectable();
+				return SelStateHandler().IsSelectable();
 			}
 			public bool IsUnselectable(){
-				return UISelStateHandler().IsUnselectable();
-			}
-			public void Select(){
-				UISelStateHandler().Select();
+				return SelStateHandler().IsUnselectable();
 			}
 			public virtual void InitializeStates(){
-				UISelStateHandler().Deactivate();
+				SelStateHandler().Deactivate();
 			}
 			public void InitializeSSE(){
-				SetSelStateHandler(new UISelStateHandler());
+				SetSelStateHandler(new UISelStateHandler(new UISelCoroutineRepo()));
 			}
 		/*	public fields	*/
 			public virtual void SetHierarchy(){
@@ -256,7 +276,7 @@ namespace UISystem{
 		bool Contains(IUIElement element);
 		IUIElement this[int i]{get;}
 		int GetLevel();
-		IUISelStateHandler UISelStateHandler();
+		IUISelStateHandler SelStateHandler();
 		void Activate();
 		void Deactivate();
 		void MakeSelectable();

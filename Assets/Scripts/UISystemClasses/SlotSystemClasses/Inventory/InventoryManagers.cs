@@ -12,9 +12,9 @@ namespace UISystem{
 			equippableCarriedGearCount = playerData.GetEquippableCarriedGearsCount();
 			equippedElementsProvider = equippedProvider;
 		}
-		public void InitializeEquipToolInventories(){
-			List<IInventoryItemInstance> allItems = poolInventory.Items();
-			List<IInventoryItemInstance> unequippedItems = new List<IInventoryItemInstance>();
+		public void InitializeInventory(){
+			List<Item> allItems = poolInventory.Items();
+			List<Item> unequippedItems = new List<Item>();
 			BowInstance equippedBow = null;
 			WearInstance equippedWear = null;
 			List<CarriedGearInstance> equippedCGears = new List<CarriedGearInstance>();
@@ -45,11 +45,11 @@ namespace UISystem{
 				IEquippedItemsInventory equippedItemsInventory = new EquippedItemsInventory(equippedBow, equippedWear, equippedCGears, equippableCarriedGearCount);
 				SetEquippedItemsInventory(equippedItemsInventory);
 			}
-			void CreateAndSetUnequippedItemsInventory(List<IInventoryItemInstance> unequippedItems){
+			void CreateAndSetUnequippedItemsInventory(List<Item> unequippedItems){
 				IUnequippedItemsInventory unequippedItemsInventory = new UnequippedItemsInventory(unequippedItems);
 				SetUnequippedItemsInventory(unequippedItemsInventory);
 			}
-		public IEquippedItemsInventory GetEquippedItemsInventory(){
+		public IEquippedItemsInventory EquippedItemsInventory(){
 			Debug.Assert(_equippedItemsInventory != null);
 			return _equippedItemsInventory;
 		}
@@ -57,7 +57,7 @@ namespace UISystem{
 			_equippedItemsInventory = inv;
 		}
 			IEquippedItemsInventory _equippedItemsInventory;
-		public IUnequippedItemsInventory GetUnequippedItemsInventory(){
+		public IUnequippedItemsInventory UnequippedItemsInventory(){
 			Debug.Assert(_unequippedItemsInventory != null);
 			return _unequippedItemsInventory;
 		}
@@ -74,18 +74,20 @@ namespace UISystem{
 			WearInstance equippedWear = equippedElementsProvider.GetWearInFocusedSGEWear();
 			List<CarriedGearInstance> equippedCGears = equippedElementsProvider.GetCGearsInFocusedSGECGears();
 
-			GetEquippedItemsInventory().UpdateInventory(equippedBow, equippedWear, equippedCGears);
-			GetUnequippedItemsInventory().UpdateInventory(equippedBow, equippedWear, equippedCGears);
+			EquippedItemsInventory().UpdateInventory(equippedBow, equippedWear, equippedCGears);
+			UnequippedItemsInventory().UpdateInventory(equippedBow, equippedWear, equippedCGears);
 		}
 		void UpdateItemsEquipState(){
-			GetEquippedItemsInventory().UpdateItemsEquipState();
-			GetUnequippedItemsInventory().UpdateItemsEquipState();
+			EquippedItemsInventory().UpdateItemsEquipState();
+			UnequippedItemsInventory().UpdateItemsEquipState();
 		}
 	}
-	public interface IEquipToolInventoryManager{
-		void InitializeEquipToolInventories();
-		IUnequippedItemsInventory GetUnequippedItemsInventory();
-		IEquippedItemsInventory GetEquippedItemsInventory();
+	public interface IEquipToolInventoryManager: IInventoryManager{
+		IUnequippedItemsInventory UnequippedItemsInventory();
+		IEquippedItemsInventory EquippedItemsInventory();
 		void UpdateEquipStatus();
+	}
+	public interface IInventoryManager{
+		void InitializeInventory();
 	}
 }

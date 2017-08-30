@@ -47,8 +47,12 @@ namespace UISystem{
 		}
 		public class AcquisitionOrderComparer: Comparer<ISlottable>{
 			public override int Compare(ISlottable x, ISlottable y){
-				int xAcqOrder = x.GetAcquisitionOrder();
-				int yAcqOrder = y.GetAcquisitionOrder();
+				Debug.Assert((x is IInventoryItemSB));
+				Debug.Assert((y is IInventoryItemSB));
+				IInventoryItemSB invSBX = (IInventoryItemSB)x;
+				IInventoryItemSB invSBY = (IInventoryItemSB)y;
+				int xAcqOrder = invSBX.AcquisitionOrder();
+				int yAcqOrder = invSBY.AcquisitionOrder();
 				if(xAcqOrder.Equals(yAcqOrder)) 
 					return 0;
 				return xAcqOrder.CompareTo(yAcqOrder);
@@ -56,8 +60,8 @@ namespace UISystem{
 		}
 		public class ItemIDOrderComparer: Comparer<ISlottable>{
 			public override int Compare(ISlottable x, ISlottable y){
-				int xItemID = x.GetItemID();
-				int yItemID = y.GetItemID();
+				int xItemID = x.ItemID();
+				int yItemID = y.ItemID();
 
 				if(xItemID.Equals(yItemID))
 					return new AcquisitionOrderComparer().Compare(x, y);

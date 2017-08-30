@@ -12,8 +12,8 @@ namespace UISystem{
 			*/
 			ISlotGroup pickedSG = pickedSB.GetSG();
 			ISlotGroup otherSG = otherSB.GetSG();
-			IInventoryItemInstance pickedItem = pickedSB.GetItem();
-			IInventoryItemInstance otherItem = otherSB.GetItem();
+			Item pickedItem = pickedSB.Item();
+			Item otherItem = otherSB.Item();
 			IFilterHandler pickedSGFilterHandler = pickedSG.GetFilterHandler();
 			IFilterHandler otherSGFilterHandler = otherSG.GetFilterHandler();
 			if(pickedSG != otherSG){

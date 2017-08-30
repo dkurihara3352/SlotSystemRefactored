@@ -9,42 +9,36 @@ namespace UISystem{
 			/*	Action State	*/
 				public SGActStateHandler(ISlotGroup sg){
 					SetActStateEngine(new UIStateEngine<ISGActState>());
-					SetStatesRepo(new SGStatesRepo(sg));
+					SetStatesRepo(new SGActStateRepo(sg));
 					SetActProcEngine(new UIProcessEngine<ISGActProcess>());
 				}
-				IUIStateEngine<ISGActState> actStateEngine{
-					get{
-						if(_actStateEngine != null)
-							return _actStateEngine;
-						else throw new InvalidOperationException("actStateEngine not set");
-					}
+				IUIStateEngine<ISGActState> ActStateEngine(){
+					Debug.Assert(_actStateEngine != null);
+					return _actStateEngine;
 				}
-					IUIStateEngine<ISGActState> _actStateEngine;
 				void SetActStateEngine(IUIStateEngine<ISGActState> engine){
 					_actStateEngine = engine;
 				}
+					IUIStateEngine<ISGActState> _actStateEngine;
 				public void SetActState(ISGActState state){
-					actStateEngine.SetState(state);
-					if(state ==null && GetActProcess() != null)
+					ActStateEngine().SetState(state);
+					if(state ==null && ActProcess() != null)
 						SetAndRunActProcess(null);
 				}
 				ISGActState curActState{
-					get{return actStateEngine.GetCurState();}
+					get{return ActStateEngine().GetCurState();}
 				}
 				ISGActState prevActState{
-					get{return actStateEngine.GetPrevState();}
+					get{return ActStateEngine().GetPrevState();}
 				}
-				ISGStatesRepo statesRepo{
-					get{
-						if(_statesRepo != null)
-							return _statesRepo;
-						else throw new InvalidOperationException("stateRepo not set");
-					}
+				ISGActStateRepo StatesRepo(){
+					Debug.Assert(_statesRepo != null);
+					return _statesRepo;
 				}
-					ISGStatesRepo _statesRepo;
-				public void SetStatesRepo(ISGStatesRepo repo){
+				public void SetStatesRepo(ISGActStateRepo repo){
 					_statesRepo = repo;
 				}
+					ISGActStateRepo _statesRepo;
 				public void ClearCurActState(){
 					SetActState(null);
 				}
@@ -55,127 +49,51 @@ namespace UISystem{
 						return prevActState == null;
 					}
 				public void WaitForAction(){
-					SetActState(waitForActionState);
+					SetActState(waitingForActionState);
 				}
-					public ISGActState waitForActionState{
-						get{return statesRepo.GetWaitForActionState();}
+					public ISGActState waitingForActionState{
+						get{return StatesRepo().WaitingForActionState();}
 					}
 					public bool IsWaitingForAction(){
-						return curActState == waitForActionState;
+						return curActState == waitingForActionState;
 					}
 					public bool WasWaitingForAction(){
-						return prevActState == waitForActionState;
+						return prevActState == waitingForActionState;
 					}
-				public void Revert(){
-					SetActState(revertState);
+				public void Resize(){
+					SetActState(resizingState);
 				}
-					public ISGActState revertState{
-						get{return statesRepo.GetRevertState();}
+					public ISGActState resizingState{
+						get{return StatesRepo().ResizingState();}
 					}
-					public bool IsReverting(){
-						return curActState == revertState;
+					public bool IsResizing(){
+						return curActState == resizingState;
 					}
-					public bool WasReverting(){
-						return prevActState == revertState;
-					}
-				public void Reorder(){
-					SetActState(reorderState);
-				}
-					public ISGActState reorderState{
-						get{return statesRepo.GetReorderState();}
-					}
-					public bool IsReordering(){
-						return curActState == reorderState;
-					}
-					public bool WasReordering(){
-						return prevActState == reorderState;
-					}
-				public void Add(){
-					SetActState(addState);
-				}
-					public ISGActState addState{
-						get{return statesRepo.GetAddState();}
-					}
-					public bool IsAdding(){
-						return curActState == addState;
-					}
-					public bool WasAdding(){
-						return prevActState == addState;
-					}
-				public void Remove(){
-					SetActState(removeState);
-				}
-					public ISGActState removeState{
-						get{return statesRepo.GetRemoveState();}
-					}
-					public bool IsRemoving(){
-						return curActState == removeState;
-					}
-					public bool WasRemoving(){
-						return prevActState == removeState;
-					}
-				public void Swap(){
-					SetActState(swapState);
-				}
-					public ISGActState swapState{
-						get{return statesRepo.GetSwapState();}
-					}
-					public bool IsSwapping(){
-						return curActState == swapState;
-					}
-					public bool WasSwapping(){
-						return prevActState == swapState;
-					}
-				public void Fill(){
-					SetActState(fillState);
-				}
-					public ISGActState fillState{
-						get{return statesRepo.GetFillState();}
-					}
-					public bool IsFilling(){
-						return curActState == fillState;
-					}
-					public bool WasFilling(){
-						return prevActState == fillState;
-					}
-				public void Sort(){
-					SetActState(sortState);
-				}
-					public ISGActState sortState{
-						get{return statesRepo.GetSortState();}
-					}
-					public bool IsSorting(){
-						return curActState == sortState;
-					}
-					public bool WasSorting(){
-						return prevActState == sortState;
+					public bool WasResizing(){
+						return prevActState == resizingState;
 					}
 	/*	process	*/
 		/*	Action Process	*/
-			IUIProcessEngine<ISGActProcess> actProcEngine{
-				get{
-					if(_actProcEngine != null)
-						return _actProcEngine;
-					else
-						throw new InvalidOperationException("actProcEngine not set");
-				}
+			IUIProcessEngine<ISGActProcess> ActProcEngine(){
+				Debug.Assert(_actProcEngine != null);
+				return _actProcEngine;
 			}
-				IUIProcessEngine<ISGActProcess> _actProcEngine;
 			public void SetActProcEngine(IUIProcessEngine<ISGActProcess> engine){
 				_actProcEngine = engine;
 			}
+				IUIProcessEngine<ISGActProcess> _actProcEngine;
 			public void SetAndRunActProcess(ISGActProcess process){
-				actProcEngine.SetAndRunProcess(process);
+				ActProcEngine().SetAndRunProcess(process);
 			}
 			public void ExpireActProcess(){
-				ISGActProcess actProcess = GetActProcess();
+				ISGActProcess actProcess = ActProcess();
 				if(actProcess != null) 
 					actProcess.Expire();
 			}
-			public ISGActProcess GetActProcess(){
-				return actProcEngine.GetProcess();
+			public ISGActProcess ActProcess(){
+				return ActProcEngine().GetProcess();
 			}
-			public IEnumeratorFake TransactionCoroutine(){
+			public Func<IEnumeratorFake> ResizeCoroutine(){
 				return null;
 			}
 	}
@@ -186,31 +104,13 @@ namespace UISystem{
 		void WaitForAction();
 			bool IsWaitingForAction();
 			bool WasWaitingForAction();
-		void Revert();
-			bool IsReverting();
-			bool WasReverting();
-		void Reorder();
-			bool IsReordering();
-			bool WasReordering();
-		void Add();
-			bool IsAdding();
-			bool WasAdding();
-		void Remove();
-			bool IsRemoving();
-			bool WasRemoving();
-		void Swap();
-			bool IsSwapping();
-			bool WasSwapping();
-		void Fill();
-			bool IsFilling();
-			bool WasFilling();
-		void Sort();
-			bool IsSorting();
-			bool WasSorting();
+		void Resize();
+			bool IsResizing();
+			bool WasResizing();
 	/* Proc */
 		void SetAndRunActProcess(ISGActProcess process);
 		void ExpireActProcess();
-		ISGActProcess GetActProcess();
-		IEnumeratorFake TransactionCoroutine();
+		ISGActProcess ActProcess();
+		Func<IEnumeratorFake> ResizeCoroutine();
 	}
 }

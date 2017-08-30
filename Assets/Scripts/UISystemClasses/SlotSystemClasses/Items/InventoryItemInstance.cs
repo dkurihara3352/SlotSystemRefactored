@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 
 namespace UISystem{
-	public class InventoryItemInstance: IInventoryItemInstance{
+	public class InventoryItemInstance: Item{
 		public InventoryItem InventoryItem(){
 			return _inventoryItem;
 		}
@@ -47,7 +47,7 @@ namespace UISystem{
 			return InventoryItem().IsStackable();
 		}
 		public virtual bool IsContainedInEquippedItems(IEquippedElementsProvider equipProv){
-			List<IInventoryItemInstance> equippedItems = equipProv.GetAllItemsInFocusedSGEs();
+			List<Item> equippedItems = equipProv.GetAllItemsInFocusedSGEs();
 			if(equippedItems.Contains(this))
 				return true;
 			return false;
@@ -58,9 +58,9 @@ namespace UISystem{
 			return Equals((ISlottableItem)other);
 		}
 		public bool Equals(ISlottableItem other){
-			if(!(other is IInventoryItemInstance))
+			if(!(other is Item))
 				return false;
-			IInventoryItemInstance otherInst = (IInventoryItemInstance)other;
+			Item otherInst = (Item)other;
 			if(IsStackable())
 				return InventoryItem().Equals(otherInst.InventoryItem());
 			else
@@ -88,7 +88,7 @@ namespace UISystem{
 			return !(a == b);
 		}
 	}
-	public interface IInventoryItemInstance: ISlottableItem{
+	public interface Item: ISlottableItem{
 		InventoryItem InventoryItem();
 		void SetInventoryItem(InventoryItem item);
 		int AcquisitionOrder();

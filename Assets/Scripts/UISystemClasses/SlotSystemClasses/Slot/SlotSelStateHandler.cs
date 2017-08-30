@@ -5,9 +5,8 @@ using UnityEngine;
 namespace UISystem{
 	public class SlotSelStateHandler : UISelStateHandler {
 		ISlot slot;
-		public SlotSelStateHandler(ISlot slot){
+		public SlotSelStateHandler(SlotSelCoroutineRepo repo, ISlot slot): base(repo){
 			this.slot = slot;
-			SetSelCoroutineRepo(new SlotSelCoroutineRepo());
 		}
 		public override void MakeSelectable(){
 			base.MakeSelectable();

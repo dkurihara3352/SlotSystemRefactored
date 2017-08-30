@@ -10,17 +10,11 @@ namespace UISystem{
 	}
 	public interface ISGProcess: IUIProcess{
 	}
-		public interface ISGActProcess: ISGProcess{}
-			public class SGTransactionProcess: SGProcess, ISGActProcess{
-				ISGTransactionHandler sgTAHandler;
-				public SGTransactionProcess(ISlotGroup sg, Func<IEnumeratorFake> coroutine): base(sg, coroutine){
-					sgTAHandler = sg.GetSGTAHandler();
-				}
-				public override void Expire(){
-					base.Expire();
-					sgTAHandler.ReportTAComp();
-				}
-			}
+	public interface ISGActProcess: ISGProcess{}
+	public class SGResizeProcess: SGProcess, ISGActProcess{
+		public SGResizeProcess(ISlotGroup sg, Func<IEnumeratorFake> coroutine): base(sg, coroutine){
+		}
+	}
 	public class SGSelCoroutineRepo: IUISelCoroutineRepo{
 		public Func<IEnumeratorFake> DeactivateCoroutine(){
 			return SGDeactivateCoroutine;

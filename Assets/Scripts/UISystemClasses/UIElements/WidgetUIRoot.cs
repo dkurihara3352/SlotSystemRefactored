@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
 	public class WidgetUIRoot : UIElement, IWidgetUIRoot {
-		public WidgetUIRoot(RectTransform rectTrans): base(rectTrans){}
+		public WidgetUIRoot(RectTransformFake rectTrans): base(rectTrans){}
 		public void OnWidgetSelected(object uiManager, IWidgetUIRoot selectedRoot){
 			if(selectedRoot == this)
 				Activate();

@@ -13,7 +13,7 @@ namespace UISystem{
 		}
 		public override void SetSG(ISlotGroup sg){
 			_slotsHolder = sg.GetSlotsHolder();
-			_filterHandler = sg.GetFilterHandler();
+			_filterHandler = sg.FilterHandler();
 		}
 		ISlotsHolder slotsHolder{
 			get{
@@ -58,12 +58,12 @@ namespace UISystem{
 		}
 			List<CarriedGearInstance> _equippedCGears = new List<CarriedGearInstance>();
 		
-		public override List<IInventoryItemInstance> Items(){
-			List<IInventoryItemInstance> result = new List<IInventoryItemInstance>();
+		public override List<Item> Items(){
+			List<Item> result = new List<Item>();
 			result.Add(_equippedBow);
 			result.Add(_equippedWear);
 			foreach(CarriedGearInstance inst in _equippedCGears){
-				result.Add((IInventoryItemInstance)inst);
+				result.Add((Item)inst);
 			}
 			return result;
 		}

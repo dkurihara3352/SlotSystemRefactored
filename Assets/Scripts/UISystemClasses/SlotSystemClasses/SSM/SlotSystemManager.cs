@@ -4,27 +4,44 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
 	public class SlotSystemManager : UIElement, ISlotSystemManager{
-		public SlotSystemManager(IUIElement uiElement, RectTransformFake rectTrans): base(rectTrans){
+		public SlotSystemManager(IUIElement uiElement, RectTransformFake rectTrans, IInventoryManager invManager): base(rectTrans){
 			this.uiElement = uiElement;
+			SetInventoryManager(invManager);
+			SetSelStateHandler(new SSMSelStateHandler(new SSMSelCoroutineRepo(), this));
 		}
 			IUIElement uiElement;
-		void Initialize(){
-			SetSlotSystemElements();
+		public void InitializeSlotSystemOnActivate(){
+			SetSlotSystemElementsOnActivate();
 		}
-			void SetSlotSystemElements(){
-				List<ISlotSystemElement> result = new List<ISlotSystemElement>();
-				uiElement.PerformInHierarchy(AddSSEToList, result);
-				_slotSystemElements = result;
-			}
-			void AddSSEToList(IUIElement uiElement, IList<ISlotSystemElement> list){
-				if(uiElement is ISlotSystemElement)
-					list.Add((ISlotSystemElement)uiElement);
-			}
 		public List<ISlotSystemElement> SlotSystemElements(){
 			Debug.Assert(_slotSystemElements != null);
 			return _slotSystemElements;
 		}
+		public void SetSlotSystemElementsOnActivate(){
+			List<ISlotSystemElement> result = new List<ISlotSystemElement>();
+			uiElement.PerformInHierarchy(AddSSEToList, result);
+			_slotSystemElements = result;
+		}
+		void AddSSEToList(IUIElement uiElement, IList<ISlotSystemElement> list){
+			if(uiElement is ISlotSystemElement)
+				list.Add((ISlotSystemElement)uiElement);
+		}
 			List<ISlotSystemElement> _slotSystemElements;
+		List<ISlotGroup> SlotGroups(){
+			List<ISlotGroup> result = new List<ISlotGroup>();
+			foreach(var sse in SlotSystemElements())
+				if(sse is ISlotGroup)
+					result.Add((ISlotGroup)sse);
+			return result;
+		}
+		public IInventoryManager InventoryManager(){
+			Debug.Assert(_inventoryManager != null);
+			return _inventoryManager;
+		}
+		void SetInventoryManager(IInventoryManager inventoryManager){
+			_inventoryManager = inventoryManager;
+		}
+			IInventoryManager _inventoryManager;
 		public ISlottable GetPickedSB(){
 			return _pickedSB;
 		}
@@ -52,14 +69,14 @@ namespace UISystem{
 				if(SBPickedUp != null)
 					SBPickedUp.Invoke(this, e);
 			}
-			public ISlotGroup GetHoveredSG(){
+			public ISlotGroup HoveredSG(){
 				return _hoveredSG;
 			}
 			public void SetHoveredSG(ISlotGroup hoveredSG){
-				ISlotGroup prevSG = GetHoveredSG();
+				ISlotGroup prevSG = HoveredSG();
 				if(prevSG != hoveredSG){
 					_hoveredSG = hoveredSG;
-					ISlotGroup newHoveredSG = GetHoveredSG();
+					ISlotGroup newHoveredSG = HoveredSG();
 					if(newHoveredSG != null)
 						OnSGHoverEntered(new SGEventArgs(newHoveredSG));
 				}
@@ -70,14 +87,14 @@ namespace UISystem{
 				if(SGHoverEntered != null)
 					SGHoverEntered.Invoke(this, e);
 			}
-			public ISlot GetHoveredSlot(){
+			public ISlot HoveredSlot(){
 				return _hoveredSlot;
 			}
 			public void SetHoveredSlot(ISlot hoveredSlot){
-				ISlot prevSlot = GetHoveredSlot();
+				ISlot prevSlot = HoveredSlot();
 				if(prevSlot != hoveredSlot){
 					_hoveredSlot = hoveredSlot;
-					ISlot newHoveredSlot = GetHoveredSlot();
+					ISlot newHoveredSlot = HoveredSlot();
 					if(newHoveredSlot != null)
 						OnSlotHoverEntered(new SlotEventArgs(newHoveredSlot));
 				}
@@ -106,11 +123,15 @@ namespace UISystem{
 			}
 	}
 	public interface ISlotSystemManager: IUIElement{
+		IInventoryManager InventoryManager();
+		void InitializeSlotSystemOnActivate();
 		List<ISlotSystemElement> SlotSystemElements();
 		void Refresh();
 		void OnSSMFocus(object source, ISlotSystemManager ssm);
 		void SetPickedSB(ISlottable sb);
+		ISlotGroup HoveredSG();
 		void SetHoveredSG(ISlotGroup sg);
+		ISlot HoveredSlot();
 		void SetHoveredSlot(ISlot slot);
 		void Drop();
 		void UpdateInventory(IInventory inventory);

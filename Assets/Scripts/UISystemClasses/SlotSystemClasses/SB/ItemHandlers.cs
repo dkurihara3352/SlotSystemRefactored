@@ -55,4 +55,8 @@ namespace UISystem{
 		void SetQuantity(int quant);
 		int ItemID();
 	}
+	public interface IInventoryItemHandler: IItemHandler{
+		int AcquisitionOrder();
+		void SetAcquitionOrder(int order);
+	}
 }

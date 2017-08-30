@@ -6,32 +6,28 @@ using Utility;
 
 namespace UISystem{
 	public class Slottable : ISlottable{
-		public void InitializeSB(ISlot slot, IInventoryItemInstance item){
+		public Slottable(ISlot slot, ISlottableItem item, IItemHandler itemHandler){
+			SetSlot(slot);
+			SetItemHandler(itemHandler);
+			SetItem(item);
+		}
+		public void InitializeSB(ISlot slot, ISlottableItem item){
 			SetItemHandler(new ItemHandler(item));
 			SetSlot(slot);
 			InitializeStateHandlers();
 			InitializeStates();
 		}
-		public ISBToolHandler GetToolHandler(){
-			Debug.Assert(_sbToolHandler != null);
-			return _sbToolHandler;
-		}
-			ISBToolHandler _sbToolHandler;
-		void SetToolHandler(ISBToolHandler toolHandler){
-			_sbToolHandler = toolHandler;
-		}
 		/*	States	*/
-			public void InitializeStates(){
+			public virtual void InitializeStates(){
 				MakeUnselectable();
 				WaitForAction();
-				GetToolHandler().InitializeStates();
 			}
 			public void InitializeStateHandlers(){
 				_selStateHandler = new SBSelStateHandler();
 				_actStateHandler = new SBActStateHandler(this);
 			}
 			/*	SB Selection state */
-				ISBSelStateHandler SelStateHandler(){
+				public ISBSelStateHandler SelStateHandler(){
 					Debug.Assert(_selStateHandler != null);
 					return _selStateHandler;
 				}
@@ -46,7 +42,7 @@ namespace UISystem{
 					SelStateHandler().Select();
 				}
 			/*	Action State */
-				ISBActStateHandler ActStateHandler(){
+				public ISBActStateHandler ActStateHandler(){
 					Debug.Assert(_actStateHandler != null);
 					return _actStateHandler;
 				}
@@ -88,10 +84,13 @@ namespace UISystem{
 				_itemHandler = itemHandler;
 			}
 				IItemHandler _itemHandler;
-			public ISlottableItem GetItem(){
+			public ISlottableItem Item(){
 				return ItemHandler().Item();
 			}
-			public int GetItemID(){
+			public void SetItem(ISlottableItem item){
+				ItemHandler().SetItem(item);
+			}
+			public int ItemID(){
 				return ItemHandler().ItemID();
 			}
 			public bool IsStackable(){
@@ -109,7 +108,7 @@ namespace UISystem{
 			}
 				ISlot _slot;
 			public ISlotGroup SlotGroup(){
-				Slot().SlotGroup();
+				return Slot().SlotGroup();
 			}
 			public void Refresh(){
 				ActStateHandler().WaitForAction();
@@ -118,7 +117,7 @@ namespace UISystem{
 			public bool ShareSGAndItem(ISlottable other){
 				bool flag = true;
 				flag &= SlotGroup() == other.SlotGroup();
-				flag &= GetItem().Equals(other.GetItem());
+				flag &= Item().Equals(other.Item());
 				return flag;
 			}
 			public void Destroy(){
@@ -138,13 +137,11 @@ namespace UISystem{
 			void Disappear();
 			bool IsActProcessRunning();
 			void ExpireActProcess();
-		ISBToolHandler GetToolHandler();
-		void SetToolHandler(ISBToolHandler handler);
 		IItemHandler ItemHandler();
-			IInventoryItemInstance GetItem();
-			int GetItemID();
+			ISlottableItem Item();
+			void SetItem(ISlottableItem item);
+			int ItemID();
 			bool IsStackable();
-		/* Other */
 		ISlot Slot();
 		void SetSlot(ISlot slot);
 		ISlotGroup SlotGroup();

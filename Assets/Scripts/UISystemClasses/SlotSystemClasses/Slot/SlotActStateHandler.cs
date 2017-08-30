@@ -152,17 +152,29 @@ namespace UISystem{
 		public void SetCoroutineRepo(ISlotActCoroutineRepo coroutineRepo){
 			_coroutineRepo = coroutineRepo;
 		}
-		public System.Func<IEnumeratorFake> GetWaitForPointerUpCoroutine(){
+		public System.Func<IEnumeratorFake> WaitForPointerUpCoroutine(){
 			return coroutineRepo.GetWaitForPointerUpCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetWaitForPickUpCoroutine(){
+		public System.Func<IEnumeratorFake> WaitForPickUpCoroutine(){
 			return coroutineRepo.GetWaitForPickUpCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetPickUpCoroutine(){
+		public System.Func<IEnumeratorFake> PickUpCoroutine(){
 			return coroutineRepo.GetPickUpCoroutine();
 		}
-		public System.Func<IEnumeratorFake> GetWaitForNextTouchCoroutine(){
+		public System.Func<IEnumeratorFake> WaitForNextTouchCoroutine(){
 			return coroutineRepo.GetWaitForNextTouchCoroutine();
+		}
+		public void OnPointerDown(){
+			curActState.OnPointerDown();
+		}
+		public void OnPointerUp(){
+			curActState.OnPointerUp();
+		}
+		public void OnEndDrag(){
+			curActState.OnEndDrag();
+		}
+		public void OnDeselected(){
+			curActState.OnDeselected();
 		}
 	}
 	public interface ISlotActStateHandler{
@@ -189,10 +201,13 @@ namespace UISystem{
 		void SetAndRunActProcess(ISlotActProcess process);
 		bool IsActProcessRunning();
 		void ExpireActProcess();
-			Func<IEnumeratorFake> GetWaitForPointerUpCoroutine();
-			Func<IEnumeratorFake> GetWaitForPickUpCoroutine();
-			Func<IEnumeratorFake> GetPickUpCoroutine();
-			Func<IEnumeratorFake> GetWaitForNextTouchCoroutine();
-			
+		Func<IEnumeratorFake> WaitForPointerUpCoroutine();
+		Func<IEnumeratorFake> WaitForPickUpCoroutine();
+		Func<IEnumeratorFake> WaitForNextTouchCoroutine();
+		Func<IEnumeratorFake> PickUpCoroutine();
+		void OnPointerDown();
+		void OnPointerUp();
+		void OnEndDrag();
+		void OnDeselected();
 	}
 }

@@ -32,7 +32,7 @@ namespace UISystem{
 			IUISelStateHandler selStateHandler;
 			public WaitForNextTouchProcess(ISlot slot, System.Func<IEnumeratorFake> coroutine): base(coroutine){
 				this.slot = slot;
-				this.selStateHandler = slot.UISelStateHandler();
+				this.selStateHandler = slot.SelStateHandler();
 			}
 			public override void Expire(){
 				base.Expire();

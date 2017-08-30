@@ -3,28 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
-	public abstract class SlotState: UIState{
-	}
-	public abstract class SlotActState: SlotState, ISlotActState{
+    /* ActState */
+	public abstract class SlotActState: UIState, ISlotActState{
 		protected ISlotActStateHandler actStateHandler;
 		public SlotActState(ISlotActStateHandler handler){
 			actStateHandler = handler;
 		}
 		public virtual void OnPointerDown(){}
 		public virtual void OnPointerUp(){}
-		public virtual void OnDeselected(){}
 		public virtual void OnEndDrag(){}
+		public virtual void OnDeselected(){}
 	}
 	public interface ISlotActState: IUIState{
 		void OnPointerDown();
 		void OnPointerUp();
-		void OnDeselected();
 		void OnEndDrag();
+		void OnDeselected();
 	}
 	public class WaitForActionState: SlotActState{//up state
 		IUISelStateHandler selStateHandler;
 		public WaitForActionState(ISlot slot): base(slot.ActStateHandler()){
-			this.selStateHandler = slot.UISelStateHandler();
+			this.selStateHandler = slot.SelStateHandler();
 		}
 		public override void EnterState(){
 			if(!actStateHandler.WasActStateNull())
@@ -43,12 +42,12 @@ namespace UISystem{
         IUISelStateHandler selStateHandler;
         ISlot slot;
         public WaitForPickUpState(ISlot slot): base(slot.ActStateHandler()){
-            this.selStateHandler = slot.UISelStateHandler();
+            this.selStateHandler = slot.SelStateHandler();
             this.slot = slot;
         }
         public override void EnterState(){
             if(actStateHandler.WasWaitingForAction()){
-                ISlotActProcess wfpuProcess = new WaitForPickUpProcess(actStateHandler, actStateHandler.GetWaitForPickUpCoroutine());
+                ISlotActProcess wfpuProcess = new WaitForPickUpProcess(actStateHandler, actStateHandler.WaitForPickUpCoroutine());
                 actStateHandler.SetAndRunActProcess(wfpuProcess);
             }else
                 throw new InvalidOperationException("cannot enter this state from anything other than WaitForActionState");
@@ -65,12 +64,12 @@ namespace UISystem{
         IUISelStateHandler selStateHandler;
         ISlot slot;
         public WaitForPointerUpState(ISlot slot): base(slot.ActStateHandler()){
-            this.selStateHandler = slot.UISelStateHandler();
+            this.selStateHandler = slot.SelStateHandler();
             this.slot = slot;
         }
         public override void EnterState(){
             if(actStateHandler.WasWaitingForAction()){
-                ISlotActProcess wfPtuProcess = new WaitForPointerUpProcess(selStateHandler, actStateHandler.GetWaitForPointerUpCoroutine());
+                ISlotActProcess wfPtuProcess = new WaitForPointerUpProcess(selStateHandler, actStateHandler.WaitForPointerUpCoroutine());
                 actStateHandler.SetAndRunActProcess(wfPtuProcess);
             }else
                 throw new InvalidOperationException("cannot enter this state from anything other than WaitForActionState");
@@ -89,12 +88,12 @@ namespace UISystem{
             IUISelStateHandler selStateHandler;
             ISlot slot;
             public WaitForNextTouchState(ISlot slot): base(slot.ActStateHandler()){
-                this.selStateHandler = slot.UISelStateHandler();
+                this.selStateHandler = slot.SelStateHandler();
                 this.slot = slot;
             }
             public override void EnterState(){
                 if(actStateHandler.WasPickingUp() || actStateHandler.WasWaitingForPickUp()){
-                    ISlotActProcess wfntProcess = new WaitForNextTouchProcess(slot, actStateHandler.GetWaitForNextTouchCoroutine());
+                    ISlotActProcess wfntProcess = new WaitForNextTouchProcess(slot, actStateHandler.WaitForNextTouchCoroutine());
                     actStateHandler.SetAndRunActProcess(wfntProcess);
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than PickingUpState or WaitForPickUpState");
@@ -113,20 +112,16 @@ namespace UISystem{
         }
         public class PickingUpState: SlotActState{//down state
             IUISelStateHandler selStateHandler;
-            IHoverable slotHoverable;
-            IItemHandler itemHandler;
             ISlot slot;
             public PickingUpState(ISlot slot): base(slot.ActStateHandler()){
-                selStateHandler = slot.UISelStateHandler();
-                slotHoverable = slot.Hoverable();
-                itemHandler = slot.ItemHandler();
+                selStateHandler = slot.SelStateHandler();
                 this.slot = slot;
             }
             public override void EnterState(){
                 if(actStateHandler.WasWaitingForPickUp() || actStateHandler.WasWaitingForNextTouch()){
-                    slotHoverable.OnHoverEnter();
+                    slot.HoverEnter();
 
-                    ISlotActProcess pickedUpProcess = new PickUpProcess(actStateHandler.GetPickUpCoroutine());
+                    ISlotActProcess pickedUpProcess = new PickUpProcess(actStateHandler.PickUpCoroutine());
                     actStateHandler.SetAndRunActProcess(pickedUpProcess);
                 }else
                     throw new InvalidOperationException("cannot enter this state from anything other than WaitForPickUpState or WaitForNextTouchState");
@@ -136,10 +131,8 @@ namespace UISystem{
                 selStateHandler.MakeSelectable();
             }
             public override void OnPointerUp(){
-                if(slotHoverable.IsHovered() && itemHandler.IsStackable())
+                if(slot.IsHovered() && slot.HasItemAndIsStackable())
                     actStateHandler.WaitForNextTouch();
-
-
             }
             public override void OnEndDrag(){
 

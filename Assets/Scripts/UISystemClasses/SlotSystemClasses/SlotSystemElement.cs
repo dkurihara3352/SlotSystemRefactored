@@ -11,8 +11,9 @@ namespace UISystem{
 			_ssm = ssm;
 		}
 			ISlotSystemManager _ssm;
-		public SlotSystemElement(RectTransformFake rectTrans): base(rectTrans){
+		public SlotSystemElement(RectTransformFake rectTrans, ISSEEventCommandsRepo repo): base(rectTrans){
 			ISlotSystemManager ssm = SSM();
+			SetSSEEventCommandsRepo(repo);
 			ssm.SBPickedUp += OnSBPickedUp;
 			ssm.SlotHoverEntered += OnSlotHoverEntered;
 			ssm.SGHoverEntered += OnSGHoverEntered;
@@ -25,54 +26,51 @@ namespace UISystem{
 			ssm.SGHoverEntered -= OnSGHoverEntered;
 			ssm.SBDropped -= OnSBDropped;
 		}
+		public virtual void HoverEnter(){}
+		public virtual bool IsHovered(){return false;}
+		ISSEEventCommandsRepo CommandsRepo(){
+			Debug.Assert(_commandsRepo != null);
+			return _commandsRepo;
+		}
+			protected ISSEEventCommandsRepo _commandsRepo;
+		public void SetSSEEventCommandsRepo(ISSEEventCommandsRepo repo){
+			_commandsRepo = repo;
+		}
 		public void OnSBPickedUp(object ssm, SBEventArgs e){
 			OnSBPickUpCommand().Execute(e.slottable);
 		}
-			SBEventArgsCommand OnSBPickUpCommand(){
-				Debug.Assert(_onSBPickUpCommand != null);
-				return _onSBPickUpCommand;
-			}
-			SBEventArgsCommand _onSBPickUpCommand;
-			public void SetOnSBPickUpCommand(SBEventArgsCommand comm){
-				_onSBPickUpCommand = comm;
+			ISBEventArgsCommand OnSBPickUpCommand(){
+				Debug.Assert(CommandsRepo() != null);
+				return CommandsRepo().OnSBPickedUpCommand();
 			}
 		public void OnSlotHoverEntered(object ssm, SlotEventArgs e){
 			OnSlotHoverEnterCommand().Execute(e.slot);
 		}
-			SlotEventArgsCommand OnSlotHoverEnterCommand(){
-				Debug.Assert(_onSlotHoverEnterCommand != null);
-				return _onSlotHoverEnterCommand;
-			}
-			SlotEventArgsCommand _onSlotHoverEnterCommand;
-			public void SetOnSlotHoverEnterCommand(SlotEventArgsCommand comm){
-				_onSlotHoverEnterCommand = comm;
+			ISlotEventArgsCommand OnSlotHoverEnterCommand(){
+				Debug.Assert(CommandsRepo() != null);
+				return CommandsRepo().OnSlotHoverEnteredCommand();
 			}
 		public void OnSGHoverEntered(object ssm, SGEventArgs e){
 			OnSGHoverEnterCommand().Execute(e.slotGroup);
 		}
-			SGEventArgsCommand OnSGHoverEnterCommand(){
-				Debug.Assert(_onSGHoverEnterCommand != null);
-				return _onSGHoverEnterCommand;
-			}
-			SGEventArgsCommand _onSGHoverEnterCommand;
-			public void SetOnSGHoverEnterCommand(SGEventArgsCommand comm){
-				_onSGHoverEnterCommand = comm;
+			ISGEventArgsCommand OnSGHoverEnterCommand(){
+				Debug.Assert(CommandsRepo() != null);
+				return CommandsRepo().OnSGHoverEnteredCommand();
 			}
 		public void OnSBDropped(object ssm, SBEventArgs e){
 			OnSBDropCommand().Execute(e.slottable);
 		}
-			SBEventArgsCommand OnSBDropCommand(){
-				Debug.Assert(_onSBDropCommand != null);
-				return _onSBDropCommand;
-			}
-			SBEventArgsCommand _onSBDropCommand;
-			public void SetOnSBDropCommand(SBEventArgsCommand comm){
-				_onSBDropCommand = comm;
+			ISBEventArgsCommand OnSBDropCommand(){
+				Debug.Assert(CommandsRepo() != null);
+				return CommandsRepo().OnSBDroppedCommand();
 			}
 	}
 	public interface ISlotSystemElement{
 		ISlotSystemManager SSM();
 		void SetSSM(ISlotSystemManager ssm);
+		void HoverEnter();
+		bool IsHovered();
+		void SetSSEEventCommandsRepo(ISSEEventCommandsRepo repo);
 		void OnSBPickedUp(object source, SBEventArgs e);
 		void OnSlotHoverEntered(object source, SlotEventArgs e);
 		void OnSGHoverEntered(object source, SGEventArgs e);

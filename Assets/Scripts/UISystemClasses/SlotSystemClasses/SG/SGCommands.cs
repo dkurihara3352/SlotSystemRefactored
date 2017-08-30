@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
+	
 	public interface ICreateSlotCommand{
 		Slot CreateSlot();
 	}
 	public class CreateSlotCommand: ICreateSlotCommand{
 		public Slot CreateSlot(){
-			Slot slot = new Slot(new RectTransformFake());
+			Slot slot = new Slot(new RectTransformFake(), new EmptySSECommandsRepo(), new TapCommand());
 			return slot;
 		}
 	}
@@ -36,13 +37,41 @@ namespace UISystem{
 
 		}
 	}
-	public class SGCommandsRepo: ISGCommandsRepo{
-		ISlotGroup sg;
-		public SGCommandsRepo(ISlotGroup sg){
-			this.sg = sg;
+	public interface IAcceptsItemCommand{
+		bool AcceptsItem(ISlottableItem item);
+	}
+	public class EmptyAcceptsItemCommand: IAcceptsItemCommand{
+		public bool AcceptsItem(ISlottableItem item){
+			return false;
 		}
 	}
-	public interface ISGCommandsRepo{
+	public interface IFetchInventoryCommand{
+		IInventory FetchInventory();
 	}
-
+	public class FetchEquippedItemsInventory{
+		ISlotSystemManager ssm;
+		public FetchEquippedItemsInventory(ISlotGroup sg){
+			this.ssm = sg.SSM();
+		}
+		public IInventory FetchInventory(){
+			IInventoryManager inventoryManager = ssm.InventoryManager();
+			Debug.Assert(inventoryManager != null && (inventoryManager is IEquipToolInventoryManager));
+			IEquipToolInventoryManager equipToolInvManager = (IEquipToolInventoryManager)inventoryManager;
+			IEquippedItemsInventory equippedItemInventory = equipToolInvManager.EquippedItemsInventory();
+			return equippedItemInventory;
+		}
+	}
+	public class FetchUnequippedItemsInventory{
+		ISlotSystemManager ssm;
+		public FetchUnequippedItemsInventory(ISlotGroup sg){
+			this.ssm = sg.SSM();
+		}
+		public IInventory FetchInventory(){
+			IInventoryManager inventoryManager = ssm.InventoryManager();
+			Debug.Assert(inventoryManager != null && (inventoryManager is IEquipToolInventoryManager));
+			IEquipToolInventoryManager equipToolInvManager = (IEquipToolInventoryManager)inventoryManager;
+			IUnequippedItemsInventory unequippedItemInventory = equipToolInvManager.UnequippedItemsInventory();
+			return unequippedItemInventory;
+		}
+	}
 }
