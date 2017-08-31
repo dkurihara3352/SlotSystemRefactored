@@ -15,7 +15,7 @@ namespace SlotSystemTests{
 				[Test]
 				public void SGWaitForActionState_EnterState_WhenCalled_SetsSGActProcNull(){
 					ISlotGroup sg = MakeSubSG();
-						ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
+						IResizableSGActStateHandler actStateHandler = Substitute.For<IResizableSGActStateHandler>();
 						sg.GetSGActStateHandler().Returns(actStateHandler);
 					SGWaitForActionState sgwfaState = new SGWaitForActionState(sg);
 
@@ -27,7 +27,7 @@ namespace SlotSystemTests{
 				[Test]
 				public void SGRevertState_EnterState_WhenCalled_CallsSGUpdateToRevert(){
 					ISlotGroup sg = MakeSubSG();
-						ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
+						IResizableSGActStateHandler actStateHandler = Substitute.For<IResizableSGActStateHandler>();
 						sg.GetSGActStateHandler().Returns(actStateHandler);
 					SGRevertState revState = new SGRevertState(sg);
 

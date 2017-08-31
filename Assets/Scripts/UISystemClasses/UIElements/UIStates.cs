@@ -52,9 +52,13 @@ namespace UISystem{
 		}
 		public interface IUISelStateRepo{
 			IUISelState DeactivatedState();
+			IUISelState ActivatedState();
+			IUISelState HiddenState();
+			IUISelState ShownState();
+			IUISelState SelectedState();
+			IUISelState DeselectedState();
 			IUISelState SelectableState();
 			IUISelState UnselectableState();
-			IUISelState SelectedState();
 		}
 	/* State */
 		public abstract class UIState: IUIState{
@@ -75,8 +79,46 @@ namespace UISystem{
 			public class UIDeactivatedState: UISelState{
 				public UIDeactivatedState(IUISelStateHandler handler): base(handler){}
 				public override void EnterState(){
-					if(!handler.WasSelStateNull())
+					if(handler.WasActivated())
 						handler.SetAndRunSelProcess(new UIDeactivateProcess(handler.DeactivateCoroutine()));
+				}
+			}
+			public class UIActivatedState: UISelState{
+				public UIActivatedState(IUISelStateHandler handler): base(handler){}
+				public override void EnterState(){
+					if(handler.WasDeactivated())
+						handler.ShowInstantly();
+				}
+			}
+			public class UIHiddenState: UISelState{
+				public UIHiddenState(IUISelStateHandler handler): base(handler){}
+				public override void EnterState(){
+					if(handler.WasShown())
+						handler.SetAndRunSelProcess(new UIHideProcess(handler.HideCoroutine()));
+				}
+			}
+			public class UIShownState: UISelState{
+				public UIShownState(IUISelStateHandler handler): base(handler){
+				}
+				public override void EnterState(){
+					if(handler.WasHidden())
+						handler.MakeSelectable();
+				}
+			}
+			public class UISelectedState : UISelState{
+				public UISelectedState(IUISelStateHandler handler): base(handler){}
+				public override void EnterState(){
+					if(!handler.WasSelStateNull())
+						handler.SetAndRunSelProcess(new UISelectProcess(handler.SelectCoroutine()));
+					else
+						handler.SelectInstantly();
+				}
+			}
+			public class UIUnselectedState: UISelState{
+				public UIUnselectedState(IUISelStateHandler handler): base(handler){}
+				public override void EnterState(){
+					if(handler.WasSelected())
+						handler.MakeSelectable();
 				}
 			}
 			public class UISelectableState: UISelState{
@@ -97,15 +139,5 @@ namespace UISystem{
 					else
 						handler.MakeUnselectableInstantly();
 				}
-			}
-			public class UISelectedState : UISelState{
-				public UISelectedState(IUISelStateHandler handler): base(handler){}
-				public override void EnterState(){
-					if(!handler.WasSelStateNull())
-						handler.SetAndRunSelProcess(new UISelectProcess(handler.SelectCoroutine()));
-					else
-						handler.SelectInstantly();
-				}
-			
 			}
 }

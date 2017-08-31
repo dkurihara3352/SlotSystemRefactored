@@ -4,27 +4,27 @@ using UnityEngine;
 
 namespace UISystem{
 	public static class SlotSystemUtil{
-		public static bool AreSwappable(ISlottable pickedSB, ISlottable otherSB){
-			/*	precondition
-					1) they do not share same SG
-					2) otherSB.SG accepts pickedSB
-					3) not stackable
-			*/
-			ISlotGroup pickedSG = pickedSB.GetSG();
-			ISlotGroup otherSG = otherSB.GetSG();
-			Item pickedItem = pickedSB.Item();
-			Item otherItem = otherSB.Item();
-			IFilterHandler pickedSGFilterHandler = pickedSG.GetFilterHandler();
-			IFilterHandler otherSGFilterHandler = otherSG.GetFilterHandler();
-			if(pickedSG != otherSG){
-				if(otherSGFilterHandler.AcceptsFilter(pickedSB)){
-					if(!(pickedItem.Equals(otherItem) && pickedItem.IsStackable()))
-						if(pickedSGFilterHandler.AcceptsFilter(otherSB))
+		public static bool SBsAreSwappable(ISlottable pickedSB, ISlottable otherSB){
+			ISlotGroup pickedSG = pickedSB.SlotGroup();
+			ISlotGroup otherSG = otherSB.SlotGroup();
+			ISlottableItem pickedItem = pickedSB.Item();
+			ISlottableItem otherItem = otherSB.Item();
+
+			if(AreDifferentSGs(pickedSG, otherSG))
+				if(AreBothNonStackable(pickedItem, otherItem))
+					if(AreMutuallyAccepting(pickedSG, pickedItem, otherSG, otherItem))
 						return true;
-				}
-			}
 			return false;
 		}
+			static bool AreDifferentSGs(ISlotGroup sg, ISlotGroup otherSG){
+				return sg != otherSG;
+			}
+			static bool AreBothNonStackable(ISlottableItem item, ISlottableItem otherItem){
+				return !(item.IsStackable() || otherItem.IsStackable());
+			}
+			static bool AreMutuallyAccepting(ISlotGroup sg, ISlottableItem item, ISlotGroup otherSG, ISlottableItem otherItem){
+				return (sg.AcceptsItem(otherItem) && otherSG.AcceptsItem(item));
+			}
 		public static string Red(string str){
 			return "<color=#ff0000>" + str + "</color>";
 		}

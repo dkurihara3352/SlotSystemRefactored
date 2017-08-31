@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
-	public class SGActStateHandler : ISGActStateHandler {
+	public class SGActStateHandler : IResizableSGActStateHandler {
 		/*	Engines	*/
 			/*	Action State	*/
 				public SGActStateHandler(ISlotGroup sg){
@@ -97,7 +97,7 @@ namespace UISystem{
 				return null;
 			}
 	}
-	public interface ISGActStateHandler{
+	public interface IResizableSGActStateHandler{
 		void ClearCurActState();
 			bool WasActStateNull();
 			bool IsActStateNull();

@@ -22,7 +22,7 @@ namespace SlotSystemTests{
 							sbs = new List<ISlottable>(new ISlottable[]{sbA, sbB, sbC});
 						sbHandler.GetSBs().Returns(sbs);
 					sg.SetSBHandler(sbHandler);
-					ISGActStateHandler actStateHandler = Substitute.For<ISGActStateHandler>();
+					IResizableSGActStateHandler actStateHandler = Substitute.For<IResizableSGActStateHandler>();
 					sg.SetSGActStateHandler(actStateHandler);
 
 				sg.TransactionCoroutine();
@@ -189,7 +189,7 @@ namespace SlotSystemTests{
 				[Test]
 				public void Refresh_Always_SetActStateWFA(){
 					SlotGroup sg = MakeSG();
-						ISGActStateHandler sgActStateHandler = new SGActStateHandler(sg);
+						IResizableSGActStateHandler sgActStateHandler = new SGActStateHandler(sg);
 						sg.SetSGActStateHandler(sgActStateHandler);
 						ISBHandler sbHandler = new SBHandler();
 						sg.SetSBHandler(sbHandler);
@@ -205,7 +205,7 @@ namespace SlotSystemTests{
 				[Test]
 				public void Refresh_Always_SetsFields(){
 					SlotGroup sg = MakeSG();
-						ISGActStateHandler sgActStateHandler = new SGActStateHandler(sg);
+						IResizableSGActStateHandler sgActStateHandler = new SGActStateHandler(sg);
 						sg.SetSGActStateHandler(sgActStateHandler);
 						ISBHandler sbHandler = new SBHandler();
 						sg.SetSBHandler(sbHandler);
@@ -344,7 +344,7 @@ namespace SlotSystemTests{
 					SlotGroup sg = MakeSG();
 						IUISelStateHandler sgSelStateHandler = Substitute.For<IUISelStateHandler>();
 						sg.SetSelStateHandler(sgSelStateHandler);
-						ISGActStateHandler sgActStateHandler = new SGActStateHandler(sg);
+						IResizableSGActStateHandler sgActStateHandler = new SGActStateHandler(sg);
 						sg.SetSGActStateHandler(sgActStateHandler);
 						ISGTransactionHandler sgTAHandler = Substitute.For<ISGTransactionHandler>();
 						sg.SetSGTAHandler(sgTAHandler);

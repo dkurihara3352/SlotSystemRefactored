@@ -5,17 +5,16 @@ using Utility;
 using System;
 namespace UISystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
-		public SlotGroup(RectTransformFake rectTrans, IFetchInventoryCommand fetchInventoryCommand, IAcceptsItemCommand acceptsItemCommand, ISorterHandler sorterHandler, int initSlotCount, IFilterHandler filterHandler, bool isReorderable): base(rectTrans, new EmptySSECommandsRepo()){
+		public SlotGroup(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg.SSEEventCommandsRepo()){
 			SSM().InventoryUpdated += OnInventoryUpdated;
-			SetIntialSlotCount(initSlotCount);
-			SetFetchInventoryCommand(fetchInventoryCommand);
-			SetAcceptsItemCommand(acceptsItemCommand);
+			SetIntialSlotCount(constArg.InitSlotCount());
+			SetFetchInventoryCommand(constArg.FetchInventoryCommand());
+			SetAcceptsItemCommand(constArg.AcceptsItemCommand());
+			SetReorderability(constArg.IsReorderable());
+			SetPositionSlotsCommand(constArg.PositionSlotsCommand());
+			SetSorterHandler(new SorterHandler(constArg.InitSorter()));
 			SetCreateSlotCommand(new CreateSlotCommand());
-			SetPositionSlotsCommand(new PositionSlotsCommand(this));
-			SetSorterHandler(sorterHandler);
-			SetReorderability(isReorderable);
 			SetSelStateHandler(new SGSelStateHandler(new SGSelCoroutineRepo(), this));
-			SetActStateHandler(new SGActStateHandler(this));
 		}
 		public void InitializeOnSlotSystemActivate(){
 			SetUpInventory();
@@ -48,20 +47,8 @@ namespace UISystem{
 			_slots = slots;
 		}
 			List<ISlot> _slots;
-		List<ISlot> CreateSlots(){
-			List<ISlot> result;
-			if(IsResizable())
-				result = CreateSlotsForEachInventoryItems();
-			else
-				result = CreateSlotsByInitialSlotCount();
-			return result;
-		}
-		List<ISlot> CreateSlotsForEachInventoryItems(){
-			List<ISlot> result = new List<ISlot>();
-			foreach(var item in Inventory().Items()){
-				Slot slot = CreateSlot();
-				result.Add(slot);
-			}
+		protected virtual List<ISlot> CreateSlots(){
+			List<ISlot> result = CreateSlotsByInitialSlotCount();
 			return result;
 		}
 		List<ISlot> CreateSlotsByInitialSlotCount(){
@@ -70,7 +57,7 @@ namespace UISystem{
 				result.Add(CreateSlotCommand().CreateSlot());
 			return result;
 		}
-		Slot CreateSlot(){
+		protected Slot CreateSlot(){
 			return CreateSlotCommand().CreateSlot();
 		}
 		ICreateSlotCommand CreateSlotCommand(){
@@ -166,9 +153,6 @@ namespace UISystem{
 				SetSlots(slots);
 			}
 		/*	intrinsic */
-		public bool IsResizable(){
-			return InitialSlotCount() == 0;
-		}
 		public bool IsReorderable(){
 			return _isReorderable;
 		}
@@ -176,15 +160,13 @@ namespace UISystem{
 			_isReorderable = on;
 		}
 			bool _isReorderable;
-		public bool IsReceivable(){
-			return IsResizable() || HasEmptySlot();
+		public virtual bool IsReceivable(){
+			return HasEmptySlot();
 		}
 		bool HasEmptySlot(){
-			if(!IsResizable()){
-				foreach(var slot in Slots())
-					if(slot.IsEmpty())
-						return true;
-			}
+			foreach(var slot in Slots())
+				if(slot.IsEmpty())
+					return true;
 			return false;
 		}
 		public bool IsSwappable(ISlottable sb){
@@ -194,7 +176,7 @@ namespace UISystem{
 			List<ISlottable> result = new List<ISlottable>();
 			foreach(ISlottable sb in this){
 				if(sb != null){
-					if(SlotSystemUtil.AreSwappable(pickedSB, sb))
+					if(SlotSystemUtil.SBsAreSwappable(pickedSB, sb))
 						result.Add(sb);
 				}
 			}
@@ -215,26 +197,9 @@ namespace UISystem{
 		public void Refresh(){
 
 		}
-		public ISGActStateHandler ActStateHandler(){
-			Debug.Assert(_actStateHandler != null);
-			return _actStateHandler;
-		}
-		void SetActStateHandler(ISGActStateHandler handler){
-			_actStateHandler = handler;
-		}
-			ISGActStateHandler _actStateHandler;
-		public void WaitForAction(){
-			ActStateHandler().WaitForAction();
-		}
-		public void Resize(){
-			ActStateHandler().Resize();
-		}
 	}
 	public interface ISlotGroup: ISlotSystemElement{
 		void InitializeOnSlotSystemActivate();
-		ISGActStateHandler ActStateHandler();
-			void WaitForAction();
-			void Resize();
 		ISorterHandler GetSorterHandler();
 			void InstantSort();
 			void ToggleAutoSort(bool on);
@@ -243,7 +208,6 @@ namespace UISystem{
 		void SetInventory(IInventory inventory);
 		void OnInventoryUpdated(object source, InventoryEventArgs e);
 		bool AcceptsItem(ISlottableItem item);
-		bool IsResizable();
 		bool IsReorderable();
 		bool IsReceivable();
 		bool IsSwappable(ISlottable sb);

@@ -74,33 +74,100 @@ namespace UISystem{
 	}
 	/* Factory */
 	public class UISelCoroutineRepo: IUISelCoroutineRepo{
+		IUISelStateHandler handler;
+		public UISelCoroutineRepo(IUISelStateHandler handler){
+			this.handler = handler;
+		}
 		public Func<IEnumeratorFake> DeactivateCoroutine(){
 			return UIDeactivateCoroutine;
 		}
 			IEnumeratorFake UIDeactivateCoroutine(){
+				if(handler.WasActivated()){
+					/*	this coroutine may not be needed, since deactivation is supposed to happen at once
+					*/
+				}
+				return null;
+			}
+		public Func<IEnumeratorFake> HideCoroutine(){
+			return UIHideCoroutine;
+		}
+			IEnumeratorFake UIHideCoroutine(){
+				if(handler.WasDeactivated()){
+					/*	hide instantly and break
+					*/
+				}else if(handler.WasShown()){
+					/*	Decrease scale or alpha to make it disappear gradually
+					*/
+				}
 				return null;
 			}
 		public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
 			return UIUnselectableCoroutine;
 		}
 			IEnumeratorFake UIUnselectableCoroutine(){
+				if(handler.WasDeactivated()){
+					/*	show & turn unselectable instantly and break
+					*/
+				}else if(handler.WasHidden()){
+					/*	show gradually
+					*/
+				}else{
+					if(handler.WasSelectable()){
+						/*	turn from selectable color to unselectable color
+						*/
+					}else if(handler.WasSelected()){
+						/*	turn from selected color to unselectable color
+						*/
+					}
+				}
 				return null;
 			}
 		public Func<IEnumeratorFake> MakeSelectableCoroutine(){
 			return UISelectableCoroutine;
 		}
 			IEnumeratorFake UISelectableCoroutine(){
+				if(handler.WasDeactivated()){
+					/*	show & turn selectable instantly and break
+					*/
+				}else if(handler.WasHidden()){
+					/*	show gradually
+					*/
+				}else{
+					if(handler.WasUnselectable()){
+						/*	turn from unselectable color to selectable color
+						*/
+					}else if(handler.WasSelected()){
+						/*	turn from selected color to selectable color
+						*/
+					}
+				}
 				return null;
 			}
 		public Func<IEnumeratorFake> SelectCoroutine(){
 			return UISelectCoroutine;
 		}
 			IEnumeratorFake UISelectCoroutine(){
+				if(handler.WasDeactivated()){
+					/*	show & turn selected instantly and break
+					*/
+				}else if(handler.WasHidden()){
+					/*	show gradually
+					*/
+				}else{
+					if(handler.WasUnselectable()){
+						/*	turn from unselectable color to selected color
+						*/
+					}else if(handler.WasSelectable()){
+						/*	turn from selectable color to selected color
+						*/
+					}
+				}
 				return null;
 			}
 	}
 	public interface IUISelCoroutineRepo{
 		Func<IEnumeratorFake> DeactivateCoroutine();
+		Func<IEnumeratorFake> HideCoroutine();
 		Func<IEnumeratorFake> MakeUnselectableCoroutine();
 		Func<IEnumeratorFake> MakeSelectableCoroutine();
 		Func<IEnumeratorFake> SelectCoroutine();
@@ -113,33 +180,18 @@ namespace UISystem{
 	public interface IUISelProcess: IUIProcess{
 	}
 	public class UIDeactivateProcess: UISelProcess{
-		/* 	Change color, alpha etc from whatever to deactivated value (probably make it disappear)
-			if any indicator for selection is there, fade it out
-		*/
 		public UIDeactivateProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
 		}
 	}
 	public class UIFocusProcess: UISelProcess{
-		/* 	Change color, alpha etc from whatever to focus value
-			if its hidden, make it appear gradually
-			if any indicator for selection is there, fade it out
-		*/
 		public UIFocusProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
 		}
 	}
 	public class UIDefocusProcess: UISelProcess{
-		/* 	Change color, alpha etc from whatever to defocus value
-			if its hidden, make it appear gradually
-			if any indicator for selection is there, fade it out
-		*/
 		public UIDefocusProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
 		}
 	}
 	public class UISelectProcess: UISelProcess{
-		/* 	Change color, alpha etc from whatever to select value
-			if its hidden, make it appear gradually
-			if any indicator for selection is not there, fade it in
-		*/
 		public UISelectProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
 		}
 	}

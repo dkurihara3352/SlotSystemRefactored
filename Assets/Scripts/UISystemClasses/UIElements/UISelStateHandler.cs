@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,7 +33,7 @@ namespace UISystem{
 			}
 			void SetSelState(IUISelState state){
 				SelStateEngine().SetState(state);
-				if(state == null && GetSelProcess() != null)
+				if(state == null && SelProcess() != null)
 					SetAndRunSelProcess(null);
 			}
 			public void ClearCurSelState(){
@@ -44,7 +45,7 @@ namespace UISystem{
 				public bool WasSelStateNull(){
 					return prevSelState == null;
 				}
-			public virtual void Deactivate(){
+			public void Deactivate(){
 				SetSelState(deactivatedState);
 			}
 				IUISelState deactivatedState{
@@ -56,7 +57,16 @@ namespace UISystem{
 				public bool WasDeactivated(){
 					return prevSelState == deactivatedState;
 				}
-			public virtual void MakeUnselectable(){
+			public void Hide(){
+				SetSelState(SelStateRepo().HiddenState());
+			}
+				public bool WasHidden(){
+					return prevSelState == SelStateRepo().HiddenState();
+				}
+				public bool IsHidden(){
+					return curSelState == SelStateRepo().HiddenState();
+				}
+			public void MakeUnselectable(){
 				SetSelState(defocusedState);
 			}
 				IUISelState defocusedState{
@@ -65,10 +75,10 @@ namespace UISystem{
 				public bool IsUnselectable(){
 					return curSelState == defocusedState;
 				}
-				public bool WasDefocused(){
+				public bool WasUnselectable(){
 					return prevSelState == defocusedState;
 				}
-			public virtual void MakeSelectable(){
+			public void MakeSelectable(){
 				SetSelState(focusedState);
 			}
 				IUISelState focusedState{
@@ -77,10 +87,10 @@ namespace UISystem{
 				public bool IsSelectable(){
 					return curSelState == focusedState;
 				}
-				public bool WasFocused(){
+				public bool WasSelectable(){
 					return prevSelState == focusedState;
 				}
-			public virtual void Select(){
+			public void Select(){
 				SetSelState(selectedState);
 			}
 				IUISelState selectedState{
@@ -92,13 +102,24 @@ namespace UISystem{
 				public bool WasSelected(){
 					return prevSelState == selectedState;
 				}
-			public virtual void Activate(){
-				
-				MakeSelectable();
+			public void Activate(){
+				SetSelState(SelStateRepo().ActivatedState());
 			}
-			public virtual void Deselect(){
-				MakeSelectable();
+				public bool WasActivated(){
+					return WasHidden() || WasShown();
+				}
+			public void Deselect(){
+				SetSelState(SelStateRepo().DeselectedState());
 			}
+				public bool WasDeselected(){
+					return WasSelectable() || WasUnselectable();
+				}
+			public void Show(){
+				SetSelState(SelStateRepo().ShownState());
+			}
+				public bool WasShown(){
+					return WasSelected() || WasDeselected();
+				}
 		/*	process	*/
 			IUIProcessEngine<IUISelProcess> SelProcEngine(){
 				Debug.Assert(_selProcEngine != null);
@@ -111,8 +132,11 @@ namespace UISystem{
 			public void SetAndRunSelProcess(IUISelProcess process){
 				SelProcEngine().SetAndRunProcess(process);
 			}
-			public IUISelProcess GetSelProcess(){
+			public IUISelProcess SelProcess(){
 				return SelProcEngine().GetProcess();
+			}
+			void ExpireSelProc(){
+				SelProcess().Expire();
 			}
 			/* Coroutines */
 				IUISelCoroutineRepo CoroutineRepo(){
@@ -121,67 +145,77 @@ namespace UISystem{
 				}
 					IUISelCoroutineRepo _coroutineRepo;
 				public void SetSelCoroutineRepo(IUISelCoroutineRepo repo){_coroutineRepo = repo;}
-				public System.Func<IEnumeratorFake> DeactivateCoroutine(){
+				public Func<IEnumeratorFake> DeactivateCoroutine(){
 					return CoroutineRepo().DeactivateCoroutine();
 				}
-				public System.Func<IEnumeratorFake> MakeSelectableCoroutine(){
+				public Func<IEnumeratorFake> HideCoroutine(){
+					return CoroutineRepo().HideCoroutine();
+				}
+				public Func<IEnumeratorFake> MakeSelectableCoroutine(){
 					return CoroutineRepo().MakeSelectableCoroutine();
 				}
-				public System.Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+				public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
 					return CoroutineRepo().MakeUnselectableCoroutine();
 				}
-				public System.Func<IEnumeratorFake> SelectCoroutine(){
+				public Func<IEnumeratorFake> SelectCoroutine(){
 					return CoroutineRepo().SelectCoroutine();
 				}
 
 		/* Instant Methods */
-			IInstantCommands instantCommands{
-				get{
-					if(m_instantCommands == null)
-						m_instantCommands = new InstantCommands();
-					return m_instantCommands;
-				}
-			}
-				IInstantCommands m_instantCommands;
-				public void SetInstantCommands(IInstantCommands comms){
-					m_instantCommands = comms;
-				}
 			public virtual void MakeUnselectableInstantly(){
-				instantCommands.ExecuteInstantDefocus();
+				MakeUnselectable();
+				ExpireSelProc();
 			}
 			public virtual void MakeSelectableInstantly(){
-				instantCommands.ExecuteInstantFocus();
+				MakeSelectable();
+				ExpireSelProc();
 			}
 			public virtual void SelectInstantly(){
-				instantCommands.ExecuteInstantSelect();
+				Select();
+				ExpireSelProc();
+			}
+			public virtual void ShowInstantly(){
+				MakeSelectableInstantly();
 			}
 	}
 	public interface IUISelStateHandler{
 			bool IsSelStateNull();
 			bool WasSelStateNull();
+		/* Process States */
 		void Deactivate();
 			bool IsDeactivated();
 			bool WasDeactivated();
+		void Hide();
+			bool IsHidden();
+			bool WasHidden();
 		void MakeSelectable();
 			bool IsSelectable();
-			bool WasFocused();
+			bool WasSelectable();
 		void MakeUnselectable();
 			bool IsUnselectable();
-			bool WasDefocused();
+			bool WasUnselectable();
 		void Select();
 			bool IsSelected();
 			bool WasSelected();
+
+		/* SwitchStates */
 		void Activate();
+			bool WasActivated();
 		void Deselect();
+			bool WasDeselected();
+		void Show();
+			bool WasShown();
 		void SetAndRunSelProcess(IUISelProcess process);
-		IUISelProcess GetSelProcess();
+		IUISelProcess SelProcess();
 		void SetSelCoroutineRepo(IUISelCoroutineRepo repo);
 		System.Func<IEnumeratorFake> DeactivateCoroutine();
+		System.Func<IEnumeratorFake> HideCoroutine();
 		System.Func<IEnumeratorFake> MakeSelectableCoroutine();
 		System.Func<IEnumeratorFake> MakeUnselectableCoroutine();
 		System.Func<IEnumeratorFake> SelectCoroutine();
 		void MakeSelectableInstantly();
 		void MakeUnselectableInstantly();
 		void SelectInstantly();
+		void ShowInstantly();
 	}
 }

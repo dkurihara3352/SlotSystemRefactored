@@ -6,34 +6,12 @@ using System;
 namespace UISystem{
 	public class EquippedItemsInventory: Inventory, IEquippedItemsInventory{
 		public EquippedItemsInventory(BowInstance initBow, WearInstance initWear, List<CarriedGearInstance> initCGears ,int initCGCount){
-			_equippedBow = initBow;
-			_equippedWear = initWear;
-			_equippedCGears = initCGears;
+			SetEquippedBow(initBow);
+			SetEquippedWear(initWear);
 			SetEquippableCGearsCount(initCGCount);
+			SetEquippedCarriedGears(initCGears);
 		}
-		public override void SetSG(ISlotGroup sg){
-			_slotsHolder = sg.GetSlotsHolder();
-			_filterHandler = sg.FilterHandler();
-		}
-		ISlotsHolder slotsHolder{
-			get{
-				if(_slotsHolder != null)
-					return _slotsHolder;
-				else
-					throw new InvalidOperationException("slotsHolder not set");
-			}
-		}
-			ISlotsHolder _slotsHolder;
-		IFilterHandler filterHandler{
-			get{
-				if(_filterHandler != null)
-					return _filterHandler;
-				else
-					throw new InvalidOperationException("filterHandler not set");
-			}
-		}
-			IFilterHandler _filterHandler;
-		public BowInstance GetEquippedBow(){
+		public BowInstance EquippedBow(){
 			Debug.Assert(_equippedBow != null);
 			return _equippedBow;
 		}
@@ -41,7 +19,7 @@ namespace UISystem{
 			_equippedBow = bow;
 		}
 			BowInstance _equippedBow;
-		public WearInstance GetEquippedWear(){
+		public WearInstance EquippedWear(){
 			Debug.Assert(_equippedWear != null);
 			return _equippedWear;
 		}
@@ -49,14 +27,25 @@ namespace UISystem{
 			_equippedWear = wear;
 		}
 			WearInstance _equippedWear;
-		public List<CarriedGearInstance> GetEquippedCarriedGears(){
+		public List<CarriedGearInstance> EquippedCarriedGears(){
 			Debug.Assert(_equippedCGears != null);
 			return _equippedCGears;
 		}
 		public void SetEquippedCarriedGears(List<CarriedGearInstance> cGears){
-			_equippedCGears = cGears;
+			Debug.Assert(cGears != null);
+			List<CarriedGearInstance> adjusted = AdjustedCGears(cGears);
+			_equippedCGears = adjusted;
 		}
 			List<CarriedGearInstance> _equippedCGears = new List<CarriedGearInstance>();
+		List<CarriedGearInstance> AdjustedCGears(List<CarriedGearInstance> source){
+			if(source.Count > EquippableCGearsCount()){
+				List<CarriedGearInstance> result = new List<CarriedGearInstance>();
+				for(int i = 0; i < EquippableCGearsCount(); i ++)
+					result.Add(source[i]);
+				return result;
+			}else
+				return source;
+		}
 		
 		public override List<Item> Items(){
 			List<Item> result = new List<Item>();
@@ -67,14 +56,11 @@ namespace UISystem{
 			}
 			return result;
 		}
- 		public int GetEquippableCGearsCount(){
+ 		public int EquippableCGearsCount(){
 			return _equippableCGearsCount;
 		}
-		public void SetEquippableCGearsCount(int num){
-			_equippableCGearsCount = num;
-			ISlotGroup sg = GetSG();
-			if(sg != null && filterHandler.GetFilter() is SGCGearsFilter && !sg.IsResizable())
-			slotsHolder.SetInitSlotsCount(num);
+		public void SetEquippableCGearsCount(int count){
+			_equippableCGearsCount = count;
 		}
 			int _equippableCGearsCount;
 		public void UpdateInventory(BowInstance equippedBow, WearInstance equippedWear, List<CarriedGearInstance> equippedCGears){
@@ -88,17 +74,17 @@ namespace UISystem{
 		}
 	}
 	public interface IEquippedItemsInventory: IInventory{
-		BowInstance GetEquippedBow();
+		BowInstance EquippedBow();
 		void SetEquippedBow(BowInstance bow);
 
-		WearInstance GetEquippedWear();
+		WearInstance EquippedWear();
 		void SetEquippedWear(WearInstance wear);
 
-		List<CarriedGearInstance> GetEquippedCarriedGears();
+		List<CarriedGearInstance> EquippedCarriedGears();
 		void SetEquippedCarriedGears(List<CarriedGearInstance> cGears);
 
-		int GetEquippableCGearsCount();
-		void SetEquippableCGearsCount(int num);
+		int EquippableCGearsCount();
+		void SetEquippableCGearsCount(int count);
 		void UpdateInventory(BowInstance equippedBow, WearInstance equippedWear, List<CarriedGearInstance> equippedCGears);
 		void UpdateItemsEquipState();
 	}

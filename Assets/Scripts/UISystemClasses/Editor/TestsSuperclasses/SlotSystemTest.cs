@@ -13,69 +13,15 @@ public class SlotSystemTest{
 		foreach(var obj in gos)
 			GameObject.DestroyImmediate(obj);
 	}
-	public void AssertCreatedSB(ISlottable sb, IInventoryItemInstance addedItem, ISlotSystemManager ssm){
-		Assert.That(sb.GetItem(), Is.SameAs(addedItem));
-		Assert.That(sb.GetSSM(), Is.SameAs(ssm));
-		IUISelStateHandler sbSelStateHandler = sb.UISelStateHandler();
-		Assert.That(sbSelStateHandler.IsUnselectable(), Is.True);
-		Assert.That(sb, Is.Not.Null.And.InstanceOf(typeof(Slottable)));
-	}
 	/*	Elements	*/
-		protected static SlotGroup MakeSG_FilterHandler_RSBHandler(){
-			SlotGroup sg = MakeSG();
-			sg.SetSBHandler(new SBHandler());
-			sg.SetFilterHandler(new FilterHandler());
-			return sg;
-		}
-		protected static SlotGroup MakeSG_ISBHandler(List<ISlottable> sbs){
-			SlotGroup sg = MakeSG();
-				ISBHandler sbHandler = Substitute.For<ISBHandler>();
-				sbHandler.GetSBs().Returns(sbs);
-			sg.SetSBHandler(sbHandler);
-
-			return sg;
-		}
-		protected static TransactionManager MakeTAM(){
-			return new TransactionManager();
-		}
-		protected static SlotSystemManager MakeSSM(){
-			GameObject go = new GameObject("go");
-			go.tag = "TestGO";
-			SlotSystemManager ssm = go.AddComponent<SlotSystemManager>();
-			return ssm;
-		}
 		protected static ISlotSystemManager MakeSubSSM(){
 			return Substitute.For<ISlotSystemManager>();
-		}
-		protected static EquipmentSet MakeEquipmentSet(){
-			GameObject go = new GameObject("eSetGO");
-			go.tag = "TestGO";
-			EquipmentSet eSet = go.AddComponent<EquipmentSet>();
-			return eSet;
 		}
 		protected static IEquipmentSet MakeSubESet(){
 			return Substitute.For<IEquipmentSet>();
 		}
-		protected static IEquipmentSet MakeSubEquipmentSetInitWithSGs(){
-			IEquipmentSet eSet = Substitute.For<IEquipmentSet>();
-			ISlotGroup bowSG = MakeSubSGWithEmptySBs();
-			ISlotGroup wearSG = MakeSubSGWithEmptySBs();
-			ISlotGroup cGearsSG = MakeSubSGWithEmptySBs();
-			IEnumerable<IUIElement> eles = new IUIElement[]{
-				bowSG, wearSG, cGearsSG
-			};
-			eSet.GetEnumerator().Returns(eles.GetEnumerator());
-			eSet.GetEnumerator().Returns(eles.GetEnumerator());
-			return eSet;
-		}
 		protected static IUIBundle MakeSubBundle(){
 			return Substitute.For<IUIBundle>();
-		}
-		protected static UIBundle MakeSSBundle(){
-			GameObject go = new GameObject("ssBunGO");
-			go.tag = "TestGO";
-			UIBundle ssBun = go.AddComponent<UIBundle>();
-			return ssBun;
 		}
 		protected static ISlotGroup MakeSubSG(){
 			return Substitute.For<ISlotGroup>();
@@ -86,48 +32,15 @@ public class SlotSystemTest{
 			sg.GetEnumerator().Returns(eles.GetEnumerator());
 			return sg;
 		}
-		protected static SlotGroup MakeSG(){
-			GameObject go = new GameObject("go");
-			go.tag = "TestGO";
-			return go.AddComponent<SlotGroup>();
-		}
-		protected static Slottable MakeSB(){
-			GameObject sbGO = new GameObject("sbGO");
-			sbGO.tag = "TestGO";
-			Slottable sb = sbGO.AddComponent<Slottable>();
-			return sb;
-		}
 		protected static ISlottable MakeSubSB(){
 			return Substitute.For<ISlottable>();
 		}
-		protected static TestUIElement MakeTestSSE(){
-			GameObject sseGO = new GameObject("sseGO");
-			return sseGO.AddComponent<TestUIElement>();
-		}
-		protected static IUIElement MakeSubSSE(){
+		protected static IUIElement MakeSubUIE(){
 			return Substitute.For<IUIElement>();
 		}
 	/*	Non elements	*/
-		protected static ITransactionManager MakeSubTAM(){
-			return Substitute.For<ITransactionManager>();
-		}
-		protected static ITransactionCache MakeSubTAC(){
-			return Substitute.For<ITransactionCache>();
-		}
-		protected static ITransactionIconHandler MakeSubIconHandler(){
-			return Substitute.For<ITransactionIconHandler>();
-		}
-		protected static ITransactionSGHandler MakeSubSGHandler(){
-			return Substitute.For<ITransactionSGHandler>();
-		}
-		protected static ITAMActStateHandler MakeSubTAMStateHandler(){
-			return Substitute.For<ITAMActStateHandler>();
-		}
-		protected static List<Slot> CreateSlots(int count){
-			List<Slot> slots = new List<Slot>();
-			for(int i = 0; i< count; i++)
-				slots.Add(new Slot());
-			return slots;
+		protected static IInventory MakeSubInv(){
+			return Substitute.For<IInventory>();
 		}
 		protected static IEquippedItemsInventory MakeSubEquipInv(){
 			return Substitute.For<IEquippedItemsInventory>();
@@ -135,84 +48,54 @@ public class SlotSystemTest{
 		protected static IPoolInventory MakeSubPoolInv(){
 			return Substitute.For<IPoolInventory>();
 		}
-		/* States */
-			protected static SBActState MakeSubSBActState(){
-				return Substitute.For<SBActState>();
-			}
-			protected static SBEqpState MakeSubSBEqpState(){
-				return Substitute.For<SBEqpState>();
-			}
-			protected static SGActState MakeSubSGActState(){
-				return Substitute.For<SGActState>();
-			}
-			protected static TAMActState MakeSubSSMActState(){
-				return Substitute.For<TAMActState>();
-			}
-		/* Process */
-			protected static ISBActProcess MakeSubSBActProc(){
-				return Substitute.For<ISBActProcess>();
-			}
-			protected static ISBEqpProcess MakeSubSBEqpProc(){
-				return Substitute.For<ISBEqpProcess>();
-			}
-			protected static ISBMrkProcess MakeSubSBMrkProc(){
-				return Substitute.For<ISBMrkProcess>();
-			}
-			protected static ISGActProcess MakeSubSGActProc(){
-				return Substitute.For<ISGActProcess>();
-			}
-			protected static ITAMActProcess MakeSubTAMActProc(){
-				return Substitute.For<ITAMActProcess>();
-			}
-		/* ItemInstance */
+	/* Items */
+		const int bowIDBase = 0;
+		const int wearIDBase = 1000;
+		const int shieldIDBase = 2000;
+		const int mWeaponIDBase = 3000;
+		const int quiverIDBase = 4000;
+		const int packIDBase = 5000;
+		const int partsIDBase = 6000;
 		protected static BowInstance MakeBowInstance(int id){
 			BowFake bowFake = new BowFake();
-			bowFake.SetItemID(id);
-			BowInstance bowInst = new BowInstance();
-			bowInst.SetInventoryItem(bowFake);
+			bowFake.SetItemID(bowIDBase + id);
+			BowInstance bowInst = new BowInstance(bowFake);
 			return bowInst;
 		}
 		protected static WearInstance MakeWearInstance(int id){
 			WearFake wearFake = new WearFake();
-			wearFake.SetItemID(1000 + id);
-			WearInstance wearInst = new WearInstance();
-			wearInst.SetInventoryItem(wearFake);
+			wearFake.SetItemID(wearIDBase + id);
+			WearInstance wearInst = new WearInstance(wearFake);
 			return wearInst;
 		}
 		protected static ShieldInstance MakeShieldInstance(int id){
 			ShieldFake shieldFake = new ShieldFake();
-			shieldFake.SetItemID(2000 + id);
-			ShieldInstance shieldInst = new ShieldInstance();
-			shieldInst.SetInventoryItem(shieldFake);
+			shieldFake.SetItemID(shieldIDBase + id);
+			ShieldInstance shieldInst = new ShieldInstance(shieldFake);
 			return shieldInst;
 		}
 		protected static MeleeWeaponInstance MakeMWeaponInstance(int id){
 			MeleeWeaponFake mWFake = new MeleeWeaponFake();
-			mWFake.SetItemID(3000 + id);
-			MeleeWeaponInstance mWInst = new MeleeWeaponInstance();
-			mWInst.SetInventoryItem(mWFake);
+			mWFake.SetItemID(mWeaponIDBase + id);
+			MeleeWeaponInstance mWInst = new MeleeWeaponInstance(mWFake);
 			return mWInst;
 		}
 		protected static QuiverInstance MakeQuiverInstance(int id){
 			QuiverFake quiverFake = new QuiverFake();
-			quiverFake.SetItemID(4000 + id);
-			QuiverInstance quiverInst = new QuiverInstance();
-			quiverInst.SetInventoryItem(quiverFake);
+			quiverFake.SetItemID(quiverIDBase + id);
+			QuiverInstance quiverInst = new QuiverInstance(quiverFake);
 			return quiverInst;
 		}
 		protected static PackInstance MakePackInstance(int id){
 			PackFake packFake = new PackFake();
-			packFake.SetItemID(5000 + id);
-			PackInstance packInst = new PackInstance();
-			packInst.SetInventoryItem(packFake);
+			packFake.SetItemID(packIDBase + id);
+			PackInstance packInst = new PackInstance(packFake);
 			return packInst;
 		}
 		protected static PartsInstance MakePartsInstance(int id, int quantity){
 			PartsFake partsFake = new PartsFake();
-			partsFake.SetItemID(6000 + id);
-			PartsInstance partsInst = new PartsInstance();
-			partsInst.SetInventoryItem(partsFake);
-			partsInst.SetQuantity(quantity);
+			partsFake.SetItemID(partsIDBase + id);
+			PartsInstance partsInst = new PartsInstance(partsFake, quantity);
 			return partsInst;
 		}
 		protected static BowInstance MakeBowInstWithOrder(int id, int order){
@@ -252,29 +135,5 @@ public class SlotSystemTest{
 		}
 		protected static IEnumeratorFake FakeCoroutine(){
 			return new IEnumeratorFake();
-		}
-		protected static ISlotSystemTransaction MakeSubTA(){
-			return Substitute.For<ISlotSystemTransaction>();
-		}
-		protected static ITransactionFactory MakeSubTAFactory(){
-			return Substitute.For<ITransactionFactory>();
-		}
-		protected static IRevertTransaction MakeTestRevertTA(){
-			return new TestRevertTransaction();
-		}
-		protected static IReorderTransaction MakeTestReorderTA(){
-			return new TestReorderTransaction();
-		}
-		protected static ISortTransaction MakeTestSortTA(){
-			return new TestSortTransaction();
-		}
-		protected static IFillTransaction MakeTestFillTA(){
-			return new TestFillTransaction();
-		}
-		protected static ISwapTransaction MakeTestSwapTA(){
-			return new TestSwapTransaction();
-		}
-		protected static IStackTransaction MakeTestStackTA(){
-			return new TestStackTransaction();
 		}
 }

@@ -6,7 +6,7 @@ using Utility;
 namespace UISystem{
     public abstract class SGActState: UIState, ISGActState{
         protected ISlotGroup sg;
-        protected ISGActStateHandler actStateHandler;
+        protected IResizableSGActStateHandler actStateHandler;
         public SGActState(ISlotGroup sg){
             this.sg = sg;
             this.actStateHandler = sg.ActStateHandler();

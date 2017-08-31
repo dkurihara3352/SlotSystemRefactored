@@ -10,7 +10,7 @@ namespace UISystem{
 			return _items;
 		}
 			List<Item> _items;
-		public ISlotGroup GetSG(){
+		public ISlotGroup SlotGroup(){
 			return _sg;
 		}
 		public virtual void SetSG(ISlotGroup sg){
@@ -21,7 +21,7 @@ namespace UISystem{
 	}
 	public interface IInventory{
 		List<Item> Items();
-		ISlotGroup GetSG();
+		ISlotGroup SlotGroup();
 		void SetSG(ISlotGroup sg);
 		void UpdateInventory();
 	}

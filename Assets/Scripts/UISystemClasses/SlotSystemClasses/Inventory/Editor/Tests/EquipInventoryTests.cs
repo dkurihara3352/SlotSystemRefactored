@@ -19,7 +19,7 @@ namespace SlotSystemTests{
 
                         foreach(var item in added){
                             equipInv.Add(item);
-                            Assert.That(equipInv.GetEquippedBow(), Is.SameAs(item));
+                            Assert.That(equipInv.EquippedBow(), Is.SameAs(item));
                         }
                     }
                         class AddBowCases: IEnumerable{
@@ -41,7 +41,7 @@ namespace SlotSystemTests{
 
                         foreach(var item in added){
                             equipInv.Add(item);
-                            Assert.That(equipInv.GetEquippedWear(), Is.SameAs(item));
+                            Assert.That(equipInv.EquippedWear(), Is.SameAs(item));
                         }
                     }
                         class AddWearInstCases: IEnumerable{
@@ -64,7 +64,7 @@ namespace SlotSystemTests{
                         foreach(var item in added)
                             equipInv.Add(item);
                         
-                        Assert.That(equipInv.GetEquippedCarriedGears(), Is.EqualTo(expected));
+                        Assert.That(equipInv.EquippedCarriedGears(), Is.EqualTo(expected));
                     }
                         class AddCGearsNotExceedingLimitCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
@@ -159,15 +159,15 @@ namespace SlotSystemTests{
                         EquippedItemsInventory equipInv = new EquippedItemsInventory(MakeBowInstance(0), MakeWearInstance(0), new List<CarriedGearInstance>(), added.Count);
                         foreach(var item in added)
                             equipInv.Add(item);
-                        BowInstance bow = equipInv.GetEquippedBow();
-                        WearInstance wear = equipInv.GetEquippedWear();
-                        List<CarriedGearInstance> cgs = equipInv.GetEquippedCarriedGears();
+                        BowInstance bow = equipInv.EquippedBow();
+                        WearInstance wear = equipInv.EquippedWear();
+                        List<CarriedGearInstance> cgs = equipInv.EquippedCarriedGears();
                         foreach(var item in removed)
                             equipInv.Remove(item);
                         
-                        Assert.That(equipInv.GetEquippedBow(), Is.SameAs(bow));
-                        Assert.That(equipInv.GetEquippedWear(), Is.SameAs(wear));
-                        Assert.That(equipInv.GetEquippedCarriedGears(), Is.EqualTo(cgs));
+                        Assert.That(equipInv.EquippedBow(), Is.SameAs(bow));
+                        Assert.That(equipInv.EquippedWear(), Is.SameAs(wear));
+                        Assert.That(equipInv.EquippedCarriedGears(), Is.EqualTo(cgs));
                      }
                         class RemoveNonMemberCases: IEnumerable{
                             public IEnumerator GetEnumerator(){
@@ -196,9 +196,9 @@ namespace SlotSystemTests{
                         foreach(var item in removed)
                             equipInv.Remove(item);
                         
-                        Assert.That(equipInv.GetEquippedBow(), Is.EqualTo(expBow));
-                        Assert.That(equipInv.GetEquippedWear(), Is.EqualTo(expWear));
-                        bool equality = equipInv.GetEquippedCarriedGears().MemberEquals(expCGears);
+                        Assert.That(equipInv.EquippedBow(), Is.EqualTo(expBow));
+                        Assert.That(equipInv.EquippedWear(), Is.EqualTo(expWear));
+                        bool equality = equipInv.EquippedCarriedGears().MemberEquals(expCGears);
                         Assert.That(equality, Is.True);
                         }
                         class RemoveMemberCases: IEnumerable{

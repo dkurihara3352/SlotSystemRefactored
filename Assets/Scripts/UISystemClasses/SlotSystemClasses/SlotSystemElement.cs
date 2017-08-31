@@ -65,7 +65,7 @@ namespace UISystem{
 				return CommandsRepo().OnSBDroppedCommand();
 			}
 	}
-	public interface ISlotSystemElement{
+	public interface ISlotSystemElement: IUIElement{
 		ISlotSystemManager SSM();
 		void SetSSM(ISlotSystemManager ssm);
 		void HoverEnter();
