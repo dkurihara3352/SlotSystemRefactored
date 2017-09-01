@@ -30,10 +30,10 @@ namespace UISystem{
 				SetAndRunActProcess(null);
 		}
 		ISBActState curActState{
-			get{return actStateEngine.GetCurState();}
+			get{return actStateEngine.CurState();}
 		}
 		ISBActState prevActState{
-			get{return actStateEngine.GetPrevState();}
+			get{return actStateEngine.PrevState();}
 		}
 		ISBActStateRepo actStateRepo{
 			get{
@@ -55,7 +55,7 @@ namespace UISystem{
 			public virtual bool WasWaitingForAction(){
 				return prevActState == waitingForActionState;
 			}
-		public virtual void Travel(ISlotGroup slotGroup, ISlot slot){
+		public virtual void Travel(IResizableSG slotGroup, ISlot slot){
 			SetActState(travellingState);
 		}
 			ISBActState travellingState{
@@ -175,7 +175,7 @@ namespace UISystem{
 	}
 	public interface ISBActStateHandler{
 		void WaitForAction();
-		void Travel(ISlotGroup sg, ISlot slot);
+		void Travel(IResizableSG sg, ISlot slot);
 		void Lift();
 		void Land();
 		void Appear();

@@ -7,9 +7,9 @@ namespace UISystem{
 	public class SGActStateHandler : IResizableSGActStateHandler {
 		/*	Engines	*/
 			/*	Action State	*/
-				public SGActStateHandler(ISlotGroup sg){
+				public SGActStateHandler(IResizableSG sg){
 					SetActStateEngine(new UIStateEngine<ISGActState>());
-					SetStatesRepo(new SGActStateRepo(sg));
+					SetStatesRepo(new ResizableSGActStateRepo(sg));
 					SetActProcEngine(new UIProcessEngine<ISGActProcess>());
 				}
 				IUIStateEngine<ISGActState> ActStateEngine(){
@@ -26,19 +26,19 @@ namespace UISystem{
 						SetAndRunActProcess(null);
 				}
 				ISGActState curActState{
-					get{return ActStateEngine().GetCurState();}
+					get{return ActStateEngine().CurState();}
 				}
 				ISGActState prevActState{
-					get{return ActStateEngine().GetPrevState();}
+					get{return ActStateEngine().PrevState();}
 				}
-				ISGActStateRepo StatesRepo(){
+				IResizableSGActStateRepo StatesRepo(){
 					Debug.Assert(_statesRepo != null);
 					return _statesRepo;
 				}
-				public void SetStatesRepo(ISGActStateRepo repo){
+				public void SetStatesRepo(IResizableSGActStateRepo repo){
 					_statesRepo = repo;
 				}
-					ISGActStateRepo _statesRepo;
+					IResizableSGActStateRepo _statesRepo;
 				public void ClearCurActState(){
 					SetActState(null);
 				}
@@ -54,7 +54,7 @@ namespace UISystem{
 					public ISGActState waitingForActionState{
 						get{return StatesRepo().WaitingForActionState();}
 					}
-					public bool IsWaitingForAction(){
+					public bool IsWaitingForResize(){
 						return curActState == waitingForActionState;
 					}
 					public bool WasWaitingForAction(){
@@ -102,7 +102,7 @@ namespace UISystem{
 			bool WasActStateNull();
 			bool IsActStateNull();
 		void WaitForAction();
-			bool IsWaitingForAction();
+			bool IsWaitingForResize();
 			bool WasWaitingForAction();
 		void Resize();
 			bool IsResizing();

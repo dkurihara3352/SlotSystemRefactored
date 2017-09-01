@@ -2,13 +2,67 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Utility;
 namespace UISystem{
+    /* SelState */
+        public class SlotSelStateRepo: UISelStateRepo{
+            ISlot Slot(){
+                Debug.Assert((element is ISlot));
+                return element as ISlot;
+            }
+            public override void InitializeStates(){
+                SetDeactivatedState(new UIDeactivatedState(handler));
+                SetActivatedState(new UIActivatedState(element, handler));
+                SetHiddenState(new UIHiddenState(handler));
+                SetShownState(new UIShownState(handler));
+                SetSelectedState(new SlotSelectedState(Slot(), handler));
+                SetDeselectedState(new UIDeselectedState(handler));
+                SetSelectableState(new SlotSelectableState(Slot(), handler));
+                SetUnselectableState(new SlotUnselectableState(Slot(), handler));
+            }
+        }
+        public class SlotSelectableState: UISelectableState{
+            ISlot slot;
+            public SlotSelectableState(IUIElement element, IUISelStateHandler handler): base(handler){
+                Debug.Assert((element is ISlot));
+                slot = (ISlot)element;
+            }
+            public override void Enter(){
+                base.Enter();
+                slot.MakeSBSelectable();
+            }
+        }
+        public class SlotUnselectableState: UIUnselectableState{
+            ISlot slot;
+            public SlotUnselectableState(IUIElement element, IUISelStateHandler handler): base(handler){
+                Debug.Assert((element is ISlot));
+                slot = (ISlot)element;
+            }
+            public override void Enter(){
+                base.Enter();
+                slot.MakeSBUnselectable();
+            }
+        }
+        public class SlotSelectedState: UISelectedState{
+            ISlot slot;
+            public SlotSelectedState(IUIElement element, IUISelStateHandler handler): base(handler){
+                Debug.Assert((element is ISlot));
+                slot = (ISlot)element;
+            }
+            public override void Enter(){
+                base.Enter();
+                slot.SelectSB();
+            }
+        }
     /* ActState */
-	public abstract class SlotActState: UIState, ISlotActState{
+	public abstract class SlotActState: ISlotActState{
 		protected ISlotActStateHandler actStateHandler;
 		public SlotActState(ISlotActStateHandler handler){
 			actStateHandler = handler;
 		}
+        public virtual void Enter(){}
+        public virtual void Exit(){}
+        public virtual bool CanEnter(){return false;}
 		public virtual void OnPointerDown(){}
 		public virtual void OnPointerUp(){}
 		public virtual void OnEndDrag(){}
@@ -25,7 +79,7 @@ namespace UISystem{
 		public WaitForActionState(ISlot slot): base(slot.ActStateHandler()){
 			this.selStateHandler = slot.SelStateHandler();
 		}
-		public override void EnterState(){
+		public override void Enter(){
 			if(!actStateHandler.WasActStateNull())
 				actStateHandler.SetAndRunActProcess(null);
 		}
@@ -45,7 +99,7 @@ namespace UISystem{
             this.selStateHandler = slot.SelStateHandler();
             this.slot = slot;
         }
-        public override void EnterState(){
+        public override void Enter(){
             if(actStateHandler.WasWaitingForAction()){
                 ISlotActProcess wfpuProcess = new WaitForPickUpProcess(actStateHandler, actStateHandler.WaitForPickUpCoroutine());
                 actStateHandler.SetAndRunActProcess(wfpuProcess);
@@ -67,7 +121,7 @@ namespace UISystem{
             this.selStateHandler = slot.SelStateHandler();
             this.slot = slot;
         }
-        public override void EnterState(){
+        public override void Enter(){
             if(actStateHandler.WasWaitingForAction()){
                 ISlotActProcess wfPtuProcess = new WaitForPointerUpProcess(selStateHandler, actStateHandler.WaitForPointerUpCoroutine());
                 actStateHandler.SetAndRunActProcess(wfPtuProcess);
@@ -91,7 +145,7 @@ namespace UISystem{
                 this.selStateHandler = slot.SelStateHandler();
                 this.slot = slot;
             }
-            public override void EnterState(){
+            public override void Enter(){
                 if(actStateHandler.WasPickingUp() || actStateHandler.WasWaitingForPickUp()){
                     ISlotActProcess wfntProcess = new WaitForNextTouchProcess(slot, actStateHandler.WaitForNextTouchCoroutine());
                     actStateHandler.SetAndRunActProcess(wfntProcess);
@@ -117,7 +171,7 @@ namespace UISystem{
                 selStateHandler = slot.SelStateHandler();
                 this.slot = slot;
             }
-            public override void EnterState(){
+            public override void Enter(){
                 if(actStateHandler.WasWaitingForPickUp() || actStateHandler.WasWaitingForNextTouch()){
                     slot.HoverEnter();
 

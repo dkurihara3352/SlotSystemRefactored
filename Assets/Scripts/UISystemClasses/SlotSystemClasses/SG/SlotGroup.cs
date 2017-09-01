@@ -5,7 +5,7 @@ using Utility;
 using System;
 namespace UISystem{
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
-		public SlotGroup(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg.SSEEventCommandsRepo()){
+		public SlotGroup(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg.UISelStateRepo(), constArg.SSEEventCommandsRepo()){
 			SSM().InventoryUpdated += OnInventoryUpdated;
 			SetIntialSlotCount(constArg.InitSlotCount());
 			SetFetchInventoryCommand(constArg.FetchInventoryCommand());
@@ -14,7 +14,7 @@ namespace UISystem{
 			SetPositionSlotsCommand(constArg.PositionSlotsCommand());
 			SetSorterHandler(new SorterHandler(constArg.InitSorter()));
 			SetCreateSlotCommand(new CreateSlotCommand());
-			SetSelStateHandler(new SGSelStateHandler(new SGSelCoroutineRepo(), this));
+			SetSelStateHandler(new UISelStateHandler(this, constArg.UISelStateRepo()));
 		}
 		public void InitializeOnSlotSystemActivate(){
 			SetUpInventory();
@@ -196,6 +196,12 @@ namespace UISystem{
 			IAcceptsItemCommand _acceptsItemCommand;
 		public void Refresh(){
 
+		}
+		public override void HoverEnter(){
+			SSM().SetHoveredSG(this);
+		}
+		public override bool IsHovered(){
+			return SSM().HoveredSG() == this;
 		}
 	}
 	public interface ISlotGroup: ISlotSystemElement{

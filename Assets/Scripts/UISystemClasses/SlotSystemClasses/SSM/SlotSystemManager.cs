@@ -4,12 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
 	public class SlotSystemManager : UIElement, ISlotSystemManager{
-		public SlotSystemManager(IUIElement uiElement, RectTransformFake rectTrans, IInventoryManager invManager): base(rectTrans){
-			this.uiElement = uiElement;
+		public SlotSystemManager(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, IInventoryManager invManager): base(rectTrans, selStateRepo){
 			SetInventoryManager(invManager);
-			SetSelStateHandler(new SSMSelStateHandler(new SSMSelCoroutineRepo(), this));
 		}
-			IUIElement uiElement;
 		public void InitializeSlotSystemOnActivate(){
 			SetSlotSystemElementsOnActivate();
 		}
@@ -19,7 +16,7 @@ namespace UISystem{
 		}
 		public void SetSlotSystemElementsOnActivate(){
 			List<ISlotSystemElement> result = new List<ISlotSystemElement>();
-			uiElement.PerformInHierarchy(AddSSEToList, result);
+			PerformInHierarchy(AddSSEToList, result);
 			_slotSystemElements = result;
 		}
 		void AddSSEToList(IUIElement uiElement, IList<ISlotSystemElement> list){
@@ -127,7 +124,6 @@ namespace UISystem{
 		void InitializeSlotSystemOnActivate();
 		List<ISlotSystemElement> SlotSystemElements();
 		void Refresh();
-		void OnSSMFocus(object source, ISlotSystemManager ssm);
 		void SetPickedSB(ISlottable sb);
 		ISlotGroup HoveredSG();
 		void SetHoveredSG(ISlotGroup sg);

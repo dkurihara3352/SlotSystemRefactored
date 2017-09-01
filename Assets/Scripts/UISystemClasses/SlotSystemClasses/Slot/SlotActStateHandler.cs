@@ -28,10 +28,10 @@ namespace UISystem{
 				SetAndRunActProcess(null);
 		}
 		ISlotActState curActState{
-			get{return actStateEngine.GetCurState();}
+			get{return actStateEngine.CurState();}
 		}
 		ISlotActState prevActState{
-			get{return actStateEngine.GetPrevState();}
+			get{return actStateEngine.PrevState();}
 		}
 		ISlotActStateRepo actStateRepo{
 			get{

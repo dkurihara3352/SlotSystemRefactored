@@ -17,8 +17,8 @@ namespace UISystem{
 		void Execute();
 	}
 	public class PositionSlotsCommand: IPositionSlotsCommand{
-		ISlotGroup sg;
-		public PositionSlotsCommand(ISlotGroup sg){
+		IResizableSG sg;
+		public PositionSlotsCommand(IResizableSG sg){
 			this.sg = sg;
 		}
 		public void Execute(){
@@ -29,8 +29,8 @@ namespace UISystem{
 		void Execute(IInventory inventory);
 	}
 	public class OnInventoryUpdatedCommand: IOnInventoryUpdatedCommand{
-		ISlotGroup sg;
-		public OnInventoryUpdatedCommand(ISlotGroup sg){
+		IResizableSG sg;
+		public OnInventoryUpdatedCommand(IResizableSG sg){
 			this.sg = sg;
 		}
 		public void Execute(IInventory inventory){
@@ -50,7 +50,7 @@ namespace UISystem{
 	}
 	public class FetchEquippedItemsInventory{
 		ISlotSystemManager ssm;
-		public FetchEquippedItemsInventory(ISlotGroup sg){
+		public FetchEquippedItemsInventory(IResizableSG sg){
 			this.ssm = sg.SSM();
 		}
 		public IInventory FetchInventory(){
@@ -63,7 +63,7 @@ namespace UISystem{
 	}
 	public class FetchUnequippedItemsInventory{
 		ISlotSystemManager ssm;
-		public FetchUnequippedItemsInventory(ISlotGroup sg){
+		public FetchUnequippedItemsInventory(IResizableSG sg){
 			this.ssm = sg.SSM();
 		}
 		public IInventory FetchInventory(){

@@ -5,18 +5,23 @@ using UnityEngine;
 
 namespace UISystem{
 	public class UISelStateHandler : IUISelStateHandler {
-		public UISelStateHandler(IUISelCoroutineRepo selCoroutineRepo){
-			SetSelStateRepo(new UISelStateRepo(this));
-			SetSelCoroutineRepo(selCoroutineRepo);
-			_selStateEngine = new UIStateEngine<IUISelState>();
+		public UISelStateHandler(IUIElement element, IUISelStateRepo selStateRepo){
+			SetSelStateRepo(selStateRepo);
+			SelStateRepo().InitializeFields(element);
+			SelStateRepo().InitializeStates();
+			SetSelCoroutineRepo(new UISelCoroutineRepo(element, this));
+			_selStateEngine = new UIStateEngine<IUISelectionState>();
 			_selProcEngine = new UIProcessEngine<IUISelProcess>();
 		}
+		public void SetUIElement(IUIElement element){
+
+		}
 		/*	state	*/
-			IUIStateEngine<IUISelState> SelStateEngine(){
+			IUIStateEngine<IUISelectionState> SelStateEngine(){
 				Debug.Assert(_selStateEngine != null);
 				return _selStateEngine;
 			}
-				IUIStateEngine<IUISelState> _selStateEngine;
+				IUIStateEngine<IUISelectionState> _selStateEngine;
 			IUISelStateRepo SelStateRepo(){
 				Debug.Assert(_selStateRepo != null);
 				return _selStateRepo;
@@ -25,30 +30,21 @@ namespace UISystem{
 			public void SetSelStateRepo(IUISelStateRepo repo){
 				_selStateRepo = repo;
 			}
-			IUISelState prevSelState{
-				get{return SelStateEngine().GetPrevState();}
+			IUISelectionState prevSelState{
+				get{return SelStateEngine().PrevState();}
 			}
-			IUISelState curSelState{
-				get{return SelStateEngine().GetCurState();}
+			IUISelectionState curSelState{
+				get{return SelStateEngine().CurState();}
 			}
-			void SetSelState(IUISelState state){
+			void SetSelState(IUISelectionState state){
 				SelStateEngine().SetState(state);
 				if(state == null && SelProcess() != null)
 					SetAndRunSelProcess(null);
 			}
-			public void ClearCurSelState(){
-				SetSelState(null);
-			}
-				public bool IsSelStateNull(){
-					return curSelState == null;
-				}
-				public bool WasSelStateNull(){
-					return prevSelState == null;
-				}
 			public void Deactivate(){
 				SetSelState(deactivatedState);
 			}
-				IUISelState deactivatedState{
+				IUISelectionState deactivatedState{
 					get{return SelStateRepo().DeactivatedState();}
 				}
 				public bool IsDeactivated(){
@@ -69,7 +65,7 @@ namespace UISystem{
 			public void MakeUnselectable(){
 				SetSelState(defocusedState);
 			}
-				IUISelState defocusedState{
+				IUISelectionState defocusedState{
 					get{return SelStateRepo().UnselectableState();}
 				}
 				public bool IsUnselectable(){
@@ -81,7 +77,7 @@ namespace UISystem{
 			public void MakeSelectable(){
 				SetSelState(focusedState);
 			}
-				IUISelState focusedState{
+				IUISelectionState focusedState{
 					get{return SelStateRepo().SelectableState();}
 				}
 				public bool IsSelectable(){
@@ -93,7 +89,7 @@ namespace UISystem{
 			public void Select(){
 				SetSelState(selectedState);
 			}
-				IUISelState selectedState{
+				IUISelectionState selectedState{
 					get{return SelStateRepo().SelectedState();}
 				}
 				public bool IsSelected(){
@@ -108,17 +104,26 @@ namespace UISystem{
 				public bool WasActivated(){
 					return WasHidden() || WasShown();
 				}
+				public bool IsActivated(){
+					return IsHidden() || IsShown();
+				}
 			public void Deselect(){
 				SetSelState(SelStateRepo().DeselectedState());
 			}
 				public bool WasDeselected(){
 					return WasSelectable() || WasUnselectable();
 				}
+				public bool IsDeselected(){
+					return IsSelectable() || IsUnselectable();
+				}
 			public void Show(){
 				SetSelState(SelStateRepo().ShownState());
 			}
 				public bool WasShown(){
 					return WasSelected() || WasDeselected();
+				}
+				public bool IsShown(){
+					return IsSelected() || IsDeselected();
 				}
 		/*	process	*/
 			IUIProcessEngine<IUISelProcess> SelProcEngine(){
@@ -135,53 +140,33 @@ namespace UISystem{
 			public IUISelProcess SelProcess(){
 				return SelProcEngine().GetProcess();
 			}
-			void ExpireSelProc(){
+			public void ExpireProcess(){
 				SelProcess().Expire();
 			}
-			/* Coroutines */
-				IUISelCoroutineRepo CoroutineRepo(){
-					Debug.Assert(_coroutineRepo != null);
-					return _coroutineRepo;
-				}
-					IUISelCoroutineRepo _coroutineRepo;
-				public void SetSelCoroutineRepo(IUISelCoroutineRepo repo){_coroutineRepo = repo;}
-				public Func<IEnumeratorFake> DeactivateCoroutine(){
-					return CoroutineRepo().DeactivateCoroutine();
-				}
-				public Func<IEnumeratorFake> HideCoroutine(){
-					return CoroutineRepo().HideCoroutine();
-				}
-				public Func<IEnumeratorFake> MakeSelectableCoroutine(){
-					return CoroutineRepo().MakeSelectableCoroutine();
-				}
-				public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
-					return CoroutineRepo().MakeUnselectableCoroutine();
-				}
-				public Func<IEnumeratorFake> SelectCoroutine(){
-					return CoroutineRepo().SelectCoroutine();
-				}
-
-		/* Instant Methods */
-			public virtual void MakeUnselectableInstantly(){
-				MakeUnselectable();
-				ExpireSelProc();
+		/* Coroutines */
+			IUISelCoroutineRepo CoroutineRepo(){
+				Debug.Assert(_coroutineRepo != null);
+				return _coroutineRepo;
 			}
-			public virtual void MakeSelectableInstantly(){
-				MakeSelectable();
-				ExpireSelProc();
+				IUISelCoroutineRepo _coroutineRepo;
+			public void SetSelCoroutineRepo(IUISelCoroutineRepo repo){_coroutineRepo = repo;}
+			public Func<IEnumeratorFake> DeactivateCoroutine(){
+				return CoroutineRepo().DeactivateCoroutine();
 			}
-			public virtual void SelectInstantly(){
-				Select();
-				ExpireSelProc();
+			public Func<IEnumeratorFake> HideCoroutine(){
+				return CoroutineRepo().HideCoroutine();
 			}
-			public virtual void ShowInstantly(){
-				MakeSelectableInstantly();
+			public Func<IEnumeratorFake> MakeSelectableCoroutine(){
+				return CoroutineRepo().MakeSelectableCoroutine();
+			}
+			public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+				return CoroutineRepo().MakeUnselectableCoroutine();
+			}
+			public Func<IEnumeratorFake> SelectCoroutine(){
+				return CoroutineRepo().SelectCoroutine();
 			}
 	}
 	public interface IUISelStateHandler{
-			bool IsSelStateNull();
-			bool WasSelStateNull();
-		/* Process States */
 		void Deactivate();
 			bool IsDeactivated();
 			bool WasDeactivated();
@@ -198,24 +183,24 @@ namespace UISystem{
 			bool IsSelected();
 			bool WasSelected();
 
-		/* SwitchStates */
+		/* Relay States */
 		void Activate();
 			bool WasActivated();
+			bool IsActivated();
 		void Deselect();
 			bool WasDeselected();
+			bool IsDeselected();
 		void Show();
 			bool WasShown();
+			bool IsShown();
 		void SetAndRunSelProcess(IUISelProcess process);
 		IUISelProcess SelProcess();
 		void SetSelCoroutineRepo(IUISelCoroutineRepo repo);
+		void ExpireProcess();
 		System.Func<IEnumeratorFake> DeactivateCoroutine();
 		System.Func<IEnumeratorFake> HideCoroutine();
 		System.Func<IEnumeratorFake> MakeSelectableCoroutine();
 		System.Func<IEnumeratorFake> MakeUnselectableCoroutine();
 		System.Func<IEnumeratorFake> SelectCoroutine();
-		void MakeSelectableInstantly();
-		void MakeUnselectableInstantly();
-		void SelectInstantly();
-		void ShowInstantly();
 	}
 }

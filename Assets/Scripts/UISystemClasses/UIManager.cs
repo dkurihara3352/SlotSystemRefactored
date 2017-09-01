@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
 	public class UIManager :UIElement, IUIManager {
-		public UIManager(RectTransformFake rectTrans): base(rectTrans){
+		public UIManager(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, IUISelCoroutineRepo coroutineRepo): base(rectTrans, selStateRepo, coroutineRepo){
 			SetUIHierarchy();
 			SetUIMOnAllElements();
 			CollectWidgetUIRoots();

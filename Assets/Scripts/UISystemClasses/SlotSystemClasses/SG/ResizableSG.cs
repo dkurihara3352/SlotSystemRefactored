@@ -30,8 +30,14 @@ namespace UISystem{
 		public void WaitForResize(){
 			ActStateHandler().WaitForAction();
 		}
+		public bool IsWaitingForResize(){
+			return ActStateHandler().IsWaitingForResize();
+		}
 		public void Resize(){
 			ActStateHandler().Resize();
+		}
+		public bool IsResizing(){
+			return ActStateHandler().IsResizing();
 		}
 		public override bool IsReceivable(){
 			return true;
@@ -40,6 +46,8 @@ namespace UISystem{
 	public interface IResizableSG: ISlotGroup{
 		IResizableSGActStateHandler ActStateHandler();
 			void WaitForResize();
+			bool IsWaitingForResize();
 			void Resize();
+			bool IsResizing();
 	}
 }

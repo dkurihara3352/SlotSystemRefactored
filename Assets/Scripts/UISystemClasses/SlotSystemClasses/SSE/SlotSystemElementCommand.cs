@@ -7,7 +7,7 @@ namespace UISystem{
 		void Execute(ISlottable pickedSB);
 	}
 	public interface ISGEventArgsCommand: ISlotSystemElementCommand{
-		void Execute(ISlotGroup hoveredSG);
+		void Execute(IResizableSG hoveredSG);
 	}
 	public interface ISlotEventArgsCommand: ISlotSystemElementCommand{
 		void Execute(ISlot slot);
@@ -54,7 +54,7 @@ namespace UISystem{
 			public void Execute(ISlot slot){}
 		}
 		public class OnSGHoverEnteredCommand_empty: ISGEventArgsCommand{
-			public void Execute(ISlotGroup sg){}
+			public void Execute(IResizableSG sg){}
 		}
 		public class OnSBDroppedCommand_empty: ISBEventArgsCommand{
 			public void Execute(ISlottable sb){}

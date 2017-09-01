@@ -53,7 +53,7 @@ namespace UISystem{
 				public void WaitForAction(){
 					ActStateHandler().WaitForAction();
 				}
-				public void Travel(ISlotGroup slotGroup, ISlot slot){
+				public void Travel(IResizableSG slotGroup, ISlot slot){
 					ActStateHandler().Travel(slotGroup, slot);
 				}
 				public void Lift(){
@@ -107,7 +107,7 @@ namespace UISystem{
 				_slot = slot;
 			}
 				ISlot _slot;
-			public ISlotGroup SlotGroup(){
+			public IResizableSG SlotGroup(){
 				return Slot().SlotGroup();
 			}
 			public void Refresh(){
@@ -130,7 +130,7 @@ namespace UISystem{
 			void Select();
 		ISBActStateHandler ActStateHandler();
 			void WaitForAction();
-			void Travel(ISlotGroup slotGroup, ISlot slot);
+			void Travel(IResizableSG slotGroup, ISlot slot);
 			void Lift();
 			void Land();
 			void Appear();
@@ -144,7 +144,7 @@ namespace UISystem{
 			bool IsStackable();
 		ISlot Slot();
 		void SetSlot(ISlot slot);
-		ISlotGroup SlotGroup();
+		IResizableSG SlotGroup();
 		void Refresh();
 		void Destroy();
 	}

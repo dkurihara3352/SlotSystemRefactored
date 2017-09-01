@@ -27,13 +27,13 @@ namespace UISystem{
 		public override void SetHierarchy(){
 			base.SetHierarchy();
 			foreach(var ele in this)
-				if(!ele.IsActivatedOnDefault())
+				if(!ele.IsShownOnActivation())
 					if(GetFocusedElement() == ele)
-						ele.SetIsActivatedOnDefault(true);
+						ele.SetIsShownOnActivation(true);
 		}
 		public void InspectorSetUp(IUIElement initFocEle){
-			if(!initFocEle.IsActivatedOnDefault())
-				initFocEle.SetIsActivatedOnDefault(true);
+			if(!initFocEle.IsShownOnActivation())
+				initFocEle.SetIsShownOnActivation(true);
 			m_initiallyFocusedElement = initFocEle;
 		}
 	}

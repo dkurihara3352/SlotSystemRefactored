@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace UISystem{
 	public class Slot: SlotSystemElement, ISlot{
-		public Slot(RectTransformFake rectTrans, ISSEEventCommandsRepo repo, ITapCommand tapCommand): base(rectTrans, repo){
+		public Slot(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ISSEEventCommandsRepo eventCommRepo, ITapCommand tapCommand): base(rectTrans, selStateRepo, eventCommRepo){
 			SetActStateHandler(new SlotActStateHandler(this));
-			SetSelStateHandler(new SlotSelStateHandler(new SlotSelCoroutineRepo(), this));
+			SetSelStateHandler(new UISelStateHandler(this, selStateRepo));
 			SetTapCommand(tapCommand);
 		}
-
 
 		public ISlotActStateHandler ActStateHandler(){
 			Debug.Assert(_actStateHandler != null);
@@ -109,14 +108,14 @@ namespace UISystem{
 			_isPickedUp = pickedUp;
 		}
 			bool _isPickedUp;
-		public ISlotGroup SlotGroup(){
+		public IResizableSG SlotGroup(){
 			Debug.Assert(_slotGroup != null);
 			return _slotGroup;
 		}
-		public void SetSG(ISlotGroup sg){
+		public void SetSG(IResizableSG sg){
 			_slotGroup = sg;
 		}
-			ISlotGroup _slotGroup;
+			IResizableSG _slotGroup;
 		public ISlottable Slottable(){
 			return _slottable;
 		}
@@ -125,13 +124,16 @@ namespace UISystem{
 			_slottable = sb;
 		}
 		public void MakeSBSelectable(){
-			Slottable().MakeSelectable();
+			if(!IsEmpty())
+				Slottable().MakeSelectable();
 		}
 		public void MakeSBUnselectable(){
-			Slottable().MakeUnselectable();
+			if(!IsEmpty())
+				Slottable().MakeUnselectable();
 		}
 		public void SelectSB(){
-			Slottable().Select();
+			if(!IsEmpty())
+				Slottable().Select();
 		}
 		public bool IsEmpty(){
 			return Slottable() == null;
@@ -151,7 +153,7 @@ namespace UISystem{
 		void SelectSB();
 		int ID();
 		void SetID(int id);
-		ISlotGroup SlotGroup();
+		IResizableSG SlotGroup();
 		ISlottable Slottable();
 		bool IsEmpty();
 		ISlotActStateHandler ActStateHandler();

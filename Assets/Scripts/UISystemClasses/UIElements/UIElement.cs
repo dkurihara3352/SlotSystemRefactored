@@ -6,17 +6,16 @@ using Utility;
 namespace UISystem{
 	public class UIElement : IUIElement{
 		RectTransformFake rectTransform;
-		public UIElement(RectTransformFake rectTrans){
+		public UIElement(RectTransformFake rectTrans, IUISelStateRepo selStateRepo){
 			rectTransform = rectTrans;
+			SetSelStateHandler(new UISelStateHandler(this, selStateRepo));
 		}
 		/* State Handling */
-			public virtual IUISelStateHandler SelStateHandler(){
-				if(_selStateHandler != null)
-					return _selStateHandler;
-				else
-					throw new InvalidOperationException("selStateHandler not set");
+			public IUISelStateHandler SelStateHandler(){
+				Debug.Assert(_selStateHandler != null);
+				return _selStateHandler;
 			}
-			public virtual void SetSelStateHandler(IUISelStateHandler handler){
+			public void SetSelStateHandler(IUISelStateHandler handler){
 				_selStateHandler = handler;
 			}
 				IUISelStateHandler _selStateHandler;
@@ -64,9 +63,6 @@ namespace UISystem{
 			public virtual void InitializeStates(){
 				SelStateHandler().Deactivate();
 			}
-			public void InitializeSSE(){
-				SetSelStateHandler(new UISelStateHandler(new UISelCoroutineRepo()));
-			}
 		/*	public fields	*/
 			public virtual void SetHierarchy(){
 				List<IUIElement> elements = new List<IUIElement>();
@@ -80,36 +76,25 @@ namespace UISystem{
 				foreach(var e in this)
 					e.SetParent(this);
 			}
-			public bool IsActivatedOnDefault(){
+			public bool IsShownOnActivation(){
 				IUIElement inspected = GetParent();
 				while(true){
 					if(inspected　== null)
 						break;
-					if(inspected.IsActivatedOnDefault())
+					if(inspected.IsShownOnActivation())
 						inspected = inspected.GetParent();
 					else
 						return false;
 				}
-				return _isActivatedOnDefault;
+				return _isShownOnActivation;
 			}
-			public void SetIsActivatedOnDefault(bool activated){
+			public void SetIsShownOnActivation(bool shown){
 				if(isBundleElement && ImmediateBundle().GetFocusedElement() == (IUIElement)this)
-					_isActivatedOnDefault = true;
+					_isShownOnActivation = true;
 				else
-					_isActivatedOnDefault = activated;
+					_isShownOnActivation = shown;
 			}
-				bool _isActivatedOnDefault = true;
-			public void ActivateRecursively(){
-				PerformInHierarchy(ActivateInHi);
-			}
-				void ActivateInHi(IUIElement ele){
-					if(ele.IsActivatedOnDefault()){
-						if(ele.IsFocusableInHierarchy())
-							ele.Activate();
-						else
-							ele.MakeUnselectable();
-					}
-				}
+				bool _isShownOnActivation;
 			public bool IsFocusedInHierarchy(){
 				IUIElement inspected = this;
 				while(true){
@@ -260,8 +245,8 @@ namespace UISystem{
 	public interface IUIElement: IEnumerable<IUIElement>{
 		void InitializeStates();
 		void SetHierarchy();
-		bool IsActivatedOnDefault();
-		void SetIsActivatedOnDefault(bool activated);
+		bool IsShownOnActivation();
+		void SetIsShownOnActivation(bool shown);
 		bool IsFocusedInHierarchy();
 		bool IsFocusableInHierarchy();
 		void FocusInBundle();

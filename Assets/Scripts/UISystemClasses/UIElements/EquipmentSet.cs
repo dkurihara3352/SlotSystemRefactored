@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 namespace UISystem{
 	public class EquipmentSet : UIElement, IEquipmentSet{
-		public ISlotGroup bowSG{
+		public IResizableSG bowSG{
 			get{
 				if(m_bowSG == null)
 					throw new System.InvalidOperationException("EquipmentSet.bowSG: not set, assign in the inspector first");
@@ -12,8 +12,8 @@ namespace UISystem{
 					return m_bowSG;
 			}
 		}
-			ISlotGroup m_bowSG;
-		public ISlotGroup wearSG{
+			IResizableSG m_bowSG;
+		public IResizableSG wearSG{
 			get{
 				if(m_wearSG == null)
 					throw new System.InvalidOperationException("EquipmentSet.wearSG: not set, assign in the inspector first");
@@ -21,8 +21,8 @@ namespace UISystem{
 					return m_wearSG;
 			}
 		}
-			ISlotGroup m_wearSG; 
-		public ISlotGroup cGearsSG{
+			IResizableSG m_wearSG; 
+		public IResizableSG cGearsSG{
 			get{
 				if(m_cGearsSG == null)
 					throw new System.InvalidOperationException("EquipmentSet.m_cGearsSG: not set, assign in the inspector first");
@@ -30,11 +30,11 @@ namespace UISystem{
 					return m_cGearsSG;
 			}
 		}
-			ISlotGroup m_cGearsSG;
+			IResizableSG m_cGearsSG;
 		public override void SetHierarchy(){
 			if(transform.childCount == 3){
 				for(int i = 0; i< transform.childCount; i++){
-					ISlotGroup sg = transform.GetChild(i).GetComponent<ISlotGroup>();
+					IResizableSG sg = transform.GetChild(i).GetComponent<IResizableSG>();
 					if(sg != null){
 						IFilterHandler filterHandler = sg.GetFilterHandler();
 						if(filterHandler.GetFilter() is SGBowFilter){
@@ -57,7 +57,7 @@ namespace UISystem{
 			}else
 				throw new InvalidOperationException("transform children' count is not exactly 3");
 		}
-		public void InspectorSetUp(ISlotGroup bowSG, ISlotGroup wearSG, ISlotGroup cGearsSG){
+		public void InspectorSetUp(IResizableSG bowSG, IResizableSG wearSG, IResizableSG cGearsSG){
 			m_bowSG = bowSG; m_wearSG = wearSG; m_cGearsSG = cGearsSG;
 		}
 		protected override IEnumerable<IUIElement> elements{

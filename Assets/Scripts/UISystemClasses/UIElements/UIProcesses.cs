@@ -74,9 +74,15 @@ namespace UISystem{
 	}
 	/* Factory */
 	public class UISelCoroutineRepo: IUISelCoroutineRepo{
-		IUISelStateHandler handler;
-		public UISelCoroutineRepo(IUISelStateHandler handler){
+		public UISelCoroutineRepo(IUIElement element, IUISelStateHandler handler){
+			this.element = element;
 			this.handler = handler;
+		}
+		IUIElement element;
+		IUISelStateHandler handler;
+		public void InitializeFields(IUIElement element){
+			this.element = element;
+			this.handler = element.SelStateHandler();
 		}
 		public Func<IEnumeratorFake> DeactivateCoroutine(){
 			return UIDeactivateCoroutine;
@@ -183,12 +189,16 @@ namespace UISystem{
 		public UIDeactivateProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
 		}
 	}
-	public class UIFocusProcess: UISelProcess{
-		public UIFocusProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+	public class UIHideProcess: UISelProcess{
+		public UIHideProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
 		}
 	}
-	public class UIDefocusProcess: UISelProcess{
-		public UIDefocusProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+	public class UIMakeSelectableProcess: UISelProcess{
+		public UIMakeSelectableProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+		}
+	}
+	public class UIMakeUnselectableProcess: UISelProcess{
+		public UIMakeUnselectableProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
 		}
 	}
 	public class UISelectProcess: UISelProcess{

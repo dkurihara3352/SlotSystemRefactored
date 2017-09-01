@@ -5,8 +5,8 @@ using UnityEngine;
 namespace UISystem{
 	public static class SlotSystemUtil{
 		public static bool SBsAreSwappable(ISlottable pickedSB, ISlottable otherSB){
-			ISlotGroup pickedSG = pickedSB.SlotGroup();
-			ISlotGroup otherSG = otherSB.SlotGroup();
+			IResizableSG pickedSG = pickedSB.SlotGroup();
+			IResizableSG otherSG = otherSB.SlotGroup();
 			ISlottableItem pickedItem = pickedSB.Item();
 			ISlottableItem otherItem = otherSB.Item();
 
@@ -16,13 +16,13 @@ namespace UISystem{
 						return true;
 			return false;
 		}
-			static bool AreDifferentSGs(ISlotGroup sg, ISlotGroup otherSG){
+			static bool AreDifferentSGs(IResizableSG sg, IResizableSG otherSG){
 				return sg != otherSG;
 			}
 			static bool AreBothNonStackable(ISlottableItem item, ISlottableItem otherItem){
 				return !(item.IsStackable() || otherItem.IsStackable());
 			}
-			static bool AreMutuallyAccepting(ISlotGroup sg, ISlottableItem item, ISlotGroup otherSG, ISlottableItem otherItem){
+			static bool AreMutuallyAccepting(IResizableSG sg, ISlottableItem item, IResizableSG otherSG, ISlottableItem otherItem){
 				return (sg.AcceptsItem(otherItem) && otherSG.AcceptsItem(item));
 			}
 		public static string Red(string str){

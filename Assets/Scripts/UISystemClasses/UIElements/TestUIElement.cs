@@ -16,7 +16,7 @@ namespace UISystem{
 		}
 			void FocusIfAOD(IUIElement ele){
 				IUISelStateHandler eleSelStateHandler = ele.SelStateHandler();
-				if(ele.IsActivatedOnDefault())
+				if(ele.IsShownOnActivation())
 					eleSelStateHandler.MakeSelectable();
 			}
 		public void InitializeStatesRecursively(){

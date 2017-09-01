@@ -31,10 +31,10 @@ namespace UISystem{
 					SetAndRunEqpProcess(null);
 			}
 			ISBEqpState curEqpState{
-				get{return eqpStateEngine.GetCurState();}
+				get{return eqpStateEngine.CurState();}
 			}
 			ISBEqpState prevEqpState{
-				get{return eqpStateEngine.GetPrevState();}
+				get{return eqpStateEngine.PrevState();}
 			}
 			ISBEqpStateRepo eqpStateRepo{
 				get{

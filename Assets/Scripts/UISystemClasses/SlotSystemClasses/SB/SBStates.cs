@@ -47,21 +47,21 @@ namespace UISystem{
         }
         public class SBSelectableState: SBSelState{
             public SBSelectableState(ISBSelStateHandler handler): base(handler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBMakeSelectableProcess process = new SBMakeSelectableProcess(sbSelStateHandler.MakeSelectableCoroutine());
                 sbSelStateHandler.SetAndRunSelProcess(process);
             }
         }
         public class SBUnselectableState: SBSelState{
             public SBUnselectableState(ISBSelStateHandler handler): base(handler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBMakeUnselectableProcess process = new SBMakeUnselectableProcess(sbSelStateHandler.MakeUnselectableCoroutine());
                 sbSelStateHandler.SetAndRunSelProcess(process);
             }
         }
         public class SBSelectedState: SBSelState{
             public SBSelectedState(ISBSelStateHandler handler): base(handler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBSelectProcess process = new SBSelectProcess(sbSelStateHandler.SelectCoroutine());
                 sbSelStateHandler.SetAndRunSelProcess(process);
             }
@@ -130,42 +130,42 @@ namespace UISystem{
         }
         public class SBWaitingForActionState: SBActState{
             public SBWaitingForActionState(ISBActStateHandler actStateHandler): base(actStateHandler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBWaitForActionProcess process = new SBWaitForActionProcess(actStateHandler.WaitForActionCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBTravellingState: SBActState{
             public SBTravellingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBTravelProcess process = new SBTravelProcess(actStateHandler.TravelCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBLiftingState: SBActState{
             public SBLiftingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBLiftProcess process = new SBLiftProcess(actStateHandler.LiftCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBLandingState: SBActState{
             public SBLandingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBLandProcess process = new SBLandProcess(actStateHandler.LandCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBAppearingState: SBActState{
             public SBAppearingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBAppearProcess process = new SBAppearProcess(actStateHandler.AppearCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
         }
         public class SBDisappearingState: SBActState{
             public SBDisappearingState(ISBActStateHandler actStateHandler): base(actStateHandler){}
-            public override void EnterState(){
+            public override void Enter(){
                 SBDisappearProcess process = new SBDisappearProcess(actStateHandler.DisappearCoroutine());
                 actStateHandler.SetAndRunActProcess(process);
             }
@@ -210,7 +210,7 @@ namespace UISystem{
             public SBEquippedState(ISlottable sb): base(sb){
                 this.sb = sb;
             }
-            public override void EnterState(){
+            public override void Enter(){
                 if(!sb.IsHierarchySetUp())
                     return;
                 if(equipToolHandler.IsPool()){
@@ -226,7 +226,7 @@ namespace UISystem{
             public SBUnequippedState(ISlottable sb): base(sb){
                 this.sb = sb;
             }
-            public override void EnterState(){
+            public override void Enter(){
                 if(!sb.IsHierarchySetUp()) 
                     return;
                 if(equipToolHandler.IsPool()){

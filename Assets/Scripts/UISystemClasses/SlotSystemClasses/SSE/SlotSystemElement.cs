@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
-	public class SlotSystemElement : UIElement, ISlotSystemElement{
+	public abstract class SlotSystemElement : UIElement, ISlotSystemElement{
 		public ISlotSystemManager SSM(){
 			return _ssm;
 		}
@@ -11,7 +11,7 @@ namespace UISystem{
 			_ssm = ssm;
 		}
 			ISlotSystemManager _ssm;
-		public SlotSystemElement(RectTransformFake rectTrans, ISSEEventCommandsRepo repo): base(rectTrans){
+		public SlotSystemElement(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ISSEEventCommandsRepo repo): base(rectTrans, selStateRepo){
 			ISlotSystemManager ssm = SSM();
 			SetSSEEventCommandsRepo(repo);
 			ssm.SBPickedUp += OnSBPickedUp;
@@ -26,8 +26,8 @@ namespace UISystem{
 			ssm.SGHoverEntered -= OnSGHoverEntered;
 			ssm.SBDropped -= OnSBDropped;
 		}
-		public virtual void HoverEnter(){}
-		public virtual bool IsHovered(){return false;}
+		public abstract void HoverEnter();
+		public abstract bool IsHovered();
 		ISSEEventCommandsRepo CommandsRepo(){
 			Debug.Assert(_commandsRepo != null);
 			return _commandsRepo;

@@ -4,15 +4,15 @@ using UnityEngine;
 using System;
 namespace UISystem{
 	public abstract class SGProcess: UIProcess, ISGProcess{
-		protected ISlotGroup sg;
-		public SGProcess(ISlotGroup sg, Func<IEnumeratorFake> coroutine): base(coroutine){
+		protected IResizableSG sg;
+		public SGProcess(IResizableSG sg, Func<IEnumeratorFake> coroutine): base(coroutine){
 		}
 	}
 	public interface ISGProcess: IUIProcess{
 	}
 	public interface ISGActProcess: ISGProcess{}
 	public class SGResizeProcess: SGProcess, ISGActProcess{
-		public SGResizeProcess(ISlotGroup sg, Func<IEnumeratorFake> coroutine): base(sg, coroutine){
+		public SGResizeProcess(IResizableSG sg, Func<IEnumeratorFake> coroutine): base(sg, coroutine){
 		}
 	}
 	public class SGSelCoroutineRepo: IUISelCoroutineRepo{

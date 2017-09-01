@@ -39,10 +39,10 @@ namespace UISystem{
 			StateEngine().SetState( SelStateRepo().SelectableState() );
 		}
 		bool IsSelectable(){
-			return StateEngine().GetCurState() == SelStateRepo().SelectableState();
+			return StateEngine().CurState() == SelStateRepo().SelectableState();
 		}
 		bool WasSelectable(){
-			return StateEngine().GetPrevState() == SelStateRepo().SelectableState();
+			return StateEngine().PrevState() == SelStateRepo().SelectableState();
 		}
 		public void MakeUnselectable(){
 			StateEngine().SetState( SelStateRepo().UnselectableState() );
