@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace UISystem{
 	public abstract class Inventory: IInventory{
-		public virtual List<Item> Items(){
+		public virtual List<IInventorySystemItem> Items(){
 			if(_items == null)
-				_items = new List<Item>();
+				_items = new List<IInventorySystemItem>();
 			return _items;
 		}
-			List<Item> _items;
+			List<IInventorySystemItem> _items;
 		public ISlotGroup SlotGroup(){
 			return _sg;
 		}
@@ -20,7 +20,7 @@ namespace UISystem{
 		public virtual void UpdateInventory(){}
 	}
 	public interface IInventory{
-		List<Item> Items();
+		List<IInventorySystemItem> Items();
 		ISlotGroup SlotGroup();
 		void SetSG(ISlotGroup sg);
 		void UpdateInventory();

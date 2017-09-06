@@ -5,20 +5,23 @@ using System;
 
 namespace UISystem{
 	public class UIProcess: IUIProcess{
+		public UIProcess(IEnumeratorFake coroutine){
+			_coroutineFake = coroutine;
+		}
+		public IEnumeratorFake Coroutine(){
+			return _coroutineFake;
+		}
+		public void SetCoroutine(IEnumeratorFake coroutine){
+			_coroutineFake = coroutine;
+		}
+			IEnumeratorFake _coroutineFake;
 		public virtual bool IsRunning(){
 			return _isRunning;
 		}
 			bool _isRunning;
-		public Func<IEnumeratorFake> GetCoroutine(){
-			return _coroutineFake;
-		}
-		public void SetCoroutine(Func<IEnumeratorFake> coroutine){
-			_coroutineFake = coroutine;
-		}
-			Func<IEnumeratorFake> _coroutineFake;
 		public virtual void Start(){
 			_isRunning = true;
-			_coroutineFake();
+			Coroutine();
 		}
 		public virtual void Stop(){ 
 			if(IsRunning())
@@ -33,14 +36,11 @@ namespace UISystem{
 				return this.GetType().Equals(other.GetType());
 			else return false;
 		}
-		public UIProcess(Func<IEnumeratorFake> coroutine){
-			_coroutineFake = coroutine;
-		}
 	}
 	public interface IUIProcess: IEquatable<IUIProcess>{
 		bool IsRunning();
-		Func<IEnumeratorFake> GetCoroutine();
-		void SetCoroutine(Func<IEnumeratorFake> coroutine);
+		IEnumeratorFake Coroutine();
+		void SetCoroutine(IEnumeratorFake coroutine);
 		void Start();
 		void Stop();
 		void Expire();
@@ -51,28 +51,28 @@ namespace UISystem{
 		public UIProcessEngine(T from){
 			SetProcess(from);
 		}
-		public virtual T GetProcess(){return _process;}
+		public virtual T Process(){return _process;}
 		void SetProcess(T process){
 			_process = process;
 		}
 		protected T _process;
 		public virtual void SetAndRunProcess(T p){
-			T process = GetProcess();
+			T process = Process();
 			if(p == null || !p.Equals(process)){
 				if(process != null)
 					process.Stop();
 				SetProcess(p);
-				process = GetProcess();
+				process = Process();
 				if(process != null)
 					process.Start();
 			}
 		}
 	}
 	public interface IUIProcessEngine<T> where T: IUIProcess{
-		T GetProcess();
+		T Process();
 		void SetAndRunProcess(T process);
 	}
-	/* Factory */
+	/* repo */
 	public class UISelCoroutineRepo: IUISelCoroutineRepo{
 		public UISelCoroutineRepo(IUIElement element, IUISelStateHandler handler){
 			this.element = element;
@@ -84,8 +84,8 @@ namespace UISystem{
 			this.element = element;
 			this.handler = element.SelStateHandler();
 		}
-		public Func<IEnumeratorFake> DeactivateCoroutine(){
-			return UIDeactivateCoroutine;
+		public IEnumeratorFake DeactivateCoroutine(){
+			return UIDeactivateCoroutine();
 		}
 			IEnumeratorFake UIDeactivateCoroutine(){
 				if(handler.WasActivated()){
@@ -94,8 +94,8 @@ namespace UISystem{
 				}
 				return null;
 			}
-		public Func<IEnumeratorFake> HideCoroutine(){
-			return UIHideCoroutine;
+		public IEnumeratorFake HideCoroutine(){
+			return UIHideCoroutine();
 		}
 			IEnumeratorFake UIHideCoroutine(){
 				if(handler.WasDeactivated()){
@@ -107,8 +107,8 @@ namespace UISystem{
 				}
 				return null;
 			}
-		public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
-			return UIUnselectableCoroutine;
+		public IEnumeratorFake MakeUnselectableCoroutine(){
+			return UIUnselectableCoroutine();
 		}
 			IEnumeratorFake UIUnselectableCoroutine(){
 				if(handler.WasDeactivated()){
@@ -128,8 +128,8 @@ namespace UISystem{
 				}
 				return null;
 			}
-		public Func<IEnumeratorFake> MakeSelectableCoroutine(){
-			return UISelectableCoroutine;
+		public IEnumeratorFake MakeSelectableCoroutine(){
+			return UISelectableCoroutine();
 		}
 			IEnumeratorFake UISelectableCoroutine(){
 				if(handler.WasDeactivated()){
@@ -149,8 +149,8 @@ namespace UISystem{
 				}
 				return null;
 			}
-		public Func<IEnumeratorFake> SelectCoroutine(){
-			return UISelectCoroutine;
+		public IEnumeratorFake SelectCoroutine(){
+			return UISelectCoroutine();
 		}
 			IEnumeratorFake UISelectCoroutine(){
 				if(handler.WasDeactivated()){
@@ -172,37 +172,61 @@ namespace UISystem{
 			}
 	}
 	public interface IUISelCoroutineRepo{
-		Func<IEnumeratorFake> DeactivateCoroutine();
-		Func<IEnumeratorFake> HideCoroutine();
-		Func<IEnumeratorFake> MakeUnselectableCoroutine();
-		Func<IEnumeratorFake> MakeSelectableCoroutine();
-		Func<IEnumeratorFake> SelectCoroutine();
+		IEnumeratorFake DeactivateCoroutine();
+		IEnumeratorFake HideCoroutine();
+		IEnumeratorFake MakeUnselectableCoroutine();
+		IEnumeratorFake MakeSelectableCoroutine();
+		IEnumeratorFake SelectCoroutine();
 	}
 	/* SelProces */
-	public abstract class UISelProcess: UIProcess, IUISelProcess{
-		public UISelProcess(System.Func<IEnumeratorFake> coroutine): base(coroutine){
-		}
-	}
 	public interface IUISelProcess: IUIProcess{
 	}
-	public class UIDeactivateProcess: UISelProcess{
-		public UIDeactivateProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+	public class UIDeactivateProcess: UIProcess, IUISelProcess{
+		public UIDeactivateProcess(IEnumeratorFake coroutineMock): base(coroutineMock){
 		}
 	}
-	public class UIHideProcess: UISelProcess{
-		public UIHideProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+	public class UIHideProcess: UIProcess, IUISelProcess{
+		public UIHideProcess(IEnumeratorFake coroutineMock): base(coroutineMock){
 		}
 	}
-	public class UIMakeSelectableProcess: UISelProcess{
-		public UIMakeSelectableProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+	public class UIMakeSelectableProcess: UIProcess, IUISelProcess{
+		public UIMakeSelectableProcess(IEnumeratorFake coroutineMock): base(coroutineMock){
 		}
 	}
-	public class UIMakeUnselectableProcess: UISelProcess{
-		public UIMakeUnselectableProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+	public class UIMakeUnselectableProcess: UIProcess, IUISelProcess{
+		public UIMakeUnselectableProcess(IEnumeratorFake coroutineMock): base(coroutineMock){
 		}
 	}
-	public class UISelectProcess: UISelProcess{
-		public UISelectProcess(System.Func<IEnumeratorFake> coroutineMock): base(coroutineMock){
+	public class UISelectProcess: UIProcess, IUISelProcess{
+		public UISelectProcess(IEnumeratorFake coroutineMock): base(coroutineMock){
+		}
+	}
+	/* TapProcess */
+	public interface ITapStateProcess: IUIProcess{
+	}
+	public abstract class TapStateProcess: UIProcess, ITapStateProcess{
+		protected ITapStateHandler handler;
+		public TapStateProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine){
+			this.handler = handler;
+		}
+	}
+	public class UIWaitForTapPointerDownProcess: TapStateProcess{
+		public UIWaitForTapPointerDownProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){}
+	}
+	public class UIWaitForTapTimerUpProcess: TapStateProcess{
+		public UIWaitForTapTimerUpProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){}
+		public override void Expire(){
+			handler.WaitForTapPointerUp();
+		}
+	}
+	public class UIWaitForTapPointerUpProcess: TapStateProcess{
+		public UIWaitForTapPointerUpProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){}
+	}
+	public class UITapProcess: TapStateProcess{
+		public UITapProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){
+		}
+		public override void Expire(){
+			handler.WaitForTapPointerDown();
 		}
 	}
 }

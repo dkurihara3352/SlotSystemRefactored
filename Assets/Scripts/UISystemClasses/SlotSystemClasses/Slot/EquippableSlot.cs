@@ -3,8 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
-	public class EquippableSB : InventoryItemSB, IEquippableSB {
-		public EquippableSB(ISlot slot, InventoryItemInstance itemInstance, IInventoryItemHandler itemHandler): base(slot, itemInstance, itemHandler){
+	public interface IEquippableSlot: IInventoryItemSlot{
+		ISBEqpStateHandler EqpStateHandler();
+		bool IsEquipped();
+		bool IsUnequipped();
+		void Equip();
+		void Unequip();
+		void ClearCurEqpState();
+		void UpdateEquipState();
+	}
+	public class EquippableSlot : InventoryItemSlot, IEquippableSlot {
+		public EquippableSlot(RectTransformFake rectTrans, ISBSelStateRepo selStateRepo, ITapCommand tapCommand, ISSEEventCommandsRepo eventCommandsRepo, InventoryItemInstance itemInstance, bool leavesGhost): base(rectTrans, selStateRepo, tapCommand, eventCommandsRepo, itemInstance, leavesGhost){
 			SetEqpStateHandler(new SBEqpStateHandler(this));
 		}
 		public ISBEqpStateHandler EqpStateHandler(){
@@ -34,14 +43,5 @@ namespace UISystem{
 			if(IsEquipped()) Equip();
 			else Unequip();
 		}
-	}
-	public interface IEquippableSB: IInventoryItemSB{
-		ISBEqpStateHandler EqpStateHandler();
-		bool IsEquipped();
-		bool IsUnequipped();
-		void Equip();
-		void Unequip();
-		void ClearCurEqpState();
-		void UpdateEquipState();
 	}
 }

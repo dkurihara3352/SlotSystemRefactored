@@ -4,13 +4,46 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace UISystem{
+	public interface IUIElement: IEnumerable<IUIElement>, IUISystemInputHandler{
+		void InitializeStates();
+		void SetHierarchy();
+		bool IsShownOnActivation();
+		void SetIsShownOnActivation(bool shown);
+		bool IsFocusedInHierarchy();
+		bool IsFocusableInHierarchy();
+		void FocusInBundle();
+		IUIBundle ImmediateBundle();
+		IUIElement Parent();
+		void SetParent(IUIElement par);
+		void SetUIM(IUIManager uim);
+		bool ContainsInHierarchy(IUIElement ele);
+		void PerformInHierarchy(System.Action<IUIElement> act);
+		void PerformInHierarchy(System.Action<IUIElement, object> act, object obj);
+		void PerformInHierarchy<T>(System.Action<IUIElement, IList<T>> act, IList<T> list);
+		bool Contains(IUIElement element);
+		IUIElement this[int i]{get;}
+		int GetLevel();
+		IUISelStateHandler SelStateHandler();
+			void Activate();
+			void Deactivate();
+			void MakeSelectable();
+			void MakeUnselectable();
+			bool IsSelectable();
+			void Select();
+			bool IsSelected();
+			void Deselect();
+		ITapStateHandler TapStateHandler();
+		void ExecuteTapCommand();
+	}
 	public class UIElement : IUIElement{
 		RectTransformFake rectTransform;
-		public UIElement(RectTransformFake rectTrans, IUISelStateRepo selStateRepo){
+		public UIElement(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ITapCommand tapCommand){
 			rectTransform = rectTrans;
 			SetSelStateHandler(new UISelStateHandler(this, selStateRepo));
+			SetTapStateHandler(new TapStateHandler(this));
+			SetTapCommand(tapCommand);
 		}
-		/* State Handling */
+		/* Sel State Handling */
 			public IUISelStateHandler SelStateHandler(){
 				Debug.Assert(_selStateHandler != null);
 				return _selStateHandler;
@@ -54,11 +87,17 @@ namespace UISystem{
 			public void Select(){
 				SelStateHandler().Select();
 			}
+				public bool IsSelected(){
+					return SelStateHandler().IsSelected();
+				}
 			public bool IsSelectable(){
 				return SelStateHandler().IsSelectable();
 			}
 			public bool IsUnselectable(){
 				return SelStateHandler().IsUnselectable();
+			}
+			public void Deselect(){
+				SelStateHandler().Deselect();
 			}
 			public virtual void InitializeStates(){
 				SelStateHandler().Deactivate();
@@ -77,12 +116,12 @@ namespace UISystem{
 					e.SetParent(this);
 			}
 			public bool IsShownOnActivation(){
-				IUIElement inspected = GetParent();
+				IUIElement inspected = Parent();
 				while(true){
 					if(inspected　== null)
 						break;
 					if(inspected.IsShownOnActivation())
-						inspected = inspected.GetParent();
+						inspected = inspected.Parent();
 					else
 						return false;
 				}
@@ -101,7 +140,7 @@ namespace UISystem{
 					if(inspected　== null)
 						break;
 					if(inspected.IsSelectable())
-						inspected = inspected.GetParent();
+						inspected = inspected.Parent();
 					else
 						return false;
 				}
@@ -139,11 +178,11 @@ namespace UISystem{
 			}
 			public bool isBundleElement{
 				get{
-					return GetParent() is IUIBundle;
+					return Parent() is IUIBundle;
 				}
 			}
 			public IUIBundle ImmediateBundle(){
-				IUIElement parent = GetParent();
+				IUIElement parent = Parent();
 				if(parent == null)
 					return null;
 				else if(parent is IUIBundle)
@@ -151,7 +190,7 @@ namespace UISystem{
 				else
 					return parent.ImmediateBundle();
 			}
-			public virtual IUIElement GetParent(){
+			public virtual IUIElement Parent(){
 				return _parent;
 			}
 				IUIElement _parent;
@@ -164,13 +203,13 @@ namespace UISystem{
 			IUIManager _uim;
 			public virtual bool ContainsInHierarchy(IUIElement ele){
 				if(ele != null){
-					IUIElement testEle = ele.GetParent();
+					IUIElement testEle = ele.Parent();
 					while(true){
 						if(testEle == null)
 							return false;
 						if(testEle == (IUIElement)this)
 							return true;
-						testEle = testEle.GetParent();
+						testEle = testEle.Parent();
 					}
 				}
 				throw new System.ArgumentNullException();
@@ -229,7 +268,7 @@ namespace UISystem{
 			}
 				IEnumerable<IUIElement> _elements;
 			public int GetLevel(){
-				IUIElement parent = GetParent();
+				IUIElement parent = Parent();
 				if(parent == null)
 					return 0;
 				return parent.GetLevel() + 1;
@@ -240,34 +279,39 @@ namespace UISystem{
 			}
 				IEnumerator IEnumerable.GetEnumerator(){
 					return GetEnumerator();
-				}	
-	}
-	public interface IUIElement: IEnumerable<IUIElement>{
-		void InitializeStates();
-		void SetHierarchy();
-		bool IsShownOnActivation();
-		void SetIsShownOnActivation(bool shown);
-		bool IsFocusedInHierarchy();
-		bool IsFocusableInHierarchy();
-		void FocusInBundle();
-		IUIBundle ImmediateBundle();
-		IUIElement GetParent();
-		void SetParent(IUIElement par);
-		void SetUIM(IUIManager uim);
-		bool ContainsInHierarchy(IUIElement ele);
-		void PerformInHierarchy(System.Action<IUIElement> act);
-		void PerformInHierarchy(System.Action<IUIElement, object> act, object obj);
-		void PerformInHierarchy<T>(System.Action<IUIElement, IList<T>> act, IList<T> list);
-		bool Contains(IUIElement element);
-		IUIElement this[int i]{get;}
-		int GetLevel();
-		IUISelStateHandler SelStateHandler();
-		void Activate();
-		void Deactivate();
-		void MakeSelectable();
-		void MakeUnselectable();
-		bool IsSelectable();
-		bool IsUnselectable();
-		void Select();
+				}
+		/* Input Handling */
+			public ITapStateHandler TapStateHandler(){
+				Debug.Assert(_tapStateHandler != null);
+				return _tapStateHandler;
+			}
+			void SetTapStateHandler(ITapStateHandler handler){
+				_tapStateHandler = handler;
+			}
+				ITapStateHandler _tapStateHandler;
+			public void ExecuteTapCommand(){
+				TapCommand().Execute();
+			}
+			ITapCommand TapCommand(){
+				Debug.Assert(_tapCommand != null);
+				return _tapCommand;
+			}
+			void SetTapCommand(ITapCommand comm){
+				_tapCommand = comm;
+				TapCommand().SetUIElement(this);
+			}
+				ITapCommand _tapCommand;
+			public virtual void OnPointerDown(){
+				TapStateHandler().OnPointerDown();
+			}
+			public virtual void OnPointerUp(){
+				TapStateHandler().OnPointerUp();
+			}
+			public virtual void OnEndDrag(){
+				TapStateHandler().OnEndDrag();
+			}
+			public virtual void OnDeselected(){
+				TapStateHandler().OnDeselected();
+			}
 	}
 }

@@ -4,28 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
 	public class UnequippedItemsInventory : Inventory, IUnequippedItemsInventory {
-		public UnequippedItemsInventory(List<Item> items){
+		public UnequippedItemsInventory(List<IInventorySystemItem> items){
 			_unequippedItems = items;
 		}
-		public override List<Item> Items(){
+		public override List<IInventorySystemItem> Items(){
 			Debug.Assert(_unequippedItems != null);
 			return _unequippedItems;
 		}
-			List<Item> _unequippedItems;
+			List<IInventorySystemItem> _unequippedItems;
 		public void UpdateInventory(BowInstance equippedBow, WearInstance equippedWear, List<CarriedGearInstance> equippedCGears){
-			List<Item> allEquippedItems = GetAllEquippedItems(equippedBow, equippedWear, equippedCGears);
+			List<IInventorySystemItem> allEquippedItems = GetAllEquippedItems(equippedBow, equippedWear, equippedCGears);
 			foreach(var item in allEquippedItems){
-				List<Item> items = Items();
+				List<IInventorySystemItem> items = Items();
 				if(items.Contains(item))
 					items.Remove(item);
 			}
 		}
-		List<Item> GetAllEquippedItems(BowInstance bow, WearInstance wear, List<CarriedGearInstance> cGears){
-			List<Item> result = new List<Item>();
+		List<IInventorySystemItem> GetAllEquippedItems(BowInstance bow, WearInstance wear, List<CarriedGearInstance> cGears){
+			List<IInventorySystemItem> result = new List<IInventorySystemItem>();
 			result.Add(bow);
 			result.Add(wear);
 			foreach(var cGear in cGears)
-				result.Add((Item)cGear);
+				result.Add((IInventorySystemItem)cGear);
 			return result;
 		}
 		public void UpdateItemsEquipState(){

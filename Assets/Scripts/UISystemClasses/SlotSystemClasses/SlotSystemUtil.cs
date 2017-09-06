@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UISystem{
 	public static class SlotSystemUtil{
-		public static bool SBsAreSwappable(ISlottable pickedSB, ISlottable otherSB){
+		public static bool SBsAreSwappable(ISlot pickedSB, ISlot otherSB){
 			IResizableSG pickedSG = pickedSB.SlotGroup();
 			IResizableSG otherSG = otherSB.SlotGroup();
 			ISlottableItem pickedItem = pickedSB.Item();

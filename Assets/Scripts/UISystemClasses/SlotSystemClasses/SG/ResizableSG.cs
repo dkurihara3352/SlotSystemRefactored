@@ -5,19 +5,7 @@ using UnityEngine;
 namespace UISystem{
 	public class ResizableSG : SlotGroup, IResizableSG{
 		public ResizableSG(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg){
-			SetActStateHandler(new SGActStateHandler(this));
-		}
-		protected override List<ISlot> CreateSlots(){
-			List<ISlot> result = CreateSlotsForEachInventoryItems();
-			return result;
-		}
-		List<ISlot> CreateSlotsForEachInventoryItems(){
-			List<ISlot> result = new List<ISlot>();
-			foreach(var item in Inventory().Items()){
-				Slot slot = CreateSlot();
-				result.Add(slot);
-			}
-			return result;
+			SetActStateHandler(new ResizableSGActStateHandler(this));
 		}
 		public IResizableSGActStateHandler ActStateHandler(){
 			Debug.Assert(_actStateHandler != null);
@@ -30,14 +18,8 @@ namespace UISystem{
 		public void WaitForResize(){
 			ActStateHandler().WaitForAction();
 		}
-		public bool IsWaitingForResize(){
-			return ActStateHandler().IsWaitingForResize();
-		}
 		public void Resize(){
 			ActStateHandler().Resize();
-		}
-		public bool IsResizing(){
-			return ActStateHandler().IsResizing();
 		}
 		public override bool IsReceivable(){
 			return true;
@@ -46,8 +28,6 @@ namespace UISystem{
 	public interface IResizableSG: ISlotGroup{
 		IResizableSGActStateHandler ActStateHandler();
 			void WaitForResize();
-			bool IsWaitingForResize();
 			void Resize();
-			bool IsResizing();
 	}
 }

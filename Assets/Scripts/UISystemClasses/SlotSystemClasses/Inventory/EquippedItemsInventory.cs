@@ -47,12 +47,12 @@ namespace UISystem{
 				return source;
 		}
 		
-		public override List<Item> Items(){
-			List<Item> result = new List<Item>();
+		public override List<IInventorySystemItem> Items(){
+			List<IInventorySystemItem> result = new List<IInventorySystemItem>();
 			result.Add(_equippedBow);
 			result.Add(_equippedWear);
 			foreach(CarriedGearInstance inst in _equippedCGears){
-				result.Add((Item)inst);
+				result.Add((IInventorySystemItem)inst);
 			}
 			return result;
 		}

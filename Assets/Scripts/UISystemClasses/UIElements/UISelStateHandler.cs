@@ -138,10 +138,12 @@ namespace UISystem{
 				SelProcEngine().SetAndRunProcess(process);
 			}
 			public IUISelProcess SelProcess(){
-				return SelProcEngine().GetProcess();
+				return SelProcEngine().Process();
 			}
 			public void ExpireProcess(){
-				SelProcess().Expire();
+				IUISelProcess selProc = SelProcess();
+				if(selProc != null)
+					selProc.Expire();
 			}
 		/* Coroutines */
 			IUISelCoroutineRepo CoroutineRepo(){
@@ -150,19 +152,19 @@ namespace UISystem{
 			}
 				IUISelCoroutineRepo _coroutineRepo;
 			public void SetSelCoroutineRepo(IUISelCoroutineRepo repo){_coroutineRepo = repo;}
-			public Func<IEnumeratorFake> DeactivateCoroutine(){
+			public IEnumeratorFake DeactivateCoroutine(){
 				return CoroutineRepo().DeactivateCoroutine();
 			}
-			public Func<IEnumeratorFake> HideCoroutine(){
+			public IEnumeratorFake HideCoroutine(){
 				return CoroutineRepo().HideCoroutine();
 			}
-			public Func<IEnumeratorFake> MakeSelectableCoroutine(){
+			public IEnumeratorFake MakeSelectableCoroutine(){
 				return CoroutineRepo().MakeSelectableCoroutine();
 			}
-			public Func<IEnumeratorFake> MakeUnselectableCoroutine(){
+			public IEnumeratorFake MakeUnselectableCoroutine(){
 				return CoroutineRepo().MakeUnselectableCoroutine();
 			}
-			public Func<IEnumeratorFake> SelectCoroutine(){
+			public IEnumeratorFake SelectCoroutine(){
 				return CoroutineRepo().SelectCoroutine();
 			}
 	}
@@ -197,10 +199,10 @@ namespace UISystem{
 		IUISelProcess SelProcess();
 		void SetSelCoroutineRepo(IUISelCoroutineRepo repo);
 		void ExpireProcess();
-		System.Func<IEnumeratorFake> DeactivateCoroutine();
-		System.Func<IEnumeratorFake> HideCoroutine();
-		System.Func<IEnumeratorFake> MakeSelectableCoroutine();
-		System.Func<IEnumeratorFake> MakeUnselectableCoroutine();
-		System.Func<IEnumeratorFake> SelectCoroutine();
+		IEnumeratorFake DeactivateCoroutine();
+		IEnumeratorFake HideCoroutine();
+		IEnumeratorFake MakeSelectableCoroutine();
+		IEnumeratorFake MakeUnselectableCoroutine();
+		IEnumeratorFake SelectCoroutine();
 	}
 }

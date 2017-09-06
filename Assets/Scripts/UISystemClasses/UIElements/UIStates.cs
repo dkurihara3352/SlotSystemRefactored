@@ -108,7 +108,8 @@ namespace UISystem{
 			}
 		}
 	/* State */
-		public interface IUIState: ISwitchableState{}
+		public interface IUIState: ISwitchableState{}// for engine use
+	/* Selection State */
 		public interface IUISelectionState: IUIState{
 		}
 		public abstract class UISelectionState: IUISelectionState{
@@ -121,6 +122,21 @@ namespace UISystem{
 			public virtual bool CanEnter(){
 				return false;
 			}
+			protected void RunDeactivateProcess(){
+				handler.SetAndRunSelProcess(new UIDeactivateProcess(handler.DeactivateCoroutine()));
+			}
+			protected void RunHideProcess(){
+				handler.SetAndRunSelProcess(new UIHideProcess(handler.HideCoroutine()));
+			}
+			protected void RunSelectProcess(){
+				handler.SetAndRunSelProcess(new UISelectProcess(handler.SelectCoroutine()));
+			}
+			protected void RunMakeSelectableProcess(){
+				handler.SetAndRunSelProcess(new UIMakeSelectableProcess(handler.MakeSelectableCoroutine()));
+			}
+			protected void RunMakeUnselectableProcess(){
+				handler.SetAndRunSelProcess(new UIMakeUnselectableProcess(handler.MakeUnselectableCoroutine()));
+			}
 		}
 			public class UIDeactivatedState: UISelectionState{
 				public UIDeactivatedState(IUISelStateHandler handler): base(handler){}
@@ -131,7 +147,7 @@ namespace UISystem{
 						return true;
 				}
 				public override void Enter(){
-					handler.SetAndRunSelProcess(new UIDeactivateProcess(handler.DeactivateCoroutine()));
+					RunDeactivateProcess();
 				}
 			}
 			public class UIActivatedState: UISelectionState, IRelayState{
@@ -159,7 +175,7 @@ namespace UISystem{
 						return true;
 				}
 				public override void Enter(){
-					handler.SetAndRunSelProcess(new UIHideProcess(handler.HideCoroutine()));
+					RunHideProcess();
 					if(handler.WasDeactivated())
 						handler.ExpireProcess();
 				}
@@ -186,7 +202,7 @@ namespace UISystem{
 						return true;
 				}
 				public override void Enter(){
-					handler.SetAndRunSelProcess(new UISelectProcess(handler.SelectCoroutine()));
+					RunSelectProcess();
 					if(handler.WasDeactivated())
 						handler.ExpireProcess();
 				}
@@ -212,7 +228,7 @@ namespace UISystem{
 						return true;
 				}
 				public override void Enter(){
-					handler.SetAndRunSelProcess(new UIMakeSelectableProcess(handler.MakeSelectableCoroutine()));
+					RunMakeSelectableProcess();
 					if(handler.WasDeactivated())
 						handler.ExpireProcess();
 				}
@@ -226,9 +242,127 @@ namespace UISystem{
 						return true;
 				}
 				public override void Enter(){
-					handler.SetAndRunSelProcess(new UIMakeUnselectableProcess(handler.MakeUnselectableCoroutine()));
+					RunMakeUnselectableProcess();
 					if(handler.WasDeactivated())
 						handler.ExpireProcess();
 				}
 			}
+	/* TapState */
+		// public interface IUIInputState: IUIState{
+		// 	void OnPointerDown();
+		// 	void OnPointerUp();
+		// 	void OnEndDrag();
+		// 	void OnDeselected();
+		// }
+		public interface IUIPointerDownState: IUIState{
+			void OnPointerUp();
+			void OnEndDrag();
+		}
+		public interface IUIPointerUpState: IUIState{
+			void OnPointerDown();
+			void OnDeselected();
+		}
+		public interface IUITapState: IUIState{
+		}
+		public abstract class UITapState: IUITapState{
+			protected ITapStateHandler handler;
+			public UITapState(ITapStateHandler handler){
+				this.handler = handler;
+			}
+			public virtual void Enter(){}
+			public virtual void Exit(){}
+			public virtual bool CanEnter(){return false;}
+
+			protected void RunWaitForPointerDownProcess(){
+				handler.SetAndRunTapProcess(new UIWaitForTapPointerDownProcess(handler.WaitForTapPointerDownCoroutine(), handler));
+			}
+			protected void RunWaitForTapTimerUpProcess(){
+				handler.SetAndRunTapProcess(new UIWaitForTapTimerUpProcess(handler.WaitForTapTimerUpCoroutine(), handler));
+			}
+			protected void RunWaitForTapPointerUpProcess(){
+				handler.SetAndRunTapProcess(new UIWaitForTapPointerUpProcess(handler.WaitForTapPointerUpCoroutine(), handler));
+			}
+			protected void RunTapProcess(){
+				handler.SetAndRunTapProcess(new UITapProcess(handler.TapCoroutine(), handler));
+			}
+		}
+		public class UIWaitingForTapPointerDownState: UITapState, IUIPointerUpState{
+			public UIWaitingForTapPointerDownState(ITapStateHandler handler): base(handler){
+			}
+			public override bool CanEnter(){
+				if(handler.IsWaitingForTapPointerDown())
+					return false;
+				else
+					return true;
+			}
+			public override void Enter(){
+				RunWaitForPointerDownProcess();
+			}
+			public void OnPointerDown(){
+				handler.WaitForTapTimerUp();
+			}
+			public void OnDeselected(){}
+		}
+		public class UIWaitingForTapTimerUpState: UITapState, IUIPointerDownState{
+			public UIWaitingForTapTimerUpState(ITapStateHandler handler): base(handler){
+			}
+			public override bool CanEnter(){
+				if(handler.IsWaitingForTapTimerUp())
+					return false;
+				else if(handler.IsWaitingForTapPointerDown())
+					return true;
+				else
+					return false;
+			}
+			public override void Enter(){
+				RunWaitForTapTimerUpProcess();
+			}
+			public void OnPointerUp(){
+				handler.Tap();
+			}
+			public void OnEndDrag(){
+				handler.WaitForTapPointerDown();
+			}
+		}
+		public class UIWaitingForTapPointerUpState: UITapState, IUIPointerDownState{
+			public UIWaitingForTapPointerUpState(ITapStateHandler handler): base(handler){
+			}
+			public override bool CanEnter(){
+				if(handler.IsWaitingForTapPointerUp())
+					return false;
+				else if(handler.IsWaitingForTapTimerUp())
+					return true;
+				else
+					return false;
+			}
+			public override void Enter(){
+				RunWaitForTapPointerUpProcess();
+			}
+			public void OnPointerUp(){
+				handler.WaitForTapPointerDown();
+			}
+			public void OnEndDrag(){
+				handler.WaitForTapPointerDown();
+			}
+		}
+		public class UITappingState: UITapState, IUIPointerUpState{
+			public UITappingState(ITapStateHandler handler): base(handler){
+			}
+			public override bool CanEnter(){
+				if(handler.IsTapping())
+					return false;
+				else if(handler.WasWaitingForTapTimerUp())
+					return true;
+				else
+					return false;
+			}
+			public override void Enter(){
+				handler.ExecuteTapCommand();
+				RunTapProcess();
+			}
+			public void OnPointerDown(){
+				handler.WaitForTapTimerUp();
+			}
+			public void OnDeselected(){}
+		}
 }

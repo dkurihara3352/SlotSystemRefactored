@@ -4,7 +4,15 @@ using UnityEngine;
 using System;
 
 namespace UISystem{
-	public class InventoryItemInstance: Item{
+	public interface IInventorySystemItem: ISlottableItem{
+		InventoryItem InventoryItem();
+		void SetInventoryItem(InventoryItem item);
+		int AcquisitionOrder();
+		void SetAcquisitionOrder(int order);
+		bool IsEquipped();
+		void SetEquippability(bool equipped);
+	}
+	public class InventoryItemInstance: IInventorySystemItem{
 		public InventoryItem InventoryItem(){
 			return _inventoryItem;
 		}
@@ -36,7 +44,7 @@ namespace UISystem{
 			_isMarked = marked;
 		}
 			bool _isMarked = false;
-		public int GetQuantity(){
+		public int Quantity(){
 			return _quantity;
 		}
 		public void SetQuantity(int quantity){
@@ -46,21 +54,15 @@ namespace UISystem{
 		public bool IsStackable(){
 			return InventoryItem().IsStackable();
 		}
-		public virtual bool IsContainedInEquippedItems(IEquippedElementsProvider equipProv){
-			List<Item> equippedItems = equipProv.GetAllItemsInFocusedSGEs();
-			if(equippedItems.Contains(this))
-				return true;
-			return false;
-		}
 		public override bool Equals(object other){
 			if(!(other is ISlottableItem))
 				return false;
 			return Equals((ISlottableItem)other);
 		}
 		public bool Equals(ISlottableItem other){
-			if(!(other is Item))
+			if(!(other is IInventorySystemItem))
 				return false;
-			Item otherInst = (Item)other;
+			IInventorySystemItem otherInst = (IInventorySystemItem)other;
 			if(IsStackable())
 				return InventoryItem().Equals(otherInst.InventoryItem());
 			else
@@ -87,14 +89,5 @@ namespace UISystem{
 			}
 			return !(a == b);
 		}
-	}
-	public interface Item: ISlottableItem{
-		InventoryItem InventoryItem();
-		void SetInventoryItem(InventoryItem item);
-		int AcquisitionOrder();
-		void SetAcquisitionOrder(int order);
-		bool IsEquipped();
-		void SetEquippability(bool equipped);
-		bool IsContainedInEquippedItems(IEquippedElementsProvider equipProv);
 	}
 }

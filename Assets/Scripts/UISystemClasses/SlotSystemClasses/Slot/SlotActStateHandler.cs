@@ -3,211 +3,189 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
-	public class SlotActStateHandler : ISlotActStateHandler {
-		ISlot slot{
-			get{
-				Debug.Assert(_slot != null);
-				return _slot;
-			}
-		}
-		ISlot _slot;
+	public interface ISlotActStateHandler: IUISystemInputHandler{
+		void WaitForAction();
+			bool WasWaitingForAction();
+			bool IsWaitingForAction();
+		void WaitForPickUp();
+			bool WasWaitingForPickUp();
+			bool IsWaitingForPickUp();
+		void WaitForPointerUp();
+			bool WasWaitingForPointerUp();
+			bool IsWaitingForPointerUp();
+		void WaitForNextTouch();
+			bool WasWaitingForNextTouch();
+			bool IsWaitingForNextTouch();
+
+		void PickUp();
+		void SetAndRunActProcess(ISlotActProcess actProcess);
+		IEnumeratorFake WaitForActionCoroutine();
+		IEnumeratorFake WaitForPickUpCoroutine();
+		IEnumeratorFake WaitForPointerUpCoroutine();
+		IEnumeratorFake WaitForNextTouchCoroutine();
+	}
+	public class SlotActStateHandler : ISlotActStateHandler{
 		public SlotActStateHandler(ISlot slot){
-			_slot = slot;
+			SetSlot(slot);
+			SetActStateEngine(new UIStateEngine<ISlotActState>());
+			SetActProcessEngine(new UIProcessEngine<ISlotActProcess>());
+			InitializeStates();
 		}
-		IUIStateEngine<ISlotActState> actStateEngine{
-			get{
-				if(_actStateEngine == null)
-					_actStateEngine = new UIStateEngine<ISlotActState>();
-				return _actStateEngine;
-			}
+		ISlot Slot(){
+			Debug.Assert(_slot != null);
+			return _slot;
+		}
+		void SetSlot(ISlot sb){
+			_slot = sb;
+		}
+			ISlot _slot;
+		IUIStateEngine<ISlotActState> ActStateEngine(){
+			Debug.Assert(_actStateEngine != null);
+			return _actStateEngine;
+		}
+		void SetActStateEngine(IUIStateEngine<ISlotActState> stateEngine){
+			_actStateEngine = stateEngine;
 		}
 			IUIStateEngine<ISlotActState> _actStateEngine;
-		void SetActState(ISlotActState state){
-			actStateEngine.SetState(state);
-			if(state == null && GetActProcess() != null)
+		public void SetActState(ISlotActState state){
+			ActStateEngine().SetState(state);
+			if(state == null && ActProcess() != null)
 				SetAndRunActProcess(null);
 		}
-		ISlotActState curActState{
-			get{return actStateEngine.CurState();}
+		ISlotActState CurState(){
+			return ActStateEngine().CurState();
 		}
-		ISlotActState prevActState{
-			get{return actStateEngine.PrevState();}
+		ISlotActState PrevState(){
+			return ActStateEngine().PrevState();
 		}
-		ISlotActStateRepo actStateRepo{
-			get{
-				if(_actStateRepo == null)
-					_actStateRepo = new SlotActStateRepo(slot);
-				return _actStateRepo;
-			}
+
+		
+		void InitializeStates(){
+			_waitingForActionState = new SlotWaitingForActionState(this);
+			_waitingForPickUpState = new SlotWaitingForPickUpState(this);
+			_waitingForPointerUpState = new SlotWaitingForPointerUpState(this);
+			_waitingForNextTouchState = new SlotWaitingForNextTouchState(this);
 		}
-			ISlotActStateRepo _actStateRepo;
-		public void ClearCurActState(){
-			SetActState(null);
+
+		public void WaitForAction(){
+			SetActState( WaitingForActionState());
 		}
-			public bool WasActStateNull(){
-				return prevActState == null;
+			ISlotActState WaitingForActionState(){
+				Debug.Assert(_waitingForActionState != null);
+				return _waitingForActionState;
 			}
-			public bool IsActStateNull(){
-				return curActState == null;
+			ISlotActState _waitingForActionState;
+			public bool WasWaitingForAction(){
+				return PrevState() == WaitingForActionState();
 			}
-		public virtual void WaitForAction(){
-			SetActState(waitForActionState);
+			public bool IsWaitingForAction(){
+				return CurState() == WaitingForActionState();
+			}
+		public void WaitForPickUp(){
+			SetActState( WaitingForPickUpState());
 		}
-			ISlotActState waitForActionState{
-				get{return actStateRepo.GetWaitForActionState();}
+			ISlotActState WaitingForPickUpState(){
+				Debug.Assert(_waitingForPickUpState != null);
+				return _waitingForPickUpState;
 			}
-			public virtual bool IsWaitingForAction(){
-				return curActState == waitForActionState;
+			ISlotActState _waitingForPickUpState;
+			public bool WasWaitingForPickUp(){
+				return PrevState() == WaitingForPickUpState();
 			}
-			public virtual bool WasWaitingForAction(){
-				return prevActState == waitForActionState;
+			public bool IsWaitingForPickUp(){
+				return CurState() == WaitingForPickUpState();
 			}
-		public virtual void WaitForPointerUp(){
-			SetActState(waitForPointerUpState);
+		public void WaitForPointerUp(){
+			SetActState( WaitingForPointerUpState());
 		}
-			ISlotActState waitForPointerUpState{
-				get{return actStateRepo.GetWaitForPointerUpState();}
+			ISlotActState WaitingForPointerUpState(){
+				Debug.Assert(_waitingForPointerUpState != null);
+				return _waitingForPointerUpState;
 			}
-			public virtual bool IsWaitingForPointerUp(){
-				return curActState == waitForPointerUpState;
+			ISlotActState _waitingForPointerUpState;
+			public bool WasWaitingForPointerUp(){
+				return PrevState() == WaitingForPointerUpState();
 			}
-			public virtual bool WasWaitingForPointerUp(){
-				return prevActState == waitForPointerUpState;
+			public bool IsWaitingForPointerUp(){
+				return CurState() == WaitingForPointerUpState();
 			}
-		public virtual void WaitForPickUp(){
-			SetActState(waitForPickUpState);
+		public void WaitForNextTouch(){
+			SetActState( WaitingForNextTouchState());
 		}
-			ISlotActState waitForPickUpState{
-				get{return actStateRepo.GetWaitForPickUpState();}
+			ISlotActState WaitingForNextTouchState(){
+				Debug.Assert(_waitingForNextTouchState != null);
+				return _waitingForNextTouchState;
 			}
-			public virtual bool IsWaitingForPickUp(){
-				return curActState == waitForPickUpState;
+			ISlotActState _waitingForNextTouchState;
+			public bool WasWaitingForNextTouch(){
+				return PrevState() == WaitingForNextTouchState();
 			}
-			public virtual bool WasWaitingForPickUp(){
-				return prevActState == waitForPickUpState;
+			public bool IsWaitingForNextTouch(){
+				return CurState() == WaitingForNextTouchState();
 			}
-		public virtual void WaitForNextTouch(){
-			SetActState(waitForNextTouchState);
+
+
+		public void PickUp(){
+			Slot().PickUp();
 		}
-			ISlotActState waitForNextTouchState{
-				get{return actStateRepo.GetWaitForNextTouchState();}
-			}
-			public virtual bool IsWaitingForNextTouch(){
-				return curActState == waitForNextTouchState;
-			}
-			public virtual bool WasWaitingForNextTouch(){
-				return prevActState == waitForNextTouchState;
-			}
-		public virtual void PickUp(){
-			SetActState(pickedUpState);
-		}
-		public void SetPickedUpState(){
-			SetActState(pickedUpState);
-		}
-			ISlotActState pickedUpState{
-				get{return actStateRepo.GetPickingUpState();}
-			}
-			public virtual bool IsPickingUp(){
-				return curActState == pickedUpState;
-			}
-			public virtual bool WasPickingUp(){
-				return prevActState == pickedUpState;
-			}
-		public ISlotActProcess GetActProcess(){
-			return actProcEngine.GetProcess();
+
+
+		public ISlotActProcess ActProcess(){
+			return ActProcEngine().Process();
 		}
 		public bool IsActProcessRunning(){
-			ISlotActProcess actProcess = GetActProcess();
+			ISlotActProcess actProcess = ActProcess();
 			if(actProcess != null)
 				return actProcess.IsRunning();
 			return false;
 		}
 		public void SetAndRunActProcess(ISlotActProcess process){
-			actProcEngine.SetAndRunProcess(process);
+			ActProcEngine().SetAndRunProcess(process);
 		}
-		IUIProcessEngine<ISlotActProcess> actProcEngine{
-			get{
-				if(m_actProcEngine == null)
-					m_actProcEngine = new UIProcessEngine<ISlotActProcess>();
-				return m_actProcEngine;
-			}
+		IUIProcessEngine<ISlotActProcess> ActProcEngine(){
+			Debug.Assert(_actProcessEngine != null);
+			return _actProcessEngine;
 		}
-			IUIProcessEngine<ISlotActProcess> m_actProcEngine;
+			IUIProcessEngine<ISlotActProcess> _actProcessEngine;
 		public void SetActProcessEngine(IUIProcessEngine<ISlotActProcess> engine){
-			m_actProcEngine = engine;
+			_actProcessEngine = engine;
 		}
 		public void ExpireActProcess(){
-			ISlotActProcess actProcess = GetActProcess();
+			ISlotActProcess actProcess = ActProcess();
 			if(actProcess != null)
 				actProcess.Expire();
 		}
-		ISlotActCoroutineRepo coroutineRepo{
-			get{
-				if(_coroutineRepo == null)
-					_coroutineRepo = new SlotActCoroutineRepo();
-				return _coroutineRepo;
-			}
+
+
+		public IEnumeratorFake WaitForActionCoroutine(){
+			return null;
 		}
-			ISlotActCoroutineRepo _coroutineRepo;
-		public void SetCoroutineRepo(ISlotActCoroutineRepo coroutineRepo){
-			_coroutineRepo = coroutineRepo;
+		public IEnumeratorFake WaitForPickUpCoroutine(){
+			return null;
 		}
-		public System.Func<IEnumeratorFake> WaitForPointerUpCoroutine(){
-			return coroutineRepo.GetWaitForPointerUpCoroutine();
+		public IEnumeratorFake WaitForPointerUpCoroutine(){
+			return null;
 		}
-		public System.Func<IEnumeratorFake> WaitForPickUpCoroutine(){
-			return coroutineRepo.GetWaitForPickUpCoroutine();
+		public IEnumeratorFake WaitForNextTouchCoroutine(){
+			return null;
 		}
-		public System.Func<IEnumeratorFake> PickUpCoroutine(){
-			return coroutineRepo.GetPickUpCoroutine();
-		}
-		public System.Func<IEnumeratorFake> WaitForNextTouchCoroutine(){
-			return coroutineRepo.GetWaitForNextTouchCoroutine();
-		}
+		
+
 		public void OnPointerDown(){
-			curActState.OnPointerDown();
+			if(CurState() is IUIPointerUpState)
+				((IUIPointerUpState)CurState()).OnPointerDown();
 		}
 		public void OnPointerUp(){
-			curActState.OnPointerUp();
+			if(CurState() is IUIPointerDownState)
+				((IUIPointerDownState)CurState()).OnPointerUp();
 		}
 		public void OnEndDrag(){
-			curActState.OnEndDrag();
+			if(CurState() is IUIPointerDownState)
+				((IUIPointerDownState)CurState()).OnEndDrag();
 		}
 		public void OnDeselected(){
-			curActState.OnDeselected();
+			if(CurState() is IUIPointerUpState)
+				((IUIPointerUpState)CurState()).OnDeselected();
 		}
-	}
-	public interface ISlotActStateHandler{
-		void ClearCurActState();
-			bool WasActStateNull();
-			bool IsActStateNull();
-		void WaitForAction();
-			bool IsWaitingForAction();
-			bool WasWaitingForAction();
-		void WaitForPointerUp();
-			bool IsWaitingForPointerUp();
-			bool WasWaitingForPointerUp();
-		void WaitForPickUp();
-			bool IsWaitingForPickUp();
-			bool WasWaitingForPickUp();
-		void WaitForNextTouch();
-			bool IsWaitingForNextTouch();
-			bool WasWaitingForNextTouch();
-		void PickUp();
-		void SetPickedUpState();
-			bool IsPickingUp();
-			bool WasPickingUp();
-		ISlotActProcess GetActProcess();
-		void SetAndRunActProcess(ISlotActProcess process);
-		bool IsActProcessRunning();
-		void ExpireActProcess();
-		Func<IEnumeratorFake> WaitForPointerUpCoroutine();
-		Func<IEnumeratorFake> WaitForPickUpCoroutine();
-		Func<IEnumeratorFake> WaitForNextTouchCoroutine();
-		Func<IEnumeratorFake> PickUpCoroutine();
-		void OnPointerDown();
-		void OnPointerUp();
-		void OnEndDrag();
-		void OnDeselected();
 	}
 }

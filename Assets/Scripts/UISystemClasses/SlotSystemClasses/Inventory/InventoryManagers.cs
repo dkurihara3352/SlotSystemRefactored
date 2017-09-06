@@ -13,8 +13,8 @@ namespace UISystem{
 			equippedElementsProvider = equippedProvider;
 		}
 		public void InitializeInventory(){
-			List<Item> allItems = poolInventory.Items();
-			List<Item> unequippedItems = new List<Item>();
+			List<IInventorySystemItem> allItems = poolInventory.Items();
+			List<IInventorySystemItem> unequippedItems = new List<IInventorySystemItem>();
 			BowInstance equippedBow = null;
 			WearInstance equippedWear = null;
 			List<CarriedGearInstance> equippedCGears = new List<CarriedGearInstance>();
@@ -45,7 +45,7 @@ namespace UISystem{
 				IEquippedItemsInventory equippedItemsInventory = new EquippedItemsInventory(equippedBow, equippedWear, equippedCGears, equippableCarriedGearCount);
 				SetEquippedItemsInventory(equippedItemsInventory);
 			}
-			void CreateAndSetUnequippedItemsInventory(List<Item> unequippedItems){
+			void CreateAndSetUnequippedItemsInventory(List<IInventorySystemItem> unequippedItems){
 				IUnequippedItemsInventory unequippedItemsInventory = new UnequippedItemsInventory(unequippedItems);
 				SetUnequippedItemsInventory(unequippedItemsInventory);
 			}

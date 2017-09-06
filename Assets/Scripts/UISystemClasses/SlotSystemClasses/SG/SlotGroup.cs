@@ -4,23 +4,45 @@ using UnityEngine;
 using Utility;
 using System;
 namespace UISystem{
+	public interface ISlotGroup: ISlotSystemElement{
+		void InitializeOnSlotSystemActivate();
+		ISorterHandler GetSorterHandler();
+			void InstantSort();
+			void ToggleAutoSort(bool on);
+			bool IsAutoSort();
+		List<ISlot> Slots();
+		IInventory Inventory();
+		void SetInventory(IInventory inventory);
+		void OnInventoryUpdated(object source, InventoryEventArgs e);
+		bool AcceptsItem(ISlottableItem item);
+		bool IsReorderable();
+		bool IsReceivable();
+		bool IsSwappable(ISlot sb);
+
+		ISlot PickedItemSlot();
+		bool HasPickedItemSlot();
+		void AddItem(ISlottableItem item);
+		void ReduceItem(ISlottableItem item);
+		void Reorder(ISlot toSlot);
+	}
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
-		public SlotGroup(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg.UISelStateRepo(), constArg.SSEEventCommandsRepo()){
+		public SlotGroup(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg.UISelStateRepo(), constArg.TapCommand()){
 			SSM().InventoryUpdated += OnInventoryUpdated;
 			SetIntialSlotCount(constArg.InitSlotCount());
 			SetFetchInventoryCommand(constArg.FetchInventoryCommand());
 			SetAcceptsItemCommand(constArg.AcceptsItemCommand());
 			SetReorderability(constArg.IsReorderable());
-			SetPositionSlotsCommand(constArg.PositionSlotsCommand());
+			SetPositionSlotsCommand(constArg.PositionSBsCommand());
 			SetSorterHandler(new SorterHandler(constArg.InitSorter()));
-			SetCreateSlotCommand(new CreateSlotCommand());
 			SetSelStateHandler(new UISelStateHandler(this, constArg.UISelStateRepo()));
 		}
 		public void InitializeOnSlotSystemActivate(){
 			SetUpInventory();
 			InitializeSlots();
-			InitializeSlottables();
 		}
+
+
+		/* inventory */
 		void SetUpInventory(){
 			IInventory inventory = FetchInventoryCommand().FetchInventory();
 			SetInventory(inventory);
@@ -32,66 +54,6 @@ namespace UISystem{
 			IFetchInventoryCommand _fetchInventoryCommand;
 		void SetFetchInventoryCommand(IFetchInventoryCommand comm){
 			_fetchInventoryCommand = comm;
-		}
-		void InitializeSlots(){
-			List<ISlot> slots = CreateSlots();
-			SetSlots(slots);
-			PositionSlots();
-			UpdateSlotIDs();
-		}
-		public List<ISlot> Slots(){
-			Debug.Assert(_slots != null);
-			return _slots;
-		}
-		void SetSlots(List<ISlot> slots){
-			_slots = slots;
-		}
-			List<ISlot> _slots;
-		protected virtual List<ISlot> CreateSlots(){
-			List<ISlot> result = CreateSlotsByInitialSlotCount();
-			return result;
-		}
-		List<ISlot> CreateSlotsByInitialSlotCount(){
-			List<ISlot> result = new List<ISlot>();
-			for(int i = 0; i < InitialSlotCount(); i ++)
-				result.Add(CreateSlotCommand().CreateSlot());
-			return result;
-		}
-		protected Slot CreateSlot(){
-			return CreateSlotCommand().CreateSlot();
-		}
-		ICreateSlotCommand CreateSlotCommand(){
-			Debug.Assert(_createSlotCommand != null);
-			return _createSlotCommand;
-		}
-			ICreateSlotCommand _createSlotCommand;
-		void SetCreateSlotCommand(ICreateSlotCommand comm){
-			_createSlotCommand = comm;
-		}
-		int InitialSlotCount(){
-			Debug.Assert(_initialSlotCount != -1);
-			return _initialSlotCount;
-		}
-			int _initialSlotCount = -1;
-		void SetIntialSlotCount(int count){
-			_initialSlotCount = count;
-		}
-		void PositionSlots(){
-			PositionSlotsCommand().Execute();
-		}
-		IPositionSlotsCommand PositionSlotsCommand(){
-			Debug.Assert(_positionSlotsCommand != null);
-			return _positionSlotsCommand;
-		}
-		void SetPositionSlotsCommand(IPositionSlotsCommand comm){
-			_positionSlotsCommand = comm;
-		}
-			IPositionSlotsCommand _positionSlotsCommand;
-		void UpdateSlotIDs(){
-			int index = 0;
-			foreach(var slot in Slots()){
-				slot.SetID(index ++);
-			}
 		}
 		public IInventory Inventory(){
 			Debug.Assert(_inventory != null);
@@ -113,9 +75,43 @@ namespace UISystem{
 			return _onInventoryUpdatedCommand;
 		}
 			IOnInventoryUpdatedCommand _onInventoryUpdatedCommand;
-		public void InitializeSlottables(){
+
+
+
+		/* Slots */
+		public void InitializeSlots(){
 
 		}
+		public List<ISlot> Slots(){
+			Debug.Assert(_slots != null);
+			return _slots;
+		}
+		void SetSlots(List<ISlot> slots){
+			_slots = slots;
+		}
+			List<ISlot> _slots;
+		int InitialSlotCount(){
+			Debug.Assert(_initialSlotCount != -1);
+			return _initialSlotCount;
+		}
+			int _initialSlotCount = -1;
+		void SetIntialSlotCount(int count){
+			_initialSlotCount = count;
+		}
+		void PositionSlots(){
+			PositionSlotsCommand().Execute();
+		}
+		IPositionSBsCommand PositionSlotsCommand(){
+			Debug.Assert(_positionSlotsCommand != null);
+			return _positionSlotsCommand;
+		}
+		void SetPositionSlotsCommand(IPositionSBsCommand comm){
+			_positionSlotsCommand = comm;
+		}
+			IPositionSBsCommand _positionSlotsCommand;
+
+
+
 		public ISorterHandler GetSorterHandler(){
 			Debug.Assert(_sorterHandler != null);
 			return _sorterHandler;
@@ -124,34 +120,39 @@ namespace UISystem{
 			_sorterHandler = sorterHandler;
 		}
 			ISorterHandler _sorterHandler;
-		/*	sorter	*/
-			public bool IsAutoSort(){
-				return GetSorterHandler().IsAutoSort();
-			}
-			public void InstantSort(){
-				
-			}
-			public void ToggleAutoSort(bool on){
-				GetSorterHandler().SetIsAutoSort(on);
-				SSM().Refresh();
-			}
+		public bool IsAutoSort(){
+			
+			return GetSorterHandler().IsAutoSort();
+		}
+		public void InstantSort(){
+			
+		}
+		public void ToggleAutoSort(bool on){
+			GetSorterHandler().SetIsAutoSort(on);
+			SSM().Refresh();
+		}
+		
+		
+		
 		/*	SlotSystemElement implementation	*/
-			protected override IEnumerable<IUIElement> elements{
-				get{
-					foreach(ISlot slot in Slots())
-						yield return slot;
-				}
+		protected override IEnumerable<IUIElement> elements{
+			get{
+				foreach(ISlot sb in Slots())
+					yield return sb;
 			}
-			public override void SetElements(IEnumerable<IUIElement> elements){
-				List<ISlot> slots = new List<ISlot>();
-				foreach(var e in elements){
-					if(e == null || e is ISlot){
-						slots.Add(e as ISlot);
-					}else
-						throw new System.ArgumentException("parameter needs to be a collection of only ISlot or null");
-				}
-				SetSlots(slots);
+		}
+		public override void SetElements(IEnumerable<IUIElement> elements){
+			List<ISlot> slottables = new List<ISlot>();
+			foreach(var e in elements){
+				if(e == null || e is ISlot){
+					slottables.Add(e as ISlot);
+				}else
+					throw new System.ArgumentException("parameter needs to be a collection of only ISlottable or null");
 			}
+			SetSlots(slottables);
+		}
+
+
 		/*	intrinsic */
 		public bool IsReorderable(){
 			return _isReorderable;
@@ -161,20 +162,20 @@ namespace UISystem{
 		}
 			bool _isReorderable;
 		public virtual bool IsReceivable(){
-			return HasEmptySlot();
+			return HasEmptySlottable();
 		}
-		bool HasEmptySlot(){
-			foreach(var slot in Slots())
-				if(slot.IsEmpty())
+		bool HasEmptySlottable(){
+			foreach(var slottable in Slots())
+				if(slottable.IsEmpty())
 					return true;
 			return false;
 		}
-		public bool IsSwappable(ISlottable sb){
+		public bool IsSwappable(ISlot sb){
 			return SwappableSBs(sb).Count == 1;
 		}
-		public List<ISlottable> SwappableSBs(ISlottable pickedSB){
-			List<ISlottable> result = new List<ISlottable>();
-			foreach(ISlottable sb in this){
+		public List<ISlot> SwappableSBs(ISlot pickedSB){
+			List<ISlot> result = new List<ISlot>();
+			foreach(ISlot sb in this){
 				if(sb != null){
 					if(SlotSystemUtil.SBsAreSwappable(pickedSB, sb))
 						result.Add(sb);
@@ -194,28 +195,50 @@ namespace UISystem{
 			_acceptsItemCommand = comm;
 		}
 			IAcceptsItemCommand _acceptsItemCommand;
-		public void Refresh(){
-
+		public override void PerformHoverEnterAction(){
+			SSM().SetDestinationSG(this);
 		}
-		public override void HoverEnter(){
-			SSM().SetHoveredSG(this);
+		public override void PerformHoverExitAction(){
+			/*	do nothing
+			*/
 		}
 		public override bool IsHovered(){
-			return SSM().HoveredSG() == this;
+			return SSM().HoveredSSE() == this;
 		}
-	}
-	public interface ISlotGroup: ISlotSystemElement{
-		void InitializeOnSlotSystemActivate();
-		ISorterHandler GetSorterHandler();
-			void InstantSort();
-			void ToggleAutoSort(bool on);
-			bool IsAutoSort();
-		IInventory Inventory();
-		void SetInventory(IInventory inventory);
-		void OnInventoryUpdated(object source, InventoryEventArgs e);
-		bool AcceptsItem(ISlottableItem item);
-		bool IsReorderable();
-		bool IsReceivable();
-		bool IsSwappable(ISlottable sb);
+
+		
+		public ISlot PickedItemSlot(){
+			foreach(var slot in Slots()){
+				if(slot.Item() == SSM().PickedItem())
+					return slot;
+			}
+			return null;
+		}
+		public bool HasPickedItemSlot(){
+			return PickedItemSlot() != null;
+		}
+		public void AddItem(ISlottableItem pickedItem){
+			/*	Find or Create new Slot
+				Update slots indexes
+				Make them travel
+				Set the slot as destination
+
+				swap or fill
+			*/
+		}
+		public void ReduceItem(ISlottableItem pickedItem){
+			/*	Remove PickedItemSlot if quantity is to be zero
+				if so, Update slots indexes
+				and make them travel
+				if pickedItemSlot is ready for swap, make it wait for swap
+			*/
+		}
+		public void Reorder(ISlot toSlot){
+			/*	from PickedItemSlot to toSlot
+			*/
+		}
+
+		public void Refresh(){
+		}
 	}
 }

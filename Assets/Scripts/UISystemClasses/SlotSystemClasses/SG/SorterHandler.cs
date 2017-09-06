@@ -7,10 +7,10 @@ namespace UISystem{
 		public SorterHandler(ISGSorter initSorter){
 			SetSorter(initSorter);
 		}
-		public List<ISlottable> GetSortedSBsWithoutResize(List<ISlottable> source){
+		public List<ISlot> GetSortedSBsWithoutResize(List<ISlot> source){
 			return GetSorter().OrderedSBsWithoutResize(source);
 		}
-		public List<ISlottable> GetSortedSBsWithResize(List<ISlottable> source){
+		public List<ISlot> GetSortedSBsWithResize(List<ISlot> source){
 			return GetSorter().OrderedAndTrimmedSBs(source);
 		}
 		public void SetSorter(ISGSorter sorter){
@@ -32,8 +32,8 @@ namespace UISystem{
 			protected bool _isAutoSort = true;
 	}
 	public interface ISorterHandler{
-		List<ISlottable> GetSortedSBsWithoutResize(List<ISlottable> source);
-		List<ISlottable> GetSortedSBsWithResize(List<ISlottable> source);
+		List<ISlot> GetSortedSBsWithoutResize(List<ISlot> source);
+		List<ISlot> GetSortedSBsWithResize(List<ISlot> source);
 		ISGSorter GetSorter();
 		void SetSorter(ISGSorter sorter);
 		void SetIsAutoSort(bool on);

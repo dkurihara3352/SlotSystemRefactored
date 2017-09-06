@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace UISystem{
 	public interface ISGSorter{
-		List<ISlottable> OrderedSBsWithoutResize(List<ISlottable> source);
-		List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> soruce);
+		List<ISlot> OrderedSBsWithoutResize(List<ISlot> source);
+		List<ISlot> OrderedAndTrimmedSBs(List<ISlot> soruce);
 	}
 	public abstract class SGSorter: ISGSorter{
-		public virtual List<ISlottable> OrderedSBsWithoutResize(List<ISlottable> source){
-			List<ISlottable> result = source;
+		public virtual List<ISlot> OrderedSBsWithoutResize(List<ISlot> source){
+			List<ISlot> result = source;
 			int origCount = source.Count;
 			result = OrderedAndTrimmedSBs(result);
 			while(result.Count < origCount){
@@ -17,10 +17,10 @@ namespace UISystem{
 			}
 			return result;
 		}
-		public abstract List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source);
-		public List<ISlottable> TrimmedSBsOrderedByCompairer(List<ISlottable> source, Comparer<ISlottable> compairer){
-			List<ISlottable> result = new List<ISlottable>();
-			foreach(ISlottable sb in source){
+		public abstract List<ISlot> OrderedAndTrimmedSBs(List<ISlot> source);
+		public List<ISlot> TrimmedSBsOrderedByCompairer(List<ISlot> source, Comparer<ISlot> compairer){
+			List<ISlot> result = new List<ISlot>();
+			foreach(ISlot sb in source){
 				if(sb != null)
 					result.Add(sb);
 			}
@@ -29,28 +29,28 @@ namespace UISystem{
 		}
 	}
 		public class　SGItemIDSorter: SGSorter{
-			public override List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source){
+			public override List<ISlot> OrderedAndTrimmedSBs(List<ISlot> source){
 				return TrimmedSBsOrderedByCompairer(source, new ItemIDOrderComparer());
 			}
 		}
 		public class SGInverseItemIDSorter: SGSorter{
-			public override List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source){
-				List<ISlottable> result = new SGItemIDSorter().OrderedAndTrimmedSBs(source);
+			public override List<ISlot> OrderedAndTrimmedSBs(List<ISlot> source){
+				List<ISlot> result = new SGItemIDSorter().OrderedAndTrimmedSBs(source);
 				result.Reverse();
 				return result;
 			}
 		}
 		public class SGAcquisitionOrderSorter: SGSorter{
-			public override List<ISlottable> OrderedAndTrimmedSBs(List<ISlottable> source){
+			public override List<ISlot> OrderedAndTrimmedSBs(List<ISlot> source){
 				return TrimmedSBsOrderedByCompairer(source, new AcquisitionOrderComparer());
 			}
 		}
-		public class AcquisitionOrderComparer: Comparer<ISlottable>{
-			public override int Compare(ISlottable x, ISlottable y){
-				Debug.Assert((x is IInventoryItemSB));
-				Debug.Assert((y is IInventoryItemSB));
-				IInventoryItemSB invSBX = (IInventoryItemSB)x;
-				IInventoryItemSB invSBY = (IInventoryItemSB)y;
+		public class AcquisitionOrderComparer: Comparer<ISlot>{
+			public override int Compare(ISlot x, ISlot y){
+				Debug.Assert((x is IInventoryItemSlot));
+				Debug.Assert((y is IInventoryItemSlot));
+				IInventoryItemSlot invSBX = (IInventoryItemSlot)x;
+				IInventoryItemSlot invSBY = (IInventoryItemSlot)y;
 				int xAcqOrder = invSBX.AcquisitionOrder();
 				int yAcqOrder = invSBY.AcquisitionOrder();
 				if(xAcqOrder.Equals(yAcqOrder)) 
@@ -58,8 +58,8 @@ namespace UISystem{
 				return xAcqOrder.CompareTo(yAcqOrder);
 			}
 		}
-		public class ItemIDOrderComparer: Comparer<ISlottable>{
-			public override int Compare(ISlottable x, ISlottable y){
+		public class ItemIDOrderComparer: Comparer<ISlot>{
+			public override int Compare(ISlot x, ISlot y){
 				int xItemID = x.ItemID();
 				int yItemID = y.ItemID();
 

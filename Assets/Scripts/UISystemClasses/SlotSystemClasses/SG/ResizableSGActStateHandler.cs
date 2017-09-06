@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
-	public class SGActStateHandler : IResizableSGActStateHandler {
+	public class ResizableSGActStateHandler : IResizableSGActStateHandler {
 		/*	Engines	*/
 			/*	Action State	*/
-				public SGActStateHandler(IResizableSG sg){
+				public ResizableSGActStateHandler(IResizableSG sg){
 					SetActStateEngine(new UIStateEngine<ISGActState>());
 					SetStatesRepo(new ResizableSGActStateRepo(sg));
 					SetActProcEngine(new UIProcessEngine<ISGActProcess>());
@@ -91,7 +91,7 @@ namespace UISystem{
 					actProcess.Expire();
 			}
 			public ISGActProcess ActProcess(){
-				return ActProcEngine().GetProcess();
+				return ActProcEngine().Process();
 			}
 			public Func<IEnumeratorFake> ResizeCoroutine(){
 				return null;

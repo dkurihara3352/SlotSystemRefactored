@@ -5,10 +5,11 @@ using UnityEngine;
 namespace UISystem{
 	public interface ISGConstructorArg{
 		IUISelStateRepo UISelStateRepo();
+		ITapCommand TapCommand();
 		ISSEEventCommandsRepo SSEEventCommandsRepo();
 		IFetchInventoryCommand FetchInventoryCommand();
 		IAcceptsItemCommand AcceptsItemCommand();
-		IPositionSlotsCommand PositionSlotsCommand();
+		IPositionSBsCommand PositionSBsCommand();
 		ISGSorter InitSorter();
 		int InitSlotCount();
 		bool IsReorderable();

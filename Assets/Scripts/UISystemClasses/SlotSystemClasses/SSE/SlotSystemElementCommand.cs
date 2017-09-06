@@ -3,70 +3,81 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
-	public interface ISBEventArgsCommand: ISlotSystemElementCommand{
-		void Execute(ISlottable pickedSB);
-	}
-	public interface ISGEventArgsCommand: ISlotSystemElementCommand{
-		void Execute(IResizableSG hoveredSG);
-	}
-	public interface ISlotEventArgsCommand: ISlotSystemElementCommand{
-		void Execute(ISlot slot);
+	public interface ISSEEventArgsCommand: ISlotSystemElementCommand{
+		void Execute(SSEEventArgs e);
 	}
 	public interface ISlotSystemElementCommand{
 	}
+	/* Event Commands Repo */
 	public interface ISSEEventCommandsRepo{
-		ISBEventArgsCommand OnSBPickedUpCommand();
-		ISlotEventArgsCommand OnSlotHoverEnteredCommand();
-		ISGEventArgsCommand OnSGHoverEnteredCommand();
-		ISBEventArgsCommand OnSBDroppedCommand();
+		void InitializeCommands();
+		ISSEEventArgsCommand OnSBPickedUpCommand();
+		ISSEEventArgsCommand OnSBHoverEnteredCommand();
+		ISSEEventArgsCommand OnSlotHoverEnteredCommand();
+		ISSEEventArgsCommand OnSGHoverEnteredCommand();
+		ISSEEventArgsCommand OnSBDroppedCommand();
 	}
-
-	public class EmptySSECommandsRepo: ISSEEventCommandsRepo{
-		public ISBEventArgsCommand OnSBPickedUpCommand(){
-			if(_onSBPickedUpCommand == null)
-				_onSBPickedUpCommand = new OnSBPickedUpCommand_empty();
+	public abstract class SSEEventCommandsRepo: ISSEEventCommandsRepo{
+		public abstract void InitializeCommands();
+		public ISSEEventArgsCommand OnSBPickedUpCommand(){
 			return _onSBPickedUpCommand;
 		}
-			ISBEventArgsCommand _onSBPickedUpCommand;
-		public ISlotEventArgsCommand OnSlotHoverEnteredCommand(){
-			if(_onSlotHoverEnteredCommand == null)
-				_onSlotHoverEnteredCommand = new OnSlotHoverEnteredCommand_empty();
+		protected void SetOnItemPickedUpCommand(ISSEEventArgsCommand comm){
+			_onSBPickedUpCommand = comm;
+		}
+			ISSEEventArgsCommand _onSBPickedUpCommand;
+		public ISSEEventArgsCommand OnSBHoverEnteredCommand(){
+			return _onSBHoverEnteredCommand;
+		}
+		protected void SetOnSBHoverEnteredCommand(ISSEEventArgsCommand comm){
+			_onSBHoverEnteredCommand = comm;
+		}
+			ISSEEventArgsCommand _onSBHoverEnteredCommand;
+		public ISSEEventArgsCommand OnSlotHoverEnteredCommand(){
 			return _onSlotHoverEnteredCommand;
 		}
-			ISlotEventArgsCommand _onSlotHoverEnteredCommand;
-		public ISGEventArgsCommand OnSGHoverEnteredCommand(){
-			if(_onSGHoverEnteredCommand == null)
-				_onSGHoverEnteredCommand = new OnSGHoverEnteredCommand_empty();
+		protected void SetOnSlotHoverEnteredCommand(ISSEEventArgsCommand comm){
+			_onSlotHoverEnteredCommand = comm;
+		}
+			ISSEEventArgsCommand _onSlotHoverEnteredCommand;
+		public ISSEEventArgsCommand OnSGHoverEnteredCommand(){
 			return _onSGHoverEnteredCommand;
 		}
-			ISGEventArgsCommand _onSGHoverEnteredCommand;
-		public ISBEventArgsCommand OnSBDroppedCommand(){
-			if(_onSBDroppedCommand == null)
-				_onSBDroppedCommand = new OnSBDroppedCommand_empty();
+		protected void SetOnSGHoverEnteredCommand(ISSEEventArgsCommand comm){
+			_onSGHoverEnteredCommand = comm;
+		}
+			ISSEEventArgsCommand _onSGHoverEnteredCommand;
+		public ISSEEventArgsCommand OnSBDroppedCommand(){
 			return _onSBDroppedCommand;
 		}
-			ISBEventArgsCommand _onSBDroppedCommand;
+		protected void SetOnItemDroppedCommand(ISSEEventArgsCommand comm){
+			_onSBDroppedCommand = comm;
+		}
+			ISSEEventArgsCommand _onSBDroppedCommand;
 	}
-		public class OnSBPickedUpCommand_empty: ISBEventArgsCommand{
-			public void Execute(ISlottable sb){}
+
+	public class EmptySSECommandsRepo: SSEEventCommandsRepo{
+		public override void InitializeCommands(){
+			SetOnItemPickedUpCommand(new OnSBPickedUpCommand_empty());
+			SetOnSBHoverEnteredCommand(new OnSBHoverEnteredCommand_empty());
+			SetOnSlotHoverEnteredCommand(new OnSlotHoverEnteredCommand_empty());
+			SetOnSGHoverEnteredCommand(new OnSGHoverEnteredCommand_empty());
+			SetOnItemDroppedCommand(new OnSBDroppedCommand_empty());
 		}
-		public class OnSlotHoverEnteredCommand_empty: ISlotEventArgsCommand{
-			public void Execute(ISlot slot){}
-		}
-		public class OnSGHoverEnteredCommand_empty: ISGEventArgsCommand{
-			public void Execute(IResizableSG sg){}
-		}
-		public class OnSBDroppedCommand_empty: ISBEventArgsCommand{
-			public void Execute(ISlottable sb){}
-		}
-	public interface ITapCommand{
-		void Execute();
 	}
-	public class TapCommand: ITapCommand{
-		ISlotSystemElement sse;
-		public TapCommand(ISlotSystemElement sse){
-			this.sse = sse;
+		public class OnSBPickedUpCommand_empty: ISSEEventArgsCommand{
+			public void Execute(SSEEventArgs e){}
 		}
-		public void Execute(){}
-	}
+		public class OnSBHoverEnteredCommand_empty: ISSEEventArgsCommand{
+			public void Execute(SSEEventArgs e){}
+		}
+		public class OnSlotHoverEnteredCommand_empty: ISSEEventArgsCommand{
+			public void Execute(SSEEventArgs e){}
+		}
+		public class OnSGHoverEnteredCommand_empty: ISSEEventArgsCommand{
+			public void Execute(SSEEventArgs e){}
+		}
+		public class OnSBDroppedCommand_empty: ISSEEventArgsCommand{
+			public void Execute(SSEEventArgs e){}
+		}
 }

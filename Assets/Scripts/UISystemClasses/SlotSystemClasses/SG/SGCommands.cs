@@ -3,20 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
-	
-	public interface ICreateSlotCommand{
-		Slot CreateSlot();
-	}
-	public class CreateSlotCommand: ICreateSlotCommand{
-		public Slot CreateSlot(){
-			Slot slot = new Slot(new RectTransformFake(), new EmptySSECommandsRepo(), new TapCommand());
-			return slot;
-		}
-	}
-	public interface IPositionSlotsCommand{
+	public interface IPositionSBsCommand{
 		void Execute();
 	}
-	public class PositionSlotsCommand: IPositionSlotsCommand{
+	public class PositionSlotsCommand: IPositionSBsCommand{
 		IResizableSG sg;
 		public PositionSlotsCommand(IResizableSG sg){
 			this.sg = sg;
@@ -74,4 +64,5 @@ namespace UISystem{
 			return unequippedItemInventory;
 		}
 	}
+
 }

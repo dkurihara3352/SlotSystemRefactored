@@ -1,173 +1,168 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using Utility;
 
 namespace UISystem{
-	public class Slot: SlotSystemElement, ISlot{
-		public Slot(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ISSEEventCommandsRepo eventCommRepo, ITapCommand tapCommand): base(rectTrans, selStateRepo, eventCommRepo){
+	public interface ISlot: ISlotSystemElement{
+		ISlotGroup SlotGroup();
+
+		ISlotActStateHandler ActStateHandler();
+		void WaitForAction();
+
+		void PickUp();
+		ISlottableItem Item();
+		bool IsEmpty();
+		void SetItem(ISlottableItem item);
+		int ItemID();
+		bool IsStackable();
+		int Quantity();
+		void SetQuantity(int quantity);
+		int PickedQuantity();
+
+		void Decrement();
+
+		bool LeavesGhost();
+		void Refresh();
+		void Destroy();
+	}
+	public class Slot : SlotSystemElement, ISlot{
+		public Slot(RectTransformFake rectTrans, ISBSelStateRepo selStateRepo, ITapCommand tapCommand, ISlottableItem item, bool leavesGhost): base(rectTrans, selStateRepo, selStateRepo){
+			SetItem(item);
 			SetActStateHandler(new SlotActStateHandler(this));
-			SetSelStateHandler(new UISelStateHandler(this, selStateRepo));
-			SetTapCommand(tapCommand);
+			InitializeStates();
+			SetLeavesGhost(leavesGhost);
 		}
+		/*	States	*/
+			public override void InitializeStates(){
+				MakeUnselectable();
+				WaitForAction();
+			}
+			/*	Action State */
+				public ISlotActStateHandler ActStateHandler(){
+					Debug.Assert(_actStateHandler != null);
+					return _actStateHandler;
+				}
+					ISlotActStateHandler _actStateHandler;
+				public void SetActStateHandler(ISlotActStateHandler actStateHandler){
+					_actStateHandler = actStateHandler;
+				}
+				public void WaitForAction(){
+					ActStateHandler().WaitForAction();
+				}
+			public void PickUp(){
+				CreateDraggedIcon();
+				SSM().SetPickedItem( Item());
+				PostPickFilter();
+			}
+			void CreateDraggedIcon(){
 
-		public ISlotActStateHandler ActStateHandler(){
-			Debug.Assert(_actStateHandler != null);
-			return _actStateHandler;
-		}
-		void SetActStateHandler(ISlotActStateHandler handler){
-			_actStateHandler = handler;
-		}
-			ISlotActStateHandler _actStateHandler;
-		public void WaitForAction(){
-			ActStateHandler().WaitForAction();
-		}
-		public void WaitForPickUp(){
-			ActStateHandler().WaitForPickUp();
-		}
-		public void WaitForPointerUp(){
-			ActStateHandler().WaitForPointerUp();
-		}
-		public void WaitForNextTouch(){
-			ActStateHandler().WaitForNextTouch();
-		}
-		public void PickUp(){
-			ActStateHandler().PickUp();
-			SetIsPickedUp(true);
-		}
-		public void OnPointerDown(){
-			ActStateHandler().OnPointerDown();
-		}
-		public void OnPointerUp(){
-			ActStateHandler().OnPointerUp();
-		}
-		public void OnEndDrag(){
-			ActStateHandler().OnEndDrag();
-		}
-		public void OnDeselected(){
-			ActStateHandler().OnDeselected();
-		}
+			}
+			public override void OnPointerDown(){
+				base.OnPointerDown();
+				ActStateHandler().OnPointerDown();
+			}
+			public override void OnPointerUp(){
+				base.OnPointerUp();
+				ActStateHandler().OnPointerUp();
+			}
+			public override void OnEndDrag(){
+				base.OnEndDrag();
+				ActStateHandler().OnEndDrag();
+			}
+			public override void OnDeselected(){
+				base.OnDeselected();
+				ActStateHandler().OnDeselected();
+			}
+		/* Item Handling */
+			public ISlottableItem Item(){
+				Debug.Assert(_item != null);
+				return _item;
+			}
+				ISlottableItem _item;
+			public void SetItem(ISlottableItem item){
+				_item = item;
+			}
+			public int PickedQuantity(){
+				return SSM().PickedQuantity();
+			}
+			public virtual bool IsStackable(){
+				return Item().IsStackable();
+			}
+			public int Quantity(){
+				return Item().Quantity();
+			}
+			public void SetQuantity(int quant){
+				Item().SetQuantity(quant);
+			}
+			public int ItemID(){
+				return Item().ItemID();
+			}
+			public bool IsEmpty(){
+				return (Item() is EmptySlottableItem);
+			}
+		/* Others */
+			public ISlotGroup SlotGroup(){
+				return (ISlotGroup)Parent();
+			}
+			public bool ShareSGAndItem(ISlot other){
+				bool flag = true;
+				flag &= SlotGroup() == other.SlotGroup();
+				flag &= Item().Equals(other.Item());
+				return flag;
+			}
+			public void Destroy(){
+				if(LeavesGhost()){
 
+				}else{
 
-		public void Refresh(){
-			SetIsPickedUp(false);
-			SetPickedAmount(0);
-			WaitForAction();
-		}
-		public void Tap(){
-			TapCommand().Execute();
-		}
-		ITapCommand TapCommand(){
-			Debug.Assert(_tapCommand != null);
-			return _tapCommand;
-		}
-			ITapCommand _tapCommand;
-		void SetTapCommand(ITapCommand comm){
-			_tapCommand = comm;
-		}
-		public int PickedAmount(){
-			return _pickedAmount;
-		}
-		public void SetPickedAmount(int amount){
-			_pickedAmount = amount;
-		}
-			int _pickedAmount = 0;
-		public void Increment(){
-			ISlottable sb = Slottable();
-			if(sb != null){
-				ISlottableItem item = Slottable().Item();
-				if(item != null){
-					int quantity = item.Quantity();
-					if(PickedAmount() < quantity)
-						SetPickedAmount(PickedAmount() + 1);
 				}
 			}
-		}
-		public void Drop(){
-			if(IsPickedUp()){
-				SSM().Drop();
+			public bool LeavesGhost(){
+				return _leavesGhost;
 			}
-		}
+			void SetLeavesGhost(bool leaves){
+				_leavesGhost = leaves;
+			}
+				bool _leavesGhost;
+			public override void PerformHoverEnterAction(){
+				SSM().SetDestinationSG( SlotGroup());
+				if(Item() != SSM().PickedItem()){
+					if(SlotGroup().HasPickedItemSlot())
+						SlotGroup().Reorder(this);
+					else{
+						GetReadyForSwap();
+					}
+				}else{
+					/*	stacked or reverted, do nothing
+					*/
+				} 
+			}
+			public override void PerformHoverExitAction(){
+				if(IsReadyForSwap())
+					WaitForSwap();
+			}
+			public override bool IsHovered(){
+				return SSM().HoveredSSE() == this;
+			}
 
+			void GetReadyForSwap(){
+				SSM().SetDestinationSlot(this);
+				/*	instantly swappes item to pickedItem
+					Create and make hovered offset a dragged icon for previous item
+				*/
+			}
+			void WaitForSwap(){
+				SSM().SetDestinationSlot(null);
+				/*	Make the DraggedIcon travel back to this slot
+					Upon expiration, instaly swap item from pickedItem to draggedIcon item
+				*/
+			}
 
-		public override void HoverEnter(){
-			SSM().SetHoveredSlot(this);
-		}
-		public override bool IsHovered(){
-			return SSM().HoveredSlot() == this;
-		}
-		public bool HasItemAndIsStackable(){
-			ISlottable sb = Slottable();
-			if(sb != null)
-				return sb.IsStackable();
-			return false;
-		}
-		public bool IsPickedUp(){
-			return _isPickedUp;
-		}
-		void SetIsPickedUp(bool pickedUp){
-			_isPickedUp = pickedUp;
-		}
-			bool _isPickedUp;
-		public IResizableSG SlotGroup(){
-			Debug.Assert(_slotGroup != null);
-			return _slotGroup;
-		}
-		public void SetSG(IResizableSG sg){
-			_slotGroup = sg;
-		}
-			IResizableSG _slotGroup;
-		public ISlottable Slottable(){
-			return _slottable;
-		}
-			ISlottable _slottable;
-		void SetSlottable(ISlottable sb){
-			_slottable = sb;
-		}
-		public void MakeSBSelectable(){
-			if(!IsEmpty())
-				Slottable().MakeSelectable();
-		}
-		public void MakeSBUnselectable(){
-			if(!IsEmpty())
-				Slottable().MakeUnselectable();
-		}
-		public void SelectSB(){
-			if(!IsEmpty())
-				Slottable().Select();
-		}
-		public bool IsEmpty(){
-			return Slottable() == null;
-		}
-		public int ID(){
-			Debug.Assert(_id != -1);
-			return _id;
-		}
-			int _id = -1;
-		public void SetID(int id){
-			_id = id;
-		}
-	}
-	public interface ISlot: ISlotSystemElement, IUIElement, IUISystemInputHandler{
-		void MakeSBSelectable();
-		void MakeSBUnselectable();
-		void SelectSB();
-		int ID();
-		void SetID(int id);
-		IResizableSG SlotGroup();
-		ISlottable Slottable();
-		bool IsEmpty();
-		ISlotActStateHandler ActStateHandler();
-			void WaitForAction();
-			void WaitForPickUp();
-			void WaitForPointerUp();
-			void WaitForNextTouch();
-			void PickUp();
-		bool IsPickedUp();
-		int PickedAmount();
-		bool HasItemAndIsStackable();
-		void Drop();
-		void Tap();
-		void Refresh();
-		void Increment();
+			public void Refresh(){
+				WaitForAction();
+				WaitForSwap();
+			}
 	}
 }

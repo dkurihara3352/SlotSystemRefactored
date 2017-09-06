@@ -3,8 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
+	public interface ISlotSystemManager: IUIElement{
+		IInventoryManager InventoryManager();
+		void InitializeSlotSystemOnActivate();
+		List<ISlotSystemElement> SlotSystemElements();
+		
+		ISlottableItem PickedItem();
+		int PickedQuantity();
+		void SetPicked(ISlottableItem item, ISlotGroup sourceSG);
+		ISlotSystemElement HoveredSSE();
+		void SetHoveredSSE(ISlotSystemElement hoveredSSE);
+		void SetSourceSGHovered();
+
+		ISlotGroup DestinationSG();
+		void SetDestinationSG(ISlotGroup destSG);
+		ISlot DestinationSlot();
+		void SetDestinationSlot(ISlot destSlot);
+
+		void Drop();
+		void UpdateInventory(IInventory inventory);
+		event EventHandler<InventoryEventArgs> InventoryUpdated;
+		
+		void Refresh();
+	}
+	public interface IInventorySystemSSM{}
 	public class SlotSystemManager : UIElement, ISlotSystemManager{
-		public SlotSystemManager(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, IInventoryManager invManager): base(rectTrans, selStateRepo){
+		public SlotSystemManager(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ITapCommand tapCommand, IInventoryManager invManager): base(rectTrans, selStateRepo, tapCommand){
 			SetInventoryManager(invManager);
 		}
 		public void InitializeSlotSystemOnActivate(){
@@ -39,9 +63,6 @@ namespace UISystem{
 			_inventoryManager = inventoryManager;
 		}
 			IInventoryManager _inventoryManager;
-		public ISlottable GetPickedSB(){
-			return _pickedSB;
-		}
 		public void OnSSMSelected(object uiManager, ISlotSystemManager ssm){
 			OnSSMSelectedCommand().Execute(ssm);
 		}
@@ -50,66 +71,100 @@ namespace UISystem{
 				return _onSSMSelectedCommand;
 			}
 			IOnSSMSelectedCommand _onSSMSelectedCommand;
-		public void Refresh(){}
+
+
+
 		/* Events and triggers */
-			public void SetPickedSB(ISlottable pickedSB){
-				ISlottable prevPickedSB = GetPickedSB();
-				if(prevPickedSB != pickedSB)
-					_pickedSB = pickedSB;
-				ISlottable newPickedSB = GetPickedSB();
-				if(newPickedSB != null)
-					OnSBPickedUp(new SBEventArgs(pickedSB));
+			public ISlottableItem PickedItem(){
+				return _pickedItem;
 			}
-				ISlottable _pickedSB;
-			public event EventHandler<SBEventArgs> SBPickedUp;
-			protected virtual void OnSBPickedUp(SBEventArgs e){
-				if(SBPickedUp != null)
-					SBPickedUp.Invoke(this, e);
+			public void SetPicked(ISlottableItem pickedItem, ISlotGroup sourceSG){
+				_pickedItem = pickedItem;
+				SetSourceSG(sourceSG);
 			}
-			public ISlotGroup HoveredSG(){
-				return _hoveredSG;
+				ISlottableItem _pickedItem;
+			public int PickedQuantity(){
+				return PickedItem().Quantity();
 			}
-			public void SetHoveredSG(ISlotGroup hoveredSG){
-				ISlotGroup prevSG = HoveredSG();
-				if(prevSG != hoveredSG){
-					_hoveredSG = hoveredSG;
-					ISlotGroup newHoveredSG = HoveredSG();
-					if(newHoveredSG != null)
-						OnSGHoverEntered(new SGEventArgs(newHoveredSG));
+			ISlotGroup SourceSG(){
+				return _sourceSG;
+			}
+			void SetSourceSG(ISlotGroup sourceSG){
+				_sourceSG = sourceSG;
+			}
+				ISlotGroup _sourceSG;
+			
+			public ISlotSystemElement HoveredSSE(){
+				return _hoveredSSE;
+			}
+			public void SetHoveredSSE(ISlotSystemElement hoveredSSE){
+				ISlotSystemElement prevHovered = HoveredSSE();
+				if(prevHovered != hoveredSSE){
+
+					_hoveredSSE = hoveredSSE;
+
+					if(prevHovered != null)
+						prevHovered.PerformHoverExitAction();
+
+					ISlotSystemElement newHoveredSSE = HoveredSSE();
+					if(newHoveredSSE != null)
+						newHoveredSSE.PerformHoverEnterAction();
+					else{
+						SetSourceSGHovered();
+					}
 				}
 			}
-				ISlotGroup _hoveredSG;
-			public event EventHandler<SGEventArgs> SGHoverEntered;
-			protected virtual void OnSGHoverEntered(SGEventArgs e){
-				if(SGHoverEntered != null)
-					SGHoverEntered.Invoke(this, e);
+				ISlotSystemElement _hoveredSSE;
+			public void SetSourceSGHovered(){
+				SetHoveredSSE( SourceSG());
 			}
-			public ISlot HoveredSlot(){
-				return _hoveredSlot;
+
+			public ISlotGroup DestinationSG(){
+				return _destinationSG;
 			}
-			public void SetHoveredSlot(ISlot hoveredSlot){
-				ISlot prevSlot = HoveredSlot();
-				if(prevSlot != hoveredSlot){
-					_hoveredSlot = hoveredSlot;
-					ISlot newHoveredSlot = HoveredSlot();
-					if(newHoveredSlot != null)
-						OnSlotHoverEntered(new SlotEventArgs(newHoveredSlot));
+			public void SetDestinationSG(ISlotGroup destSG){
+				ISlotGroup prevDestSG = DestinationSG();
+				if(destSG != prevDestSG){
+
+					_destinationSG = destSG;
+
+					if(prevDestSG != null){
+						prevDestSG.Deselect();
+						prevDestSG.ReduceItem( PickedItem());
+					}
+					ISlotGroup newDestSG = DestinationSG();
+					if(newDestSG != null){
+						newDestSG.Select();
+						if(newDestSG.IsHovered())
+							newDestSG.AddItem( PickedItem());
+					}
 				}
 			}
-				ISlot _hoveredSlot;
-			public event EventHandler<SlotEventArgs> SlotHoverEntered;
-			protected virtual void OnSlotHoverEntered(SlotEventArgs e){
-				if(SlotHoverEntered != null)
-					SlotHoverEntered.Invoke(this, e);
+				ISlotGroup _destinationSG;
+			public ISlot DestinationSlot(){
+				return _destinationSlot;
 			}
+			public void SetDestinationSlot(ISlot destSlot){
+				ISlot prevDestSlot = DestinationSlot();
+				if(destSlot != prevDestSlot){
+
+					_destinationSlot = destSlot;
+
+					if(prevDestSlot != null){
+						prevDestSlot.Deselect();
+					}
+					ISlot newDestSlot = DestinationSlot();
+					if(newDestSlot != null){
+						newDestSlot.Select();
+					}
+				}
+			}
+				ISlot _destinationSlot;
+
+
 			public void Drop(){
-				OnSBDropped(new SBEventArgs(GetPickedSB()));
 			}
-			public event EventHandler<SBEventArgs> SBDropped;
-			protected virtual void OnSBDropped(SBEventArgs e){
-				if(SBDropped != null)
-					SBDropped.Invoke(this, e);
-			}
+
 			public void UpdateInventory(IInventory inventory){
 				OnInventoryUpdated(new InventoryEventArgs(inventory));
 			}
@@ -118,42 +173,10 @@ namespace UISystem{
 				if(InventoryUpdated != null)
 					InventoryUpdated.Invoke(this, e);
 			}
-	}
-	public interface ISlotSystemManager: IUIElement{
-		IInventoryManager InventoryManager();
-		void InitializeSlotSystemOnActivate();
-		List<ISlotSystemElement> SlotSystemElements();
-		void Refresh();
-		void SetPickedSB(ISlottable sb);
-		ISlotGroup HoveredSG();
-		void SetHoveredSG(ISlotGroup sg);
-		ISlot HoveredSlot();
-		void SetHoveredSlot(ISlot slot);
-		void Drop();
-		void UpdateInventory(IInventory inventory);
-		event EventHandler<SBEventArgs> SBPickedUp;
-		event EventHandler<SGEventArgs> SGHoverEntered;
-		event EventHandler<SlotEventArgs> SlotHoverEntered;
-		event EventHandler<SBEventArgs> SBDropped;
-		event EventHandler<InventoryEventArgs> InventoryUpdated;
-	}
-	public interface IInventorySystemSSM{}
-	public class SBEventArgs: EventArgs{
-		public readonly ISlottable slottable;
-		public SBEventArgs(ISlottable slottable){
-			this.slottable = slottable;
-		}
-	}
-	public class SGEventArgs: EventArgs{
-		public readonly ISlotGroup slotGroup;
-		public SGEventArgs(ISlotGroup sg){
-			this.slotGroup = sg;
-		}
-	}
-	public class SlotEventArgs: EventArgs{
-		public readonly ISlot slot;
-		public SlotEventArgs(ISlot slot){
-			this.slot = slot;
+
+		public void Refresh(){
+			SetPicked(null, null);
+			SetHoveredSSE(null);
 		}
 	}
 	public class InventoryEventArgs: EventArgs{
