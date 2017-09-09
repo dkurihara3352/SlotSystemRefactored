@@ -6,8 +6,6 @@ namespace UISystem{
 	public interface ISlotSystemElement: IUIElement{
 		ISlotSystemManager SSM();
 		void SetSSM(ISlotSystemManager ssm);
-		void PerformHoverEnterAction();
-		void PerformHoverExitAction();
 		void HoverEnter();
 		bool IsHovered();
 	}
@@ -22,8 +20,6 @@ namespace UISystem{
 		public SlotSystemElement(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ITapCommand tapCommand): base(rectTrans, selStateRepo, tapCommand){
 			ISlotSystemManager ssm = SSM();
 		}
-		public abstract void PerformHoverEnterAction();
-		public abstract void PerformHoverExitAction();
 		public void HoverEnter(){
 			SSM().SetHoveredSSE(this);
 		}

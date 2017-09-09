@@ -16,13 +16,14 @@ namespace UISystem{
 		void OnInventoryUpdated(object source, InventoryEventArgs e);
 		bool AcceptsItem(ISlottableItem item);
 		bool IsReorderable();
-		bool IsReceivable();
-		bool IsSwappable(ISlot sb);
-
+		bool IsFillable();
+		bool IsSwappable();
+		
+		void EplicitlySpecifyDestSlot(ISlot hoveredSlot);
 		ISlot PickedItemSlot();
 		bool HasPickedItemSlot();
-		void AddItem(ISlottableItem item);
-		void ReduceItem(ISlottableItem item);
+		void ImplicitlyFocusTargetSlot();
+		void ReverseImplicitTargetFocus();
 		void Reorder(ISlot toSlot);
 	}
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
@@ -32,6 +33,7 @@ namespace UISystem{
 			SetFetchInventoryCommand(constArg.FetchInventoryCommand());
 			SetAcceptsItemCommand(constArg.AcceptsItemCommand());
 			SetReorderability(constArg.IsReorderable());
+			SetIsSwappedOverFilled(constArg.IsSwappedOverFilled());
 			SetPositionSlotsCommand(constArg.PositionSBsCommand());
 			SetSorterHandler(new SorterHandler(constArg.InitSorter()));
 			SetSelStateHandler(new UISelStateHandler(this, constArg.UISelStateRepo()));
@@ -154,6 +156,13 @@ namespace UISystem{
 
 
 		/*	intrinsic */
+		public bool IsSwappedOverFilled(){
+			return _isSwappedOverFilled;
+		}
+		void SetIsSwappedOverFilled(bool swappedOverFilled){
+			_isSwappedOverFilled = swappedOverFilled;
+		}
+			bool _isSwappedOverFilled;
 		public bool IsReorderable(){
 			return _isReorderable;
 		}
@@ -161,7 +170,7 @@ namespace UISystem{
 			_isReorderable = on;
 		}
 			bool _isReorderable;
-		public virtual bool IsReceivable(){
+		public virtual bool IsFillable(){
 			return HasEmptySlottable();
 		}
 		bool HasEmptySlottable(){
@@ -170,15 +179,18 @@ namespace UISystem{
 					return true;
 			return false;
 		}
-		public bool IsSwappable(ISlot sb){
-			return SwappableSBs(sb).Count == 1;
+		public bool IsSwappable(){
+			return SwappableSlots().Count == 1;
 		}
-		public List<ISlot> SwappableSBs(ISlot pickedSB){
+		public List<ISlot> SwappableSlots(){
 			List<ISlot> result = new List<ISlot>();
-			foreach(ISlot sb in this){
-				if(sb != null){
-					if(SlotSystemUtil.SBsAreSwappable(pickedSB, sb))
-						result.Add(sb);
+			ISlotGroup sourceSG = SSM().SourceSG();
+			if(sourceSG != this && AcceptsItem( SSM().PickedItem())){
+				foreach(ISlot slot in this){
+					if(slot != null){
+						if(sourceSG.AcceptsItem(slot.Item()))
+							result.Add(slot);
+					}
 				}
 			}
 			return result;
@@ -195,18 +207,47 @@ namespace UISystem{
 			_acceptsItemCommand = comm;
 		}
 			IAcceptsItemCommand _acceptsItemCommand;
-		public override void PerformHoverEnterAction(){
-			SSM().SetDestinationSG(this);
-		}
-		public override void PerformHoverExitAction(){
-			/*	do nothing
-			*/
-		}
 		public override bool IsHovered(){
 			return SSM().HoveredSSE() == this;
 		}
 
-		
+
+		ISlot DestinationSlot(){
+			return _destinationSlot;
+		}
+		void SwitchDestinationSlot(ISlot destSlot){
+			ISlot prevSlot = DestinationSlot();
+			if(destSlot != prevSlot){
+
+				_destinationSlot = destSlot;
+				if(prevSlot != null)
+					prevSlot.Deselect();
+				ISlot newDestSlot = DestinationSlot();
+				if(newDestSlot != null)
+					newDestSlot.Select();
+			}
+		}
+			ISlot _destinationSlot;
+		public virtual void SetUpPickedItemSlotOnPickUp(){
+			/*	called when pick up and if is filtered in
+				prepare a pickedItemSlot and keep it hidden behind
+			*/
+			if( !HasPickedItemSlot()){
+				ISlot newPickedItemSlot = CreateSlot();
+				newPickedItemSlot.SetItem( SSM().PickedItem());
+				Debug.Assert(newPickedItemSlot.IsDeactivated() == true);
+				HideSlot( newPickedItemSlot);
+				newPickedItemSlot.SetID( InvalidID());
+				newPickedItemSlot.SetSlotGroup(this);
+			}
+		}
+		ISlot GetFirstEmptySlot(){
+			foreach(var slot in Slots()){
+				if(slot.IsEmpty())
+					return slot;
+			}
+			return null;
+		}
 		public ISlot PickedItemSlot(){
 			foreach(var slot in Slots()){
 				if(slot.Item() == SSM().PickedItem())
@@ -217,21 +258,132 @@ namespace UISystem{
 		public bool HasPickedItemSlot(){
 			return PickedItemSlot() != null;
 		}
-		public void AddItem(ISlottableItem pickedItem){
-			/*	Find or Create new Slot
-				Update slots indexes
-				Make them travel
-				Set the slot as destination
+		void ShowSlots(List<ISlot> slots){
 
-				swap or fill
-			*/
 		}
-		public void ReduceItem(ISlottableItem pickedItem){
+		void ShowSlot(ISlot slot, int index){
+			ISlot slotAtIndex = Slots()[index];
+			if(slotAtIndex.IsEmpty()){
+				//do nothing
+			}else{
+				slot.GetReadyForSwap( slotAtIndex.Item());
+				SubstituteWithEmpty( index);
+			}
+			slot.SetID( index);
+			slot.Show();
+		}
+		void HideSlots(List<ISlot> slots){
+
+		}
+		void HideSlot(ISlot slot){
+			/*	Sync Icon dehovering and slot icon shrinking animation
+			*/
+			if( slot.IsReadyForSwap())
+				slot.WaitForSwap();
+			slot.Hide();
+		}
+
+		public void EplicitlySpecifyDestSlot(ISlot hoveredSlot){
+			if(HasPickedItemSlot()){
+				SwitchDestinationSlot( PickedItemSlot());
+				if(DestinationSlot().IsReadyForSwap()){
+					SwitchSwapTarget(hoveredSlot);
+				}else
+					Reorder(hoveredSlot);
+			}else{
+				SetUpPickedItemSlotOnPickUp();
+				ShowSlot( PickedItemSlot(), hoveredSlot.SlotID());
+			}
+		}
+		void SwitchSwapTarget(ISlot hoveredSlot){
+			/*	need revision
+			*/
+			DestinationSlot().WaitForSwap();
+			hoveredSlot.GetReadyForSwap();
+		}
+
+		public void ImplicitlyFocusTargetSlot(){
+			if( HasIncrementTargetSlot()){
+				SwitchDestinationSlot( IncrementTargetSlot());
+			}else{
+				int showIndex;
+				if(IsSwappableAndFillable()){
+					if(IsSwappedOverFilled())
+						showIndex = SwapTargetSlot().SlotID();
+					else
+						showIndex = FillTargetSlot().SlotID();
+				}else{
+					if( IsSwappable())
+						showIndex = SwapTargetSlot().SlotID();
+					else if( IsFillable())
+						showIndex = FillTargetSlot().SlotID();
+					else
+						throw new InvalidOperationException("this sg should not be filtered in");
+				}
+				SwitchDestinationSlot( PickedItemSlot());
+				ShowSlot( PickedItemSlot(), showIndex);
+			}
+		}
+		bool HasIncrementTargetSlot(){
+			return IncrementTargetSlot() != null;
+		}
+		ISlot IncrementTargetSlot(){
+			if( HasPickedItemSlot())
+				if(PickedItemSlot().IsStackable())
+					return PickedItemSlot();
+			return null;
+		}
+		bool IsSwappableAndFillable(){
+			return IsSwappable() && IsFillable();
+		}
+		ISlot SwapTargetSlot(){
+			return SwappableSlots()[0];
+		}
+		ISlot FillTargetSlot(){
+			return FirstEmptySlot();
+		}
+		public void ReverseImplicitTargetFocus(){
+			DefocusIncrementTargetSlot();
+			DefocusSwapTargetSlot();
+			DefocusFillTargetSlot();
+
 			/*	Remove PickedItemSlot if quantity is to be zero
 				if so, Update slots indexes
 				and make them travel
 				if pickedItemSlot is ready for swap, make it wait for swap
 			*/
+		}
+		void DefocusIncrementTargetSlot(){
+			if(DestinationSlot() == IncrementTargetSlot()){
+				HideSlot( DestinationSlot());
+				SwitchDestinationSlot(null);
+			}
+		}
+		void DefocusSwapTargetSlot(){
+			if( DestinationSlot().IsReadyForSwap()){
+				HideSlot( DestinationSlot());
+				SwapTargetSlot().WaitForSwap();
+				SwitchDestinationSlot( null);
+			}
+		}
+		void DefocusFillTargetSlo(){
+			// if( DestinationSlot() == FillTargetSlot())
+		}
+		void ReverseSwap(){
+			ISlot destSlot = DestinationSlot();
+			if(destSlot.IsReadyForSwap()){
+				destSlot.WaitForSwap();
+			}
+			SwitchDestinationSlot(null);
+		}
+		void ReverseFill(){
+			ISlot destSlot = DestinationSlot();
+			if(!destSlot.IsReadyForSwap()){
+				if(destSlot.PreviewQuantity() <= 0){
+					HideSlot(destSlot);
+				}
+			}
+			SwitchDestinationSlot(null);
 		}
 		public void Reorder(ISlot toSlot){
 			/*	from PickedItemSlot to toSlot
@@ -239,6 +391,7 @@ namespace UISystem{
 		}
 
 		public void Refresh(){
+			SwitchDestinationSlot(null);
 		}
 	}
 }

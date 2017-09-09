@@ -17,8 +17,6 @@ namespace UISystem{
 
 		ISlotGroup DestinationSG();
 		void SetDestinationSG(ISlotGroup destSG);
-		ISlot DestinationSlot();
-		void SetDestinationSlot(ISlot destSlot);
 
 		void Drop();
 		void UpdateInventory(IInventory inventory);
@@ -104,17 +102,41 @@ namespace UISystem{
 					_hoveredSSE = hoveredSSE;
 
 					if(prevHovered != null)
-						prevHovered.PerformHoverExitAction();
+						PerformHoverExitAction(prevHovered);
 
 					ISlotSystemElement newHoveredSSE = HoveredSSE();
-					if(newHoveredSSE != null)
-						newHoveredSSE.PerformHoverEnterAction();
+					if(newHoveredSSE != null){
+						PerformHoverEnterAction(newHoveredSSE);
+					}
 					else{
 						SetSourceSGHovered();
 					}
 				}
 			}
 				ISlotSystemElement _hoveredSSE;
+			void PerformHoverEnterAction(ISlotSystemElement hoveredSSE){
+				if(hoveredSSE is ISlotGroup)
+					SetDestinationSG((ISlotGroup)hoveredSSE);
+				else if(hoveredSSE is ISlot){
+					ISlot hoveredSlot = (ISlot)hoveredSSE;
+					SetDestinationSG( hoveredSlot.SlotGroup());
+					if(hoveredSlot.IsIncrementable())
+						DraggedIcon().GetReadyForIncrement();
+					else{
+						DestinationSG().EplicitlySpecifyDestSlot(hoveredSlot);
+					}
+				}
+			}
+			void PerformHoverExitAction(ISlotSystemElement exitedSSE){
+				if(exitedSSE is ISlotGroup)
+					return;
+				else if( exitedSSE is ISlot){
+					ISlot exitedSlot = (ISlot)exitedSSE;
+					if(HoveredSSE() == null)
+						exitedSlot.WaitForSwap();
+					DraggedIcon().WaitForIncrement();
+				}
+			}
 			public void SetSourceSGHovered(){
 				SetHoveredSSE( SourceSG());
 			}
@@ -130,36 +152,18 @@ namespace UISystem{
 
 					if(prevDestSG != null){
 						prevDestSG.Deselect();
-						prevDestSG.ReduceItem( PickedItem());
+						prevDestSG.ReverseImplicitTargetFocus();
 					}
+
 					ISlotGroup newDestSG = DestinationSG();
+
 					if(newDestSG != null){
 						newDestSG.Select();
-						if(newDestSG.IsHovered())
-							newDestSG.AddItem( PickedItem());
+						newDestSG.ImplicitlyFocusTargetSlot();
 					}
 				}
 			}
 				ISlotGroup _destinationSG;
-			public ISlot DestinationSlot(){
-				return _destinationSlot;
-			}
-			public void SetDestinationSlot(ISlot destSlot){
-				ISlot prevDestSlot = DestinationSlot();
-				if(destSlot != prevDestSlot){
-
-					_destinationSlot = destSlot;
-
-					if(prevDestSlot != null){
-						prevDestSlot.Deselect();
-					}
-					ISlot newDestSlot = DestinationSlot();
-					if(newDestSlot != null){
-						newDestSlot.Select();
-					}
-				}
-			}
-				ISlot _destinationSlot;
 
 
 			public void Drop(){

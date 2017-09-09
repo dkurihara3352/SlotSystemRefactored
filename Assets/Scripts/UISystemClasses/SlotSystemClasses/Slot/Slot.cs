@@ -17,18 +17,25 @@ namespace UISystem{
 		void SetItem(ISlottableItem item);
 		int ItemID();
 		bool IsStackable();
+		bool IsIncrementable();
 		int Quantity();
 		void SetQuantity(int quantity);
 		int PickedQuantity();
 
-		void Decrement();
+		int PreviewQuantity();
+		bool IsSwappableWith(ISlottableItem item);
+
+
+		bool IsReadyForSwap();
+		void WaitForSwap();
+		void GetReadyForSwap(ISlottableItem item);
 
 		bool LeavesGhost();
 		void Refresh();
 		void Destroy();
 	}
 	public class Slot : SlotSystemElement, ISlot{
-		public Slot(RectTransformFake rectTrans, ISBSelStateRepo selStateRepo, ITapCommand tapCommand, ISlottableItem item, bool leavesGhost): base(rectTrans, selStateRepo, selStateRepo){
+		public Slot(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ITapCommand tapCommand, ISlottableItem item, bool leavesGhost): base(rectTrans, selStateRepo, tapCommand){
 			SetItem(item);
 			SetActStateHandler(new SlotActStateHandler(this));
 			InitializeStates();
@@ -90,6 +97,9 @@ namespace UISystem{
 			public virtual bool IsStackable(){
 				return Item().IsStackable();
 			}
+			public bool IsIncrementable(){
+				return Item() == SSM().PickedItem() && IsStackable();
+			}
 			public int Quantity(){
 				return Item().Quantity();
 			}
@@ -102,6 +112,11 @@ namespace UISystem{
 			public bool IsEmpty(){
 				return (Item() is EmptySlottableItem);
 			}
+
+			public int PreviewQuantity(){
+				return _previewQuantity;
+			}
+				int _previewQuantity;
 		/* Others */
 			public ISlotGroup SlotGroup(){
 				return (ISlotGroup)Parent();
@@ -126,39 +141,36 @@ namespace UISystem{
 				_leavesGhost = leaves;
 			}
 				bool _leavesGhost;
-			public override void PerformHoverEnterAction(){
-				SSM().SetDestinationSG( SlotGroup());
-				if(Item() != SSM().PickedItem()){
-					if(SlotGroup().HasPickedItemSlot())
-						SlotGroup().Reorder(this);
-					else{
-						GetReadyForSwap();
-					}
-				}else{
-					/*	stacked or reverted, do nothing
-					*/
-				} 
-			}
-			public override void PerformHoverExitAction(){
-				if(IsReadyForSwap())
-					WaitForSwap();
-			}
 			public override bool IsHovered(){
 				return SSM().HoveredSSE() == this;
 			}
 
-			void GetReadyForSwap(){
-				SSM().SetDestinationSlot(this);
-				/*	instantly swappes item to pickedItem
-					Create and make hovered offset a dragged icon for previous item
+			public void WaitForSwap(){
+				/*	
+					SlotGroup.HideSlot() -->
+					SwappedIcon.Dehover()
+						Animate the swapped back to slot with swap target id
+					upon expiration, 
+						wait until slot's HideProcess is over
+					upon expiration of HideProcess
+						if( !IsReadyForSwap)
+							Swap instantly to empty
+						if(IsReadyForSwap) -->this case
+							Swap instantly to SwappedIcon item
+
 				*/
 			}
-			void WaitForSwap(){
-				SSM().SetDestinationSlot(null);
-				/*	Make the DraggedIcon travel back to this slot
-					Upon expiration, instaly swap item from pickedItem to draggedIcon item
-				*/
+			public void GetReadyForSwap(ISlottableItem swappedItem){
+				// SlotGroup.ShowSlot() -->
+				DraggedIcon swappedIcon = CreateSwappedIcon(swappedItem);
+				SetSwappedIcon(swappedIcon);
+				SwappedIcon().Hover();
+				
 			}
+			public bool IsReadyForSwap(){
+				return SwappedIcon() != null;
+			}
+
 
 			public void Refresh(){
 				WaitForAction();
