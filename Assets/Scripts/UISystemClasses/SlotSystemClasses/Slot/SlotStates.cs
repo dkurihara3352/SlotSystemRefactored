@@ -8,7 +8,6 @@ namespace UISystem{
     public class SlotSelStateRepo: UISelStateRepo{
         public override void InitializeStates(){
             SetHiddenState( new SlotHiddenState( handler, element));
-            SetShownState( new SlotShownState( handler));
         }
     }
         public class SlotHiddenState: UISelectionState{
@@ -25,15 +24,7 @@ namespace UISystem{
                 handler.SetAndRunSelProcess( new SlotHideProcess(handler.HideCoroutine(), slot));
             }
         }
-        public class SlotShownState: UISelectionState, IRelayState{
-            ISlot slot;
-            public SlotShownState( IUISelStateHandler handler, IUIElement element): base( handler){
-                this.slot = (ISlot)element;
-            }
-            public override void Enter(){
-                   
-            }
-        }
+        
     /* Slot Act State */
         public interface ISlotActState: IUIState{
         }

@@ -13,6 +13,7 @@ namespace UISystem{
 		ISGSorter InitSorter();
 		int InitSlotCount();
 		bool IsReorderable();
-		bool IsSwappedOverFilled();
+		bool IsExchangedOverFilled();
+		bool IsExchangedOverReordered();
 	}
 }

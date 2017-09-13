@@ -10,10 +10,11 @@ namespace UISystem{
 				this.slot = slot;
 			}
 			public override void Expire(){
-				if(slot.IsReadyForSwap())
+				if(slot.IsReadyForExchange())
 					slot.SubstituteWithSlotWithSwappedItem();
 				else
 					slot.SubstituteWithEmptySlot();
+				slot.SetID( InvalidID());
 			}
 		}
 	/* Act Proc */

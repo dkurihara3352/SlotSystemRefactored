@@ -25,10 +25,15 @@ namespace UISystem{
 		int PreviewQuantity();
 		bool IsSwappableWith(ISlottableItem item);
 
+		
+		void SetUpAsIncrementTarget();
+		void SetUpAsFillTarget();
+		void SetUpAsExchangeTarget();
+		void TearDownAsTarget();
 
-		bool IsReadyForSwap();
-		void WaitForSwap();
-		void GetReadyForSwap(ISlottableItem item);
+		bool IsReadyForExchange();
+		void WaitForExchange();
+		void GetReadyForExchange();
 
 		bool LeavesGhost();
 		void Refresh();
@@ -145,7 +150,25 @@ namespace UISystem{
 				return SSM().HoveredSSE() == this;
 			}
 
-			public void WaitForSwap(){
+			public void TearDownAsTarget(){
+				SSM().MakeDraggedIconWaitForIncrement();
+				WaitForExchange();
+				Deselect();
+			}
+			public void SetUpAsIncrementTarget(){
+				SSM().GetDraggedIconReadyForIncrement();
+				Select();
+			}
+			public void SetUpAsFillTarget(){
+				Select();
+			}
+			public void SetUpAsExchangeTarget(){
+				GetReadyForExchange();
+				SwapItemToEmpty();
+				Select();
+			}
+
+			public void WaitForExchange(){
 				/*	
 					SlotGroup.HideSlot() -->
 					SwappedIcon.Dehover()
@@ -160,21 +183,21 @@ namespace UISystem{
 
 				*/
 			}
-			public void GetReadyForSwap(ISlottableItem swappedItem){
-				// SlotGroup.ShowSlot() -->
-				DraggedIcon swappedIcon = CreateSwappedIcon(swappedItem);
-				SetSwappedIcon(swappedIcon);
-				SwappedIcon().Hover();
-				
+			public void GetReadyForExchange(){
+				if( !IsEmpty()){
+					DraggedIcon exchangeIcon = CreateExchangeIcon( Item());
+					SetExchangeIcon(exchangeIcon);
+					ExchangeIcon().Hover();
+				}
 			}
-			public bool IsReadyForSwap(){
-				return SwappedIcon() != null;
+			public bool IsReadyForExchange(){
+				return ExchangeIcon() != null;
 			}
 
 
 			public void Refresh(){
 				WaitForAction();
-				WaitForSwap();
+				WaitForExchange();
 			}
 	}
 }
