@@ -10,20 +10,20 @@ namespace UISystem{
 			return element as ISlotSystemManager;
 		}
 		public override void InitializeStates(){
-			SetDeactivatedState(new UIDeactivatedState(handler));
-			SetActivatedState(new SSMActivatedState(SSM(), handler));
-			SetHiddenState(new UIHiddenState(handler));
-			SetShownState(new UIShownState(handler));
-			SetSelectedState(new UISelectedState(handler));
-			SetDeselectedState(new UIDeselectedState(handler));
-			SetSelectableState(new UISelectableState(handler));
-			SetUnselectableState(new UIUnselectableState(handler));
+			SetDeactivatedState(new UIDeactivatedState(engine));
+			SetActivatedState(new SSMActivatedState(SSM(), engine));
+			SetHiddenState(new UIHiddenState(engine));
+			SetShownState(new UIShownState(engine));
+			SetSelectedState(new UISelectedState(engine));
+			SetDeselectedState(new UIDeselectedState(engine));
+			SetSelectableState(new UISelectableState(engine));
+			SetUnselectableState(new UIUnselectableState(engine));
 		}
 	}
 	public class SSMActivatedState: UIActivatedState, IRelayState{
 		ISlotSystemManager ssm;
 
-		public SSMActivatedState(IUIElement element, IUISelStateHandler handler): base(element, handler){
+		public SSMActivatedState(IUIElement element, IUISelStateEngine engine): base(element, engine){
 			Debug.Assert((element is ISlotSystemManager));
 			ssm = (ISlotSystemManager)element;
 		}

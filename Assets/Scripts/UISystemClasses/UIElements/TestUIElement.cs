@@ -15,7 +15,7 @@ namespace UISystem{
 			PerformInHierarchy(FocusIfAOD);
 		}
 			void FocusIfAOD(IUIElement ele){
-				IUISelStateHandler eleSelStateHandler = ele.SelStateHandler();
+				IUISelStateEngine eleSelStateHandler = ele.SelStateHandler();
 				if(ele.IsShownOnActivation())
 					eleSelStateHandler.MakeSelectable();
 			}

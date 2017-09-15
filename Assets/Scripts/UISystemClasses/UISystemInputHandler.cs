@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
-	public interface IUISystemInputHandler{
+	public interface IUISystemInputEngine{
 		void OnPointerDown();
 		void OnPointerUp();
 		void OnDeselected();

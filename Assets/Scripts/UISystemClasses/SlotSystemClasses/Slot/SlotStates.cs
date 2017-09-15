@@ -7,21 +7,21 @@ using System;
 namespace UISystem{
     public class SlotSelStateRepo: UISelStateRepo{
         public override void InitializeStates(){
-            SetHiddenState( new SlotHiddenState( handler, element));
+            SetHiddenState( new SlotHiddenState( engine, element));
         }
     }
         public class SlotHiddenState: UISelectionState{
             ISlot slot;
-            public SlotHiddenState( IUISelStateHandler handler, IUIElement element): base( handler){
+            public SlotHiddenState( IUISelStateEngine engine, IUIElement element): base( engine){
                 this.slot = (ISlot)element;
             }
             public override void Enter(){
                 RunSlotHideProcess();
-                if(handler.WasDeactivated())
-                    handler.ExpireProcess();
+                if(engine.WasDeactivated())
+                    engine.ExpireProcess();
             }
             void RunSlotHideProcess(){
-                handler.SetAndRunSelProcess( new SlotHideProcess(handler.HideCoroutine(), slot));
+                engine.SetAndRunSelProcess( new SlotHideProcess(engine.HideCoroutine(), slot));
             }
         }
         
@@ -29,31 +29,31 @@ namespace UISystem{
         public interface ISlotActState: IUIState{
         }
         public abstract class SlotActState: ISlotActState{
-            protected ISlotActStateHandler handler;
-            public SlotActState(ISlotActStateHandler handler){
-                this.handler = handler;
+            protected ISlotActStateEngine engine;
+            public SlotActState(ISlotActStateEngine engine){
+                this.engine = engine;
             }
             public virtual bool CanEnter(){return false;}
             public virtual void Enter(){}
             public virtual void Exit(){}
 
             protected void RunWaitForActionProcess(){
-                handler.SetAndRunActProcess(new SlotWaitForActionProcess(handler.WaitForActionCoroutine(), handler));
+                engine.SetAndRunActProcess(new SlotWaitForActionProcess(engine.WaitForActionCoroutine(), engine));
             }
             protected void RunWaitForPickUpProcess(){
-                handler.SetAndRunActProcess(new SlotWaitForPickUpProcess(handler.WaitForPickUpCoroutine(), handler));
+                engine.SetAndRunActProcess(new SlotWaitForPickUpProcess(engine.WaitForPickUpCoroutine(), engine));
             }
             protected void RunWaitForPointerUpProcess(){
-                handler.SetAndRunActProcess(new SlotWaitForPointerUpProcess(handler.WaitForPointerUpCoroutine(), handler));
+                engine.SetAndRunActProcess(new SlotWaitForPointerUpProcess(engine.WaitForPointerUpCoroutine(), engine));
             }
             protected void RunWaitForNextTouchProcess(){
-                handler.SetAndRunActProcess(new SlotWaitForNextTouchProcess(handler.WaitForNextTouchCoroutine(), handler));
+                engine.SetAndRunActProcess(new SlotWaitForNextTouchProcess(engine.WaitForNextTouchCoroutine(), engine));
             }
         }
         public class SlotWaitingForActionState: SlotActState, IUIPointerUpState{
-            public SlotWaitingForActionState(ISlotActStateHandler handler): base(handler){}
+            public SlotWaitingForActionState(ISlotActStateEngine engine): base(engine){}
             public override bool CanEnter(){
-                if(handler.IsWaitingForAction())
+                if(engine.IsWaitingForAction())
                     return false;
                 else
                     return true;
@@ -62,17 +62,17 @@ namespace UISystem{
                 RunWaitForActionProcess();
             }
             public void OnPointerDown(){
-                handler.WaitForPickUp();
+                engine.WaitForPickUp();
             }
             public void OnDeselected(){
             }
         }
         public class SlotWaitingForPickUpState: SlotActState, IUIPointerDownState{
-            public SlotWaitingForPickUpState(ISlotActStateHandler handler): base(handler){}
+            public SlotWaitingForPickUpState(ISlotActStateEngine engine): base(engine){}
             public override bool CanEnter(){
-                if(handler.IsWaitingForPickUp())
+                if(engine.IsWaitingForPickUp())
                     return false;
-                else if(handler.IsWaitingForAction())
+                else if(engine.IsWaitingForAction())
                     return true;
                 else
                     return false;
@@ -81,18 +81,18 @@ namespace UISystem{
                 RunWaitForPickUpProcess();
             }
             public void OnPointerUp(){
-                handler.WaitForNextTouch();
+                engine.WaitForNextTouch();
             }
             public void OnEndDrag(){
-                handler.WaitForAction();
+                engine.WaitForAction();
             }
         }
         public class SlotWaitingForPointerUpState: SlotActState, IUIPointerDownState{
-            public SlotWaitingForPointerUpState(ISlotActStateHandler handler): base(handler){}
+            public SlotWaitingForPointerUpState(ISlotActStateEngine engine): base(engine){}
             public override bool CanEnter(){
-                if(handler.IsWaitingForPointerUp())
+                if(engine.IsWaitingForPointerUp())
                     return false;
-                else if(handler.IsWaitingForPickUp())
+                else if(engine.IsWaitingForPickUp())
                     return true;
                 else
                     return false;
@@ -101,18 +101,18 @@ namespace UISystem{
                 RunWaitForPointerUpProcess();
             }
             public void OnPointerUp(){
-                handler.WaitForAction();
+                engine.WaitForAction();
             }
             public void OnEndDrag(){
-                handler.WaitForAction();
+                engine.WaitForAction();
             }
         }
         public class SlotWaitingForNextTouchState: SlotActState, IUIPointerUpState{
-            public SlotWaitingForNextTouchState(ISlotActStateHandler handler): base(handler){}
+            public SlotWaitingForNextTouchState(ISlotActStateEngine engine): base(engine){}
             public override bool CanEnter(){
-                if(handler.IsWaitingForNextTouch())
+                if(engine.IsWaitingForNextTouch())
                     return false;
-                else if(handler.IsWaitingForPickUp())
+                else if(engine.IsWaitingForPickUp())
                     return true;
                 else
                     return false;
@@ -121,14 +121,17 @@ namespace UISystem{
                 RunWaitForNextTouchProcess();
             }
             public void OnPointerDown(){
-                handler.PickUp();
-                handler.WaitForAction();
+                engine.PickUp();
+                engine.WaitForAction();
             }
             public void OnDeselected(){
-                handler.WaitForAction();
+                engine.WaitForAction();
             }
         }
-    /* Slot Swap State */
-        public interface ISlotSwapState: IUIState{
+    /* Slot Fade State */
+        public interface ISlotFadeState: IUIState{
+        }
+        public abstract class SlotFadeState: ISlotFadeState{
+            protected ISlotFadeStateEngine engine;
         }
 }

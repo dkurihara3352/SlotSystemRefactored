@@ -5,16 +5,16 @@ using UnityEngine;
 namespace UISystem{
 	public class ResizableSG : SlotGroup, IResizableSG{
 		public ResizableSG(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg){
-			SetActStateHandler(new ResizableSGActStateHandler(this));
+			SetActStateHandler(new ResizableSGActStateEngine(this));
 		}
-		public IResizableSGActStateHandler ActStateHandler(){
+		public IResizableSGActStateEngine ActStateHandler(){
 			Debug.Assert(_actStateHandler != null);
 			return _actStateHandler;
 		}
-		void SetActStateHandler(IResizableSGActStateHandler handler){
+		void SetActStateHandler(IResizableSGActStateEngine handler){
 			_actStateHandler = handler;
 		}
-		IResizableSGActStateHandler _actStateHandler;
+		IResizableSGActStateEngine _actStateHandler;
 		public void WaitForResize(){
 			ActStateHandler().WaitForAction();
 		}
@@ -45,7 +45,7 @@ namespace UISystem{
 		}
 	}
 	public interface IResizableSG: ISlotGroup{
-		IResizableSGActStateHandler ActStateHandler();
+		IResizableSGActStateEngine ActStateHandler();
 			void WaitForResize();
 			void Resize();
 	}

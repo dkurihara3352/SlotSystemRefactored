@@ -4,24 +4,58 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
-	public class UISelStateHandler : IUISelStateHandler {
-		public UISelStateHandler(IUIElement element, IUISelStateRepo selStateRepo){
+	public interface IUISelStateEngine{
+		void Deactivate();
+			bool IsDeactivated();
+			bool WasDeactivated();
+		void Hide();
+			bool IsHidden();
+			bool WasHidden();
+		void MakeSelectable();
+			bool IsSelectable();
+			bool WasSelectable();
+		void MakeUnselectable();
+			bool IsUnselectable();
+			bool WasUnselectable();
+		void Select();
+			bool IsSelected();
+			bool WasSelected();
+
+		/* Relay States */
+		void Activate();
+			bool WasActivated();
+			bool IsActivated();
+		void Deselect();
+			bool WasDeselected();
+			bool IsDeselected();
+		void Show();
+			bool WasShown();
+			bool IsShown();
+		void SetAndRunSelProcess(IUISelProcess process);
+		IUISelProcess SelProcess();
+		void SetSelCoroutineRepo(IUISelCoroutineRepo repo);
+		void ExpireProcess();
+		IEnumeratorFake DeactivateCoroutine();
+		IEnumeratorFake HideCoroutine();
+		IEnumeratorFake MakeSelectableCoroutine();
+		IEnumeratorFake MakeUnselectableCoroutine();
+		IEnumeratorFake SelectCoroutine();
+	}
+	public class UISelStateEngine : IUISelStateEngine {
+		public UISelStateEngine(IUIElement element, IUISelStateRepo selStateRepo){
 			SetSelStateRepo(selStateRepo);
 			SelStateRepo().InitializeFields(element);
 			SelStateRepo().InitializeStates();
 			SetSelCoroutineRepo(new UISelCoroutineRepo(element, this));
-			_selStateEngine = new UIStateEngine<IUISelectionState>();
-			_selProcEngine = new UIProcessEngine<IUISelProcess>();
-		}
-		public void SetUIElement(IUIElement element){
-
+			_selStateSwitch = new UIStateSwitch<IUISelectionState>();
+			_selProcSwitch = new UIProcessSwitch<IUISelProcess>();
 		}
 		/*	state	*/
-			IUIStateEngine<IUISelectionState> SelStateEngine(){
-				Debug.Assert(_selStateEngine != null);
-				return _selStateEngine;
+			IUIStateSwitch<IUISelectionState> SelStateSwitch(){
+				Debug.Assert(_selStateSwitch != null);
+				return _selStateSwitch;
 			}
-				IUIStateEngine<IUISelectionState> _selStateEngine;
+				IUIStateSwitch<IUISelectionState> _selStateSwitch;
 			IUISelStateRepo SelStateRepo(){
 				Debug.Assert(_selStateRepo != null);
 				return _selStateRepo;
@@ -31,13 +65,13 @@ namespace UISystem{
 				_selStateRepo = repo;
 			}
 			IUISelectionState prevSelState{
-				get{return SelStateEngine().PrevState();}
+				get{return SelStateSwitch().PrevState();}
 			}
 			IUISelectionState curSelState{
-				get{return SelStateEngine().CurState();}
+				get{return SelStateSwitch().CurState();}
 			}
 			void SetSelState(IUISelectionState state){
-				SelStateEngine().SetState(state);
+				SelStateSwitch().SwitchTo(state);
 				if(state == null && SelProcess() != null)
 					SetAndRunSelProcess(null);
 			}
@@ -126,19 +160,19 @@ namespace UISystem{
 					return IsSelected() || IsDeselected();
 				}
 		/*	process	*/
-			IUIProcessEngine<IUISelProcess> SelProcEngine(){
-				Debug.Assert(_selProcEngine != null);
-				return _selProcEngine;
+			IUIProcessSwitch<IUISelProcess> SelProcSwitch(){
+				Debug.Assert(_selProcSwitch != null);
+				return _selProcSwitch;
 			}
-				IUIProcessEngine<IUISelProcess> _selProcEngine;
-			public void SetSelProcEngine(IUIProcessEngine<IUISelProcess> engine){
-				_selProcEngine = engine;
+				IUIProcessSwitch<IUISelProcess> _selProcSwitch;
+			public void SetSelProcSwitch(IUIProcessSwitch<IUISelProcess> engine){
+				_selProcSwitch = engine;
 			}
 			public void SetAndRunSelProcess(IUISelProcess process){
-				SelProcEngine().SetAndRunProcess(process);
+				SelProcSwitch().SetAndRunProcess(process);
 			}
 			public IUISelProcess SelProcess(){
-				return SelProcEngine().Process();
+				return SelProcSwitch().Process();
 			}
 			public void ExpireProcess(){
 				IUISelProcess selProc = SelProcess();
@@ -167,42 +201,5 @@ namespace UISystem{
 			public IEnumeratorFake SelectCoroutine(){
 				return CoroutineRepo().SelectCoroutine();
 			}
-	}
-	public interface IUISelStateHandler{
-		void Deactivate();
-			bool IsDeactivated();
-			bool WasDeactivated();
-		void Hide();
-			bool IsHidden();
-			bool WasHidden();
-		void MakeSelectable();
-			bool IsSelectable();
-			bool WasSelectable();
-		void MakeUnselectable();
-			bool IsUnselectable();
-			bool WasUnselectable();
-		void Select();
-			bool IsSelected();
-			bool WasSelected();
-
-		/* Relay States */
-		void Activate();
-			bool WasActivated();
-			bool IsActivated();
-		void Deselect();
-			bool WasDeselected();
-			bool IsDeselected();
-		void Show();
-			bool WasShown();
-			bool IsShown();
-		void SetAndRunSelProcess(IUISelProcess process);
-		IUISelProcess SelProcess();
-		void SetSelCoroutineRepo(IUISelCoroutineRepo repo);
-		void ExpireProcess();
-		IEnumeratorFake DeactivateCoroutine();
-		IEnumeratorFake HideCoroutine();
-		IEnumeratorFake MakeSelectableCoroutine();
-		IEnumeratorFake MakeUnselectableCoroutine();
-		IEnumeratorFake SelectCoroutine();
 	}
 }

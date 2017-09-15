@@ -3,10 +3,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
-	public class TapStateHandler : ITapStateHandler{
-		public TapStateHandler(IUIElement element){
+	public interface ITapStateEngine: IUISystemInputEngine{
+		void WaitForTapPointerDown();
+			bool WasWaitingForTapPointerDown();
+			bool IsWaitingForTapPointerDown();
+		void WaitForTapTimerUp();
+			bool WasWaitingForTapTimerUp();
+			bool IsWaitingForTapTimerUp();
+		void WaitForTapPointerUp();
+			bool WasWaitingForTapPointerUp();
+			bool IsWaitingForTapPointerUp();
+		void Tap();
+			bool WasTapping();
+			bool IsTapping();
+		
+		void ExecuteTapCommand();
+
+		void SetAndRunTapProcess(ITapStateProcess process);
+
+		IEnumeratorFake WaitForTapPointerDownCoroutine();
+		IEnumeratorFake WaitForTapTimerUpCoroutine();
+		IEnumeratorFake WaitForTapPointerUpCoroutine();
+		IEnumeratorFake TapCoroutine();
+	}
+	public class TapStateEngine : ITapStateEngine{
+		public TapStateEngine(IUIElement element){
 			_uiElement = element;
-			_tapStateEngine = new UIStateEngine<IUITapState>();
+			_tapStateSwitch = new UIStateSwitch<IUITapState>();
 			InitializeStates();
 		}
 		IUIElement UIElement(){
@@ -14,21 +37,21 @@ namespace UISystem{
 			return _uiElement;
 		}
 			IUIElement _uiElement;
-		IUIStateEngine<IUITapState> TapStateEngine(){
-			Debug.Assert(_tapStateEngine != null);
-			return _tapStateEngine;
+		IUIStateSwitch<IUITapState> TapStateSwitch(){
+			Debug.Assert(_tapStateSwitch != null);
+			return _tapStateSwitch;
 		}
-			IUIStateEngine<IUITapState> _tapStateEngine;
+			IUIStateSwitch<IUITapState> _tapStateSwitch;
 			void SetTapState(IUITapState state){
-				TapStateEngine().SetState(state);
+				TapStateSwitch().SwitchTo(state);
 				if(state == null && TapStateProcess() != null)
 					SetAndRunTapProcess(null);
 			}
 			IUITapState PrevState(){
-				return TapStateEngine().PrevState();
+				return TapStateSwitch().PrevState();
 			}
 			IUITapState CurState(){
-				return TapStateEngine().CurState();
+				return TapStateSwitch().CurState();
 			}
 		void InitializeStates(){
 			_waitingForTapPointerDownState = new UIWaitingForTapPointerDownState(this);
@@ -98,16 +121,16 @@ namespace UISystem{
 		public void ExecuteTapCommand(){
 			UIElement().ExecuteTapCommand();
 		}
-		IUIProcessEngine<ITapStateProcess> TapProcessEngine(){
-			Debug.Assert(_tapProcessEngine != null);
-			return _tapProcessEngine;
+		IUIProcessSwitch<ITapStateProcess> TapProcessSwitch(){
+			Debug.Assert(_tapProcessSwitch != null);
+			return _tapProcessSwitch;
 		}
-			IUIProcessEngine<ITapStateProcess> _tapProcessEngine;
+			IUIProcessSwitch<ITapStateProcess> _tapProcessSwitch;
 		public void SetAndRunTapProcess(ITapStateProcess process){
-			TapProcessEngine().SetAndRunProcess(process);
+			TapProcessSwitch().SetAndRunProcess(process);
 		}
 		ITapStateProcess TapStateProcess(){
-			return TapProcessEngine().Process();
+			return TapProcessSwitch().Process();
 		}
 
 
@@ -140,28 +163,5 @@ namespace UISystem{
 			if(CurState() is IUIPointerUpState)
 				((IUIPointerUpState)CurState()).OnDeselected();
 		}
-	}
-	public interface ITapStateHandler: IUISystemInputHandler{
-		void WaitForTapPointerDown();
-			bool WasWaitingForTapPointerDown();
-			bool IsWaitingForTapPointerDown();
-		void WaitForTapTimerUp();
-			bool WasWaitingForTapTimerUp();
-			bool IsWaitingForTapTimerUp();
-		void WaitForTapPointerUp();
-			bool WasWaitingForTapPointerUp();
-			bool IsWaitingForTapPointerUp();
-		void Tap();
-			bool WasTapping();
-			bool IsTapping();
-		
-		void ExecuteTapCommand();
-
-		void SetAndRunTapProcess(ITapStateProcess process);
-
-		IEnumeratorFake WaitForTapPointerDownCoroutine();
-		IEnumeratorFake WaitForTapTimerUpCoroutine();
-		IEnumeratorFake WaitForTapPointerUpCoroutine();
-		IEnumeratorFake TapCoroutine();
 	}
 }

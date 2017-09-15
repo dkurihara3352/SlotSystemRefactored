@@ -4,32 +4,48 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace UISystem{
-	public class ResizableSGActStateHandler : IResizableSGActStateHandler {
+	public interface IResizableSGActStateEngine{
+		void ClearCurActState();
+			bool WasActStateNull();
+			bool IsActStateNull();
+		void WaitForAction();
+			bool IsWaitingForResize();
+			bool WasWaitingForAction();
+		void Resize();
+			bool IsResizing();
+			bool WasResizing();
+	/* Proc */
+		void SetAndRunActProcess(ISGActProcess process);
+		void ExpireActProcess();
+		ISGActProcess ActProcess();
+		Func<IEnumeratorFake> ResizeCoroutine();
+	}
+	public class ResizableSGActStateEngine : IResizableSGActStateEngine {
 		/*	Engines	*/
 			/*	Action State	*/
-				public ResizableSGActStateHandler(IResizableSG sg){
-					SetActStateEngine(new UIStateEngine<ISGActState>());
+				public ResizableSGActStateEngine(IResizableSG sg){
+					SetActStateSwitch(new UIStateSwitch<ISGActState>());
 					SetStatesRepo(new ResizableSGActStateRepo(sg));
-					SetActProcEngine(new UIProcessEngine<ISGActProcess>());
+					SetActProcSwitch(new UIProcessSwitch<ISGActProcess>());
 				}
-				IUIStateEngine<ISGActState> ActStateEngine(){
-					Debug.Assert(_actStateEngine != null);
-					return _actStateEngine;
+				IUIStateSwitch<ISGActState> ActStateSwitch(){
+					Debug.Assert(_actStateSwitch != null);
+					return _actStateSwitch;
 				}
-				void SetActStateEngine(IUIStateEngine<ISGActState> engine){
-					_actStateEngine = engine;
+				void SetActStateSwitch(IUIStateSwitch<ISGActState> stateSwitch){
+					_actStateSwitch = stateSwitch;
 				}
-					IUIStateEngine<ISGActState> _actStateEngine;
+					IUIStateSwitch<ISGActState> _actStateSwitch;
 				public void SetActState(ISGActState state){
-					ActStateEngine().SetState(state);
+					ActStateSwitch().SwitchTo(state);
 					if(state ==null && ActProcess() != null)
 						SetAndRunActProcess(null);
 				}
 				ISGActState curActState{
-					get{return ActStateEngine().CurState();}
+					get{return ActStateSwitch().CurState();}
 				}
 				ISGActState prevActState{
-					get{return ActStateEngine().PrevState();}
+					get{return ActStateSwitch().PrevState();}
 				}
 				IResizableSGActStateRepo StatesRepo(){
 					Debug.Assert(_statesRepo != null);
@@ -74,16 +90,16 @@ namespace UISystem{
 					}
 	/*	process	*/
 		/*	Action Process	*/
-			IUIProcessEngine<ISGActProcess> ActProcEngine(){
-				Debug.Assert(_actProcEngine != null);
-				return _actProcEngine;
+			IUIProcessSwitch<ISGActProcess> ActProcSwitch(){
+				Debug.Assert(_actProcSwitch != null);
+				return _actProcSwitch;
 			}
-			public void SetActProcEngine(IUIProcessEngine<ISGActProcess> engine){
-				_actProcEngine = engine;
+			public void SetActProcSwitch(IUIProcessSwitch<ISGActProcess> processSwitch){
+				_actProcSwitch = processSwitch;
 			}
-				IUIProcessEngine<ISGActProcess> _actProcEngine;
+				IUIProcessSwitch<ISGActProcess> _actProcSwitch;
 			public void SetAndRunActProcess(ISGActProcess process){
-				ActProcEngine().SetAndRunProcess(process);
+				ActProcSwitch().SetAndRunProcess(process);
 			}
 			public void ExpireActProcess(){
 				ISGActProcess actProcess = ActProcess();
@@ -91,26 +107,10 @@ namespace UISystem{
 					actProcess.Expire();
 			}
 			public ISGActProcess ActProcess(){
-				return ActProcEngine().Process();
+				return ActProcSwitch().Process();
 			}
 			public Func<IEnumeratorFake> ResizeCoroutine(){
 				return null;
 			}
-	}
-	public interface IResizableSGActStateHandler{
-		void ClearCurActState();
-			bool WasActStateNull();
-			bool IsActStateNull();
-		void WaitForAction();
-			bool IsWaitingForResize();
-			bool WasWaitingForAction();
-		void Resize();
-			bool IsResizing();
-			bool WasResizing();
-	/* Proc */
-		void SetAndRunActProcess(ISGActProcess process);
-		void ExpireActProcess();
-		ISGActProcess ActProcess();
-		Func<IEnumeratorFake> ResizeCoroutine();
 	}
 }

@@ -17,7 +17,7 @@ namespace UISystem{
 		bool AcceptsItem(ISlottableItem item);
 		bool IsReorderable();
 		bool IsFillable();
-		bool IsSwappable();
+		bool IsExchangeable();
 		
 		void TearDownAsDestSG();
 		void SetUpAsDestSG();
@@ -38,7 +38,7 @@ namespace UISystem{
 			SetIsExchangedOverReordered( constArg.IsExchangedOverReordered());
 			SetPositionSlotsCommand(constArg.PositionSBsCommand());
 			SetSorterHandler(new SorterHandler(constArg.InitSorter()));
-			SetSelStateHandler(new UISelStateHandler(this, constArg.UISelStateRepo()));
+			SetSelStateHandler(new UISelStateEngine(this, constArg.UISelStateRepo()));
 		}
 		public void InitializeOnSlotSystemActivate(){
 			SetUpInventory();
@@ -189,10 +189,10 @@ namespace UISystem{
 					return true;
 			return false;
 		}
-		public bool IsSwappable(){
-			return SwappableSlots().Count == 1;
+		public bool IsExchangeable(){
+			return ExchangeableSlots().Count == 1;
 		}
-		public List<ISlot> SwappableSlots(){
+		public List<ISlot> ExchangeableSlots(){
 			List<ISlot> result = new List<ISlot>();
 			ISlotGroup sourceSG = SSM().SourceSG();
 			if(sourceSG != this && AcceptsItem( SSM().PickedItem())){
@@ -258,14 +258,14 @@ namespace UISystem{
 			if( HasIncrementTargetSlot()){
 				destSlot = IncrementTargetSlot();
 			}else{
-				if(IsSwappableAndFillable()){
+				if(IsExchangeableAndFillable()){
 					if(IsExchangedOverFilled())
-						destSlot = SwapTargetSlot();
+						destSlot = ExchangeTargetSlot();
 					else
 						destSlot = FillTargetSlot();
 				}else{
-					if( IsSwappable())
-						destSlot = SwapTargetSlot();
+					if( IsExchangeable())
+						destSlot = ExchangeTargetSlot();
 					else if( IsFillable())
 						destSlot = FillTargetSlot();
 					else
@@ -306,11 +306,11 @@ namespace UISystem{
 					return PickedItemSlot();
 			return null;
 		}
-		bool IsSwappableAndFillable(){
-			return IsSwappable() && IsFillable();
+		bool IsExchangeableAndFillable(){
+			return IsExchangeable() && IsFillable();
 		}
-		ISlot SwapTargetSlot(){
-			return SwappableSlots()[0];
+		ISlot ExchangeTargetSlot(){
+			return ExchangeableSlots()[0];
 		}
 		ISlot FillTargetSlot(){
 			return FirstEmptySlot();

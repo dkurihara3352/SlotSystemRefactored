@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace UISystem{
-	public interface IUIElement: IEnumerable<IUIElement>, IUISystemInputHandler{
+	public interface IUIElement: IEnumerable<IUIElement>, IUISystemInputEngine{
 		void InitializeStates();
 		void SetHierarchy();
 		bool IsShownOnActivation();
@@ -23,7 +23,7 @@ namespace UISystem{
 		bool Contains(IUIElement element);
 		IUIElement this[int i]{get;}
 		int GetLevel();
-		IUISelStateHandler SelStateHandler();
+		IUISelStateEngine SelStateHandler();
 			void Activate();
 			void Deactivate();
 			void MakeSelectable();
@@ -32,26 +32,26 @@ namespace UISystem{
 			void Select();
 			bool IsSelected();
 			void Deselect();
-		ITapStateHandler TapStateHandler();
+		ITapStateEngine TapStateHandler();
 		void ExecuteTapCommand();
 	}
 	public class UIElement : IUIElement{
 		RectTransformFake rectTransform;
 		public UIElement(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ITapCommand tapCommand){
 			rectTransform = rectTrans;
-			SetSelStateHandler(new UISelStateHandler(this, selStateRepo));
-			SetTapStateHandler(new TapStateHandler(this));
+			SetSelStateHandler(new UISelStateEngine(this, selStateRepo));
+			SetTapStateHandler(new TapStateEngine(this));
 			SetTapCommand(tapCommand);
 		}
 		/* Sel State Handling */
-			public IUISelStateHandler SelStateHandler(){
+			public IUISelStateEngine SelStateHandler(){
 				Debug.Assert(_selStateHandler != null);
 				return _selStateHandler;
 			}
-			public void SetSelStateHandler(IUISelStateHandler handler){
+			public void SetSelStateHandler(IUISelStateEngine handler){
 				_selStateHandler = handler;
 			}
-				IUISelStateHandler _selStateHandler;
+				IUISelStateEngine _selStateHandler;
 			public void Activate(){
 				SelStateHandler().Activate();
 				ActivateChildren();
@@ -281,14 +281,14 @@ namespace UISystem{
 					return GetEnumerator();
 				}
 		/* Input Handling */
-			public ITapStateHandler TapStateHandler(){
+			public ITapStateEngine TapStateHandler(){
 				Debug.Assert(_tapStateHandler != null);
 				return _tapStateHandler;
 			}
-			void SetTapStateHandler(ITapStateHandler handler){
+			void SetTapStateHandler(ITapStateEngine handler){
 				_tapStateHandler = handler;
 			}
-				ITapStateHandler _tapStateHandler;
+				ITapStateEngine _tapStateHandler;
 			public void ExecuteTapCommand(){
 				TapCommand().Execute();
 			}

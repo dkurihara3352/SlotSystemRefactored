@@ -10,20 +10,20 @@ namespace UISystem{
             return element as ISlotGroup;
         }
         public override void InitializeStates(){
-            SetDeactivatedState(new UIDeactivatedState(handler));
-			SetActivatedState(new SGActivatedState(SG(), handler));
-			SetHiddenState(new UIHiddenState(handler));
-			SetShownState(new UIShownState(handler));
-			SetSelectedState(new UISelectedState(handler));
-			SetDeselectedState(new UIDeselectedState(handler));
-			SetSelectableState(new UISelectableState(handler));
-			SetUnselectableState(new UIUnselectableState(handler));
+            SetDeactivatedState(new UIDeactivatedState(engine));
+			SetActivatedState(new SGActivatedState(SG(), engine));
+			SetHiddenState(new UIHiddenState(engine));
+			SetShownState(new UIShownState(engine));
+			SetSelectedState(new UISelectedState(engine));
+			SetDeselectedState(new UIDeselectedState(engine));
+			SetSelectableState(new UISelectableState(engine));
+			SetUnselectableState(new UIUnselectableState(engine));
         }
     }
     public class SGActivatedState: UIActivatedState, IRelayState{
 		ISlotGroup sg;
 
-		public SGActivatedState(IUIElement element, IUISelStateHandler handler): base(element, handler){
+		public SGActivatedState(IUIElement element, IUISelStateEngine engine): base(element, engine){
 			Debug.Assert((element is ISlotGroup));
 			sg = (ISlotGroup)element;
 		}
@@ -34,7 +34,7 @@ namespace UISystem{
 	}
     public abstract class ResizableSGActState: ISGActState{
         protected IResizableSG sg;
-        protected IResizableSGActStateHandler actStateHandler;
+        protected IResizableSGActStateEngine actStateHandler;
         public ResizableSGActState(IResizableSG sg){
             this.sg = sg;
             this.actStateHandler = sg.ActStateHandler();

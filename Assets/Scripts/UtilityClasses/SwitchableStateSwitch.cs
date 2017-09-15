@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Utility{
-	public abstract class SwitchableStateEngine<T>: ISwitchableStateEngine<T> where T: ISwitchableState{
+	public abstract class SwitchableStateSwitch<T>: ISwitchableStateSwitch<T> where T: ISwitchableState{
 		virtual public T PrevState(){
 			return _prevState;
 		}
@@ -12,7 +12,7 @@ namespace Utility{
 			return _curState;
 		}
 			protected T _curState;
-		public void SetState(T newState){
+		public void SwitchTo(T newState){
 			Debug.Assert( !(CurState() is IRelayState));
 			if(newState.CanEnter()){
 				UpdatePrevState();
@@ -31,11 +31,10 @@ namespace Utility{
 				toState.Enter();
 		}
 	}
-	public interface ISwitchableStateEngine<T> where T: ISwitchableState{
+	public interface ISwitchableStateSwitch<T> where T: ISwitchableState{
 		T PrevState();
 		T CurState();
-		void SetState(T state);
-
+		void SwitchTo(T state);
 	}
 	public interface ISwitchableState{
 		void Enter();

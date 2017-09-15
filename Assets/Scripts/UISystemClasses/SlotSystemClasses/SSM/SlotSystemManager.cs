@@ -11,7 +11,8 @@ namespace UISystem{
 		ISlottableItem PickedItem();
 		int PickedQuantity();
 		ISlotGroup SourceSG();
-		void SetPicked(ISlottableItem item, ISlotGroup sourceSG);
+		void SetPicked( ISlot pickedSlot);
+		// void SetDraggedIcon( IDraggedIcon icon);
 		ISlotSystemElement HoveredSSE();
 		void SetHoveredSSE(ISlotSystemElement hoveredSSE);
 
@@ -22,6 +23,10 @@ namespace UISystem{
 		void UpdateInventory(IInventory inventory);
 		event EventHandler<InventoryEventArgs> InventoryUpdated;
 		
+
+		void MakePickedSlotWaitForIncrement();
+		void GetPickedSlotReadyForIncrement();
+
 		void Refresh();
 	}
 	public interface IInventorySystemSSM{}
@@ -73,6 +78,14 @@ namespace UISystem{
 
 
 		/* Events and triggers */
+			public ISlot PickedSlot(){
+				return _pickedSlot;
+			}
+			void SetPickedSlot( ISlot pickedSlot){
+				_pickedSlot = pickedSlot;
+			}
+				ISlot _pickedSlot;
+			
 			public ISlottableItem PickedItem(){
 				return _pickedItem;
 			}
@@ -90,10 +103,21 @@ namespace UISystem{
 				_sourceSG = sourceSG;
 			}
 				ISlotGroup _sourceSG;
-			public void SetPicked(ISlottableItem pickedItem, ISlotGroup sourceSG){
-				SetPickedItem( pickedItem);
-				SetSourceSG( sourceSG);
+			public void SetPicked(ISlot pickedSlot){
+				if( pickedSlot != null){
+					SetPickedSlot( pickedSlot);
+					SetPickedItem( pickedSlot.Item());
+					SetSourceSG( pickedSlot.SlotGroup());
+				}else{
+					SetPickedSlot( null);
+					SetPickedItem( null);
+					SetSourceSG( null);
+				}
 			}
+			// public void SetDraggedIcon( IDraggedIcon icon){
+			// 	_draggedIcon = icon;
+			// }
+			// 	IDraggedIcon _draggedIcon;
 
 			public ISlotSystemElement HoveredSSE(){
 				return _hoveredSSE;
@@ -156,8 +180,16 @@ namespace UISystem{
 					InventoryUpdated.Invoke(this, e);
 			}
 
+
+			public void GetPickedSlotReadyForIncrement(){
+				PickedSlot().GetReadyForIncrement();
+			}
+			public void MakePickedSlotWaitForIncrement(){
+				PickedSlot().WaitForIncrement();
+			}
+
 		public void Refresh(){
-			SetPicked(null, null);
+			SetPicked(null);
 			SetHoveredSSE(null);
 		}
 	}

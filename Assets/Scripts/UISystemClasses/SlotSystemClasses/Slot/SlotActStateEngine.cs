@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace UISystem{
-	public interface ISlotActStateHandler: IUISystemInputHandler{
+	public interface ISlotActStateEngine: IUISystemInputEngine{
 		void WaitForAction();
 			bool WasWaitingForAction();
 			bool IsWaitingForAction();
@@ -24,11 +24,11 @@ namespace UISystem{
 		IEnumeratorFake WaitForPointerUpCoroutine();
 		IEnumeratorFake WaitForNextTouchCoroutine();
 	}
-	public class SlotActStateHandler : ISlotActStateHandler{
-		public SlotActStateHandler(ISlot slot){
+	public class SlotActStateEngine : ISlotActStateEngine{
+		public SlotActStateEngine(ISlot slot){
 			SetSlot(slot);
-			SetActStateEngine(new UIStateEngine<ISlotActState>());
-			SetActProcessEngine(new UIProcessEngine<ISlotActProcess>());
+			SetActStateSwitch(new UIStateSwitch<ISlotActState>());
+			SetActProcessSwitch(new UIProcessSwitch<ISlotActProcess>());
 			InitializeStates();
 		}
 		ISlot Slot(){
@@ -39,24 +39,24 @@ namespace UISystem{
 			_slot = sb;
 		}
 			ISlot _slot;
-		IUIStateEngine<ISlotActState> ActStateEngine(){
-			Debug.Assert(_actStateEngine != null);
-			return _actStateEngine;
+		IUIStateSwitch<ISlotActState> ActStateSwitch(){
+			Debug.Assert(_actStateSwitch != null);
+			return _actStateSwitch;
 		}
-		void SetActStateEngine(IUIStateEngine<ISlotActState> stateEngine){
-			_actStateEngine = stateEngine;
+		void SetActStateSwitch(IUIStateSwitch<ISlotActState> stateSwitch){
+			_actStateSwitch = stateSwitch;
 		}
-			IUIStateEngine<ISlotActState> _actStateEngine;
+			IUIStateSwitch<ISlotActState> _actStateSwitch;
 		public void SetActState(ISlotActState state){
-			ActStateEngine().SetState(state);
+			ActStateSwitch().SwitchTo(state);
 			if(state == null && ActProcess() != null)
 				SetAndRunActProcess(null);
 		}
 		ISlotActState CurState(){
-			return ActStateEngine().CurState();
+			return ActStateSwitch().CurState();
 		}
 		ISlotActState PrevState(){
-			return ActStateEngine().PrevState();
+			return ActStateSwitch().PrevState();
 		}
 
 		
@@ -131,7 +131,7 @@ namespace UISystem{
 
 
 		public ISlotActProcess ActProcess(){
-			return ActProcEngine().Process();
+			return ActProcSwitch().Process();
 		}
 		public bool IsActProcessRunning(){
 			ISlotActProcess actProcess = ActProcess();
@@ -140,15 +140,15 @@ namespace UISystem{
 			return false;
 		}
 		public void SetAndRunActProcess(ISlotActProcess process){
-			ActProcEngine().SetAndRunProcess(process);
+			ActProcSwitch().SetAndRunProcess(process);
 		}
-		IUIProcessEngine<ISlotActProcess> ActProcEngine(){
-			Debug.Assert(_actProcessEngine != null);
-			return _actProcessEngine;
+		IUIProcessSwitch<ISlotActProcess> ActProcSwitch(){
+			Debug.Assert(_actProcessSwitch != null);
+			return _actProcessSwitch;
 		}
-			IUIProcessEngine<ISlotActProcess> _actProcessEngine;
-		public void SetActProcessEngine(IUIProcessEngine<ISlotActProcess> engine){
-			_actProcessEngine = engine;
+			IUIProcessSwitch<ISlotActProcess> _actProcessSwitch;
+		public void SetActProcessSwitch(IUIProcessSwitch<ISlotActProcess> processSwitch){
+			_actProcessSwitch = processSwitch;
 		}
 		public void ExpireActProcess(){
 			ISlotActProcess actProcess = ActProcess();

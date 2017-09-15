@@ -46,11 +46,11 @@ namespace UISystem{
 		void Expire();
 	}
 	/* Engine */
-	public class UIProcessEngine<T>: IUIProcessEngine<T> where T: IUIProcess{
-		public UIProcessEngine(){}
-		public UIProcessEngine(T from){
-			SetProcess(from);
-		}
+	public interface IUIProcessSwitch<T> where T: IUIProcess{
+		T Process();
+		void SetAndRunProcess(T process);
+	}
+	public class UIProcessSwitch<T>: IUIProcessSwitch<T> where T: IUIProcess{
 		public virtual T Process(){return _process;}
 		void SetProcess(T process){
 			_process = process;
@@ -68,27 +68,23 @@ namespace UISystem{
 			}
 		}
 	}
-	public interface IUIProcessEngine<T> where T: IUIProcess{
-		T Process();
-		void SetAndRunProcess(T process);
-	}
 	/* repo */
 	public class UISelCoroutineRepo: IUISelCoroutineRepo{
-		public UISelCoroutineRepo(IUIElement element, IUISelStateHandler handler){
+		public UISelCoroutineRepo(IUIElement element, IUISelStateEngine engine){
 			this.element = element;
-			this.handler = handler;
+			this.engine = engine;
 		}
 		IUIElement element;
-		IUISelStateHandler handler;
+		IUISelStateEngine engine;
 		public void InitializeFields(IUIElement element){
 			this.element = element;
-			this.handler = element.SelStateHandler();
+			this.engine = element.SelStateHandler();
 		}
 		public IEnumeratorFake DeactivateCoroutine(){
 			return UIDeactivateCoroutine();
 		}
 			IEnumeratorFake UIDeactivateCoroutine(){
-				if(handler.WasActivated()){
+				if(engine.WasActivated()){
 					/*	this coroutine may not be needed, since deactivation is supposed to happen at once
 					*/
 				}
@@ -98,10 +94,10 @@ namespace UISystem{
 			return UIHideCoroutine();
 		}
 			IEnumeratorFake UIHideCoroutine(){
-				if(handler.WasDeactivated()){
+				if(engine.WasDeactivated()){
 					/*	hide instantly and break
 					*/
-				}else if(handler.WasShown()){
+				}else if(engine.WasShown()){
 					/*	Decrease scale or alpha to make it disappear gradually
 					*/
 				}
@@ -111,17 +107,17 @@ namespace UISystem{
 			return UIUnselectableCoroutine();
 		}
 			IEnumeratorFake UIUnselectableCoroutine(){
-				if(handler.WasDeactivated()){
+				if(engine.WasDeactivated()){
 					/*	show & turn unselectable instantly and break
 					*/
-				}else if(handler.WasHidden()){
+				}else if(engine.WasHidden()){
 					/*	show gradually
 					*/
 				}else{
-					if(handler.WasSelectable()){
+					if(engine.WasSelectable()){
 						/*	turn from selectable color to unselectable color
 						*/
-					}else if(handler.WasSelected()){
+					}else if(engine.WasSelected()){
 						/*	turn from selected color to unselectable color
 						*/
 					}
@@ -132,17 +128,17 @@ namespace UISystem{
 			return UISelectableCoroutine();
 		}
 			IEnumeratorFake UISelectableCoroutine(){
-				if(handler.WasDeactivated()){
+				if(engine.WasDeactivated()){
 					/*	show & turn selectable instantly and break
 					*/
-				}else if(handler.WasHidden()){
+				}else if(engine.WasHidden()){
 					/*	show gradually
 					*/
 				}else{
-					if(handler.WasUnselectable()){
+					if(engine.WasUnselectable()){
 						/*	turn from unselectable color to selectable color
 						*/
-					}else if(handler.WasSelected()){
+					}else if(engine.WasSelected()){
 						/*	turn from selected color to selectable color
 						*/
 					}
@@ -153,17 +149,17 @@ namespace UISystem{
 			return UISelectCoroutine();
 		}
 			IEnumeratorFake UISelectCoroutine(){
-				if(handler.WasDeactivated()){
+				if(engine.WasDeactivated()){
 					/*	show & turn selected instantly and break
 					*/
-				}else if(handler.WasHidden()){
+				}else if(engine.WasHidden()){
 					/*	show gradually
 					*/
 				}else{
-					if(handler.WasUnselectable()){
+					if(engine.WasUnselectable()){
 						/*	turn from unselectable color to selected color
 						*/
-					}else if(handler.WasSelectable()){
+					}else if(engine.WasSelectable()){
 						/*	turn from selectable color to selected color
 						*/
 					}
@@ -205,28 +201,28 @@ namespace UISystem{
 	public interface ITapStateProcess: IUIProcess{
 	}
 	public abstract class TapStateProcess: UIProcess, ITapStateProcess{
-		protected ITapStateHandler handler;
-		public TapStateProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine){
-			this.handler = handler;
+		protected ITapStateEngine engine;
+		public TapStateProcess(IEnumeratorFake coroutine, ITapStateEngine engine): base(coroutine){
+			this.engine = engine;
 		}
 	}
 	public class UIWaitForTapPointerDownProcess: TapStateProcess{
-		public UIWaitForTapPointerDownProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){}
+		public UIWaitForTapPointerDownProcess(IEnumeratorFake coroutine, ITapStateEngine engine): base(coroutine, engine){}
 	}
 	public class UIWaitForTapTimerUpProcess: TapStateProcess{
-		public UIWaitForTapTimerUpProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){}
+		public UIWaitForTapTimerUpProcess(IEnumeratorFake coroutine, ITapStateEngine engine): base(coroutine, engine){}
 		public override void Expire(){
-			handler.WaitForTapPointerUp();
+			engine.WaitForTapPointerUp();
 		}
 	}
 	public class UIWaitForTapPointerUpProcess: TapStateProcess{
-		public UIWaitForTapPointerUpProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){}
+		public UIWaitForTapPointerUpProcess(IEnumeratorFake coroutine, ITapStateEngine engine): base(coroutine, engine){}
 	}
 	public class UITapProcess: TapStateProcess{
-		public UITapProcess(IEnumeratorFake coroutine, ITapStateHandler handler): base(coroutine, handler){
+		public UITapProcess(IEnumeratorFake coroutine, ITapStateEngine engine): base(coroutine, engine){
 		}
 		public override void Expire(){
-			handler.WaitForTapPointerDown();
+			engine.WaitForTapPointerDown();
 		}
 	}
 }
