@@ -9,41 +9,51 @@ namespace UISystem{
 			public SlotHideProcess(IEnumeratorFake coroutine, ISlot slot): base(coroutine){
 				this.slot = slot;
 			}
-			public override void Expire(){
-				if(slot.IsReadyForExchange())
-					slot.SubstituteWithSlotWithSwappedItem();
-				else
-					slot.SubstituteWithEmptySlot();
-				slot.SetID( InvalidID());
-			}
 		}
 	/* Act Proc */
 		public interface ISlotActProcess: IUIProcess{}
-		public abstract class SlotActProcess: UIProcess{
+		public abstract class SlotActProcess: UIProcess, ISlotActProcess{
 			protected ISlotActStateEngine engine;
 			public SlotActProcess(IEnumeratorFake coroutine, ISlotActStateEngine engine): base(coroutine){
 				this.engine = engine;
 			}
 		}
 			
-		public class SlotWaitForActionProcess: SlotActProcess, ISlotActProcess{
+		public class SlotWaitForActionProcess: SlotActProcess{
 			public SlotWaitForActionProcess(IEnumeratorFake coroutine, ISlotActStateEngine engine): base(coroutine, engine){}
 		}
-		public class SlotWaitForPickUpProcess: SlotActProcess, ISlotActProcess{
+		public class SlotWaitForPickUpProcess: SlotActProcess{
 			public SlotWaitForPickUpProcess(IEnumeratorFake coroutine, ISlotActStateEngine engine): base(coroutine, engine){}
 			public override void Expire(){
 				engine.PickUp();
 				engine.WaitForAction();
 			}
 		}
-		public class SlotWaitForPointerUpProcess: SlotActProcess, ISlotActProcess{
+		public class SlotWaitForPointerUpProcess: SlotActProcess{
 			public SlotWaitForPointerUpProcess(IEnumeratorFake coroutine, ISlotActStateEngine engine): base(coroutine, engine){}
 		}
-		public class SlotWaitForNextTouchProcess: SlotActProcess, ISlotActProcess{
+		public class SlotWaitForNextTouchProcess: SlotActProcess{
 			public SlotWaitForNextTouchProcess(IEnumeratorFake coroutine, ISlotActStateEngine engine): base(coroutine, engine){}
 			public override void Expire(){
 				engine.PickUp();
 				engine.WaitForAction();
+			}
+		}
+	/* FadeProc */
+		public interface ISlotFadeProcess: IUIProcess{}
+		public abstract class SlotFadeProcess: UIProcess, ISlotFadeProcess{
+			protected ISlotFadeStateEngine engine;
+			public SlotFadeProcess( IEnumeratorFake coroutine, ISlotFadeStateEngine engine): base( coroutine){
+				this.engine = engine;
+			}
+		}
+		public class SlotWaitForItemFadeProcess: SlotFadeProcess{
+			public SlotWaitForItemFadeProcess( IEnumeratorFake coroutine, ISlotFadeStateEngine engine): base( coroutine, engine){}
+		}
+		public class SlotFadeItemProcess: SlotFadeProcess{
+			public SlotFadeItemProcess( IEnumeratorFake coroutine, ISlotFadeStateEngine engine): base( coroutine, engine){}
+			public override void Expire(){
+				engine.WaitForItemFade();
 			}
 		}
 }

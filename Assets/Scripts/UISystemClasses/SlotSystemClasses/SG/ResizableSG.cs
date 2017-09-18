@@ -24,24 +24,15 @@ namespace UISystem{
 		public override bool IsFillable(){
 			return true;
 		}
-		public override void SetUpPickedItemSlotOnPickUp(){
-			
-		}
-		protected override void SetFillTargetSlotAsDestination(){
-			/*	Get the empty Slot
-				Switch its item from empty to PickedItem
-				if auto reorder
-					reindex and travel
-				set it as destination
-			*/
-			ISlot emptySlot = EmptySlot();
-			emptySlot.SwitchItemTo( SSM().PickedItem());
-			if(IsAutoReorderEnabled())
-				Reindex();
-			SSM().SetDestinationSlot( emptySlot);
-		}
-		public override void ReverseImplicitTargetFocus(){
-
+		public override bool IsPotentialDropTargetFor(ISlottableItem pickedItem){
+			if(SSM().SourceSG() == this)
+				return true;
+			else{
+				if(AcceptsItem( pickedItem))
+					return true;
+				else
+					return false;
+			}
 		}
 	}
 	public interface IResizableSG: ISlotGroup{

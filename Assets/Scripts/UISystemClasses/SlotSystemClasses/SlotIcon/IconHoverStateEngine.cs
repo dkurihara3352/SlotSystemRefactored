@@ -19,7 +19,7 @@ namespace UISystem{
 		void SwapItemBackToOriginal();
 	}
 	public class IconHoverStateEngine : IIconHoverStateEngine {
-		public IconHoverStateEngine( ISlotIcon slotIcon, ISlot slot){
+		public IconHoverStateEngine( IHoverIcon slotIcon, ISlot slot){
 			SetSlotIcon( slotIcon);
 			SetSlot( slot);
 			SetStateSwitch( new IconHoverStateSwitch());
@@ -27,13 +27,13 @@ namespace UISystem{
 		}
 
 
-		ISlotIcon SlotIcon(){
+		IHoverIcon SlotIcon(){
 			return _slotIcon;
 		}
-		void SetSlotIcon( ISlotIcon slotIcon){
+		void SetSlotIcon( IHoverIcon slotIcon){
 			_slotIcon = slotIcon;
 		}
-			ISlotIcon _slotIcon;
+			IHoverIcon _slotIcon;
 		ISlot Slot(){
 			return _slot;
 		}

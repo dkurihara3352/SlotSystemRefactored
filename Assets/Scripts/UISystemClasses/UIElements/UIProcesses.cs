@@ -78,7 +78,7 @@ namespace UISystem{
 		IUISelStateEngine engine;
 		public void InitializeFields(IUIElement element){
 			this.element = element;
-			this.engine = element.SelStateHandler();
+			this.engine = element.SelStateEngine();
 		}
 		public IEnumeratorFake DeactivateCoroutine(){
 			return UIDeactivateCoroutine();

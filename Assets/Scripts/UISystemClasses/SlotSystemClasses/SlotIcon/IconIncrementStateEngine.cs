@@ -17,20 +17,20 @@ namespace UISystem{
 		IEnumeratorFake GetReadyForIncrementCoroutine();
 	}
 	public class IconIncrementStateEngine : IIconIncrementStateEngine {
-		public IconIncrementStateEngine( ISlotIcon slotIcon){
+		public IconIncrementStateEngine( IHoverIcon slotIcon){
 			SetSlotIcon( slotIcon);
 			SetStateSwitch( new IconIncrementStateSwitch());
 			InitializeStates();
 		}
 
 
-		ISlotIcon SlotIcon(){
+		IHoverIcon SlotIcon(){
 			return _slotIcon;
 		}
-		void SetSlotIcon( ISlotIcon slotIcon){
+		void SetSlotIcon( IHoverIcon slotIcon){
 			_slotIcon = slotIcon;
 		}
-			ISlotIcon _slotIcon;
+			IHoverIcon _slotIcon;
 
 
 		ISwitchableStateSwitch<IIconIncrementState> StateSwitch(){

@@ -10,8 +10,8 @@ namespace UISystem{
 
 		ISlotActStateEngine ActStateEngine();
 		void WaitForAction();
-
 		void PickUp();
+
 		ISlottableItem Item();
 		bool IsEmpty();
 		void SetItem(ISlottableItem item);
@@ -43,6 +43,8 @@ namespace UISystem{
 		void WaitForIncrement();
 
 		bool LeavesGhost();
+		void Ghostify();
+		void Unghostify();
 		void Refresh();
 		void Destroy();
 	}
@@ -50,7 +52,7 @@ namespace UISystem{
 		public Slot(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ITapCommand tapCommand, ISlottableItem item, bool leavesGhost): base(rectTrans, selStateRepo, tapCommand){
 			SetItem(item);
 			SetActStateEngine( new SlotActStateEngine( this));
-			SetFadeStateEngine( new SlotFadeStateEngine( this));
+			SetFadeStateEngine( new SlotFadeStateEngine());
 			InitializeStates();
 			SetLeavesGhost(leavesGhost);
 		}
@@ -58,24 +60,36 @@ namespace UISystem{
 			public override void InitializeStates(){
 				MakeUnselectable();
 				WaitForAction();
+				WaitForItemFade();
+				WaitForIncrement();
 			}
-			/*	Action State */
-				public ISlotActStateEngine ActStateEngine(){
-					Debug.Assert(_actStateEngine != null);
-					return _actStateEngine;
-				}
-					ISlotActStateEngine _actStateEngine;
-				public void SetActStateEngine(ISlotActStateEngine actStateEngine){
-					_actStateEngine = actStateEngine;
-				}
-				public void WaitForAction(){
-					ActStateEngine().WaitForAction();
-				}
+
+		/*	Action State */
+			public ISlotActStateEngine ActStateEngine(){
+				Debug.Assert(_actStateEngine != null);
+				return _actStateEngine;
+			}
+				ISlotActStateEngine _actStateEngine;
+			public void SetActStateEngine(ISlotActStateEngine actStateEngine){
+				_actStateEngine = actStateEngine;
+			}
+			public void WaitForAction(){
+				ActStateEngine().WaitForAction();
+			}
 			public void PickUp(){
 				SSM().SetPicked( this);
-				ISlotIcon draggedIcon = new SlotIcon( Item());
-				SetDraggedIcon( draggedIcon);
-				PostPickFilter();
+				SSM().PostPickFilter();
+				ISlottableItem slotIconItem = CreateSlotIconItem(Item(), 1);
+				IHoverIcon draggedIcon = new HoverIcon( slotIconItem);
+				SetHoverIcon( draggedIcon);
+				HoverIcon().Hover();
+				UpdatePreviewQuantity();
+				/*	picked quantity here
+				*/
+			}
+			protected virtual ISlottableItem CreateSlotIconItem( ISlottableItem item, int quantity){
+				ISlottableItem newItem = new SlottableItem( quantity, item.IsStackable(), item.ItemID());
+				return newItem;
 			}
 			public override void OnPointerDown(){
 				base.OnPointerDown();
@@ -93,6 +107,8 @@ namespace UISystem{
 				base.OnDeselected();
 				ActStateEngine().OnDeselected();
 			}
+
+
 		/* Item Handling */
 			public ISlottableItem Item(){
 				Debug.Assert(_item != null);
@@ -103,7 +119,10 @@ namespace UISystem{
 				_item = item;
 			}
 			public int PickedQuantity(){
-				return SSM().PickedQuantity();
+				if(HoverIcon() != null)
+					return HoverIcon().ItemQuantity();
+				else
+					return 0;
 			}
 			public virtual bool IsStackable(){
 				return Item().IsStackable();
@@ -128,7 +147,17 @@ namespace UISystem{
 				return _previewQuantity;
 			}
 				int _previewQuantity;
-			
+			void UpdatePreviewQuantity(){
+				int newPreviewQua = Quantity() - PickedQuantity();
+				if(newPreviewQua <= 0)
+					IndicateZeroQuantity();
+			}
+			void IndicateZeroQuantity(){
+				if( LeavesGhost())
+					Ghostify();
+				else
+					ChangeItemToEmptyInstantly();
+			}
 
 			public void ChangeItemInstantlyTo( ISlottableItem item){
 				SetItem( item);
@@ -157,12 +186,6 @@ namespace UISystem{
 			public ISlotGroup SlotGroup(){
 				return (ISlotGroup)Parent();
 			}
-			public bool ShareSGAndItem(ISlot other){
-				bool flag = true;
-				flag &= SlotGroup() == other.SlotGroup();
-				flag &= Item().Equals(other.Item());
-				return flag;
-			}
 			public void Destroy(){
 				if(LeavesGhost()){
 
@@ -177,14 +200,23 @@ namespace UISystem{
 				_leavesGhost = leaves;
 			}
 				bool _leavesGhost;
-			public override bool IsHovered(){
-				return SSM().HoveredSSE() == this;
+			public void Ghostify(){
+
+			}
+			public void Unghostify(){
+				
 			}
 
 			public void TearDownAsTarget(){
 				SSM().MakePickedSlotWaitForIncrement();
 				WaitForExchange();
 				Deselect();
+				if( SSM().DestinationSG() != SlotGroup()){
+					if( !LeavesGhost()){
+						Hide();
+						SlotGroup().Reindex();
+					}
+				}
 			}
 			public void SetUpAsIncrementTarget(){
 				SSM().GetPickedSlotReadyForIncrement();
@@ -199,63 +231,41 @@ namespace UISystem{
 				Select();
 			}
 
-			public void WaitForExchange(){
-				/*	
-					SlotGroup.HideSlot() -->
-					SwappedIcon.Dehover()
-						Animate the swapped back to slot with swap target id
-					upon expiration, 
-						wait until slot's HideProcess is over
-					upon expiration of HideProcess
-						if( !IsReadyForSwap)
-							Swap instantly to empty
-						if(IsReadyForSwap) -->this case
-							Swap instantly to SwappedIcon item
-
-				*/
-				DraggedIcon().Dehover();
+		/* Slot Icon */
+			IHoverIcon HoverIcon(){
+				return _hoverIcon;
 			}
-			void PostPickFilter(){
-				
+			void SetHoverIcon( IHoverIcon icon){
+				_hoverIcon = icon;
+			}
+				IHoverIcon _hoverIcon;	
+			public void WaitForExchange(){
+				HoverIcon().Dehover();
 			}
 			public void GetReadyForExchange(){
 				if( !IsEmpty()){
-					SlotIcon exchangeIcon = new SlotIcon( Item());
-					SetExchangeIcon(exchangeIcon);
-					ExchangeIcon().Hover();
+					ISlottableItem exchangeIconItem = CreateSlotIconItem( Item(), 1);
+					HoverIcon exchangeIcon = new HoverIcon( exchangeIconItem);
+					SetHoverIcon(exchangeIcon);
+					HoverIcon().Hover();
+					UpdatePreviewQuantity();
 				}
 			}
-			ISlotIcon ExchangeIcon(){
-				return _exchangeIcon;
-			}
-			void SetExchangeIcon( ISlotIcon icon){
-				_exchangeIcon = icon;
-			}
-				ISlotIcon _exchangeIcon;
 			public bool IsReadyForExchange(){
-				return ExchangeIcon() != null;
+				return SSM().PickedSlot() != this && HoverIcon() != null;
 			}
-
-
-			ISlotIcon DraggedIcon(){
-				return _draggedIcon;
-			}
-			void SetDraggedIcon( ISlotIcon draggedIcon){
-				_draggedIcon = draggedIcon;
-			}
-				ISlotIcon _draggedIcon;
 			public void WaitForIncrement(){
-				DraggedIcon().WaitForIncrement();
+				HoverIcon().WaitForIncrement();
 			}
 			public void GetReadyForIncrement(){
-				DraggedIcon().GetReadyForIncrement();
+				HoverIcon().GetReadyForIncrement();
 			}
 
 			public void Refresh(){
 				WaitForAction();
 				WaitForExchange();
-				SetExchangeIcon( null);
-				SetDraggedIcon( null);
+				WaitForIncrement();
+				SetHoverIcon( null);
 			}
 	}
 }

@@ -21,8 +21,11 @@ namespace UISystem{
 			ISlotSystemManager ssm = SSM();
 		}
 		public void HoverEnter(){
-			SSM().SetHoveredSSE(this);
+			if( IsSelectable())
+				SSM().SetHoveredSSE(this);
 		}
-		public abstract bool IsHovered();
+		public bool IsHovered(){
+			return SSM().HoveredSSE() == this;
+		}
 	}
 }

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utility;
 namespace UISystem{
-	public interface ISlotIcon{
+	public interface IHoverIcon{
 		ISlottableItem Item();
+		int ItemQuantity();
 		void WaitForIncrement();
 		void GetReadyForIncrement();
 		void Dehover();
 		void Hover();
 	}
-	public class SlotIcon : ISlotIcon {
-		public SlotIcon( ISlottableItem item){
+	public class HoverIcon : IHoverIcon {
+		public HoverIcon( ISlottableItem item){
 			SetItem(item);
 			SetIncrementStateEngine( new IconIncrementStateEngine( this));
 		}
@@ -22,6 +23,10 @@ namespace UISystem{
 			_item = item;
 		}
 		ISlottableItem _item;
+
+		public int ItemQuantity(){
+			return Item().Quantity();
+		}
 
 
 		IconIncrementStateEngine IncrementStateEngine(){
@@ -54,7 +59,5 @@ namespace UISystem{
 		public void Hover(){
 			HoverStateEngine().Hover();
 		}
-
-		
 	}
 }

@@ -14,5 +14,12 @@ namespace UISystem{
 		}
 		public void SetAcquisitionOrder(int order){
 		}
+		protected override ISlottableItem CreateSlotIconItem(ISlottableItem item, int quantity){
+			IInventorySystemItem origInvItem = (IInventorySystemItem)item;
+			IInventorySystemItem newInvItem = new InventoryItemInstance();
+			newInvItem.SetInventoryItem( origInvItem.InventoryItem());
+			newInvItem.SetQuantity( quantity);
+			return newInvItem;
+		}
 	}
 }

@@ -23,9 +23,11 @@ namespace UISystem{
 		bool Contains(IUIElement element);
 		IUIElement this[int i]{get;}
 		int GetLevel();
-		IUISelStateEngine SelStateHandler();
+		IUISelStateEngine SelStateEngine();
 			void Activate();
 			void Deactivate();
+			void Hide();
+			void Show();
 			void MakeSelectable();
 			void MakeUnselectable();
 			bool IsSelectable();
@@ -44,16 +46,16 @@ namespace UISystem{
 			SetTapCommand(tapCommand);
 		}
 		/* Sel State Handling */
-			public IUISelStateEngine SelStateHandler(){
-				Debug.Assert(_selStateHandler != null);
-				return _selStateHandler;
+			public IUISelStateEngine SelStateEngine(){
+				Debug.Assert(_selStateEngine != null);
+				return _selStateEngine;
 			}
-			public void SetSelStateHandler(IUISelStateEngine handler){
-				_selStateHandler = handler;
+			public void SetSelStateHandler(IUISelStateEngine engine){
+				_selStateEngine = engine;
 			}
-				IUISelStateEngine _selStateHandler;
+				IUISelStateEngine _selStateEngine;
 			public void Activate(){
-				SelStateHandler().Activate();
+				SelStateEngine().Activate();
 				ActivateChildren();
 			}
 				void ActivateChildren(){
@@ -61,15 +63,31 @@ namespace UISystem{
 						ele.Activate();
 				}
 			public void Deactivate(){
-				SelStateHandler().Deactivate();
+				SelStateEngine().Deactivate();
 				DeactivateChildren();
 			}
 				void DeactivateChildren(){
 					foreach(var ele in this)
 						ele.Deactivate();
 				}
+			public void Hide(){
+				SelStateEngine().Hide();
+				HideChildren();
+			}
+				void HideChildren(){
+					foreach( var ele in this)
+						ele.Hide();
+				}
+			public void Show(){
+				SelStateEngine().Show();
+				ShowChildren();
+			}
+				void ShowChildren(){
+					foreach( var ele in this)
+						ele.Show();
+				}
 			public void MakeSelectable(){
-				SelStateHandler().MakeSelectable();
+				SelStateEngine().MakeSelectable();
 				MakeChildrenSelectable();
 			}
 				void MakeChildrenSelectable(){
@@ -77,7 +95,7 @@ namespace UISystem{
 						ele.MakeSelectable();
 				}
 			public void MakeUnselectable(){
-				SelStateHandler().MakeUnselectable();
+				SelStateEngine().MakeUnselectable();
 				MakeChildrenUnselectable();
 			}
 				void MakeChildrenUnselectable(){
@@ -85,22 +103,22 @@ namespace UISystem{
 						ele.MakeUnselectable();
 				}
 			public void Select(){
-				SelStateHandler().Select();
+				SelStateEngine().Select();
 			}
 				public bool IsSelected(){
-					return SelStateHandler().IsSelected();
+					return SelStateEngine().IsSelected();
 				}
 			public bool IsSelectable(){
-				return SelStateHandler().IsSelectable();
+				return SelStateEngine().IsSelectable();
 			}
 			public bool IsUnselectable(){
-				return SelStateHandler().IsUnselectable();
+				return SelStateEngine().IsUnselectable();
 			}
 			public void Deselect(){
-				SelStateHandler().Deselect();
+				SelStateEngine().Deselect();
 			}
 			public virtual void InitializeStates(){
-				SelStateHandler().Deactivate();
+				SelStateEngine().Deactivate();
 			}
 		/*	public fields	*/
 			public virtual void SetHierarchy(){
@@ -174,7 +192,7 @@ namespace UISystem{
 					immBundle.FocusElement(containingEle);
 					tested = tested.ImmediateBundle();
 				}
-				_selStateHandler.MakeSelectable();
+				_selStateEngine.MakeSelectable();
 			}
 			public bool isBundleElement{
 				get{

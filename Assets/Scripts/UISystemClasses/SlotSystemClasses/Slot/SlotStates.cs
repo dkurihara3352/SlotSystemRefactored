@@ -133,5 +133,41 @@ namespace UISystem{
         }
         public abstract class SlotFadeState: ISlotFadeState{
             protected ISlotFadeStateEngine engine;
+            public SlotFadeState( ISlotFadeStateEngine engine){
+                this.engine = engine;
+            }
+            public abstract bool CanEnter();
+            public abstract void Enter();
+            public virtual void Exit(){}
+            protected void RunWaitForItemFadeProcess(){
+                engine.SetAndRunFadeProcess( new SlotWaitForItemFadeProcess( engine.WaitForItemFadeCoroutine(), engine));
+            }
+            protected void RunFadeItemProcess(){
+                engine.SetAndRunFadeProcess( new SlotFadeItemProcess( engine.FadeItemCoroutine(), engine));
+            }
+        }
+        public class SlotWaitingForItemFadeState: SlotFadeState{
+            public SlotWaitingForItemFadeState( ISlotFadeStateEngine engine): base( engine){}
+            public override bool CanEnter(){
+                if( engine.IsWaitingForItemFade())
+                    return false;
+                else
+                    return true;
+            }
+            public override void Enter(){
+                RunWaitForItemFadeProcess();
+            }
+        }
+        public class SlotFadingItemState: SlotFadeState{
+            public SlotFadingItemState( ISlotFadeStateEngine engine): base( engine){}
+            public override bool CanEnter(){
+                if( engine.IsFadingItem())
+                    return false;
+                else
+                    return true;
+            }
+            public override void Enter(){
+                RunFadeItemProcess();
+            }
         }
 }

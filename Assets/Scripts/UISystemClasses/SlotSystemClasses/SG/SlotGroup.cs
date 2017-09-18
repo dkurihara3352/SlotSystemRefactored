@@ -18,6 +18,7 @@ namespace UISystem{
 		bool IsReorderable();
 		bool IsFillable();
 		bool IsExchangeable();
+		bool IsPotentialDropTargetFor( ISlottableItem pickedItem);
 		
 		void TearDownAsDestSG();
 		void SetUpAsDestSG();
@@ -26,6 +27,7 @@ namespace UISystem{
 		ISlot CalculateDestSlot( ISlot hoveredSlot);
 		void SwitchDestinationSlot( ISlot destSlot);
 		void Reorder(ISlot toSlot);
+		void Reindex();
 	}
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
 		public SlotGroup(RectTransformFake rectTrans, ISGConstructorArg constArg): base(rectTrans, constArg.UISelStateRepo(), constArg.TapCommand()){
@@ -181,7 +183,7 @@ namespace UISystem{
 		}
 			bool _isReorderable;
 		public virtual bool IsFillable(){
-			return HasEmptySlot();
+			return HasEmptySlot() || HasIncrementable();
 		}
 		bool HasEmptySlot(){
 			foreach(var slot in Slots())
@@ -189,8 +191,14 @@ namespace UISystem{
 					return true;
 			return false;
 		}
+		bool HasIncrementable(){
+			foreach( var slot in Slots())
+				if(slot.IsIncrementable())
+					return true;
+			return false;
+		}
 		public bool IsExchangeable(){
-			return ExchangeableSlots().Count == 1;
+			return ExchangeableSlots().Count != 0;
 		}
 		public List<ISlot> ExchangeableSlots(){
 			List<ISlot> result = new List<ISlot>();
@@ -217,10 +225,19 @@ namespace UISystem{
 			_acceptsItemCommand = comm;
 		}
 			IAcceptsItemCommand _acceptsItemCommand;
-		public override bool IsHovered(){
-			return SSM().HoveredSSE() == this;
+		public virtual bool IsPotentialDropTargetFor( ISlottableItem pickedItem){
+			if(SSM().SourceSG() == this)
+				return true;
+			else{
+				if( AcceptsItem( pickedItem)){
+					if( IsFillable() || IsExchangeable())
+						return true;
+					else
+						return false;
+				}else
+					return false;
+			}
 		}
-
 
 		ISlot DestinationSlot(){
 			return _destinationSlot;
@@ -310,7 +327,10 @@ namespace UISystem{
 			return IsExchangeable() && IsFillable();
 		}
 		ISlot ExchangeTargetSlot(){
-			return ExchangeableSlots()[0];
+			List<ISlot> sortedExchangeableSlots = new List<ISlot>( ExchangeableSlots());
+			sortedExchangeableSlots.Sort( new ItemIDOrderComparer());
+			ISlot targetSlot = sortedExchangeableSlots[0];
+			return targetSlot;
 		}
 		ISlot FillTargetSlot(){
 			return FirstEmptySlot();
@@ -318,6 +338,16 @@ namespace UISystem{
 		public void Reorder(ISlot toSlot){
 			/*	from PickedItemSlot to toSlot
 			*/
+		}
+		bool IsReordering(){
+
+		}
+		void WaitForReorder(){
+			
+		}
+
+		public void Reindex(){
+			
 		}
 
 		public void Refresh(){

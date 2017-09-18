@@ -8,11 +8,13 @@ namespace UISystem{
 		void InitializeSlotSystemOnActivate();
 		List<ISlotSystemElement> SlotSystemElements();
 		
+		ISlot PickedSlot();
 		ISlottableItem PickedItem();
-		int PickedQuantity();
 		ISlotGroup SourceSG();
 		void SetPicked( ISlot pickedSlot);
-		// void SetDraggedIcon( IDraggedIcon icon);
+		void PostPickFilter();
+
+
 		ISlotSystemElement HoveredSSE();
 		void SetHoveredSSE(ISlotSystemElement hoveredSSE);
 
@@ -93,9 +95,6 @@ namespace UISystem{
 				_pickedItem = item;
 			}
 				ISlottableItem _pickedItem;
-			public int PickedQuantity(){
-				return PickedItem().Quantity();
-			}
 			public ISlotGroup SourceSG(){
 				return _sourceSG;
 			}
@@ -114,10 +113,13 @@ namespace UISystem{
 					SetSourceSG( null);
 				}
 			}
-			// public void SetDraggedIcon( IDraggedIcon icon){
-			// 	_draggedIcon = icon;
-			// }
-			// 	IDraggedIcon _draggedIcon;
+			public void PostPickFilter(){
+				foreach(ISlotGroup sg in SlotGroups())
+					if(sg.IsPotentialDropTargetFor( PickedItem()))
+						sg.MakeSelectable();
+					else
+						sg.MakeUnselectable();
+			}
 
 			public ISlotSystemElement HoveredSSE(){
 				return _hoveredSSE;
