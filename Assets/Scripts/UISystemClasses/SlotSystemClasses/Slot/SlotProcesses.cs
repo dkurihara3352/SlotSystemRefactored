@@ -39,21 +39,38 @@ namespace UISystem{
 				engine.WaitForAction();
 			}
 		}
-	/* FadeProc */
-		public interface ISlotFadeProcess: IUIProcess{}
-		public abstract class SlotFadeProcess: UIProcess, ISlotFadeProcess{
-			protected ISlotFadeStateEngine engine;
-			public SlotFadeProcess( IEnumeratorFake coroutine, ISlotFadeStateEngine engine): base( coroutine){
+	/* ItemVisualUpdateProcs */
+		public interface IItemVisualUpdateProcess: IUIProcess{}
+		public abstract class ItemVisualUpdateProcess: UIProcess, IItemVisualUpdateProcess{
+			protected IItemVisualUpdateEngine engine;
+			public ItemVisualUpdateProcess( IEnumeratorFake coroutine, IItemVisualUpdateEngine engine): base( coroutine){
 				this.engine = engine;
 			}
 		}
-		public class SlotWaitForItemFadeProcess: SlotFadeProcess{
-			public SlotWaitForItemFadeProcess( IEnumeratorFake coroutine, ISlotFadeStateEngine engine): base( coroutine, engine){}
+		public class WaitForItemVisualUpdateProcess: ItemVisualUpdateProcess{
+			public WaitForItemVisualUpdateProcess( IEnumeratorFake coroutine, IItemVisualUpdateEngine engine): base( coroutine, engine){}
 		}
-		public class SlotFadeItemProcess: SlotFadeProcess{
-			public SlotFadeItemProcess( IEnumeratorFake coroutine, ISlotFadeStateEngine engine): base( coroutine, engine){}
+		public class UpdateItemVisualProcess: ItemVisualUpdateProcess{
+			public UpdateItemVisualProcess( IEnumeratorFake coroutine, IItemVisualUpdateEngine engine): base( coroutine, engine){}
 			public override void Expire(){
-				engine.WaitForItemFade();
+				engine.WaitForItemVisualUpdate();
 			}
+		}
+	
+	
+	/*	GhostifyProc */
+		public interface IGhostificationProcess: IUIProcess{}
+		public abstract class GhostificationProcess: UIProcess, IGhostificationProcess{
+			protected IGhostificationEngine engine;
+			public GhostificationProcess( IEnumeratorFake coroutine, IGhostificationEngine engine): base( coroutine){
+				this.engine = engine;
+			}
+		}
+
+		public class UnghostifyProcess: GhostificationProcess{
+			public UnghostifyProcess( IEnumeratorFake coroutine, IGhostificationEngine engine): base( coroutine, engine){}
+		}
+		public class GhostifyProcess: GhostificationProcess{
+			public GhostifyProcess( IEnumeratorFake coroutine, IGhostificationEngine engine): base( coroutine, engine){}
 		}
 }

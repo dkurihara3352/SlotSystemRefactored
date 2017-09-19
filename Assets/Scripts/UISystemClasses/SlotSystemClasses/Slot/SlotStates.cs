@@ -129,45 +129,87 @@ namespace UISystem{
             }
         }
     /* Slot Fade State */
-        public interface ISlotFadeState: IUIState{
+        public interface IItemVisualUpdateState: IUIState{
         }
-        public abstract class SlotFadeState: ISlotFadeState{
-            protected ISlotFadeStateEngine engine;
-            public SlotFadeState( ISlotFadeStateEngine engine){
+        public abstract class ItemVisualUpdateState: IItemVisualUpdateState{
+            protected IItemVisualUpdateEngine engine;
+            public ItemVisualUpdateState( IItemVisualUpdateEngine engine){
                 this.engine = engine;
             }
             public abstract bool CanEnter();
             public abstract void Enter();
             public virtual void Exit(){}
-            protected void RunWaitForItemFadeProcess(){
-                engine.SetAndRunFadeProcess( new SlotWaitForItemFadeProcess( engine.WaitForItemFadeCoroutine(), engine));
+            protected void RunWaitForItemVisualUpdateProcess(){
+                engine.SetAndRunItemVisualUpdateProcess( new WaitForItemVisualUpdateProcess( engine.WaitForItemVisualUpdateCoroutine(), engine));
             }
-            protected void RunFadeItemProcess(){
-                engine.SetAndRunFadeProcess( new SlotFadeItemProcess( engine.FadeItemCoroutine(), engine));
+            protected void RunUpdateItemVisualProcess(){
+                engine.SetAndRunItemVisualUpdateProcess( new UpdateItemVisualProcess( engine.UpdateItemVisualCoroutine(), engine));
             }
         }
-        public class SlotWaitingForItemFadeState: SlotFadeState{
-            public SlotWaitingForItemFadeState( ISlotFadeStateEngine engine): base( engine){}
+        public class WaitingForItemVisualUpdateState: ItemVisualUpdateState{
+            public WaitingForItemVisualUpdateState( IItemVisualUpdateEngine engine): base( engine){}
             public override bool CanEnter(){
-                if( engine.IsWaitingForItemFade())
+                if( engine.IsWaitingForItemVisualUpdate())
                     return false;
                 else
                     return true;
             }
             public override void Enter(){
-                RunWaitForItemFadeProcess();
+                RunWaitForItemVisualUpdateProcess();
             }
         }
-        public class SlotFadingItemState: SlotFadeState{
-            public SlotFadingItemState( ISlotFadeStateEngine engine): base( engine){}
+        public class UpdatingItemVisualState: ItemVisualUpdateState{
+            public UpdatingItemVisualState( IItemVisualUpdateEngine engine): base( engine){}
             public override bool CanEnter(){
-                if( engine.IsFadingItem())
+                if( engine.IsUpdatingItemVisual())
                     return false;
                 else
                     return true;
             }
             public override void Enter(){
-                RunFadeItemProcess();
+                RunUpdateItemVisualProcess();
+            }
+        }
+    /* GhostificationState */
+        public interface IGhostificationState: IUIState{
+        }
+        public abstract class GhostificationState: IGhostificationState{
+            protected IGhostificationEngine engine;
+            public GhostificationState( IGhostificationEngine engine){
+                this.engine = engine;
+            }
+            public abstract bool CanEnter();
+            public abstract void Enter();
+            public virtual void Exit(){}
+            protected void RunUnghostifyProcess(){
+                engine.SetAndRunGhostificationProcess( new UnghostifyProcess( engine.UnghostifyCoroutine(), engine));
+            }
+            protected void RunGhostifyProcess(){
+                engine.SetAndRunGhostificationProcess( new GhostifyProcess( engine.GhostifyCoroutine(), engine));
+            }
+        }
+        public class UnghostifiedState: GhostificationState{
+            public UnghostifiedState( IGhostificationEngine engine): base( engine){}
+            public override bool CanEnter(){
+                if( engine.IsUnghostified())
+                    return false;
+                else
+                    return true;
+            }
+            public override void Enter(){
+                RunUnghostifyProcess();
+            }
+        }
+        public class GhostifiedState: GhostificationState{
+            public GhostifiedState( IGhostificationEngine engine): base( engine){}
+            public override bool CanEnter(){
+                if( engine.IsGhostified())
+                    return false;
+                else
+                    return true;
+            }
+            public override void Enter(){
+                RunGhostifyProcess();
             }
         }
 }

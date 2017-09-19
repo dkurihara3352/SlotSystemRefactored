@@ -26,25 +26,15 @@ namespace UISystem{
 
 		void ChangeItemInstantlyTo( ISlottableItem item);
 		void ChangeItemGraduallyTo( ISlottableItem item);
-		void WaitForItemFade();
-		void FadeItem( ISlottableItem item);
-
 		
 		void SetUpAsIncrementTarget();
 		void SetUpAsFillTarget();
 		void SetUpAsExchangeTarget();
 		void TearDownAsTarget();
 
-		bool IsReadyForExchange();
-		void WaitForExchange();
-		void GetReadyForExchange();
-
 		void GetReadyForIncrement();
 		void WaitForIncrement();
 
-		bool LeavesGhost();
-		void Ghostify();
-		void Unghostify();
 		void Refresh();
 		void Destroy();
 	}
@@ -52,18 +42,36 @@ namespace UISystem{
 		public Slot(RectTransformFake rectTrans, IUISelStateRepo selStateRepo, ITapCommand tapCommand, ISlottableItem item, bool leavesGhost): base(rectTrans, selStateRepo, tapCommand){
 			SetItem(item);
 			SetActStateEngine( new SlotActStateEngine( this));
-			SetFadeStateEngine( new SlotFadeStateEngine());
+			SetItemVisualUpdateEngine( new ItemVisualUpdateEngine());
+			SetGhostificationEngine( new GhostificationEngine());
 			InitializeStates();
 			SetLeavesGhost(leavesGhost);
 		}
-		/*	States	*/
-			public override void InitializeStates(){
-				MakeUnselectable();
-				WaitForAction();
-				WaitForItemFade();
-				WaitForIncrement();
-			}
+		public override void InitializeStates(){
+			MakeUnselectable();
+			WaitForAction();
+			WaitForItemVisualUpdate();
+			WaitForIncrement();
+			Unghostify();
+		}
+		public void Refresh(){
+			WaitForAction();
+			WaitForExchange();
+			WaitForIncrement();
+			WaitForItemVisualUpdate();
+			SetHoverIcon( null);
+			Unghostify();
+		}
+		public ISlotGroup SlotGroup(){
+			return (ISlotGroup)Parent();
+		}
+		public void Destroy(){
+			if(LeavesGhost()){
 
+			}else{
+
+			}
+		}
 		/*	Action State */
 			public ISlotActStateEngine ActStateEngine(){
 				Debug.Assert(_actStateEngine != null);
@@ -84,8 +92,6 @@ namespace UISystem{
 				SetHoverIcon( draggedIcon);
 				HoverIcon().Hover();
 				UpdatePreviewQuantity();
-				/*	picked quantity here
-				*/
 			}
 			protected virtual ISlottableItem CreateSlotIconItem( ISlottableItem item, int quantity){
 				ISlottableItem newItem = new SlottableItem( quantity, item.IsStackable(), item.ItemID());
@@ -143,56 +149,72 @@ namespace UISystem{
 				return (Item() is EmptySlottableItem);
 			}
 
+
 			public int PreviewQuantity(){
 				return _previewQuantity;
+			}
+			void SetPreveiewQuantity( int previewQua){
+				_previewQuantity = previewQua;
 			}
 				int _previewQuantity;
 			void UpdatePreviewQuantity(){
 				int newPreviewQua = Quantity() - PickedQuantity();
-				if(newPreviewQua <= 0)
+				SetPreveiewQuantity( newPreviewQua);
+				if( PreviewQuantity() > 0)
+					UpdateQuantityVisual();
+				else
 					IndicateZeroQuantity();
+			}
+			void UpdateQuantityVisual(){
 			}
 			void IndicateZeroQuantity(){
 				if( LeavesGhost())
 					Ghostify();
 				else
-					ChangeItemToEmptyInstantly();
+					ChangeItemInstantlyToEmpty();
 			}
+
+
+		/* Item Visual Update */
 
 			public void ChangeItemInstantlyTo( ISlottableItem item){
 				SetItem( item);
+				UpdateItemVisual( item);
+				ItemVisualUpdateEngine().ExpireProcess();
 			}
-			public void ChangeItemToEmptyInstantly(){
-				SetItem( new EmptySlottableItem());
+			public void ChangeItemInstantlyToEmpty(){
+				EmptySlottableItem emptyItem = new EmptySlottableItem();
+				SetItem( emptyItem);
+				UpdateItemVisual( emptyItem);
+				ItemVisualUpdateEngine().ExpireProcess();
 			}
 			public void ChangeItemGraduallyTo( ISlottableItem item){
 				SetItem( item);
-				FadeItem( item);
+				UpdateItemVisual( item);
 			}
-			ISlotFadeStateEngine FadeStateEngine(){
-				return _fadeStateEngine;
+			IItemVisualUpdateEngine ItemVisualUpdateEngine(){
+				return _itemVisualUpdateEngine;
 			}
-			void SetFadeStateEngine( ISlotFadeStateEngine engine){
-				_fadeStateEngine = engine;
+			void SetItemVisualUpdateEngine( IItemVisualUpdateEngine engine){
+				_itemVisualUpdateEngine = engine;
 			}
-				ISlotFadeStateEngine _fadeStateEngine;
-			public void WaitForItemFade(){
-				FadeStateEngine().WaitForItemFade();
+				IItemVisualUpdateEngine _itemVisualUpdateEngine;
+			public void WaitForItemVisualUpdate(){
+				ItemVisualUpdateEngine().WaitForItemVisualUpdate();
 			}
-			public void FadeItem( ISlottableItem item){
-				FadeStateEngine().FadeItem( item);
+			public void UpdateItemVisual( ISlottableItem item){
+				ItemVisualUpdateEngine().UpdateItemVisual( item);
 			}
-		/* Others */
-			public ISlotGroup SlotGroup(){
-				return (ISlotGroup)Parent();
+		
+		
+		/* Ghostification */
+			IGhostificationEngine GhostificationEngine(){
+				return _ghostificationEngine;
 			}
-			public void Destroy(){
-				if(LeavesGhost()){
-
-				}else{
-
-				}
+			void SetGhostificationEngine( IGhostificationEngine engine){
+				_ghostificationEngine = engine;
 			}
+			IGhostificationEngine _ghostificationEngine;
 			public bool LeavesGhost(){
 				return _leavesGhost;
 			}
@@ -200,13 +222,15 @@ namespace UISystem{
 				_leavesGhost = leaves;
 			}
 				bool _leavesGhost;
-			public void Ghostify(){
-
-			}
 			public void Unghostify(){
-				
+				GhostificationEngine().Unghostify();
+			}
+			public void Ghostify(){
+				GhostificationEngine().Ghostify();
 			}
 
+
+		/* Transaction */
 			public void TearDownAsTarget(){
 				SSM().MakePickedSlotWaitForIncrement();
 				WaitForExchange();
@@ -227,11 +251,11 @@ namespace UISystem{
 			}
 			public void SetUpAsExchangeTarget(){
 				GetReadyForExchange();
-				ChangeItemToEmptyInstantly();
+				ChangeItemInstantlyToEmpty();
 				Select();
 			}
 
-		/* Slot Icon */
+		/* Hover Icon */
 			IHoverIcon HoverIcon(){
 				return _hoverIcon;
 			}
@@ -259,13 +283,6 @@ namespace UISystem{
 			}
 			public void GetReadyForIncrement(){
 				HoverIcon().GetReadyForIncrement();
-			}
-
-			public void Refresh(){
-				WaitForAction();
-				WaitForExchange();
-				WaitForIncrement();
-				SetHoverIcon( null);
 			}
 	}
 }

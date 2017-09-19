@@ -49,6 +49,7 @@ namespace UISystem{
 	public interface IUIProcessSwitch<T> where T: IUIProcess{
 		T Process();
 		void SetAndRunProcess(T process);
+		void ExpireProcess();
 	}
 	public class UIProcessSwitch<T>: IUIProcessSwitch<T> where T: IUIProcess{
 		public virtual T Process(){return _process;}
@@ -66,6 +67,9 @@ namespace UISystem{
 				if(process != null)
 					process.Start();
 			}
+		}
+		public void ExpireProcess(){
+			Process().Expire();
 		}
 	}
 	/* repo */

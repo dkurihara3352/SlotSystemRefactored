@@ -8,6 +8,7 @@ namespace UISystem{
 		void InitializeOnSlotSystemActivate();
 		ISorterHandler GetSorterHandler();
 			void InstantSort();
+			void Sort();
 			void ToggleAutoSort(bool on);
 			bool IsAutoSort();
 		List<ISlot> Slots();
@@ -15,18 +16,17 @@ namespace UISystem{
 		void SetInventory(IInventory inventory);
 		void OnInventoryUpdated(object source, InventoryEventArgs e);
 		bool AcceptsItem(ISlottableItem item);
-		bool IsReorderable();
 		bool IsFillable();
 		bool IsExchangeable();
 		bool IsPotentialDropTargetFor( ISlottableItem pickedItem);
 		
 		void TearDownAsDestSG();
 		void SetUpAsDestSG();
+		
 		ISlot PickedItemSlot();
 		bool HasPickedItemSlot();
 		ISlot CalculateDestSlot( ISlot hoveredSlot);
 		void SwitchDestinationSlot( ISlot destSlot);
-		void Reorder(ISlot toSlot);
 		void Reindex();
 	}
 	public class SlotGroup : SlotSystemElement, ISlotGroup{
@@ -133,6 +133,9 @@ namespace UISystem{
 		public void InstantSort(){
 			
 		}
+		public void Sort(){
+
+		}
 		public void ToggleAutoSort(bool on){
 			GetSorterHandler().SetIsAutoSort(on);
 			SSM().Refresh();
@@ -159,7 +162,7 @@ namespace UISystem{
 		}
 
 
-		/*	intrinsic */
+		/*	Slot Transaction */
 		public bool IsExchangedOverFilled(){
 			return _isExchangedOverFilled;
 		}
@@ -239,6 +242,15 @@ namespace UISystem{
 			}
 		}
 
+
+		public void TearDownAsDestSG(){
+			Deselect();
+		}
+		public void SetUpAsDestSG(){
+			Select();
+		}
+
+
 		ISlot DestinationSlot(){
 			return _destinationSlot;
 		}
@@ -258,7 +270,7 @@ namespace UISystem{
 					else if( newDestSlot.IsEmpty())
 						newDestSlot.SetUpAsFillTarget();
 					else{
-						if( IsDestSlotSet() && !IsExchangedOverReordered())
+						if( IsDestSlotSet() && !IsExchangedOverReordered() && IsReorderable())
 							Reorder( destSlot);
 						else
 							newDestSlot.SetUpAsExchangeTarget();
@@ -266,10 +278,10 @@ namespace UISystem{
 				}
 			}
 		}
-			ISlot _destinationSlot;
-			bool IsDestSlotSet(){
-				return DestinationSlot() != null;
-			}
+		ISlot _destinationSlot;
+		bool IsDestSlotSet(){
+			return DestinationSlot() != null;
+		}
 		public ISlot CalculateDestSlot( ISlot hoveredSlot){
 			ISlot destSlot;
 			if( HasIncrementTargetSlot()){
@@ -291,12 +303,16 @@ namespace UISystem{
 			}
 			return destSlot;
 		}
-		ISlot FirstEmptySlot(){
-			foreach(var slot in Slots()){
-				if(slot.IsEmpty())
-					return slot;
-			}
+
+
+		ISlot IncrementTargetSlot(){
+			if( HasPickedItemSlot())
+				if(PickedItemSlot().IsStackable())
+					return PickedItemSlot();
 			return null;
+		}
+		bool HasIncrementTargetSlot(){
+			return IncrementTargetSlot() != null;
 		}
 		public ISlot PickedItemSlot(){
 			foreach(var slot in Slots()){
@@ -307,21 +323,6 @@ namespace UISystem{
 		}
 		public bool HasPickedItemSlot(){
 			return PickedItemSlot() != null;
-		}
-		public void TearDownAsDestSG(){
-			Deselect();
-		}
-		public void SetUpAsDestSG(){
-			Select();
-		}
-		bool HasIncrementTargetSlot(){
-			return IncrementTargetSlot() != null;
-		}
-		ISlot IncrementTargetSlot(){
-			if( HasPickedItemSlot())
-				if(PickedItemSlot().IsStackable())
-					return PickedItemSlot();
-			return null;
 		}
 		bool IsExchangeableAndFillable(){
 			return IsExchangeable() && IsFillable();
@@ -335,7 +336,17 @@ namespace UISystem{
 		ISlot FillTargetSlot(){
 			return FirstEmptySlot();
 		}
-		public void Reorder(ISlot toSlot){
+		ISlot FirstEmptySlot(){
+			foreach(var slot in Slots()){
+				if(slot.IsEmpty())
+					return slot;
+			}
+			return null;
+		}
+
+
+
+		void Reorder(ISlot toSlot){
 			/*	from PickedItemSlot to toSlot
 			*/
 		}
