@@ -44,6 +44,7 @@ namespace UISystem{
 			SetActStateEngine( new SlotActStateEngine( this));
 			SetItemVisualUpdateEngine( new ItemVisualUpdateEngine());
 			SetGhostificationEngine( new GhostificationEngine());
+			SetQuantityVisualUpdateEngine( new QuantityVisualUpdateEngine());
 			InitializeStates();
 			SetLeavesGhost(leavesGhost);
 		}
@@ -52,6 +53,7 @@ namespace UISystem{
 			WaitForAction();
 			WaitForItemVisualUpdate();
 			WaitForIncrement();
+			WaitForQuantityVisualUpdate();
 			Unghostify();
 		}
 		public void Refresh(){
@@ -59,6 +61,7 @@ namespace UISystem{
 			WaitForExchange();
 			WaitForIncrement();
 			WaitForItemVisualUpdate();
+			WaitForQuantityVisualUpdate();
 			SetHoverIcon( null);
 			Unghostify();
 		}
@@ -165,7 +168,21 @@ namespace UISystem{
 				else
 					IndicateZeroQuantity();
 			}
+
+
+		/* Quantity Visual Update  */
+			IQuantityVisualUpdateEngine QuantityVisualUpdateEngine(){
+				return _quantityVisualUpdateEngine;
+			}
+			void SetQuantityVisualUpdateEngine( IQuantityVisualUpdateEngine engine){
+				_quantityVisualUpdateEngine = engine;
+			}
+			IQuantityVisualUpdateEngine _quantityVisualUpdateEngine;
+			void WaitForQuantityVisualUpdate(){
+				QuantityVisualUpdateEngine().WaitForQuantityVisualUpdate();
+			}
 			void UpdateQuantityVisual(){
+				QuantityVisualUpdateEngine().UpdateQuantityVisual( PreviewQuantity());
 			}
 			void IndicateZeroQuantity(){
 				if( LeavesGhost())

@@ -73,4 +73,17 @@ namespace UISystem{
 		public class GhostifyProcess: GhostificationProcess{
 			public GhostifyProcess( IEnumeratorFake coroutine, IGhostificationEngine engine): base( coroutine, engine){}
 		}
+
+
+	/* QuantityVisualUpdate Process */
+		public interface IQuantityVisualUpdateProcess: IUIProcess{}
+		public abstract class QuantityVisualUpdateProcess: UIProcess, IQuantityVisualUpdateProcess{
+			protected IQuantityVisualUpdateEngine engine;
+			public QuantityVisualUpdateProcess( IEnumeratorFake coroutine, IQuantityVisualUpdateEngine engine): base( coroutine){
+				this.engine = engine;
+			}
+		}
+		public class UpdateQuantityVisualProcess: QuantityVisualUpdateProcess{
+			public UpdateQuantityVisualProcess( IEnumeratorFake coroutine, IQuantityVisualUpdateEngine engine): base( coroutine, engine){}
+		}
 }

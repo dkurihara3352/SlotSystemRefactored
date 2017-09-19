@@ -212,4 +212,43 @@ namespace UISystem{
                 RunGhostifyProcess();
             }
         }
+    /* Update Quantity Visual States */
+        public interface IQuantityVisualUpdateState: IUIState{
+        }
+        public abstract class QuantityVisualUpdateState: IQuantityVisualUpdateState{
+            protected IQuantityVisualUpdateEngine engine;
+            public QuantityVisualUpdateState( IQuantityVisualUpdateEngine engine){
+                this.engine = engine;
+            }
+            public abstract bool CanEnter();
+            public abstract void Enter();
+            public virtual void Exit(){}
+            protected void RunUpdateQuantityVisualProcess(){
+                engine.SetAndRunQuantityVisualUpdateProcess( new UpdateQuantityVisualProcess( engine.UpdateQuantityVisualCoroutine(), engine));
+            }
+        }
+        public class WaitingForQuantityVisualUpdateState: QuantityVisualUpdateState{
+            public WaitingForQuantityVisualUpdateState( IQuantityVisualUpdateEngine engine): base( engine){}
+            public override bool CanEnter(){
+                if( engine.IsWaitingForQuantityVisualUpdate())
+                    return false;
+                else
+                    return true;
+            }
+            public override void Enter(){
+                // do nothing
+            }
+        }
+        public class UpdatingQuantityVisualState: QuantityVisualUpdateState{
+            public UpdatingQuantityVisualState( IQuantityVisualUpdateEngine engine): base( engine){}
+            public override bool CanEnter(){
+                if( engine.IsUpdatingQuantityVisual())
+                    return false;
+                else
+                    return true;
+            }
+            public override void Enter(){
+                RunUpdateQuantityVisualProcess();
+            }
+        }
 }
